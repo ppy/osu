@@ -233,10 +233,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     new OsuMenuItem("Give host", MenuItemType.Standard, () =>
                     {
                         // Ensure the local user is still host.
-                        if (Room.Host?.UserID != api.LocalUser.Value.Id)
+                        if (!Client.IsHost)
                             return;
 
                         Client.TransferHost(targetUser);
+                    }),
+                    new OsuMenuItem("Kick", MenuItemType.Destructive, () =>
+                    {
+                        // Ensure the local user is still host.
+                        if (!Client.IsHost)
+                            return;
+
+                        Client.KickUser(targetUser);
                     })
                 };
             }
@@ -247,6 +255,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             public KickButton()
             {
                 Icon = FontAwesome.Solid.UserTimes;
+                TooltipText = "Kick";
             }
 
             [BackgroundDependencyLoader]
