@@ -34,7 +34,18 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override void OnApply(HitExplosionEntry entry)
         {
             base.OnApply(entry);
+            if (IsLoaded)
+                apply(entry);
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            apply(Entry);
+        }
+
+        private void apply(HitExplosionEntry entry)
+        {
             ApplyTransformsAt(double.MinValue, true);
             ClearTransforms(true);
 
