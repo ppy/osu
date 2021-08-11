@@ -50,8 +50,10 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Localisation;
+using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
 
 namespace osu.Game
@@ -221,7 +223,20 @@ namespace osu.Game
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
-            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
+
+            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
+
+            try
+            {
+                Ruleset.Value = preferredRuleset ?? RulesetStore.AvailableRulesets.First();
+            }
+            catch (Exception e)
+            {
+                // on startup, a ruleset may be selected which has compatibility issues.
+                Logger.Error(e, $@"Failed to switch to preferred ruleset {preferredRuleset}.");
+                Ruleset.Value = RulesetStore.AvailableRulesets.First();
+            }
+
             Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
 
             // bind config int to database SkinInfo
@@ -288,6 +303,10 @@ namespace osu.Game
 
                 case LinkAction.OpenChannel:
                     ShowChannel(link.Argument);
+                    break;
+
+                case LinkAction.SearchBeatmapSet:
+                    SearchBeatmapSet(link.Argument);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -361,6 +380,12 @@ namespace osu.Game
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
 
         /// <summary>
+        /// Shows the beatmap listing overlay, with the given <paramref name="query"/> in the search box.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        public void SearchBeatmapSet(string query) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithSearch(query));
+
+        /// <summary>
         /// Show a wiki's page as an overlay
         /// </summary>
         /// <param name="path">The wiki page to show</param>
@@ -426,9 +451,12 @@ namespace osu.Game
         {
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
-            var databasedScoreInfo = score.OnlineScoreID != null
-                ? ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID)
-                : ScoreManager.Query(s => s.Hash == score.Hash);
+            ScoreInfo databasedScoreInfo = null;
+
+            if (score.OnlineScoreID != null)
+                databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
+
+            databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == score.Hash);
 
             if (databasedScoreInfo == null)
             {
@@ -473,6 +501,10 @@ namespace osu.Game
         public override Task Import(params ImportTask[] imports)
         {
             // encapsulate task as we don't want to begin the import process until in a ready state.
+
+            // ReSharper disable once AsyncVoidLambda
+            // TODO: This is bad because `new Task` doesn't have a Func<Task?> override.
+            // Only used for android imports and a bit of a mess. Probably needs rethinking overall.
             var importTask = new Task(async () => await base.Import(imports).ConfigureAwait(false));
 
             waitForReady(() => this, _ => importTask.Start());
@@ -484,6 +516,8 @@ namespace osu.Game
 
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
 
+        protected virtual HighPerformanceSession CreateHighPerformanceSession() => new HighPerformanceSession();
+
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
         #region Beatmap progression
@@ -491,16 +525,11 @@ namespace osu.Game
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
             beatmap.OldValue?.CancelAsyncLoad();
-
-            updateModDefaults();
-
             beatmap.NewValue?.BeginAsyncLoad();
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            updateModDefaults();
-
             // a lease may be taken on the mods bindable, at which point we can't really ensure valid mods.
             if (SelectedMods.Disabled)
                 return;
@@ -509,19 +538,6 @@ namespace osu.Game
             {
                 // ensure we always have a valid set of mods.
                 SelectedMods.Value = mods.NewValue.Except(invalid).ToArray();
-            }
-        }
-
-        private void updateModDefaults()
-        {
-            BeatmapDifficulty baseDifficulty = Beatmap.Value.BeatmapInfo.BaseDifficulty;
-
-            if (baseDifficulty != null && SelectedMods.Value.Any(m => m is IApplicableToDifficulty))
-            {
-                var adjustedDifficulty = baseDifficulty.Clone();
-
-                foreach (var mod in SelectedMods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ReadFromDifficulty(adjustedDifficulty);
             }
         }
 
@@ -577,8 +593,16 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
-                var cultureCode = language.ToString();
-                Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+                var cultureCode = language.ToCultureCode();
+
+                try
+                {
+                    Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                }
             }
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
@@ -601,9 +625,9 @@ namespace osu.Game
 
             LocalConfig.LookupKeyBindings = l =>
             {
-                var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l).ToArray();
+                var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l);
 
-                if (combinations.Length == 0)
+                if (combinations.Count == 0)
                     return "none";
 
                 return string.Join(" or ", combinations);
@@ -712,7 +736,6 @@ namespace osu.Game
                 PostNotification = n => notifications.Post(n),
             }, Add, true);
 
-            loadComponentSingleFile(difficultyRecommender, Add);
             loadComponentSingleFile(stableImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
@@ -728,12 +751,13 @@ namespace osu.Game
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add);
+            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add, true);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -752,8 +776,11 @@ namespace osu.Game
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
 
+            loadComponentSingleFile(CreateHighPerformanceSession(), Add);
+
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
+            Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
 
@@ -905,7 +932,7 @@ namespace osu.Game
 
                     try
                     {
-                        Logger.Log($"Loading {component}...", level: LogLevel.Debug);
+                        Logger.Log($"Loading {component}...");
 
                         // Since this is running in a separate thread, it is possible for OsuGame to be disposed after LoadComponentAsync has been called
                         // throwing an exception. To avoid this, the call is scheduled on the update thread, which does not run if IsDisposed = true
@@ -925,7 +952,7 @@ namespace osu.Game
 
                         await task.ConfigureAwait(false);
 
-                        Logger.Log($"Loaded {component}!", level: LogLevel.Debug);
+                        Logger.Log($"Loaded {component}!");
                     }
                     catch (OperationCanceledException)
                     {
@@ -1031,7 +1058,7 @@ namespace osu.Game
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
                 API.Activity.BindTo(newOsuScreen.Activity);
 
-                MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
+                MusicController.AllowTrackAdjustments = newOsuScreen.AllowTrackAdjustments;
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();

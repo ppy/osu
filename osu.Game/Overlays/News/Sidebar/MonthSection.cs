@@ -15,13 +15,18 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Diagnostics;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Platform;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
     public class MonthSection : CompositeDrawable
     {
         private const int animation_duration = 250;
+        private Sample sampleOpen;
+        private Sample sampleClose;
 
         public readonly BindableBool Expanded = new BindableBool();
 
@@ -51,6 +56,21 @@ namespace osu.Game.Overlays.News.Sidebar
                     }
                 }
             };
+
+            Expanded.ValueChanged += expanded =>
+            {
+                if (expanded.NewValue)
+                    sampleOpen?.Play();
+                else
+                    sampleClose?.Play();
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
+            sampleClose = audio.Samples.Get(@"UI/dropdown-close");
         }
 
         private class DropdownHeader : OsuClickableContainer
@@ -104,6 +124,7 @@ namespace osu.Game.Overlays.News.Sidebar
             private readonly APINewsPost post;
 
             public PostButton(APINewsPost post)
+                : base(HoverSampleSet.Submit)
             {
                 this.post = post;
 

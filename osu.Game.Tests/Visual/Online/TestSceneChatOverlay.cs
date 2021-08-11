@@ -82,7 +82,8 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     switch (req)
                     {
-                        case JoinChannelRequest _:
+                        case JoinChannelRequest joinChannel:
+                            joinChannel.TriggerSuccess();
                             return true;
                     }
 
@@ -329,22 +330,11 @@ namespace osu.Game.Tests.Visual.Online
             InputManager.ReleaseKey(Key.AltLeft);
         }
 
-        private void pressCloseDocumentKeys() => pressKeysFor(PlatformActionType.DocumentClose);
+        private void pressCloseDocumentKeys() => InputManager.Keys(PlatformAction.DocumentClose);
 
-        private void pressNewTabKeys() => pressKeysFor(PlatformActionType.TabNew);
+        private void pressNewTabKeys() => InputManager.Keys(PlatformAction.TabNew);
 
-        private void pressRestoreTabKeys() => pressKeysFor(PlatformActionType.TabRestore);
-
-        private void pressKeysFor(PlatformActionType type)
-        {
-            var binding = host.PlatformKeyBindings.First(b => ((PlatformAction)b.Action).ActionType == type);
-
-            foreach (var k in binding.KeyCombination.Keys)
-                InputManager.PressKey((Key)k);
-
-            foreach (var k in binding.KeyCombination.Keys)
-                InputManager.ReleaseKey((Key)k);
-        }
+        private void pressRestoreTabKeys() => InputManager.Keys(PlatformAction.TabRestore);
 
         private void clickDrawable(Drawable d)
         {

@@ -356,8 +356,8 @@ namespace osu.Game.Rulesets.UI
                     // This is done before Apply() so that the state is updated once when the hitobject is applied.
                     if (mods != null)
                     {
-                        foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
-                            m.ApplyToDrawableHitObjects(dho.Yield());
+                        foreach (var m in mods.OfType<IApplicableToDrawableHitObject>())
+                            m.ApplyToDrawableHitObject(dho);
                     }
                 }
 

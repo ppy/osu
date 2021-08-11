@@ -16,6 +16,11 @@ namespace osu.Game.Online.API
         /// </summary>
         protected virtual string FileExtension { get; } = @".tmp";
 
+        protected APIDownloadRequest()
+        {
+            base.Success += () => Success?.Invoke(filename);
+        }
+
         protected override WebRequest CreateWebRequest()
         {
             var file = Path.GetTempFileName();
@@ -37,12 +42,6 @@ namespace osu.Game.Online.API
             this.filename = filename;
 
             TriggerSuccess();
-        }
-
-        internal override void TriggerSuccess()
-        {
-            base.TriggerSuccess();
-            Success?.Invoke(filename);
         }
 
         public event APIProgressHandler Progressed;

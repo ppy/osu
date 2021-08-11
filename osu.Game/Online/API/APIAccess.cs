@@ -148,6 +148,16 @@ namespace osu.Game.Online.API
 
                         var userReq = new GetUserRequest();
 
+                        userReq.Failure += ex =>
+                        {
+                            if (ex is WebException webException && webException.Message == @"Unauthorized")
+                            {
+                                log.Add(@"Login no longer valid");
+                                Logout();
+                            }
+                            else
+                                failConnectionProcess();
+                        };
                         userReq.Success += u =>
                         {
                             localUser.Value = u;
@@ -167,6 +177,7 @@ namespace osu.Game.Online.API
                         // getting user's friends is considered part of the connection process.
                         var friendsReq = new GetFriendsRequest();
 
+                        friendsReq.Failure += _ => failConnectionProcess();
                         friendsReq.Success += res =>
                         {
                             friends.AddRange(res);
@@ -246,8 +257,8 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
-        public IHubClientConnector GetHubConnector(string clientName, string endpoint) =>
-            new HubClientConnector(clientName, endpoint, this, versionHash);
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) =>
+            new HubClientConnector(clientName, endpoint, this, versionHash, preferMessagePack);
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {

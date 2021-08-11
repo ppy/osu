@@ -4,6 +4,8 @@
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -43,6 +45,8 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private const float transition_length = 500;
+        private Sample sampleChecked;
+        private Sample sampleUnchecked;
 
         public OsuTabControlCheckbox()
         {
@@ -77,8 +81,7 @@ namespace osu.Game.Graphics.UserInterface
                     Colour = Color4.White,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                },
-                new HoverClickSounds()
+                }
             };
 
             Current.ValueChanged += selected =>
@@ -91,10 +94,13 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             if (accentColour == null)
                 AccentColour = colours.Blue;
+
+            sampleChecked = audio.Samples.Get(@"UI/check-on");
+            sampleUnchecked = audio.Samples.Get(@"UI/check-off");
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -109,6 +115,16 @@ namespace osu.Game.Graphics.UserInterface
                 updateFade();
 
             base.OnHoverLost(e);
+        }
+
+        protected override void OnUserChange(bool value)
+        {
+            base.OnUserChange(value);
+
+            if (value)
+                sampleChecked?.Play();
+            else
+                sampleUnchecked?.Play();
         }
 
         private void updateFade()

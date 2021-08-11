@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly bool noVideo;
 
-        public string TooltipText => button.Enabled.Value ? "download this beatmap" : "login to download";
+        public LocalisableString TooltipText => button.Enabled.Value ? "download this beatmap" : "login to download";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 

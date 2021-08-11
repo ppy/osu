@@ -176,7 +176,7 @@ namespace osu.Game.Tests.Visual
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
         protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
-            CreateWorkingBeatmap(CreateBeatmap(ruleset), null);
+            CreateWorkingBeatmap(CreateBeatmap(ruleset));
 
         protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
             new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, Audio);
@@ -350,7 +350,7 @@ namespace osu.Game.Tests.Visual
                     if (CurrentTime >= Length)
                     {
                         Stop();
-                        RaiseCompleted();
+                        // `RaiseCompleted` is not called here to prevent transitioning to the next song.
                     }
                 }
             }

@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -126,15 +127,15 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Padding = new MarginPadding { Horizontal = 10 },
                                 Children = new Drawable[]
                                 {
-                                    generalFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>(@"General"),
+                                    generalFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>(BeatmapsStrings.ListingSearchFiltersGeneral),
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
-                                    categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(@"Categories"),
-                                    genreFilter = new BeatmapSearchFilterRow<SearchGenre>(@"Genre"),
-                                    languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(@"Language"),
-                                    extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(@"Extra"),
+                                    categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(BeatmapsStrings.ListingSearchFiltersStatus),
+                                    genreFilter = new BeatmapSearchFilterRow<SearchGenre>(BeatmapsStrings.ListingSearchFiltersGenre),
+                                    languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(BeatmapsStrings.ListingSearchFiltersLanguage),
+                                    extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(BeatmapsStrings.ListingSearchFiltersExtra),
                                     ranksFilter = new BeatmapSearchScoreFilterRow(),
-                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"Played"),
-                                    explicitContentFilter = new BeatmapSearchFilterRow<SearchExplicit>(@"Explicit Content"),
+                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(BeatmapsStrings.ListingSearchFiltersPlayed),
+                                    explicitContentFilter = new BeatmapSearchFilterRow<SearchExplicit>(BeatmapsStrings.ListingSearchFiltersNsfw),
                                 }
                             }
                         }
@@ -172,7 +173,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             public BeatmapSearchTextBox()
             {
-                PlaceholderText = @"type in keywords...";
+                PlaceholderText = BeatmapsStrings.ListingSearchPrompt;
             }
 
             protected override bool OnKeyDown(KeyDownEvent e)

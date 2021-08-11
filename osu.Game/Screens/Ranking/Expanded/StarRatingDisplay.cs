@@ -4,9 +4,7 @@
 using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -25,6 +23,7 @@ namespace osu.Game.Screens.Ranking.Expanded
     public class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
         private Box background;
+        private FillFlowContainer content;
         private OsuTextFlowContainer textFlow;
 
         [Resolved]
@@ -66,7 +65,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                         },
                     }
                 },
-                new FillFlowContainer
+                content = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = 8, Vertical = 4 },
@@ -80,7 +79,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                             Origin = Anchor.CentreLeft,
                             Size = new Vector2(7),
                             Icon = FontAwesome.Solid.Star,
-                            Colour = Color4.Black
                         },
                         textFlow = new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
                         {
@@ -109,24 +107,20 @@ namespace osu.Game.Screens.Ranking.Expanded
             string fractionPart = starRatingParts[1];
             string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
-            var rating = Current.Value.DifficultyRating;
+            var stars = Current.Value.Stars;
 
-            background.Colour = rating == DifficultyRating.ExpertPlus
-                ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
-                : (ColourInfo)colours.ForDifficultyRating(rating);
+            background.Colour = colours.ForStarDifficulty(stars);
+            content.Colour = stars >= 6.5 ? colours.Orange1 : Color4.Black;
 
             textFlow.Clear();
-
             textFlow.AddText($"{wholePart}", s =>
             {
-                s.Colour = Color4.Black;
                 s.Font = s.Font.With(size: 14);
                 s.UseFullGlyphHeight = false;
             });
 
             textFlow.AddText($"{separator}{fractionPart}", s =>
             {
-                s.Colour = Color4.Black;
                 s.Font = s.Font.With(size: 7);
                 s.UseFullGlyphHeight = false;
             });

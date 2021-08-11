@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -62,7 +63,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
             else
             {
-                length.Value = TimeSpan.FromMilliseconds(beatmap.Length).ToString(@"m\:ss");
+                length.Value = TimeSpan.FromMilliseconds(beatmap.Length).ToFormattedDuration();
                 circleCount.Value = beatmap.OnlineInfo.CircleCount.ToString();
                 sliderCount.Value = beatmap.OnlineInfo.SliderCount.ToString();
             }
@@ -95,7 +96,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             private readonly OsuSpriteText value;
 
-            public string TooltipText { get; }
+            public LocalisableString TooltipText { get; }
 
             public LocalisableString Value
             {

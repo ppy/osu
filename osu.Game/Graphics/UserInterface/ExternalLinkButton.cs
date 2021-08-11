@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osuTK;
 using osuTK.Graphics;
@@ -22,14 +23,20 @@ namespace osu.Game.Graphics.UserInterface
         [Resolved]
         private GameHost host { get; set; }
 
+        private readonly SpriteIcon linkIcon;
+
         public ExternalLinkButton(string link = null)
         {
             Link = link;
             Size = new Vector2(12);
-            InternalChild = new SpriteIcon
+            InternalChildren = new Drawable[]
             {
-                Icon = FontAwesome.Solid.ExternalLinkAlt,
-                RelativeSizeAxes = Axes.Both
+                linkIcon = new SpriteIcon
+                {
+                    Icon = FontAwesome.Solid.ExternalLinkAlt,
+                    RelativeSizeAxes = Axes.Both
+                },
+                new HoverClickSounds(HoverSampleSet.Submit)
             };
         }
 
@@ -41,13 +48,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            InternalChild.FadeColour(hoverColour, 500, Easing.OutQuint);
+            linkIcon.FadeColour(hoverColour, 500, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            InternalChild.FadeColour(Color4.White, 500, Easing.OutQuint);
+            linkIcon.FadeColour(Color4.White, 500, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -58,6 +65,6 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        public string TooltipText => "view in browser";
+        public LocalisableString TooltipText => "view in browser";
     }
 }

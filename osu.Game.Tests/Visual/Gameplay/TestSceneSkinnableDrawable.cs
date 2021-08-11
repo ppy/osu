@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
@@ -74,7 +75,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Children = new[]
                         {
                             new ExposedSkinnableDrawable("default", _ => new DefaultBox()),
-                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.ScaleToFit),
+                            new ExposedSkinnableDrawable("available", _ => new DefaultBox()),
                             new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.NoScaling)
                         }
                     },
@@ -329,6 +330,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
 
             public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => throw new NotImplementedException();
+
+            public IEnumerable<ISkin> AllSources => throw new NotImplementedException();
 
             public event Action SourceChanged
             {

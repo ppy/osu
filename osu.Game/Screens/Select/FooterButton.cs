@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
         private readonly Box light;
 
         public FooterButton()
-            : base(HoverSampleSet.SongSelect)
+            : base(HoverSampleSet.Button)
         {
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Select
         {
             if (action == Hotkey)
             {
-                Click();
+                TriggerClick();
                 return true;
             }
 

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             RelativeSizeAxes = Axes.X;
         }
 
-        protected override string FormatCount(long count) => count.ToString("N0");
+        protected override LocalisableString FormatCount(long count) => count.ToString("N0");
 
         protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
         {

@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -211,7 +212,7 @@ namespace osu.Game.Overlays.Profile
             protected readonly OsuSpriteText Counter, BottomText;
             private readonly Box background;
 
-            protected UserGraphTooltip(string tooltipCounterName)
+            protected UserGraphTooltip(LocalisableString tooltipCounterName)
             {
                 AutoSizeAxes = Axes.Both;
                 Masking = true;

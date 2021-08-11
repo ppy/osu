@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Play.HUD
 
         public Anchor Origin { get; set; }
 
+        /// <inheritdoc cref="ISkinnableDrawable.UsesFixedAnchor"/>
+        public bool UsesFixedAnchor { get; set; }
+
         public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
 
         [JsonConstructor]
@@ -52,6 +55,9 @@ namespace osu.Game.Screens.Play.HUD
             Scale = component.Scale;
             Anchor = component.Anchor;
             Origin = component.Origin;
+
+            if (component is ISkinnableDrawable skinnable)
+                UsesFixedAnchor = skinnable.UsesFixedAnchor;
 
             if (component is Container<Drawable> container)
             {

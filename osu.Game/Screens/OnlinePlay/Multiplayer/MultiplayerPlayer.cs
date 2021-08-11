@@ -96,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            ((IBindable<bool>)leaderboard.Expanded).BindTo(IsBreakTime);
+            ((IBindable<bool>)leaderboard.Expanded).BindTo(HUDOverlay.ShowHud);
         }
 
         protected override void StartGameplay()
@@ -125,9 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             const float padding = 44; // enough margin to avoid the hit error display.
 
-            leaderboard.Position = new Vector2(
-                padding,
-                padding + HUDOverlay.TopScoringElementsHeight);
+            leaderboard.Position = new Vector2(padding, padding + HUDOverlay.TopScoringElementsHeight);
         }
 
         private void onMatchStarted() => Scheduler.Add(() =>

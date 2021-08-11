@@ -1,30 +1,27 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
-using osu.Game.Tournament.Configuration;
 using osu.Game.Tests;
+using osu.Game.Tournament.Configuration;
 
 namespace osu.Game.Tournament.Tests.NonVisual
 {
     [TestFixture]
-    public class CustomTourneyDirectoryTest
+    public class CustomTourneyDirectoryTest : TournamentHostTest
     {
         [Test]
         public void TestDefaultDirectory()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestDefaultDirectory)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadTournament(host);
                     var storage = osu.Dependencies.Get<Storage>();
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(Path.Combine(host.Storage.GetFullPath("."), "tournaments", "default")));
@@ -54,7 +51,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadTournament(host);
 
                     storage = osu.Dependencies.Get<Storage>();
 
@@ -111,7 +108,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadTournament(host);
 
                     var storage = osu.Dependencies.Get<Storage>();
 
@@ -139,29 +136,16 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 }
                 finally
                 {
-                    host.Storage.Delete("tournament.ini");
-                    host.Storage.DeleteDirectory("tournaments");
+                    try
+                    {
+                        host.Storage.Delete("tournament.ini");
+                        host.Storage.DeleteDirectory("tournaments");
+                    }
+                    catch { }
+
                     host.Exit();
                 }
             }
-        }
-
-        private TournamentGameBase loadOsu(GameHost host)
-        {
-            var osu = new TournamentGameBase();
-            Task.Run(() => host.Run(osu));
-            waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
-            return osu;
-        }
-
-        private static void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 90000)
-        {
-            Task task = Task.Run(() =>
-            {
-                while (!result()) Thread.Sleep(200);
-            });
-
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
 
         private string basePath(string testInstance) => Path.Combine(RuntimeInfo.StartupDirectory, "headless", testInstance);

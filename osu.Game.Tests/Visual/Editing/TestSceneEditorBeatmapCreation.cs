@@ -55,7 +55,12 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestExitWithoutSave()
         {
-            AddStep("exit without save", () => Editor.Exit());
+            AddStep("exit without save", () =>
+            {
+                Editor.Exit();
+                DialogOverlay.CurrentDialog.PerformOkAction();
+            });
+
             AddUntilStep("wait for exit", () => !Editor.IsCurrentScreen());
             AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID)?.DeletePending == true);
         }

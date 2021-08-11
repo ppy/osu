@@ -3,6 +3,9 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,6 +16,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osuTK;
 using osuTK.Graphics;
@@ -38,6 +42,8 @@ namespace osu.Game.Overlays.Chat.Tabs
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
+
+        private Sample sampleTabSwitched;
 
         public ChannelTabItem(Channel value)
             : base(value)
@@ -112,6 +118,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                         },
                     },
                 },
+                new HoverSounds()
             };
         }
 
@@ -146,17 +153,18 @@ namespace osu.Game.Overlays.Chat.Tabs
             switch (e.Button)
             {
                 case MouseButton.Middle:
-                    CloseButton.Click();
+                    CloseButton.TriggerClick();
                     break;
             }
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             BackgroundActive = colours.ChatBlue;
             BackgroundInactive = colours.Gray4;
             backgroundHover = colours.Gray7;
+            sampleTabSwitched = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
 
             highlightBox.Colour = colours.Yellow;
         }
@@ -217,7 +225,14 @@ namespace osu.Game.Overlays.Chat.Tabs
             Text.Font = Text.Font.With(weight: FontWeight.Medium);
         }
 
-        protected override void OnActivated() => updateState();
+        protected override void OnActivated()
+        {
+            if (IsLoaded)
+                sampleTabSwitched?.Play();
+
+            updateState();
+        }
+
         protected override void OnDeactivated() => updateState();
     }
 }

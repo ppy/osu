@@ -11,10 +11,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneModDisplay : OsuTestScene
     {
-        [TestCase(ExpansionMode.ExpandOnHover)]
-        [TestCase(ExpansionMode.AlwaysExpanded)]
-        [TestCase(ExpansionMode.AlwaysContracted)]
-        public void TestMode(ExpansionMode mode)
+        [Test]
+        public void TestMode([Values] ExpansionMode mode)
         {
             AddStep("create mod display", () =>
             {

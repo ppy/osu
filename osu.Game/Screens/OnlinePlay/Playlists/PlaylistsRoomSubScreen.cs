@@ -175,7 +175,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                                     {
                                                                                         Anchor = Anchor.CentreLeft,
                                                                                         Origin = Anchor.CentreLeft,
-                                                                                        DisplayUnrankedText = false,
                                                                                         Current = UserMods,
                                                                                         Scale = new Vector2(0.8f),
                                                                                     },
@@ -231,7 +230,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 settingsOverlay = new PlaylistsMatchSettingsOverlay
                 {
                     RelativeSizeAxes = Axes.Both,
-                    EditPlaylist = () => this.Push(new PlaylistsSongSelect()),
+                    EditPlaylist = () =>
+                    {
+                        if (this.IsCurrentScreen())
+                            this.Push(new PlaylistsSongSelect());
+                    },
                     State = { Value = roomId.Value == null ? Visibility.Visible : Visibility.Hidden }
                 }
             });

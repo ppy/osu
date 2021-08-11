@@ -1,11 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Extensions;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.General
@@ -15,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private SettingsDropdown<Language> languageSelection;
         private Bindable<string> frameworkLocale;
 
-        protected override string Header => "Language";
+        protected override LocalisableString Header => "Language";
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
@@ -35,11 +36,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
             };
 
-            if (!Enum.TryParse<Language>(frameworkLocale.Value, out var locale))
+            if (!LanguageExtensions.TryParseCultureCode(frameworkLocale.Value, out var locale))
                 locale = Language.en;
             languageSelection.Current.Value = locale;
 
-            languageSelection.Current.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToString());
+            languageSelection.Current.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
         }
     }
 }

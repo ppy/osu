@@ -15,8 +15,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class MainCirclePiece : CompositeDrawable
     {
-        public override bool RemoveCompletedTransforms => false;
-
         private readonly CirclePiece circle;
         private readonly RingPiece ring;
         private readonly FlashPiece flash;
@@ -44,7 +42,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
-        private readonly IBindable<ArmedState> armedState = new Bindable<ArmedState>();
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; }
@@ -56,7 +53,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
-            armedState.BindTo(drawableObject.State);
         }
 
         protected override void LoadComplete()
@@ -72,19 +68,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
 
-            armedState.BindValueChanged(animate, true);
+            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
+            updateStateTransforms(drawableObject, drawableObject.State.Value);
         }
 
-        private void animate(ValueChangedEvent<ArmedState> state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            ClearTransforms(true);
-
             using (BeginAbsoluteSequence(drawableObject.StateUpdateTime))
                 glow.FadeOut(400);
 
             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
-                switch (state.NewValue)
+                switch (state)
                 {
                     case ArmedState.Hit:
                         const double flash_in = 40;
@@ -110,6 +105,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         break;
                 }
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableObject != null)
+                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

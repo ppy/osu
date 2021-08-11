@@ -109,6 +109,34 @@ namespace osu.Game.Tests.Visual.Gameplay
                     meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Count() == 2));
         }
 
+        [Test]
+        public void TestBonus()
+        {
+            AddStep("OD 1", () => recreateDisplay(new OsuHitWindows(), 1));
+
+            AddStep("small bonus", () => newJudgement(result: HitResult.SmallBonus));
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+
+            AddStep("large bonus", () => newJudgement(result: HitResult.LargeBonus));
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+        }
+
+        [Test]
+        public void TestIgnore()
+        {
+            AddStep("OD 1", () => recreateDisplay(new OsuHitWindows(), 1));
+
+            AddStep("ignore hit", () => newJudgement(result: HitResult.IgnoreHit));
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+
+            AddStep("ignore miss", () => newJudgement(result: HitResult.IgnoreMiss));
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+        }
+
         private void recreateDisplay(HitWindows hitWindows, float overallDifficulty)
         {
             hitWindows?.SetDifficulty(overallDifficulty);

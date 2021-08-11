@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.UI
 
         private const float size = 80;
 
-        public virtual string TooltipText => showTooltip ? mod.IconTooltip : null;
+        public virtual LocalisableString TooltipText => showTooltip ? mod.IconTooltip : null;
 
         private Mod mod;
         private readonly bool showTooltip;

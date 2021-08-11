@@ -58,7 +58,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             new Room
             {
                 Name = { Value = $"{API.LocalUser}'s awesome room" },
-                Category = { Value = RoomCategory.Realtime }
+                Category = { Value = RoomCategory.Realtime },
+                Type = { Value = MatchType.HeadToHead },
             };
 
         protected override string ScreenTitle => "Multiplayer";
