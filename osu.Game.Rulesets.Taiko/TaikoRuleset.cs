@@ -149,7 +149,8 @@ namespace osu.Game.Rulesets.Taiko
                 case ModType.Fun:
                     return new Mod[]
                     {
-                        new MultiMod(new ModWindUp(), new ModWindDown())
+                        new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new TaikoModMuted(),
                     };
 
                 default:

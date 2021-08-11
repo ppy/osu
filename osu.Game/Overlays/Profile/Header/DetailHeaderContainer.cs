@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
@@ -172,13 +173,13 @@ namespace osu.Game.Overlays.Profile.Header
         private void updateDisplay(User user)
         {
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
-            ppInfo.Content = user?.Statistics?.PP?.ToString("#,##0") ?? "0";
+            ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
 
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToString("\\##,##0") ?? "-";
-            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToString("\\##,##0") ?? "-";
+            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
 
             rankGraph.Statistics.Value = user?.Statistics;
         }
@@ -189,7 +190,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             public int RankCount
             {
-                set => rankCount.Text = value.ToString("#,##0");
+                set => rankCount.Text = value.ToLocalisableString("#,##0");
             }
 
             public ScoreRankInfo(ScoreRank rank)

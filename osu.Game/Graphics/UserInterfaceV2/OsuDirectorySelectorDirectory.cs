@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 {
                     Depth = 1
                 },
-                new HoverClickSounds(HoverSampleSet.Soft)
+                new HoverClickSounds()
             });
         }
 

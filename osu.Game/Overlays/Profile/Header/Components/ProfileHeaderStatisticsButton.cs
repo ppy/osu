@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -46,6 +47,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         protected abstract IconUsage Icon { get; }
 
-        protected void SetValue(int value) => drawableText.Text = value.ToString("#,##0");
+        protected void SetValue(int value) => drawableText.Text = value.ToLocalisableString("#,##0");
     }
 }

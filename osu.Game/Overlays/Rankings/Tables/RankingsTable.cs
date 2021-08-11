@@ -13,6 +13,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -54,29 +55,24 @@ namespace osu.Game.Overlays.Rankings.Tables
 
             rankings.ForEach(_ => backgroundFlow.Add(new TableRowBackground { Height = row_height }));
 
-            Columns = mainHeaders.Concat(CreateAdditionalHeaders()).ToArray();
+            Columns = mainHeaders.Concat(CreateAdditionalHeaders()).Cast<TableColumn>().ToArray();
             Content = rankings.Select((s, i) => createContent((page - 1) * items_per_page + i, s)).ToArray().ToRectangular();
         }
 
         private Drawable[] createContent(int index, TModel item) => new Drawable[] { createIndexDrawable(index), createMainContent(item) }.Concat(CreateAdditionalContent(item)).ToArray();
 
-        private static TableColumn[] mainHeaders => new[]
+        private static RankingsTableColumn[] mainHeaders => new[]
         {
-            new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.Absolute, 40)), // place
-            new TableColumn(string.Empty, Anchor.CentreLeft, new Dimension()), // flag and username (country name)
+            new RankingsTableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.Absolute, 40)), // place
+            new RankingsTableColumn(string.Empty, Anchor.CentreLeft, new Dimension()), // flag and username (country name)
         };
 
-        protected abstract TableColumn[] CreateAdditionalHeaders();
+        protected abstract RankingsTableColumn[] CreateAdditionalHeaders();
 
         protected abstract Drawable[] CreateAdditionalContent(TModel item);
 
-        protected virtual string HighlightedColumn => @"Performance";
-
-        protected override Drawable CreateHeader(int index, TableColumn column)
-        {
-            var title = column?.Header ?? string.Empty;
-            return new HeaderText(title, title == HighlightedColumn);
-        }
+        protected sealed override Drawable CreateHeader(int index, TableColumn column)
+            => (column as RankingsTableColumn)?.CreateHeaderText() ?? new HeaderText(column?.Header ?? default, false);
 
         protected abstract Country GetCountry(TModel item);
 
@@ -84,7 +80,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         private OsuSpriteText createIndexDrawable(int index) => new RowText
         {
-            Text = $"#{index + 1}",
+            Text = (index + 1).ToLocalisableString(@"\##"),
             Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.SemiBold)
         };
 
@@ -105,11 +101,24 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         };
 
+        protected class RankingsTableColumn : TableColumn
+        {
+            protected readonly bool Highlighted;
+
+            public RankingsTableColumn(LocalisableString? header = null, Anchor anchor = Anchor.TopLeft, Dimension dimension = null, bool highlighted = false)
+                : base(header, anchor, dimension)
+            {
+                Highlighted = highlighted;
+            }
+
+            public virtual HeaderText CreateHeaderText() => new HeaderText(Header, Highlighted);
+        }
+
         protected class HeaderText : OsuSpriteText
         {
             private readonly bool isHighlighted;
 
-            public HeaderText(string text, bool isHighlighted)
+            public HeaderText(LocalisableString text, bool isHighlighted)
             {
                 this.isHighlighted = isHighlighted;
 
@@ -135,7 +144,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         }
 
-        protected class ColoredRowText : RowText
+        protected class ColouredRowText : RowText
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)

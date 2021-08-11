@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [Test]
-        public void TestCustomEndGlowColour()
+        public void TestCustomAfterImageColour()
         {
             var skin = new TestSkin
             {
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [Test]
-        public void TestCustomEndGlowColourPriority()
+        public void TestCustomAfterImageColourPriority()
         {
             var skin = new TestSkin
             {
@@ -111,39 +111,37 @@ namespace osu.Game.Rulesets.Catch.Tests
             checkHyperDashFruitColour(skin, skin.HyperDashColour);
         }
 
-        private void checkHyperDashCatcherColour(ISkin skin, Color4 expectedCatcherColour, Color4? expectedEndGlowColour = null)
+        private void checkHyperDashCatcherColour(ISkin skin, Color4 expectedCatcherColour, Color4? expectedAfterImageColour = null)
         {
-            Container trailsContainer = null;
-            Catcher catcher = null;
             CatcherTrailDisplay trails = null;
+            Catcher catcher = null;
 
             AddStep("create hyper-dashing catcher", () =>
             {
-                trailsContainer = new Container();
+                CatcherArea catcherArea;
                 Child = setupSkinHierarchy(new Container
                 {
                     Anchor = Anchor.Centre,
-                    Children = new Drawable[]
+                    Child = catcherArea = new CatcherArea
                     {
-                        catcher = new Catcher(trailsContainer, new DroppedObjectContainer())
+                        Catcher = catcher = new Catcher(new DroppedObjectContainer())
                         {
                             Scale = new Vector2(4)
-                        },
-                        trailsContainer
+                        }
                     }
                 }, skin);
+                trails = catcherArea.ChildrenOfType<CatcherTrailDisplay>().Single();
             });
 
-            AddStep("get trails container", () =>
+            AddStep("start hyper-dash", () =>
             {
-                trails = trailsContainer.OfType<CatcherTrailDisplay>().Single();
                 catcher.SetHyperDashState(2);
             });
 
             AddUntilStep("catcher colour is correct", () => catcher.Colour == expectedCatcherColour);
 
             AddAssert("catcher trails colours are correct", () => trails.HyperDashTrailsColour == expectedCatcherColour);
-            AddAssert("catcher end-glow colours are correct", () => trails.EndGlowSpritesColour == (expectedEndGlowColour ?? expectedCatcherColour));
+            AddAssert("catcher after-image colours are correct", () => trails.HyperDashAfterImageColour == (expectedAfterImageColour ?? expectedCatcherColour));
 
             AddStep("finish hyper-dashing", () =>
             {

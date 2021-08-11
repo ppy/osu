@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
@@ -34,7 +35,7 @@ namespace osu.Game.Scoring
         public double Accuracy { get; set; }
 
         [JsonIgnore]
-        public string DisplayAccuracy => Accuracy.FormatAccuracy();
+        public LocalisableString DisplayAccuracy => Accuracy.FormatAccuracy();
 
         [JsonProperty(@"pp")]
         public double? PP { get; set; }

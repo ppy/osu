@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 Background = new Box
                 {
@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
                     Size = new Vector2(13),
                     Icon = icon,
                 },
-            };
+            });
         }
     }
 }

@@ -27,7 +27,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private readonly IBindableList<Room> rooms = new BindableList<Room>();
 
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
-        public IReadOnlyList<DrawableRoom> Rooms => roomFlow;
+
+        public IReadOnlyList<DrawableRoom> Rooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
 
         [Resolved(CanBeNull = true)]
         private Bindable<FilterCriteria> filter { get; set; }
