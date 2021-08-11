@@ -347,18 +347,43 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert($"{PLAYER_1_ID} score quit still set", () => getLeaderboardScore(PLAYER_1_ID).HasQuit.Value);
         }
 
-        private void loadSpectateScreen(bool waitForPlayerLoad = true)
+        /// <summary>
+        /// Tests spectating with a gameplay start time set to a negative value.
+        /// Simulating beatmaps with high <see cref="BeatmapInfo.AudioLeadIn"/> or negative time storyboard elements.
+        /// </summary>
+        [Test]
+        public void TestNegativeGameplayStartTime()
         {
-            AddStep("load screen", () =>
+            start(PLAYER_1_ID);
+
+            loadSpectateScreen(false, -500);
+
+            // to ensure negative gameplay start time does not affect spectator, send frames exactly after StartGameplay().
+            // (similar to real spectating sessions in which the first frames get sent between StartGameplay() and player load complete)
+            AddStep("send frames at gameplay start", () => getInstance(PLAYER_1_ID).OnGameplayStarted += () => SpectatorClient.SendFrames(PLAYER_1_ID, 100));
+
+            AddUntilStep("wait for player load", () => spectatorScreen.AllPlayersLoaded);
+
+            AddWaitStep("wait for progression", 3);
+
+            assertNotCatchingUp(PLAYER_1_ID);
+            assertRunning(PLAYER_1_ID);
+        }
+
+        private void loadSpectateScreen(bool waitForPlayerLoad = true, double? gameplayStartTime = null)
+        {
+            AddStep(!gameplayStartTime.HasValue ? "load screen" : $"load screen (start = {gameplayStartTime}ms)", () =>
             {
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(importedBeatmap);
                 Ruleset.Value = importedBeatmap.Ruleset;
 
-                LoadScreen(spectatorScreen = new MultiSpectatorScreen(playingUsers.ToArray()));
+                LoadScreen(spectatorScreen = new TestMultiSpectatorScreen(playingUsers.ToArray(), gameplayStartTime));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
         }
+
+        private void start(int userId, int? beatmapId = null) => start(new[] { userId }, beatmapId);
 
         private void start(int[] userIds, int? beatmapId = null)
         {
@@ -419,6 +444,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void assertMuted(int userId, bool muted)
             => AddAssert($"{userId} {(muted ? "is" : "is not")} muted", () => getInstance(userId).Mute == muted);
 
+        private void assertRunning(int userId)
+            => AddAssert($"{userId} clock running", () => getInstance(userId).GameplayClock.IsRunning);
+
+        private void assertNotCatchingUp(int userId)
+            => AddAssert($"{userId} in sync", () => !getInstance(userId).GameplayClock.IsCatchingUp);
+
         private void waitForCatchup(int userId)
             => AddUntilStep($"{userId} not catching up", () => !getInstance(userId).GameplayClock.IsCatchingUp);
 
@@ -429,5 +460,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId);
 
         private int[] getPlayerIds(int count) => Enumerable.Range(PLAYER_1_ID, count).ToArray();
+
+        private class TestMultiSpectatorScreen : MultiSpectatorScreen
+        {
+            private readonly double? gameplayStartTime;
+
+            public TestMultiSpectatorScreen(MultiplayerRoomUser[] users, double? gameplayStartTime = null)
+                : base(users)
+            {
+                this.gameplayStartTime = gameplayStartTime;
+            }
+
+            protected override MasterGameplayClockContainer CreateMasterGameplayClockContainer(WorkingBeatmap beatmap)
+                => new MasterGameplayClockContainer(beatmap, gameplayStartTime ?? 0, gameplayStartTime.HasValue);
+        }
     }
 }
