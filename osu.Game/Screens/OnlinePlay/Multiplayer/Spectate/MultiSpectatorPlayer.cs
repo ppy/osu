@@ -54,18 +54,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
             }
 
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                updateContainerState();
+            }
+
             protected override void Update()
+            {
+                updateContainerState();
+                base.Update();
+            }
+
+            protected override GameplayClock CreateGameplayClock(IFrameBasedClock source) => new GameplayClock(source);
+
+            private void updateContainerState()
             {
                 // The player clock's running state is controlled externally, but the local pausing state needs to be updated to stop gameplay.
                 if (SourceClock.IsRunning)
                     Start();
                 else
                     Stop();
-
-                base.Update();
             }
-
-            protected override GameplayClock CreateGameplayClock(IFrameBasedClock source) => new GameplayClock(source);
         }
     }
 }
