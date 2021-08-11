@@ -389,6 +389,12 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
+        Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user)
+        {
+            // TODO: also inform users of the kick operation.
+            return ((IMultiplayerClient)this).UserLeft(user);
+        }
+
         Task IMultiplayerClient.HostChanged(int userId)
         {
             if (Room == null)
