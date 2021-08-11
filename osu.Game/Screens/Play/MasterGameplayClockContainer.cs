@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
         {
             // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
             // we may want to consider reversing the application of offsets in the future as it may feel more correct.
-            base.Seek(time - totalOffset);
+            base.Seek(time - totalOffset * GameplayClock.Rate);
         }
 
         /// <summary>
