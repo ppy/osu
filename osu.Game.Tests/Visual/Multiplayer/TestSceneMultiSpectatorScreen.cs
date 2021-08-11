@@ -12,6 +12,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -47,8 +48,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("start players silently", () =>
             {
-                Client.CurrentMatchPlayingUserIds.Add(PLAYER_1_ID);
-                Client.CurrentMatchPlayingUserIds.Add(PLAYER_2_ID);
+                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID }, true);
+                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID }, true);
+
                 playingUserIds.Add(PLAYER_1_ID);
                 playingUserIds.Add(PLAYER_2_ID);
             });
@@ -264,7 +266,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 foreach (int id in userIds)
                 {
-                    Client.CurrentMatchPlayingUserIds.Add(id);
+                    OnlinePlayDependencies.Client.AddUser(new User { Id = id }, true);
+
                     SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
                     playingUserIds.Add(id);
                 }
