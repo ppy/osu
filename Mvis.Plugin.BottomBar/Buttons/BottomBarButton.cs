@@ -1,6 +1,3 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -18,11 +15,12 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.Plugins.Internal.BottomBar.Buttons
+namespace Mvis.Plugin.BottomBar.Buttons
 {
     public class BottomBarButton : CompositeDrawable, IHasTooltip
     {

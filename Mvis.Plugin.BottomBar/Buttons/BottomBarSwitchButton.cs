@@ -1,13 +1,10 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.Plugins.Internal.BottomBar.Buttons
+namespace Mvis.Plugin.BottomBar.Buttons
 {
     public class BottomBarSwitchButton : BottomBarButton
     {

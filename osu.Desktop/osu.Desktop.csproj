@@ -28,6 +28,7 @@
     <ProjectReference Include="..\Mvis.Plugin.SandboxToPanel\Mvis.Plugin.SandboxToPanel.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.FakeEditor\Mvis.Plugin.FakeEditor.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.Yasp\Mvis.Plugin.Yasp.csproj" />
+    <ProjectReference Include="..\Mvis.Plugin.BottomBar\Mvis.Plugin.BottomBar.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Microsoft.NETCore.Targets" Version="5.0.0" />

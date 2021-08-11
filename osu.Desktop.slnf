@@ -23,6 +23,7 @@
       "Mvis.Plugin.CloudMusicSupport\\Mvis.Plugin.CloudMusicSupport.csproj",
       "Mvis.Plugin.SandboxToPanel\\Mvis.Plugin.SandboxToPanel.csproj",
       "Mvis.Plugin.FakeEditor\\Mvis.Plugin.FakeEditor.csproj",
+      "Mvis.Plugin.BottomBar\\Mvis.Plugin.BottomBar.csproj",
       "..\\osu-framework\\osu.Framework\\osu.Framework.csproj",
       "..\\osu-framework\\osu.Framework.NativeLibs\\osu.Framework.NativeLibs.csproj",
       "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform\\osu.Game.Rulesets.EmptyFreeform.csproj",

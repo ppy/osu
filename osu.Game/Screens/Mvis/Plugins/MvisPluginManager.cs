@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Screens.Mvis.Plugins.Config;
+using osu.Game.Screens.Mvis.Plugins.Types;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
@@ -33,8 +34,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         internal Action<MvisPlugin> OnPluginAdd;
         internal Action<MvisPlugin> OnPluginUnLoad;
 
-        public int PluginVersion => 5;
-        public int MinimumPluginVersion => 4;
+        public int PluginVersion => 6;
+        public int MinimumPluginVersion => 6;
         private const bool experimental = true;
 
         private string blockedPluginFilePath => storage.GetFullPath("custom/blocked_plugins.json");
@@ -203,5 +204,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             avaliablePlugins.Clear();
         }
+
+        internal List<IFunctionBarProvider> FunctionBarProviders = new List<IFunctionBarProvider>();
     }
 }

@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mvis.Plugin.BottomBar.Buttons;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Mvis.BottomBar;
-using osu.Game.Screens.Mvis.Plugins.Internal.BottomBar.Buttons;
+using osu.Game.Screens.Mvis;
+using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Plugins.Internal.BottomBar
+namespace Mvis.Plugin.BottomBar
 {
     internal class LegacyBottomBar : MvisPlugin, IFunctionBarProvider
     {
@@ -22,8 +23,6 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.BottomBar
 
         protected override bool PostInit() => true;
 
-        public override int Version => 0;
-
         private readonly FillFlowContainer<BottomBarButton> leftContent;
         private readonly FillFlowContainer<BottomBarButton> centreContent;
         private readonly FillFlowContainer<BottomBarButton> rightContent;
@@ -35,8 +34,17 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.BottomBar
         [Resolved]
         private MvisScreen mvisScreen { get; set; }
 
+        public override int Version => 6;
+
+        public override TargetLayer Target => TargetLayer.FunctionBar;
+
         public LegacyBottomBar()
         {
+            Name = "功能条";
+            Description = "mf-osu默认功能条";
+            Author = "MATRIX-夜翎";
+            Depth = -1;
+
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             RelativeSizeAxes = Axes.X;

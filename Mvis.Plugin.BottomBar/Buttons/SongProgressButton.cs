@@ -2,9 +2,10 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Plugins.Types;
 
-namespace osu.Game.Screens.Mvis.Plugins.Internal.BottomBar.Buttons
+namespace Mvis.Plugin.BottomBar.Buttons
 {
     public class SongProgressButton : BottomBarSwitchButton
     {

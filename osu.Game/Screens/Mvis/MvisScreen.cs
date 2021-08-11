@@ -30,7 +30,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Internal.BottomBar;
+using osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis.SideBar.Settings;
@@ -181,13 +181,12 @@ namespace osu.Game.Screens.Mvis
         [NotNull]
         private IFunctionBarProvider currentFunctionBarProvider
         {
-            get => realFunctionBarProvider ?? legacyBottomBarContainer;
+            get => realFunctionBarProvider ?? fallbackFunctionBar;
             set => realFunctionBarProvider = value;
         }
 
-        private readonly LegacyBottomBar legacyBottomBarContainer = new LegacyBottomBar();
+        private readonly FunctionBar fallbackFunctionBar = new FunctionBar();
 
-        private readonly List<IFunctionBarProvider> functionBarProviders = new List<IFunctionBarProvider>();
         private readonly List<IFunctionProvider> functionProviders = new List<IFunctionProvider>();
 
         //留着这些能让播放器在触发GlobalAction时会有更好的界面体验
@@ -657,7 +656,7 @@ namespace osu.Game.Screens.Mvis
             if (targetDrawable != null)
                 overlay.Remove(targetDrawable);
 
-            currentFunctionBarProvider = target ?? legacyBottomBarContainer;
+            currentFunctionBarProvider = target ?? fallbackFunctionBar;
             currentFunctionBarProvider.SetFunctionControls(functionProviders);
 
             overlay.Add((Drawable)currentFunctionBarProvider);
