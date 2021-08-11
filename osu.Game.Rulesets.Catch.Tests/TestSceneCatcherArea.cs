@@ -122,10 +122,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             public TestCatcherArea(BeatmapDifficulty beatmapDifficulty)
             {
                 var droppedObjectContainer = new DroppedObjectContainer();
-
                 Add(droppedObjectContainer);
 
-                Catcher = new Catcher(this, droppedObjectContainer, beatmapDifficulty)
+                Catcher = new Catcher(droppedObjectContainer, beatmapDifficulty)
                 {
                     X = CatchPlayfield.CENTER_X
                 };

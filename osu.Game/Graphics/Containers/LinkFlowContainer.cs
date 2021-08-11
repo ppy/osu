@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
@@ -24,6 +25,9 @@ namespace osu.Game.Graphics.Containers
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         public void AddLinks(string text, List<Link> links)
         {
@@ -91,8 +95,11 @@ namespace osu.Game.Graphics.Containers
                 {
                     if (action != null)
                         action();
-                    else
-                        game?.HandleLink(link);
+                    else if (game != null)
+                        game.HandleLink(link);
+                    // fallback to handle cases where OsuGame is not available, ie. tournament client.
+                    else if (link.Action == LinkAction.External)
+                        host.OpenUrlExternally(link.Argument);
                 },
             });
         }

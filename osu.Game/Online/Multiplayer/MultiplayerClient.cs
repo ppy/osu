@@ -62,7 +62,9 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The users in the joined <see cref="Room"/> which are participating in the current gameplay loop.
         /// </summary>
-        public readonly BindableList<int> CurrentMatchPlayingUserIds = new BindableList<int>();
+        public IBindableList<int> CurrentMatchPlayingUserIds => PlayingUserIds;
+
+        protected readonly BindableList<int> PlayingUserIds = new BindableList<int>();
 
         public readonly Bindable<PlaylistItem?> CurrentMatchPlayingItem = new Bindable<PlaylistItem?>();
 
@@ -142,11 +144,20 @@ namespace osu.Game.Online.Multiplayer
                     APIRoom = room;
                     foreach (var user in joinedRoom.Users)
                         updateUserPlayingState(user.UserID, user.State);
+
+                    OnRoomJoined();
                 }, cancellationSource.Token).ConfigureAwait(false);
 
                 // Update room settings.
                 await updateLocalRoomSettings(joinedRoom.Settings, cancellationSource.Token).ConfigureAwait(false);
             }, cancellationSource.Token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Fired when the room join sequence is complete
+        /// </summary>
+        protected virtual void OnRoomJoined()
+        {
         }
 
         /// <summary>
@@ -170,7 +181,8 @@ namespace osu.Game.Online.Multiplayer
             {
                 APIRoom = null;
                 Room = null;
-                CurrentMatchPlayingUserIds.Clear();
+                CurrentMatchPlayingItem.Value = null;
+                PlayingUserIds.Clear();
 
                 RoomUpdated?.Invoke();
             });
@@ -192,8 +204,9 @@ namespace osu.Game.Online.Multiplayer
         /// </remarks>
         /// <param name="name">The new room name, if any.</param>
         /// <param name="password">The new password, if any.</param>
+        /// <param name="matchType">The type of the match, if any.</param>
         /// <param name="item">The new room playlist item, if any.</param>
-        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<PlaylistItem> item = default)
+        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<PlaylistItem> item = default)
         {
             if (Room == null)
                 throw new InvalidOperationException("Must be joined to a match to change settings.");
@@ -219,6 +232,7 @@ namespace osu.Game.Online.Multiplayer
                 BeatmapID = item.GetOr(existingPlaylistItem).BeatmapID,
                 BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
+                MatchType = matchType.GetOr(Room.Settings.MatchType),
                 RequiredMods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.RequiredMods,
                 AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods,
             });
@@ -293,6 +307,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task ChangeUserMods(IEnumerable<APIMod> newMods);
 
+        public abstract Task SendMatchRequest(MatchUserRequest request);
+
         public abstract Task StartMatch();
 
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
@@ -363,7 +379,7 @@ namespace osu.Game.Online.Multiplayer
                     return;
 
                 Room.Users.Remove(user);
-                CurrentMatchPlayingUserIds.Remove(user.UserID);
+                PlayingUserIds.Remove(user.UserID);
 
                 RoomUpdated?.Invoke();
             }, false);
@@ -417,6 +433,46 @@ namespace osu.Game.Online.Multiplayer
                 RoomUpdated?.Invoke();
             }, false);
 
+            return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.MatchUserStateChanged(int userId, MatchUserState state)
+        {
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                if (Room == null)
+                    return;
+
+                Room.Users.Single(u => u.UserID == userId).MatchState = state;
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.MatchRoomStateChanged(MatchRoomState state)
+        {
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                if (Room == null)
+                    return;
+
+                Room.MatchState = state;
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        public Task MatchEvent(MatchServerEvent e)
+        {
+            // not used by any match types just yet.
             return Task.CompletedTask;
         }
 
@@ -606,16 +662,16 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="state">The new state of the user.</param>
         private void updateUserPlayingState(int userId, MultiplayerUserState state)
         {
-            bool wasPlaying = CurrentMatchPlayingUserIds.Contains(userId);
+            bool wasPlaying = PlayingUserIds.Contains(userId);
             bool isPlaying = state >= MultiplayerUserState.WaitingForLoad && state <= MultiplayerUserState.FinishedPlay;
 
             if (isPlaying == wasPlaying)
                 return;
 
             if (isPlaying)
-                CurrentMatchPlayingUserIds.Add(userId);
+                PlayingUserIds.Add(userId);
             else
-                CurrentMatchPlayingUserIds.Remove(userId);
+                PlayingUserIds.Remove(userId);
         }
 
         private Task scheduleAsync(Action action, CancellationToken cancellationToken = default)

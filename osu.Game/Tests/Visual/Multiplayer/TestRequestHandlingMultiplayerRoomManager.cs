@@ -20,7 +20,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// <summary>
     /// A <see cref="RoomManager"/> for use in multiplayer test scenes. Should generally not be used by itself outside of a <see cref="MultiplayerTestScene"/>.
     /// </summary>
-    public class TestMultiplayerRoomManager : MultiplayerRoomManager
+    /// <remarks>
+    /// This implementation will pretend to be a server, handling room retrieval and manipulation requests
+    /// and returning a roughly expected state, without the need for a server to be running.
+    /// </remarks>
+    public class TestRequestHandlingMultiplayerRoomManager : MultiplayerRoomManager
     {
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -33,13 +37,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public new readonly List<Room> Rooms = new List<Room>();
 
+        private int currentRoomId;
+        private int currentPlaylistItemId;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             int currentScoreId = 0;
-            int currentRoomId = 0;
-            int currentPlaylistItemId = 0;
 
+            // Handling here is pretending to be a server, while also updating the local state to match
+            // how the server would eventually respond and update the RoomManager.
             ((DummyAPIAccess)api).HandleRequest = req =>
             {
                 switch (req)
@@ -48,19 +55,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         var apiRoom = new Room();
 
                         apiRoom.CopyFrom(createRoomRequest.Room);
-                        apiRoom.RoomID.Value ??= currentRoomId++;
 
                         // Passwords are explicitly not copied between rooms.
                         apiRoom.HasPassword.Value = !string.IsNullOrEmpty(createRoomRequest.Room.Password.Value);
                         apiRoom.Password.Value = createRoomRequest.Room.Password.Value;
 
-                        for (int i = 0; i < apiRoom.Playlist.Count; i++)
-                            apiRoom.Playlist[i].ID = currentPlaylistItemId++;
+                        AddRoom(apiRoom);
 
                         var responseRoom = new APICreatedRoom();
                         responseRoom.CopyFrom(createResponseRoom(apiRoom, false));
 
-                        Rooms.Add(apiRoom);
                         createRoomRequest.TriggerSuccess(responseRoom);
                         return true;
 
@@ -127,6 +131,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 return false;
             };
         }
+
+        public void AddRoom(Room room)
+        {
+            room.RoomID.Value ??= currentRoomId++;
+            for (int i = 0; i < room.Playlist.Count; i++)
+                room.Playlist[i].ID = currentPlaylistItemId++;
+
+            Rooms.Add(room);
+        }
+
+        public new void RemoveRoom(Room room) => base.RemoveRoom(room);
 
         private Room createResponseRoom(Room room, bool withParticipants)
         {
