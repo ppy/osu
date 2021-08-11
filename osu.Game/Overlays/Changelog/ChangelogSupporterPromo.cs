@@ -22,8 +22,7 @@ namespace osu.Game.Overlays.Changelog
     {
         private const float image_container_width = 164;
 
-        private readonly LinkFlowContainer supportLinkText;
-        private readonly TextFlowContainer supportNoteText;
+        private readonly FillFlowContainer textContainer;
         private readonly Container imageContainer;
 
         public ChangelogSupporterPromo()
@@ -65,7 +64,7 @@ namespace osu.Game.Overlays.Changelog
                             Padding = new MarginPadding { Horizontal = 75 },
                             Children = new Drawable[]
                             {
-                                new FillFlowContainer
+                                textContainer = new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -73,32 +72,6 @@ namespace osu.Game.Overlays.Changelog
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Padding = new MarginPadding { Right = 50 + image_container_width },
-                                    Children = new Drawable[]
-                                    {
-                                        new OsuSpriteText
-                                        {
-                                            Text = ChangelogStrings.SupportHeading,
-                                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
-                                            Margin = new MarginPadding { Bottom = 20 },
-                                        },
-                                        supportLinkText = new LinkFlowContainer(t =>
-                                        {
-                                            t.Font = t.Font.With(size: 14);
-                                        })
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                        },
-                                        supportNoteText = new TextFlowContainer(t =>
-                                        {
-                                            t.Font = t.Font.With(size: 12);
-                                        })
-                                        {
-                                            Margin = new MarginPadding { Top = 10 },
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                        }
-                                    },
                                 },
                                 imageContainer = new Container
                                 {
@@ -117,17 +90,44 @@ namespace osu.Game.Overlays.Changelog
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, TextureStore textures)
         {
-            void fontPinkColour(SpriteText t) => t.Colour = colour.PinkLighter;
+            LinkFlowContainer supportLinkText;
+            textContainer.Children = new Drawable[]
+            {
+                new OsuSpriteText
+                {
+                    Text = ChangelogStrings.SupportHeading,
+                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
+                    Margin = new MarginPadding { Bottom = 20 },
+                },
+                supportLinkText = new LinkFlowContainer(t =>
+                {
+                    t.Font = t.Font.With(size: 14);
+                    t.Colour = colour.PinkLighter;
+                })
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
+                new TextFlowContainer(t =>
+                {
+                    t.Font = t.Font.With(size: 12);
+                    t.Colour = colour.PinkLighter;
+                })
+                {
+                    Text = "Not only will you help speed development, but you will also get some extra features and customisations!",
+                    Margin = new MarginPadding { Top = 10 },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                }
+            };
 
-            supportLinkText.AddText("Support further development of osu! and ", fontPinkColour);
+            supportLinkText.AddText("Support further development of osu! and ");
             supportLinkText.AddLink("become an osu!supporter", "https://osu.ppy.sh/home/support", t =>
             {
                 t.Colour = colour.PinkDark;
                 t.Font = t.Font.With(weight: FontWeight.Bold);
             });
-            supportLinkText.AddText(" today!", fontPinkColour);
-
-            supportNoteText.AddText("Not only will you help speed development, but you will also get some extra features and customisations!", fontPinkColour);
+            supportLinkText.AddText(" today!");
 
             imageContainer.Children = new Drawable[]
             {
