@@ -33,41 +33,38 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new BufferedContainer
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                new Container
                 {
-                    new Container
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 1,
+                    Children = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Vertical = 1 },
-                        Children = new[]
+                        minBackground = new Box
                         {
-                            minBackground = new Box
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(0.5f),
-                            },
-                            maxBackground = new Box
-                            {
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre,
-                                RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(0.5f),
-                            },
-                        }
-                    },
-                    new FillFlowContainer
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.Both,
+                            Size = new Vector2(0.5f),
+                        },
+                        maxBackground = new Box
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            RelativeSizeAxes = Axes.Both,
+                            Size = new Vector2(0.5f),
+                        },
+                    }
+                },
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            minDisplay = new StarRatingDisplay(default),
-                            maxDisplay = new StarRatingDisplay(default)
-                        }
+                        minDisplay = new StarRatingDisplay(default),
+                        maxDisplay = new StarRatingDisplay(default)
                     }
                 }
             };
