@@ -133,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
                 leaderboardContainer.Add(leaderboard);
 
-                if (leaderboard.TeamScores.Count >= 2)
+                if (leaderboard.TeamScores.Count == 2)
                 {
                     LoadComponentAsync(new MatchScoreDisplay
                     {
