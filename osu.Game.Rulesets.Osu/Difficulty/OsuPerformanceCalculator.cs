@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 // Add an additional bonus for HDFL.
                 if (mods.Any(h => h is OsuModHidden))
-                    flashlightValue *= 1.2;
+                    flashlightValue *= 1.3;
 
                 // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
                 if (countMiss > 0)
