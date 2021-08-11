@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Osu.Replays.Movers
         public FlowerMover()
         {
             var c = OsuRulesetConfigManager.Instance;
-            mult = c.Get<float>(OsuRulesetSetting.JumpMulti);
-            nmult = c.Get<float>(OsuRulesetSetting.JumpMulti);
+            mult = c.Get<float>(OsuRulesetSetting.JumpMult);
+            nmult = c.Get<float>(OsuRulesetSetting.JumpMult);
             offsetMult = c.Get<float>(OsuRulesetSetting.AngleOffset);
         }
 

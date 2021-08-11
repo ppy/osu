@@ -202,17 +202,6 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                 for (double time = (objectsDuring[i] ? hitObject.StartTime : hitObject.GetEndTime()) + frameDelay; time < mover.End.StartTime; time += frameDelay)
                 {
-                    Start:
-                    var timeToNext = mover.End.StartTime - time;
-
-                    if (timeToNext > 3000 && lastFrame.Time < mover.End.StartTime - timeToNext * 0.6)
-                    {
-                        AddFrameToReplay(new OsuReplayFrame(hitObject.GetEndTime(), hitObject.StackedEndPosition));
-                        AddFrameToReplay(new OsuReplayFrame(mover.End.StartTime - timeToNext * 0.8, hitObject.StackedEndPosition));
-                        time = mover.End.StartTime - timeToNext * 0.6;
-                        goto Start;
-                    }
-
                     Vector2 currentPosition = ApplyPippiOffset(mover.Update(time), time, isStream ? -1 : 0);
 
                     if (config.Get<bool>(OsuRulesetSetting.BorderBounce))
