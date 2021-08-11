@@ -112,11 +112,23 @@ namespace osu.Game.Screens.Play.HUD
             Score1Text.Current.Value = Team1Score.Value;
             Score2Text.Current.Value = Team2Score.Value;
 
-            var winningText = Team1Score.Value > Team2Score.Value ? Score1Text : Score2Text;
-            var losingText = Team1Score.Value <= Team2Score.Value ? Score1Text : Score2Text;
+            int comparison = Team1Score.Value.CompareTo(Team2Score.Value);
 
-            winningText.Winning = true;
-            losingText.Winning = false;
+            if (comparison > 0)
+            {
+                Score1Text.Winning = true;
+                Score2Text.Winning = false;
+            }
+            else if (comparison < 0)
+            {
+                Score1Text.Winning = false;
+                Score2Text.Winning = true;
+            }
+            else
+            {
+                Score1Text.Winning = false;
+                Score2Text.Winning = false;
+            }
 
             var winningBar = Team1Score.Value > Team2Score.Value ? score1Bar : score2Bar;
             var losingBar = Team1Score.Value <= Team2Score.Value ? score1Bar : score2Bar;
