@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
                 Text = "Set Time to now",
                 Action = () =>
                 {
-                    config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = DateTime.Now;
+                    config.SetValue(OsuSetting.BeatmapDownloadLastTime,DateTime.Now);
                 }
             });
 
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
                 Text = "Set Time to 1 week ago",
                 Action = () =>
                 {
-                    config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = new DateTime(DateTime.Now.Ticks - TimeSpan.TicksPerDay * 7);
+                    config.SetValue(OsuSetting.BeatmapDownloadLastTime,new DateTime(DateTime.Now.Ticks - TimeSpan.TicksPerDay * 7));
                 }
             });
         }
