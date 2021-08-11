@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -42,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private ModDisplay userModsDisplay;
         private StateDisplay userStateDisplay;
 
+        private IconButton kickButton;
+
         public ParticipantPanel(MultiplayerRoomUser user)
         {
             User = user;
@@ -64,7 +67,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 {
                     new Dimension(GridSizeMode.Absolute, 18),
                     new Dimension(GridSizeMode.AutoSize),
-                    new Dimension()
+                    new Dimension(),
+                    new Dimension(GridSizeMode.AutoSize),
                 },
                 Content = new[]
                 {
@@ -157,7 +161,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                     Margin = new MarginPadding { Right = 10 },
                                 }
                             }
-                        }
+                        },
+                        kickButton = new KickButton
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Alpha = 0,
+                            Margin = new MarginPadding(4),
+                            Action = () =>
+                            {
+                                Debug.Assert(user != null);
+
+                                Client.KickUser(user.Id);
+                            }
+                        },
                     },
                 }
             };
@@ -178,6 +195,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
+
+            if (Client.LocalUser != null && Room.Host?.Equals(Client.LocalUser) == true)
+                kickButton.FadeIn(fade_time);
+            else
+                kickButton.FadeOut(fade_time);
 
             if (Room.Host?.Equals(User) == true)
                 crown.FadeIn(fade_time);
@@ -217,6 +239,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                         Client.TransferHost(targetUser);
                     })
                 };
+            }
+        }
+
+        public class KickButton : IconButton
+        {
+            public KickButton()
+            {
+                Icon = FontAwesome.Solid.UserTimes;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                IconHoverColour = colours.Red;
             }
         }
     }
