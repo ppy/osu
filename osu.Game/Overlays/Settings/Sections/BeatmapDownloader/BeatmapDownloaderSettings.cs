@@ -12,7 +12,6 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
 {
     public class BeatmapDownloaderSettings : SettingsSubsection
     {
-
         protected override LocalisableString Header => "Downloader Settings";
 
         private SettingsDropdown<RulesetInfo> rulesetInfoDropdown;

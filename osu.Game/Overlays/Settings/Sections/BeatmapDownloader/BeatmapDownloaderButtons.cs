@@ -14,7 +14,6 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
 {
     public class BeatmapDownloaderButtons : SettingsSubsection
     {
-
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notifications { get; set; }
 

@@ -93,10 +93,10 @@ namespace osu.Game.Tests.Beatmaps
             if (config == null)
                 return;
 
-            config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = new DateTime(2007, 1, 1);
-            config.GetBindable<double>(OsuSetting.BeatmapDownloadMinimumStarRating).Value = 0.0;
-            config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset).Value = 0;
-            config.GetBindable<BeatmapDownloader.SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory).Value = BeatmapDownloader.SearchCategory.Both;
+            config.SetValue(OsuSetting.BeatmapDownloadLastTime, new DateTime(2007, 1, 1));
+            config.SetValue(OsuSetting.BeatmapDownloadMinimumStarRating, 0.0);
+            config.SetValue(OsuSetting.BeatmapDownloadRuleset, 0);
+            config.SetValue(OsuSetting.BeatmapDownloadSearchCategory, BeatmapDownloader.SearchCategory.Both);
         }
 
         [TearDown]
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestMatchingCriteriaFailDate()
         {
-            config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = new DateTime(2020, 10, 1);
+            config.SetValue(OsuSetting.BeatmapDownloadLastTime, new DateTime(2020, 10, 1));
 
             foreach (var beatmapsetinfo in beatmapSetInfos)
             {
@@ -146,10 +146,10 @@ namespace osu.Game.Tests.Beatmaps
             Assert.True(downloader.DownloadBeatmaps().Result == BeatmapDownloaderStrings.YouNeedToBeLoggedInToDownloadBeatmaps.ToString());
 
             API.Login("dummy", "password");
-            config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay * 7);
+            config.SetValue(OsuSetting.BeatmapDownloadLastTime, new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay * 7));
             Assert.True(downloader.DownloadBeatmaps().Result == BeatmapDownloaderStrings.TheLastDownloadedBeatmapTimeIsInTheFuture.ToString());
 
-            config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = DateTime.Now.AddSeconds(-30);
+            config.SetValue(OsuSetting.BeatmapDownloadLastTime, DateTime.Now.AddSeconds(-30));
             Assert.True(downloader.DownloadBeatmaps().Result == BeatmapDownloaderStrings.PleaseWaitAMinuteBeforeRequestingNewBeatmaps.ToString());
         }
 

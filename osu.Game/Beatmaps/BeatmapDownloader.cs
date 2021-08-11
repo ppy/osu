@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
             category = config.GetBindable<SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory);
             ruelsetId = config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset);
 
-            if (config.GetBindable<bool>(OsuSetting.BeatmapDownloadStartUp).Value)
+            if (config.Get<bool>(OsuSetting.BeatmapDownloadStartUp))
             {
                 Task.Run(DownloadBeatmaps);
             }
@@ -216,7 +216,6 @@ namespace osu.Game.Beatmaps
     [Serializable]
     internal class DownloaderException : Exception
     {
-
         public DownloaderException(string message) : base(message)
         {
         }
