@@ -6,12 +6,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class OffsetSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Offset Adjustment";
+        protected override LocalisableString Header => AudioSettingsStrings.OffsetHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -20,13 +21,13 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 new SettingsSlider<double, OffsetSlider>
                 {
-                    LabelText = "Audio offset",
+                    LabelText = AudioSettingsStrings.AudioOffset,
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
                     KeyboardStep = 1f
                 },
                 new SettingsButton
                 {
-                    Text = "Offset wizard"
+                    Text = AudioSettingsStrings.OffsetWizard
                 }
             };
         }
