@@ -46,4 +46,7 @@
     <ProjectReference Include="..\M.Resources\M.Resources.csproj" />
     <ProjectReference Include="..\..\osu-framework\osu.Framework\osu.Framework.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Screens\Mvis\Plugins\Internal" />
+  </ItemGroup>
 </Project>

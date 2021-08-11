@@ -238,7 +238,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         public enum TargetLayer
         {
             Background,
-            Foreground
+            Foreground,
+            FunctionBar
         }
 
         protected override void Dispose(bool isDisposing)

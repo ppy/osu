@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.BottomBar.Buttons;
+using osu.Game.Screens.Mvis.Plugins.Internal.BottomBar.Buttons;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Mvis

@@ -4,25 +4,25 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osuTK;
-using osu.Framework.Graphics.Containers;
-using osuTK.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Configuration;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Skinning;
+using osu.Game.Screens.Mvis.Plugins.Types;
+using osuTK;
+using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.BottomBar.Buttons
+namespace osu.Game.Screens.Mvis.Plugins.Internal.BottomBar.Buttons
 {
     public class BottomBarButton : CompositeDrawable, IHasTooltip
     {
@@ -31,33 +31,26 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
         protected CustomColourProvider ColourProvider => colourProvider;
         protected FillFlowContainer ContentFillFlow;
-        protected virtual string BackgroundTextureName => "MButtonSquare-background";
 
-        protected virtual Drawable CreateBackgroundDrawable => new SkinnableSprite(BackgroundTextureName, confineMode: ConfineMode.ScaleToFit)
+        public IconUsage Icon
         {
-            RelativeSizeAxes = Axes.Both,
-            CentreComponent = false
-        };
+            get => SpriteIcon.Icon;
+            set => SpriteIcon.Icon = value;
+        }
+
+        public LocalisableString Title
+        {
+            get => SpriteText.Text;
+            set => SpriteText.Text = value;
+        }
 
         protected Box BgBox;
         private Box flashBox;
         private Container content;
         private IconUsage emptyIcon => new IconUsage();
 
-        public Action Action;
+        public Action Action { get; set; }
         public LocalisableString TooltipText { get; set; }
-
-        public IconUsage ButtonIcon
-        {
-            get => SpriteIcon.Icon;
-            set => SpriteIcon.Icon = value;
-        }
-
-        public LocalisableString Text
-        {
-            get => SpriteText.Text;
-            set => SpriteText.Text = value;
-        }
 
         protected readonly OsuSpriteText SpriteText = new OsuSpriteText
         {
@@ -79,9 +72,22 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             set => base.AutoSizeAxes = value;
         }
 
-        public BottomBarButton()
+        public BottomBarButton(IFunctionProvider provider = null)
         {
             Size = new Vector2(30);
+
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
+            if (provider != null)
+            {
+                Action = provider.Action;
+                Icon = provider.Icon;
+                SpriteText.Text = provider.Title;
+                SpriteIcon.Icon = provider.Icon;
+                TooltipText = provider.Description;
+                Size = provider.Size;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -103,14 +109,13 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                         Colour = Color4.Black.Opacity(0.6f),
                         Offset = new Vector2(0, 1.5f)
                     },
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         BgBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = ColourProvider.Background3
                         },
-                        CreateBackgroundDrawable,
                         ContentFillFlow = new FillFlowContainer
                         {
                             Margin = new MarginPadding { Left = 15, Right = 15 },
@@ -132,10 +137,10 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                 new HoverClickSounds()
             };
 
-            if (!ButtonIcon.Equals(emptyIcon))
+            if (!Icon.Equals(emptyIcon))
                 ContentFillFlow.Add(SpriteIcon);
 
-            if (string.IsNullOrEmpty(Text.ToString()))
+            if (string.IsNullOrEmpty(Title.ToString()))
                 ContentFillFlow.Add(SpriteText);
 
             // From OsuAnimatedButton
