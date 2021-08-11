@@ -3,6 +3,7 @@
 
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
@@ -14,7 +15,14 @@ namespace osu.Game.Graphics.UserInterface
     {
         private const int fade_duration = 250;
 
-        public OsuContextMenu()
+        [Resolved]
+        private OsuContextMenuSamples samples { get; set; }
+
+        // todo: this shouldn't be required after https://github.com/ppy/osu-framework/issues/4519 is fixed.
+        private bool wasOpened;
+        private readonly bool playClickSample;
+
+        public OsuContextMenu(bool playClickSample = false)
             : base(Direction.Vertical)
         {
             MaskingContainer.CornerRadius = 5;
@@ -28,16 +36,38 @@ namespace osu.Game.Graphics.UserInterface
             ItemsContainer.Padding = new MarginPadding { Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL };
 
             MaxHeight = 250;
+
+            this.playClickSample = playClickSample;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             BackgroundColour = colours.ContextMenuGray;
         }
 
-        protected override void AnimateOpen() => this.FadeIn(fade_duration, Easing.OutQuint);
-        protected override void AnimateClose() => this.FadeOut(fade_duration, Easing.OutQuint);
+        protected override void AnimateOpen()
+        {
+            this.FadeIn(fade_duration, Easing.OutQuint);
+
+            if (playClickSample)
+                samples.PlayClickSample();
+
+            if (!wasOpened)
+                samples.PlayOpenSample();
+
+            wasOpened = true;
+        }
+
+        protected override void AnimateClose()
+        {
+            this.FadeOut(fade_duration, Easing.OutQuint);
+
+            if (wasOpened)
+                samples.PlayCloseSample();
+
+            wasOpened = false;
+        }
 
         protected override Menu CreateSubMenu() => new OsuContextMenu();
     }
