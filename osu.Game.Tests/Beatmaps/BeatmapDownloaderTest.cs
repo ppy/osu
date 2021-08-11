@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Beatmaps
         private static List<BeatmapSetInfo> beatmapSetInfos = new List<BeatmapSetInfo>() {
             new BeatmapSetInfo()
             {
-                ID = 1,
+                ID = 0,
                 OnlineBeatmapSetID = 3756,
                 Beatmaps = new List<BeatmapInfo>
                 {
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Beatmaps
             },
             new BeatmapSetInfo()
             {
-                ID = 1,
+                ID = 0,
                 OnlineBeatmapSetID = 1,
                 Beatmaps = new List<BeatmapInfo>
                 {
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Beatmaps
             },
             new BeatmapSetInfo()
             {
-                ID = 1,
+                ID = 0,
                 OnlineBeatmapSetID = 2459,
                 Beatmaps = new List<BeatmapInfo>
                 {
