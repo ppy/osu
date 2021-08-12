@@ -25,6 +25,9 @@ namespace osu.Game.Overlays.Changelog
         private readonly FillFlowContainer textContainer;
         private readonly Container imageContainer;
 
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
+
         public ChangelogSupporterPromo()
         {
             RelativeSizeAxes = Axes.X;
