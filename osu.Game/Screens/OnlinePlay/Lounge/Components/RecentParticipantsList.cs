@@ -4,16 +4,16 @@
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
@@ -22,7 +22,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private const float avatar_size = 36;
 
         private FillFlowContainer<CircularAvatar> avatarFlow;
+
         private HiddenUserCount hiddenUsers;
+        private OsuSpriteText totalCount;
 
         public RecentParticipantsList()
         {
@@ -31,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colours)
         {
             InternalChildren = new Drawable[]
             {
@@ -44,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4Extensions.FromHex(@"#2E3835")
+                        Colour = colours.Background4,
                     }
                 },
                 new FillFlowContainer
@@ -54,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(4),
-                    Padding = new MarginPadding { Left = 8, Right = 16 },
+                    Padding = new MarginPadding { Right = 16 },
                     Children = new Drawable[]
                     {
                         new SpriteIcon
@@ -62,7 +64,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Size = new Vector2(16),
+                            Margin = new MarginPadding { Left = 8 },
                             Icon = FontAwesome.Solid.User,
+                        },
+                        totalCount = new OsuSpriteText
+                        {
+                            Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                         },
                         avatarFlow = new FillFlowContainer<CircularAvatar>
                         {
@@ -70,7 +79,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             Origin = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(4)
+                            Spacing = new Vector2(4),
+                            Margin = new MarginPadding { Left = 4 },
                         },
                         hiddenUsers = new HiddenUserCount
                         {
@@ -87,17 +97,24 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             base.LoadComplete();
 
             RecentParticipants.BindCollectionChanged(onParticipantsChanged, true);
-            ParticipantCount.BindValueChanged(_ => updateHiddenUserCount(), true);
+            ParticipantCount.BindValueChanged(_ =>
+            {
+                updateHiddenUsers();
+                totalCount.Text = ParticipantCount.Value.ToString();
+            }, true);
         }
 
-        private int numberOfAvatars = 3;
+        private int numberOfCircles = 4;
 
-        public int NumberOfAvatars
+        /// <summary>
+        /// The maximum number of circles visible (including the "hidden count" circle in the overflow case).
+        /// </summary>
+        public int NumberOfCircles
         {
-            get => numberOfAvatars;
+            get => numberOfCircles;
             set
             {
-                numberOfAvatars = value;
+                numberOfCircles = value;
 
                 if (LoadState < LoadState.Loaded)
                     return;
@@ -106,6 +123,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 clearUsers();
                 foreach (var u in RecentParticipants)
                     addUser(u);
+
+                updateHiddenUsers();
             }
         }
 
@@ -135,34 +154,45 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         addUser(u);
                     break;
             }
+
+            updateHiddenUsers();
         }
+
+        private int displayedCircles => avatarFlow.Count + (hiddenUsers.Count > 0 ? 1 : 0);
 
         private void addUser(User user)
         {
-            if (avatarFlow.Count < NumberOfAvatars)
+            if (displayedCircles < NumberOfCircles)
                 avatarFlow.Add(new CircularAvatar { User = user });
-
-            updateHiddenUserCount();
         }
 
         private void removeUser(User user)
         {
-            if (avatarFlow.RemoveAll(a => a.User == user) > 0)
-            {
-                if (RecentParticipants.Count >= NumberOfAvatars)
-                    avatarFlow.Add(new CircularAvatar { User = RecentParticipants.First(u => avatarFlow.All(a => a.User != u)) });
-            }
-
-            updateHiddenUserCount();
+            avatarFlow.RemoveAll(a => a.User == user);
         }
 
         private void clearUsers()
         {
             avatarFlow.Clear();
-            updateHiddenUserCount();
+            updateHiddenUsers();
         }
 
-        private void updateHiddenUserCount() => hiddenUsers.Count = ParticipantCount.Value - avatarFlow.Count;
+        private void updateHiddenUsers()
+        {
+            int hiddenCount = 0;
+            if (RecentParticipants.Count > NumberOfCircles)
+                hiddenCount = ParticipantCount.Value - NumberOfCircles + 1;
+
+            hiddenUsers.Count = hiddenCount;
+
+            if (displayedCircles > NumberOfCircles)
+                avatarFlow.Remove(avatarFlow.Last());
+            else if (displayedCircles < NumberOfCircles)
+            {
+                var nextUser = RecentParticipants.FirstOrDefault(u => avatarFlow.All(a => a.User != u));
+                if (nextUser != null) addUser(nextUser);
+            }
+        }
 
         private class CircularAvatar : CompositeDrawable
         {
@@ -172,9 +202,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 set => avatar.User = value;
             }
 
-            private readonly UpdateableAvatar avatar;
+            private readonly UpdateableAvatar avatar = new UpdateableAvatar(showUsernameTooltip: true) { RelativeSizeAxes = Axes.Both };
 
-            public CircularAvatar()
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colours)
             {
                 Size = new Vector2(avatar_size);
 
@@ -182,7 +213,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    Child = avatar = new UpdateableAvatar(showUsernameTooltip: true) { RelativeSizeAxes = Axes.Both }
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = colours.Background5,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        avatar
+                    }
                 };
             }
         }
@@ -206,9 +245,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             private int count;
 
-            private readonly SpriteText countText;
+            private readonly SpriteText countText = new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.Default.With(weight: FontWeight.Bold),
+            };
 
-            public HiddenUserCount()
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colours)
             {
                 Size = new Vector2(avatar_size);
                 Alpha = 0;
@@ -222,13 +267,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black
+                            Colour = colours.Background5,
                         },
-                        countText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }
+                        countText
                     }
                 };
             }
