@@ -13,6 +13,7 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Beatmaps;
@@ -25,6 +26,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         [Cached]
         private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
+
+        [Cached]
+        protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
         [Test]
         public void TestMultipleStatuses()

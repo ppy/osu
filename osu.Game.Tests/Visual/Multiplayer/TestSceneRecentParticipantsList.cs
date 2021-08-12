@@ -3,9 +3,11 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Users;
@@ -16,6 +18,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneRecentParticipantsList : OnlinePlayTestScene
     {
         private RecentParticipantsList list;
+
+        [Cached]
+        protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
         [SetUp]
         public new void Setup() => Schedule(() =>
