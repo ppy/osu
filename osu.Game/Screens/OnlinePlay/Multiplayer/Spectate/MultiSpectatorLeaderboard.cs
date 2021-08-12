@@ -4,6 +4,7 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Timing;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 
@@ -11,8 +12,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     public class MultiSpectatorLeaderboard : MultiplayerGameplayLeaderboard
     {
-        public MultiSpectatorLeaderboard([NotNull] ScoreProcessor scoreProcessor, int[] userIds)
-            : base(scoreProcessor, userIds)
+        public MultiSpectatorLeaderboard([NotNull] ScoreProcessor scoreProcessor, MultiplayerRoomUser[] users)
+            : base(scoreProcessor, users)
         {
         }
 
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             ((SpectatingTrackedUserData)data).Clock = null;
         }
 
-        protected override TrackedUserData CreateUserData(int userId, ScoreProcessor scoreProcessor) => new SpectatingTrackedUserData(userId, scoreProcessor);
+        protected override TrackedUserData CreateUserData(MultiplayerRoomUser user, ScoreProcessor scoreProcessor) => new SpectatingTrackedUserData(user, scoreProcessor);
 
         protected override void Update()
         {
@@ -47,8 +48,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             [CanBeNull]
             public IClock Clock;
 
-            public SpectatingTrackedUserData(int userId, ScoreProcessor scoreProcessor)
-                : base(userId, scoreProcessor)
+            public SpectatingTrackedUserData(MultiplayerRoomUser user, ScoreProcessor scoreProcessor)
+                : base(user, scoreProcessor)
             {
             }
 
