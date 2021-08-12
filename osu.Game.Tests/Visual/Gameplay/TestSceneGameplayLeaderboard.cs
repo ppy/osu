@@ -84,6 +84,23 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add frenzibyte", () => createRandomScore(new User { Username = "frenzibyte", Id = 14210502 }));
         }
 
+        [Test]
+        public void TestMaxHeight()
+        {
+            int playerNumber = 1;
+            AddRepeatStep("add 3 other players", () => createRandomScore(new User { Username = $"Player {playerNumber++}" }), 3);
+            checkHeight(4);
+
+            AddRepeatStep("add 4 other players", () => createRandomScore(new User { Username = $"Player {playerNumber++}" }), 4);
+            checkHeight(8);
+
+            AddRepeatStep("add 4 other players", () => createRandomScore(new User { Username = $"Player {playerNumber++}" }), 4);
+            checkHeight(8);
+
+            void checkHeight(int panelCount)
+                => AddAssert($"leaderboard height is {panelCount} panels high", () => leaderboard.DrawHeight == (GameplayLeaderboardScore.PANEL_HEIGHT + leaderboard.Spacing) * panelCount);
+        }
+
         private void createRandomScore(User user) => createLeaderboardScore(new BindableDouble(RNG.Next(0, 5_000_000)), user);
 
         private void createLeaderboardScore(BindableDouble score, User user, bool isTracked = false)
@@ -94,9 +111,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestGameplayLeaderboard : GameplayLeaderboard
         {
+            public float Spacing => Flow.Spacing.Y;
+
             public bool CheckPositionByUsername(string username, int? expectedPosition)
             {
-                var scoreItem = this.FirstOrDefault(i => i.User?.Username == username);
+                var scoreItem = Flow.FirstOrDefault(i => i.User?.Username == username);
 
                 return scoreItem != null && scoreItem.ScorePosition == expectedPosition;
             }
