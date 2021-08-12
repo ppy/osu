@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
@@ -46,6 +47,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             CacheAs(Filter);
             CacheAs(OngoingOperationTracker);
             CacheAs(AvailabilityTracker);
+            CacheAs(new OverlayColourProvider(OverlayColourScheme.Plum));
         }
 
         public object Get(Type type)

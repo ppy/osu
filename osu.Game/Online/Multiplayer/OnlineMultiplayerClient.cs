@@ -91,6 +91,14 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.TransferHost), userId);
         }
 
+        public override Task KickUser(int userId)
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.KickUser), userId);
+        }
+
         public override Task ChangeSettings(MultiplayerRoomSettings settings)
         {
             if (!IsConnected.Value)

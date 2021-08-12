@@ -962,7 +962,7 @@ namespace osu.Game.Screens.Play
             screenSuspension?.Expire();
 
             // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
-            if (Score != null && prepareScoreForDisplayTask == null)
+            if (prepareScoreForDisplayTask == null)
             {
                 Score.ScoreInfo.Passed = false;
                 // potentially should be ScoreRank.F instead? this is the best alternative for now.

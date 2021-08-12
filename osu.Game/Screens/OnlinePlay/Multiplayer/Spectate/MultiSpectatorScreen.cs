@@ -55,7 +55,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public MultiSpectatorScreen(MultiplayerRoomUser[] users)
             : base(users.Select(u => u.UserID).ToArray())
         {
-            // todo: this is a bit ugly, but not sure on a better way to handle.
             this.users = users;
 
             instances = new PlayerArea[Users.Count];

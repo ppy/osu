@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osuTK;
@@ -15,6 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Components
 {
+    [HeadlessTest]
     public class TestScenePollingComponent : OsuTestScene
     {
         private Container pollBox;
