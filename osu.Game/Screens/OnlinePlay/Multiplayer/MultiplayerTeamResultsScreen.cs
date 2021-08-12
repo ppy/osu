@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -52,10 +53,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             var redScore = teamScores.First().Value;
             var blueScore = teamScores.Last().Value;
 
-            // eventually this will be replaced by team names coming from the multiplayer match state.
-            string winner = redScore.Value > blueScore.Value ? @"Red" : @"Blue";
+            LocalisableString winner;
+            Colour4 winnerColour;
 
-            var winnerColour = redScore.Value > blueScore.Value ? colours.TeamColourRed : colours.TeamColourBlue;
+            int comparison = redScore.Value.CompareTo(blueScore.Value);
+
+            if (comparison < 0)
+            {
+                // team name should eventually be coming from the multiplayer match state.
+                winner = MultiplayerTeamResultsScreenStrings.TeamWins(@"Blue");
+                winnerColour = colours.TeamColourBlue;
+            }
+            else if (comparison > 0)
+            {
+                // team name should eventually be coming from the multiplayer match state.
+                winner = MultiplayerTeamResultsScreenStrings.TeamWins(@"Red");
+                winnerColour = colours.TeamColourRed;
+            }
+            else
+            {
+                winner = MultiplayerTeamResultsScreenStrings.TheTeamsAreTied;
+                winnerColour = Colour4.White.Opacity(0.5f);
+            }
 
             AddRangeInternal(new Drawable[]
             {
@@ -96,7 +115,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 {
                     Alpha = 0,
                     Font = OsuFont.Torus.With(size: 80, weight: FontWeight.Bold),
-                    Text = MultiplayerResultsScreenStrings.TeamWins(winner),
+                    Text = winner,
                     Blending = BlendingParameters.Additive
                 }).WithEffect(new GlowEffect
                 {

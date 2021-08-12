@@ -17,6 +17,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         [TestCase(7483253, 1048576)]
         [TestCase(1048576, 7483253)]
+        [TestCase(1048576, 1048576)]
         public void TestDisplayWithTeams(int team1Score, int team2Score)
         {
             MultiplayerResultsScreen screen = null;
