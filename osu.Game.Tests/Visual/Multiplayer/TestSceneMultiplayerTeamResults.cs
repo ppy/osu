@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     { 1, new BindableInt(1048576) }
                 };
 
-                Stack.Push(screen = new MultiplayerResultsScreen(score, 1, playlistItem, teamScores));
+                Stack.Push(screen = new MultiplayerTeamResultsScreen(score, 1, playlistItem, teamScores));
             });
 
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
@@ -85,9 +85,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     BeatmapID = beatmapInfo.ID,
                 };
 
-                SortedDictionary<int, BindableInt> teamScores = new SortedDictionary<int, BindableInt>();
-
-                Stack.Push(screen = new MultiplayerResultsScreen(score, 1, playlistItem, teamScores));
+                Stack.Push(screen = new MultiplayerResultsScreen(score, 1, playlistItem));
             });
 
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
