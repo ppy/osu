@@ -56,6 +56,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             var defaultLegacySkin = skins.DefaultLegacySkin;
 
+            // sprite names intentionally swapped to match stable member naming / ease of cross-referencing
             explosion1.Texture = defaultLegacySkin.GetTexture("scoreboard-explosion-2");
             explosion2.Texture = defaultLegacySkin.GetTexture("scoreboard-explosion-1");
         }
