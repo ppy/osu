@@ -8,8 +8,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -65,6 +67,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             AddRangeInternal(new Drawable[]
             {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4Extensions.FromHex(@"3e3a44") // This is super temporary.
+                },
                 BeatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
                 {
                     SelectedItem = { BindTarget = SelectedItem }
