@@ -4,7 +4,6 @@
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,7 +13,6 @@ using osu.Game.Overlays;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
@@ -208,9 +206,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             private int count;
 
-            private readonly SpriteText countText;
+            private readonly SpriteText countText = new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            };
 
-            public HiddenUserCount()
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colours)
             {
                 Size = new Vector2(avatar_size);
                 Alpha = 0;
@@ -224,13 +227,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black
+                            Colour = colours.Background5,
                         },
-                        countText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }
+                        countText
                     }
                 };
             }
