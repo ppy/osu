@@ -40,6 +40,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddStep("add local player", () => createLeaderboardScore(playerScore, new User { Username = "You", Id = 3 }, true));
+            AddStep("toggle expanded", () => leaderboard.Expanded.Value = !leaderboard.Expanded.Value);
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
         }
 
