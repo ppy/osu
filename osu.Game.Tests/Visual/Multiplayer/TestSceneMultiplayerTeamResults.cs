@@ -15,8 +15,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerTeamResults : ScreenTestScene
     {
-        [Test]
-        public void TestDisplayWithTeams()
+        [TestCase(7483253, 1048576)]
+        [TestCase(1048576, 7483253)]
+        public void TestDisplayWithTeams(int team1Score, int team2Score)
         {
             MultiplayerResultsScreen screen = null;
 
@@ -46,8 +47,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 SortedDictionary<int, BindableInt> teamScores = new SortedDictionary<int, BindableInt>
                 {
-                    { 0, new BindableInt(7483253) },
-                    { 1, new BindableInt(1048576) }
+                    { 0, new BindableInt(team1Score) },
+                    { 1, new BindableInt(team2Score) }
                 };
 
                 Stack.Push(screen = new MultiplayerTeamResultsScreen(score, 1, playlistItem, teamScores));
