@@ -5,10 +5,12 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shaders;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -21,14 +23,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private double lastTrailTime;
         private IBindable<float> cursorSize;
 
+        private Vector2? currentPosition;
+
         public LegacyCursorTrail(ISkin skin)
         {
             this.skin = skin;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(ShaderManager shaders, OsuConfigManager config)
         {
+            Shader = shaders.Load(@"LegacyCursorTrail", FragmentShaderDescriptor.TEXTURE);
+
             Texture = skin.GetTexture("cursortrail");
             disjointTrail = skin.GetTexture("cursormiddle") == null;
 
@@ -59,18 +65,24 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected override float IntervalMultiplier => 1 / Math.Max(cursorSize.Value, 1);
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        protected override void Update()
         {
-            if (!disjointTrail)
-                return base.OnMouseMove(e);
+            base.Update();
+
+            if (!disjointTrail || !currentPosition.HasValue)
+                return;
 
             if (Time.Current - lastTrailTime >= disjoint_trail_time_separation)
             {
                 lastTrailTime = Time.Current;
-                return base.OnMouseMove(e);
+                AddTrail(currentPosition.Value);
             }
+        }
 
-            return false;
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            currentPosition = e.ScreenSpaceMousePosition;
+            return base.OnMouseMove(e);
         }
     }
 }
