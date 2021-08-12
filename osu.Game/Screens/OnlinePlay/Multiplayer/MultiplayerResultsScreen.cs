@@ -6,7 +6,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -22,6 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         private readonly SortedDictionary<int, BindableInt> teamScores;
 
+        private Container winnerBackground;
         private Drawable winnerText;
 
         public MultiplayerResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, SortedDictionary<int, BindableInt> teamScores)
@@ -36,6 +40,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
+            const float winner_background_half_height = 250;
+
             ScorePanelList.Anchor = ScorePanelList.Origin = Anchor.TopCentre;
             ScorePanelList.Scale = new Vector2(0.9f);
             ScorePanelList.Y = 75;
@@ -58,6 +64,32 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         Origin = Anchor.TopCentre,
                         Team1Score = { BindTarget = redScore },
                         Team2Score = { BindTarget = blueScore },
+                    },
+                    winnerBackground = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Alpha = 0,
+                        Children = new[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = winner_background_half_height,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.BottomCentre,
+                                Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0), Colour4.Black.Opacity(0.4f))
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = winner_background_half_height,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.TopCentre,
+                                Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0.4f), Colour4.Black.Opacity(0))
+                            }
+                        }
                     },
                     (winnerText = new OsuSpriteText
                     {
@@ -83,7 +115,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             using (BeginDelayedSequence(300))
             {
-                winnerText.FadeInFromZero(600, Easing.InQuint);
+                const double fade_in_duration = 600;
+
+                winnerText.FadeInFromZero(fade_in_duration, Easing.InQuint);
+                winnerBackground.FadeInFromZero(fade_in_duration, Easing.InQuint);
 
                 winnerText
                     .ScaleTo(10)
@@ -91,6 +126,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     .Then()
                     .ScaleTo(1.02f, 1600, Easing.OutQuint)
                     .FadeOut(5000, Easing.InQuad);
+                winnerBackground.Delay(2200).FadeOut(2000);
             }
         }
     }
