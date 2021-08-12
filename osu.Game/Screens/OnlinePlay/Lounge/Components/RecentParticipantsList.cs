@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(4),
-                    Padding = new MarginPadding { Left = 8, Right = 16 },
+                    Padding = new MarginPadding { Right = 16 },
                     Children = new Drawable[]
                     {
                         new SpriteIcon
@@ -62,6 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Size = new Vector2(16),
+                            Margin = new MarginPadding(8),
                             Icon = FontAwesome.Solid.User,
                         },
                         avatarFlow = new FillFlowContainer<CircularAvatar>
