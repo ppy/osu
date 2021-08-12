@@ -9,31 +9,27 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Rooms.GameTypes;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class GameTypePicker : DisableableTabControl<GameType>
+    public class MatchTypePicker : DisableableTabControl<MatchType>
     {
         private const float height = 40;
         private const float selection_width = 3;
 
-        protected override TabItem<GameType> CreateTabItem(GameType value) => new GameTypePickerItem(value);
+        protected override TabItem<MatchType> CreateTabItem(MatchType value) => new GameTypePickerItem(value);
 
-        protected override Dropdown<GameType> CreateDropdown() => null;
+        protected override Dropdown<MatchType> CreateDropdown() => null;
 
-        public GameTypePicker()
+        public MatchTypePicker()
         {
             Height = height + selection_width * 2;
             TabContainer.Spacing = new Vector2(10 - selection_width * 2);
 
-            AddItem(new GameTypeTag());
-            AddItem(new GameTypeVersus());
-            AddItem(new GameTypeTagTeam());
-            AddItem(new GameTypeTeamVersus());
-            AddItem(new GameTypePlaylists());
+            AddItem(MatchType.HeadToHead);
+            AddItem(MatchType.TeamVersus);
         }
 
         private class GameTypePickerItem : DisableableTabItem
@@ -42,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
             private readonly CircularContainer hover, selection;
 
-            public GameTypePickerItem(GameType value)
+            public GameTypePickerItem(MatchType value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.Both;

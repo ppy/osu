@@ -1,14 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -41,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
             Value = true
         };
 
-        [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.")]
+        [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
         public BindableInt MuteComboCount { get; } = new BindableInt
         {
             Default = 100,
@@ -63,6 +65,11 @@ namespace osu.Game.Rulesets.Mods
             Default = true,
             Value = true
         };
+
+        protected ModMuted()
+        {
+            InverseMuting.BindValueChanged(i => MuteComboCount.MinValue = i.NewValue ? 1 : 0, true);
+        }
 
         public void ApplyToTrack(ITrack track)
         {
@@ -89,7 +96,7 @@ namespace osu.Game.Rulesets.Mods
             currentCombo = scoreProcessor.Combo.GetBoundCopy();
             currentCombo.BindValueChanged(combo =>
             {
-                double dimFactor = Math.Min(1, (double)combo.NewValue / MuteComboCount.Value);
+                double dimFactor = MuteComboCount.Value == 0 ? 1 : (double)combo.NewValue / MuteComboCount.Value;
 
                 if (InverseMuting.Value)
                     dimFactor = 1 - dimFactor;
@@ -100,5 +107,10 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+    }
+
+    public class MuteComboSlider : OsuSliderBar<int>
+    {
+        public override LocalisableString TooltipText => Current.Value == 0 ? "always muted" : base.TooltipText;
     }
 }

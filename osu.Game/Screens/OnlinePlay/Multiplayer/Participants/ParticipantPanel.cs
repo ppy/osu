@@ -37,6 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private RulesetStore rulesets { get; set; }
 
         private SpriteIcon crown;
+
         private OsuSpriteText userRankText;
         private ModDisplay userModsDisplay;
         private StateDisplay userStateDisplay;
@@ -56,99 +57,108 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             var backgroundColour = Color4Extensions.FromHex("#33413C");
 
-            InternalChildren = new Drawable[]
+            InternalChild = new GridContainer
             {
-                crown = new SpriteIcon
+                RelativeSizeAxes = Axes.Both,
+                ColumnDimensions = new[]
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Icon = FontAwesome.Solid.Crown,
-                    Size = new Vector2(14),
-                    Colour = Color4Extensions.FromHex("#F7E65D"),
-                    Alpha = 0
+                    new Dimension(GridSizeMode.Absolute, 18),
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension()
                 },
-                new Container
+                Content = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = 24 },
-                    Child = new Container
+                    new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        CornerRadius = 5,
-                        Children = new Drawable[]
+                        crown = new SpriteIcon
                         {
-                            new Box
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Icon = FontAwesome.Solid.Crown,
+                            Size = new Vector2(14),
+                            Colour = Color4Extensions.FromHex("#F7E65D"),
+                            Alpha = 0
+                        },
+                        new TeamDisplay(user),
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            CornerRadius = 5,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = backgroundColour
-                            },
-                            new UserCoverBackground
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                RelativeSizeAxes = Axes.Both,
-                                Width = 0.75f,
-                                User = user,
-                                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White.Opacity(0.25f))
-                            },
-                            new FillFlowContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Spacing = new Vector2(10),
-                                Direction = FillDirection.Horizontal,
-                                Children = new Drawable[]
+                                new Box
                                 {
-                                    new UpdateableAvatar
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = backgroundColour
+                                },
+                                new UserCoverBackground
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.75f,
+                                    User = user,
+                                    Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White.Opacity(0.25f))
+                                },
+                                new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Spacing = new Vector2(10),
+                                    Direction = FillDirection.Horizontal,
+                                    Children = new Drawable[]
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        RelativeSizeAxes = Axes.Both,
-                                        FillMode = FillMode.Fit,
-                                        User = user
-                                    },
-                                    new UpdateableFlag
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Size = new Vector2(30, 20),
-                                        Country = user?.Country
-                                    },
-                                    new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
-                                        Text = user?.Username
-                                    },
-                                    userRankText = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(size: 14),
+                                        new UpdateableAvatar
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            RelativeSizeAxes = Axes.Both,
+                                            FillMode = FillMode.Fit,
+                                            User = user
+                                        },
+                                        new UpdateableFlag
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Size = new Vector2(30, 20),
+                                            Country = user?.Country
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
+                                            Text = user?.Username
+                                        },
+                                        userRankText = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(size: 14),
+                                        }
                                     }
-                                }
-                            },
-                            new Container
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                AutoSizeAxes = Axes.Both,
-                                Margin = new MarginPadding { Right = 70 },
-                                Child = userModsDisplay = new ModDisplay
+                                },
+                                new Container
                                 {
-                                    Scale = new Vector2(0.5f),
-                                    ExpansionMode = ExpansionMode.AlwaysContracted,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    AutoSizeAxes = Axes.Both,
+                                    Margin = new MarginPadding { Right = 70 },
+                                    Child = userModsDisplay = new ModDisplay
+                                    {
+                                        Scale = new Vector2(0.5f),
+                                        ExpansionMode = ExpansionMode.AlwaysContracted,
+                                    }
+                                },
+                                userStateDisplay = new StateDisplay
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    Margin = new MarginPadding { Right = 10 },
                                 }
-                            },
-                            userStateDisplay = new StateDisplay
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                Margin = new MarginPadding { Right = 10 },
                             }
                         }
-                    }
+                    },
                 }
             };
         }

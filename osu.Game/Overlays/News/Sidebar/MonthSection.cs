@@ -79,8 +79,6 @@ namespace osu.Game.Overlays.News.Sidebar
 
             private readonly SpriteIcon icon;
 
-            protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
-
             public DropdownHeader(int month, int year)
             {
                 var date = new DateTime(year, month, 1);
