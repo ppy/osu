@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
             // This code updates the storyboard before creating its DrawableStoryboard and starting elements' loading.
             double? storyboardLatestEventTime = storyboard.LatestEventTime;
 
-            if (!storyboard.ReplacesBackground && storyboardLatestEventTime != null)
+            if (!storyboard.ReplacesBackground && storyboardLatestEventTime != null && storyboard.GetLayer("Background").Elements.Count != 0)
             {
                 var sprite = new StoryboardBackgroundSprite(storyboard.BeatmapInfo.Metadata?.BackgroundFile, (double)storyboardLatestEventTime);
                 storyboard.GetLayer("Background").Elements.Insert(0, sprite);
