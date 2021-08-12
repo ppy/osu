@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void createLeaderboardScore(BindableDouble score, User user, bool isTracked = false)
         {
-            var leaderboardScore = leaderboard.AddPlayer(user, isTracked);
+            var leaderboardScore = leaderboard.Add(user, isTracked);
             leaderboardScore.TotalScore.BindTo(score);
         }
 

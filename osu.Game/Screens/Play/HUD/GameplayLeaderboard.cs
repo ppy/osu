@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play.HUD
         /// Whether the player should be tracked on the leaderboard.
         /// Set to <c>true</c> for the local player or a player whose replay is currently being played.
         /// </param>
-        public ILeaderboardScore AddPlayer([CanBeNull] User user, bool isTracked)
+        public ILeaderboardScore Add([CanBeNull] User user, bool isTracked)
         {
             var drawable = CreateLeaderboardScoreDrawable(user, isTracked);
 
