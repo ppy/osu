@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool PerformFail() => true;
 
-        public override bool RestartOnFail => Restart.Value;
-
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
             => result.Type.AffectsCombo()
                && !result.IsHit;
