@@ -101,7 +101,6 @@ namespace osu.Game.Screens.OnlinePlay
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = Header.HEIGHT },
                         Children = new[]
                         {
                             header = new Container
