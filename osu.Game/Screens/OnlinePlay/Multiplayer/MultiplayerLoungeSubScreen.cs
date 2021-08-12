@@ -21,7 +21,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
-        protected override FilterControl CreateFilterControl() => new MultiplayerFilterControl();
+        protected override FilterCriteria CreateFilterCriteria()
+        {
+            var criteria = base.CreateFilterCriteria();
+            criteria.Category = "realtime";
+            return criteria;
+        }
 
         protected override OsuButton CreateNewRoomButton() => new CreateMultiplayerMatchButton();
 
