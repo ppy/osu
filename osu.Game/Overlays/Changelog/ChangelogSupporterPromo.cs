@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Changelog
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },
-                new TextFlowContainer(t =>
+                new OsuTextFlowContainer(t =>
                 {
                     t.Font = t.Font.With(size: 12);
                     t.Colour = colour.PinkLighter;
