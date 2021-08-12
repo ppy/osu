@@ -214,8 +214,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     flashlightValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
                 // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
-                flashlightValue *= 0.5 + 0.15 * Math.Min(1.0, totalHits / 200.0) +
-                                   (totalHits > 200 ? 0.35 * Math.Min(1.0, (totalHits - 200) / 600.0) : 0.0);
+                flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
+                                   (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
 
                 // Scale the flashlight value with accuracy _slightly_.
                 flashlightValue *= 0.5 + accuracy / 2.0;
