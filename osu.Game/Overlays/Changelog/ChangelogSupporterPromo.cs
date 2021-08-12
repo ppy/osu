@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Changelog
                     t.Colour = colour.PinkLighter;
                 })
                 {
-                    Text = "Not only will you help speed development, but you will also get some extra features and customisations!",
+                    Text = ChangelogStrings.SupportText2.ToString(),
                     Margin = new MarginPadding { Top = 10 },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
