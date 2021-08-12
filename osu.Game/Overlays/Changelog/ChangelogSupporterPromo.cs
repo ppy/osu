@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -12,6 +14,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
@@ -24,9 +27,6 @@ namespace osu.Game.Overlays.Changelog
 
         private readonly FillFlowContainer textContainer;
         private readonly Container imageContainer;
-
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         public ChangelogSupporterPromo()
         {
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Changelog
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, TextureStore textures)
         {
-            LinkFlowContainer supportLinkText;
+            SupporterPromoLinkFlowContainer supportLinkText;
             textContainer.Children = new Drawable[]
             {
                 new OsuSpriteText
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Changelog
                     Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
                     Margin = new MarginPadding { Bottom = 20 },
                 },
-                supportLinkText = new LinkFlowContainer(t =>
+                supportLinkText = new SupporterPromoLinkFlowContainer(t =>
                 {
                     t.Font = t.Font.With(size: 14);
                     t.Colour = colour.PinkLighter;
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Changelog
             };
 
             supportLinkText.AddText("Support further development of osu! and ");
-            supportLinkText.AddLink("become an osu!supporter", "https://osu.ppy.sh/home/support", t => t.Font = t.Font.With(weight: FontWeight.Bold));
+            supportLinkText.AddLink("become and osu!supporter", "https://osu.ppy.sh/home/support", t => t.Font = t.Font.With(weight: FontWeight.Bold));
             supportLinkText.AddText(" today!");
 
             imageContainer.Children = new Drawable[]
@@ -148,6 +148,40 @@ namespace osu.Game.Overlays.Changelog
                     Texture = textures.Get(@"Online/supporter-heart"),
                 },
             };
+        }
+
+        private class SupporterPromoLinkFlowContainer : LinkFlowContainer
+        {
+            public SupporterPromoLinkFlowContainer(Action<SpriteText> defaultCreationParameters)
+                : base(defaultCreationParameters)
+            {
+            }
+
+            public new void AddLink(string text, string url, Action<SpriteText> creationParameters) =>
+                AddInternal(new SupporterPromoLinkCompiler(AddText(text, creationParameters)) { Url = url });
+
+            private class SupporterPromoLinkCompiler : DrawableLinkCompiler
+            {
+                [Resolved(CanBeNull = true)]
+                private OsuGame game { get; set; }
+
+                public string Url;
+
+                public SupporterPromoLinkCompiler(IEnumerable<Drawable> parts)
+                    : base(parts)
+                {
+                    RelativeSizeAxes = Axes.Both;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colour)
+                {
+                    TooltipText = Url;
+                    Action = () => game?.HandleLink(Url);
+                    IdleColour = colour.PinkDark;
+                    HoverColour = Color4.White;
+                }
+            }
         }
     }
 }
