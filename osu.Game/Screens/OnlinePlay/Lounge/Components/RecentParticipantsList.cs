@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -23,7 +22,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private const float avatar_size = 36;
 
         private FillFlowContainer<CircularAvatar> avatarFlow;
+
         private HiddenUserCount hiddenUsers;
+        private OsuSpriteText totalCount;
 
         public RecentParticipantsList()
         {
@@ -63,8 +64,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Size = new Vector2(16),
-                            Margin = new MarginPadding(8),
+                            Margin = new MarginPadding { Left = 8 },
                             Icon = FontAwesome.Solid.User,
+                        },
+                        totalCount = new OsuSpriteText
+                        {
+                            Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                         },
                         avatarFlow = new FillFlowContainer<CircularAvatar>
                         {
@@ -72,7 +79,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             Origin = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(4)
+                            Spacing = new Vector2(4),
+                            Margin = new MarginPadding { Left = 4 },
                         },
                         hiddenUsers = new HiddenUserCount
                         {
@@ -89,7 +97,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             base.LoadComplete();
 
             RecentParticipants.BindCollectionChanged(onParticipantsChanged, true);
-            ParticipantCount.BindValueChanged(_ => updateHiddenUsers(), true);
+            ParticipantCount.BindValueChanged(_ =>
+            {
+                updateHiddenUsers();
+                totalCount.Text = ParticipantCount.Value.ToString();
+            }, true);
         }
 
         private int numberOfCircles = 4;
