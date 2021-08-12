@@ -112,7 +112,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Show menu cursor in screenshots"
         /// </summary>
-        public static LocalisableString ShowCursorInScreenshots => new TranslatableString(getKey(@""), @"Show menu cursor in screenshots");
+        public static LocalisableString ShowCursorInScreenshots => new TranslatableString(getKey(@"show_cursor_in_screenshots"), @"Show menu cursor in screenshots");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
