@@ -181,7 +181,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
             Debug.Assert(RoomId.Value != null);
-            return new MultiplayerResultsScreen(score, RoomId.Value.Value, PlaylistItem, leaderboard.TeamScores);
+            return leaderboard.TeamScores.Count == 2
+                ? new MultiplayerTeamResultsScreen(score, RoomId.Value.Value, PlaylistItem, leaderboard.TeamScores)
+                : new MultiplayerResultsScreen(score, RoomId.Value.Value, PlaylistItem);
         }
 
         protected override void Dispose(bool isDisposing)
