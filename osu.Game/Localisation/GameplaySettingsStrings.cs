@@ -89,7 +89,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"Increase visibility of first object when visual impairment mods are enabled");
 
-
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
