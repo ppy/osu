@@ -21,7 +21,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private bool firstDisplay = true;
         private PillContainer pill;
         private SpriteText statusText;
 
@@ -51,6 +50,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             EndDate.BindValueChanged(_ => updateDisplay());
             Status.BindValueChanged(_ => updateDisplay(), true);
+
+            FinishTransforms(true);
         }
 
         private void updateDisplay()
@@ -58,10 +59,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             RoomStatus status = getDisplayStatus();
 
             pill.Background.Alpha = 1;
-            pill.Background.FadeColour(status.GetAppropriateColour(colours), firstDisplay ? 0 : 100);
+            pill.Background.FadeColour(status.GetAppropriateColour(colours), 100);
             statusText.Text = status.Message;
-
-            firstDisplay = false;
         }
 
         private RoomStatus getDisplayStatus()
