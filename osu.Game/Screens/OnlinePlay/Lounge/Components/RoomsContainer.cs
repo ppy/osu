@@ -50,6 +50,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            // account for the fact we are in a scroll container and want a bit of spacing from the scroll bar.
+            Padding = new MarginPadding { Right = 5 };
+
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,

@@ -293,6 +293,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task TransferHost(int userId);
 
+        public abstract Task KickUser(int userId);
+
         public abstract Task ChangeSettings(MultiplayerRoomSettings settings);
 
         public abstract Task ChangeState(MultiplayerUserState newState);
