@@ -1013,10 +1013,14 @@ namespace osu.Game
             ScreenOffsetContainer.Padding = new MarginPadding { Top = ToolbarOffset };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
-            ScreenOffsetContainer.X = 0f;
+            var horizontalOffset = 0f;
 
-            if (Settings.IsLoaded) ScreenOffsetContainer.X += (ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X) * SCREEN_OFFSET_RATIO;
-            if (Notifications.IsLoaded) ScreenOffsetContainer.X += (ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - DrawWidth) * SCREEN_OFFSET_RATIO;
+            if (Settings.IsLoaded)
+                horizontalOffset += (ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X) * SCREEN_OFFSET_RATIO;
+            if (Notifications.IsLoaded)
+                horizontalOffset += (ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - DrawWidth) * SCREEN_OFFSET_RATIO;
+
+            ScreenOffsetContainer.X = horizontalOffset;
 
             MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
