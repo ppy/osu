@@ -22,8 +22,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     {
         private const float avatar_size = 36;
 
-        private bool canDisplayMoreUsers = true;
-
         private FillFlowContainer<CircularAvatar> avatarFlow;
         private HiddenUserCount hiddenUsers;
 
@@ -91,10 +89,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             base.LoadComplete();
 
             RecentParticipants.BindCollectionChanged(onParticipantsChanged, true);
-            ParticipantCount.BindValueChanged(_ => updateHiddenUserCount(), true);
+            ParticipantCount.BindValueChanged(_ => updateHiddenUsers(), true);
         }
 
-        private int numberOfCircles = 3;
+        private int numberOfCircles = 4;
 
         /// <summary>
         /// The maximum number of circles visible (including the "hidden count" circle in the overflow case).
@@ -114,7 +112,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 foreach (var u in RecentParticipants)
                     addUser(u);
 
-                updateHiddenUserCount();
+                updateHiddenUsers();
             }
         }
 
@@ -145,44 +143,43 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     break;
             }
 
-            updateHiddenUserCount();
+            updateHiddenUsers();
         }
+
+        private int displayedCircles => avatarFlow.Count + (hiddenUsers.Count > 0 ? 1 : 0);
 
         private void addUser(User user)
         {
-            if (!canDisplayMoreUsers)
-                return;
-
-            if (avatarFlow.Count < NumberOfCircles)
+            if (displayedCircles < NumberOfCircles)
                 avatarFlow.Add(new CircularAvatar { User = user });
-            else if (avatarFlow.Count == NumberOfCircles)
-                avatarFlow.Remove(avatarFlow.Last());
         }
 
         private void removeUser(User user)
         {
-            var nextUser = RecentParticipants.FirstOrDefault(u => avatarFlow.All(a => a.User != u));
-            if (nextUser == null)
-                return;
-
-            if (canDisplayMoreUsers || NumberOfCircles == RecentParticipants.Count)
-                avatarFlow.Add(new CircularAvatar { User = nextUser });
+            avatarFlow.RemoveAll(a => a.User == user);
         }
 
         private void clearUsers()
         {
-            canDisplayMoreUsers = true;
             avatarFlow.Clear();
-            updateHiddenUserCount();
+            updateHiddenUsers();
         }
 
-        private void updateHiddenUserCount()
+        private void updateHiddenUsers()
         {
-            int count = ParticipantCount.Value - avatarFlow.Count;
+            int hiddenCount = 0;
+            if (RecentParticipants.Count > NumberOfCircles)
+                hiddenCount = ParticipantCount.Value - NumberOfCircles + 1;
 
-            Debug.Assert(count != 1);
+            hiddenUsers.Count = hiddenCount;
 
-            hiddenUsers.Count = count;
+            if (displayedCircles > NumberOfCircles)
+                avatarFlow.Remove(avatarFlow.Last());
+            else if (displayedCircles < NumberOfCircles)
+            {
+                var nextUser = RecentParticipants.FirstOrDefault(u => avatarFlow.All(a => a.User != u));
+                if (nextUser != null) addUser(nextUser);
+            }
         }
 
         private class CircularAvatar : CompositeDrawable
@@ -193,9 +190,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 set => avatar.User = value;
             }
 
-            private readonly UpdateableAvatar avatar;
+            private readonly UpdateableAvatar avatar = new UpdateableAvatar(showUsernameTooltip: true) { RelativeSizeAxes = Axes.Both };
 
-            public CircularAvatar()
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colours)
             {
                 Size = new Vector2(avatar_size);
 
@@ -203,7 +201,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    Child = avatar = new UpdateableAvatar(showUsernameTooltip: true) { RelativeSizeAxes = Axes.Both }
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = colours.Background5,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        avatar
+                    }
                 };
             }
         }

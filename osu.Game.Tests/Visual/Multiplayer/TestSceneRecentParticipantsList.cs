@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                NumberOfCircles = 3
+                NumberOfCircles = 4
             };
         });
 
@@ -43,6 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 for (int i = 0; i < 8; i++)
                     addUser(i);
             });
+
             AddStep("set 8 circles", () => list.NumberOfCircles = 8);
             AddAssert("0 hidden users", () => list.ChildrenOfType<RecentParticipantsList.HiddenUserCount>().Single().Count == 0);
 
@@ -60,6 +61,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestHiddenUsersBecomeDisplayed()
+        {
+            AddStep("add 8 users", () =>
+            {
+                for (int i = 0; i < 8; i++)
+                    addUser(i);
+            });
+
+            AddStep("set 3 circles", () => list.NumberOfCircles = 3);
+
+            for (int i = 0; i < 8; i++)
+            {
+                AddStep("remove user", () => removeUserAt(0));
+                int remainingUsers = 7 - i;
+
+                int displayedUsers = remainingUsers > 3 ? 2 : remainingUsers;
+                AddAssert($"{displayedUsers} avatars displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == displayedUsers);
+            }
+        }
+
+        [Test]
         public void TestCircleCount()
         {
             AddStep("add 50 users", () =>
@@ -69,12 +91,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("set 3 circles", () => list.NumberOfCircles = 3);
-            AddAssert("3 circles displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 3);
-            AddAssert("47 hidden users", () => list.ChildrenOfType<RecentParticipantsList.HiddenUserCount>().Single().Count == 47);
+            AddAssert("2 users displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 2);
+            AddAssert("48 hidden users", () => list.ChildrenOfType<RecentParticipantsList.HiddenUserCount>().Single().Count == 48);
 
             AddStep("set 10 circles", () => list.NumberOfCircles = 10);
-            AddAssert("10 circles displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 10);
-            AddAssert("40 hidden users", () => list.ChildrenOfType<RecentParticipantsList.HiddenUserCount>().Single().Count == 40);
+            AddAssert("9 users displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 9);
+            AddAssert("41 hidden users", () => list.ChildrenOfType<RecentParticipantsList.HiddenUserCount>().Single().Count == 41);
         }
 
         [Test]
@@ -109,18 +131,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addUser(int id)
         {
-            SelectedRoom.Value.ParticipantCount.Value++;
             SelectedRoom.Value.RecentParticipants.Add(new User
             {
                 Id = id,
                 Username = $"User {id}"
             });
+            SelectedRoom.Value.ParticipantCount.Value++;
         }
 
         private void removeUserAt(int index)
         {
-            SelectedRoom.Value.ParticipantCount.Value--;
             SelectedRoom.Value.RecentParticipants.RemoveAt(index);
+            SelectedRoom.Value.ParticipantCount.Value--;
         }
     }
 }
