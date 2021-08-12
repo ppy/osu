@@ -68,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             if (EndDate.Value < DateTimeOffset.Now)
                 return new RoomStatusEnded();
 
-            return Status.Value ?? new RoomStatusOpen();
+            return Status.Value;
         }
     }
 }
