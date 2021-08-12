@@ -61,6 +61,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected RoomSubScreen()
         {
+            Padding = new MarginPadding { Top = Header.HEIGHT };
+
             AddRangeInternal(new Drawable[]
             {
                 BeatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker

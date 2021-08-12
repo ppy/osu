@@ -32,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay
             Child = title = new MultiHeaderTitle(mainTitle)
             {
                 Anchor = Anchor.CentreLeft,
-                Origin = Anchor.BottomLeft,
+                Origin = Anchor.CentreLeft,
             };
 
             stack.ScreenPushed += (_, __) => updateSubScreenTitle();
