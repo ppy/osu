@@ -1016,7 +1016,7 @@ namespace osu.Game
             var horizontalOffset = 0f;
 
             if (Settings.IsLoaded && Settings.IsPresent)
-                horizontalOffset += (ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X) * SCREEN_OFFSET_RATIO;
+                horizontalOffset += ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X * SCREEN_OFFSET_RATIO;
             if (Notifications.IsLoaded && Notifications.IsPresent)
                 horizontalOffset += (ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - DrawWidth) * SCREEN_OFFSET_RATIO;
 
