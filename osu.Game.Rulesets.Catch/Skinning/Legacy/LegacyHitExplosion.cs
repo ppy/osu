@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             RelativeSizeAxes = Axes.Both;
-            Scale = new Vector2(0.4f);
+            Scale = new Vector2(0.5f);
 
             InternalChildren = new[]
             {
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     explosion1.Position = new Vector2(explosionOffset, 0);
 
                     explosion1.FadeOutFromOne(300);
-                    explosion1.ScaleTo(new Vector2(20 * scale, 1.1f), 160, Easing.Out);
+                    explosion1.ScaleTo(new Vector2(16 * scale, 1.1f), 160, Easing.Out);
                 }
 
                 explosion2.Scale = new Vector2(0.9f, 1);
