@@ -97,11 +97,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     TeamID = 1,
                 };
 
-                SpectatorClient.StartPlay(PLAYER_1_ID, importedBeatmapId);
-                SpectatorClient.StartPlay(PLAYER_2_ID, importedBeatmapId);
+                SpectatorClient.StartPlay(player1.UserID, importedBeatmapId);
+                SpectatorClient.StartPlay(player2.UserID, importedBeatmapId);
 
-                playingUsers.Add(new MultiplayerRoomUser(PLAYER_1_ID));
-                playingUsers.Add(new MultiplayerRoomUser(PLAYER_2_ID));
+                playingUsers.Add(player1);
+                playingUsers.Add(player2);
             });
 
             loadSpectateScreen();
