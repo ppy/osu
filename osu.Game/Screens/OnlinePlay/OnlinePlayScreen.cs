@@ -22,6 +22,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Users;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay
@@ -100,9 +101,14 @@ namespace osu.Game.Screens.OnlinePlay
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new HeaderBackgroundSprite
+                            new BufferedContainer
                             {
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
+                                BlurSigma = new Vector2(10),
+                                Child = new HeaderBackgroundSprite
+                                {
+                                    RelativeSizeAxes = Axes.Both
+                                }
                             },
                             new Box
                             {
