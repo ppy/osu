@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -55,7 +56,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 OsuScoreProcessor scoreProcessor;
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
 
-                var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
+                var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
+                var multiplayerUsers = new List<MultiplayerRoomUser>();
 
                 foreach (var user in users)
                 {
@@ -66,6 +68,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         TeamID = RNG.Next(0, 2)
                     };
+
+                    multiplayerUsers.Add(roomUser);
                 }
 
                 Children = new Drawable[]
@@ -73,9 +77,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     scoreProcessor = new OsuScoreProcessor(),
                 };
 
-                scoreProcessor.ApplyBeatmap(playable);
+                scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, Client.Room?.Users.ToArray())
+                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, multiplayerUsers.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
