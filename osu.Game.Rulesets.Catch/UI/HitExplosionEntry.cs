@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public float Position { get; }
 
-        public HitExplosionEntry(JudgementResult judgementResult, Color4 objectColour, float position, double startTime)
+        public HitExplosionEntry(double startTime, JudgementResult judgementResult, Color4 objectColour, float position)
         {
             LifetimeStart = startTime;
             Position = position;

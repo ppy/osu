@@ -367,7 +367,7 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         private void addLighting(JudgementResult judgementResult, Color4 colour, float x) =>
-            hitExplosionContainer.Add(new HitExplosionEntry(judgementResult, colour, x, Time.Current));
+            hitExplosionContainer.Add(new HitExplosionEntry(Time.Current, judgementResult, colour, x));
 
         private CaughtObject getCaughtObject(PalpableCatchHitObject source)
         {
