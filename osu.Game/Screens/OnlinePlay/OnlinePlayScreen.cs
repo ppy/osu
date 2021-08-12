@@ -21,8 +21,8 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -68,9 +68,6 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
 
-        private Drawable header;
-        private Drawable headerBackground;
-
         protected OnlinePlayScreen()
         {
             Anchor = Anchor.Centre;
@@ -101,41 +98,21 @@ namespace osu.Game.Screens.OnlinePlay
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new[]
+                        Children = new Drawable[]
                         {
-                            header = new Container
+                            new HeaderBackgroundSprite
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Height = 400,
-                                Children = new[]
-                                {
-                                    headerBackground = new Container
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Width = 1.25f,
-                                        Masking = true,
-                                        Children = new Drawable[]
-                                        {
-                                            new HeaderBackgroundSprite
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 400 // Keep a static height so the header doesn't change as it's resized between subscreens
-                                            },
-                                        }
-                                    },
-                                    new Container
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Bottom = -1 }, // 1px padding to avoid a 1px gap due to masking
-                                        Child = new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.5f), backgroundColour)
-                                        },
-                                    }
-                                }
+                                RelativeSizeAxes = Axes.Both
                             },
-                            screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both }
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.9f), Color4.Black.Opacity(0.6f))
+                            },
+                            screenStack = new OnlinePlaySubScreenStack
+                            {
+                                RelativeSizeAxes = Axes.Both
+                            }
                         }
                     },
                     new Header(ScreenTitle, screenStack),
@@ -288,19 +265,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void subScreenChanged(IScreen lastScreen, IScreen newScreen)
         {
-            switch (newScreen)
-            {
-                case LoungeSubScreen _:
-                    header.Delay(OnlinePlaySubScreen.RESUME_TRANSITION_DELAY).ResizeHeightTo(400, OnlinePlaySubScreen.APPEAR_DURATION, Easing.OutQuint);
-                    headerBackground.MoveToX(0, OnlinePlaySubScreen.X_MOVE_DURATION, Easing.OutQuint);
-                    break;
-
-                case RoomSubScreen _:
-                    header.ResizeHeightTo(135, OnlinePlaySubScreen.APPEAR_DURATION, Easing.OutQuint);
-                    headerBackground.MoveToX(-OnlinePlaySubScreen.X_SHIFT, OnlinePlaySubScreen.X_MOVE_DURATION, Easing.OutQuint);
-                    break;
-            }
-
             if (lastScreen is IOsuScreen lastOsuScreen)
                 Activity.UnbindFrom(lastOsuScreen.Activity);
 
