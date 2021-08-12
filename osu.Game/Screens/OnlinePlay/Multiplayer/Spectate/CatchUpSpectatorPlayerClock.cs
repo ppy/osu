@@ -66,7 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             if (IsRunning)
             {
-                double elapsedSource = Source.ElapsedFrameTime;
+                double elapsedSource = Math.Max(Source.ElapsedFrameTime, 0);
                 double elapsed = elapsedSource * Rate;
 
                 CurrentTime += elapsed;
