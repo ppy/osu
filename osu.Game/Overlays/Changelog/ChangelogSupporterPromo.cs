@@ -125,11 +125,7 @@ namespace osu.Game.Overlays.Changelog
             };
 
             supportLinkText.AddText("Support further development of osu! and ");
-            supportLinkText.AddLink("become an osu!supporter", "https://osu.ppy.sh/home/support", t =>
-            {
-                t.Colour = colour.PinkDark;
-                t.Font = t.Font.With(weight: FontWeight.Bold);
-            });
+            supportLinkText.AddLink("become an osu!supporter", "https://osu.ppy.sh/home/support", t => t.Font = t.Font.With(weight: FontWeight.Bold));
             supportLinkText.AddText(" today!");
 
             imageContainer.Children = new Drawable[]
