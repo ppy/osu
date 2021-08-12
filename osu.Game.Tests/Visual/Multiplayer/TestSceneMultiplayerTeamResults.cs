@@ -18,6 +18,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestDisplayWithTeams()
         {
+            MultiplayerResultsScreen screen = null;
+
             AddStep("show results screen", () =>
             {
                 var rulesetInfo = new OsuRuleset().RulesetInfo;
@@ -48,13 +50,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     { 1, new BindableInt(1048576) }
                 };
 
-                Stack.Push(new MultiplayerResultsScreen(score, 1, playlistItem, teamScores));
+                Stack.Push(screen = new MultiplayerResultsScreen(score, 1, playlistItem, teamScores));
             });
+
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
         }
 
         [Test]
         public void TestDisplayWithoutTeams()
         {
+            MultiplayerResultsScreen screen = null;
+
             AddStep("show results screen", () =>
             {
                 var rulesetInfo = new OsuRuleset().RulesetInfo;
@@ -81,8 +87,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 SortedDictionary<int, BindableInt> teamScores = new SortedDictionary<int, BindableInt>();
 
-                Stack.Push(new MultiplayerResultsScreen(score, 1, playlistItem, teamScores));
+                Stack.Push(screen = new MultiplayerResultsScreen(score, 1, playlistItem, teamScores));
             });
+
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
         }
     }
 }
