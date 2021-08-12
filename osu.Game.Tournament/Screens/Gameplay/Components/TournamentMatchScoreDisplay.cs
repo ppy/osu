@@ -16,7 +16,8 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
-    public class MatchScoreDisplay : CompositeDrawable
+    // TODO: Update to derive from osu-side class?
+    public class TournamentMatchScoreDisplay : CompositeDrawable
     {
         private const float bar_height = 18;
 
@@ -29,7 +30,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         private readonly Drawable score1Bar;
         private readonly Drawable score2Bar;
 
-        public MatchScoreDisplay()
+        public TournamentMatchScoreDisplay()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
