@@ -28,6 +28,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 using osuTK.Graphics;
@@ -40,8 +41,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private const float corner_radius = 10;
         private const float transition_duration = 60;
         private const float height = 100;
-
-        private static readonly Color4 background_colour = Color4Extensions.FromHex(@"#27302E");
 
         public event Action<SelectionState> StateChanged;
 
@@ -154,7 +153,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OverlayColourProvider colours, AudioManager audio)
         {
             Children = new Drawable[]
             {
@@ -167,7 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = background_colour,
+                            Colour = colours.Background5,
                         },
                         new OnlinePlayBackgroundSprite
                         {
@@ -208,12 +207,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                 new Box
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Colour = background_colour,
+                                                    Colour = colours.Background5,
                                                 },
                                                 new Box
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Colour = ColourInfo.GradientHorizontal(background_colour, background_colour.Opacity(0.3f))
+                                                    Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f))
                                                 },
                                             }
                                         }
@@ -531,7 +530,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             private OsuPasswordTextBox passwordTextbox;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
                 Child = new FillFlowContainer
                 {

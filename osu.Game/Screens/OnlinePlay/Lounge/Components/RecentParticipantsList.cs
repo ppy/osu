@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -31,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colours)
         {
             InternalChildren = new Drawable[]
             {
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4Extensions.FromHex(@"#2E3835")
+                        Colour = colours.Background4,
                     }
                 },
                 new FillFlowContainer
