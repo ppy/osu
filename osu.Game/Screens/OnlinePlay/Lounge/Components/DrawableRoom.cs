@@ -120,7 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 numberOfAvatars = value;
 
                 if (recentParticipantsList != null)
-                    recentParticipantsList.NumberOfAvatars = value;
+                    recentParticipantsList.NumberOfCircles = value;
             }
         }
 
@@ -315,7 +315,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
-                                        NumberOfAvatars = NumberOfAvatars
+                                        NumberOfCircles = NumberOfAvatars
                                     }
                                 }
                             },
