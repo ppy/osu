@@ -28,7 +28,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
         private int currentIndex;
-        private IShader shader;
+
+        protected IShader Shader;
+
         private double timeOffset;
         private float time;
 
@@ -63,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
+            Shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
         }
 
         protected override void LoadComplete()
@@ -141,21 +143,32 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Vector2 pos = e.ScreenSpaceMousePosition;
+            Vector2 position = e.ScreenSpaceMousePosition;
 
             if (lastPosition == null)
             {
-                lastPosition = pos;
+                lastPosition = position;
                 resampler.AddPosition(lastPosition.Value);
                 return base.OnMouseMove(e);
             }
 
-            foreach (Vector2 pos2 in resampler.AddPosition(pos))
-            {
-                Trace.Assert(lastPosition.HasValue);
+            if (InterpolateMovements)
+                AddTrail(position);
 
-                if (InterpolateMovements)
+            return base.OnMouseMove(e);
+        }
+
+        protected void AddTrail(Vector2 position)
+        {
+            if (!lastPosition.HasValue)
+                return;
+
+            if (InterpolateMovements)
+            {
+                foreach (Vector2 pos2 in resampler.AddPosition(position))
                 {
+                    Trace.Assert(lastPosition.HasValue);
+
                     // ReSharper disable once PossibleInvalidOperationException
                     Vector2 pos1 = lastPosition.Value;
                     Vector2 diff = pos2 - pos1;
@@ -170,14 +183,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         addPart(lastPosition.Value);
                     }
                 }
-                else
-                {
-                    lastPosition = pos2;
-                    addPart(lastPosition.Value);
-                }
             }
-
-            return base.OnMouseMove(e);
+            else
+            {
+                lastPosition = position;
+                addPart(lastPosition.Value);
+            }
         }
 
         private void addPart(Vector2 screenSpacePosition)
@@ -223,7 +234,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 base.ApplyState();
 
-                shader = Source.shader;
+                shader = Source.Shader;
                 texture = Source.texture;
                 size = Source.partSize;
                 time = Source.time;
