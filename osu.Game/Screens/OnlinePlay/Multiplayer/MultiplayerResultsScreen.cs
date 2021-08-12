@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -15,6 +14,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play.HUD;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -36,6 +36,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
+            ScorePanelList.Anchor = ScorePanelList.Origin = Anchor.TopCentre;
+            ScorePanelList.Scale = new Vector2(0.9f);
+            ScorePanelList.Y = 75;
+
             if (teamScores.Count == 2)
             {
                 var redScore = teamScores.First().Value;
