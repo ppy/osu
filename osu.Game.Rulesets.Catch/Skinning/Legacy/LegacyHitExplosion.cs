@@ -62,9 +62,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public void Animate(HitExplosionEntry entry)
         {
-            if (entry == null)
-                return;
-
             Colour = entry.ObjectColour;
 
             using (BeginAbsoluteSequence(entry.LifetimeStart))

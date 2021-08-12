@@ -72,9 +72,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
         public void Animate(HitExplosionEntry entry)
         {
-            if (entry == null)
-                return;
-
             X = entry.Position;
             Scale = new Vector2(entry.HitObject.Scale);
             setColour(entry.ObjectColour);
