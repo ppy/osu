@@ -137,7 +137,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 roomFlow.Remove(toRemove);
 
-                selectedRoom.Value = null;
+                // selection may have a lease due to being in a sub screen.
+                if (!selectedRoom.Disabled)
+                    selectedRoom.Value = null;
             }
         }
 
