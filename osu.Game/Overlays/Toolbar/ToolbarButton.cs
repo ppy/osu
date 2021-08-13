@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (action == Hotkey)
             {
-                Click();
+                TriggerClick();
                 return true;
             }
 

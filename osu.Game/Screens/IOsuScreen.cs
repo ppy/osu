@@ -59,9 +59,9 @@ namespace osu.Game.Screens
         Bindable<RulesetInfo> Ruleset { get; }
 
         /// <summary>
-        /// Whether mod rate adjustments are allowed to be applied.
+        /// Whether mod track adjustments are allowed to be applied.
         /// </summary>
-        bool AllowRateAdjustments { get; }
+        bool AllowTrackAdjustments { get; }
 
         /// <summary>
         /// Invoked when the back button has been pressed to close any overlays before exiting this <see cref="IOsuScreen"/>.

@@ -59,7 +59,7 @@ namespace osu.Game.Online.API.Requests
             SearchPlayed played = SearchPlayed.Any,
             SearchExplicit explicitContent = SearchExplicit.Hide)
         {
-            this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
+            this.query = query;
             this.ruleset = ruleset;
             this.cursor = cursor;
 
@@ -78,7 +78,9 @@ namespace osu.Game.Online.API.Requests
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
-            req.AddParameter("q", query);
+
+            if (query != null)
+                req.AddParameter("q", query);
 
             if (General != null && General.Any())
                 req.AddParameter("c", string.Join('.', General.Select(e => e.ToString().ToLowerInvariant())));

@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 });
             });
 
-            AddStep("start match", () => match.ChildrenOfType<PlaylistsReadyButton>().First().Click());
+            AddStep("start match", () => match.ChildrenOfType<PlaylistsReadyButton>().First().TriggerClick());
             AddUntilStep("player loader loaded", () => Stack.CurrentScreen is PlayerLoader);
         }
 

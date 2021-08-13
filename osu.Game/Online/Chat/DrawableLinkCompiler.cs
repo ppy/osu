@@ -31,6 +31,7 @@ namespace osu.Game.Online.Chat
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, Parts);
 
         public DrawableLinkCompiler(IEnumerable<Drawable> parts)
+            : base(HoverSampleSet.Submit)
         {
             Parts = parts.ToList();
         }

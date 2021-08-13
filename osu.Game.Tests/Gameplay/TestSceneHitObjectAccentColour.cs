@@ -100,6 +100,14 @@ namespace osu.Game.Tests.Gameplay
                 set => ComboIndexBindable.Value = value;
             }
 
+            public Bindable<int> ComboIndexWithOffsetsBindable { get; } = new Bindable<int>();
+
+            public int ComboIndexWithOffsets
+            {
+                get => ComboIndexWithOffsetsBindable.Value;
+                set => ComboIndexWithOffsetsBindable.Value = value;
+            }
+
             public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
 
             public bool LastInCombo
