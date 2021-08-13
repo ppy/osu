@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Comments
                                                         {
                                                             AutoSizeAxes = Axes.Both,
                                                             Direction = FillDirection.Horizontal,
-                                                            Spacing = new Vector2(3, 0),
+                                                            Spacing = new Vector2(2, 0),
                                                             Alpha = Comment.Pinned ? 1 : 0,
                                                             Children = new Drawable[]
                                                             {
