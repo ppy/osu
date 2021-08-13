@@ -55,14 +55,14 @@ namespace osu.Game.Localisation
         public static LocalisableString Resolution => new TranslatableString(getKey(@"resolution"), @"Resolution");
 
         /// <summary>
-        /// "UI Scaling"
+        /// "UI scaling"
         /// </summary>
-        public static LocalisableString UIScaling => new TranslatableString(getKey(@"ui_scaling"), @"UI Scaling");
+        public static LocalisableString UIScaling => new TranslatableString(getKey(@"ui_scaling"), @"UI scaling");
 
         /// <summary>
-        /// "Screen Scaling"
+        /// "Screen scaling"
         /// </summary>
-        public static LocalisableString ScreenScaling => new TranslatableString(getKey(@"screen_scaling"), @"Screen Scaling");
+        public static LocalisableString ScreenScaling => new TranslatableString(getKey(@"screen_scaling"), @"Screen scaling");
 
         /// <summary>
         /// "Horizontal position"
@@ -95,14 +95,14 @@ namespace osu.Game.Localisation
         public static LocalisableString DetailSettingsHeader => new TranslatableString(getKey(@"detail_settings_header"), @"Detail Settings");
 
         /// <summary>
-        /// "Storyboard / Video"
+        /// "Storyboard / video"
         /// </summary>
-        public static LocalisableString StoryboardVideo => new TranslatableString(getKey(@"storyboard_video"), @"Storyboard / Video");
+        public static LocalisableString StoryboardVideo => new TranslatableString(getKey(@"storyboard_video"), @"Storyboard / video");
 
         /// <summary>
-        /// "Hit Lighting"
+        /// "Hit lighting"
         /// </summary>
-        public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit Lighting");
+        public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit lighting");
 
         /// <summary>
         /// "Screenshot format"
