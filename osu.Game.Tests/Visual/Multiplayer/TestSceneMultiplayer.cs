@@ -405,8 +405,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
 
-            testLeave("lounge tab item", () => this.ChildrenOfType<BreadcrumbControl<IScreen>.BreadcrumbTabItem>().First().TriggerClick());
-
             testLeave("back button", () => multiplayerScreen.OnBackButton());
 
             // mimics home button and OS window close
