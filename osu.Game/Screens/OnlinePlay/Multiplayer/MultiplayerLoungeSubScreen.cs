@@ -25,10 +25,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
+        private MultiplayerListingPollingComponent listingPollingComponent;
+
+        private readonly IBindable<bool> isConnected = new Bindable<bool>();
+        private readonly Bindable<bool> allowPolling = new Bindable<bool>();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            isConnected.BindTo(client.IsConnected);
+            isConnected.BindValueChanged(c => Scheduler.AddOnce(() => listingPollingComponent.AllowPolling = c.NewValue));
+        }
+
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
-            ListingPollingComponent.PollImmediately();
+            listingPollingComponent.PollImmediately();
         }
 
         protected override FilterCriteria CreateFilterCriteria()
@@ -49,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
 
-        protected override ListingPollingComponent CreatePollingComponent() => new MultiplayerListingPollingComponent();
+        protected override ListingPollingComponent CreatePollingComponent() => listingPollingComponent = new MultiplayerListingPollingComponent();
 
         protected override void OpenNewRoom(Room room)
         {
@@ -64,23 +77,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private class MultiplayerListingPollingComponent : ListingPollingComponent
         {
-            public readonly IBindable<bool> AllowPolling = new Bindable<bool>();
+            private bool allowPolling;
 
-            protected override void LoadComplete()
+            public bool AllowPolling
             {
-                base.LoadComplete();
-
-                AllowPolling.BindValueChanged(allowPolling =>
+                get => allowPolling;
+                set
                 {
-                    if (!allowPolling.NewValue)
+                    if (allowPolling == value)
+                        return;
+
+                    allowPolling = value;
+
+                    if (!allowPolling)
                         return;
 
                     if (IsLoaded)
                         PollImmediately();
-                });
+                }
             }
 
-            protected override Task Poll() => !AllowPolling.Value ? Task.CompletedTask : base.Poll();
+            protected override Task Poll() => !AllowPolling ? Task.CompletedTask : base.Poll();
         }
     }
 }

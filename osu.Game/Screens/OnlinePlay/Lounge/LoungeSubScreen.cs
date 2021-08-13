@@ -44,8 +44,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             AutoSizeAxes = Axes.Both
         };
 
-        protected ListingPollingComponent ListingPollingComponent { get; private set; }
-
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
 
@@ -73,6 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private RoomsContainer roomsContainer;
         private SearchTextBox searchTextBox;
         private Dropdown<RoomStatusFilter> statusDropdown;
+        private ListingPollingComponent listingPollingComponent;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -83,7 +82,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             InternalChildren = new Drawable[]
             {
-                ListingPollingComponent = CreatePollingComponent(),
+                listingPollingComponent = CreatePollingComponent(),
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -183,7 +182,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             searchTextBox.Current.BindValueChanged(_ => updateFilterDebounced());
             ruleset.BindValueChanged(_ => UpdateFilter());
 
-            ListingPollingComponent.HasPolledOnce.BindValueChanged(_ => updateLoadingLayer());
+            listingPollingComponent.HasPolledOnce.BindValueChanged(_ => updateLoadingLayer());
 
             if (idleTracker != null)
             {
@@ -331,7 +330,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void updateLoadingLayer()
         {
-            if (operationInProgress.Value || !ListingPollingComponent.HasPolledOnce.Value)
+            if (operationInProgress.Value || !listingPollingComponent.HasPolledOnce.Value)
                 loadingLayer.Show();
             else
                 loadingLayer.Hide();
@@ -340,11 +339,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private void updatePollingRate()
         {
             if (!this.IsCurrentScreen())
-                ListingPollingComponent.TimeBetweenPolls.Value = 0;
+                listingPollingComponent.TimeBetweenPolls.Value = 0;
             else
-                ListingPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 120000 : 15000;
+                listingPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 120000 : 15000;
 
-            Logger.Log($"Polling adjusted (listing: {ListingPollingComponent.TimeBetweenPolls.Value})");
+            Logger.Log($"Polling adjusted (listing: {listingPollingComponent.TimeBetweenPolls.Value})");
         }
 
         protected abstract OsuButton CreateNewRoomButton();
