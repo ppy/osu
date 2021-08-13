@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Bindables;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
@@ -13,12 +11,10 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerTeamResults : ScreenTestScene
+    public class TestSceneMultiplayerResults : ScreenTestScene
     {
-        [TestCase(7483253, 1048576)]
-        [TestCase(1048576, 7483253)]
-        [TestCase(1048576, 1048576)]
-        public void TestDisplayTeamResults(int team1Score, int team2Score)
+        [Test]
+        public void TestDisplayResults()
         {
             MultiplayerResultsScreen screen = null;
 
@@ -46,13 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     BeatmapID = beatmapInfo.ID,
                 };
 
-                SortedDictionary<int, BindableInt> teamScores = new SortedDictionary<int, BindableInt>
-                {
-                    { 0, new BindableInt(team1Score) },
-                    { 1, new BindableInt(team2Score) }
-                };
-
-                Stack.Push(screen = new MultiplayerTeamResultsScreen(score, 1, playlistItem, teamScores));
+                Stack.Push(screen = new MultiplayerResultsScreen(score, 1, playlistItem));
             });
 
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
