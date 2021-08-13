@@ -33,10 +33,10 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             room.RoomID.Value ??= Rooms.Select(r => r.RoomID.Value).Where(id => id != null).Select(id => id.Value).DefaultIfEmpty().Max() + 1;
             onSuccess?.Invoke(room);
 
-            AddRoom(room);
+            AddOrUpdateRoom(room);
         }
 
-        public void AddRoom(Room room)
+        public void AddOrUpdateRoom(Room room)
         {
             Rooms.Add(room);
             RoomsUpdated?.Invoke();
@@ -45,6 +45,12 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public void RemoveRoom(Room room)
         {
             Rooms.Remove(room);
+            RoomsUpdated?.Invoke();
+        }
+
+        public void ClearRooms()
+        {
+            Rooms.Clear();
             RoomsUpdated?.Invoke();
         }
 

@@ -12,14 +12,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
@@ -41,10 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             AutoSizeAxes = Axes.Both
         };
 
-        private readonly IBindable<bool> initialRoomsReceived = new Bindable<bool>();
-        private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
-
-        private LoadingLayer loadingLayer;
+        protected ListingPollingComponent ListingPollingComponent { get; private set; }
 
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
@@ -61,9 +61,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private IdleTracker idleTracker { get; set; }
+
         [CanBeNull]
         private IDisposable joiningRoomOperation { get; set; }
 
+        private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
+        private readonly IBindable<bool> isIdle = new BindableBool();
+        private LoadingLayer loadingLayer;
         private RoomsContainer roomsContainer;
         private SearchTextBox searchTextBox;
         private Dropdown<RoomStatusFilter> statusDropdown;
@@ -77,6 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             InternalChildren = new Drawable[]
             {
+                ListingPollingComponent = CreatePollingComponent(),
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -176,8 +183,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             searchTextBox.Current.BindValueChanged(_ => updateFilterDebounced());
             ruleset.BindValueChanged(_ => UpdateFilter());
 
-            initialRoomsReceived.BindTo(RoomManager.InitialRoomsReceived);
-            initialRoomsReceived.BindValueChanged(_ => updateLoadingLayer());
+            ListingPollingComponent.HasPolledOnce.BindValueChanged(_ => updateLoadingLayer());
+
+            if (idleTracker != null)
+            {
+                isIdle.BindTo(idleTracker.IsIdle);
+                isIdle.BindValueChanged(_ => updatePollingRate(), true);
+            }
 
             if (ongoingOperationTracker != null)
             {
@@ -231,7 +243,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-
             onReturning();
         }
 
@@ -266,11 +277,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void onReturning()
         {
+            updatePollingRate();
             searchTextBox.HoldFocus = true;
         }
 
         private void onLeaving()
         {
+            updatePollingRate();
             searchTextBox.HoldFocus = false;
 
             // ensure any password prompt is dismissed.
@@ -316,6 +329,24 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             this.Push(CreateRoomSubScreen(room));
         }
 
+        private void updateLoadingLayer()
+        {
+            if (operationInProgress.Value || !ListingPollingComponent.HasPolledOnce.Value)
+                loadingLayer.Show();
+            else
+                loadingLayer.Hide();
+        }
+
+        private void updatePollingRate()
+        {
+            if (!this.IsCurrentScreen())
+                ListingPollingComponent.TimeBetweenPolls.Value = 0;
+            else
+                ListingPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 120000 : 15000;
+
+            Logger.Log($"Polling adjusted (listing: {ListingPollingComponent.TimeBetweenPolls.Value})");
+        }
+
         protected abstract OsuButton CreateNewRoomButton();
 
         /// <summary>
@@ -326,13 +357,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
 
-        private void updateLoadingLayer()
-        {
-            if (operationInProgress.Value || !initialRoomsReceived.Value)
-                loadingLayer.Show();
-            else
-                loadingLayer.Hide();
-        }
+        protected abstract ListingPollingComponent CreatePollingComponent();
 
         private class LoungeSearchTextBox : SearchTextBox
         {
