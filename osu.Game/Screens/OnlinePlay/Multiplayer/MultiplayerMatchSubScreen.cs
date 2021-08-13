@@ -176,7 +176,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                 Spacing = new Vector2(10, 0),
                                                                                 Children = new Drawable[]
                                                                                 {
-                                                                                    new PurpleTriangleButton
+                                                                                    new UserModSelectButton
                                                                                     {
                                                                                         Anchor = Anchor.CentreLeft,
                                                                                         Origin = Anchor.CentreLeft,
@@ -475,16 +475,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override Screen CreateGameplayScreen()
         {
             Debug.Assert(client.LocalUser != null);
+            Debug.Assert(client.Room != null);
 
             int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
+            MultiplayerRoomUser[] users = userIds.Select(id => client.Room.Users.First(u => u.UserID == id)).ToArray();
 
             switch (client.LocalUser.State)
             {
                 case MultiplayerUserState.Spectating:
-                    return new MultiSpectatorScreen(userIds);
+                    return new MultiSpectatorScreen(users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
 
                 default:
-                    return new PlayerLoader(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
+                    return new PlayerLoader(() => new MultiplayerPlayer(SelectedItem.Value, users));
             }
         }
 

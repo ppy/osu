@@ -48,10 +48,9 @@ namespace osu.Game.Screens.Play.HUD
         /// </param>
         public ILeaderboardScore AddPlayer([CanBeNull] User user, bool isTracked)
         {
-            var drawable = new GameplayLeaderboardScore(user, isTracked)
-            {
-                Expanded = { BindTarget = Expanded },
-            };
+            var drawable = CreateLeaderboardScoreDrawable(user, isTracked);
+
+            drawable.Expanded.BindTo(Expanded);
 
             base.Add(drawable);
             drawable.TotalScore.BindValueChanged(_ => sorting.Invalidate(), true);
@@ -60,6 +59,9 @@ namespace osu.Game.Screens.Play.HUD
 
             return drawable;
         }
+
+        protected virtual GameplayLeaderboardScore CreateLeaderboardScoreDrawable(User user, bool isTracked) =>
+            new GameplayLeaderboardScore(user, isTracked);
 
         public sealed override void Add(GameplayLeaderboardScore drawable)
         {
