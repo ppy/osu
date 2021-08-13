@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 
         protected readonly HitCirclePiece CirclePiece;
 
-        public HitCircleSelectionBlueprint(DrawableHitCircle drawableCircle)
-            : base(drawableCircle)
+        public HitCircleSelectionBlueprint(HitCircle circle)
+            : base(circle)
         {
             InternalChild = CirclePiece = new HitCirclePiece();
         }
@@ -30,6 +30,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => DrawableObject.HitArea.ReceivePositionalInputAt(screenSpacePos);
 
-        public override Quad SelectionQuad => DrawableObject.HitArea.ScreenSpaceDrawQuad;
+        public override Quad SelectionQuad => CirclePiece.ScreenSpaceDrawQuad;
     }
 }

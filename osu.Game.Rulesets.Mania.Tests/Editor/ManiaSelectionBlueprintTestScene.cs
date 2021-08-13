@@ -1,31 +1,54 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Timing;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
     public abstract class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene
     {
-        [Cached(Type = typeof(IAdjustableClock))]
-        private readonly IAdjustableClock clock = new StopwatchClock();
+        protected override Container<Drawable> Content => blueprints ?? base.Content;
 
-        protected ManiaSelectionBlueprintTestScene()
+        private readonly Container blueprints;
+
+        [Cached(typeof(Playfield))]
+        public Playfield Playfield { get; }
+
+        private readonly ScrollingTestContainer scrollingTestContainer;
+
+        protected ScrollingDirection Direction
         {
-            Add(new Column(0)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                AccentColour = Color4.OrangeRed,
-                Clock = new FramedClock(new StopwatchClock()), // No scroll
-            });
+            set => scrollingTestContainer.Direction = value;
         }
 
-        public ManiaPlayfield Playfield => null;
+        protected ManiaSelectionBlueprintTestScene(int columns)
+        {
+            var stageDefinitions = new List<StageDefinition> { new StageDefinition { Columns = columns } };
+            base.Content.Child = scrollingTestContainer = new ScrollingTestContainer(ScrollingDirection.Up)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    Playfield = new ManiaPlayfield(stageDefinitions)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    blueprints = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }
+                }
+            };
+
+            AddToggleStep("Downward scroll", b => Direction = b ? ScrollingDirection.Down : ScrollingDirection.Up);
+        }
     }
 }

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 
@@ -9,7 +10,7 @@ namespace osu.Game.Collections
     /// <summary>
     /// A <see cref="BeatmapCollection"/> filter.
     /// </summary>
-    public class CollectionFilterMenuItem
+    public class CollectionFilterMenuItem : IEquatable<CollectionFilterMenuItem>
     {
         /// <summary>
         /// The collection to filter beatmaps from.
@@ -33,6 +34,23 @@ namespace osu.Game.Collections
             Collection = collection;
             CollectionName = Collection?.Name.GetBoundCopy() ?? new Bindable<string>("All beatmaps");
         }
+
+        public bool Equals(CollectionFilterMenuItem other)
+        {
+            if (other == null)
+                return false;
+
+            // collections may have the same name, so compare first on reference equality.
+            // this relies on the assumption that only one instance of the BeatmapCollection exists game-wide, managed by CollectionManager.
+            if (Collection != null)
+                return Collection == other.Collection;
+
+            // fallback to name-based comparison.
+            // this is required for special dropdown items which don't have a collection (all beatmaps / manage collections items below).
+            return CollectionName.Value == other.CollectionName.Value;
+        }
+
+        public override int GetHashCode() => CollectionName.Value.GetHashCode();
     }
 
     public class AllBeatmapsCollectionFilterMenuItem : CollectionFilterMenuItem

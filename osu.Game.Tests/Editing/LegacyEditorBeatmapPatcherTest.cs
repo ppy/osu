@@ -38,6 +38,12 @@ namespace osu.Game.Tests.Editing
         }
 
         [Test]
+        public void TestPatchNoObjectChanges()
+        {
+            runTest(new OsuBeatmap());
+        }
+
+        [Test]
         public void TestAddHitObject()
         {
             var patch = new OsuBeatmap
@@ -133,7 +139,7 @@ namespace osu.Game.Tests.Editing
                 HitObjects =
                 {
                     (OsuHitObject)current.HitObjects[0],
-                    new HitCircle { StartTime = 2000, Samples = { new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH } } },
+                    new HitCircle { StartTime = 2000, Samples = { new HitSampleInfo(HitSampleInfo.HIT_FINISH) } },
                     (OsuHitObject)current.HitObjects[2],
                 }
             };
@@ -262,12 +268,12 @@ namespace osu.Game.Tests.Editing
                 HitObjects =
                 {
                     (OsuHitObject)current.HitObjects[0],
-                    new HitCircle { StartTime = 1000, Samples = { new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH } } },
+                    new HitCircle { StartTime = 1000, Samples = { new HitSampleInfo(HitSampleInfo.HIT_FINISH) } },
                     (OsuHitObject)current.HitObjects[2],
                     (OsuHitObject)current.HitObjects[3],
-                    new HitCircle { StartTime = 2250, Samples = { new HitSampleInfo { Name = HitSampleInfo.HIT_WHISTLE } } },
+                    new HitCircle { StartTime = 2250, Samples = { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE) } },
                     (OsuHitObject)current.HitObjects[5],
-                    new HitCircle { StartTime = 3000, Samples = { new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP } } },
+                    new HitCircle { StartTime = 3000, Samples = { new HitSampleInfo(HitSampleInfo.HIT_CLAP) } },
                     (OsuHitObject)current.HitObjects[7],
                 }
             };

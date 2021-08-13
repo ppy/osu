@@ -1,65 +1,71 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.News;
 using osu.Game.Overlays.News.Displays;
+using osu.Game.Overlays.News.Sidebar;
 
 namespace osu.Game.Overlays
 {
-    public class NewsOverlay : FullscreenOverlay<NewsHeader>
+    public class NewsOverlay : OnlineOverlay<NewsHeader>
     {
-        private readonly Bindable<string> article = new Bindable<string>(null);
+        private readonly Bindable<string> article = new Bindable<string>();
 
-        private Container content;
-        private LoadingLayer loading;
-        private OverlayScrollContainer scrollFlow;
+        private readonly Container sidebarContainer;
+        private readonly NewsSidebar sidebar;
+        private readonly Container content;
+
+        private GetNewsRequest request;
+
+        private Cursor lastCursor;
+
+        /// <summary>
+        /// The year currently being displayed. If null, the main listing is being displayed.
+        /// </summary>
+        private int? displayedYear;
+
+        private CancellationTokenSource cancellationToken;
+
+        private bool displayUpdateRequired = true;
 
         public NewsOverlay()
-            : base(OverlayColourScheme.Purple, new NewsHeader())
+            : base(OverlayColourScheme.Purple, false)
         {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Children = new Drawable[]
+            Child = new GridContainer
             {
-                new Box
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                RowDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourProvider.Background5,
+                    new Dimension(GridSizeMode.AutoSize)
                 },
-                scrollFlow = new OverlayScrollContainer
+                ColumnDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new FillFlowContainer
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension()
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        sidebarContainer = new Container
                         {
-                            Header.With(h =>
-                            {
-                                h.ShowFrontPage = ShowFrontPage;
-                            }),
-                            content = new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                            }
+                            AutoSizeAxes = Axes.X,
+                            Child = sidebar = new NewsSidebar()
                         },
-                    },
-                },
-                loading = new LoadingLayer(content),
+                        content = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        }
+                    }
+                }
             };
         }
 
@@ -68,10 +74,16 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             // should not be run until first pop-in to avoid requesting data before user views.
-            article.BindValueChanged(onArticleChanged);
+            article.BindValueChanged(a =>
+            {
+                if (a.NewValue == null)
+                    loadListing();
+                else
+                    loadArticle(a.NewValue);
+            });
         }
 
-        private bool displayUpdateRequired = true;
+        protected override NewsHeader CreateHeader() => new NewsHeader { ShowFrontPage = ShowFrontPage };
 
         protected override void PopIn()
         {
@@ -96,42 +108,94 @@ namespace osu.Game.Overlays
             Show();
         }
 
+        public void ShowYear(int year)
+        {
+            loadListing(year);
+            Show();
+        }
+
         public void ShowArticle(string slug)
         {
             article.Value = slug;
             Show();
         }
 
-        private CancellationTokenSource cancellationToken;
-
-        private void onArticleChanged(ValueChangedEvent<string> e)
-        {
-            cancellationToken?.Cancel();
-            loading.Show();
-
-            if (e.NewValue == null)
-            {
-                Header.SetFrontPage();
-                LoadDisplay(new FrontPageDisplay());
-                return;
-            }
-
-            Header.SetArticle(e.NewValue);
-            LoadDisplay(Empty());
-        }
-
         protected void LoadDisplay(Drawable display)
         {
-            scrollFlow.ScrollToStart();
+            ScrollFlow.ScrollToStart();
             LoadComponentAsync(display, loaded =>
             {
                 content.Child = loaded;
-                loading.Hide();
+                Loading.Hide();
             }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            sidebarContainer.Height = DrawHeight;
+            sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
+        }
+
+        private void loadListing(int? year = null)
+        {
+            Header.SetFrontPage();
+
+            displayedYear = year;
+            lastCursor = null;
+
+            beginLoading(true);
+
+            request = new GetNewsRequest(displayedYear);
+            request.Success += response => Schedule(() =>
+            {
+                lastCursor = response.Cursor;
+                sidebar.Metadata.Value = response.SidebarMetadata;
+
+                var listing = new ArticleListing(getMorePosts);
+                listing.AddPosts(response.NewsPosts, response.Cursor != null);
+                LoadDisplay(listing);
+            });
+
+            API.PerformAsync(request);
+        }
+
+        private void getMorePosts()
+        {
+            beginLoading(false);
+
+            request = new GetNewsRequest(displayedYear, lastCursor);
+            request.Success += response => Schedule(() =>
+            {
+                lastCursor = response.Cursor;
+                if (content.Child is ArticleListing listing)
+                    listing.AddPosts(response.NewsPosts, response.Cursor != null);
+            });
+
+            API.PerformAsync(request);
+        }
+
+        private void loadArticle(string article)
+        {
+            // This is not yet implemented nor called from anywhere.
+            beginLoading(true);
+
+            Header.SetArticle(article);
+            LoadDisplay(Empty());
+        }
+
+        private void beginLoading(bool showLoadingOverlay)
+        {
+            request?.Cancel();
+            cancellationToken?.Cancel();
+
+            if (showLoadingOverlay)
+                Loading.Show();
         }
 
         protected override void Dispose(bool isDisposing)
         {
+            request?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }

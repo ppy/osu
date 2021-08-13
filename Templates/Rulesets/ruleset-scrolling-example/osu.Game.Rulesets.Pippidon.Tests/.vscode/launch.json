@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "VisualTests (Debug)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/bin/Debug/net5.0/osu.Game.Rulesets.Pippidon.Tests.dll"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Debug)",
+            "env": {},
+            "console": "internalConsole"
+        },
+        {
+            "name": "VisualTests (Release)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/bin/Release/net5.0/osu.Game.Rulesets.Pippidon.Tests.dll"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Release)",
+            "env": {},
+            "console": "internalConsole"
+        }
+    ]
+}

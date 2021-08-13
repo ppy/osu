@@ -47,7 +47,10 @@ namespace osu.Game.Beatmaps.Drawables
         private readonly IReadOnlyList<Mod> mods;
 
         private readonly bool shouldShowTooltip;
-        private readonly IBindable<StarDifficulty> difficultyBindable = new Bindable<StarDifficulty>();
+
+        private readonly bool performBackgroundDifficultyLookup;
+
+        private readonly Bindable<StarDifficulty> difficultyBindable = new Bindable<StarDifficulty>();
 
         private Drawable background;
 
@@ -70,10 +73,12 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         /// <param name="beatmap">The beatmap to show the difficulty of.</param>
         /// <param name="shouldShowTooltip">Whether to display a tooltip when hovered.</param>
-        public DifficultyIcon([NotNull] BeatmapInfo beatmap, bool shouldShowTooltip = true)
+        /// <param name="performBackgroundDifficultyLookup">Whether to perform difficulty lookup (including calculation if necessary).</param>
+        public DifficultyIcon([NotNull] BeatmapInfo beatmap, bool shouldShowTooltip = true, bool performBackgroundDifficultyLookup = true)
         {
             this.beatmap = beatmap ?? throw new ArgumentNullException(nameof(beatmap));
             this.shouldShowTooltip = shouldShowTooltip;
+            this.performBackgroundDifficultyLookup = performBackgroundDifficultyLookup;
 
             AutoSizeAxes = Axes.Both;
 
@@ -88,20 +93,20 @@ namespace osu.Game.Beatmaps.Drawables
                 new CircularContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.84f),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
                     {
-                        Colour = Color4.Black.Opacity(0.08f),
+                        Colour = Color4.Black.Opacity(0.06f),
+
                         Type = EdgeEffectType.Shadow,
-                        Radius = 5,
+                        Radius = 3,
                     },
                     Child = background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.ForDifficultyRating(beatmap.DifficultyRating) // Default value that will be re-populated once difficulty calculation completes
+                        Colour = colours.ForStarDifficulty(beatmap.StarDifficulty) // Default value that will be re-populated once difficulty calculation completes
                     },
                 },
                 new ConstrainedIconContainer
@@ -112,10 +117,14 @@ namespace osu.Game.Beatmaps.Drawables
                     // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
                     Icon = (ruleset ?? beatmap.Ruleset)?.CreateInstance()?.CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }
                 },
-                new DelayedLoadUnloadWrapper(() => new DifficultyRetriever(beatmap, ruleset, mods) { StarDifficulty = { BindTarget = difficultyBindable } }, 0),
             };
 
-            difficultyBindable.BindValueChanged(difficulty => background.Colour = colours.ForDifficultyRating(difficulty.NewValue.DifficultyRating));
+            if (performBackgroundDifficultyLookup)
+                iconContainer.Add(new DelayedLoadUnloadWrapper(() => new DifficultyRetriever(beatmap, ruleset, mods) { StarDifficulty = { BindTarget = difficultyBindable } }, 0));
+            else
+                difficultyBindable.Value = new StarDifficulty(beatmap.StarDifficulty, 0);
+
+            difficultyBindable.BindValueChanged(difficulty => background.Colour = colours.ForStarDifficulty(difficulty.NewValue.Stars));
         }
 
         public ITooltip GetCustomTooltip() => new DifficultyIconTooltip();
@@ -133,7 +142,7 @@ namespace osu.Game.Beatmaps.Drawables
             private CancellationTokenSource difficultyCancellation;
 
             [Resolved]
-            private BeatmapDifficultyManager difficultyManager { get; set; }
+            private BeatmapDifficultyCache difficultyCache { get; set; }
 
             public DifficultyRetriever(BeatmapInfo beatmap, RulesetInfo ruleset, IReadOnlyList<Mod> mods)
             {
@@ -142,16 +151,20 @@ namespace osu.Game.Beatmaps.Drawables
                 this.mods = mods;
             }
 
-            private IBindable<StarDifficulty> localStarDifficulty;
+            private IBindable<StarDifficulty?> localStarDifficulty;
 
             [BackgroundDependencyLoader]
             private void load()
             {
                 difficultyCancellation = new CancellationTokenSource();
                 localStarDifficulty = ruleset != null
-                    ? difficultyManager.GetBindableDifficulty(beatmap, ruleset, mods, difficultyCancellation.Token)
-                    : difficultyManager.GetBindableDifficulty(beatmap, difficultyCancellation.Token);
-                localStarDifficulty.BindValueChanged(difficulty => StarDifficulty.Value = difficulty.NewValue);
+                    ? difficultyCache.GetBindableDifficulty(beatmap, ruleset, mods, difficultyCancellation.Token)
+                    : difficultyCache.GetBindableDifficulty(beatmap, difficultyCancellation.Token);
+                localStarDifficulty.BindValueChanged(d =>
+                {
+                    if (d.NewValue is StarDifficulty diff)
+                        StarDifficulty.Value = diff;
+                });
             }
 
             protected override void Dispose(bool isDisposing)
@@ -258,7 +271,7 @@ namespace osu.Game.Beatmaps.Drawables
                 starDifficulty.BindValueChanged(difficulty =>
                 {
                     starRating.Text = $"{difficulty.NewValue.Stars:0.##}";
-                    difficultyFlow.Colour = colours.ForDifficultyRating(difficulty.NewValue.DifficultyRating, true);
+                    difficultyFlow.Colour = colours.ForStarDifficulty(difficulty.NewValue.Stars);
                 }, true);
 
                 return true;

@@ -17,9 +17,9 @@ namespace osu.Game.Screens.Play
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
     /// </remarks>
     /// </summary>
-    public class GameplayClock : IFrameBasedClock, ISamplePlaybackDisabler
+    public class GameplayClock : IFrameBasedClock
     {
-        private readonly IFrameBasedClock underlyingClock;
+        internal readonly IFrameBasedClock UnderlyingClock;
 
         public readonly BindableBool IsPaused = new BindableBool();
 
@@ -28,16 +28,14 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual IEnumerable<Bindable<double>> NonGameplayAdjustments => Enumerable.Empty<Bindable<double>>();
 
-        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
-
         public GameplayClock(IFrameBasedClock underlyingClock)
         {
-            this.underlyingClock = underlyingClock;
+            UnderlyingClock = underlyingClock;
         }
 
-        public double CurrentTime => underlyingClock.CurrentTime;
+        public double CurrentTime => UnderlyingClock.CurrentTime;
 
-        public double Rate => underlyingClock.Rate;
+        public double Rate => UnderlyingClock.Rate;
 
         /// <summary>
         /// The rate of gameplay when playback is at 100%.
@@ -61,28 +59,19 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public bool IsRunning => underlyingClock.IsRunning;
-
-        /// <summary>
-        /// Whether nested samples supporting the <see cref="ISamplePlaybackDisabler"/> interface should be paused.
-        /// </summary>
-        protected virtual bool ShouldDisableSamplePlayback => IsPaused.Value;
+        public bool IsRunning => UnderlyingClock.IsRunning;
 
         public void ProcessFrame()
         {
             // intentionally not updating the underlying clock (handled externally).
-
-            samplePlaybackDisabled.Value = ShouldDisableSamplePlayback;
         }
 
-        public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
+        public double ElapsedFrameTime => UnderlyingClock.ElapsedFrameTime;
 
-        public double FramesPerSecond => underlyingClock.FramesPerSecond;
+        public double FramesPerSecond => UnderlyingClock.FramesPerSecond;
 
-        public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
+        public FrameTimeInfo TimeInfo => UnderlyingClock.TimeInfo;
 
-        public IClock Source => underlyingClock;
-
-        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
+        public IClock Source => UnderlyingClock;
     }
 }

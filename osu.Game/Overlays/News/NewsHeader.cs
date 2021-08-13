@@ -4,28 +4,36 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.News
 {
     public class NewsHeader : BreadcrumbControlOverlayHeader
     {
-        private const string front_page_string = "frontpage";
+        public static LocalisableString FrontPageString => NewsStrings.IndexTitleInfo;
 
         public Action ShowFrontPage;
 
-        private readonly Bindable<string> article = new Bindable<string>(null);
+        private readonly Bindable<string> article = new Bindable<string>();
 
         public NewsHeader()
         {
-            TabControl.AddItem(front_page_string);
+            TabControl.AddItem(FrontPageString);
+
+            article.BindValueChanged(onArticleChanged, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Current.BindValueChanged(e =>
             {
-                if (e.NewValue == front_page_string)
+                if (e.NewValue == FrontPageString)
                     ShowFrontPage?.Invoke();
             });
-
-            article.BindValueChanged(onArticleChanged, true);
         }
 
         public void SetFrontPage() => article.Value = null;
@@ -44,7 +52,7 @@ namespace osu.Game.Overlays.News
             }
             else
             {
-                Current.Value = front_page_string;
+                Current.Value = FrontPageString;
             }
         }
 
@@ -56,8 +64,8 @@ namespace osu.Game.Overlays.News
         {
             public NewsHeaderTitle()
             {
-                Title = "news";
-                Description = "get up-to-date on community happenings";
+                Title = PageTitleStrings.MainNewsControllerDefault;
+                Description = NamedOverlayComponentStrings.NewsDescription;
                 IconTexture = "Icons/Hexacons/news";
             }
         }

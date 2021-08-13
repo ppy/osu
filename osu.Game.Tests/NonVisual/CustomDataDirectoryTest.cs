@@ -47,7 +47,7 @@ namespace osu.Game.Tests.NonVisual
             using (var host = new CustomTestHeadlessGameHost())
             {
                 using (var storageConfig = new StorageConfigManager(host.InitialStorage))
-                    storageConfig.Set(StorageConfig.FullPath, customPath);
+                    storageConfig.SetValue(StorageConfig.FullPath, customPath);
 
                 try
                 {
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.NonVisual
             using (var host = new CustomTestHeadlessGameHost())
             {
                 using (var storageConfig = new StorageConfigManager(host.InitialStorage))
-                    storageConfig.Set(StorageConfig.FullPath, customPath);
+                    storageConfig.SetValue(StorageConfig.FullPath, customPath);
 
                 try
                 {
@@ -111,6 +111,7 @@ namespace osu.Game.Tests.NonVisual
 
                     var osu = LoadOsuIntoHost(host);
                     var storage = osu.Dependencies.Get<Storage>();
+                    var osuStorage = storage as MigratableStorage;
 
                     // Store the current storage's path. We'll need to refer to this for assertions in the original directory after the migration completes.
                     string originalDirectory = storage.GetFullPath(".");
@@ -137,13 +138,18 @@ namespace osu.Game.Tests.NonVisual
                     Assert.That(!Directory.Exists(Path.Combine(originalDirectory, "test-nested", "cache")));
                     Assert.That(storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
 
-                    foreach (var file in OsuStorage.IGNORE_FILES)
+                    Assert.That(osuStorage, Is.Not.Null);
+
+                    foreach (var file in osuStorage.IgnoreFiles)
                     {
-                        Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
+                        // avoid touching realm files which may be a pipe and break everything.
+                        // this is also done locally inside OsuStorage via the IgnoreFiles list.
+                        if (file.EndsWith(".ini", StringComparison.Ordinal))
+                            Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
                         Assert.That(storage.Exists(file), Is.False);
                     }
 
-                    foreach (var dir in OsuStorage.IGNORE_DIRECTORIES)
+                    foreach (var dir in osuStorage.IgnoreDirectories)
                     {
                         Assert.That(Directory.Exists(Path.Combine(originalDirectory, dir)));
                         Assert.That(storage.ExistsDirectory(dir), Is.False);
@@ -177,6 +183,9 @@ namespace osu.Game.Tests.NonVisual
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath2));
                     Assert.That(File.Exists(Path.Combine(customPath2, database_filename)));
+
+                    // some files may have been left behind for whatever reason, but that's not what we're testing here.
+                    customPath = prepareCustomPath();
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
                     Assert.That(File.Exists(Path.Combine(customPath, database_filename)));

@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -19,22 +19,42 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override Drawable CreateDefaultJudgement(HitResult result) => new DefaultManiaJudgementPiece(result);
+
+        private class DefaultManiaJudgementPiece : DefaultJudgementPiece
         {
-            if (JudgementText != null)
+            public DefaultManiaJudgementPiece(HitResult result)
+                : base(result)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
                 JudgementText.Font = JudgementText.Font.With(size: 25);
-        }
+            }
 
-        protected override double FadeInDuration => 50;
+            public override void PlayAnimation()
+            {
+                base.PlayAnimation();
 
-        protected override void ApplyHitAnimations()
-        {
-            JudgementBody.ScaleTo(0.8f);
-            JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
+                switch (Result)
+                {
+                    case HitResult.None:
+                    case HitResult.Miss:
+                        break;
 
-            JudgementBody.Delay(FadeInDuration).ScaleTo(0.75f, 250);
-            this.Delay(FadeInDuration).FadeOut(200);
+                    default:
+                        this.ScaleTo(0.8f);
+                        this.ScaleTo(1, 250, Easing.OutElastic);
+
+                        this.Delay(50)
+                            .ScaleTo(0.75f, 250)
+                            .FadeOut(200);
+                        break;
+                }
+            }
         }
     }
 }

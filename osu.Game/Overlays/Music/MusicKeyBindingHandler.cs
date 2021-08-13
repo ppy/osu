@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.OSD;
 
@@ -37,11 +38,11 @@ namespace osu.Game.Overlays.Music
                     bool wasPlaying = musicController.IsPlaying;
 
                     if (musicController.TogglePause())
-                        onScreenDisplay?.Display(new MusicActionToast(wasPlaying ? "Pause track" : "Play track"));
+                        onScreenDisplay?.Display(new MusicActionToast(wasPlaying ? "Pause track" : "Play track", action));
                     return true;
 
                 case GlobalAction.MusicNext:
-                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast("Next track")));
+                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast("Next track", action)));
 
                     return true;
 
@@ -51,11 +52,11 @@ namespace osu.Game.Overlays.Music
                         switch (res)
                         {
                             case PreviousTrackResult.Restart:
-                                onScreenDisplay?.Display(new MusicActionToast("Restart track"));
+                                onScreenDisplay?.Display(new MusicActionToast("Restart track", action));
                                 break;
 
                             case PreviousTrackResult.Previous:
-                                onScreenDisplay?.Display(new MusicActionToast("Previous track"));
+                                onScreenDisplay?.Display(new MusicActionToast("Previous track", action));
                                 break;
                         }
                     });
@@ -72,9 +73,18 @@ namespace osu.Game.Overlays.Music
 
         private class MusicActionToast : Toast
         {
-            public MusicActionToast(string action)
-                : base("Music Playback", action, string.Empty)
+            private readonly GlobalAction action;
+
+            public MusicActionToast(string value, GlobalAction action)
+                : base("Music Playback", value, string.Empty)
             {
+                this.action = action;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
+            {
+                ShortcutText.Text = config.LookupKeyBindings(action).ToUpperInvariant();
             }
         }
     }

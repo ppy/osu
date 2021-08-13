@@ -34,8 +34,8 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         protected virtual double UnloadDelay => 10000;
 
-        protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
-            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay);
+        protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad) =>
+            new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay) { RelativeSizeAxes = Axes.Both };
 
         protected override double TransformDuration => 400;
 

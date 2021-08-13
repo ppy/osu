@@ -18,7 +18,8 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 multiplierSlider = new SliderWithTextBoxInput<double>("Speed Multiplier")
                 {
-                    Current = new DifficultyControlPoint().SpeedMultiplierBindable
+                    Current = new DifficultyControlPoint().SpeedMultiplierBindable,
+                    KeyboardStep = 0.1f
                 }
             });
         }
@@ -27,14 +28,23 @@ namespace osu.Game.Screens.Edit.Timing
         {
             if (point.NewValue != null)
             {
-                multiplierSlider.Current = point.NewValue.SpeedMultiplierBindable;
+                var selectedPointBindable = point.NewValue.SpeedMultiplierBindable;
+
+                // there may be legacy control points, which contain infinite precision for compatibility reasons (see LegacyDifficultyControlPoint).
+                // generally that level of precision could only be set by externally editing the .osu file, so at the point
+                // a user is looking to update this within the editor it should be safe to obliterate this additional precision.
+                double expectedPrecision = new DifficultyControlPoint().SpeedMultiplierBindable.Precision;
+                if (selectedPointBindable.Precision < expectedPrecision)
+                    selectedPointBindable.Precision = expectedPrecision;
+
+                multiplierSlider.Current = selectedPointBindable;
                 multiplierSlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
         }
 
         protected override DifficultyControlPoint CreatePoint()
         {
-            var reference = Beatmap.Value.Beatmap.ControlPointInfo.DifficultyPointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.DifficultyPointAt(SelectedGroup.Value.Time);
 
             return new DifficultyControlPoint
             {

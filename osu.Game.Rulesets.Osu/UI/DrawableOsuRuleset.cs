@@ -12,9 +12,9 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -24,10 +24,14 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
+        public new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
+
         public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
         }
+
+        public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h) => null;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
 
@@ -39,26 +43,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay();
 
-        public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h)
-        {
-            switch (h)
-            {
-                case HitCircle circle:
-                    return new DrawableHitCircle(circle);
-
-                case Slider slider:
-                    return new DrawableSlider(slider);
-
-                case Spinner spinner:
-                    return new DrawableSpinner(spinner);
-            }
-
-            return null;
-        }
-
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 
-        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new OsuReplayRecorder(replay);
+        protected override ReplayRecorder CreateReplayRecorder(Score score) => new OsuReplayRecorder(score);
 
         public override double GameplayStartTime
         {

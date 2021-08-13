@@ -4,12 +4,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
@@ -21,14 +19,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestAllSamplesStopDuringSeek()
         {
             DrawableSlider slider = null;
-            DrawableSample[] samples = null;
-            ISamplePlaybackDisabler gameplayClock = null;
+            PoolableSkinnableSample[] samples = null;
+            ISamplePlaybackDisabler sampleDisabler = null;
 
-            AddStep("get variables", () =>
+            AddUntilStep("get variables", () =>
             {
-                gameplayClock = Player.ChildrenOfType<FrameStabilityContainer>().First().GameplayClock;
-                slider = Player.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).First();
-                samples = slider.ChildrenOfType<DrawableSample>().ToArray();
+                sampleDisabler = Player;
+                slider = Player.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).FirstOrDefault();
+                samples = slider?.ChildrenOfType<PoolableSkinnableSample>().ToArray();
+
+                return slider != null;
             });
 
             AddUntilStep("wait for slider sliding then seek", () =>
@@ -43,16 +43,16 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return true;
             });
 
-            AddAssert("sample playback disabled", () => gameplayClock.SamplePlaybackDisabled.Value);
+            AddAssert("sample playback disabled", () => sampleDisabler.SamplePlaybackDisabled.Value);
 
             // because we are in frame stable context, it's quite likely that not all samples are "played" at this point.
             // the important thing is that at least one started, and that sample has since stopped.
             AddAssert("all looping samples stopped immediately", () => allStopped(allLoopingSounds));
             AddUntilStep("all samples stopped eventually", () => allStopped(allSounds));
 
-            AddAssert("sample playback still disabled", () => gameplayClock.SamplePlaybackDisabled.Value);
+            AddAssert("sample playback still disabled", () => sampleDisabler.SamplePlaybackDisabled.Value);
 
-            AddUntilStep("seek finished, sample playback enabled", () => !gameplayClock.SamplePlaybackDisabled.Value);
+            AddUntilStep("seek finished, sample playback enabled", () => !sampleDisabler.SamplePlaybackDisabled.Value);
             AddUntilStep("any sample is playing", () => Player.ChildrenOfType<PausableSkinnableSound>().Any(s => s.IsPlaying));
         }
 

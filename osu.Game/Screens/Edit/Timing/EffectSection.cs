@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override EffectControlPoint CreatePoint()
         {
-            var reference = Beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.EffectPointAt(SelectedGroup.Value.Time);
 
             return new EffectControlPoint
             {

@@ -20,6 +20,10 @@ namespace osu.Game.Users
     {
         public readonly User User;
 
+        /// <summary>
+        /// Perform an action in addition to showing the user's profile.
+        /// This should be used to perform auxiliary tasks and not as a primary action for clicking a user panel (to maintain a consistent UX).
+        /// </summary>
         public new Action Action;
 
         protected Action ViewProfile { get; private set; }
@@ -27,6 +31,7 @@ namespace osu.Game.Users
         protected Drawable Background { get; private set; }
 
         protected UserPanel(User user)
+            : base(HoverSampleSet.Submit)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));

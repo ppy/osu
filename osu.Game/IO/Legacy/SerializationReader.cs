@@ -38,6 +38,7 @@ namespace osu.Game.IO.Legacy
         /// <summary> Reads a string from the buffer.  Overrides the base implementation so it can cope with nulls. </summary>
         public override string ReadString()
         {
+            // ReSharper disable once AssignNullToNotNullAttribute
             if (ReadByte() == 0) return null;
 
             return base.ReadString();

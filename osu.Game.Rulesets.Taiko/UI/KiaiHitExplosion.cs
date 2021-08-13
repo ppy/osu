@@ -1,71 +1,47 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class KiaiHitExplosion : CircularContainer
+    public class KiaiHitExplosion : Container
     {
         public override bool RemoveWhenNotAlive => true;
 
+        [Cached(typeof(DrawableHitObject))]
         public readonly DrawableHitObject JudgedObject;
-        private readonly HitType type;
 
-        public KiaiHitExplosion(DrawableHitObject judgedObject, HitType type)
+        private readonly HitType hitType;
+
+        private SkinnableDrawable skinnable;
+
+        public override double LifetimeStart => skinnable.Drawable.LifetimeStart;
+
+        public override double LifetimeEnd => skinnable.Drawable.LifetimeEnd;
+
+        public KiaiHitExplosion(DrawableHitObject judgedObject, HitType hitType)
         {
             JudgedObject = judgedObject;
-            this.type = type;
+            this.hitType = hitType;
 
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(TaikoHitObject.DEFAULT_SIZE, 1);
-
-            Blending = BlendingParameters.Additive;
-
-            Masking = true;
-            Alpha = 0.25f;
-
-            Children = new[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    AlwaysPresent = true
-                }
-            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = type == HitType.Rim ? colours.BlueDarker : colours.PinkDarker,
-                Radius = 60,
-            };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            this.ScaleTo(new Vector2(1, 3f), 500, Easing.OutQuint);
-            this.FadeOut(250);
-
-            Expire(true);
+            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoExplosionKiai), _ => new DefaultKiaiHitExplosion(hitType));
         }
     }
 }

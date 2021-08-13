@@ -4,7 +4,6 @@
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
@@ -14,13 +13,14 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     public class ControlPointPart : TimelinePart<GroupVisualisation>
     {
-        private IBindableList<ControlPointGroup> controlPointGroups;
+        private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
-        protected override void LoadBeatmap(WorkingBeatmap beatmap)
+        protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
             base.LoadBeatmap(beatmap);
 
-            controlPointGroups = beatmap.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
+            controlPointGroups.UnbindAll();
+            controlPointGroups.BindTo(beatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((sender, args) =>
             {
                 switch (args.Action)

@@ -52,30 +52,36 @@ namespace osu.Game.Updater
 
             // debug / local compilations will reset to a non-release string.
             // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
-            config.Set(OsuSetting.Version, version);
+            config.SetValue(OsuSetting.Version, version);
         }
 
         private readonly object updateTaskLock = new object();
 
-        private Task updateCheckTask;
+        private Task<bool> updateCheckTask;
 
-        public async Task CheckForUpdateAsync()
+        public async Task<bool> CheckForUpdateAsync()
         {
             if (!CanCheckForUpdate)
-                return;
+                return false;
 
-            Task waitTask;
+            Task<bool> waitTask;
 
             lock (updateTaskLock)
                 waitTask = (updateCheckTask ??= PerformUpdateCheck());
 
-            await waitTask;
+            bool hasUpdates = await waitTask.ConfigureAwait(false);
 
             lock (updateTaskLock)
                 updateCheckTask = null;
+
+            return hasUpdates;
         }
 
-        protected virtual Task PerformUpdateCheck() => Task.CompletedTask;
+        /// <summary>
+        /// Performs an asynchronous check for application updates.
+        /// </summary>
+        /// <returns>Whether any update is waiting. May return true if an error occured (there is potentially an update available).</returns>
+        protected virtual Task<bool> PerformUpdateCheck() => Task.FromResult(false);
 
         private class UpdateCompleteNotification : SimpleNotification
         {
@@ -84,7 +90,7 @@ namespace osu.Game.Updater
             public UpdateCompleteNotification(string version)
             {
                 this.version = version;
-                Text = $"You are now running osu!lazer {version}.\nClick to see what's new!";
+                Text = $"You are now running osu! {version}.\nClick to see what's new!";
             }
 
             [BackgroundDependencyLoader]

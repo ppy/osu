@@ -69,6 +69,15 @@ namespace osu.Game.Screens.Edit.Timing
             }, true);
         }
 
+        /// <summary>
+        /// A custom step value for each key press which actuates a change on this control.
+        /// </summary>
+        public float KeyboardStep
+        {
+            get => slider.KeyboardStep;
+            set => slider.KeyboardStep = value;
+        }
+
         public Bindable<T> Current
         {
             get => slider.Current;

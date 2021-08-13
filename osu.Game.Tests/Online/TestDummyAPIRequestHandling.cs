@@ -23,8 +23,10 @@ namespace osu.Game.Tests.Online
                 {
                     case CommentVoteRequest cRequest:
                         cRequest.TriggerSuccess(new CommentBundle());
-                        break;
+                        return true;
                 }
+
+                return false;
             });
 
             CommentVoteRequest request = null;
@@ -108,8 +110,10 @@ namespace osu.Game.Tests.Online
                 {
                     case LeaveChannelRequest cRequest:
                         cRequest.TriggerSuccess();
-                        break;
+                        return true;
                 }
+
+                return false;
             });
         }
     }

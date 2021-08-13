@@ -3,7 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -12,10 +12,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
     /// </summary>
-    public class Aim : Skill
+    public class Aim : OsuStrainSkill
     {
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
+
+        public Aim(Mod[] mods)
+            : base(mods)
+        {
+        }
 
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
@@ -41,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                         Math.Max(osuPrevious.JumpDistance - scale, 0)
                         * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
                         * Math.Max(osuCurrent.JumpDistance - scale, 0));
-                    result = 1.5 * applyDiminishingExp(Math.Max(0, angleBonus)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
+                    result = 1.4 * applyDiminishingExp(Math.Max(0, angleBonus)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
                 }
             }
 

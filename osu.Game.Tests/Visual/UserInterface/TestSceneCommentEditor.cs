@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
             AddStep("enter text", () => commentEditor.Current.Value = "text");
 
-            AddStep("press Enter", () => press(Key.Enter));
+            AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
             AddAssert("text committed", () => commentEditor.CommittedText == "text");
             AddAssert("button is loading", () => commentEditor.IsLoading);
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddStep("press Enter", () => press(Key.Enter));
+            AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
             AddAssert("no text committed", () => commentEditor.CommittedText == null);
             AddAssert("button is not loading", () => !commentEditor.IsLoading);
@@ -99,12 +99,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddAssert("cancel action fired", () => cancellableCommentEditor.Cancelled);
-        }
-
-        private void press(Key key)
-        {
-            InputManager.PressKey(key);
-            InputManager.ReleaseKey(key);
         }
 
         private class TestCommentEditor : CommentEditor

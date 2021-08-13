@@ -2,17 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using Microsoft.Data.Sqlite;
 using osu.Framework.Development;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -23,6 +22,7 @@ namespace osu.Game.Beatmaps
 {
     public partial class BeatmapManager
     {
+        [ExcludeFromDynamicCompile]
         private class BeatmapOnlineLookupQueue : IDisposable
         {
             private readonly IAPIProvider api;
@@ -48,7 +48,6 @@ namespace osu.Game.Beatmaps
 
             public Task UpdateAsync(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
             {
-                LogForModel(beatmapSet, "Performing online lookups...");
                 return Task.WhenAll(beatmapSet.Beatmaps.Select(b => UpdateAsync(beatmapSet, b, cancellationToken)).ToArray());
             }
 
@@ -61,7 +60,7 @@ namespace osu.Game.Beatmaps
                 if (checkLocalCache(set, beatmap))
                     return;
 
-                if (api?.State != APIState.Online)
+                if (api?.State.Value != APIState.Online)
                     return;
 
                 var req = new GetBeatmapRequest(beatmap);
@@ -81,6 +80,12 @@ namespace osu.Game.Beatmaps
                         beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
                         beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
                         beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
+
+                        if (beatmap.Metadata != null)
+                            beatmap.Metadata.AuthorID = res.AuthorID;
+
+                        if (beatmap.BeatmapSet.Metadata != null)
+                            beatmap.BeatmapSet.Metadata.AuthorID = res.AuthorID;
 
                         LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
                     }
@@ -102,7 +107,7 @@ namespace osu.Game.Beatmaps
                 string cacheFilePath = storage.GetFullPath(cache_database_name);
                 string compressedCacheFilePath = $"{cacheFilePath}.bz2";
 
-                cacheDownloadRequest = new FileWebRequest(compressedCacheFilePath, $"https://assets.ppy.sh/client-resources/{cache_database_name}.bz2");
+                cacheDownloadRequest = new FileWebRequest(compressedCacheFilePath, $"https://assets.ppy.sh/client-resources/{cache_database_name}.bz2?{DateTimeOffset.UtcNow:yyyyMMdd}");
 
                 cacheDownloadRequest.Failed += ex =>
                 {
@@ -152,20 +157,37 @@ namespace osu.Game.Beatmaps
                 {
                     using (var db = new SqliteConnection(storage.GetDatabaseConnectionString("online")))
                     {
-                        var found = db.QuerySingleOrDefault<CachedOnlineBeatmapLookup>(
-                            "SELECT * FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path", beatmap);
+                        db.Open();
 
-                        if (found != null)
+                        using (var cmd = db.CreateCommand())
                         {
-                            var status = (BeatmapSetOnlineStatus)found.approved;
+                            cmd.CommandText = "SELECT beatmapset_id, beatmap_id, approved, user_id FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path";
 
-                            beatmap.Status = status;
-                            beatmap.BeatmapSet.Status = status;
-                            beatmap.BeatmapSet.OnlineBeatmapSetID = found.beatmapset_id;
-                            beatmap.OnlineBeatmapID = found.beatmap_id;
+                            cmd.Parameters.Add(new SqliteParameter("@MD5Hash", beatmap.MD5Hash));
+                            cmd.Parameters.Add(new SqliteParameter("@OnlineBeatmapID", beatmap.OnlineBeatmapID ?? (object)DBNull.Value));
+                            cmd.Parameters.Add(new SqliteParameter("@Path", beatmap.Path));
 
-                            LogForModel(set, $"Cached local retrieval for {beatmap}.");
-                            return true;
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    var status = (BeatmapSetOnlineStatus)reader.GetByte(2);
+
+                                    beatmap.Status = status;
+                                    beatmap.BeatmapSet.Status = status;
+                                    beatmap.BeatmapSet.OnlineBeatmapSetID = reader.GetInt32(0);
+                                    beatmap.OnlineBeatmapID = reader.GetInt32(1);
+
+                                    if (beatmap.Metadata != null)
+                                        beatmap.Metadata.AuthorID = reader.GetInt32(3);
+
+                                    if (beatmap.BeatmapSet.Metadata != null)
+                                        beatmap.BeatmapSet.Metadata.AuthorID = reader.GetInt32(3);
+
+                                    LogForModel(set, $"Cached local retrieval for {beatmap}.");
+                                    return true;
+                                }
+                            }
                         }
                     }
                 }
@@ -181,17 +203,6 @@ namespace osu.Game.Beatmaps
             {
                 cacheDownloadRequest?.Dispose();
                 updateScheduler?.Dispose();
-            }
-
-            [Serializable]
-            [SuppressMessage("ReSharper", "InconsistentNaming")]
-            private class CachedOnlineBeatmapLookup
-            {
-                public int approved { get; set; }
-
-                public int? beatmapset_id { get; set; }
-
-                public int? beatmap_id { get; set; }
             }
         }
     }

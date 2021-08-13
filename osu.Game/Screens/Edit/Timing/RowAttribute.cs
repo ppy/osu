@@ -1,33 +1,35 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
+using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class RowAttribute : CompositeDrawable, IHasTooltip
+    public class RowAttribute : CompositeDrawable
     {
-        private readonly string header;
-        private readonly Func<string> content;
-        private readonly Color4 colour;
+        protected readonly ControlPoint Point;
 
-        public RowAttribute(string header, Func<string> content, Color4 colour)
+        private readonly string label;
+
+        protected FillFlowContainer Content { get; private set; }
+
+        public RowAttribute(ControlPoint point, string label)
         {
-            this.header = header;
-            this.content = content;
-            this.colour = colour;
+            Point = point;
+
+            this.label = label;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OverlayColourProvider overlayColours)
         {
             AutoSizeAxes = Axes.X;
 
@@ -37,27 +39,43 @@ namespace osu.Game.Screens.Edit.Timing
             Origin = Anchor.CentreLeft;
 
             Masking = true;
-            CornerRadius = 5;
+            CornerRadius = 3;
 
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
-                    Colour = colour,
+                    Colour = overlayColours.Background4,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new OsuSpriteText
+                Content = new FillFlowContainer
                 {
-                    Padding = new MarginPadding(2),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 12),
-                    Text = header,
-                    Colour = colours.Gray0
-                },
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding { Horizontal = 5 },
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        new Circle
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Colour = Point.GetRepresentingColour(colours),
+                            RelativeSizeAxes = Axes.Y,
+                            Size = new Vector2(4, 0.6f),
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Padding = new MarginPadding(3),
+                            Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 12),
+                            Text = label,
+                        },
+                    },
+                }
             };
         }
-
-        public string TooltipText => content();
     }
 }

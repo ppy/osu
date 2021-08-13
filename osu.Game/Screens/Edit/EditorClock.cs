@@ -11,14 +11,13 @@ using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
     /// A decoupled clock which adds editor-specific functionality, such as snapping to a user-defined beat divisor.
     /// </summary>
-    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock, ISamplePlaybackDisabler
+    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
         public IBindable<Track> Track => track;
 
@@ -32,16 +31,23 @@ namespace osu.Game.Screens.Edit
 
         private readonly DecoupleableInterpolatingFramedClock underlyingClock;
 
-        public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
+        private bool playbackFinished;
 
-        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+        public IBindable<bool> SeekingOrStopped => seekingOrStopped;
 
-        public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
-            : this(beatmap.Beatmap.ControlPointInfo, beatmap.Track.Length, beatDivisor)
+        private readonly Bindable<bool> seekingOrStopped = new Bindable<bool>(true);
+
+        /// <summary>
+        /// Whether a seek is currently in progress. True for the duration of a seek performed via <see cref="SeekSmoothlyTo"/>.
+        /// </summary>
+        public bool IsSeeking { get; private set; }
+
+        public EditorClock(IBeatmap beatmap, BindableBeatDivisor beatDivisor)
+            : this(beatmap.ControlPointInfo, beatDivisor)
         {
         }
 
-        public EditorClock(ControlPointInfo controlPointInfo, double trackLength, BindableBeatDivisor beatDivisor)
+        public EditorClock(ControlPointInfo controlPointInfo, BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor = beatDivisor;
 
@@ -51,7 +57,7 @@ namespace osu.Game.Screens.Edit
         }
 
         public EditorClock()
-            : this(new ControlPointInfo(), 1000, new BindableBeatDivisor())
+            : this(new ControlPointInfo(), new BindableBeatDivisor())
         {
         }
 
@@ -112,7 +118,7 @@ namespace osu.Game.Screens.Edit
 
             if (!snapped || ControlPointInfo.TimingPoints.Count == 0)
             {
-                SeekTo(seekTime);
+                SeekSmoothlyTo(seekTime);
                 return;
             }
 
@@ -146,11 +152,11 @@ namespace osu.Game.Screens.Edit
 
             // Ensure the sought point is within the boundaries
             seekTime = Math.Clamp(seekTime, 0, TrackLength);
-            SeekTo(seekTime);
+            SeekSmoothlyTo(seekTime);
         }
 
         /// <summary>
-        /// The current time of this clock, include any active transform seeks performed via <see cref="SeekTo"/>.
+        /// The current time of this clock, include any active transform seeks performed via <see cref="SeekSmoothlyTo"/>.
         /// </summary>
         public double CurrentTimeAccurate =>
             Transforms.OfType<TransformSeek>().FirstOrDefault()?.EndValue ?? CurrentTime;
@@ -166,21 +172,42 @@ namespace osu.Game.Screens.Edit
         public void Start()
         {
             ClearTransforms();
+
+            if (playbackFinished)
+                underlyingClock.Seek(0);
+
             underlyingClock.Start();
         }
 
         public void Stop()
         {
-            samplePlaybackDisabled.Value = true;
+            seekingOrStopped.Value = true;
             underlyingClock.Stop();
         }
 
         public bool Seek(double position)
         {
-            samplePlaybackDisabled.Value = true;
+            seekingOrStopped.Value = IsSeeking = true;
 
             ClearTransforms();
             return underlyingClock.Seek(position);
+        }
+
+        /// <summary>
+        /// Seek smoothly to the provided destination.
+        /// Use <see cref="Seek"/> to perform an immediate seek.
+        /// </summary>
+        /// <param name="seekDestination"></param>
+        public void SeekSmoothlyTo(double seekDestination)
+        {
+            seekingOrStopped.Value = true;
+
+            if (IsRunning)
+                Seek(seekDestination);
+            else
+            {
+                transformSeekTo(seekDestination, transform_time, Easing.OutQuint);
+            }
         }
 
         public void ResetSpeedAdjustments() => underlyingClock.ResetSpeedAdjustments();
@@ -195,7 +222,21 @@ namespace osu.Game.Screens.Edit
 
         public bool IsRunning => underlyingClock.IsRunning;
 
-        public void ProcessFrame() => underlyingClock.ProcessFrame();
+        public void ProcessFrame()
+        {
+            underlyingClock.ProcessFrame();
+
+            playbackFinished = CurrentTime >= TrackLength;
+
+            if (playbackFinished)
+            {
+                if (IsRunning)
+                    underlyingClock.Stop();
+
+                if (CurrentTime > TrackLength)
+                    underlyingClock.Seek(TrackLength);
+            }
+        }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
 
@@ -228,8 +269,10 @@ namespace osu.Game.Screens.Edit
 
         private void updateSeekingState()
         {
-            if (samplePlaybackDisabled.Value)
+            if (seekingOrStopped.Value)
             {
+                IsSeeking &= Transforms.Any();
+
                 if (track.Value?.IsRunning != true)
                 {
                     // seeking in the editor can happen while the track isn't running.
@@ -240,18 +283,8 @@ namespace osu.Game.Screens.Edit
                 // we are either running a seek tween or doing an immediate seek.
                 // in the case of an immediate seek the seeking bool will be set to false after one update.
                 // this allows for silencing hit sounds and the likes.
-                samplePlaybackDisabled.Value = Transforms.Any();
+                seekingOrStopped.Value = IsSeeking;
             }
-        }
-
-        public void SeekTo(double seekDestination)
-        {
-            samplePlaybackDisabled.Value = true;
-
-            if (IsRunning)
-                Seek(seekDestination);
-            else
-                transformSeekTo(seekDestination, transform_time, Easing.OutQuint);
         }
 
         private void transformSeekTo(double seek, double duration = 0, Easing easing = Easing.None)
@@ -267,8 +300,15 @@ namespace osu.Game.Screens.Edit
         {
             public override string TargetMember => nameof(currentTime);
 
-            protected override void Apply(EditorClock clock, double time) =>
-                clock.currentTime = Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+            protected override void Apply(EditorClock clock, double time) => clock.currentTime = valueAt(time);
+
+            private double valueAt(double time)
+            {
+                if (time < StartTime) return StartValue;
+                if (time >= EndTime) return EndValue;
+
+                return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+            }
 
             protected override void ReadIntoStartValue(EditorClock clock) => StartValue = clock.currentTime;
         }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -43,9 +44,12 @@ namespace osu.Game.Tournament.Screens.Editors
         private void addAllCountries()
         {
             List<TournamentTeam> countries;
+
             using (Stream stream = game.Resources.GetStream("Resources/countries.json"))
             using (var sr = new StreamReader(stream))
                 countries = JsonConvert.DeserializeObject<List<TournamentTeam>>(sr.ReadToEnd());
+
+            Debug.Assert(countries != null);
 
             foreach (var c in countries)
                 Storage.Add(c);
@@ -210,7 +214,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     [Resolved]
                     private TournamentGameBase game { get; set; }
 
-                    private readonly Bindable<string> userId = new Bindable<string>();
+                    private readonly Bindable<int?> userId = new Bindable<int?>();
 
                     private readonly Container drawableContainer;
 
@@ -274,14 +278,12 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load()
                     {
-                        userId.Value = user.Id.ToString();
-                        userId.BindValueChanged(idString =>
+                        userId.Value = user.Id;
+                        userId.BindValueChanged(id =>
                         {
-                            long.TryParse(idString.NewValue, out var parsed);
+                            user.Id = id.NewValue ?? 0;
 
-                            user.Id = parsed;
-
-                            if (idString.NewValue != idString.OldValue)
+                            if (id.NewValue != id.OldValue)
                                 user.Username = string.Empty;
 
                             if (!string.IsNullOrEmpty(user.Username))

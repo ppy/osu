@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
@@ -75,13 +76,13 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
-                    new HoverClickSounds()
+                    new HoverClickSounds(HoverSampleSet.TabSelect)
                 };
 
                 Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Torus, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
             }
 
-            protected virtual string CreateText() => (Value as Enum)?.GetDescription() ?? Value.ToString();
+            protected virtual LocalisableString CreateText() => (Value as Enum)?.GetLocalisableDescription() ?? Value.ToString();
 
             protected override bool OnHover(HoverEvent e)
             {

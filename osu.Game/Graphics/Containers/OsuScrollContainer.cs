@@ -12,7 +12,19 @@ using osuTK.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuScrollContainer : ScrollContainer<Drawable>
+    public class OsuScrollContainer : OsuScrollContainer<Drawable>
+    {
+        public OsuScrollContainer()
+        {
+        }
+
+        public OsuScrollContainer(Direction direction)
+            : base(direction)
+        {
+        }
+    }
+
+    public class OsuScrollContainer<T> : ScrollContainer<T> where T : Drawable
     {
         public const float SCROLL_BAR_HEIGHT = 10;
         public const float SCROLL_BAR_PADDING = 3;
@@ -21,7 +33,7 @@ namespace osu.Game.Graphics.Containers
         /// Allows controlling the scroll bar from any position in the container using the right mouse button.
         /// Uses the value of <see cref="DistanceDecayOnRightMouseScrollbar"/> to smoothly scroll to the dragged location.
         /// </summary>
-        public bool RightMouseScrollbar = false;
+        public bool RightMouseScrollbar;
 
         /// <summary>
         /// Controls the rate with which the target position is approached when performing a relative drag. Default is 0.02.

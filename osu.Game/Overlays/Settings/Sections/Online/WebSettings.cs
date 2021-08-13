@@ -3,13 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class WebSettings : SettingsSubsection
     {
-        protected override string Header => "Web";
+        protected override LocalisableString Header => "Web";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -27,6 +28,18 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                     Keywords = new[] { "no-video" },
                     Current = config.GetBindable<bool>(OsuSetting.PreferNoVideo)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Automatically download beatmaps when spectating",
+                    Keywords = new[] { "spectator" },
+                    Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating),
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Show explicit content in search results",
+                    Keywords = new[] { "nsfw", "18+", "offensive" },
+                    Current = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent),
+                }
             };
         }
     }

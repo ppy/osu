@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -13,7 +14,7 @@ namespace osu.Game.Tests
 {
     public class TestScoreInfo : ScoreInfo
     {
-        public TestScoreInfo(RulesetInfo ruleset)
+        public TestScoreInfo(RulesetInfo ruleset, bool excessMods = false)
         {
             User = new User
             {
@@ -25,7 +26,10 @@ namespace osu.Game.Tests
             Beatmap = new TestBeatmap(ruleset).BeatmapInfo;
             Ruleset = ruleset;
             RulesetID = ruleset.ID ?? 0;
-            Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() };
+
+            Mods = excessMods
+                ? ruleset.CreateInstance().GetAllMods().ToArray()
+                : new Mod[] { new TestModHardRock(), new TestModDoubleTime() };
 
             TotalScore = 2845370;
             Accuracy = 0.95;

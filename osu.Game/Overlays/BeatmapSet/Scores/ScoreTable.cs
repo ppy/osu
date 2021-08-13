@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -15,9 +16,10 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
-using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Localisation;
+using osu.Framework.Extensions.LocalisationExtensions;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -60,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         /// <summary>
         /// The statistics that appear in the table, in order of appearance.
         /// </summary>
-        private readonly List<HitResult> statisticResultTypes = new List<HitResult>();
+        private readonly List<(HitResult result, string displayName)> statisticResultTypes = new List<(HitResult, string)>();
 
         private bool showPerformancePoints;
 
@@ -101,15 +103,24 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
 
             // All statistics across all scores, unordered.
-            var allScoreStatistics = scores.SelectMany(s => s.GetStatisticsForDisplay().Select(stat => stat.result)).ToHashSet();
+            var allScoreStatistics = scores.SelectMany(s => s.GetStatisticsForDisplay().Select(stat => stat.Result)).ToHashSet();
 
-            foreach (var result in OrderAttributeUtils.GetValuesInOrder<HitResult>())
+            var ruleset = scores.First().Ruleset.CreateInstance();
+
+            foreach (var result in EnumExtensions.GetValuesInOrder<HitResult>())
             {
                 if (!allScoreStatistics.Contains(result))
                     continue;
 
-                columns.Add(new TableColumn(result.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
-                statisticResultTypes.Add(result);
+                // for the time being ignore bonus result types.
+                // this is not being sent from the API and will be empty in all cases.
+                if (result.IsBonus())
+                    continue;
+
+                string displayName = ruleset.GetDisplayNameForHitResult(result);
+
+                columns.Add(new TableColumn(displayName, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
+                statisticResultTypes.Add((result, displayName));
             }
 
             if (showPerformancePoints)
@@ -163,18 +174,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 }
             };
 
-            var availableStatistics = score.GetStatisticsForDisplay().ToDictionary(tuple => tuple.result);
+            var availableStatistics = score.GetStatisticsForDisplay().ToDictionary(tuple => tuple.Result);
 
             foreach (var result in statisticResultTypes)
             {
-                if (!availableStatistics.TryGetValue(result, out var stat))
-                    stat = (result, 0, null);
+                if (!availableStatistics.TryGetValue(result.result, out var stat))
+                    stat = new HitResultDisplayStatistic(result.result, 0, null, result.displayName);
 
                 content.Add(new OsuSpriteText
                 {
-                    Text = stat.maxCount == null ? $"{stat.count}" : $"{stat.count}/{stat.maxCount}",
+                    Text = stat.MaxCount == null ? $"{stat.Count}" : $"{stat.Count}/{stat.MaxCount}",
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = stat.count == 0 ? Color4.Gray : Color4.White
+                    Colour = stat.Count == 0 ? Color4.Gray : Color4.White
                 });
             }
 
@@ -202,11 +213,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             return content.ToArray();
         }
 
-        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty);
+        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? default);
 
         private class HeaderText : OsuSpriteText
         {
-            public HeaderText(string text)
+            public HeaderText(LocalisableString text)
             {
                 Text = text.ToUpper();
                 Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold);

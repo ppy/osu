@@ -45,7 +45,10 @@ namespace osu.Game.Overlays
 
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
-        public bool IsUserPaused { get; private set; }
+        /// <summary>
+        /// Whether the user has requested the track to be paused. Use <see cref="IsPlaying"/> to determine whether the track is still playing.
+        /// </summary>
+        public bool UserPauseRequested { get; private set; }
 
         /// <summary>
         /// Fired when the global <see cref="WorkingBeatmap"/> has changed.
@@ -148,9 +151,9 @@ namespace osu.Game.Overlays
         /// </summary>
         public void EnsurePlayingSomething()
         {
-            if (IsUserPaused) return;
+            if (UserPauseRequested) return;
 
-            if (CurrentTrack.IsDummyDevice)
+            if (CurrentTrack.IsDummyDevice || beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 if (beatmap.Disabled)
                     return;
@@ -166,10 +169,17 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Start playing the current track (if not already playing).
         /// </summary>
+        /// <param name="restart">Whether to restart the track from the beginning.</param>
+        /// <param name="requestedByUser">
+        /// Whether the request to play was issued by the user rather than internally.
+        /// Specifying <c>true</c> will ensure that other methods like <see cref="EnsurePlayingSomething"/>
+        /// will resume music playback going forward.
+        /// </param>
         /// <returns>Whether the operation was successful.</returns>
-        public bool Play(bool restart = false)
+        public bool Play(bool restart = false, bool requestedByUser = false)
         {
-            IsUserPaused = false;
+            if (requestedByUser)
+                UserPauseRequested = false;
 
             if (restart)
                 CurrentTrack.Restart();
@@ -182,9 +192,14 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Stop playing the current track and pause at the current position.
         /// </summary>
-        public void Stop()
+        /// <param name="requestedByUser">
+        /// Whether the request to stop was issued by the user rather than internally.
+        /// Specifying <c>true</c> will ensure that other methods like <see cref="EnsurePlayingSomething"/>
+        /// will not resume music playback until the next explicit call to <see cref="Play"/>.
+        /// </param>
+        public void Stop(bool requestedByUser = false)
         {
-            IsUserPaused = true;
+            UserPauseRequested |= requestedByUser;
             if (CurrentTrack.IsRunning)
                 CurrentTrack.Stop();
         }
@@ -196,9 +211,9 @@ namespace osu.Game.Overlays
         public bool TogglePause()
         {
             if (CurrentTrack.IsRunning)
-                Stop();
+                Stop(true);
             else
-                Play();
+                Play(requestedByUser: true);
 
             return true;
         }
@@ -237,7 +252,7 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
-                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value));
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First()));
                 restartTrack();
                 return PreviousTrackResult.Previous;
             }
@@ -268,7 +283,7 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
-                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value));
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First()));
                 restartTrack();
                 return true;
             }
@@ -385,35 +400,38 @@ namespace osu.Game.Overlays
                 NextTrack();
         }
 
-        private bool allowRateAdjustments;
+        private bool allowTrackAdjustments;
 
         /// <summary>
-        /// Whether mod rate adjustments are allowed to be applied.
+        /// Whether mod track adjustments are allowed to be applied.
         /// </summary>
-        public bool AllowRateAdjustments
+        public bool AllowTrackAdjustments
         {
-            get => allowRateAdjustments;
+            get => allowTrackAdjustments;
             set
             {
-                if (allowRateAdjustments == value)
+                if (allowTrackAdjustments == value)
                     return;
 
-                allowRateAdjustments = value;
+                allowTrackAdjustments = value;
                 ResetTrackAdjustments();
             }
         }
 
         /// <summary>
-        /// Resets the speed adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowRateAdjustments"/> is <c>true</c>.
+        /// Resets the adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowTrackAdjustments"/> is <c>true</c>.
         /// </summary>
         /// <remarks>
-        /// Does not reset speed adjustments applied directly to the beatmap track.
+        /// Does not reset any adjustments applied directly to the beatmap track.
         /// </remarks>
         public void ResetTrackAdjustments()
         {
-            CurrentTrack.ResetSpeedAdjustments();
+            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Balance);
+            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Frequency);
+            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
+            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
 
-            if (allowRateAdjustments)
+            if (allowTrackAdjustments)
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(CurrentTrack);

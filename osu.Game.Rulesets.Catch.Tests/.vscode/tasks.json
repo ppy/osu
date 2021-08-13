@@ -9,11 +9,10 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Game.Rulesets.Catch.Tests.csproj",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
@@ -24,24 +23,14 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Game.Rulesets.Catch.Tests.csproj",
-                "/p:Configuration=Release",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:Configuration=Release",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Restore",
-            "type": "shell",
-            "command": "dotnet",
-            "args": [
-                "restore"
-            ],
-            "problemMatcher": []
         }
     ]
 }

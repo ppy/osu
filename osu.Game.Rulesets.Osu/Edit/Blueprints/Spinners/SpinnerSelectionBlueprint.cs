@@ -3,7 +3,6 @@
 
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
@@ -12,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
     {
         private readonly SpinnerPiece piece;
 
-        public SpinnerSelectionBlueprint(DrawableSpinner spinner)
+        public SpinnerSelectionBlueprint(Spinner spinner)
             : base(spinner)
         {
             InternalChild = piece = new SpinnerPiece();

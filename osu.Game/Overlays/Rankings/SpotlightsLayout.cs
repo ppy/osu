@@ -45,6 +45,7 @@ namespace osu.Game.Overlays.Rankings
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             InternalChild = new ReverseChildIDFillFlowContainer<Drawable>
             {
                 RelativeSizeAxes = Axes.X,
@@ -68,7 +69,7 @@ namespace osu.Game.Overlays.Rankings
                                 AutoSizeAxes = Axes.Y,
                                 Margin = new MarginPadding { Vertical = 10 }
                             },
-                            loading = new LoadingLayer(content)
+                            loading = new LoadingLayer(true)
                         }
                     }
                 }

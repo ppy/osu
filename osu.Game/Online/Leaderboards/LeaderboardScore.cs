@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -24,8 +25,8 @@ using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
-using Humanizer;
 using osu.Game.Online.API;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -61,6 +62,9 @@ namespace osu.Game.Online.Leaderboards
         [Resolved(CanBeNull = true)]
         private SongSelect songSelect { get; set; }
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
         {
             this.score = score;
@@ -78,7 +82,7 @@ namespace osu.Game.Online.Leaderboards
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
-            DrawableAvatar innerAvatar;
+            ClickableAvatar innerAvatar;
 
             Children = new Drawable[]
             {
@@ -115,7 +119,7 @@ namespace osu.Game.Online.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    innerAvatar = new DrawableAvatar(user)
+                                    innerAvatar = new ClickableAvatar(user)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
@@ -244,7 +248,7 @@ namespace osu.Game.Online.Leaderboards
             this.FadeIn(200);
             content.MoveToY(0, 800, Easing.OutQuint);
 
-            using (BeginDelayedSequence(100, true))
+            using (BeginDelayedSequence(100))
             {
                 avatar.FadeIn(300, Easing.OutQuint);
                 nameLabel.FadeIn(350, Easing.OutQuint);
@@ -252,12 +256,12 @@ namespace osu.Game.Online.Leaderboards
                 avatar.MoveToX(0, 300, Easing.OutQuint);
                 nameLabel.MoveToX(0, 350, Easing.OutQuint);
 
-                using (BeginDelayedSequence(250, true))
+                using (BeginDelayedSequence(250))
                 {
                     scoreLabel.FadeIn(200);
                     scoreRank.FadeIn(200);
 
-                    using (BeginDelayedSequence(50, true))
+                    using (BeginDelayedSequence(50))
                     {
                         var drawables = new Drawable[] { flagBadgeContainer, modsContainer }.Concat(statisticsLabels).ToArray();
                         for (int i = 0; i < drawables.Length; i++)
@@ -292,7 +296,7 @@ namespace osu.Game.Online.Leaderboards
 
             public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
 
-            public string TooltipText { get; }
+            public LocalisableString TooltipText { get; }
 
             public ScoreComponentLabel(LeaderboardScoreStatistic statistic)
             {
@@ -358,20 +362,20 @@ namespace osu.Game.Online.Leaderboards
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 20, italics: true),
-                    Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
+                    Text = rank == null ? "-" : rank.Value.FormatRank()
                 };
             }
 
-            public string TooltipText { get; }
+            public LocalisableString TooltipText { get; }
         }
 
         public class LeaderboardScoreStatistic
         {
             public IconUsage Icon;
-            public string Value;
+            public LocalisableString Value;
             public string Name;
 
-            public LeaderboardScoreStatistic(IconUsage icon, string name, string value)
+            public LeaderboardScoreStatistic(IconUsage icon, string name, LocalisableString value)
             {
                 Icon = icon;
                 Name = name;
@@ -387,6 +391,9 @@ namespace osu.Game.Online.Leaderboards
 
                 if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
+
+                if (score.Files?.Count > 0)
+                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(score)));
 
                 if (score.ID != 0)
                     items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));

@@ -12,17 +12,33 @@ namespace osu.Game.Rulesets.Taiko.Tests
     [TestFixture]
     public class TaikoLegacyModConversionTest : LegacyModConversionTest
     {
-        [TestCase(LegacyMods.Easy, new[] { typeof(TaikoModEasy) })]
-        [TestCase(LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(TaikoModHardRock), typeof(TaikoModDoubleTime) })]
-        [TestCase(LegacyMods.DoubleTime, new[] { typeof(TaikoModDoubleTime) })]
-        [TestCase(LegacyMods.Nightcore, new[] { typeof(TaikoModNightcore) })]
+        private static readonly object[][] taiko_mod_mapping =
+        {
+            new object[] { LegacyMods.NoFail, new[] { typeof(TaikoModNoFail) } },
+            new object[] { LegacyMods.Easy, new[] { typeof(TaikoModEasy) } },
+            new object[] { LegacyMods.Hidden, new[] { typeof(TaikoModHidden) } },
+            new object[] { LegacyMods.HardRock, new[] { typeof(TaikoModHardRock) } },
+            new object[] { LegacyMods.SuddenDeath, new[] { typeof(TaikoModSuddenDeath) } },
+            new object[] { LegacyMods.DoubleTime, new[] { typeof(TaikoModDoubleTime) } },
+            new object[] { LegacyMods.Relax, new[] { typeof(TaikoModRelax) } },
+            new object[] { LegacyMods.HalfTime, new[] { typeof(TaikoModHalfTime) } },
+            new object[] { LegacyMods.Nightcore, new[] { typeof(TaikoModNightcore) } },
+            new object[] { LegacyMods.Flashlight, new[] { typeof(TaikoModFlashlight) } },
+            new object[] { LegacyMods.Autoplay, new[] { typeof(TaikoModAutoplay) } },
+            new object[] { LegacyMods.Perfect, new[] { typeof(TaikoModPerfect) } },
+            new object[] { LegacyMods.Random, new[] { typeof(TaikoModRandom) } },
+            new object[] { LegacyMods.Cinema, new[] { typeof(TaikoModCinema) } },
+            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(TaikoModHardRock), typeof(TaikoModDoubleTime) } }
+        };
+
+        [TestCaseSource(nameof(taiko_mod_mapping))]
+        [TestCase(LegacyMods.Cinema | LegacyMods.Autoplay, new[] { typeof(TaikoModCinema) })]
         [TestCase(LegacyMods.Nightcore | LegacyMods.DoubleTime, new[] { typeof(TaikoModNightcore) })]
-        [TestCase(LegacyMods.Flashlight | LegacyMods.Nightcore | LegacyMods.DoubleTime, new[] { typeof(TaikoModFlashlight), typeof(TaikoModNightcore) })]
-        [TestCase(LegacyMods.Perfect, new[] { typeof(TaikoModPerfect) })]
-        [TestCase(LegacyMods.SuddenDeath, new[] { typeof(TaikoModSuddenDeath) })]
         [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath, new[] { typeof(TaikoModPerfect) })]
-        [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath | LegacyMods.DoubleTime, new[] { typeof(TaikoModDoubleTime), typeof(TaikoModPerfect) })]
-        public new void Test(LegacyMods legacyMods, Type[] expectedMods) => base.Test(legacyMods, expectedMods);
+        public new void TestFromLegacy(LegacyMods legacyMods, Type[] expectedMods) => base.TestFromLegacy(legacyMods, expectedMods);
+
+        [TestCaseSource(nameof(taiko_mod_mapping))]
+        public new void TestToLegacy(LegacyMods legacyMods, Type[] givenMods) => base.TestToLegacy(legacyMods, givenMods);
 
         protected override Ruleset CreateRuleset() => new TaikoRuleset();
     }
