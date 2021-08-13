@@ -64,7 +64,10 @@ namespace osu.Game
     /// </summary>
     public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     {
-        public const float SCREEN_OFFSET_RATIO = 0.125f;
+        /// <summary>
+        /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
+        /// </summary>
+        protected const float SIDE_OVERLAY_OFFSET_RATIO = 0.125f;
 
         public Toolbar Toolbar;
 
@@ -1016,9 +1019,9 @@ namespace osu.Game
             var horizontalOffset = 0f;
 
             if (Settings.IsLoaded && Settings.IsPresent)
-                horizontalOffset += ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X * SCREEN_OFFSET_RATIO;
+                horizontalOffset += ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X * SIDE_OVERLAY_OFFSET_RATIO;
             if (Notifications.IsLoaded && Notifications.IsPresent)
-                horizontalOffset += (ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - DrawWidth) * SCREEN_OFFSET_RATIO;
+                horizontalOffset += (ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - DrawWidth) * SIDE_OVERLAY_OFFSET_RATIO;
 
             ScreenOffsetContainer.X = horizontalOffset;
 

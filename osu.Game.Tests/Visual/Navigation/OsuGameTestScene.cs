@@ -96,6 +96,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         public class TestOsuGame : OsuGame
         {
+            public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
+
             public new ScreenStack ScreenStack => base.ScreenStack;
 
             public new BackButton BackButton => base.BackButton;
