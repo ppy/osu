@@ -27,7 +27,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private readonly IBindableList<Room> rooms = new BindableList<Room>();
 
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
-        public IReadOnlyList<DrawableRoom> Rooms => roomFlow;
+
+        public IReadOnlyList<DrawableRoom> Rooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
 
         [Resolved(CanBeNull = true)]
         private Bindable<FilterCriteria> filter { get; set; }
@@ -49,6 +50,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            // account for the fact we are in a scroll container and want a bit of spacing from the scroll bar.
+            Padding = new MarginPadding { Right = 5 };
+
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -58,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2),
+                    Spacing = new Vector2(10),
                 }
             };
         }

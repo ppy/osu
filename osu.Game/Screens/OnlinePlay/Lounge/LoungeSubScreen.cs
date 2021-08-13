@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
@@ -18,6 +19,8 @@ using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
@@ -28,11 +31,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
+        protected Container<OsuButton> Buttons { get; } = new Container<OsuButton>
+        {
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+            AutoSizeAxes = Axes.Both
+        };
+
         private readonly IBindable<bool> initialRoomsReceived = new Bindable<bool>();
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
 
         private FilterControl filter;
-        private Container content;
         private LoadingLayer loadingLayer;
 
         [Resolved]
@@ -56,41 +65,71 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             InternalChildren = new Drawable[]
             {
-                content = new Container
+                new Box
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 100,
+                    Colour = Color4.Black,
+                    Alpha = 0.5f,
+                },
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Padding = new MarginPadding
                     {
-                        new Container
+                        Top = 20,
+                        Left = WaveOverlayContainer.WIDTH_PADDING,
+                        Right = WaveOverlayContainer.WIDTH_PADDING,
+                    },
+                    Child = new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.55f,
-                            Children = new Drawable[]
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.Absolute, 20)
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
                             {
-                                scrollContainer = new OsuScrollContainer
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 70,
+                                    Depth = -1,
+                                    Children = new Drawable[]
+                                    {
+                                        filter = CreateFilterControl(),
+                                        Buttons.WithChild(CreateNewRoomButton().With(d =>
+                                        {
+                                            d.Size = new Vector2(150, 25);
+                                            d.Action = () => Open();
+                                        }))
+                                    }
+                                }
+                            },
+                            null,
+                            new Drawable[]
+                            {
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ScrollbarOverlapsContent = false,
-                                    Padding = new MarginPadding(10),
-                                    Child = roomsContainer = new RoomsContainer()
+                                    Children = new Drawable[]
+                                    {
+                                        scrollContainer = new OsuScrollContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            ScrollbarOverlapsContent = false,
+                                            Child = roomsContainer = new RoomsContainer()
+                                        },
+                                        loadingLayer = new LoadingLayer(true),
+                                    }
                                 },
-                                loadingLayer = new LoadingLayer(true),
                             }
-                        },
-                        new RoomInspector
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.45f,
-                        },
+                        }
                     },
-                },
-                filter = CreateFilterControl().With(d =>
-                {
-                    d.RelativeSizeAxes = Axes.X;
-                    d.Height = 80;
-                })
+                }
             };
 
             // scroll selected room into view on selection.
@@ -114,18 +153,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
                 operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
             }
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            content.Padding = new MarginPadding
-            {
-                Top = filter.DrawHeight,
-                Left = WaveOverlayContainer.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + HORIZONTAL_OVERFLOW_PADDING,
-                Right = WaveOverlayContainer.WIDTH_PADDING + HORIZONTAL_OVERFLOW_PADDING,
-            };
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -177,7 +204,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             this.HidePopover();
         }
 
-        public void Join(Room room, string password)
+        public void Join(Room room, string password) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
@@ -194,7 +221,39 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
             });
+        });
+
+        /// <summary>
+        /// Push a room as a new subscreen.
+        /// </summary>
+        /// <param name="room">An optional template to use when creating the room.</param>
+        public void Open(Room room = null) => Schedule(() =>
+        {
+            // Handles the case where a room is clicked 3 times in quick succession
+            if (!this.IsCurrentScreen())
+                return;
+
+            OpenNewRoom(room ?? CreateNewRoom());
+        });
+
+        protected virtual void OpenNewRoom(Room room)
+        {
+            selectedRoom.Value = room;
+
+            this.Push(CreateRoomSubScreen(room));
         }
+
+        protected abstract FilterControl CreateFilterControl();
+
+        protected abstract OsuButton CreateNewRoomButton();
+
+        /// <summary>
+        /// Creates a new room.
+        /// </summary>
+        /// <returns>The created <see cref="Room"/>.</returns>
+        protected abstract Room CreateNewRoom();
+
+        protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
 
         private void updateLoadingLayer()
         {
@@ -203,23 +262,5 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             else
                 loadingLayer.Hide();
         }
-
-        /// <summary>
-        /// Push a room as a new subscreen.
-        /// </summary>
-        public virtual void Open(Room room)
-        {
-            // Handles the case where a room is clicked 3 times in quick succession
-            if (!this.IsCurrentScreen())
-                return;
-
-            selectedRoom.Value = room;
-
-            this.Push(CreateRoomSubScreen(room));
-        }
-
-        protected abstract FilterControl CreateFilterControl();
-
-        protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
     }
 }

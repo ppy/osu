@@ -15,16 +15,24 @@ namespace osu.Game.Rulesets.Objects.Types
         Bindable<int> IndexInCurrentComboBindable { get; }
 
         /// <summary>
-        /// The offset of this hitobject in the current combo.
+        /// The index of this hitobject in the current combo.
         /// </summary>
         int IndexInCurrentCombo { get; set; }
 
         Bindable<int> ComboIndexBindable { get; }
 
         /// <summary>
-        /// The offset of this combo in relation to the beatmap.
+        /// The index of this combo in relation to the beatmap.
         /// </summary>
         int ComboIndex { get; set; }
+
+        Bindable<int> ComboIndexWithOffsetsBindable { get; }
+
+        /// <summary>
+        /// The index of this combo in relation to the beatmap, with all aggregate <see cref="IHasCombo.ComboOffset"/>s applied.
+        /// This should be used instead of <see cref="ComboIndex"/> only when retrieving combo colours from the beatmap's skin.
+        /// </summary>
+        int ComboIndexWithOffsets { get; set; }
 
         /// <summary>
         /// Whether the HitObject starts a new combo.

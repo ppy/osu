@@ -94,10 +94,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddAssert("selected mod matches", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.Value == 1.2);
 
-            AddStep("deselect", () => modSelect.DeselectAllButton.Click());
+            AddStep("deselect", () => modSelect.DeselectAllButton.TriggerClick());
             AddAssert("selected mods empty", () => SelectedMods.Value.Count == 0);
 
-            AddStep("reselect", () => modSelect.GetModButton(osuModDoubleTime).Click());
+            AddStep("reselect", () => modSelect.GetModButton(osuModDoubleTime).TriggerClick());
             AddAssert("selected mod has default value", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.IsDefault == true);
         }
 

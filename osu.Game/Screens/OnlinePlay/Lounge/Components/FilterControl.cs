@@ -5,19 +5,18 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
-using osuTK.Graphics;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public abstract class FilterControl : CompositeDrawable
     {
-        protected const float VERTICAL_PADDING = 10;
-        protected const float HORIZONTAL_PADDING = 80;
+        protected readonly FillFlowContainer Filters;
 
         [Resolved(CanBeNull = true)]
         private Bindable<FilterCriteria> filter { get; set; }
@@ -25,60 +24,51 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        private readonly Box tabStrip;
         private readonly SearchTextBox search;
-        private readonly PageTabControl<RoomStatusFilter> tabs;
+        private readonly Dropdown<RoomStatusFilter> statusDropdown;
 
         protected FilterControl()
         {
-            InternalChildren = new Drawable[]
+            RelativeSizeAxes = Axes.X;
+            Height = 70;
+
+            InternalChild = new FillFlowContainer
             {
-                new Box
+                RelativeSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(10),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.25f,
-                },
-                tabStrip = new Box
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding
+                    search = new FilterSearchTextBox
                     {
-                        Top = VERTICAL_PADDING,
-                        Horizontal = HORIZONTAL_PADDING
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        RelativeSizeAxes = Axes.X,
+                        Width = 0.6f,
                     },
-                    Children = new Drawable[]
+                    Filters = new FillFlowContainer
                     {
-                        search = new FilterSearchTextBox
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(10),
+                        Child = statusDropdown = new SlimEnumDropdown<RoomStatusFilter>
                         {
-                            RelativeSizeAxes = Axes.X,
-                        },
-                        tabs = new PageTabControl<RoomStatusFilter>
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                        },
-                    }
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 160,
+                        }
+                    },
                 }
             };
-
-            tabs.Current.Value = RoomStatusFilter.Open;
-            tabs.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             filter ??= new Bindable<FilterCriteria>();
-            tabStrip.Colour = colours.Yellow;
         }
 
         protected override void LoadComplete()
@@ -87,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             search.Current.BindValueChanged(_ => updateFilterDebounced());
             ruleset.BindValueChanged(_ => UpdateFilter());
-            tabs.Current.BindValueChanged(_ => UpdateFilter(), true);
+            statusDropdown.Current.BindValueChanged(_ => UpdateFilter(), true);
         }
 
         private ScheduledDelegate scheduledFilterUpdate;
@@ -106,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             var criteria = CreateCriteria();
             criteria.SearchString = search.Current.Value;
-            criteria.Status = tabs.Current.Value;
+            criteria.Status = statusDropdown.Current.Value;
             criteria.Ruleset = ruleset.Value;
 
             filter.Value = criteria;

@@ -8,7 +8,7 @@ using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osu.Game.Overlays.KeyBinding;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 var resetButton = settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First();
 
-                resetButton.Click();
+                resetButton.TriggerClick();
             });
 
             AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 var resetButton = panel.ChildrenOfType<ResetButton>().First();
 
-                resetButton.Click();
+                resetButton.TriggerClick();
             });
 
             AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);

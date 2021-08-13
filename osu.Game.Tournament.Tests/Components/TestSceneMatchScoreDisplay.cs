@@ -16,7 +16,7 @@ namespace osu.Game.Tournament.Tests.Components
 
         public TestSceneMatchScoreDisplay()
         {
-            Add(new MatchScoreDisplay
+            Add(new TournamentMatchScoreDisplay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
