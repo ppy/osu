@@ -156,11 +156,15 @@ namespace osu.Game.Overlays.Comments
                                                                 {
                                                                     Icon = FontAwesome.Solid.Thumbtack,
                                                                     Size = new Vector2(14),
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
                                                                 },
                                                                 new OsuSpriteText
                                                                 {
                                                                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                                                                     Text = CommentsStrings.Pinned,
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
                                                                 }
                                                             },
                                                         },
