@@ -312,6 +312,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
+            AddUntilStep("wait for spectating user state", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
+
             AddStep("start match externally", () => client.StartMatch());
 
             AddAssert("play not started", () => multiplayerScreen.IsCurrentScreen());
@@ -347,6 +349,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerSpectateButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
+
+            AddUntilStep("wait for spectating user state", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
 
             AddStep("start match externally", () => client.StartMatch());
 
