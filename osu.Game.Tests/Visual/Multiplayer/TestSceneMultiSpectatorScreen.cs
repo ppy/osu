@@ -90,10 +90,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             loadSpectateScreen(false);
 
             AddUntilStep("wait for player loaders", () => this.ChildrenOfType<PlayerLoader>().Count() == 2);
-            AddAssert("all player loader settings hidden", () => this.ChildrenOfType<PlayerLoader>().All(l => l.ChildrenOfType<FillFlowContainer<PlayerSettingsGroup>>().Single().Alpha == 0f));
+            AddAssert("all player loader settings hidden", () => this.ChildrenOfType<PlayerLoader>().All(l => !l.ChildrenOfType<FillFlowContainer<PlayerSettingsGroup>>().Any()));
 
             AddUntilStep("wait for players to load", () => spectatorScreen.AllPlayersLoaded);
-            AddAssert("all player settings hidden", () => this.ChildrenOfType<Player>().All(p => p.ChildrenOfType<PlayerSettingsOverlay>().Single().State.Value == Visibility.Hidden));
+            AddUntilStep("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
+                !p.ChildrenOfType<PlayerSettingsOverlay>().Any() &&
+                !p.ChildrenOfType<HoldForMenuButton>().Any() &&
+                !p.ChildrenOfType<SongProgressBar>().Single().ShowHandle));
         }
 
         [Test]
