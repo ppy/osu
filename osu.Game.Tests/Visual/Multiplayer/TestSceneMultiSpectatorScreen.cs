@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
@@ -13,6 +14,8 @@ using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Users;
 
@@ -78,6 +81,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             sendFrames(userIds, 1000);
             AddWaitStep("wait a bit", 20);
+        }
+
+        [Test]
+        public void TestSpectatorPlayerSettingsHidden()
+        {
+            start(new[] { PLAYER_1_ID, PLAYER_2_ID });
+            loadSpectateScreen(false);
+
+            AddUntilStep("wait for player loaders", () => this.ChildrenOfType<PlayerLoader>().Count() == 2);
+            AddAssert("all player loader settings hidden", () => this.ChildrenOfType<PlayerLoader>().All(l => l.ChildrenOfType<FillFlowContainer<PlayerSettingsGroup>>().Single().Alpha == 0f));
+
+            AddUntilStep("wait for players to load", () => spectatorScreen.AllPlayersLoaded);
+            AddAssert("all player settings hidden", () => this.ChildrenOfType<Player>().All(p => p.ChildrenOfType<PlayerSettingsOverlay>().Single().State.Value == Visibility.Hidden));
         }
 
         [Test]
