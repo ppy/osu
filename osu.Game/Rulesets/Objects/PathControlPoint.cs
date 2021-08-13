@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -13,12 +14,14 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The position of this <see cref="PathControlPoint"/>.
         /// </summary>
+        [JsonProperty]
         public readonly Bindable<Vector2> Position = new Bindable<Vector2>();
 
         /// <summary>
         /// The type of path segment starting at this <see cref="PathControlPoint"/>.
         /// If null, this <see cref="PathControlPoint"/> will be a part of the previous path segment.
         /// </summary>
+        [JsonProperty]
         public readonly Bindable<PathType?> Type = new Bindable<PathType?>();
 
         /// <summary>

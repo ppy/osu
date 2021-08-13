@@ -23,7 +23,7 @@ namespace osu.Game.Skinning
 
         public readonly int Keys;
 
-        public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
+        public Dictionary<string, Color4> CustomColours { get; } = new Dictionary<string, Color4>();
 
         public Dictionary<string, string> ImageLookups = new Dictionary<string, string>();
 
@@ -31,10 +31,13 @@ namespace osu.Game.Skinning
         public readonly float[] ColumnSpacing;
         public readonly float[] ColumnWidth;
         public readonly float[] ExplosionWidth;
+        public readonly float[] HoldNoteLightWidth;
 
         public float HitPosition = (480 - 402) * POSITION_SCALE_FACTOR;
         public float LightPosition = (480 - 413) * POSITION_SCALE_FACTOR;
+        public float ScorePosition = 300 * POSITION_SCALE_FACTOR;
         public bool ShowJudgementLine = true;
+        public bool KeysUnderNotes;
 
         public LegacyManiaSkinConfiguration(int keys)
         {
@@ -44,6 +47,7 @@ namespace osu.Game.Skinning
             ColumnSpacing = new float[keys - 1];
             ColumnWidth = new float[keys];
             ExplosionWidth = new float[keys];
+            HoldNoteLightWidth = new float[keys];
 
             ColumnLineWidth.AsSpan().Fill(2);
             ColumnWidth.AsSpan().Fill(DEFAULT_COLUMN_SIZE);

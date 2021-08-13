@@ -2,14 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
@@ -21,7 +24,8 @@ namespace osu.Game.Screens.Select
 {
     public class FilterControl : Container
     {
-        public const float HEIGHT = 100;
+        public const float HEIGHT = 2 * side_margin + 85;
+        private const float side_margin = 20;
 
         public Action<FilterCriteria> FilterChanged;
 
@@ -33,6 +37,8 @@ namespace osu.Game.Screens.Select
 
         public FilterCriteria CreateCriteria()
         {
+            Debug.Assert(ruleset.Value.ID != null);
+
             var query = searchTextBox.Text;
 
             var criteria = new FilterCriteria
@@ -41,6 +47,7 @@ namespace osu.Game.Screens.Select
                 Sort = sortMode.Value,
                 AllowConvertedBeatmaps = showConverted.Value,
                 Ruleset = ruleset.Value,
+                Collection = collectionDropdown?.Current.Value?.Collection
             };
 
             if (!minimumStars.IsDefault)
@@ -49,11 +56,14 @@ namespace osu.Game.Screens.Select
             if (!maximumStars.IsDefault)
                 criteria.UserStarDifficulty.Max = maximumStars.Value;
 
+            criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
+
             FilterQueryParser.ApplyQueries(criteria, query);
             return criteria;
         }
 
         private SeekLimitedSearchTextBox searchTextBox;
+        private CollectionFilterDropdown collectionDropdown;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             base.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
@@ -61,23 +71,8 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
-            showConverted.ValueChanged += _ => updateCriteria();
-
-            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
-            minimumStars.ValueChanged += _ => updateCriteria();
-
-            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
-            maximumStars.ValueChanged += _ => updateCriteria();
-
-            ruleset.BindTo(parentRuleset);
-            ruleset.BindValueChanged(_ => updateCriteria());
-
             sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
             groupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupingMode);
-
-            groupMode.BindValueChanged(_ => updateCriteria());
-            sortMode.BindValueChanged(_ => updateCriteria());
 
             Children = new Drawable[]
             {
@@ -90,65 +85,118 @@ namespace osu.Game.Screens.Select
                 },
                 new Container
                 {
-                    Padding = new MarginPadding(20),
+                    Padding = new MarginPadding(side_margin),
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Children = new Drawable[]
+                    // Reverse ChildID so that dropdowns in the top section appear on top of the bottom section.
+                    Child = new ReverseChildIDFillFlowContainer<Drawable>
                     {
-                        searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
-                        new Box
+                        RelativeSizeAxes = Axes.Both,
+                        Spacing = new Vector2(0, 5),
+                        Children = new[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 1,
-                            Colour = OsuColour.Gray(80),
-                            Origin = Anchor.BottomLeft,
-                            Anchor = Anchor.BottomLeft,
-                        },
-                        new FillFlowContainer
-                        {
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            Direction = FillDirection.Horizontal,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
-                            Children = new Drawable[]
+                            new Container
                             {
-                                new OsuTabControlCheckbox
+                                RelativeSizeAxes = Axes.X,
+                                Height = 60,
+                                Children = new Drawable[]
                                 {
-                                    Text = "Show converted",
-                                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
-                                },
-                                sortTabs = new OsuTabControl<SortMode>
+                                    searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = 1,
+                                        Colour = OsuColour.Gray(80),
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.BottomRight,
+                                        Origin = Anchor.BottomRight,
+                                        Direction = FillDirection.Horizontal,
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
+                                        Children = new Drawable[]
+                                        {
+                                            new OsuTabControlCheckbox
+                                            {
+                                                Text = "Show converted",
+                                                Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                                                Anchor = Anchor.BottomRight,
+                                                Origin = Anchor.BottomRight,
+                                            },
+                                            sortTabs = new OsuTabControl<SortMode>
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Width = 0.5f,
+                                                Height = 24,
+                                                AutoSort = true,
+                                                Anchor = Anchor.BottomRight,
+                                                Origin = Anchor.BottomRight,
+                                                AccentColour = colours.GreenLight,
+                                                Current = { BindTarget = sortMode }
+                                            },
+                                            new OsuSpriteText
+                                            {
+                                                Text = "Sort by",
+                                                Font = OsuFont.GetFont(size: 14),
+                                                Margin = new MarginPadding(5),
+                                                Anchor = Anchor.BottomRight,
+                                                Origin = Anchor.BottomRight,
+                                            },
+                                        }
+                                    },
+                                }
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 20,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    Width = 0.5f,
-                                    Height = 24,
-                                    AutoSort = true,
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
-                                    AccentColour = colours.GreenLight,
-                                    Current = { BindTarget = sortMode }
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = "Sort by",
-                                    Font = OsuFont.GetFont(size: 14),
-                                    Margin = new MarginPadding(5),
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
-                                },
-                            }
-                        },
+                                    collectionDropdown = new CollectionFilterDropdown
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        RelativeSizeAxes = Axes.X,
+                                        Width = 0.4f,
+                                    }
+                                }
+                            },
+                        }
                     }
                 }
             };
 
-            searchTextBox.Current.ValueChanged += _ => FilterChanged?.Invoke(CreateCriteria());
+            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
+            showConverted.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
+            minimumStars.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
+            maximumStars.ValueChanged += _ => updateCriteria();
+
+            ruleset.BindTo(parentRuleset);
+            ruleset.BindValueChanged(_ => updateCriteria());
+
+            groupMode.BindValueChanged(_ => updateCriteria());
+            sortMode.BindValueChanged(_ => updateCriteria());
+
+            collectionDropdown.Current.ValueChanged += val =>
+            {
+                if (val.NewValue == null)
+                    // may be null briefly while menu is repopulated.
+                    return;
+
+                updateCriteria();
+            };
+
+            searchTextBox.Current.ValueChanged += _ => updateCriteria();
 
             updateCriteria();
         }
@@ -156,7 +204,6 @@ namespace osu.Game.Screens.Select
         public void Deactivate()
         {
             searchTextBox.ReadOnly = true;
-
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
                 GetContainingInputManager().ChangeFocus(searchTextBox);

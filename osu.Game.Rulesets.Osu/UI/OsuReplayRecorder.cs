@@ -2,18 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuReplayRecorder : ReplayRecorder<OsuAction>
     {
-        public OsuReplayRecorder(Replay replay)
-            : base(replay)
+        public OsuReplayRecorder(Score score)
+            : base(score)
         {
         }
 

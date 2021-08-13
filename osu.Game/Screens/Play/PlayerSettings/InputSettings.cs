@@ -9,11 +9,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class InputSettings : PlayerSettingsGroup
     {
-        protected override string Title => "Input settings";
-
         private readonly PlayerCheckbox mouseButtonsCheckbox;
 
         public InputSettings()
+            : base("Input Settings")
         {
             Children = new Drawable[]
             {

@@ -3,20 +3,18 @@
 
 using NUnit.Framework;
 using osu.Framework.IO.Stores;
-using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Tests.Gameplay
 {
-    [HeadlessTest]
     public class TestSceneHitObjectSamples : HitObjectSampleTest
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
-        protected override IResourceStore<byte[]> Resources => TestResources.GetStore();
+        protected override IResourceStore<byte[]> RulesetResources => TestResources.GetStore();
 
         /// <summary>
         /// Tests that a hitobject which provides no custom sample set retrieves samples from the user skin.
@@ -67,9 +65,11 @@ namespace osu.Game.Tests.Gameplay
         /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the beatmap skin:
         /// normal-hitnormal2
         /// normal-hitnormal
+        /// hitnormal
         /// </summary>
         [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
         {
             SetupSkins(expectedSample, expectedSample);
@@ -80,12 +80,13 @@ namespace osu.Game.Tests.Gameplay
         }
 
         /// <summary>
-        /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the user skin when the beatmap does not contain the sample:
-        /// normal-hitnormal2
+        /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the user skin
+        /// (ignoring the custom sample set index) when the beatmap skin does not contain the sample:
         /// normal-hitnormal
+        /// hitnormal
         /// </summary>
-        [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromUserSkinFallback(string expectedSample)
         {
             SetupSkins(string.Empty, expectedSample);
@@ -93,6 +94,23 @@ namespace osu.Game.Tests.Gameplay
             CreateTestWithBeatmap("hitobject-beatmap-custom-sample.osu");
 
             AssertUserLookup(expectedSample);
+        }
+
+        /// <summary>
+        /// Tests that a hitobject which provides a custom sample set of 2 does not retrieve a normal-hitnormal2 sample from the user skin
+        /// if the beatmap skin does not contain the sample.
+        /// User skins in stable ignore the custom sample set index when performing lookups.
+        /// </summary>
+        [Test]
+        public void TestUserSkinLookupIgnoresSampleBank()
+        {
+            const string unwanted_sample = "normal-hitnormal2";
+
+            SetupSkins(string.Empty, unwanted_sample);
+
+            CreateTestWithBeatmap("hitobject-beatmap-custom-sample.osu");
+
+            AssertNoLookup(unwanted_sample);
         }
 
         /// <summary>
@@ -145,6 +163,7 @@ namespace osu.Game.Tests.Gameplay
         /// </summary>
         [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestControlPointCustomSampleFromBeatmap(string sampleName)
         {
             SetupSkins(sampleName, sampleName);
@@ -178,7 +197,7 @@ namespace osu.Game.Tests.Gameplay
             string[] expectedSamples =
             {
                 "normal-hitnormal2",
-                "normal-hitwhistle2"
+                "normal-hitwhistle" // user skin lookups ignore custom sample set index
             };
 
             SetupSkins(expectedSamples[0], expectedSamples[1]);
@@ -190,7 +209,7 @@ namespace osu.Game.Tests.Gameplay
         }
 
         /// <summary>
-        /// Tests that when a custom sample bank is used, but <see cref="GlobalSkinConfiguration.LayeredHitSounds"/> is disabled,
+        /// Tests that when a custom sample bank is used, but <see cref="LegacySetting.LayeredHitSounds"/> is disabled,
         /// only the additional sound will be looked up.
         /// </summary>
         [Test]
@@ -209,7 +228,7 @@ namespace osu.Game.Tests.Gameplay
         }
 
         /// <summary>
-        /// Tests that when a normal sample bank is used and <see cref="GlobalSkinConfiguration.LayeredHitSounds"/> is disabled,
+        /// Tests that when a normal sample bank is used and <see cref="LegacySetting.LayeredHitSounds"/> is disabled,
         /// the normal sound will be looked up anyway.
         /// </summary>
         [Test]
@@ -226,6 +245,6 @@ namespace osu.Game.Tests.Gameplay
         }
 
         private void disableLayeredHitSounds()
-            => AddStep("set LayeredHitSounds to false", () => Skin.Configuration.ConfigDictionary[GlobalSkinConfiguration.LayeredHitSounds.ToString()] = "0");
+            => AddStep("set LayeredHitSounds to false", () => Skin.Configuration.ConfigDictionary[LegacySetting.LayeredHitSounds.ToString()] = "0");
     }
 }

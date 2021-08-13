@@ -23,11 +23,11 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTextBox : BasicTextBox
     {
-        private readonly SampleChannel[] textAddedSamples = new SampleChannel[4];
-        private SampleChannel capsTextAddedSample;
-        private SampleChannel textRemovedSample;
-        private SampleChannel textCommittedSample;
-        private SampleChannel caretMovedSample;
+        private readonly Sample[] textAddedSamples = new Sample[4];
+        private Sample capsTextAddedSample;
+        private Sample textRemovedSample;
+        private Sample textCommittedSample;
+        private Sample caretMovedSample;
 
         /// <summary>
         /// Whether to allow playing a different samples based on the type of character.
@@ -74,9 +74,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Color4 SelectionColour => new Color4(249, 90, 255, 255);
 
-        protected override void OnTextAdded(string added)
+        protected override void OnUserTextAdded(string added)
         {
-            base.OnTextAdded(added);
+            base.OnUserTextAdded(added);
 
             if (added.Any(char.IsUpper) && AllowUniqueCharacterSamples)
                 capsTextAddedSample?.Play();
@@ -84,9 +84,9 @@ namespace osu.Game.Graphics.UserInterface
                 textAddedSamples[RNG.Next(0, 3)]?.Play();
         }
 
-        protected override void OnTextRemoved(string removed)
+        protected override void OnUserTextRemoved(string removed)
         {
-            base.OnTextRemoved(removed);
+            base.OnUserTextRemoved(removed);
 
             textRemovedSample?.Play();
         }

@@ -24,6 +24,12 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestAroundCentre()
+        {
+            createTest(Enumerable.Range(-150, 300).Select(i => new HitEvent(i / 50f, HitResult.Perfect, new HitCircle(), new HitCircle(), null)).ToList());
+        }
+
+        [Test]
         public void TestZeroTimeOffset()
         {
             createTest(Enumerable.Range(0, 100).Select(_ => new HitEvent(0, HitResult.Perfect, new HitCircle(), new HitCircle(), null)).ToList());
@@ -33,6 +39,18 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestNoEvents()
         {
             createTest(new List<HitEvent>());
+        }
+
+        [Test]
+        public void TestMissesDontShow()
+        {
+            createTest(Enumerable.Range(0, 100).Select(i =>
+            {
+                if (i % 2 == 0)
+                    return new HitEvent(0, HitResult.Perfect, new HitCircle(), new HitCircle(), null);
+
+                return new HitEvent(30, HitResult.Miss, new HitCircle(), new HitCircle(), null);
+            }).ToList());
         }
 
         private void createTest(List<HitEvent> events) => AddStep("create test", () =>

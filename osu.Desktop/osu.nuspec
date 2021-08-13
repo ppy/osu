@@ -3,16 +3,15 @@
     <metadata>
         <id>osulazer</id>
         <version>0.0.0</version>
-        <title>osu!lazer</title>
+        <title>osu!</title>
         <authors>ppy Pty Ltd</authors>
         <owners>Dean Herbert</owners>
         <projectUrl>https://osu.ppy.sh/</projectUrl>
         <iconUrl>https://puu.sh/tYyXZ/9a01a5d1b0.ico</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>click the circles. to the beat.</description>
-        <summary>click the circles.</summary>
+        <description>A free-to-win rhythm game. Rhythm is just a *click* away!</description>
         <releaseNotes>testing</releaseNotes>
-        <copyright>Copyright (c) 2020 ppy Pty Ltd</copyright>
+        <copyright>Copyright (c) 2021 ppy Pty Ltd</copyright>
         <language>en-AU</language>
     </metadata>
     <files>
@@ -21,4 +20,3 @@
       <file src="**.config" target="lib\net45\"/>
     </files>
 </package>
-

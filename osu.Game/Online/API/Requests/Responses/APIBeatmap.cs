@@ -75,6 +75,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 StarDifficulty = starDifficulty,
                 OnlineBeatmapID = OnlineBeatmapID,
                 Version = version,
+                // this is actually an incorrect mapping (Length is calculated as drain length in lazer's import process, see BeatmapManager.calculateLength).
                 Length = TimeSpan.FromSeconds(length).TotalMilliseconds,
                 Status = Status,
                 BeatmapSet = set,

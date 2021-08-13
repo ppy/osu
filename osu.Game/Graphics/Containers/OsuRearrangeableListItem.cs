@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Whether any item is currently being dragged. Used to hide other items' drag handles.
         /// </summary>
-        public readonly BindableBool PlaylistDragActive = new BindableBool();
+        public readonly BindableBool DragActive = new BindableBool();
 
         private Color4 handleColour = Color4.White;
 
@@ -44,8 +45,9 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Whether the drag handle should be shown.
         /// </summary>
-        protected virtual bool ShowDragHandle => true;
+        protected readonly Bindable<bool> ShowDragHandle = new Bindable<bool>(true);
 
+        private Container handleContainer;
         private PlaylistItemHandle handle;
 
         protected OsuRearrangeableListItem(TModel item)
@@ -58,39 +60,44 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load()
         {
-            Container handleContainer;
-
-            InternalChild = new GridContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Content = new[]
+                new GridContainer
                 {
-                    new[]
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Content = new[]
                     {
-                        handleContainer = new Container
+                        new[]
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Horizontal = 5 },
-                            Child = handle = new PlaylistItemHandle
+                            handleContainer = new Container
                             {
-                                Size = new Vector2(12),
-                                Colour = HandleColour,
-                                AlwaysPresent = true,
-                                Alpha = 0
-                            }
-                        },
-                        CreateContent()
-                    }
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                AutoSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Horizontal = 5 },
+                                Child = handle = new PlaylistItemHandle
+                                {
+                                    Size = new Vector2(12),
+                                    Colour = HandleColour,
+                                    AlwaysPresent = true,
+                                    Alpha = 0
+                                }
+                            },
+                            CreateContent()
+                        }
+                    },
+                    ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                 },
-                ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
+                new HoverClickSounds()
             };
+        }
 
-            if (!ShowDragHandle)
-                handleContainer.Alpha = 0;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            ShowDragHandle.BindValueChanged(show => handleContainer.Alpha = show.NewValue ? 1 : 0, true);
         }
 
         protected override bool OnDragStart(DragStartEvent e)
@@ -98,13 +105,13 @@ namespace osu.Game.Graphics.Containers
             if (!base.OnDragStart(e))
                 return false;
 
-            PlaylistDragActive.Value = true;
+            DragActive.Value = true;
             return true;
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            PlaylistDragActive.Value = false;
+            DragActive.Value = false;
             base.OnDragEnd(e);
         }
 
@@ -112,7 +119,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnHover(HoverEvent e)
         {
-            handle.UpdateHoverState(IsDragged || !PlaylistDragActive.Value);
+            handle.UpdateHoverState(IsDragged || !DragActive.Value);
             return base.OnHover(e);
         }
 

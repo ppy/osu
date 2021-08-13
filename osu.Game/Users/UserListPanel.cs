@@ -26,6 +26,8 @@ namespace osu.Game.Users
         private void load()
         {
             Background.Width = 0.5f;
+            Background.Origin = Anchor.CentreRight;
+            Background.Anchor = Anchor.CentreRight;
             Background.Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.3f));
         }
 

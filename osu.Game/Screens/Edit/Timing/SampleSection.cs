@@ -2,18 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Timing
 {
     internal class SampleSection : Section<SampleControlPoint>
     {
         private LabelledTextBox bank;
-        private SettingsSlider<int> volume;
+        private SliderWithTextBoxInput<int> volume;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -24,10 +23,9 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     Label = "Bank Name",
                 },
-                volume = new SettingsSlider<int>
+                volume = new SliderWithTextBoxInput<int>("Volume")
                 {
-                    Bindable = new SampleControlPoint().SampleVolumeBindable,
-                    LabelText = "Volume",
+                    Current = new SampleControlPoint().SampleVolumeBindable,
                 }
             });
         }
@@ -37,13 +35,16 @@ namespace osu.Game.Screens.Edit.Timing
             if (point.NewValue != null)
             {
                 bank.Current = point.NewValue.SampleBankBindable;
-                volume.Bindable = point.NewValue.SampleVolumeBindable;
+                bank.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+
+                volume.Current = point.NewValue.SampleVolumeBindable;
+                volume.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
         }
 
         protected override SampleControlPoint CreatePoint()
         {
-            var reference = Beatmap.Value.Beatmap.ControlPointInfo.SamplePointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.SamplePointAt(SelectedGroup.Value.Time);
 
             return new SampleControlPoint
             {

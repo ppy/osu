@@ -2,10 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit
 {
@@ -15,16 +13,17 @@ namespace osu.Game.Screens.Edit
     public abstract class EditorScreen : Container
     {
         [Resolved]
-        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
-
-        [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        protected EditorScreen()
+        public readonly EditorScreenMode Type;
+
+        protected EditorScreen(EditorScreenMode type)
         {
+            Type = type;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
@@ -39,11 +38,6 @@ namespace osu.Game.Screens.Edit
             this.FadeTo(0)
                 .Then()
                 .FadeTo(1f, 250, Easing.OutQuint);
-        }
-
-        public void Exit()
-        {
-            this.FadeOut(250).Expire();
         }
     }
 }

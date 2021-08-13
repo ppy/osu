@@ -21,6 +21,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
             InternalChild = circlePiece = new HitCirclePiece();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            BeginPlacement();
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -39,9 +45,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
             return base.OnMouseDown(e);
         }
 
-        public override void UpdatePosition(SnapResult result)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
-            base.UpdatePosition(result);
+            base.UpdateTimeAndPosition(result);
             HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
         }
     }

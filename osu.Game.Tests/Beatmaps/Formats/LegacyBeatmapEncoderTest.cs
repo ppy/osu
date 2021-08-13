@@ -10,6 +10,7 @@ using System.Text;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -17,27 +18,74 @@ using osu.Game.IO;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
+using osuTK;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
     [TestFixture]
     public class LegacyBeatmapEncoderTest
     {
-        private static IEnumerable<string> allBeatmaps => TestResources.GetStore().GetAvailableResources().Where(res => res.EndsWith(".osu"));
+        private static readonly DllResourceStore beatmaps_resource_store = TestResources.GetStore();
+
+        private static IEnumerable<string> allBeatmaps = beatmaps_resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu", StringComparison.Ordinal));
 
         [TestCaseSource(nameof(allBeatmaps))]
         public void TestEncodeDecodeStability(string name)
         {
-            var decoded = decodeFromLegacy(TestResources.GetStore().GetStream(name));
-            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded));
+            var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded), name);
 
-            sort(decoded);
-            sort(decodedAfterEncode);
+            sort(decoded.beatmap);
+            sort(decodedAfterEncode.beatmap);
 
-            Assert.That(decodedAfterEncode.Serialize(), Is.EqualTo(decoded.Serialize()));
+            Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
+            Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
+        }
+
+        [Test]
+        public void TestEncodeMultiSegmentSliderWithFloatingPointError()
+        {
+            var beatmap = new Beatmap
+            {
+                HitObjects =
+                {
+                    new Slider
+                    {
+                        Position = new Vector2(0.6f),
+                        Path = new SliderPath(new[]
+                        {
+                            new PathControlPoint(Vector2.Zero, PathType.Bezier),
+                            new PathControlPoint(new Vector2(0.5f)),
+                            new PathControlPoint(new Vector2(0.51f)), // This is actually on the same position as the previous one in legacy beatmaps (truncated to int).
+                            new PathControlPoint(new Vector2(1f), PathType.Bezier),
+                            new PathControlPoint(new Vector2(2f))
+                        })
+                    },
+                }
+            };
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty))), string.Empty);
+            var decodedSlider = (Slider)decodedAfterEncode.beatmap.HitObjects[0];
+            Assert.That(decodedSlider.Path.ControlPoints.Count, Is.EqualTo(5));
+        }
+
+        private bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
+        {
+            // equal to null, no need to SequenceEqual
+            if (a.ComboColours == null && b.ComboColours == null)
+                return true;
+
+            if (a.ComboColours == null || b.ComboColours == null)
+                return false;
+
+            return a.ComboColours.SequenceEqual(b.ComboColours);
         }
 
         private void sort(IBeatmap beatmap)
@@ -50,18 +98,31 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private IBeatmap decodeFromLegacy(Stream stream)
+        private (IBeatmap beatmap, TestLegacySkin beatmapSkin) decodeFromLegacy(Stream stream, string name)
         {
             using (var reader = new LineBufferedReader(stream))
-                return convert(new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader));
+            {
+                var beatmap = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader);
+                var beatmapSkin = new TestLegacySkin(beatmaps_resource_store, name);
+                return (convert(beatmap), beatmapSkin);
+            }
         }
 
-        private Stream encodeToLegacy(IBeatmap beatmap)
+        private class TestLegacySkin : LegacySkin
         {
+            public TestLegacySkin(IResourceStore<byte[]> storage, string fileName)
+                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, storage, null, fileName)
+            {
+            }
+        }
+
+        private Stream encodeToLegacy((IBeatmap beatmap, ISkin beatmapSkin) fullBeatmap)
+        {
+            var (beatmap, beatmapSkin) = fullBeatmap;
             var stream = new MemoryStream();
 
             using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                new LegacyBeatmapEncoder(beatmap).Encode(writer);
+                new LegacyBeatmapEncoder(beatmap, beatmapSkin).Encode(writer);
 
             stream.Position = 0;
 
@@ -106,7 +167,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             protected override Texture GetBackground() => throw new NotImplementedException();
 
-            protected override Track GetTrack() => throw new NotImplementedException();
+            protected override Track GetBeatmapTrack() => throw new NotImplementedException();
+
+            protected override ISkin GetSkin() => throw new NotImplementedException();
+
+            public override Stream GetStream(string storagePath) => throw new NotImplementedException();
         }
     }
 }

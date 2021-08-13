@@ -37,6 +37,13 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                     RelativeSizeAxes = Axes.Both,
                 },
             };
+
+            button.Add(new DownloadProgressBar(beatmapSet)
+            {
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                Depth = -1,
+            });
         }
 
         protected override void LoadComplete()
@@ -57,7 +64,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 switch (State.Value)
                 {
                     case DownloadState.Downloading:
-                    case DownloadState.Downloaded:
+                    case DownloadState.Importing:
                         shakeContainer.Shake();
                         break;
 

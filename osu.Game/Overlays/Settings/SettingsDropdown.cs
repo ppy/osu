@@ -38,6 +38,8 @@ namespace osu.Game.Overlays.Settings
                 Margin = new MarginPadding { Top = 5 };
                 RelativeSizeAxes = Axes.X;
             }
+
+            protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
         }
     }
 }

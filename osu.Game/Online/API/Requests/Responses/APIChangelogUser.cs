@@ -20,7 +20,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public string OsuUsername { get; set; }
 
         [JsonProperty("user_id")]
-        public long? UserId { get; set; }
+        public int? UserId { get; set; }
 
         [JsonProperty("user_url")]
         public string UserUrl { get; set; }

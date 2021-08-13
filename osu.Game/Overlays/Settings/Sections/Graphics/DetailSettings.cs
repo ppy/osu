@@ -3,13 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class DetailSettings : SettingsSubsection
     {
-        protected override string Header => "Detail Settings";
+        protected override LocalisableString Header => "Detail Settings";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -19,22 +20,22 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 new SettingsCheckbox
                 {
                     LabelText = "Storyboard / Video",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
+                    Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Hit Lighting",
-                    Bindable = config.GetBindable<bool>(OsuSetting.HitLighting)
+                    Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
                 new SettingsEnumDropdown<ScreenshotFormat>
                 {
                     LabelText = "Screenshot format",
-                    Bindable = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
+                    Current = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show menu cursor in screenshots",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
+                    Current = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
                 }
             };
         }

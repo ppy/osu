@@ -2,13 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public abstract class CarouselItem
+    public abstract class CarouselItem : IComparable<CarouselItem>
     {
+        public virtual float TotalHeight => 0;
+
+        /// <summary>
+        /// An externally defined value used to determine this item's vertical display offset relative to the carousel.
+        /// </summary>
+        public float CarouselYPosition;
+
         public readonly BindableBool Filtered = new BindableBool();
 
         public readonly Bindable<CarouselItemState> State = new Bindable<CarouselItemState>(CarouselItemState.NotSelected);
@@ -18,23 +24,8 @@ namespace osu.Game.Screens.Select.Carousel
         /// </summary>
         public bool Visible => State.Value != CarouselItemState.Collapsed && !Filtered.Value;
 
-        public virtual List<DrawableCarouselItem> Drawables
-        {
-            get
-            {
-                var items = new List<DrawableCarouselItem>();
-
-                var self = DrawableRepresentation.Value;
-                if (self?.IsPresent == true) items.Add(self);
-
-                return items;
-            }
-        }
-
         protected CarouselItem()
         {
-            DrawableRepresentation = new Lazy<DrawableCarouselItem>(CreateDrawableRepresentation);
-
             Filtered.ValueChanged += filtered =>
             {
                 if (filtered.NewValue && State.Value == CarouselItemState.Selected)
@@ -42,23 +33,23 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
-        protected readonly Lazy<DrawableCarouselItem> DrawableRepresentation;
-
         /// <summary>
         /// Used as a default sort method for <see cref="CarouselItem"/>s of differing types.
         /// </summary>
         internal ulong ChildID;
 
         /// <summary>
-        /// Create a fresh drawable version of this item. If you wish to consume the current representation, use <see cref="DrawableRepresentation"/> instead.
+        /// Create a fresh drawable version of this item.
         /// </summary>
-        protected abstract DrawableCarouselItem CreateDrawableRepresentation();
+        public abstract DrawableCarouselItem CreateDrawableRepresentation();
 
         public virtual void Filter(FilterCriteria criteria)
         {
         }
 
         public virtual int CompareTo(FilterCriteria criteria, CarouselItem other) => ChildID.CompareTo(other.ChildID);
+
+        public int CompareTo(CarouselItem other) => CarouselYPosition.CompareTo(other.CarouselYPosition);
     }
 
     public enum CarouselItemState

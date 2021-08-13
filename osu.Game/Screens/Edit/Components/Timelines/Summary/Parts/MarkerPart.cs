@@ -2,15 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
@@ -54,11 +53,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             scheduledSeek?.Cancel();
             scheduledSeek = Schedule(() =>
             {
-                if (Beatmap.Value == null)
-                    return;
-
                 float markerPos = Math.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
-                editorClock.SeekTo(markerPos / DrawWidth * editorClock.TrackLength);
+                editorClock.SeekSmoothlyTo(markerPos / DrawWidth * editorClock.TrackLength);
             });
         }
 
@@ -68,7 +64,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             marker.X = (float)editorClock.CurrentTime;
         }
 
-        protected override void LoadBeatmap(WorkingBeatmap beatmap)
+        protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
             // block base call so we don't clear our marker (can be reused on beatmap change).
         }

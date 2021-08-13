@@ -48,11 +48,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             return true;
         }
 
-        public override void UpdatePosition(SnapResult result)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
-            base.UpdatePosition(result);
+            base.UpdateTimeAndPosition(result);
 
-            if (!PlacementActive)
+            if (PlacementActive == PlacementState.Waiting)
                 Column = result.Playfield as Column;
         }
     }

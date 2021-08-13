@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="hitEvents">The <see cref="HitEvent"/>s to display the timing distribution of.</param>
         public HitEventTimingDistributionGraph(IReadOnlyList<HitEvent> hitEvents)
         {
-            this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows)).ToList();
+            this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit()).ToList();
         }
 
         [BackgroundDependencyLoader]
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             foreach (var e in hitEvents)
             {
-                int binOffset = (int)(e.TimeOffset / binSize);
+                int binOffset = (int)Math.Round(e.TimeOffset / binSize, MidpointRounding.AwayFromZero);
                 bins[timing_distribution_centre_bin_index + binOffset]++;
             }
 

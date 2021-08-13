@@ -48,7 +48,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class ExampleContainer : PlayerSettingsGroup
         {
-            protected override string Title => @"example";
+            public ExampleContainer()
+                : base("example")
+            {
+            }
         }
     }
 }

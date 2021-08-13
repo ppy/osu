@@ -1,70 +1,50 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Specialized;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Game.Beatmaps;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
     /// <summary>
     /// The part of the timeline that displays the control points.
     /// </summary>
-    public class ControlPointPart : TimelinePart
+    public class ControlPointPart : TimelinePart<GroupVisualisation>
     {
-        protected override void LoadBeatmap(WorkingBeatmap beatmap)
+        private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
+
+        protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
             base.LoadBeatmap(beatmap);
 
-            ControlPointInfo cpi = beatmap.Beatmap.ControlPointInfo;
-
-            cpi.TimingPoints.ForEach(addTimingPoint);
-
-            // Consider all non-timing points as the same type
-            cpi.SamplePoints.Select(c => (ControlPoint)c)
-               .Concat(cpi.EffectPoints)
-               .Concat(cpi.DifficultyPoints)
-               .Distinct()
-               // Non-timing points should not be added where there are timing points
-               .Where(c => cpi.TimingPointAt(c.Time).Time != c.Time)
-               .ForEach(addNonTimingPoint);
-        }
-
-        private void addTimingPoint(ControlPoint controlPoint) => Add(new TimingPointVisualisation(controlPoint));
-        private void addNonTimingPoint(ControlPoint controlPoint) => Add(new NonTimingPointVisualisation(controlPoint));
-
-        private class TimingPointVisualisation : ControlPointVisualisation
-        {
-            public TimingPointVisualisation(ControlPoint controlPoint)
-                : base(controlPoint)
+            controlPointGroups.UnbindAll();
+            controlPointGroups.BindTo(beatmap.ControlPointInfo.Groups);
+            controlPointGroups.BindCollectionChanged((sender, args) =>
             {
-            }
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Reset:
+                        Clear();
+                        break;
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours) => Colour = colours.YellowDark;
-        }
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (var group in args.NewItems.OfType<ControlPointGroup>())
+                            Add(new GroupVisualisation(group));
+                        break;
 
-        private class NonTimingPointVisualisation : ControlPointVisualisation
-        {
-            public NonTimingPointVisualisation(ControlPoint controlPoint)
-                : base(controlPoint)
-            {
-            }
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (var group in args.OldItems.OfType<ControlPointGroup>())
+                        {
+                            var matching = Children.SingleOrDefault(gv => gv.Group == group);
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours) => Colour = colours.Green;
-        }
+                            matching?.Expire();
+                        }
 
-        private abstract class ControlPointVisualisation : PointVisualisation
-        {
-            protected ControlPointVisualisation(ControlPoint controlPoint)
-                : base(controlPoint.Time)
-            {
-            }
+                        break;
+                }
+            }, true);
         }
     }
 }

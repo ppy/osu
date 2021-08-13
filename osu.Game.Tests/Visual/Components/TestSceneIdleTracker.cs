@@ -81,6 +81,13 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestMovement()
         {
+            checkIdleStatus(1, false);
+            checkIdleStatus(2, false);
+            checkIdleStatus(3, false);
+            checkIdleStatus(4, false);
+
+            waitForAllIdle();
+
             AddStep("move to top right", () => InputManager.MoveMouseTo(box2));
 
             checkIdleStatus(1, true);
@@ -102,6 +109,8 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestTimings()
         {
+            waitForAllIdle();
+
             AddStep("move to centre", () => InputManager.MoveMouseTo(Content));
 
             checkIdleStatus(1, false);
@@ -140,7 +149,7 @@ namespace osu.Game.Tests.Visual.Components
 
         private void waitForAllIdle()
         {
-            AddUntilStep("Wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
+            AddUntilStep("wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
         }
 
         private class IdleTrackingBox : CompositeDrawable
@@ -149,7 +158,7 @@ namespace osu.Game.Tests.Visual.Components
 
             public bool IsIdle => idleTracker.IsIdle.Value;
 
-            public IdleTrackingBox(double timeToIdle)
+            public IdleTrackingBox(int timeToIdle)
             {
                 Box box;
 
@@ -158,7 +167,7 @@ namespace osu.Game.Tests.Visual.Components
 
                 InternalChildren = new Drawable[]
                 {
-                    idleTracker = new IdleTracker(timeToIdle),
+                    idleTracker = new GameIdleTracker(timeToIdle),
                     box = new Box
                     {
                         Colour = Color4.White,

@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the panel when contracted.
         /// </summary>
-        private const float contracted_height = 355;
+        private const float contracted_height = 385;
 
         /// <summary>
         /// Width of the panel when expanded.
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the panel when expanded.
         /// </summary>
-        private const float expanded_height = 560;
+        private const float expanded_height = 586;
 
         /// <summary>
         /// Height of the top layer when the panel is expanded.
@@ -54,12 +54,12 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Duration for the panel to resize into its expanded/contracted size.
         /// </summary>
-        private const double resize_duration = 200;
+        public const double RESIZE_DURATION = 200;
 
         /// <summary>
-        /// Delay after <see cref="resize_duration"/> before the top layer is expanded.
+        /// Delay after <see cref="RESIZE_DURATION"/> before the top layer is expanded.
         /// </summary>
-        private const double top_layer_expand_delay = 100;
+        public const double TOP_LAYER_EXPAND_DELAY = 100;
 
         /// <summary>
         /// Duration for the top layer expansion.
@@ -85,6 +85,8 @@ namespace osu.Game.Screens.Ranking
 
         public readonly ScoreInfo Score;
 
+        private bool displayWithFlair;
+
         private Container content;
 
         private Container topLayerContainer;
@@ -97,19 +99,25 @@ namespace osu.Game.Screens.Ranking
         private Container middleLayerContentContainer;
         private Drawable middleLayerContent;
 
-        public ScorePanel(ScoreInfo score)
+        public ScorePanel(ScoreInfo score, bool isNewLocalScore = false)
         {
             Score = score;
+            displayWithFlair = isNewLocalScore;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            // ScorePanel doesn't include the top extruding area in its own size.
+            // Adding a manual offset here allows the expanded version to take on an "acceptable" vertical centre when at 100% UI scale.
+            const float vertical_fudge = 20;
+
             InternalChild = content = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(40),
+                Y = vertical_fudge,
                 Children = new Drawable[]
                 {
                     topLayerContainer = new Container
@@ -151,7 +159,7 @@ namespace osu.Game.Screens.Ranking
                                         RelativeSizeAxes = Axes.Both,
                                         User = Score.User,
                                         Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
-                                    },
+                                    }
                                 }
                             },
                             middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
@@ -183,7 +191,7 @@ namespace osu.Game.Screens.Ranking
 
                 state = value;
 
-                if (LoadState >= LoadState.Ready)
+                if (IsLoaded)
                     updateState();
 
                 StateChanged?.Invoke(value);
@@ -200,29 +208,33 @@ namespace osu.Game.Screens.Ranking
                 case PanelState.Expanded:
                     Size = new Vector2(EXPANDED_WIDTH, expanded_height);
 
-                    topLayerBackground.FadeColour(expanded_top_layer_colour, resize_duration, Easing.OutQuint);
-                    middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
+                    topLayerBackground.FadeColour(expanded_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
+                    middleLayerBackground.FadeColour(expanded_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
 
-                    topLayerContentContainer.Add(middleLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
-                    middleLayerContentContainer.Add(topLayerContent = new ExpandedPanelMiddleContent(Score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair).With(d => d.Alpha = 0));
+
+                    // only the first expanded display should happen with flair.
+                    displayWithFlair = false;
                     break;
 
                 case PanelState.Contracted:
                     Size = new Vector2(CONTRACTED_WIDTH, contracted_height);
 
-                    topLayerBackground.FadeColour(contracted_top_layer_colour, resize_duration, Easing.OutQuint);
-                    middleLayerBackground.FadeColour(contracted_middle_layer_colour, resize_duration, Easing.OutQuint);
+                    topLayerBackground.FadeColour(contracted_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
+                    middleLayerBackground.FadeColour(contracted_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
 
-                    middleLayerContentContainer.Add(topLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(topLayerContent = new ContractedPanelTopContent(Score).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(middleLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
             }
 
-            content.ResizeTo(Size, resize_duration, Easing.OutQuint);
+            content.ResizeTo(Size, RESIZE_DURATION, Easing.OutQuint);
 
             bool topLayerExpanded = topLayerContainer.Y < 0;
 
             // If the top layer was already expanded, then we don't need to wait for the resize and can instead transform immediately. This looks better when changing the panel state.
-            using (BeginDelayedSequence(topLayerExpanded ? 0 : resize_duration + top_layer_expand_delay, true))
+            using (BeginDelayedSequence(topLayerExpanded ? 0 : RESIZE_DURATION + TOP_LAYER_EXPAND_DELAY))
             {
                 topLayerContainer.FadeIn();
 

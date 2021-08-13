@@ -26,7 +26,7 @@ namespace osu.Game.Database
         /// Whether this write usage will commit a transaction on completion.
         /// If false, there is a parent usage responsible for transaction commit.
         /// </summary>
-        public bool IsTransactionLeader = false;
+        public bool IsTransactionLeader;
 
         protected void Dispose(bool disposing)
         {
@@ -53,11 +53,6 @@ namespace osu.Game.Database
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        ~DatabaseWriteUsage()
-        {
-            Dispose(false);
         }
     }
 }

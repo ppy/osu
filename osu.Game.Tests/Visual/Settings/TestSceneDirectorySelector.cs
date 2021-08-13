@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -11,9 +10,9 @@ namespace osu.Game.Tests.Visual.Settings
     public class TestSceneDirectorySelector : OsuTestScene
     {
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load()
         {
-            Add(new DirectorySelector { RelativeSizeAxes = Axes.Both });
+            Add(new OsuDirectorySelector { RelativeSizeAxes = Axes.Both });
         }
     }
 }

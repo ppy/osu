@@ -25,7 +25,5 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     return new OsuJudgementResult(hitObject, judgement);
             }
         }
-
-        public override HitWindows CreateHitWindows() => new OsuHitWindows();
     }
 }

@@ -8,21 +8,22 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class UserProfileOverlay : FullscreenOverlay
+    public class UserProfileOverlay : FullscreenOverlay<ProfileHeader>
     {
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
-        protected ProfileHeader Header;
         private ProfileSectionsContainer sectionsContainer;
         private ProfileSectionTabControl tabs;
 
@@ -33,7 +34,11 @@ namespace osu.Game.Overlays
         {
         }
 
-        public void ShowUser(long userId) => ShowUser(new User { Id = userId });
+        protected override ProfileHeader CreateHeader() => new ProfileHeader();
+
+        protected override Color4 BackgroundColour => ColourProvider.Background6;
+
+        public void ShowUser(int userId) => ShowUser(new User { Id = userId });
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
@@ -44,6 +49,9 @@ namespace osu.Game.Overlays
 
             if (user.Id == Header?.User.Value?.Id)
                 return;
+
+            if (sectionsContainer != null)
+                sectionsContainer.ExpandableHeader = null;
 
             userReq?.Cancel();
             Clear();
@@ -69,15 +77,9 @@ namespace osu.Game.Overlays
                 Origin = Anchor.TopCentre,
             };
 
-            Add(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = ColourProvider.Background6
-            });
-
             Add(sectionsContainer = new ProfileSectionsContainer
             {
-                ExpandableHeader = Header = new ProfileHeader(),
+                ExpandableHeader = Header,
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
@@ -174,6 +176,10 @@ namespace osu.Game.Overlays
                 AccentColour = colourProvider.Highlight1;
             }
 
+            protected override bool OnClick(ClickEvent e) => true;
+
+            protected override bool OnHover(HoverEvent e) => true;
+
             private class ProfileSectionTabItem : OverlayTabItem
             {
                 public ProfileSectionTabItem(ProfileSection value)
@@ -195,7 +201,7 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both;
             }
 
-            protected override OsuScrollContainer CreateScrollContainer() => new OverlayScrollContainer();
+            protected override UserTrackingScrollContainer CreateScrollContainer() => new OverlayScrollContainer();
 
             protected override FlowContainer<ProfileSection> CreateScrollContentContainer() => new FillFlowContainer<ProfileSection>
             {

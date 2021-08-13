@@ -16,6 +16,8 @@ namespace osu.Game.Beatmaps.Formats
     public abstract class LegacyDecoder<T> : Decoder<T>
         where T : new()
     {
+        public const int LATEST_VERSION = 14;
+
         protected readonly int FormatVersion;
 
         protected LegacyDecoder(int version)
@@ -33,6 +35,14 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (ShouldSkipLine(line))
                     continue;
+
+                if (section != Section.Metadata)
+                {
+                    // comments should not be stripped from metadata lines, as the song metadata may contain "//" as valid data.
+                    line = StripComments(line);
+                }
+
+                line = line.TrimEnd();
 
                 if (line.StartsWith('[') && line.EndsWith(']'))
                 {
@@ -69,8 +79,6 @@ namespace osu.Game.Beatmaps.Formats
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
-            line = StripComments(line);
-
             switch (section)
             {
                 case Section.Colours:
@@ -92,7 +100,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = SplitKeyVal(line);
 
-            bool isCombo = pair.Key.StartsWith(@"Combo");
+            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
             string[] split = pair.Value.Split(',');
 
@@ -104,10 +112,6 @@ namespace osu.Game.Beatmaps.Formats
             try
             {
                 byte alpha = split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
-
-                if (alpha == 0)
-                    alpha = 255;
-
                 colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), alpha);
             }
             catch
@@ -166,13 +170,25 @@ namespace osu.Game.Beatmaps.Formats
             /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
             /// DO NOT USE THIS UNLESS 100% SURE.
             /// </summary>
-            public readonly float BpmMultiplier;
+            public double BpmMultiplier { get; private set; }
 
             public LegacyDifficultyControlPoint(double beatLength)
+                : this()
+            {
+                // Note: In stable, the division occurs on floats, but with compiler optimisations turned on actually seems to occur on doubles via some .NET black magic (possibly inlining?).
+                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
+            }
+
+            public LegacyDifficultyControlPoint()
             {
                 SpeedMultiplierBindable.Precision = double.Epsilon;
+            }
 
-                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100f : 1;
+            public override void CopyFrom(ControlPoint other)
+            {
+                base.CopyFrom(other);
+
+                BpmMultiplier = ((LegacyDifficultyControlPoint)other).BpmMultiplier;
             }
         }
 
@@ -184,11 +200,8 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var baseInfo = base.ApplyTo(hitSampleInfo);
 
-                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy
-                    && legacy.CustomSampleBank == 0)
-                {
-                    legacy.CustomSampleBank = CustomSampleBank;
-                }
+                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
+                    return legacy.With(newCustomSampleBank: CustomSampleBank);
 
                 return baseInfo;
             }
@@ -197,6 +210,13 @@ namespace osu.Game.Beatmaps.Formats
                 => base.IsRedundant(existing)
                    && existing is LegacySampleControlPoint existingSample
                    && CustomSampleBank == existingSample.CustomSampleBank;
+
+            public override void CopyFrom(ControlPoint other)
+            {
+                base.CopyFrom(other);
+
+                CustomSampleBank = ((LegacySampleControlPoint)other).CustomSampleBank;
+            }
         }
     }
 }

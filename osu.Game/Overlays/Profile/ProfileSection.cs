@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -17,7 +18,7 @@ namespace osu.Game.Overlays.Profile
 {
     public abstract class ProfileSection : Container
     {
-        public abstract string Title { get; }
+        public abstract LocalisableString Title { get; }
 
         public abstract string Identifier { get; }
 
@@ -59,7 +60,7 @@ namespace osu.Game.Overlays.Profile
                             {
                                 Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
                                 Top = 15,
-                                Bottom = 10,
+                                Bottom = 20,
                             },
                             Children = new Drawable[]
                             {

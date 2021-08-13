@@ -14,6 +14,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.BeatmapSet;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         private const float vertical_padding = 5;
         private const float height = 70;
 
-        private FillFlowContainer statusContainer;
+        private FillFlowContainer statusContainer, titleContainer;
         protected BeatmapPanelDownloadButton DownloadButton;
         private PlayButton playButton;
         private Box progressBar;
@@ -98,14 +99,22 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                                                     Direction = FillDirection.Vertical,
                                                     Children = new Drawable[]
                                                     {
-                                                        new OsuSpriteText
+                                                        titleContainer = new FillFlowContainer
                                                         {
-                                                            Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
-                                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Direction = FillDirection.Horizontal,
+                                                            Children = new[]
+                                                            {
+                                                                new OsuSpriteText
+                                                                {
+                                                                    Text = new RomanisableString(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
+                                                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
+                                                                },
+                                                            }
                                                         },
                                                         new OsuSpriteText
                                                         {
-                                                            Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
+                                                            Text = new RomanisableString(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
                                                             Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true)
                                                         },
                                                     }
@@ -207,6 +216,16 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                     Colour = colours.Yellow,
                 },
             });
+
+            if (SetInfo.OnlineInfo?.HasExplicitContent ?? false)
+            {
+                titleContainer.Add(new ExplicitContentBeatmapPill
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Margin = new MarginPadding { Left = 10f, Top = 2f },
+                });
+            }
 
             if (SetInfo.OnlineInfo?.HasVideo ?? false)
             {

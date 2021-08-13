@@ -44,6 +44,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box hover;
 
         public OsuAnimatedButton()
+            : base(HoverSampleSet.Button)
         {
             base.Content.Add(content = new Container
             {

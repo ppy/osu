@@ -55,7 +55,13 @@ namespace osu.Game.Tests.Visual.Navigation
             var secondimport = importBeatmap(3);
             presentAndConfirm(secondimport);
 
+            // Test presenting same beatmap more than once
+            presentAndConfirm(secondimport);
+
             presentSecondDifficultyAndConfirm(firstImport, 1);
+            presentSecondDifficultyAndConfirm(secondimport, 3);
+
+            // Test presenting same beatmap more than once
             presentSecondDifficultyAndConfirm(secondimport, 3);
         }
 
@@ -74,6 +80,13 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private void returnToMenu()
         {
+            // if we don't pause, there's a chance the track may change at the main menu out of our control (due to reaching the end of the track).
+            AddStep("pause audio", () =>
+            {
+                if (Game.MusicController.IsPlaying)
+                    Game.MusicController.TogglePause();
+            });
+
             AddStep("return to menu", () => Game.ScreenStack.CurrentScreen.Exit());
             AddUntilStep("wait for menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
         }

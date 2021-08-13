@@ -1,26 +1,34 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Game.Database;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarButton : OsuClickableContainer
+    public abstract class ToolbarButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        public const float WIDTH = Toolbar.HEIGHT * 1.4f;
+        protected GlobalAction? Hotkey { get; set; }
 
         public void SetIcon(Drawable icon)
         {
@@ -28,30 +36,28 @@ namespace osu.Game.Overlays.Toolbar
             IconContainer.Show();
         }
 
-        public void SetIcon(IconUsage icon) => SetIcon(new SpriteIcon
-        {
-            Size = new Vector2(20),
-            Icon = icon
-        });
+        [Resolved]
+        private TextureStore textures { get; set; }
 
-        public IconUsage Icon
-        {
-            set => SetIcon(value);
-        }
+        public void SetIcon(string texture) =>
+            SetIcon(new Sprite
+            {
+                Texture = textures.Get(texture),
+            });
 
-        public string Text
+        public LocalisableString Text
         {
             get => DrawableText.Text;
             set => DrawableText.Text = value;
         }
 
-        public string TooltipMain
+        public LocalisableString TooltipMain
         {
             get => tooltip1.Text;
             set => tooltip1.Text = value;
         }
 
-        public string TooltipSub
+        public LocalisableString TooltipSub
         {
             get => tooltip2.Text;
             set => tooltip2.Text = value;
@@ -66,12 +72,16 @@ namespace osu.Game.Overlays.Toolbar
         private readonly FillFlowContainer tooltipContainer;
         private readonly SpriteText tooltip1;
         private readonly SpriteText tooltip2;
+        private readonly SpriteText keyBindingTooltip;
         protected FillFlowContainer Flow;
 
-        public ToolbarButton()
-            : base(HoverSampleSet.Loud)
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
+
+        protected ToolbarButton()
+            : base(HoverSampleSet.Toolbar)
         {
-            Width = WIDTH;
+            Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;
 
             Children = new Drawable[]
@@ -105,7 +115,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Size = new Vector2(20),
+                            Size = new Vector2(26),
                             Alpha = 0,
                         },
                         DrawableText = new OsuSpriteText
@@ -119,11 +129,11 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both, // stops us being considered in parent's autosize
-                    Anchor = TooltipAnchor.HasFlag(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
+                    Anchor = TooltipAnchor.HasFlagFast(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,
-                    Position = new Vector2(TooltipAnchor.HasFlag(Anchor.x0) ? 5 : -5, 5),
+                    Position = new Vector2(TooltipAnchor.HasFlagFast(Anchor.x0) ? 5 : -5, 5),
                     Alpha = 0,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         tooltip1 = new OsuSpriteText
                         {
@@ -132,11 +142,17 @@ namespace osu.Game.Overlays.Toolbar
                             Shadow = true,
                             Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                         },
-                        tooltip2 = new OsuSpriteText
+                        new FillFlowContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Anchor = TooltipAnchor,
                             Origin = TooltipAnchor,
-                            Shadow = true,
+                            Direction = FillDirection.Horizontal,
+                            Children = new[]
+                            {
+                                tooltip2 = new OsuSpriteText { Shadow = true },
+                                keyBindingTooltip = new OsuSpriteText { Shadow = true }
+                            }
                         }
                     }
                 }
@@ -154,8 +170,11 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnHover(HoverEvent e)
         {
+            updateKeyBindingTooltip();
+
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
+
             return base.OnHover(e);
         }
 
@@ -163,6 +182,36 @@ namespace osu.Game.Overlays.Toolbar
         {
             HoverBackground.FadeOut(200);
             tooltipContainer.FadeOut(100);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == Hotkey)
+            {
+                TriggerClick();
+                return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
+        }
+
+        private void updateKeyBindingTooltip()
+        {
+            if (Hotkey == null) return;
+
+            var realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
+
+            if (realmKeyBinding != null)
+            {
+                var keyBindingString = realmKeyBinding.KeyCombination.ReadableString();
+
+                if (!string.IsNullOrEmpty(keyBindingString))
+                    keyBindingTooltip.Text = $" ({keyBindingString})";
+            }
         }
     }
 

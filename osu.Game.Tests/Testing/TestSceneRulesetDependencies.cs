@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration.Tracking;
+using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
@@ -46,13 +47,21 @@ namespace osu.Game.Tests.Testing
         }
 
         [Test]
+        public void TestRetrieveShader()
+        {
+            AddAssert("ruleset shaders retrieved", () =>
+                Dependencies.Get<ShaderManager>().LoadRaw(@"sh_TestVertex.vs") != null &&
+                Dependencies.Get<ShaderManager>().LoadRaw(@"sh_TestFragment.fs") != null);
+        }
+
+        [Test]
         public void TestResolveConfigManager()
         {
             AddAssert("ruleset config resolved", () =>
                 Dependencies.Get<TestRulesetConfigManager>() != null);
         }
 
-        private class TestRuleset : Ruleset
+        public class TestRuleset : Ruleset
         {
             public override string Description => string.Empty;
             public override string ShortName => string.Empty;

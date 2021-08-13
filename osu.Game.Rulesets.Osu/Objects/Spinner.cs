@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -45,18 +45,20 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             double minimumRotationsPerSecond = stable_matching_fudge * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
 
-            SpinsRequired = (int)Math.Max(1, (secondsDuration * minimumRotationsPerSecond));
+            SpinsRequired = (int)(secondsDuration * minimumRotationsPerSecond);
             MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration);
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
 
             int totalSpins = MaximumBonusSpins + SpinsRequired;
 
             for (int i = 0; i < totalSpins; i++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 double startTime = StartTime + (float)(i + 1) / totalSpins * Duration;
 
                 AddNested(i < SpinsRequired

@@ -31,15 +31,16 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     new NewsCard(new APINewsPost
                     {
-                        Title = "This post has an image which starts with \"/\" and has many authors!",
+                        Title = "This post has an image which starts with \"/\" and has many authors! (clickable)",
                         Preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                         Author = "someone, someone1, someone2, someone3, someone4",
                         FirstImage = "/help/wiki/shared/news/banners/monthly-beatmapping-contest.png",
-                        PublishedAt = DateTimeOffset.Now
+                        PublishedAt = DateTimeOffset.Now,
+                        Slug = "2020-07-16-summer-theme-park-2020-voting-open"
                     }),
                     new NewsCard(new APINewsPost
                     {
-                        Title = "This post has a full-url image! (HTML entity: &amp;)",
+                        Title = "This post has a full-url image! (HTML entity: &amp;) (non-clickable)",
                         Preview = "boom (HTML entity: &amp;)",
                         Author = "user (HTML entity: &amp;)",
                         FirstImage = "https://assets.ppy.sh/artists/88/header.jpg",
