@@ -8,7 +8,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
@@ -17,14 +16,11 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public abstract class RoomManager : CompositeDrawable, IRoomManager
+    public class RoomManager : Component, IRoomManager
     {
         public event Action RoomsUpdated;
 
         private readonly BindableList<Room> rooms = new BindableList<Room>();
-
-        public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
-        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
 
         public IBindableList<Room> Rooms => rooms;
 
@@ -40,15 +36,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        protected RoomManager()
+        public RoomManager()
         {
             RelativeSizeAxes = Axes.Both;
-
-            InternalChildren = CreatePollingComponents().Select(p =>
-            {
-                p.RoomsReceived = onRoomsReceived;
-                return p;
-            }).ToList();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -118,56 +108,41 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         private readonly HashSet<long> ignoredRooms = new HashSet<long>();
 
-        private void onRoomsReceived(List<Room> received)
+        public void AddOrUpdateRoom(Room room)
         {
-            if (received == null)
-            {
-                ClearRooms();
+            Debug.Assert(room.RoomID.Value != null);
+
+            if (ignoredRooms.Contains(room.RoomID.Value.Value))
                 return;
-            }
 
-            // Remove past matches
-            foreach (var r in rooms.ToList())
+            room.Position.Value = -room.RoomID.Value.Value;
+
+            try
             {
-                if (received.All(e => e.RoomID.Value != r.RoomID.Value))
-                    rooms.Remove(r);
+                update(room, room);
+                addRoom(room);
             }
-
-            for (int i = 0; i < received.Count; i++)
+            catch (Exception ex)
             {
-                var room = received[i];
+                Logger.Error(ex, $"Failed to update room: {room.Name.Value}.");
 
-                Debug.Assert(room.RoomID.Value != null);
-
-                if (ignoredRooms.Contains(room.RoomID.Value.Value))
-                    continue;
-
-                room.Position.Value = i;
-
-                try
-                {
-                    update(room, room);
-                    addRoom(room);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex, $"Failed to update room: {room.Name.Value}.");
-
-                    ignoredRooms.Add(room.RoomID.Value.Value);
-                    rooms.Remove(room);
-                }
+                ignoredRooms.Add(room.RoomID.Value.Value);
+                rooms.Remove(room);
             }
 
-            RoomsUpdated?.Invoke();
-            initialRoomsReceived.Value = true;
+            notifyRoomsUpdated();
         }
 
-        protected void RemoveRoom(Room room) => rooms.Remove(room);
+        public void RemoveRoom(Room room)
+        {
+            rooms.Remove(room);
+            notifyRoomsUpdated();
+        }
 
-        protected void ClearRooms()
+        public void ClearRooms()
         {
             rooms.Clear();
-            initialRoomsReceived.Value = false;
+            notifyRoomsUpdated();
         }
 
         /// <summary>
@@ -196,6 +171,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 existing.CopyFrom(room);
         }
 
-        protected abstract IEnumerable<RoomPollingComponent> CreatePollingComponents();
+        private void notifyRoomsUpdated() => Scheduler.AddOnce(() => RoomsUpdated?.Invoke());
     }
 }

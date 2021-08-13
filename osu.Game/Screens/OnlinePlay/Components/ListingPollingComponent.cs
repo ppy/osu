@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,6 +15,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
     /// </summary>
     public class ListingPollingComponent : RoomPollingComponent
     {
+        public IBindable<bool> HasPolledOnce => hasPolledOnce;
+        private readonly Bindable<bool> hasPolledOnce = new Bindable<bool>();
+
         [Resolved]
         private Bindable<FilterCriteria> currentFilter { get; set; }
 
@@ -25,7 +29,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             currentFilter.BindValueChanged(_ =>
             {
-                NotifyRoomsReceived(null);
+                RoomManager.ClearRooms();
+                hasPolledOnce.Value = false;
+
                 if (IsLoaded)
                     PollImmediately();
             });
@@ -45,17 +51,16 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             pollReq.Success += result =>
             {
-                for (int i = 0; i < result.Count; i++)
+                foreach (var existing in RoomManager.Rooms.ToArray())
                 {
-                    if (result[i].RoomID.Value == selectedRoom.Value?.RoomID.Value)
-                    {
-                        // The listing request always has less information than the opened room, so don't include it.
-                        result[i] = selectedRoom.Value;
-                        break;
-                    }
+                    if (result.All(r => r.RoomID.Value != existing.RoomID.Value))
+                        RoomManager.RemoveRoom(existing);
                 }
 
-                NotifyRoomsReceived(result);
+                foreach (var incoming in result)
+                    RoomManager.AddOrUpdateRoom(incoming);
+
+                hasPolledOnce.Value = true;
                 tcs.SetResult(true);
             };
 

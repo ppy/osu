@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var room = RoomManager.Rooms[1];
 
                 RoomManager.RemoveRoom(room);
-                RoomManager.AddRoom(room);
+                RoomManager.AddOrUpdateRoom(room);
             });
 
             AddAssert("no selection", () => checkRoomSelected(null));
