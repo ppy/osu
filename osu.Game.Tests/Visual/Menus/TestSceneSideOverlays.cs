@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Menus
         public void TestScreenOffsettingOnSettingsOverlay()
         {
             AddStep("open settings", () => Game.Settings.Show());
-            AddUntilStep("right screen offset applied", () => Game.ScreenOffsetContainer.X == SettingsPanel.WIDTH * OsuGame.SCREEN_OFFSET_RATIO);
+            AddUntilStep("right screen offset applied", () => Game.ScreenOffsetContainer.X == SettingsPanel.WIDTH * TestOsuGame.SIDE_OVERLAY_OFFSET_RATIO);
 
             AddStep("hide settings", () => Game.Settings.Hide());
             AddUntilStep("screen offset removed", () => Game.ScreenOffsetContainer.X == 0f);
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Menus
         public void TestScreenOffsettingOnNotificationOverlay()
         {
             AddStep("open notifications", () => Game.Notifications.Show());
-            AddUntilStep("right screen offset applied", () => Game.ScreenOffsetContainer.X == -NotificationOverlay.WIDTH * OsuGame.SCREEN_OFFSET_RATIO);
+            AddUntilStep("right screen offset applied", () => Game.ScreenOffsetContainer.X == -NotificationOverlay.WIDTH * TestOsuGame.SIDE_OVERLAY_OFFSET_RATIO);
 
             AddStep("hide notifications", () => Game.Notifications.Hide());
             AddUntilStep("screen offset removed", () => Game.ScreenOffsetContainer.X == 0f);
