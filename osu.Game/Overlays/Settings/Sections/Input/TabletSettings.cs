@@ -104,14 +104,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                             {
                                 t.NewLine();
-                                t.AddText("If your tablet is not getting detected properly,", s => s.Colour = colours.Yellow);
-                                t.NewParagraph();
-                                t.AddText("read ", s => s.Colour = colours.Yellow);
-                                t.AddLink("the driver's FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
+                                t.AddText("If your tablet is not detected, please read ", s => s.Colour = colours.Yellow);
+                                t.AddLink("this FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
                                     ? @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Windows-FAQ"
                                     : @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Linux-FAQ");
-
-                                t.AddText(" to troubleshoot the problem further.", s => s.Colour = colours.Yellow);
+                                t.AddText(" for troubleshooting steps.", s => s.Colour = colours.Yellow);
                             }
                         }),
                     }
