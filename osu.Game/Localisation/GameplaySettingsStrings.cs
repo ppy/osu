@@ -22,12 +22,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Background dim"
         /// </summary>
-        public static LocalisableString Dim => new TranslatableString(getKey(@"dim"), @"Background dim");
+        public static LocalisableString BackgroundDim => new TranslatableString(getKey(@"dim"), @"Background dim");
 
         /// <summary>
         /// "Background blur"
         /// </summary>
-        public static LocalisableString Blur => new TranslatableString(getKey(@"blur"), @"Background blur");
+        public static LocalisableString BackgroundBlur => new TranslatableString(getKey(@"blur"), @"Background blur");
 
         /// <summary>
         /// "Lighten playfield during breaks"
@@ -57,7 +57,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Always show key overlay"
         /// </summary>
-        public static LocalisableString KeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
+        public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
 
         /// <summary>
         /// "Positional hitsounds"

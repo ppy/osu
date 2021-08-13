@@ -22,14 +22,14 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsSlider<double>
                 {
-                    LabelText = GameplaySettingsStrings.Dim,
+                    LabelText = GameplaySettingsStrings.BackgroundDim,
                     Current = config.GetBindable<double>(OsuSetting.DimLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = GameplaySettingsStrings.Blur,
+                    LabelText = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<double>(OsuSetting.BlurLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = GameplaySettingsStrings.KeyOverlay,
+                    LabelText = GameplaySettingsStrings.AlwaysShowKeyOverlay,
                     Current = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
                 new SettingsCheckbox

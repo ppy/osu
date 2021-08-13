@@ -27,7 +27,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Prefer metadata in original language"
         /// </summary>
-        public static LocalisableString PreferOriginal => new TranslatableString(getKey(@"prefer_original"), @"Prefer metadata in original language");
+        public static LocalisableString PreferOriginalMetadataLanguage => new TranslatableString(getKey(@"prefer_original"), @"Prefer metadata in original language");
 
         /// <summary>
         /// "Updates"
