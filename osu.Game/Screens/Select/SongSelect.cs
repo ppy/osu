@@ -203,6 +203,7 @@ namespace osu.Game.Screens.Select
                                                 Margin = new MarginPadding
                                                 {
                                                     Right = left_area_padding,
+                                                    Left = -BeatmapInfoWedge.BORDER_THICKNESS, // Hide the left border
                                                 },
                                             },
                                             new Container
