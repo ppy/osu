@@ -65,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             Container filterContainer;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 new Box
                 {
