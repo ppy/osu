@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (e.ControlPressed)
             {
-                if (e.Key == Key.H && ReplayLoaded)
+                if (e.Key == Key.H && ReplayLoaded && !State.Disabled)
                 {
                     ToggleVisibility();
                     return true;

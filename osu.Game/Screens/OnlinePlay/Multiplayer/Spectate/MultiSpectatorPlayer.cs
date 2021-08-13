@@ -4,6 +4,7 @@
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
@@ -34,6 +35,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private void load()
         {
             spectatorPlayerClock.WaitingOnFrames.BindTo(waitingOnFrames);
+
+            HUDOverlay.PlayerSettingsOverlay.State.Value = Visibility.Hidden;
+            HUDOverlay.PlayerSettingsOverlay.State.Disabled = true;
         }
 
         protected override void UpdateAfterChildren()
