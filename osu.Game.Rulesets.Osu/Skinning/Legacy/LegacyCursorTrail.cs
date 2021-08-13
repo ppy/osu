@@ -79,8 +79,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
+            if (!disjointTrail)
+                return base.OnMouseMove(e);
+
             currentPosition = e.ScreenSpaceMousePosition;
-            return base.OnMouseMove(e);
+
+            // Intentionally block the base call as we're adding the trails ourselves.
+            return false;
         }
     }
 }

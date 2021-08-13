@@ -146,33 +146,25 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Vector2 position = e.ScreenSpaceMousePosition;
-
-            if (lastPosition == null)
-            {
-                lastPosition = position;
-                resampler.AddPosition(lastPosition.Value);
-                return base.OnMouseMove(e);
-            }
-
-            if (InterpolateMovements)
-                AddTrail(position);
-
+            AddTrail(e.ScreenSpaceMousePosition);
             return base.OnMouseMove(e);
         }
 
         protected void AddTrail(Vector2 position)
         {
-            if (!lastPosition.HasValue)
-                return;
-
             if (InterpolateMovements)
             {
+                if (!lastPosition.HasValue)
+                {
+                    lastPosition = position;
+                    resampler.AddPosition(lastPosition.Value);
+                    return;
+                }
+
                 foreach (Vector2 pos2 in resampler.AddPosition(position))
                 {
                     Trace.Assert(lastPosition.HasValue);
 
-                    // ReSharper disable once PossibleInvalidOperationException
                     Vector2 pos1 = lastPosition.Value;
                     Vector2 diff = pos2 - pos1;
                     float distance = diff.Length;
