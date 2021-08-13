@@ -323,11 +323,6 @@ namespace osu.Game.Overlays.Comments
                 RelativeSizeAxes = Axes.X;
                 AddRangeInternal(new Drawable[]
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4
-                    },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
