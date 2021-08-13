@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             Precision = 0.01,
         };
 
-        [SettingSource("Axis", "The axes that will be scaled.")]
+        [SettingSource("Axis", "The axes to scale.")]
         public Bindable<Axes> ActiveAxes { get; } = new Bindable<Axes>();
 
         private ITrack track;
