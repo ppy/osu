@@ -48,6 +48,11 @@ namespace osu.Game.Screens.Play
 
         protected BeatmapMetadataDisplay MetadataInfo;
 
+        /// <summary>
+        /// A fill flow containing the player settings groups, exposed for the ability to hide it from inheritors of the player loader.
+        /// </summary>
+        protected FillFlowContainer<PlayerSettingsGroup> PlayerSettingsGroups;
+
         protected VisualSettings VisualSettings;
 
         protected Task LoadTask { get; private set; }
@@ -140,7 +145,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                new FillFlowContainer<PlayerSettingsGroup>
+                PlayerSettingsGroups = new FillFlowContainer<PlayerSettingsGroup>
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
