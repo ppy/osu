@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play.HUD
 
             InternalChildren = new Drawable[]
             {
-                scroll = new ManualScrollScrollContainer
+                scroll = new InputDisabledScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = Flow = new FillFlowContainer<GameplayLeaderboardScore>
@@ -174,9 +174,9 @@ namespace osu.Game.Screens.Play.HUD
             sorting.Validate();
         }
 
-        private class ManualScrollScrollContainer : OsuScrollContainer
+        private class InputDisabledScrollContainer : OsuScrollContainer
         {
-            public ManualScrollScrollContainer()
+            public InputDisabledScrollContainer()
             {
                 ScrollbarVisible = false;
             }
