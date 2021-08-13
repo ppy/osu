@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = GeneralSettingsStrings.PreferOriginal,
+                    LabelText = GeneralSettingsStrings.PreferOriginalMetadataLanguage,
                     Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
                 },
             };
