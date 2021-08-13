@@ -8,11 +8,13 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select.Options
 {
@@ -39,13 +41,13 @@ namespace osu.Game.Screens.Select.Options
             set => iconText.Icon = value;
         }
 
-        public string FirstLineText
+        public LocalisableString FirstLineText
         {
             get => firstLine.Text;
             set => firstLine.Text = value;
         }
 
-        public string SecondLineText
+        public LocalisableString SecondLineText
         {
             get => secondLine.Text;
             set => secondLine.Text = value;
@@ -75,6 +77,7 @@ namespace osu.Game.Screens.Select.Options
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
         public BeatmapOptionsButton()
+            : base(HoverSampleSet.Submit)
         {
             Width = width;
             RelativeSizeAxes = Axes.Y;

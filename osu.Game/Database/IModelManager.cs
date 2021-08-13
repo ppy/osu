@@ -13,8 +13,16 @@ namespace osu.Game.Database
     public interface IModelManager<TModel>
         where TModel : class
     {
+        /// <summary>
+        /// A bindable which contains a weak reference to the last item that was updated.
+        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// </summary>
         IBindable<WeakReference<TModel>> ItemUpdated { get; }
 
+        /// <summary>
+        /// A bindable which contains a weak reference to the last item that was removed.
+        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// </summary>
         IBindable<WeakReference<TModel>> ItemRemoved { get; }
     }
 }

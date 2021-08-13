@@ -6,28 +6,45 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
-    public abstract class HitErrorMeter : CompositeDrawable
+    public abstract class HitErrorMeter : CompositeDrawable, ISkinnableDrawable
     {
-        protected readonly HitWindows HitWindows;
+        protected HitWindows HitWindows { get; private set; }
+
+        [Resolved]
+        private ScoreProcessor processor { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
 
-        protected HitErrorMeter(HitWindows hitWindows)
+        public bool UsesFixedAnchor { get; set; }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(DrawableRuleset drawableRuleset)
         {
-            HitWindows = hitWindows;
+            HitWindows = drawableRuleset?.FirstAvailableHitWindows ?? HitWindows.Empty;
         }
 
-        public abstract void OnNewJudgement(JudgementResult judgement);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            processor.NewJudgement += OnNewJudgement;
+        }
+
+        protected abstract void OnNewJudgement(JudgementResult judgement);
 
         protected Color4 GetColourForHitResult(HitResult result)
         {
             switch (result)
             {
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
                 case HitResult.Miss:
                     return colours.Red;
 
@@ -40,12 +57,22 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 case HitResult.Good:
                     return colours.GreenLight;
 
+                case HitResult.SmallTickHit:
+                case HitResult.LargeTickHit:
                 case HitResult.Great:
                     return colours.Blue;
 
                 default:
                     return colours.BlueLight;
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (processor != null)
+                processor.NewJudgement -= OnNewJudgement;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             MaxValue = 10
         };
 
-        public override Color4 GetRepresentingColour(OsuColour colours) => colours.GreenDark;
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Lime1;
 
         /// <summary>
         /// The speed multiplier at this control point.
@@ -39,5 +39,12 @@ namespace osu.Game.Beatmaps.ControlPoints
         public override bool IsRedundant(ControlPoint existing)
             => existing is DifficultyControlPoint existingDifficulty
                && SpeedMultiplier == existingDifficulty.SpeedMultiplier;
+
+        public override void CopyFrom(ControlPoint other)
+        {
+            SpeedMultiplier = ((DifficultyControlPoint)other).SpeedMultiplier;
+
+            base.CopyFrom(other);
+        }
     }
 }

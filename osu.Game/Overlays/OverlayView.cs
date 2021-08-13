@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
@@ -15,7 +16,7 @@ namespace osu.Game.Overlays
     /// Automatically performs a data fetch on load.
     /// </remarks>
     /// <typeparam name="T">The type of the API response.</typeparam>
-    public abstract class OverlayView<T> : CompositeDrawable, IOnlineComponent
+    public abstract class OverlayView<T> : CompositeDrawable
         where T : class
     {
         [Resolved]
@@ -29,10 +30,13 @@ namespace osu.Game.Overlays
             AutoSizeAxes = Axes.Y;
         }
 
-        protected override void LoadComplete()
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-            API.Register(this);
+            apiState.BindTo(API.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
         }
 
         /// <summary>
@@ -59,20 +63,19 @@ namespace osu.Game.Overlays
             API.Queue(request);
         }
 
-        public virtual void APIStateChanged(IAPIProvider api, APIState state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            switch (state)
+            switch (state.NewValue)
             {
                 case APIState.Online:
                     PerformFetch();
                     break;
             }
-        }
+        });
 
         protected override void Dispose(bool isDisposing)
         {
             request?.Cancel();
-            API?.Unregister(this);
             base.Dispose(isDisposing);
         }
     }

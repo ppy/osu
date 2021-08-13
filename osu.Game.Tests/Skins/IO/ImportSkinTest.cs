@@ -113,6 +113,31 @@ namespace osu.Game.Tests.Skins.IO
             }
         }
 
+        [Test]
+        public async Task TestImportUpperCasedOskArchive()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1"), "skin1.OsK"));
+
+                    Assert.That(imported.Name, Is.EqualTo("name 1"));
+                    Assert.That(imported.Creator, Is.EqualTo("author 1"));
+
+                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1"), "skin1.oSK"));
+
+                    Assert.That(imported2.Hash, Is.EqualTo(imported.Hash));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         private MemoryStream createOsk(string name, string author)
         {
             var zipStream = new MemoryStream();

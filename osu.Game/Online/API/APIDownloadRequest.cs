@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using osu.Framework.IO.Network;
 
@@ -15,6 +16,11 @@ namespace osu.Game.Online.API
         /// </summary>
         protected virtual string FileExtension { get; } = @".tmp";
 
+        protected APIDownloadRequest()
+        {
+            base.Success += () => Success?.Invoke(filename);
+        }
+
         protected override WebRequest CreateWebRequest()
         {
             var file = Path.GetTempFileName();
@@ -28,14 +34,14 @@ namespace osu.Game.Online.API
 
         private void request_Progress(long current, long total) => API.Schedule(() => Progressed?.Invoke(current, total));
 
-        protected APIDownloadRequest()
+        protected void TriggerSuccess(string filename)
         {
-            base.Success += onSuccess;
-        }
+            if (this.filename != null)
+                throw new InvalidOperationException("Attempted to trigger success more than once");
 
-        private void onSuccess()
-        {
-            Success?.Invoke(filename);
+            this.filename = filename;
+
+            TriggerSuccess();
         }
 
         public event APIProgressHandler Progressed;

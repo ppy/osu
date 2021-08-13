@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     NewCombo = i % 8 == 0,
                     Samples = new List<HitSampleInfo>(new[]
                     {
-                        new HitSampleInfo { Bank = "normal", Name = "hitnormal", Volume = 100 }
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", volume: 100)
                     })
                 });
             }

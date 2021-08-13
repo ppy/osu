@@ -1,106 +1,133 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
+using System.Diagnostics;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
-using osu.Game.Graphics;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public abstract class DrawableCarouselItem : Container
+    public abstract class DrawableCarouselItem : PoolableDrawable
     {
         public const float MAX_HEIGHT = 80;
 
-        public override bool RemoveWhenNotAlive => false;
+        public override bool IsPresent => base.IsPresent || Item?.Visible == true;
 
-        public override bool IsPresent => base.IsPresent || Item.Visible;
+        public readonly CarouselHeader Header;
 
-        public readonly CarouselItem Item;
+        /// <summary>
+        /// Optional content which sits below the header.
+        /// </summary>
+        protected readonly Container<Drawable> Content;
 
-        private Container nestedContainer;
-        private Container borderContainer;
+        protected readonly Container MovementContainer;
 
-        private Box hoverLayer;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            Header.ReceivePositionalInputAt(screenSpacePos);
 
-        protected override Container<Drawable> Content => nestedContainer;
+        private CarouselItem item;
 
-        protected DrawableCarouselItem(CarouselItem item)
+        public CarouselItem Item
         {
-            Item = item;
-
-            Height = MAX_HEIGHT;
-            RelativeSizeAxes = Axes.X;
-            Alpha = 0;
-        }
-
-        private SampleChannel sampleHover;
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
-        {
-            InternalChild = borderContainer = new Container
+            get => item;
+            set
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = 10,
-                BorderColour = new Color4(221, 255, 255, 255),
-                Children = new Drawable[]
+                if (item == value)
+                    return;
+
+                if (item != null)
                 {
-                    nestedContainer = new Container
+                    item.Filtered.ValueChanged -= onStateChange;
+                    item.State.ValueChanged -= onStateChange;
+
+                    Header.State.UnbindFrom(item.State);
+
+                    if (item is CarouselGroup group)
                     {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    hoverLayer = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                        Blending = BlendingParameters.Additive,
-                    },
+                        foreach (var c in group.Children)
+                            c.Filtered.ValueChanged -= onStateChange;
+                    }
                 }
+
+                item = value;
+
+                if (IsLoaded)
+                    UpdateItem();
+            }
+        }
+
+        protected DrawableCarouselItem()
+        {
+            RelativeSizeAxes = Axes.X;
+
+            Alpha = 0;
+
+            InternalChildren = new Drawable[]
+            {
+                MovementContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        Header = new CarouselHeader(),
+                        Content = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        }
+                    }
+                },
             };
-
-            sampleHover = audio.Samples.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
-            hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
 
-        protected override bool OnHover(HoverEvent e)
-        {
-            sampleHover?.Play();
-
-            hoverLayer.FadeIn(100, Easing.OutQuint);
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            hoverLayer.FadeOut(1000, Easing.OutQuint);
-            base.OnHoverLost(e);
-        }
-
-        public void SetMultiplicativeAlpha(float alpha) => borderContainer.Alpha = alpha;
+        public void SetMultiplicativeAlpha(float alpha) => Header.BorderContainer.Alpha = alpha;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            ApplyState();
-            Item.Filtered.ValueChanged += _ => Schedule(ApplyState);
-            Item.State.ValueChanged += _ => Schedule(ApplyState);
+            UpdateItem();
         }
+
+        protected override void Update()
+        {
+            base.Update();
+            Content.Y = Header.Height;
+        }
+
+        protected virtual void UpdateItem()
+        {
+            if (item == null)
+                return;
+
+            Scheduler.AddOnce(ApplyState);
+
+            Item.Filtered.ValueChanged += onStateChange;
+            Item.State.ValueChanged += onStateChange;
+
+            Header.State.BindTo(Item.State);
+
+            if (Item is CarouselGroup group)
+            {
+                foreach (var c in group.Children)
+                    c.Filtered.ValueChanged += onStateChange;
+            }
+        }
+
+        private void onStateChange(ValueChangedEvent<CarouselItemState> obj) => Scheduler.AddOnce(ApplyState);
+
+        private void onStateChange(ValueChangedEvent<bool> _) => Scheduler.AddOnce(ApplyState);
 
         protected virtual void ApplyState()
         {
-            if (!IsLoaded) return;
+            // Use the fact that we know the precise height of the item from the model to avoid the need for AutoSize overhead.
+            // Additionally, AutoSize doesn't work well due to content starting off-screen and being masked away.
+            Height = Item.TotalHeight;
+
+            Debug.Assert(Item != null);
 
             switch (Item.State.Value)
             {
@@ -121,30 +148,11 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void Selected()
         {
-            Item.State.Value = CarouselItemState.Selected;
-
-            borderContainer.BorderThickness = 2.5f;
-            borderContainer.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = new Color4(130, 204, 255, 150),
-                Radius = 20,
-                Roundness = 10,
-            };
+            Debug.Assert(Item != null);
         }
 
         protected virtual void Deselected()
         {
-            Item.State.Value = CarouselItemState.NotSelected;
-
-            borderContainer.BorderThickness = 0;
-            borderContainer.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(1),
-                Radius = 10,
-                Colour = Color4.Black.Opacity(100),
-            };
         }
 
         protected override bool OnClick(ClickEvent e)

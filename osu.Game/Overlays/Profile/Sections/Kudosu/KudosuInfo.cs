@@ -12,6 +12,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osu.Framework.Allocation;
+using osu.Game.Resources.Localisation.Web;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
@@ -23,51 +25,24 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
             this.user.BindTo(user);
             CountSection total;
-            CountSection avaliable;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 3;
-            Children = new Drawable[]
-            {
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5, 0),
-                    Children = new[]
-                    {
-                        total = new CountTotal(),
-                        avaliable = new CountAvailable()
-                    }
-                }
-            };
-            this.user.ValueChanged += u =>
-            {
-                total.Count = u.NewValue?.Kudosu.Total ?? 0;
-                avaliable.Count = u.NewValue?.Kudosu.Available ?? 0;
-            };
+            Child = total = new CountTotal();
+
+            this.user.ValueChanged += u => total.Count = u.NewValue?.Kudosu.Total ?? 0;
         }
 
         protected override bool OnClick(ClickEvent e) => true;
 
-        private class CountAvailable : CountSection
-        {
-            public CountAvailable()
-                : base("Kudosu Avaliable")
-            {
-                DescriptionText.Text = "Kudosu can be traded for kudosu stars, which will help your beatmap get more attention. This is the number of kudosu you haven't traded in yet.";
-            }
-        }
-
         private class CountTotal : CountSection
         {
             public CountTotal()
-                : base("Total Kudosu Earned")
+                : base(UsersStrings.ShowExtraKudosuTotal)
             {
                 DescriptionText.AddText("Based on how much of a contribution the user has made to beatmap moderation. See ");
-                DescriptionText.AddLink("this link", "https://osu.ppy.sh/wiki/Kudosu");
+                DescriptionText.AddLink("this page", "https://osu.ppy.sh/wiki/Kudosu");
                 DescriptionText.AddText(" for more information.");
             }
         }
@@ -80,13 +55,12 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
             public new int Count
             {
-                set => valueText.Text = value.ToString();
+                set => valueText.Text = value.ToLocalisableString("N0");
             }
 
-            public CountSection(string header)
+            public CountSection(LocalisableString header)
             {
                 RelativeSizeAxes = Axes.X;
-                Width = 0.5f;
                 AutoSizeAxes = Axes.Y;
                 Padding = new MarginPadding { Top = 10, Bottom = 20 };
                 Child = new FillFlowContainer
@@ -131,7 +105,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             private void load(OverlayColourProvider colourProvider)
             {
                 lineBackground.Colour = colourProvider.Highlight1;
-                DescriptionText.Colour = colourProvider.Foreground1;
             }
         }
     }

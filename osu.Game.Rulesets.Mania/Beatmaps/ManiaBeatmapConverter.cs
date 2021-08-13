@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public bool Dual;
         public readonly bool IsForCurrentRuleset;
 
+        private readonly int originalTargetColumns;
+
         // Internal for testing purposes
         internal FastRandom Random { get; private set; }
 
@@ -45,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             if (IsForCurrentRuleset)
             {
-                TargetColumns = (int)Math.Max(1, roundedCircleSize);
+                TargetColumns = GetColumnCountForNonConvert(beatmap.BeatmapInfo);
 
                 if (TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
                 {
@@ -65,6 +67,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 else
                     TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
             }
+
+            originalTargetColumns = TargetColumns;
+        }
+
+        public static int GetColumnCountForNonConvert(BeatmapInfo beatmap)
+        {
+            var roundedCircleSize = Math.Round(beatmap.BaseDifficulty.CircleSize);
+            return (int)Math.Max(1, roundedCircleSize);
         }
 
         public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
@@ -81,7 +91,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> CreateBeatmap()
         {
-            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns }, originalTargetColumns);
 
             if (Dual)
                 beatmap.Stages.Add(new StageDefinition { Columns = TargetColumns });
@@ -116,7 +126,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 prevNoteTimes.RemoveAt(0);
             prevNoteTimes.Add(newNoteTime);
 
-            density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
+            if (prevNoteTimes.Count >= 2)
+                density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
         }
 
         private double lastTime;
@@ -180,7 +191,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 case IHasDuration endTimeData:
                 {
-                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
+                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
 
                     recordNote(endTimeData.EndTime, new Vector2(256, 192));
                     computeDensity(endTimeData.EndTime);

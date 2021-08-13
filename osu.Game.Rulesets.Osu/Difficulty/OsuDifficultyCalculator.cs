@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 
             int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
+            int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
             return new OsuDifficultyAttributes
             {
@@ -59,6 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo,
                 HitCircleCount = hitCirclesCount,
+                SpinnerCount = spinnerCount,
                 Skills = skills
             };
         }
@@ -77,10 +79,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
         {
-            new Aim(),
-            new Speed()
+            new Aim(mods),
+            new Speed(mods)
         };
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]

@@ -5,6 +5,7 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <summary>
     /// Calculates the rhythm coefficient of taiko difficulty.
     /// </summary>
-    public class Rhythm : Skill
+    public class Rhythm : StrainSkill
     {
         protected override double SkillMultiplier => 10;
         protected override double StrainDecayBase => 0;
@@ -46,6 +47,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// Number of notes since the last rhythm change has taken place.
         /// </summary>
         private int notesSinceRhythmChange;
+
+        public Rhythm(Mod[] mods)
+            : base(mods)
+        {
+        }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {

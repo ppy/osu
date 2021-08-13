@@ -12,12 +12,16 @@ using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Scoring;
 using osu.Game.Tests.Resources;
+using osu.Game.Tests.Scores.IO;
 using osu.Game.Users;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -58,6 +62,42 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = LoadOsuIntoHost(host);
 
                     var imported = await LoadOszIntoOsu(osu);
+
+                    deleteBeatmapSet(imported, osu);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestImportThenDeleteFromStream()
+        {
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var tempPath = TestResources.GetTestBeatmapForImport();
+
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    BeatmapSetInfo importedSet;
+
+                    using (var stream = File.OpenRead(tempPath))
+                    {
+                        importedSet = await manager.Import(new ImportTask(stream, Path.GetFileName(tempPath)));
+                        ensureLoaded(osu);
+                    }
+
+                    Assert.IsTrue(File.Exists(tempPath), "Stream source file somehow went missing");
+                    File.Delete(tempPath);
+
+                    var imported = manager.GetAllUsableBeatmapSets().Find(beatmapSet => beatmapSet.ID == importedSet.ID);
 
                     deleteBeatmapSet(imported, osu);
                 }
@@ -127,7 +167,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                         // zip files differ because different compression or encoder.
                         Assert.AreNotEqual(hashBefore, hashFile(temp));
 
-                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
 
                         ensureLoaded(osu);
 
@@ -147,13 +187,62 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
-        private string hashFile(string filename)
+        [Test]
+        public async Task TestImportThenImportWithChangedHashedFile()
         {
-            using (var s = File.OpenRead(filename))
-                return s.ComputeMD5Hash();
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+
+                    string extractedFolder = $"{temp}_extracted";
+                    Directory.CreateDirectory(extractedFolder);
+
+                    try
+                    {
+                        var imported = await LoadOszIntoOsu(osu);
+
+                        await createScoreForBeatmap(osu, imported.Beatmaps.First());
+
+                        using (var zip = ZipArchive.Open(temp))
+                            zip.WriteToDirectory(extractedFolder);
+
+                        // arbitrary write to hashed file
+                        // this triggers the special BeatmapManager.PreImport deletion/replacement flow.
+                        using (var sw = new FileInfo(Directory.GetFiles(extractedFolder, "*.osu").First()).AppendText())
+                            await sw.WriteLineAsync("// changed");
+
+                        using (var zip = ZipArchive.Create())
+                        {
+                            zip.AddAllFromDirectory(extractedFolder);
+                            zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
+                        }
+
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
+
+                        ensureLoaded(osu);
+
+                        // check the newly "imported" beatmap is not the original.
+                        Assert.IsTrue(imported.ID != importedSecondTime.ID);
+                        Assert.IsTrue(imported.Beatmaps.First().ID != importedSecondTime.Beatmaps.First().ID);
+                    }
+                    finally
+                    {
+                        Directory.Delete(extractedFolder, true);
+                    }
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
         }
 
         [Test]
+        [Ignore("intentionally broken by import optimisations")]
         public async Task TestImportThenImportWithChangedFile()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
@@ -184,7 +273,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
                         }
 
-                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
 
                         ensureLoaded(osu);
 
@@ -227,7 +316,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                         // change filename
                         var firstFile = new FileInfo(Directory.GetFiles(extractedFolder).First());
-                        firstFile.MoveTo(Path.Combine(firstFile.DirectoryName, $"{firstFile.Name}-changed{firstFile.Extension}"));
+                        firstFile.MoveTo(Path.Combine(firstFile.DirectoryName.AsNonNull(), $"{firstFile.Name}-changed{firstFile.Extension}"));
 
                         using (var zip = ZipArchive.Create())
                         {
@@ -235,7 +324,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
                         }
 
-                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
 
                         ensureLoaded(osu);
 
@@ -256,6 +345,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        [Ignore("intentionally broken by import optimisations")]
         public async Task TestImportCorruptThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
@@ -351,7 +441,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     // this will trigger purging of the existing beatmap (online set id match) but should rollback due to broken osu.
                     try
                     {
-                        await manager.Import(breakTemp);
+                        await manager.Import(new ImportTask(breakTemp));
                     }
                     catch
                     {
@@ -401,12 +491,11 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task TestImportThenDeleteThenImportWithOnlineIDMismatch(bool set)
+        [Test]
+        public async Task TestImportThenDeleteThenImportWithOnlineIDsMissing()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-{set}"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}"))
             {
                 try
                 {
@@ -414,10 +503,8 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     var imported = await LoadOszIntoOsu(osu);
 
-                    if (set)
-                        imported.OnlineBeatmapSetID = 1234;
-                    else
-                        imported.Beatmaps.First().OnlineBeatmapID = 1234;
+                    foreach (var b in imported.Beatmaps)
+                        b.OnlineBeatmapID = null;
 
                     osu.Dependencies.Get<BeatmapManager>().Update(imported);
 
@@ -614,7 +701,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
                         }
 
-                        var imported = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+                        var imported = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
 
                         ensureLoaded(osu);
 
@@ -667,7 +754,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
                         }
 
-                        var imported = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+                        var imported = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
 
                         ensureLoaded(osu);
 
@@ -815,21 +902,34 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
+        public static async Task<BeatmapSetInfo> LoadQuickOszIntoOsu(OsuGameBase osu)
+        {
+            var temp = TestResources.GetQuickTestBeatmapForImport();
+
+            var manager = osu.Dependencies.Get<BeatmapManager>();
+
+            var importedSet = await manager.Import(new ImportTask(temp));
+
+            ensureLoaded(osu);
+
+            waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
+
+            return manager.GetAllUsableBeatmapSets().Find(beatmapSet => beatmapSet.ID == importedSet.ID);
+        }
+
         public static async Task<BeatmapSetInfo> LoadOszIntoOsu(OsuGameBase osu, string path = null, bool virtualTrack = false)
         {
             var temp = path ?? TestResources.GetTestBeatmapForImport(virtualTrack);
 
             var manager = osu.Dependencies.Get<BeatmapManager>();
 
-            await manager.Import(temp);
-
-            var imported = manager.GetAllUsableBeatmapSets();
+            var importedSet = await manager.Import(new ImportTask(temp));
 
             ensureLoaded(osu);
 
             waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
 
-            return imported.LastOrDefault();
+            return manager.GetAllUsableBeatmapSets().Find(beatmapSet => beatmapSet.ID == importedSet.ID);
         }
 
         private void deleteBeatmapSet(BeatmapSetInfo imported, OsuGameBase osu)
@@ -844,7 +944,17 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
         }
 
-        private void checkBeatmapSetCount(OsuGameBase osu, int expected, bool includeDeletePending = false)
+        private static Task createScoreForBeatmap(OsuGameBase osu, BeatmapInfo beatmap)
+        {
+            return ImportScoreTest.LoadScoreIntoOsu(osu, new ScoreInfo
+            {
+                OnlineScoreID = 2,
+                Beatmap = beatmap,
+                BeatmapInfoID = beatmap.ID
+            }, new ImportScoreTest.TestArchiveReader());
+        }
+
+        private static void checkBeatmapSetCount(OsuGameBase osu, int expected, bool includeDeletePending = false)
         {
             var manager = osu.Dependencies.Get<BeatmapManager>();
 
@@ -853,12 +963,18 @@ namespace osu.Game.Tests.Beatmaps.IO
                 : manager.GetAllUsableBeatmapSets().Count);
         }
 
-        private void checkBeatmapCount(OsuGameBase osu, int expected)
+        private static string hashFile(string filename)
+        {
+            using (var s = File.OpenRead(filename))
+                return s.ComputeMD5Hash();
+        }
+
+        private static void checkBeatmapCount(OsuGameBase osu, int expected)
         {
             Assert.AreEqual(expected, osu.Dependencies.Get<BeatmapManager>().QueryBeatmaps(_ => true).ToList().Count);
         }
 
-        private void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
+        private static void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
         {
             Assert.AreEqual(expected, osu.Dependencies.Get<FileStore>().QueryFiles(f => f.ReferenceCount == 1).Count());
         }

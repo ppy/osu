@@ -2,26 +2,26 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
     public class HitResultStatistic : CounterStatistic
     {
-        private readonly HitResult result;
+        public readonly HitResult Result;
 
-        public HitResultStatistic(HitResult result, int count, int? maxCount = null)
-            : base(result.GetDescription(), count, maxCount)
+        public HitResultStatistic(HitResultDisplayStatistic result)
+            : base(result.DisplayName, result.Count, result.MaxCount)
         {
-            this.result = result;
+            Result = result.Result;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            HeaderText.Colour = colours.ForHitResult(result);
+            HeaderText.Colour = colours.ForHitResult(Result);
         }
     }
 }

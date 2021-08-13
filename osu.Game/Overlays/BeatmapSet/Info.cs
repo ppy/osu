@@ -8,15 +8,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
     public class Info : Container
     {
-        private const float transition_duration = 250;
         private const float metadata_width = 175;
         private const float spacing = 20;
         private const float base_height = 220;
@@ -36,7 +33,7 @@ namespace osu.Game.Overlays.BeatmapSet
         public Info()
         {
             MetadataSection source, tags, genre, language;
-            OsuSpriteText unrankedPlaceholder;
+            OsuSpriteText notRankedPlaceholder;
 
             RelativeSizeAxes = Axes.X;
             Height = base_height;
@@ -60,7 +57,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = new MetadataSection("Description"),
+                                Child = new MetadataSection(MetadataType.Description),
                             },
                         },
                         new Container
@@ -78,10 +75,10 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Direction = FillDirection.Full,
                                 Children = new[]
                                 {
-                                    source = new MetadataSection("Source"),
-                                    genre = new MetadataSection("Genre") { Width = 0.5f },
-                                    language = new MetadataSection("Language") { Width = 0.5f },
-                                    tags = new MetadataSection("Tags"),
+                                    source = new MetadataSection(MetadataType.Source),
+                                    genre = new MetadataSection(MetadataType.Genre) { Width = 0.5f },
+                                    language = new MetadataSection(MetadataType.Language) { Width = 0.5f },
+                                    tags = new MetadataSection(MetadataType.Tags),
                                 },
                             },
                         },
@@ -102,12 +99,12 @@ namespace osu.Game.Overlays.BeatmapSet
                                     RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding { Top = 20, Horizontal = 15 },
                                 },
-                                unrankedPlaceholder = new OsuSpriteText
+                                notRankedPlaceholder = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Alpha = 0,
-                                    Text = "Unranked beatmap",
+                                    Text = "This beatmap is not ranked",
                                     Font = OsuFont.GetFont(size: 12)
                                 },
                             },
@@ -124,7 +121,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 language.Text = b.NewValue?.OnlineInfo?.Language?.Name ?? string.Empty;
                 var setHasLeaderboard = b.NewValue?.OnlineInfo?.Status > 0;
                 successRate.Alpha = setHasLeaderboard ? 1 : 0;
-                unrankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;
+                notRankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;
                 Height = setHasLeaderboard ? 270 : base_height;
             };
         }
@@ -134,49 +131,6 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             successRateBackground.Colour = colourProvider.Background4;
             background.Colour = colourProvider.Background5;
-        }
-
-        private class MetadataSection : FillFlowContainer
-        {
-            private readonly TextFlowContainer textFlow;
-
-            public string Text
-            {
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        Hide();
-                        return;
-                    }
-
-                    this.FadeIn(transition_duration);
-                    textFlow.Clear();
-                    textFlow.AddText(value, s => s.Font = s.Font.With(size: 12));
-                }
-            }
-
-            public MetadataSection(string title)
-            {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                Spacing = new Vector2(5f);
-
-                InternalChildren = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Text = title,
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Top = 15 },
-                    },
-                    textFlow = new OsuTextFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                    },
-                };
-            }
         }
     }
 }

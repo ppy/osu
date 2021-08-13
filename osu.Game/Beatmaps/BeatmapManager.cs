@@ -16,9 +16,12 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Statistics;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -27,8 +30,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Users;
 using osu.Game.Skinning;
+using osu.Game.Users;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Beatmaps
@@ -36,7 +39,8 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IDisposable
+    [ExcludeFromDynamicCompile]
+    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IDisposable, IBeatmapResourceProvider
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -61,23 +65,31 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        protected override string ImportFromStablePath => "Songs";
+        protected override string ImportFromStablePath => ".";
+
+        protected override Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage.GetSongStorage();
 
         private readonly RulesetStore rulesets;
         private readonly BeatmapStore beatmaps;
         private readonly AudioManager audioManager;
-        private readonly TextureStore textureStore;
+        private readonly IResourceStore<byte[]> resources;
+        private readonly LargeTextureStore largeTextureStore;
         private readonly ITrackStore trackStore;
+
+        [CanBeNull]
+        private readonly GameHost host;
 
         [CanBeNull]
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, GameHost host = null,
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
             : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
             this.audioManager = audioManager;
+            this.resources = resources;
+            this.host = host;
 
             DefaultBeatmap = defaultBeatmap;
 
@@ -90,7 +102,7 @@ namespace osu.Game.Beatmaps
             if (performOnlineLookups)
                 onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
 
-            textureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
+            largeTextureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
             trackStore = audioManager.GetTrackStore(Files.Store);
         }
 
@@ -103,8 +115,6 @@ namespace osu.Game.Beatmaps
         {
             var metadata = new BeatmapMetadata
             {
-                Artist = "artist",
-                Title = "title",
                 Author = user,
             };
 
@@ -118,7 +128,6 @@ namespace osu.Game.Beatmaps
                         BaseDifficulty = new BeatmapDifficulty(),
                         Ruleset = ruleset,
                         Metadata = metadata,
-                        Version = "difficulty"
                     }
                 }
             };
@@ -146,7 +155,7 @@ namespace osu.Game.Beatmaps
             bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0);
 
             if (onlineLookupQueue != null)
-                await onlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken);
+                await onlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken).ConfigureAwait(false);
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
@@ -172,8 +181,13 @@ namespace osu.Game.Beatmaps
                 if (existingOnlineId != null)
                 {
                     Delete(existingOnlineId);
-                    beatmaps.PurgeDeletable(s => s.ID == existingOnlineId.ID);
-                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been purged.");
+
+                    // in order to avoid a unique key constraint, immediately remove the online ID from the previous set.
+                    existingOnlineId.OnlineBeatmapSetID = null;
+                    foreach (var b in existingOnlineId.Beatmaps)
+                        b.OnlineBeatmapID = null;
+
+                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been deleted.");
                 }
             }
         }
@@ -181,8 +195,6 @@ namespace osu.Game.Beatmaps
         private void validateOnlineIds(BeatmapSetInfo beatmapSet)
         {
             var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
-
-            LogForModel(beatmapSet, $"Validating online IDs for {beatmapSet.Beatmaps.Count} beatmaps...");
 
             // ensure all IDs are unique
             if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
@@ -233,7 +245,7 @@ namespace osu.Game.Beatmaps
         /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
+        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
         {
             var setInfo = info.BeatmapSet;
 
@@ -273,23 +285,17 @@ namespace osu.Game.Beatmaps
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to lookup.</param>
-        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap. May be returned if beatmapInfo requested matches</param>
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
+        public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
-            if (beatmapInfo?.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
-                return previous;
-
-            if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
-                return DefaultBeatmap;
-
-            if (beatmapInfo.BeatmapSet.Files == null)
+            // if there are no files, presume the full beatmap info has not yet been fetched from the database.
+            if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
             {
-                var info = beatmapInfo;
-                beatmapInfo = QueryBeatmap(b => b.ID == info.ID);
+                int lookupId = beatmapInfo.ID;
+                beatmapInfo = QueryBeatmap(b => b.ID == lookupId);
             }
 
-            if (beatmapInfo == null)
+            if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 
             lock (workingCache)
@@ -300,7 +306,10 @@ namespace osu.Game.Beatmaps
 
                 beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
-                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store, textureStore, trackStore, beatmapInfo, audioManager));
+                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
+
+                // best effort; may be higher than expected.
+                GlobalStatistics.Get<int>(nameof(Beatmaps), $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
 
                 return working;
             }
@@ -312,6 +321,14 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
+
+        protected override bool CanSkipImport(BeatmapSetInfo existing, BeatmapSetInfo import)
+        {
+            if (!base.CanSkipImport(existing, import))
+                return false;
+
+            return existing.Beatmaps.Any(b => b.OnlineBeatmapID != null);
+        }
 
         protected override bool CanReuseExisting(BeatmapSetInfo existing, BeatmapSetInfo import)
         {
@@ -389,7 +406,7 @@ namespace osu.Game.Beatmaps
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
-            string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
+            string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
 
             if (string.IsNullOrEmpty(mapName))
             {
@@ -417,7 +434,7 @@ namespace osu.Game.Beatmaps
         {
             var beatmapInfos = new List<BeatmapInfo>();
 
-            foreach (var file in files.Where(f => f.Filename.EndsWith(".osu")))
+            foreach (var file in files.Where(f => f.Filename.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)))
             {
                 using (var raw = Files.Store.GetStream(file.FileInfo.StoragePath))
                 using (var ms = new MemoryStream()) // we need a memory stream so we can seek
@@ -444,7 +461,7 @@ namespace osu.Game.Beatmaps
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
                     beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
                     beatmap.BeatmapInfo.Length = calculateLength(beatmap);
-                    beatmap.BeatmapInfo.BPM = beatmap.ControlPointInfo.BPMMode;
+                    beatmap.BeatmapInfo.BPM = 60000 / beatmap.GetMostCommonBeatLength();
 
                     beatmapInfos.Add(beatmap.BeatmapInfo);
                 }
@@ -490,6 +507,17 @@ namespace osu.Game.Beatmaps
             onlineLookupQueue?.Dispose();
         }
 
+        #region IResourceStorageProvider
+
+        TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
+        ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
+        AudioManager IStorageResourceProvider.AudioManager => audioManager;
+        IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
+        IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
+        IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);
+
+        #endregion
+
         /// <summary>
         /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.
         /// </summary>
@@ -506,6 +534,8 @@ namespace osu.Game.Beatmaps
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
             protected override Track GetBeatmapTrack() => null;
+            protected override ISkin GetSkin() => null;
+            public override Stream GetStream(string storagePath) => null;
         }
     }
 

@@ -5,6 +5,7 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <summary>
     /// Calculates the colour coefficient of taiko difficulty.
     /// </summary>
-    public class Colour : Skill
+    public class Colour : StrainSkill
     {
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.4;
@@ -38,6 +39,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// Length of the current mono pattern.
         /// </summary>
         private int currentMonoLength;
+
+        public Colour(Mod[] mods)
+            : base(mods)
+        {
+        }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {

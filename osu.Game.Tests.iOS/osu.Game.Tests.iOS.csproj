@@ -21,6 +21,9 @@
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
+  </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</Project>
@@ -45,6 +48,7 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="DeepEqual" Version="2.0.0" />
+    <PackageReference Include="Moq" Version="4.16.1" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

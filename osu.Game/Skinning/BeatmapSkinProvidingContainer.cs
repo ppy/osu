@@ -15,6 +15,7 @@ namespace osu.Game.Skinning
     public class BeatmapSkinProvidingContainer : SkinProvidingContainer
     {
         private Bindable<bool> beatmapSkins;
+        private Bindable<bool> beatmapColours;
         private Bindable<bool> beatmapHitsounds;
 
         protected override bool AllowConfigurationLookup
@@ -25,6 +26,17 @@ namespace osu.Game.Skinning
                     throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
                 return beatmapSkins.Value;
+            }
+        }
+
+        protected override bool AllowColourLookup
+        {
+            get
+            {
+                if (beatmapColours == null)
+                    throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
+
+                return beatmapColours.Value;
             }
         }
 
@@ -62,6 +74,7 @@ namespace osu.Game.Skinning
             var config = parent.Get<OsuConfigManager>();
 
             beatmapSkins = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
+            beatmapColours = config.GetBindable<bool>(OsuSetting.BeatmapColours);
             beatmapHitsounds = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
 
             return base.CreateChildDependencies(parent);
@@ -71,6 +84,7 @@ namespace osu.Game.Skinning
         private void load()
         {
             beatmapSkins.BindValueChanged(_ => TriggerSourceChanged());
+            beatmapColours.BindValueChanged(_ => TriggerSourceChanged());
             beatmapHitsounds.BindValueChanged(_ => TriggerSourceChanged());
         }
     }

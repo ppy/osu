@@ -3,14 +3,16 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuSettingsSubsection : RulesetSettingsSubsection
     {
-        protected override string Header => "osu!";
+        protected override LocalisableString Header => "osu!";
 
         public OsuSettingsSubsection(Ruleset ruleset)
             : base(ruleset)
@@ -38,6 +40,11 @@ namespace osu.Game.Rulesets.Osu.UI
                 {
                     LabelText = "Cursor trail",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
+                },
+                new SettingsEnumDropdown<PlayfieldBorderStyle>
+                {
+                    LabelText = "Playfield border style",
+                    Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
                 },
             };
         }

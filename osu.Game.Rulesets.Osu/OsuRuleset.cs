@@ -24,13 +24,14 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
 using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
 
@@ -58,53 +59,82 @@ namespace osu.Game.Rulesets.Osu
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlag(LegacyMods.Nightcore))
+            if (mods.HasFlagFast(LegacyMods.Nightcore))
                 yield return new OsuModNightcore();
-            else if (mods.HasFlag(LegacyMods.DoubleTime))
+            else if (mods.HasFlagFast(LegacyMods.DoubleTime))
                 yield return new OsuModDoubleTime();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
+            if (mods.HasFlagFast(LegacyMods.Perfect))
                 yield return new OsuModPerfect();
-            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+            else if (mods.HasFlagFast(LegacyMods.SuddenDeath))
                 yield return new OsuModSuddenDeath();
 
-            if (mods.HasFlag(LegacyMods.Autopilot))
+            if (mods.HasFlagFast(LegacyMods.Autopilot))
                 yield return new OsuModAutopilot();
 
-            if (mods.HasFlag(LegacyMods.Cinema))
+            if (mods.HasFlagFast(LegacyMods.Cinema))
                 yield return new OsuModCinema();
-            else if (mods.HasFlag(LegacyMods.Autoplay))
+            else if (mods.HasFlagFast(LegacyMods.Autoplay))
                 yield return new OsuModAutoplay();
 
-            if (mods.HasFlag(LegacyMods.Easy))
+            if (mods.HasFlagFast(LegacyMods.Easy))
                 yield return new OsuModEasy();
 
-            if (mods.HasFlag(LegacyMods.Flashlight))
+            if (mods.HasFlagFast(LegacyMods.Flashlight))
                 yield return new OsuModFlashlight();
 
-            if (mods.HasFlag(LegacyMods.HalfTime))
+            if (mods.HasFlagFast(LegacyMods.HalfTime))
                 yield return new OsuModHalfTime();
 
-            if (mods.HasFlag(LegacyMods.HardRock))
+            if (mods.HasFlagFast(LegacyMods.HardRock))
                 yield return new OsuModHardRock();
 
-            if (mods.HasFlag(LegacyMods.Hidden))
+            if (mods.HasFlagFast(LegacyMods.Hidden))
                 yield return new OsuModHidden();
 
-            if (mods.HasFlag(LegacyMods.NoFail))
+            if (mods.HasFlagFast(LegacyMods.NoFail))
                 yield return new OsuModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Relax))
+            if (mods.HasFlagFast(LegacyMods.Relax))
                 yield return new OsuModRelax();
 
-            if (mods.HasFlag(LegacyMods.SpunOut))
+            if (mods.HasFlagFast(LegacyMods.SpunOut))
                 yield return new OsuModSpunOut();
 
-            if (mods.HasFlag(LegacyMods.Target))
+            if (mods.HasFlagFast(LegacyMods.Target))
                 yield return new OsuModTarget();
 
-            if (mods.HasFlag(LegacyMods.TouchDevice))
+            if (mods.HasFlagFast(LegacyMods.TouchDevice))
                 yield return new OsuModTouchDevice();
+        }
+
+        public override LegacyMods ConvertToLegacyMods(Mod[] mods)
+        {
+            var value = base.ConvertToLegacyMods(mods);
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case OsuModAutopilot _:
+                        value |= LegacyMods.Autopilot;
+                        break;
+
+                    case OsuModSpunOut _:
+                        value |= LegacyMods.SpunOut;
+                        break;
+
+                    case OsuModTarget _:
+                        value |= LegacyMods.Target;
+                        break;
+
+                    case OsuModTouchDevice _:
+                        value |= LegacyMods.TouchDevice;
+                        break;
+                }
+            }
+
+            return value;
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -134,6 +164,9 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModTarget(),
                         new OsuModDifficultyAdjust(),
+                        new OsuModClassic(),
+                        new OsuModRandom(),
+                        new OsuModMirror(),
                     };
 
                 case ModType.Automation:
@@ -154,6 +187,9 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModGrow(), new OsuModDeflate()),
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new OsuModTraceable(),
+                        new OsuModBarrelRoll(),
+                        new OsuModApproachDifferent(),
+                        new OsuModMuted(),
                     };
 
                 case ModType.System:
@@ -175,6 +211,8 @@ namespace osu.Game.Rulesets.Osu
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new OsuBeatmapVerifier();
+
         public override string Description => "osu!";
 
         public override string ShortName => SHORT_NAME;
@@ -183,13 +221,48 @@ namespace osu.Game.Rulesets.Osu
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new OsuLegacySkinTransformer(source);
+        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new OsuLegacySkinTransformer(skin);
 
         public int LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
+
+        protected override IEnumerable<HitResult> GetValidHitResults()
+        {
+            return new[]
+            {
+                HitResult.Great,
+                HitResult.Ok,
+                HitResult.Meh,
+
+                HitResult.LargeTickHit,
+                HitResult.SmallTickHit,
+                HitResult.SmallBonus,
+                HitResult.LargeBonus,
+            };
+        }
+
+        public override string GetDisplayNameForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.LargeTickHit:
+                    return "slider tick";
+
+                case HitResult.SmallTickHit:
+                    return "slider end";
+
+                case HitResult.SmallBonus:
+                    return "spinner spin";
+
+                case HitResult.LargeBonus:
+                    return "spinner bonus";
+            }
+
+            return base.GetDisplayNameForHitResult(result);
+        }
 
         public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
         {

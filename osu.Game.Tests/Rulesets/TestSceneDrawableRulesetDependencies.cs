@@ -9,13 +9,14 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
@@ -32,12 +33,14 @@ namespace osu.Game.Tests.Rulesets
             DrawableWithDependencies drawable = null;
             TestTextureStore textureStore = null;
             TestSampleStore sampleStore = null;
+            TestShaderManager shaderManager = null;
 
             AddStep("add dependencies", () =>
             {
                 Child = drawable = new DrawableWithDependencies();
                 textureStore = drawable.ParentTextureStore;
                 sampleStore = drawable.ParentSampleStore;
+                shaderManager = drawable.ParentShaderManager;
             });
 
             AddStep("clear children", Clear);
@@ -53,12 +56,14 @@ namespace osu.Game.Tests.Rulesets
 
             AddAssert("parent texture store not disposed", () => !textureStore.IsDisposed);
             AddAssert("parent sample store not disposed", () => !sampleStore.IsDisposed);
+            AddAssert("parent shader manager not disposed", () => !shaderManager.IsDisposed);
         }
 
         private class DrawableWithDependencies : CompositeDrawable
         {
             public TestTextureStore ParentTextureStore { get; private set; }
             public TestSampleStore ParentSampleStore { get; private set; }
+            public TestShaderManager ParentShaderManager { get; private set; }
 
             public DrawableWithDependencies()
             {
@@ -71,6 +76,7 @@ namespace osu.Game.Tests.Rulesets
 
                 dependencies.CacheAs<TextureStore>(ParentTextureStore = new TestTextureStore());
                 dependencies.CacheAs<ISampleStore>(ParentSampleStore = new TestSampleStore());
+                dependencies.CacheAs<ShaderManager>(ParentShaderManager = new TestShaderManager());
 
                 return new DrawableRulesetDependencies(new OsuRuleset(), dependencies);
             }
@@ -106,9 +112,9 @@ namespace osu.Game.Tests.Rulesets
                 IsDisposed = true;
             }
 
-            public SampleChannel Get(string name) => null;
+            public Sample Get(string name) => null;
 
-            public Task<SampleChannel> GetAsync(string name) => null;
+            public Task<Sample> GetAsync(string name) => null;
 
             public Stream GetStream(string name) => null;
 
@@ -119,9 +125,13 @@ namespace osu.Game.Tests.Rulesets
             public BindableNumber<double> Frequency => throw new NotImplementedException();
             public BindableNumber<double> Tempo => throw new NotImplementedException();
 
-            public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
+            public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
 
-            public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
+            public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotImplementedException();
+
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotImplementedException();
 
             public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotImplementedException();
 
@@ -131,6 +141,24 @@ namespace osu.Game.Tests.Rulesets
             public IBindable<double> AggregateTempo => throw new NotImplementedException();
 
             public int PlaybackConcurrency { get; set; }
+        }
+
+        private class TestShaderManager : ShaderManager
+        {
+            public TestShaderManager()
+                : base(new ResourceStore<byte[]>())
+            {
+            }
+
+            public override byte[] LoadRaw(string name) => null;
+
+            public bool IsDisposed { get; private set; }
+
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+                IsDisposed = true;
+            }
         }
     }
 }

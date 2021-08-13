@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play
 
         private const float duration = 2500;
 
-        private SampleChannel failSample;
+        private Sample failSample;
 
         public FailAnimation(DrawableRuleset drawableRuleset)
         {

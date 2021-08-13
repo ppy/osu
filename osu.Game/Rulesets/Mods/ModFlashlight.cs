@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
-        public override bool Ranked => true;
 
         internal ModFlashlight()
         {
@@ -107,6 +106,9 @@ namespace osu.Game.Rulesets.Mods
                 {
                     foreach (var breakPeriod in Breaks)
                     {
+                        if (!breakPeriod.HasEffect)
+                            continue;
+
                         if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
 
                         this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);

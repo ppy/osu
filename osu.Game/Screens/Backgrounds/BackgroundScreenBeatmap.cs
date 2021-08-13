@@ -27,9 +27,12 @@ namespace osu.Game.Screens.Backgrounds
         private WorkingBeatmap beatmap;
 
         /// <summary>
-        /// Whether or not user dim settings should be applied to this Background.
+        /// Whether or not user-configured settings relating to brightness of elements should be ignored.
         /// </summary>
-        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
+        /// <remarks>
+        /// Beatmap background screens should not apply user settings by default.
+        /// </remarks>
+        public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>(true);
 
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
@@ -50,7 +53,7 @@ namespace osu.Game.Screens.Backgrounds
 
             InternalChild = dimmable = CreateFadeContainer();
 
-            dimmable.EnableUserDim.BindTo(EnableUserDim);
+            dimmable.IgnoreUserSettings.BindTo(IgnoreUserSettings);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
 
@@ -148,7 +151,7 @@ namespace osu.Game.Screens.Backgrounds
             /// <summary>
             /// As an optimisation, we add the two blur portions to be applied rather than actually applying two separate blurs.
             /// </summary>
-            private Vector2 blurTarget => EnableUserDim.Value
+            private Vector2 blurTarget => !IgnoreUserSettings.Value
                 ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * USER_BLUR_FACTOR)
                 : new Vector2(BlurAmount.Value);
 
@@ -166,7 +169,9 @@ namespace osu.Game.Screens.Backgrounds
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
             }
 
-            protected override bool ShowDimContent => !ShowStoryboard.Value || !StoryboardReplacesBackground.Value; // The background needs to be hidden in the case of it being replaced by the storyboard
+            protected override bool ShowDimContent
+                // The background needs to be hidden in the case of it being replaced by the storyboard
+                => (!ShowStoryboard.Value && !IgnoreUserSettings.Value) || !StoryboardReplacesBackground.Value;
 
             protected override void UpdateVisuals()
             {

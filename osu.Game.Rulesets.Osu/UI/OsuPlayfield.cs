@@ -3,31 +3,34 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
+        private readonly PlayfieldBorder playfieldBorder;
         private readonly ProxyContainer approachCircles;
         private readonly ProxyContainer spinnerProxies;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly FollowPointRenderer followPoints;
-        private readonly OrderedHitPolicy hitPolicy;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
@@ -35,75 +38,105 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly IDictionary<HitResult, DrawablePool<DrawableOsuJudgement>> poolDictionary = new Dictionary<HitResult, DrawablePool<DrawableOsuJudgement>>();
 
+        private readonly Container judgementAboveHitObjectLayer;
+
         public OsuPlayfield()
         {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
             InternalChildren = new Drawable[]
             {
-                spinnerProxies = new ProxyContainer
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-                followPoints = new FollowPointRenderer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 2,
-                },
-                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 1,
-                },
-                // Todo: This should not exist, but currently helps to reduce LOH allocations due to unbinding skin source events on judgement disposal
-                // Todo: Remove when hitobjects are properly pooled
-                new SkinProvidingContainer(null)
-                {
-                    Child = HitObjectContainer,
-                },
-                approachCircles = new ProxyContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = -1,
-                },
+                playfieldBorder = new PlayfieldBorder { RelativeSizeAxes = Axes.Both },
+                spinnerProxies = new ProxyContainer { RelativeSizeAxes = Axes.Both },
+                followPoints = new FollowPointRenderer { RelativeSizeAxes = Axes.Both },
+                judgementLayer = new JudgementContainer<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
+                HitObjectContainer,
+                judgementAboveHitObjectLayer = new Container { RelativeSizeAxes = Axes.Both },
+                approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             };
 
-            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+            HitPolicy = new StartTimeOrderedHitPolicy();
 
             var hitWindows = new OsuHitWindows();
-
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
-                poolDictionary.Add(result, new DrawableJudgementPool(result));
+                poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgementLoaded));
 
             AddRangeInternal(poolDictionary.Values);
+
+            NewResult += onNewResult;
         }
 
-        public override void Add(DrawableHitObject h)
+        private IHitPolicy hitPolicy;
+
+        public IHitPolicy HitPolicy
         {
-            h.OnNewResult += onNewResult;
-            h.OnLoadComplete += d =>
+            get => hitPolicy;
+            set
             {
-                if (d is DrawableSpinner)
-                    spinnerProxies.Add(d.CreateProxy());
-
-                if (d is IDrawableHitObjectWithProxiedApproach c)
-                    approachCircles.Add(c.ProxiedLayer.CreateProxy());
-            };
-
-            base.Add(h);
-
-            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
-            osuHitObject.CheckHittable = hitPolicy.IsHittable;
-
-            followPoints.AddFollowPoints(osuHitObject);
+                hitPolicy = value ?? throw new ArgumentNullException(nameof(value));
+                hitPolicy.HitObjectContainer = HitObjectContainer;
+            }
         }
 
-        public override bool Remove(DrawableHitObject h)
+        protected override void OnNewDrawableHitObject(DrawableHitObject drawable)
         {
-            bool result = base.Remove(h);
+            ((DrawableOsuHitObject)drawable).CheckHittable = hitPolicy.IsHittable;
 
-            if (result)
-                followPoints.RemoveFollowPoints((DrawableOsuHitObject)h);
+            Debug.Assert(!drawable.IsLoaded, $"Already loaded {nameof(DrawableHitObject)} is added to {nameof(OsuPlayfield)}");
+            drawable.OnLoadComplete += onDrawableHitObjectLoaded;
+        }
 
-            return result;
+        private void onDrawableHitObjectLoaded(Drawable drawable)
+        {
+            // note: `Slider`'s `ProxiedLayer` is added when its nested `DrawableHitCircle` is loaded.
+            switch (drawable)
+            {
+                case DrawableSpinner _:
+                    spinnerProxies.Add(drawable.CreateProxy());
+                    break;
+
+                case DrawableHitCircle hitCircle:
+                    approachCircles.Add(hitCircle.ProxiedLayer.CreateProxy());
+                    break;
+            }
+        }
+
+        private void onJudgementLoaded(DrawableOsuJudgement judgement)
+        {
+            judgementAboveHitObjectLayer.Add(judgement.ProxiedAboveHitObjectsContent);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuRulesetConfigManager config)
+        {
+            config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
+
+            RegisterPool<HitCircle, DrawableHitCircle>(10, 100);
+
+            RegisterPool<Slider, DrawableSlider>(10, 100);
+            RegisterPool<SliderHeadCircle, DrawableSliderHead>(10, 100);
+            RegisterPool<SliderTailCircle, DrawableSliderTail>(10, 100);
+            RegisterPool<SliderTick, DrawableSliderTick>(10, 100);
+            RegisterPool<SliderRepeat, DrawableSliderRepeat>(5, 50);
+
+            RegisterPool<Spinner, DrawableSpinner>(2, 20);
+            RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
+            RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 100);
+        }
+
+        protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
+
+        protected override void OnHitObjectAdded(HitObject hitObject)
+        {
+            base.OnHitObjectAdded(hitObject);
+            followPoints.AddFollowPoints((OsuHitObject)hitObject);
+        }
+
+        protected override void OnHitObjectRemoved(HitObject hitObject)
+        {
+            base.OnHitObjectRemoved(hitObject);
+            followPoints.RemoveFollowPoints((OsuHitObject)hitObject);
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
@@ -117,6 +150,10 @@ namespace osu.Game.Rulesets.Osu.UI
             DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj => doj.Apply(result, judgedObject));
 
             judgementLayer.Add(explosion);
+
+            // the proxied content is added to judgementAboveHitObjectLayer once, on first load, and never removed from it.
+            // ensure that ordering is consistent with expectations (latest judgement should be front-most).
+            judgementAboveHitObjectLayer.ChangeChildDepth(explosion.ProxiedAboveHitObjectsContent, (float)-result.TimeAbsolute);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
@@ -129,11 +166,13 @@ namespace osu.Game.Rulesets.Osu.UI
         private class DrawableJudgementPool : DrawablePool<DrawableOsuJudgement>
         {
             private readonly HitResult result;
+            private readonly Action<DrawableOsuJudgement> onLoaded;
 
-            public DrawableJudgementPool(HitResult result)
+            public DrawableJudgementPool(HitResult result, Action<DrawableOsuJudgement> onLoaded)
                 : base(10)
             {
                 this.result = result;
+                this.onLoaded = onLoaded;
             }
 
             protected override DrawableOsuJudgement CreateNewDrawable()
@@ -143,8 +182,22 @@ namespace osu.Game.Rulesets.Osu.UI
                 // just a placeholder to initialise the correct drawable hierarchy for this pool.
                 judgement.Apply(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null);
 
+                onLoaded?.Invoke(judgement);
+
                 return judgement;
             }
+        }
+
+        private class OsuHitObjectLifetimeEntry : HitObjectLifetimeEntry
+        {
+            public OsuHitObjectLifetimeEntry(HitObject hitObject)
+                : base(hitObject)
+            {
+                // Prevent past objects in idles states from remaining alive as their end times are skipped in non-frame-stable contexts.
+                LifetimeEnd = HitObject.GetEndTime() + HitObject.HitWindows.WindowFor(HitResult.Miss);
+            }
+
+            protected override double InitialLifetimeOffset => ((OsuHitObject)HitObject).TimePreempt;
         }
     }
 }
