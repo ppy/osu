@@ -32,33 +32,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                 AutoSizeAxes = Axes.Y,
                 Content = new[]
                 {
-                    new Drawable[]
+                    new[]
                     {
-                        new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(5, 0),
-                            Children = new Drawable[]
-                            {
-                                new Circle
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Height = 9,
-                                    Width = 4,
-                                    Colour = Color4Extensions.FromHex("#00FFAA")
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Text = item.Name,
-                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
-                                }
-                            }
-                        }
+                        createHeader(item)
                     },
                     new Drawable[]
                     {
@@ -75,6 +51,38 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     new Dimension(GridSizeMode.AutoSize),
                     new Dimension(GridSizeMode.AutoSize),
+                }
+            };
+        }
+
+        private static Drawable createHeader(StatisticItem item)
+        {
+            if (string.IsNullOrEmpty(item.Name))
+                return Empty();
+
+            return new FillFlowContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(5, 0),
+                Children = new Drawable[]
+                {
+                    new Circle
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Height = 9,
+                        Width = 4,
+                        Colour = Color4Extensions.FromHex("#00FFAA")
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Text = item.Name,
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                    }
                 }
             };
         }

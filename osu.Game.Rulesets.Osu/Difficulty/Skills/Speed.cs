@@ -3,7 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
     /// </summary>
-    public class Speed : Skill
+    public class Speed : OsuStrainSkill
     {
         private const double single_spacing_threshold = 125;
 
@@ -22,10 +22,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecayBase => 0.3;
+        protected override int ReducedSectionCount => 5;
+        protected override double DifficultyMultiplier => 1.04;
 
         private const double min_speed_bonus = 75; // ~200BPM
         private const double max_speed_bonus = 45; // ~330BPM
         private const double speed_balancing_factor = 40;
+
+        public Speed(Mod[] mods)
+            : base(mods)
+        {
+        }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {

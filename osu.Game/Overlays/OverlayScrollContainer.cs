@@ -11,15 +11,17 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     /// <summary>
-    /// <see cref="OsuScrollContainer"/> which provides <see cref="ScrollToTopButton"/>. Mostly used in <see cref="FullscreenOverlay"/>.
+    /// <see cref="UserTrackingScrollContainer"/> which provides <see cref="ScrollToTopButton"/>. Mostly used in <see cref="FullscreenOverlay{T}"/>.
     /// </summary>
-    public class OverlayScrollContainer : OsuScrollContainer
+    public class OverlayScrollContainer : UserTrackingScrollContainer
     {
         /// <summary>
         /// Scroll position at which the <see cref="ScrollToTopButton"/> will be shown.
@@ -84,6 +86,7 @@ namespace osu.Game.Overlays
             private readonly Box background;
 
             public ScrollToTopButton()
+                : base(HoverSampleSet.ScrollToTop)
             {
                 Size = new Vector2(50);
                 Alpha = 0;
@@ -116,7 +119,7 @@ namespace osu.Game.Overlays
                     }
                 });
 
-                TooltipText = "Scroll to top";
+                TooltipText = CommonStrings.ButtonsBackToTop;
             }
 
             [BackgroundDependencyLoader]

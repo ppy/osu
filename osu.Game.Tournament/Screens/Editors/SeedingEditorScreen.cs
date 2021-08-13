@@ -74,13 +74,13 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "Mod",
                                 Width = 0.33f,
-                                Bindable = Model.Mod
+                                Current = Model.Mod
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "Seed",
                                 Width = 0.33f,
-                                Bindable = Model.Seed
+                                Current = Model.Seed
                             },
                             new SettingsButton
                             {
@@ -147,7 +147,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     [Resolved]
                     protected IAPIProvider API { get; private set; }
 
-                    private readonly Bindable<string> beatmapId = new Bindable<string>();
+                    private readonly Bindable<int?> beatmapId = new Bindable<int?>();
 
                     private readonly Bindable<string> score = new Bindable<string>();
 
@@ -187,21 +187,21 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "Beatmap ID",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = beatmapId,
+                                        Current = beatmapId,
                                     },
                                     new SettingsSlider<int>
                                     {
                                         LabelText = "Seed",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = beatmap.Seed
+                                        Current = beatmap.Seed
                                     },
                                     new SettingsTextBox
                                     {
                                         LabelText = "Score",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = score,
+                                        Current = score,
                                     },
                                     drawableContainer = new Container
                                     {
@@ -228,16 +228,12 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load(RulesetStore rulesets)
                     {
-                        beatmapId.Value = Model.ID.ToString();
-                        beatmapId.BindValueChanged(idString =>
+                        beatmapId.Value = Model.ID;
+                        beatmapId.BindValueChanged(id =>
                         {
-                            int parsed;
+                            Model.ID = id.NewValue ?? 0;
 
-                            int.TryParse(idString.NewValue, out parsed);
-
-                            Model.ID = parsed;
-
-                            if (idString.NewValue != idString.OldValue)
+                            if (id.NewValue != id.OldValue)
                                 Model.BeatmapInfo = null;
 
                             if (Model.BeatmapInfo != null)

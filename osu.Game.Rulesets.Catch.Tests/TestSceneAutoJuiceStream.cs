@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
@@ -38,7 +40,11 @@ namespace osu.Game.Rulesets.Catch.Tests
                         new Vector2(width, 0)
                     }),
                     StartTime = i * 2000,
-                    NewCombo = i % 8 == 0
+                    NewCombo = i % 8 == 0,
+                    Samples = new List<HitSampleInfo>(new[]
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", volume: 100)
+                    })
                 });
             }
 

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -65,11 +66,15 @@ namespace osu.Game.Rulesets
             // the requesting assembly may be located out of the executable's base directory, thus requiring manual resolving of its dependencies.
             // this attempts resolving the ruleset dependencies on game core and framework assemblies by returning assemblies with the same assembly name
             // already loaded in the AppDomain.
-            foreach (var curAsm in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (asm.Name.Equals(curAsm.GetName().Name, StringComparison.Ordinal))
-                    return curAsm;
-            }
+            var domainAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                                          // Given name is always going to be equally-or-more qualified than the assembly name.
+                                          .Where(a => args.Name.Contains(a.GetName().Name, StringComparison.Ordinal))
+                                          // Pick the greatest assembly version.
+                                          .OrderByDescending(a => a.GetName().Version)
+                                          .FirstOrDefault();
+
+            if (domainAssembly != null)
+                return domainAssembly;
 
             return loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == asm.FullName);
         }
@@ -91,13 +96,25 @@ namespace osu.Game.Rulesets
 
                 context.SaveChanges();
 
-                // add any other modes
+                var existingRulesets = context.RulesetInfo.ToList();
+
+                // add any other rulesets which have assemblies present but are not yet in the database.
                 foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
                 {
-                    // todo: StartsWith can be changed to Equals on 2020-11-08
-                    // This is to give users enough time to have their database use new abbreviated info).
-                    if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo.StartsWith(r.RulesetInfo.InstantiationInfo)) == null)
-                        context.RulesetInfo.Add(r.RulesetInfo);
+                    if (existingRulesets.FirstOrDefault(ri => ri.InstantiationInfo.Equals(r.RulesetInfo.InstantiationInfo, StringComparison.Ordinal)) == null)
+                    {
+                        var existingSameShortName = existingRulesets.FirstOrDefault(ri => ri.ShortName == r.RulesetInfo.ShortName);
+
+                        if (existingSameShortName != null)
+                        {
+                            // even if a matching InstantiationInfo was not found, there may be an existing ruleset with the same ShortName.
+                            // this generally means the user or ruleset provider has renamed their dll but the underlying ruleset is *likely* the same one.
+                            // in such cases, update the instantiation info of the existing entry to point to the new one.
+                            existingSameShortName.InstantiationInfo = r.RulesetInfo.InstantiationInfo;
+                        }
+                        else
+                            context.RulesetInfo.Add(r.RulesetInfo);
+                    }
                 }
 
                 context.SaveChanges();
@@ -107,7 +124,7 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo))).RulesetInfo;
+                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo).AsNonNull())).RulesetInfo;
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
@@ -169,7 +186,7 @@ namespace osu.Game.Rulesets
         {
             var filename = Path.GetFileNameWithoutExtension(file);
 
-            if (loadedAssemblies.Values.Any(t => t.Namespace == filename))
+            if (loadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
                 return;
 
             try
@@ -185,6 +202,11 @@ namespace osu.Game.Rulesets
         private void addRuleset(Assembly assembly)
         {
             if (loadedAssemblies.ContainsKey(assembly))
+                return;
+
+            // the same assembly may be loaded twice in the same AppDomain (currently a thing in certain Rider versions https://youtrack.jetbrains.com/issue/RIDER-48799).
+            // as a failsafe, also compare by FullName.
+            if (loadedAssemblies.Any(a => a.Key.FullName == assembly.FullName))
                 return;
 
             try

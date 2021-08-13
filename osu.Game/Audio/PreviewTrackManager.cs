@@ -7,10 +7,12 @@ using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Audio
@@ -26,14 +28,17 @@ namespace osu.Game.Audio
 
         protected TrackManagerPreviewTrack CurrentTrack;
 
+        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(OsuGameBase.GLOBAL_TRACK_VOLUME_ADJUST);
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audioManager)
         {
             // this is a temporary solution to get around muting ourselves.
             // todo: update this once we have a BackgroundTrackManager or similar.
-            trackStore = new PreviewTrackStore(new OnlineStore());
+            trackStore = new PreviewTrackStore(audioManager.Mixer, new OnlineStore());
 
             audio.AddItem(trackStore);
+            trackStore.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
             trackStore.AddAdjustment(AdjustableProperty.Volume, audio.VolumeTrack);
         }
 
@@ -76,7 +81,7 @@ namespace osu.Game.Audio
         /// <param name="source">The <see cref="IPreviewTrackOwner"/> which may be the owner of the <see cref="PreviewTrack"/>.</param>
         public void StopAnyPlaying(IPreviewTrackOwner source)
         {
-            if (CurrentTrack == null || CurrentTrack.Owner != source)
+            if (CurrentTrack == null || (CurrentTrack.Owner != null && CurrentTrack.Owner != source))
                 return;
 
             CurrentTrack.Stop();
@@ -86,11 +91,12 @@ namespace osu.Game.Audio
         /// <summary>
         /// Creates the <see cref="TrackManagerPreviewTrack"/>.
         /// </summary>
-        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
+        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) =>
+            new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
         public class TrackManagerPreviewTrack : PreviewTrack
         {
-            [Resolved]
+            [Resolved(canBeNull: true)]
             public IPreviewTrackOwner Owner { get; private set; }
 
             private readonly BeatmapSetInfo beatmapSetInfo;
@@ -102,15 +108,23 @@ namespace osu.Game.Audio
                 this.trackManager = trackManager;
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Logger.Log($"A {nameof(PreviewTrack)} was created without a containing {nameof(IPreviewTrackOwner)}. An owner should be added for correct behaviour.");
+            }
+
             protected override Track GetTrack() => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3");
         }
 
         private class PreviewTrackStore : AudioCollectionManager<AdjustableAudioComponent>, ITrackStore
         {
+            private readonly AudioMixer defaultMixer;
             private readonly IResourceStore<byte[]> store;
 
-            internal PreviewTrackStore(IResourceStore<byte[]> store)
+            internal PreviewTrackStore(AudioMixer defaultMixer, IResourceStore<byte[]> store)
             {
+                this.defaultMixer = defaultMixer;
                 this.store = store;
             }
 
@@ -134,8 +148,12 @@ namespace osu.Game.Audio
                 if (dataStream == null)
                     return null;
 
+                // Todo: This is quite unsafe. TrackBass shouldn't be exposed as public.
                 Track track = new TrackBass(dataStream);
+
+                defaultMixer.Add(track);
                 AddItem(track);
+
                 return track;
             }
 

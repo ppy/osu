@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Chat.Selection
 {
     public class ChannelSelectionOverlay : WaveOverlayContainer
     {
-        public const float WIDTH_PADDING = 170;
+        public new const float WIDTH_PADDING = 170;
 
         private const float transition_duration = 500;
 
@@ -131,11 +131,7 @@ namespace osu.Game.Overlays.Chat.Selection
             {
                 sectionsFlow.ChildrenEnumerable = new[]
                 {
-                    new ChannelSection
-                    {
-                        Header = "All Channels",
-                        Channels = channels,
-                    },
+                    new ChannelSection { Channels = channels, },
                 };
 
                 foreach (ChannelSection s in sectionsFlow.Children)

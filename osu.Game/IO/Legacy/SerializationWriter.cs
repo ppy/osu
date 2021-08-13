@@ -18,8 +18,8 @@ namespace osu.Game.IO.Legacy
     /// handle null strings and simplify use with ISerializable. </summary>
     public class SerializationWriter : BinaryWriter
     {
-        public SerializationWriter(Stream s)
-            : base(s, Encoding.UTF8)
+        public SerializationWriter(Stream s, bool leaveOpen = false)
+            : base(s, Encoding.UTF8, leaveOpen)
         {
         }
 

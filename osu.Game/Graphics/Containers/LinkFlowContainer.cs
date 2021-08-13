@@ -7,7 +7,11 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Framework.Platform;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -21,6 +25,9 @@ namespace osu.Game.Graphics.Containers
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         public void AddLinks(string text, List<Link> links)
         {
@@ -38,7 +45,12 @@ namespace osu.Game.Graphics.Containers
             foreach (var link in links)
             {
                 AddText(text[previousLinkEnd..link.Index]);
-                AddLink(text.Substring(link.Index, link.Length), link.Action, link.Argument ?? link.Url);
+
+                string displayText = text.Substring(link.Index, link.Length);
+                string linkArgument = link.Argument;
+                string tooltip = displayText == link.Url ? null : link.Url;
+
+                AddLink(displayText, link.Action, linkArgument, tooltip);
                 previousLinkEnd = link.Index + link.Length;
             }
 
@@ -49,12 +61,20 @@ namespace osu.Game.Graphics.Containers
             createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.External, url), url);
 
         public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.Custom, null), tooltipText, action);
+            => createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.Custom, string.Empty), tooltipText, action);
 
         public void AddLink(string text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), new LinkDetails(action, argument), null);
+            => createLink(AddText(text, creationParameters), new LinkDetails(action, argument), tooltipText);
 
-        public void AddLink(IEnumerable<SpriteText> text, LinkAction action = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        public void AddLink(LocalisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        {
+            var spriteText = new OsuSpriteText { Text = text };
+
+            AddText(spriteText, creationParameters);
+            createLink(spriteText.Yield(), new LinkDetails(action, argument), tooltipText);
+        }
+
+        public void AddLink(IEnumerable<SpriteText> text, LinkAction action, string linkArgument, string tooltipText = null)
         {
             foreach (var t in text)
                 AddArbitraryDrawable(t);
@@ -75,8 +95,11 @@ namespace osu.Game.Graphics.Containers
                 {
                     if (action != null)
                         action();
-                    else
-                        game?.HandleLink(link);
+                    else if (game != null)
+                        game.HandleLink(link);
+                    // fallback to handle cases where OsuGame is not available, ie. tournament client.
+                    else if (link.Action == LinkAction.External)
+                        host.OpenUrlExternally(link.Argument);
                 },
             });
         }

@@ -4,9 +4,7 @@
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Models;
@@ -17,7 +15,7 @@ namespace osu.Game.Tournament.Components
     {
         public readonly TournamentTeam Team;
 
-        protected readonly Sprite Flag;
+        protected readonly Container Flag;
         protected readonly TournamentSpriteText AcronymText;
 
         [UsedImplicitly]
@@ -27,12 +25,7 @@ namespace osu.Game.Tournament.Components
         {
             Team = team;
 
-            Flag = new DrawableTeamFlag(team)
-            {
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit
-            };
-
+            Flag = new DrawableTeamFlag(team);
             AcronymText = new TournamentSpriteText
             {
                 Font = OsuFont.Torus.With(weight: FontWeight.Regular),

@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.Utils;
+using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public bool Dual;
         public readonly bool IsForCurrentRuleset;
 
+        private readonly int originalTargetColumns;
+
         // Internal for testing purposes
         internal FastRandom Random { get; private set; }
 
@@ -45,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             if (IsForCurrentRuleset)
             {
-                TargetColumns = (int)Math.Max(1, roundedCircleSize);
+                TargetColumns = GetColumnCountForNonConvert(beatmap.BeatmapInfo);
 
                 if (TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
                 {
@@ -65,23 +67,31 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 else
                     TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
             }
+
+            originalTargetColumns = TargetColumns;
+        }
+
+        public static int GetColumnCountForNonConvert(BeatmapInfo beatmap)
+        {
+            var roundedCircleSize = Math.Round(beatmap.BaseDifficulty.CircleSize);
+            return (int)Math.Max(1, roundedCircleSize);
         }
 
         public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
 
-        protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
+        protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
             int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new FastRandom(seed);
 
-            return base.ConvertBeatmap(original);
+            return base.ConvertBeatmap(original, cancellationToken);
         }
 
         protected override Beatmap<ManiaHitObject> CreateBeatmap()
         {
-            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns }, originalTargetColumns);
 
             if (Dual)
                 beatmap.Stages.Add(new StageDefinition { Columns = TargetColumns });
@@ -89,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             return beatmap;
         }
 
-        protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
+        protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
         {
             if (original is ManiaHitObject maniaOriginal)
             {
@@ -116,7 +126,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 prevNoteTimes.RemoveAt(0);
             prevNoteTimes.Add(newNoteTime);
 
-            density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
+            if (prevNoteTimes.Count >= 2)
+                density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
         }
 
         private double lastTime;
@@ -167,8 +178,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                     var positionData = original as IHasPosition;
 
-                    for (double time = original.StartTime; !Precision.DefinitelyBigger(time, generator.EndTime); time += generator.SegmentDuration)
+                    for (int i = 0; i <= generator.SpanCount; i++)
                     {
+                        double time = original.StartTime + generator.SegmentDuration * i;
+
                         recordNote(time, positionData?.Position ?? Vector2.Zero);
                         computeDensity(time);
                     }
@@ -178,7 +191,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 case IHasDuration endTimeData:
                 {
-                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
+                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
 
                     recordNote(endTimeData.EndTime, new Vector2(256, 192));
                     computeDensity(endTimeData.EndTime);

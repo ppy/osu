@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(border_thickness, (1 - TaikoHitObject.DEFAULT_STRONG_SIZE) / 2f),
+                    Size = new Vector2(border_thickness, (1 - TaikoStrongableHitObject.DEFAULT_STRONG_SIZE) / 2f),
                     Alpha = 0.1f
                 },
                 new CircularContainer
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(TaikoHitObject.DEFAULT_STRONG_SIZE),
+                    Size = new Vector2(TaikoStrongableHitObject.DEFAULT_STRONG_SIZE),
                     Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = border_thickness,
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(border_thickness, (1 - TaikoHitObject.DEFAULT_STRONG_SIZE) / 2f),
+                    Size = new Vector2(border_thickness, (1 - TaikoStrongableHitObject.DEFAULT_STRONG_SIZE) / 2f),
                     Alpha = 0.1f
                 },
             };

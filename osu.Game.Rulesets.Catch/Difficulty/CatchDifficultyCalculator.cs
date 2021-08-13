@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         private const double star_scaling_factor = 0.153;
 
-        protected override int SectionLength => 750;
-
         private float halfCatcherWidth;
 
         public CatchDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
@@ -69,7 +67,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap)
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) * 0.5f;
 
@@ -78,7 +76,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             return new Skill[]
             {
-                new Movement(halfCatcherWidth),
+                new Movement(mods, halfCatcherWidth, clockRate),
             };
         }
 

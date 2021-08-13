@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Ranking
                         scores.Download(Model.Value);
                         break;
 
-                    case DownloadState.Downloaded:
+                    case DownloadState.Importing:
                     case DownloadState.Downloading:
                         shakeContainer.Shake();
                         break;
@@ -74,23 +74,33 @@ namespace osu.Game.Screens.Ranking
             {
                 button.State.Value = state.NewValue;
 
-                switch (replayAvailability)
-                {
-                    case ReplayAvailability.Local:
-                        button.TooltipText = @"watch replay";
-                        break;
-
-                    case ReplayAvailability.Online:
-                        button.TooltipText = @"download replay";
-                        break;
-
-                    default:
-                        button.TooltipText = @"replay unavailable";
-                        break;
-                }
+                updateTooltip();
             }, true);
 
-            button.Enabled.Value = replayAvailability != ReplayAvailability.NotAvailable;
+            Model.BindValueChanged(_ =>
+            {
+                button.Enabled.Value = replayAvailability != ReplayAvailability.NotAvailable;
+
+                updateTooltip();
+            }, true);
+        }
+
+        private void updateTooltip()
+        {
+            switch (replayAvailability)
+            {
+                case ReplayAvailability.Local:
+                    button.TooltipText = @"watch replay";
+                    break;
+
+                case ReplayAvailability.Online:
+                    button.TooltipText = @"download replay";
+                    break;
+
+                default:
+                    button.TooltipText = @"replay unavailable";
+                    break;
+            }
         }
 
         private enum ReplayAvailability

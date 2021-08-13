@@ -23,7 +23,7 @@ namespace osu.Game.Utils
 
             var options = new SentryOptions
             {
-                Dsn = new Dsn("https://5e342cd55f294edebdc9ad604d28bbd3@sentry.io/1255255"),
+                Dsn = "https://5e342cd55f294edebdc9ad604d28bbd3@sentry.io/1255255",
                 Release = game.Version
             };
 
@@ -45,7 +45,7 @@ namespace osu.Game.Utils
 
                     // since we let unhandled exceptions go ignored at times, we want to ensure they don't get submitted on subsequent reports.
                     if (lastException != null &&
-                        lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace))
+                        lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace, StringComparison.Ordinal))
                         return;
 
                     lastException = exception;
@@ -85,11 +85,6 @@ namespace osu.Game.Utils
         }
 
         #region Disposal
-
-        ~SentryLogger()
-        {
-            Dispose(false);
-        }
 
         public void Dispose()
         {

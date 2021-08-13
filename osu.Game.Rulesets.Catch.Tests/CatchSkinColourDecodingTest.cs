@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.IO.Stores;
 using osu.Game.Rulesets.Catch.Skinning;
+using osu.Game.Rulesets.Catch.Skinning.Legacy;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 

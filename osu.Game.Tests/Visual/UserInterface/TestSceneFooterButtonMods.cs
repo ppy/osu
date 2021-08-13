@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             var multiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
             var expectedValue = multiplier.Equals(1.0) ? string.Empty : $"{multiplier:N2}x";
 
-            return expectedValue == footerButtonMods.MultiplierText.Text;
+            return expectedValue == footerButtonMods.MultiplierText.Current.Value;
         }
 
         private class TestFooterButtonMods : FooterButtonMods

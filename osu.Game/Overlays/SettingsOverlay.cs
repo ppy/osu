@@ -6,23 +6,31 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osuTK.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsOverlay : SettingsPanel
+    public class SettingsOverlay : SettingsPanel, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/settings";
+        public LocalisableString Title => SettingsStrings.HeaderTitle;
+        public LocalisableString Description => SettingsStrings.HeaderDescription;
+
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {
             new GeneralSection(),
             new GraphicsSection(),
-            new GameplaySection(),
             new AudioSection(),
-            new SkinSection(),
             new InputSection(createSubPanel(new KeyBindingPanel())),
+            new UserInterfaceSection(),
+            new GameplaySection(),
+            new SkinSection(),
             new OnlineSection(),
             new MaintenanceSection(),
             new DebugSection(),
@@ -30,7 +38,7 @@ namespace osu.Game.Overlays
 
         private readonly List<SettingsSubPanel> subPanels = new List<SettingsSubPanel>();
 
-        protected override Drawable CreateHeader() => new SettingsHeader("settings", "Change the way osu! behaves");
+        protected override Drawable CreateHeader() => new SettingsHeader(Title, Description);
         protected override Drawable CreateFooter() => new SettingsFooter();
 
         public SettingsOverlay()
@@ -57,7 +65,6 @@ namespace osu.Game.Overlays
             switch (state.NewValue)
             {
                 case Visibility.Visible:
-                    Background.FadeTo(0.9f, 300, Easing.OutQuint);
                     Sidebar?.FadeColour(Color4.DarkGray, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeOut(300, Easing.OutQuint);
@@ -65,7 +72,6 @@ namespace osu.Game.Overlays
                     break;
 
                 case Visibility.Hidden:
-                    Background.FadeTo(0.6f, 500, Easing.OutQuint);
                     Sidebar?.FadeColour(Color4.White, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeIn(500, Easing.OutQuint);

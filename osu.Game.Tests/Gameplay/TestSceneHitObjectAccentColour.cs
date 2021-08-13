@@ -81,8 +81,8 @@ namespace osu.Game.Tests.Gameplay
 
         private class TestHitObjectWithCombo : ConvertHitObject, IHasComboInformation
         {
-            public bool NewCombo { get; } = false;
-            public int ComboOffset { get; } = 0;
+            public bool NewCombo { get; set; }
+            public int ComboOffset => 0;
 
             public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
 
@@ -98,6 +98,14 @@ namespace osu.Game.Tests.Gameplay
             {
                 get => ComboIndexBindable.Value;
                 set => ComboIndexBindable.Value = value;
+            }
+
+            public Bindable<int> ComboIndexWithOffsetsBindable { get; } = new Bindable<int>();
+
+            public int ComboIndexWithOffsets
+            {
+                get => ComboIndexWithOffsetsBindable.Value;
+                set => ComboIndexWithOffsetsBindable.Value = value;
             }
 
             public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
@@ -121,20 +129,16 @@ namespace osu.Game.Tests.Gameplay
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {
                 switch (lookup)
                 {
-                    case GlobalSkinColours global:
-                        switch (global)
-                        {
-                            case GlobalSkinColours.ComboColours:
-                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(ComboColours));
-                        }
-
-                        break;
+                    case SkinComboColourLookup comboColour:
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(ComboColours[comboColour.ColourIndex % ComboColours.Count]));
                 }
 
                 throw new NotImplementedException();

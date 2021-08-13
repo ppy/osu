@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <summary>
         /// Creates a new <see cref="StatisticItem"/>, to be displayed inside a <see cref="StatisticRow"/> in the results screen.
         /// </summary>
-        /// <param name="name">The name of the item.</param>
+        /// <param name="name">The name of the item. Can be <see cref="string.Empty"/> to hide the item header.</param>
         /// <param name="content">The <see cref="Drawable"/> content to be displayed.</param>
         /// <param name="dimension">The <see cref="Dimension"/> of this item. This can be thought of as the column dimension of an encompassing <see cref="GridContainer"/>.</param>
         public StatisticItem([NotNull] string name, [NotNull] Drawable content, [CanBeNull] Dimension dimension = null)

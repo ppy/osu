@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 
 namespace osu.Game.Graphics.UserInterface
@@ -19,8 +20,13 @@ namespace osu.Game.Graphics.UserInterface
 
             if (stack.CurrentScreen != null)
                 onPushed(null, stack.CurrentScreen);
+        }
 
-            Current.ValueChanged += current => current.NewValue.MakeCurrent();
+        protected override void SelectTab(TabItem<IScreen> tab)
+        {
+            // override base method to prevent current item from being changed on click.
+            // depend on screen push/exit to change current item instead.
+            tab.Value.MakeCurrent();
         }
 
         private void onPushed(IScreen lastScreen, IScreen newScreen)

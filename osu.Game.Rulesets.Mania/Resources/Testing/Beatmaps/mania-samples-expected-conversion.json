@@ -6,10 +6,10 @@
       "EndTime": 1500.0,
       "Column": 0,
       "NodeSamples": [
-        ["normal-hitnormal"],
+        ["Gameplay/normal-hitnormal"],
         []
       ],
-      "Samples": ["normal-hitnormal"]
+      "Samples": ["Gameplay/normal-hitnormal"]
     }]
   }, {
     "StartTime": 2000.0,
@@ -18,10 +18,10 @@
       "EndTime": 3000.0,
       "Column": 2,
       "NodeSamples": [
-        ["drum-hitnormal"],
+        ["Gameplay/drum-hitnormal"],
         []
       ],
-      "Samples": ["drum-hitnormal"]
+      "Samples": ["Gameplay/drum-hitnormal"]
     }]
   }]
 }

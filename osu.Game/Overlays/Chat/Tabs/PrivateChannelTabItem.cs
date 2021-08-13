@@ -50,8 +50,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Masking = true,
                             Child = new DelayedLoadWrapper(avatar = new DrawableAvatar(value.Users.First())
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                OpenOnClick = { Value = false },
+                                RelativeSizeAxes = Axes.Both
                             })
                             {
                                 RelativeSizeAxes = Axes.Both,

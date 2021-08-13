@@ -19,7 +19,7 @@ namespace osu.Game.Configuration
         {
             base.InitialiseDefaults();
 
-            Set(StorageConfig.FullPath, string.Empty);
+            SetDefault(StorageConfig.FullPath, string.Empty);
         }
     }
 

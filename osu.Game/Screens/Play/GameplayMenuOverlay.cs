@@ -2,23 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Humanizer;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
-using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using Humanizer;
-using osu.Framework.Graphics.Effects;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -31,6 +32,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool BlockNonPositionalInput => true;
 
+        protected override bool BlockScrollInput => false;
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public Action OnRetry;
@@ -39,18 +42,18 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
         /// </summary>
-        protected virtual Action BackAction => () => InternalButtons.Children.LastOrDefault()?.Click();
+        protected virtual Action BackAction => () => InternalButtons.Children.LastOrDefault()?.TriggerClick();
 
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Select"/> is triggered.
         /// </summary>
-        protected virtual Action SelectAction => () => InternalButtons.Children.FirstOrDefault(f => f.Selected.Value)?.Click();
+        protected virtual Action SelectAction => () => InternalButtons.Selected?.TriggerClick();
 
         public abstract string Header { get; }
 
         public abstract string Description { get; }
 
-        protected internal FillFlowContainer<DialogButton> InternalButtons;
+        protected SelectionCycleFillFlowContainer<DialogButton> InternalButtons;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
         private FillFlowContainer retryCounterContainer;
@@ -58,8 +61,6 @@ namespace osu.Game.Screens.Play
         protected GameplayMenuOverlay()
         {
             RelativeSizeAxes = Axes.Both;
-
-            State.ValueChanged += s => selectionIndex = -1;
         }
 
         [BackgroundDependencyLoader]
@@ -114,7 +115,7 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        InternalButtons = new FillFlowContainer<DialogButton>
+                        InternalButtons = new SelectionCycleFillFlowContainer<DialogButton>
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
@@ -138,6 +139,8 @@ namespace osu.Game.Screens.Play
                     }
                 },
             };
+
+            State.ValueChanged += s => InternalButtons.Deselect();
 
             updateRetryCount();
         }
@@ -181,27 +184,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            button.Selected.ValueChanged += selected => buttonSelectionChanged(button, selected.NewValue);
-
             InternalButtons.Add(button);
-        }
-
-        private int selectionIndex = -1;
-
-        private void setSelected(int value)
-        {
-            if (selectionIndex == value)
-                return;
-
-            // Deselect the previously-selected button
-            if (selectionIndex != -1)
-                InternalButtons[selectionIndex].Selected.Value = false;
-
-            selectionIndex = value;
-
-            // Select the newly-selected button
-            if (selectionIndex != -1)
-                InternalButtons[selectionIndex].Selected.Value = true;
         }
 
         public bool OnPressed(GlobalAction action)
@@ -209,17 +192,11 @@ namespace osu.Game.Screens.Play
             switch (action)
             {
                 case GlobalAction.SelectPrevious:
-                    if (selectionIndex == -1 || selectionIndex == 0)
-                        setSelected(InternalButtons.Count - 1);
-                    else
-                        setSelected(selectionIndex - 1);
+                    InternalButtons.SelectPrevious();
                     return true;
 
                 case GlobalAction.SelectNext:
-                    if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
-                        setSelected(0);
-                    else
-                        setSelected(selectionIndex + 1);
+                    InternalButtons.SelectNext();
                     return true;
 
                 case GlobalAction.Back:
@@ -236,14 +213,6 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(GlobalAction action)
         {
-        }
-
-        private void buttonSelectionChanged(DialogButton button, bool isSelected)
-        {
-            if (!isSelected)
-                setSelected(-1);
-            else
-                setSelected(InternalButtons.IndexOf(button));
         }
 
         private void updateRetryCount()
@@ -284,7 +253,7 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                Selected.Value = true;
+                State = SelectionState.Selected;
                 return base.OnMouseMove(e);
             }
         }

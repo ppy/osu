@@ -4,14 +4,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
+using osu.Framework.Utils;
+using osu.Game.Screens.Edit;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
     [Serializable]
-    public class ControlPointInfo
+    public class ControlPointInfo : IDeepCloneable<ControlPointInfo>
     {
         /// <summary>
         /// All control points grouped by time.
@@ -41,9 +45,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// All sound points.
         /// </summary>
         [JsonProperty]
-        public IReadOnlyList<SampleControlPoint> SamplePoints => samplePoints;
+        public IBindableList<SampleControlPoint> SamplePoints => samplePoints;
 
-        private readonly SortedList<SampleControlPoint> samplePoints = new SortedList<SampleControlPoint>(Comparer<SampleControlPoint>.Default);
+        private readonly BindableList<SampleControlPoint> samplePoints = new BindableList<SampleControlPoint>();
 
         /// <summary>
         /// All effect points.
@@ -64,6 +68,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the difficulty control point at.</param>
         /// <returns>The difficulty control point.</returns>
+        [NotNull]
         public DifficultyControlPoint DifficultyPointAt(double time) => binarySearchWithFallback(DifficultyPoints, time, DifficultyControlPoint.DEFAULT);
 
         /// <summary>
@@ -71,6 +76,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the effect control point at.</param>
         /// <returns>The effect control point.</returns>
+        [NotNull]
         public EffectControlPoint EffectPointAt(double time) => binarySearchWithFallback(EffectPoints, time, EffectControlPoint.DEFAULT);
 
         /// <summary>
@@ -78,6 +84,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
+        [NotNull]
         public SampleControlPoint SamplePointAt(double time) => binarySearchWithFallback(SamplePoints, time, SamplePoints.Count > 0 ? SamplePoints[0] : SampleControlPoint.DEFAULT);
 
         /// <summary>
@@ -85,6 +92,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <returns>The timing control point.</returns>
+        [NotNull]
         public TimingControlPoint TimingPointAt(double time) => binarySearchWithFallback(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : TimingControlPoint.DEFAULT);
 
         /// <summary>
@@ -100,13 +108,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         [JsonIgnore]
         public double BPMMinimum =>
             60000 / (TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
-
-        /// <summary>
-        /// Finds the mode BPM (most common BPM) represented by the control points.
-        /// </summary>
-        [JsonIgnore]
-        public double BPMMode =>
-            60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
 
         /// <summary>
         /// Remove all <see cref="ControlPointGroup"/>s and return to a pristine state.
@@ -158,10 +159,65 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public void RemoveGroup(ControlPointGroup group)
         {
+            foreach (var item in group.ControlPoints.ToArray())
+                group.Remove(item);
+
             group.ItemAdded -= groupItemAdded;
             group.ItemRemoved -= groupItemRemoved;
 
             groups.Remove(group);
+        }
+
+        /// <summary>
+        /// Returns the time on the given beat divisor closest to the given time.
+        /// </summary>
+        /// <param name="time">The time to find the closest snapped time to.</param>
+        /// <param name="beatDivisor">The beat divisor to snap to.</param>
+        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
+        public double GetClosestSnappedTime(double time, int beatDivisor, double? referenceTime = null)
+        {
+            var timingPoint = TimingPointAt(referenceTime ?? time);
+            return getClosestSnappedTime(timingPoint, time, beatDivisor);
+        }
+
+        /// <summary>
+        /// Returns the time on *ANY* valid beat divisor, favouring the divisor closest to the given time.
+        /// </summary>
+        /// <param name="time">The time to find the closest snapped time to.</param>
+        public double GetClosestSnappedTime(double time) => GetClosestSnappedTime(time, GetClosestBeatDivisor(time));
+
+        /// <summary>
+        /// Returns the beat snap divisor closest to the given time. If two are equally close, the smallest divisor is returned.
+        /// </summary>
+        /// <param name="time">The time to find the closest beat snap divisor to.</param>
+        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
+        public int GetClosestBeatDivisor(double time, double? referenceTime = null)
+        {
+            TimingControlPoint timingPoint = TimingPointAt(referenceTime ?? time);
+
+            int closestDivisor = 0;
+            double closestTime = double.MaxValue;
+
+            foreach (int divisor in BindableBeatDivisor.VALID_DIVISORS)
+            {
+                double distanceFromSnap = Math.Abs(time - getClosestSnappedTime(timingPoint, time, divisor));
+
+                if (Precision.DefinitelyBigger(closestTime, distanceFromSnap))
+                {
+                    closestDivisor = divisor;
+                    closestTime = distanceFromSnap;
+                }
+            }
+
+            return closestDivisor;
+        }
+
+        private static double getClosestSnappedTime(TimingControlPoint timingPoint, double time, int beatDivisor)
+        {
+            var beatLength = timingPoint.BeatLength / beatDivisor;
+            var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
+
+            return timingPoint.Time + beatLengths * beatLength;
         }
 
         /// <summary>
@@ -293,6 +349,16 @@ namespace osu.Game.Beatmaps.ControlPoints
                     difficultyPoints.Remove(typed);
                     break;
             }
+        }
+
+        public ControlPointInfo DeepClone()
+        {
+            var controlPointInfo = new ControlPointInfo();
+
+            foreach (var point in AllControlPoints)
+                controlPointInfo.Add(point.Time, point.DeepClone());
+
+            return controlPointInfo;
         }
     }
 }

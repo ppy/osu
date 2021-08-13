@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
@@ -30,18 +31,22 @@ namespace osu.Game.Tests.Beatmaps
             using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
+
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
 
-                var working = new TestWorkingBeatmap(decoder.Decode(stream));
-                working.BeatmapInfo.Ruleset = CreateRuleset().RulesetInfo;
-
-                return working;
+                return new TestWorkingBeatmap(decoder.Decode(stream))
+                {
+                    BeatmapInfo =
+                    {
+                        Ruleset = CreateRuleset().RulesetInfo
+                    }
+                };
             }
         }
 
         private Stream openResource(string name)
         {
-            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
+            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path)).AsNonNull();
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 

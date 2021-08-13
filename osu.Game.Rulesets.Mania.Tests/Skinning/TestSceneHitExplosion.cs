@@ -1,23 +1,27 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Framework.Graphics.Pooling;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Skinning;
+using osu.Game.Rulesets.Objects;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
     [TestFixture]
     public class TestSceneHitExplosion : ManiaSkinnableTestScene
     {
+        private readonly List<DrawablePool<PoolableHitExplosion>> hitExplosionPools = new List<DrawablePool<PoolableHitExplosion>>();
+
         public TestSceneHitExplosion()
         {
             int runcount = 0;
@@ -29,28 +33,40 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                 if (runcount % 15 > 12)
                     return;
 
-                CreatedDrawables.OfType<Container>().ForEach(c =>
+                int poolIndex = 0;
+
+                foreach (var c in CreatedDrawables.OfType<Container>())
                 {
-                    c.Add(new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion, 0),
-                        _ => new DefaultHitExplosion((runcount / 15) % 2 == 0 ? new Color4(94, 0, 57, 255) : new Color4(6, 84, 0, 255), runcount % 6 != 0)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }));
-                });
+                    c.Add(hitExplosionPools[poolIndex].Get(e =>
+                    {
+                        e.Apply(new JudgementResult(new HitObject(), runcount % 6 == 0 ? new HoldNoteTickJudgement() : new ManiaJudgement()));
+
+                        e.Anchor = Anchor.Centre;
+                        e.Origin = Anchor.Centre;
+                    }));
+
+                    poolIndex++;
+                }
             }, 100);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            SetContents(() => new ColumnTestContainer(0, ManiaAction.Key1)
+            SetContents(_ =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativePositionAxes = Axes.Y,
-                Y = -0.25f,
-                Size = new Vector2(Column.COLUMN_WIDTH, DefaultNotePiece.NOTE_HEIGHT),
+                var pool = new DrawablePool<PoolableHitExplosion>(5);
+                hitExplosionPools.Add(pool);
+
+                return new ColumnTestContainer(0, ManiaAction.Key1)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativePositionAxes = Axes.Y,
+                    Y = -0.25f,
+                    Size = new Vector2(Column.COLUMN_WIDTH, DefaultNotePiece.NOTE_HEIGHT),
+                    Child = pool
+                };
             });
         }
     }

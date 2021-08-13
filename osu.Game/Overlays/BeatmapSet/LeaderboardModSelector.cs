@@ -26,12 +26,14 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public LeaderboardModSelector()
         {
-            AutoSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
             InternalChild = modsContainer = new FillFlowContainer<ModButton>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AutoSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Full,
                 Spacing = new Vector2(4),
             };
@@ -52,9 +54,14 @@ namespace osu.Game.Overlays.BeatmapSet
                 return;
 
             modsContainer.Add(new ModButton(new ModNoMod()));
-            modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
+            modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllMods().Where(m => m.UserPlayable).Select(m => new ModButton(m)));
 
-            modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
+            modsContainer.ForEach(button =>
+            {
+                button.Anchor = Anchor.TopCentre;
+                button.Origin = Anchor.TopCentre;
+                button.OnSelectionChanged = selectionChanged;
+            });
         }
 
         protected override bool OnHover(HoverEvent e)

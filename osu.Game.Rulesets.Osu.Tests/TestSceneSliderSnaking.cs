@@ -19,10 +19,9 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Storyboards;
 using osuTK;
-using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -32,23 +31,19 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private AudioManager audioManager { get; set; }
 
-        private TrackVirtualManual track;
-
         protected override bool Autoplay => autoplay;
         private bool autoplay;
 
         private readonly BindableBool snakingIn = new BindableBool();
         private readonly BindableBool snakingOut = new BindableBool();
 
+        private IBeatmap beatmap;
+
         private const double duration_of_span = 3605;
         private const double fade_in_modifier = -1200;
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
-        {
-            var working = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
-            track = (TrackVirtualManual)working.Track;
-            return working;
-        }
+            => new ClockBackedTestWorkingBeatmap(this.beatmap = beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
 
         [BackgroundDependencyLoader]
         private void load(RulesetConfigCache configCache)
@@ -58,7 +53,15 @@ namespace osu.Game.Rulesets.Osu.Tests
             config.BindWith(OsuRulesetSetting.SnakingOutSliders, snakingOut);
         }
 
-        private DrawableSlider slider;
+        private Slider slider;
+        private DrawableSlider drawableSlider;
+
+        [SetUp]
+        public void Setup() => Schedule(() =>
+        {
+            slider = null;
+            drawableSlider = null;
+        });
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -72,22 +75,21 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("enable autoplay", () => autoplay = true);
             base.SetUpSteps();
-            AddUntilStep("wait for track to start running", () => track.IsRunning);
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
 
-            double startTime = hitObjects[sliderIndex].StartTime;
-            retrieveDrawableSlider(sliderIndex);
+            retrieveSlider(sliderIndex);
             setSnaking(true);
 
-            ensureSnakingIn(startTime + fade_in_modifier);
+            addEnsureSnakingInSteps(() => slider.StartTime + fade_in_modifier);
 
             for (int i = 0; i < sliderIndex; i++)
             {
                 // non-final repeats should not snake out
-                ensureNoSnakingOut(startTime, i);
+                addEnsureNoSnakingOutStep(() => slider.StartTime, i);
             }
 
             // final repeat should snake out
-            ensureSnakingOut(startTime, sliderIndex);
+            addEnsureSnakingOutSteps(() => slider.StartTime, sliderIndex);
         }
 
         [TestCase(0)]
@@ -97,18 +99,17 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("have autoplay", () => autoplay = true);
             base.SetUpSteps();
-            AddUntilStep("wait for track to start running", () => track.IsRunning);
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
 
-            double startTime = hitObjects[sliderIndex].StartTime;
-            retrieveDrawableSlider(sliderIndex);
+            retrieveSlider(sliderIndex);
             setSnaking(false);
 
-            ensureNoSnakingIn(startTime + fade_in_modifier);
+            addEnsureNoSnakingInSteps(() => slider.StartTime + fade_in_modifier);
 
             for (int i = 0; i <= sliderIndex; i++)
             {
                 // no snaking out ever, including final repeat
-                ensureNoSnakingOut(startTime, i);
+                addEnsureNoSnakingOutStep(() => slider.StartTime, i);
             }
         }
 
@@ -121,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             // repeat might have a chance to update its position depending on where in the frame its hit,
             // so some leniency is allowed here instead of checking strict equality
-            checkPositionChange(16600, sliderRepeat, positionAlmostSame);
+            addCheckPositionChangeSteps(() => 16600, getSliderRepeat, positionAlmostSame);
         }
 
         [Test]
@@ -131,39 +132,41 @@ namespace osu.Game.Rulesets.Osu.Tests
             setSnaking(true);
             base.SetUpSteps();
 
-            checkPositionChange(16600, sliderRepeat, positionDecreased);
+            addCheckPositionChangeSteps(() => 16600, getSliderRepeat, positionDecreased);
         }
 
-        private void retrieveDrawableSlider(int index) =>
-            AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
-                slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(index));
-
-        private void ensureSnakingIn(double startTime) => checkPositionChange(startTime, sliderEnd, positionIncreased);
-        private void ensureNoSnakingIn(double startTime) => checkPositionChange(startTime, sliderEnd, positionRemainsSame);
-
-        private void ensureSnakingOut(double startTime, int repeatIndex)
+        private void retrieveSlider(int index)
         {
-            var repeatTime = timeAtRepeat(startTime, repeatIndex);
+            AddStep("retrieve slider at index", () => slider = (Slider)beatmap.HitObjects[index]);
+            addSeekStep(() => slider);
+            AddUntilStep("retrieve drawable slider", () =>
+                (drawableSlider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.SingleOrDefault(d => d.HitObject == slider)) != null);
+        }
 
+        private void addEnsureSnakingInSteps(Func<double> startTime) => addCheckPositionChangeSteps(startTime, getSliderEnd, positionIncreased);
+        private void addEnsureNoSnakingInSteps(Func<double> startTime) => addCheckPositionChangeSteps(startTime, getSliderEnd, positionRemainsSame);
+
+        private void addEnsureSnakingOutSteps(Func<double> startTime, int repeatIndex)
+        {
             if (repeatIndex % 2 == 0)
-                checkPositionChange(repeatTime, sliderStart, positionIncreased);
+                addCheckPositionChangeSteps(timeAtRepeat(startTime, repeatIndex), getSliderStart, positionIncreased);
             else
-                checkPositionChange(repeatTime, sliderEnd, positionDecreased);
+                addCheckPositionChangeSteps(timeAtRepeat(startTime, repeatIndex), getSliderEnd, positionDecreased);
         }
 
-        private void ensureNoSnakingOut(double startTime, int repeatIndex) =>
-            checkPositionChange(timeAtRepeat(startTime, repeatIndex), positionAtRepeat(repeatIndex), positionRemainsSame);
+        private void addEnsureNoSnakingOutStep(Func<double> startTime, int repeatIndex)
+            => addCheckPositionChangeSteps(timeAtRepeat(startTime, repeatIndex), positionAtRepeat(repeatIndex), positionRemainsSame);
 
-        private double timeAtRepeat(double startTime, int repeatIndex) => startTime + 100 + duration_of_span * repeatIndex;
-        private Func<Vector2> positionAtRepeat(int repeatIndex) => repeatIndex % 2 == 0 ? (Func<Vector2>)sliderStart : sliderEnd;
+        private Func<double> timeAtRepeat(Func<double> startTime, int repeatIndex) => () => startTime() + 100 + duration_of_span * repeatIndex;
+        private Func<Vector2> positionAtRepeat(int repeatIndex) => repeatIndex % 2 == 0 ? (Func<Vector2>)getSliderStart : getSliderEnd;
 
-        private List<Vector2> sliderCurve => ((PlaySliderBody)slider.Body.Drawable).CurrentCurve;
-        private Vector2 sliderStart() => sliderCurve.First();
-        private Vector2 sliderEnd() => sliderCurve.Last();
+        private List<Vector2> getSliderCurve() => ((PlaySliderBody)drawableSlider.Body.Drawable).CurrentCurve;
+        private Vector2 getSliderStart() => getSliderCurve().First();
+        private Vector2 getSliderEnd() => getSliderCurve().Last();
 
-        private Vector2 sliderRepeat()
+        private Vector2 getSliderRepeat()
         {
-            var drawable = Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(1);
+            var drawable = Player.DrawableRuleset.Playfield.AllHitObjects.SingleOrDefault(d => d.HitObject == beatmap.HitObjects[1]);
             var repeat = drawable.ChildrenOfType<Container<DrawableSliderRepeat>>().First().Children.First();
             return repeat.Position;
         }
@@ -173,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private bool positionDecreased(Vector2 previous, Vector2 current) => current.X < previous.X && current.Y < previous.Y;
         private bool positionAlmostSame(Vector2 previous, Vector2 current) => Precision.AlmostEquals(previous, current, 1);
 
-        private void checkPositionChange(double startTime, Func<Vector2> positionToCheck, Func<Vector2, Vector2, bool> positionAssertion)
+        private void addCheckPositionChangeSteps(Func<double> startTime, Func<Vector2> positionToCheck, Func<Vector2, Vector2, bool> positionAssertion)
         {
             Vector2 previousPosition = Vector2.Zero;
 
@@ -182,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addSeekStep(startTime);
             AddStep($"save {positionDescription} position", () => previousPosition = positionToCheck.Invoke());
-            addSeekStep(startTime + 100);
+            addSeekStep(() => startTime() + 100);
             AddAssert($"{positionDescription} {assertionDescription}", () =>
             {
                 var currentPosition = positionToCheck.Invoke();
@@ -199,19 +202,21 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        private void addSeekStep(double time)
+        private void addSeekStep(Func<Slider> slider)
         {
-            AddStep($"seek to {time}", () => track.Seek(time));
-
-            AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
+            AddStep("seek to slider", () => Player.GameplayClockContainer.Seek(slider().StartTime));
+            AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(slider().StartTime, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
         }
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap
+        private void addSeekStep(Func<double> time)
         {
-            HitObjects = hitObjects
-        };
+            AddStep("seek to time", () => Player.GameplayClockContainer.Seek(time()));
+            AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time(), Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
+        }
 
-        private readonly List<HitObject> hitObjects = new List<HitObject>
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap { HitObjects = createHitObjects() };
+
+        private static List<HitObject> createHitObjects() => new List<HitObject>
         {
             new Slider
             {

@@ -14,10 +14,10 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
     {
         private readonly HitPiece piece;
 
-        private static Hit hit;
+        public new Hit HitObject => (Hit)base.HitObject;
 
         public HitPlacementBlueprint()
-            : base(hit = new Hit())
+            : base(new Hit())
         {
             InternalChild = piece = new HitPiece
             {
@@ -30,12 +30,12 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
             switch (e.Button)
             {
                 case MouseButton.Left:
-                    hit.Type = HitType.Centre;
+                    HitObject.Type = HitType.Centre;
                     EndPlacement(true);
                     return true;
 
                 case MouseButton.Right:
-                    hit.Type = HitType.Rim;
+                    HitObject.Type = HitType.Rim;
                     EndPlacement(true);
                     return true;
             }
@@ -43,10 +43,10 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
             return false;
         }
 
-        public override void UpdatePosition(SnapResult result)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
             piece.Position = ToLocalSpace(result.ScreenSpacePosition);
-            base.UpdatePosition(result);
+            base.UpdateTimeAndPosition(result);
         }
     }
 }

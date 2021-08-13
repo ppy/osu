@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Screens.Play;
 
@@ -77,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 lastObjectHit = true;
             }
 
-            if (!result.Judgement.AffectsCombo)
+            if (!result.Type.AffectsCombo())
                 return;
 
             lastObjectHit = result.IsHit;
@@ -115,7 +116,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         private bool triggerComboClear(JudgementResult judgementResult)
-            => (judgementResult.ComboAtJudgement + 1) % 50 == 0 && judgementResult.Judgement.AffectsCombo && judgementResult.IsHit;
+            => (judgementResult.ComboAtJudgement + 1) % 50 == 0 && judgementResult.Type.AffectsCombo() && judgementResult.IsHit;
 
         private bool triggerSwellClear(JudgementResult judgementResult)
             => judgementResult.Judgement is TaikoSwellJudgement && judgementResult.IsHit;

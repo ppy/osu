@@ -59,12 +59,13 @@ namespace osu.Game.Online.Chat
                     RelativeSizeAxes = Axes.X,
                     Height = textbox_height,
                     PlaceholderText = "type your message",
-                    OnCommit = postMessage,
                     ReleaseFocusOnCommit = false,
                     HoldFocus = true,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                 });
+
+                textbox.OnCommit += postMessage;
             }
 
             Channel.BindValueChanged(channelChanged);

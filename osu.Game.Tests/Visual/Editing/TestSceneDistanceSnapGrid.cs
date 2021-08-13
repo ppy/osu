@@ -153,6 +153,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         private class SnapProvider : IPositionSnapProvider
         {
+            public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+                new SnapResult(screenSpacePosition, null);
+
             public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
 
             public float GetBeatSnapDistanceAt(double referenceTime) => 10;

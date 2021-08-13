@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
@@ -28,13 +29,8 @@ namespace osu.Game.Tests.Visual.Ranking
     [TestFixture]
     public class TestSceneResultsScreen : OsuManualInputManagerTestScene
     {
-        private BeatmapManager beatmaps;
-
-        [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps)
-        {
-            this.beatmaps = beatmaps;
-        }
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         protected override void LoadComplete()
         {
@@ -44,10 +40,6 @@ namespace osu.Game.Tests.Visual.Ranking
             if (beatmapInfo != null)
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
         }
-
-        private TestResultsScreen createResultsScreen() => new TestResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo));
-
-        private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo));
 
         [Test]
         public void TestResultsWithoutPlayer()
@@ -68,12 +60,25 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("retry overlay not present", () => screen.RetryOverlay == null);
         }
 
-        [Test]
-        public void TestResultsWithPlayer()
+        [TestCase(0.2, ScoreRank.D)]
+        [TestCase(0.5, ScoreRank.D)]
+        [TestCase(0.75, ScoreRank.C)]
+        [TestCase(0.85, ScoreRank.B)]
+        [TestCase(0.925, ScoreRank.A)]
+        [TestCase(0.975, ScoreRank.S)]
+        [TestCase(0.9999, ScoreRank.S)]
+        [TestCase(1, ScoreRank.X)]
+        public void TestResultsWithPlayer(double accuracy, ScoreRank rank)
         {
             TestResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo)
+            {
+                Accuracy = accuracy,
+                Rank = rank
+            };
+
+            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen(score)));
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay present", () => screen.RetryOverlay != null);
         }
@@ -212,6 +217,29 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("expanded panel still on screen", () => this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded).ScreenSpaceDrawQuad.TopLeft.X > 0);
         }
 
+        [Test]
+        public void TestDownloadButtonInitiallyDisabled()
+        {
+            TestResultsScreen screen = null;
+
+            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+
+            AddAssert("download button is disabled", () => !screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
+
+            AddStep("click contracted panel", () =>
+            {
+                var contractedPanel = this.ChildrenOfType<ScorePanel>().First(p => p.State == PanelState.Contracted && p.ScreenSpaceDrawQuad.TopLeft.X > screen.ScreenSpaceDrawQuad.TopLeft.X);
+                InputManager.MoveMouseTo(contractedPanel);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("download button is enabled", () => screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
+        }
+
+        private TestResultsScreen createResultsScreen(ScoreInfo score = null) => new TestResultsScreen(score ?? new TestScoreInfo(new OsuRuleset().RulesetInfo));
+
+        private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo));
+
         private class TestResultsContainer : Container
         {
             [Cached(typeof(Player))]
@@ -236,7 +264,7 @@ namespace osu.Game.Tests.Visual.Ranking
             public HotkeyRetryOverlay RetryOverlay;
 
             public TestResultsScreen(ScoreInfo score)
-                : base(score)
+                : base(score, true)
             {
             }
 
@@ -255,6 +283,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     var score = new TestScoreInfo(new OsuRuleset().RulesetInfo);
                     score.TotalScore += 10 - i;
+                    score.Hash = $"test{i}";
                     scores.Add(score);
                 }
 
@@ -305,7 +334,7 @@ namespace osu.Game.Tests.Visual.Ranking
             public HotkeyRetryOverlay RetryOverlay;
 
             public UnrankedSoloResultsScreen(ScoreInfo score)
-                : base(score)
+                : base(score, true)
             {
                 Score.Beatmap.OnlineBeatmapID = 0;
                 Score.Beatmap.Status = BeatmapSetOnlineStatus.Pending;

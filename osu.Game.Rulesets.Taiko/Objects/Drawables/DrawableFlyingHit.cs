@@ -27,5 +27,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.LoadComplete();
             ApplyResult(r => r.Type = r.Judgement.MaxResult);
         }
+
+        protected override void LoadSamples()
+        {
+            // block base call - flying hits are not supposed to play samples
+            // the base call could overwrite the type of this hit
+        }
     }
 }

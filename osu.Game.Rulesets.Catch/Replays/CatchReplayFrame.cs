@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 if (Position > lastCatchFrame.Position)
                     lastCatchFrame.Actions.Add(CatchAction.MoveRight);
                 else if (Position < lastCatchFrame.Position)
-                    Actions.Add(CatchAction.MoveLeft);
+                    lastCatchFrame.Actions.Add(CatchAction.MoveLeft);
             }
         }
 

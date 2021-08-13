@@ -5,6 +5,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSpinnerBonusTick : DrawableSpinnerTick
     {
+        public DrawableSpinnerBonusTick()
+            : base(null)
+        {
+        }
+
         public DrawableSpinnerBonusTick(SpinnerBonusTick spinnerTick)
             : base(spinnerTick)
         {

@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class DrumRoll : TaikoHitObject, IHasPath
+    public class DrumRoll : TaikoStrongableHitObject, IHasPath
     {
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
@@ -108,6 +108,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
+
+        public class StrongNestedHit : StrongNestedHitObject
+        {
+        }
 
         #region LegacyBeatmapEncoder
 

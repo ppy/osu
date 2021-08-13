@@ -21,14 +21,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         /// <param name="column">The 0-based column index.</param>
         /// <returns>Whether the column is a special column.</returns>
-        public bool IsSpecialColumn(int column) => Columns % 2 == 1 && column == Columns / 2;
+        public readonly bool IsSpecialColumn(int column) => Columns % 2 == 1 && column == Columns / 2;
 
         /// <summary>
         /// Get the type of column given a column index.
         /// </summary>
         /// <param name="column">The 0-based column index.</param>
         /// <returns>The type of the column.</returns>
-        public ColumnType GetTypeOfColumn(int column)
+        public readonly ColumnType GetTypeOfColumn(int column)
         {
             if (IsSpecialColumn(column))
                 return ColumnType.Special;

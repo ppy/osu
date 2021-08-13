@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -13,6 +14,8 @@ namespace osu.Game.Tests.Visual.SongSelect
     public class TestSceneBeatmapDetails : OsuTestScene
     {
         private BeatmapDetails details;
+
+        private DummyAPIAccess api => (DummyAPIAccess)API;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -36,7 +39,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Version = "All Metrics",
                 Metadata = new BeatmapMetadata
                 {
-                    Source = "osu!lazer",
+                    Source = "osu!",
                     Tags = "this beatmap has all the metrics",
                 },
                 BaseDifficulty = new BeatmapDifficulty
@@ -97,7 +100,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Version = "Only Ratings",
                 Metadata = new BeatmapMetadata
                 {
-                    Source = "osu!lazer",
+                    Source = "osu!",
                     Tags = "this beatmap has ratings metrics but not retries or fails",
                 },
                 BaseDifficulty = new BeatmapDifficulty
@@ -119,7 +122,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Version = "Only Retries and Fails",
                 Metadata = new BeatmapMetadata
                 {
-                    Source = "osu!lazer",
+                    Source = "osu!",
                     Tags = "this beatmap has retries and fails but no ratings",
                 },
                 BaseDifficulty = new BeatmapDifficulty
@@ -146,7 +149,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Version = "No Metrics",
                 Metadata = new BeatmapMetadata
                 {
-                    Source = "osu!lazer",
+                    Source = "osu!",
                     Tags = "this beatmap has no metrics",
                 },
                 BaseDifficulty = new BeatmapDifficulty
@@ -173,6 +176,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 OnlineBeatmapID = 162,
             });
+            AddStep("set online", () => api.SetState(APIState.Online));
+            AddStep("set offline", () => api.SetState(APIState.Offline));
         }
     }
 }

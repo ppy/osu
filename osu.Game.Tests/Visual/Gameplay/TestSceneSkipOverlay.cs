@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -32,7 +30,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             requestCount = 0;
             increment = skip_time;
 
-            Child = gameplayClockContainer = new GameplayClockContainer(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), Array.Empty<Mod>(), 0)
+            var working = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
+            working.LoadTrack();
+
+            Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0)
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -79,7 +80,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
             AddStep("click", () =>
             {
-                increment = skip_time - gameplayClock.CurrentTime - GameplayClockContainer.MINIMUM_SKIP_TIME / 2;
+                increment = skip_time - gameplayClock.CurrentTime - MasterGameplayClockContainer.MINIMUM_SKIP_TIME / 2;
                 InputManager.Click(MouseButton.Left);
             });
             AddStep("click", () => InputManager.Click(MouseButton.Left));

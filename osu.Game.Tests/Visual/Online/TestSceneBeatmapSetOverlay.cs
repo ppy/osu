@@ -231,8 +231,19 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
-            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.Picker.Difficulties.All(b => b.Beatmap.Ruleset.Equals(overlay.Header.RulesetSelector.Current.Value)));
-            AddAssert("left-most beatmap selected", () => overlay.Header.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
+            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.Equals(overlay.Header.RulesetSelector.Current.Value)));
+            AddAssert("left-most beatmap selected", () => overlay.Header.HeaderContent.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
+        }
+
+        [Test]
+        public void TestExplicitBeatmap()
+        {
+            AddStep("show explicit map", () =>
+            {
+                var beatmapSet = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+                beatmapSet.OnlineInfo.HasExplicitContent = true;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
         }
 
         [Test]
@@ -299,12 +310,12 @@ namespace osu.Game.Tests.Visual.Online
 
         private void downloadAssert(bool shown)
         {
-            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.DownloadButtonsVisible == shown);
+            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.HeaderContent.DownloadButtonsVisible == shown);
         }
 
         private class TestBeatmapSetOverlay : BeatmapSetOverlay
         {
-            public new Header Header => base.Header;
+            public new BeatmapSetHeader Header => base.Header;
         }
     }
 }

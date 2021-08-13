@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -24,7 +26,10 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int RepeatCount { get; set; }
 
+        [JsonIgnore]
         public double Velocity { get; private set; }
+
+        [JsonIgnore]
         public double TickDistance { get; private set; }
 
         /// <summary>
@@ -49,13 +54,9 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             base.CreateNestedHitObjects(cancellationToken);
 
-            var dropletSamples = Samples.Select(s => new HitSampleInfo
-            {
-                Bank = s.Bank,
-                Name = @"slidertick",
-                Volume = s.Volume
-            }).ToList();
+            var dropletSamples = Samples.Select(s => s.With(@"slidertick")).ToList();
 
+            int nodeIndex = 0;
             SliderEventDescriptor? lastEvent = null;
 
             foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
@@ -78,7 +79,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                             AddNested(new TinyDroplet
                             {
                                 StartTime = t + lastEvent.Value.Time,
-                                X = X + Path.PositionAt(
+                                X = OriginalX + Path.PositionAt(
                                     lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X,
                             });
                         }
@@ -96,7 +97,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = dropletSamples,
                             StartTime = e.Time,
-                            X = X + Path.PositionAt(e.PathProgress).X,
+                            X = OriginalX + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
 
@@ -105,21 +106,22 @@ namespace osu.Game.Rulesets.Catch.Objects
                     case SliderEventType.Repeat:
                         AddNested(new Fruit
                         {
-                            Samples = Samples,
+                            Samples = this.GetNodeSamples(nodeIndex++),
                             StartTime = e.Time,
-                            X = X + Path.PositionAt(e.PathProgress).X,
+                            X = OriginalX + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
                 }
             }
         }
 
-        public float EndX => X + this.CurvePositionAt(1).X;
+        public float EndX => OriginalX + this.CurvePositionAt(1).X;
 
+        [JsonIgnore]
         public double Duration
         {
             get => this.SpanCount() * Path.Distance / Velocity;
-            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+            set => throw new NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
 
         public double EndTime => StartTime + Duration;

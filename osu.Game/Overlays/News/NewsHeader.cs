@@ -1,34 +1,46 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using System;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.News
 {
     public class NewsHeader : BreadcrumbControlOverlayHeader
     {
-        private const string front_page_string = "frontpage";
-
-        public readonly Bindable<string> Post = new Bindable<string>(null);
+        public static LocalisableString FrontPageString => NewsStrings.IndexTitleInfo;
 
         public Action ShowFrontPage;
 
+        private readonly Bindable<string> article = new Bindable<string>();
+
         public NewsHeader()
         {
-            TabControl.AddItem(front_page_string);
+            TabControl.AddItem(FrontPageString);
 
-            Current.ValueChanged += e =>
-            {
-                if (e.NewValue == front_page_string)
-                    ShowFrontPage?.Invoke();
-            };
-
-            Post.ValueChanged += showPost;
+            article.BindValueChanged(onArticleChanged, true);
         }
 
-        private void showPost(ValueChangedEvent<string> e)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(e =>
+            {
+                if (e.NewValue == FrontPageString)
+                    ShowFrontPage?.Invoke();
+            });
+        }
+
+        public void SetFrontPage() => article.Value = null;
+
+        public void SetArticle(string slug) => article.Value = slug;
+
+        private void onArticleChanged(ValueChangedEvent<string> e)
         {
             if (e.OldValue != null)
                 TabControl.RemoveItem(e.OldValue);
@@ -40,7 +52,7 @@ namespace osu.Game.Overlays.News
             }
             else
             {
-                Current.Value = front_page_string;
+                Current.Value = FrontPageString;
             }
         }
 
@@ -52,8 +64,9 @@ namespace osu.Game.Overlays.News
         {
             public NewsHeaderTitle()
             {
-                Title = "news";
-                IconTexture = "Icons/news";
+                Title = PageTitleStrings.MainNewsControllerDefault;
+                Description = NamedOverlayComponentStrings.NewsDescription;
+                IconTexture = "Icons/Hexacons/news";
             }
         }
     }
