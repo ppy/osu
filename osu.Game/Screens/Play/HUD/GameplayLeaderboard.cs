@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Play.HUD
                     c.Colour = Color4.Transparent;
                 else
                 {
-                    if (bottomY - fadeBottom > 0 && requiresScroll)
+                    if (requireBottomFade)
                     {
                         c.Colour = ColourInfo.GradientVertical(
                             Color4.White.Opacity(Math.Min(1 - (topY - fadeBottom) / panel_height, 1)),
