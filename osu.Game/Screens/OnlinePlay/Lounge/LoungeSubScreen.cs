@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -67,6 +68,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private RoomsContainer roomsContainer;
         private SearchTextBox searchTextBox;
         private Dropdown<RoomStatusFilter> statusDropdown;
+
+        [CanBeNull]
+        private LeasedBindable<Room> selectionLease;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -239,6 +243,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             base.OnResuming(last);
 
+            Debug.Assert(selectionLease != null);
+
+            selectionLease.Return();
+            selectionLease = null;
+
             if (selectedRoom.Value?.RoomID.Value == null)
                 selectedRoom.Value = new Room();
 
@@ -311,7 +320,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected virtual void OpenNewRoom(Room room)
         {
-            selectedRoom.Value = room;
+            selectionLease = selectedRoom.BeginLease(false);
+            Debug.Assert(selectionLease != null);
+            selectionLease.Value = room;
 
             this.Push(CreateRoomSubScreen(room));
         }
