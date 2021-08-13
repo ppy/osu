@@ -149,6 +149,7 @@ namespace osu.Game.Tests.Visual.Online
                 }
             },
             IncludedComments = new List<Comment>(),
+            PinnedComments = new List<Comment>(),
             UserVotes = new List<long>
             {
                 5
@@ -178,6 +179,7 @@ namespace osu.Game.Tests.Visual.Online
                 },
             },
             IncludedComments = new List<Comment>(),
+            PinnedComments = new List<Comment>(),
         };
 
         private class TestCommentsContainer : CommentsContainer
