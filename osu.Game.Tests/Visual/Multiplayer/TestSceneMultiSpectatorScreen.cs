@@ -93,10 +93,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("all player loader settings hidden", () => this.ChildrenOfType<PlayerLoader>().All(l => !l.ChildrenOfType<FillFlowContainer<PlayerSettingsGroup>>().Any()));
 
             AddUntilStep("wait for players to load", () => spectatorScreen.AllPlayersLoaded);
-            AddUntilStep("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
+
+            // components wrapped in skinnable target containers load asynchronously, potentially taking more than one frame to load.
+            // wait once to properly execute the assert.
+            AddWaitStep("wait for async load", 1);
+
+            AddAssert("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
                 !p.ChildrenOfType<PlayerSettingsOverlay>().Any() &&
                 !p.ChildrenOfType<HoldForMenuButton>().Any() &&
-                p.ChildrenOfType<SongProgressBar>().SingleOrDefault()?.ShowHandle == false));
+                !p.ChildrenOfType<SongProgressBar>().Single().ShowHandle));
         }
 
         [Test]
