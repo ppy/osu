@@ -24,6 +24,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"included_comments")]
         public List<Comment> IncludedComments { get; set; }
 
+        [JsonProperty(@"pinned_comments")]
+        public List<Comment> PinnedComments { get; set; }
+
         private List<long> userVotes;
 
         [JsonProperty(@"user_votes")]
