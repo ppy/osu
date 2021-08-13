@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             Team1Score.BindValueChanged(_ => updateScores());
-            Team2Score.BindValueChanged(_ => updateScores());
+            Team2Score.BindValueChanged(_ => updateScores(), true);
         }
 
         private void updateScores()
