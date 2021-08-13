@@ -35,6 +35,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             spectatorPlayerClock.WaitingOnFrames.BindTo(waitingOnFrames);
 
+            AllowUserSeekingState.Value = false;
+            AllowUserSeekingState.Disabled = true;
             HUDOverlay.PlayerSettingsOverlay.Expire();
             HUDOverlay.HoldToQuit.Expire();
         }

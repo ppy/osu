@@ -77,6 +77,10 @@ namespace osu.Game.Screens.Play
 
         protected readonly Bindable<bool> LocalUserPlaying = new Bindable<bool>();
 
+        protected readonly Bindable<bool> AllowUserSeekingState = new Bindable<bool>();
+
+        public IBindable<bool> AllowUserSeeking => AllowUserSeekingState;
+
         public int RestartCount;
 
         [Resolved]
@@ -269,7 +273,13 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset.FrameStableClock.IsCatchingUp.BindValueChanged(_ => updateSampleDisabledState());
 
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(r =>
+            {
+                if (!AllowUserSeekingState.Disabled)
+                    AllowUserSeekingState.Value = r.NewValue;
+
+                updateGameplayState();
+            });
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
