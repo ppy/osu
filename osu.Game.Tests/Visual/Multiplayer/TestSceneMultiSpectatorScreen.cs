@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestSpectatorPlayerSettingsHidden()
+        public void TestSpectatorPlayerInteractiveElementsHidden()
         {
             start(new[] { PLAYER_1_ID, PLAYER_2_ID });
             loadSpectateScreen(false);
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
                 !p.ChildrenOfType<PlayerSettingsOverlay>().Any() &&
                 !p.ChildrenOfType<HoldForMenuButton>().Any() &&
-                !p.ChildrenOfType<SongProgressBar>().Single().ShowHandle));
+                p.ChildrenOfType<SongProgressBar>().SingleOrDefault()?.ShowHandle == false));
         }
 
         [Test]
