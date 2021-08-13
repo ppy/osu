@@ -75,10 +75,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             OsuScrollContainer scrollContainer;
 
-            Container filterContainer;
-
             InternalChildren = new[]
             {
+                loadingLayer = new LoadingLayer(true),
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -159,8 +158,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         }
                     },
                 },
-                loadingLayer = new LoadingLayer(true),
-                filterContainer.CreateProxy()
             };
 
             // scroll selected room into view on selection.
