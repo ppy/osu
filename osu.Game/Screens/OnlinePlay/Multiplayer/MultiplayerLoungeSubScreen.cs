@@ -28,7 +28,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private MultiplayerListingPollingComponent listingPollingComponent;
 
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
-        private readonly Bindable<bool> allowPolling = new Bindable<bool>();
 
         protected override void LoadComplete()
         {
@@ -36,6 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             isConnected.BindTo(client.IsConnected);
             isConnected.BindValueChanged(c => Scheduler.AddOnce(() => listingPollingComponent.AllowPolling = c.NewValue));
+            listingPollingComponent.AllowPolling = isConnected.Value;
         }
 
         public override void OnResuming(IScreen last)
