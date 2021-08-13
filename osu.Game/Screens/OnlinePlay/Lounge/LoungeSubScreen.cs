@@ -83,6 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             InternalChildren = new Drawable[]
             {
                 listingPollingComponent = CreatePollingComponent(),
+                loadingLayer = new LoadingLayer(true),
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -157,13 +158,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                             ScrollbarOverlapsContent = false,
                                             Child = roomsContainer = new RoomsContainer()
                                         },
-                                        loadingLayer = new LoadingLayer(true),
                                     }
                                 },
                             }
                         }
                     },
-                }
+                },
             };
 
             // scroll selected room into view on selection.
