@@ -13,6 +13,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
         protected IAPIProvider API { get; private set; }
 
         [Resolved]
-        protected IRoomManager RoomManager { get; set; }
+        protected IRoomManager RoomManager { get; private set; }
     }
 }
