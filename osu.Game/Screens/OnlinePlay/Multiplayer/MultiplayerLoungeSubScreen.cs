@@ -43,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.OnResuming(last);
 
             // Upon having left a room, we don't know whether we were the only participant, and whether the room is now closed as a result of leaving it.
-            // To work around this, temporarily clear all rooms until the next listing poll.
+            // To work around this, temporarily remove the room and trigger an immediate listing poll.
             if (last is MultiplayerMatchSubScreen match)
             {
                 RoomManager.RemoveRoom(match.Room);

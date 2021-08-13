@@ -23,10 +23,22 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         IBindableList<Room> Rooms { get; }
 
+        /// <summary>
+        /// Adds a <see cref="Room"/> to this <see cref="IRoomManager"/>.
+        /// If already existing, the local room will be updated with the given one.
+        /// </summary>
+        /// <param name="room">The incoming <see cref="Room"/>.</param>
         void AddOrUpdateRoom(Room room);
 
+        /// <summary>
+        /// Removes a <see cref="Room"/> from this <see cref="IRoomManager"/>.
+        /// </summary>
+        /// <param name="room">The <see cref="Room"/> to remove.</param>
         void RemoveRoom(Room room);
 
+        /// <summary>
+        /// Removes all <see cref="Room"/>s from this <see cref="IRoomManager"/>.
+        /// </summary>
         void ClearRooms();
 
         /// <summary>
