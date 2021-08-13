@@ -30,8 +30,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     [Cached]
     public abstract class LoungeSubScreen : OnlinePlaySubScreen
     {
-        private const float button_height = 25;
-
         public override string Title => "Lounge";
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
@@ -93,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         RowDimensions = new[]
                         {
                             new Dimension(GridSizeMode.Absolute, Header.HEIGHT),
-                            new Dimension(GridSizeMode.Absolute, button_height),
+                            new Dimension(GridSizeMode.Absolute, 25),
                             new Dimension(GridSizeMode.Absolute, 20)
                         },
                         Content = new[]
@@ -118,7 +116,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                     {
                                         Buttons.WithChild(CreateNewRoomButton().With(d =>
                                         {
-                                            d.Size = new Vector2(150, button_height);
+                                            d.Anchor = Anchor.BottomLeft;
+                                            d.Origin = Anchor.BottomLeft;
+                                            d.Size = new Vector2(150, 37.5f);
                                             d.Action = () => Open();
                                         })),
                                         new FillFlowContainer
