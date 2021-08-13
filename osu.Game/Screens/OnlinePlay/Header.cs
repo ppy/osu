@@ -35,6 +35,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Origin = Anchor.CentreLeft,
             };
 
+            // unnecessary to unbind these as this header has the same lifetime as the screen stack we are attaching to.
             stack.ScreenPushed += (_, __) => updateSubScreenTitle();
             stack.ScreenExited += (_, __) => updateSubScreenTitle();
         }
