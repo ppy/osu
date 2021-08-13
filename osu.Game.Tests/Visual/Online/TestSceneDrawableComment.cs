@@ -43,9 +43,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep(description, () =>
             {
-                if (description == "Pinned")
-                    comment.Pinned = true;
-
+                comment.Pinned = description == "Pinned";
                 comment.Message = text;
                 container.Add(new DrawableComment(comment));
             });
