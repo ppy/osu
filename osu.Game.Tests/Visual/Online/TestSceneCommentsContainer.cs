@@ -82,6 +82,48 @@ namespace osu.Game.Tests.Visual.Online
                 () => commentsContainer.ChildrenOfType<DrawableComment>().Count() == topLevelCommentCount);
         }
 
+        [Test]
+        public void TestNoComment()
+        {
+            var comments = getExampleComments();
+            comments.Comments.Clear();
+
+            setUpCommentsResponse(comments);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddAssert("no comment showed", () => !commentsContainer.ChildrenOfType<DrawableComment>().Any());
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestSingleComment(bool withPinned)
+        {
+            var comment = new Comment
+            {
+                Id = 1,
+                Message = "This is a single comment",
+                LegacyName = "SingleUser",
+                CreatedAt = DateTimeOffset.Now,
+                VotesCount = 0,
+                Pinned = withPinned,
+            };
+
+            var bundle = new CommentBundle
+            {
+                Comments = new List<Comment> { comment },
+                IncludedComments = new List<Comment>(),
+                PinnedComments = new List<Comment>(),
+            };
+
+            if (withPinned)
+                bundle.PinnedComments.Add(comment);
+
+            setUpCommentsResponse(bundle);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("wait comment load", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
+            AddAssert("only one comment showed", () =>
+                commentsContainer.ChildrenOfType<DrawableComment>().Count(d => d.Comment.Pinned == withPinned) == 1);
+        }
+
         private void setUpCommentsResponse(CommentBundle commentBundle)
             => AddStep("set up response", () =>
             {
