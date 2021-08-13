@@ -95,10 +95,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for players to load", () => spectatorScreen.AllPlayersLoaded);
 
             // components wrapped in skinnable target containers load asynchronously, potentially taking more than one frame to load.
-            // wait once to properly execute the assert.
-            AddWaitStep("wait for async load", 1);
-
-            AddAssert("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
+            // therefore use until step rather than direct assert to account for that.
+            AddUntilStep("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
                 !p.ChildrenOfType<PlayerSettingsOverlay>().Any() &&
                 !p.ChildrenOfType<HoldForMenuButton>().Any() &&
                 !p.ChildrenOfType<SongProgressBar>().Single().ShowHandle));
