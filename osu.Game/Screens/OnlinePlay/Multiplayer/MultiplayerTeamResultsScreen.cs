@@ -46,9 +46,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             const float winner_background_half_height = 250;
 
-            ScorePanelList.Anchor = ScorePanelList.Origin = Anchor.TopCentre;
-            ScorePanelList.Scale = new Vector2(0.9f);
-            ScorePanelList.Y = 75;
+            VerticalScrollContent.Anchor = VerticalScrollContent.Origin = Anchor.TopCentre;
+            VerticalScrollContent.Scale = new Vector2(0.9f);
+            VerticalScrollContent.Y = 75;
 
             var redScore = teamScores.First().Value;
             var blueScore = teamScores.Last().Value;
