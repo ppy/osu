@@ -59,6 +59,8 @@ namespace osu.Game.Screens.OnlinePlay
         [BackgroundDependencyLoader]
         private void load()
         {
+            LeftArea.Padding = new MarginPadding { Top = Header.HEIGHT };
+
             initialBeatmap = Beatmap.Value;
             initialRuleset = Ruleset.Value;
             initialMods = Mods.Value.ToList();

@@ -87,6 +87,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestEmpty()
         {
             // used to test the flow of multiplayer from visual tests.
+            AddStep("empty step", () => { });
         }
 
         [Test]
@@ -407,8 +408,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("mod overlay is hidden", () => this.ChildrenOfType<LocalPlayerModSelectOverlay>().Single().State.Value == Visibility.Hidden);
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
-
-            testLeave("lounge tab item", () => this.ChildrenOfType<BreadcrumbControl<IScreen>.BreadcrumbTabItem>().First().TriggerClick());
 
             testLeave("back button", () => multiplayerScreen.OnBackButton());
 
