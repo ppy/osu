@@ -108,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 BlurSigma = new Vector2(10),
-                                Child = new HeaderBackgroundSprite
+                                Child = new BeatmapBackgroundSprite
                                 {
                                     RelativeSizeAxes = Axes.Both
                                 }
@@ -304,13 +304,13 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        private class HeaderBackgroundSprite : OnlinePlayBackgroundSprite
+        private class BeatmapBackgroundSprite : OnlinePlayBackgroundSprite
         {
             protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BackgroundSprite { RelativeSizeAxes = Axes.Both };
 
             private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
             {
-                protected override double TransformDuration => 200;
+                protected override double LoadDelay => 200;
             }
         }
 
