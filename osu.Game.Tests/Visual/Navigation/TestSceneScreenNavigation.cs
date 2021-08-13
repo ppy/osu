@@ -16,6 +16,7 @@ using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
@@ -316,7 +317,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
             PushAndConfirm(() => multiplayer = new TestMultiplayer());
 
-            AddStep("open room", () => multiplayer.OpenNewRoom());
+            AddUntilStep("wait for lounge", () => multiplayer.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
+            AddStep("open room", () => multiplayer.ChildrenOfType<LoungeSubScreen>().Single().Open());
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
             AddWaitStep("wait two frames", 2);
         }
