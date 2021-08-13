@@ -23,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [BackgroundDependencyLoader]
         private void load()
         {
-            PlayerSettingsGroups.Alpha = 0f;
+            PlayerSettingsGroups.Expire();
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
