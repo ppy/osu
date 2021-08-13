@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override FilterCriteria CreateFilterCriteria()
         {
             var criteria = base.CreateFilterCriteria();
-            criteria.Category = "realtime";
+            criteria.Category = @"realtime";
             return criteria;
         }
 

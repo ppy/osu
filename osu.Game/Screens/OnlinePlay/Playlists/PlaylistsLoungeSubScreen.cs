@@ -42,11 +42,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             switch (categoryDropdown.Current.Value)
             {
                 case PlaylistsCategory.Normal:
-                    criteria.Category = "normal";
+                    criteria.Category = @"normal";
                     break;
 
                 case PlaylistsCategory.Spotlight:
-                    criteria.Category = "spotlight";
+                    criteria.Category = @"spotlight";
                     break;
             }
 
