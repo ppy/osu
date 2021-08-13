@@ -11,7 +11,6 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Game.Localisation;
@@ -92,23 +91,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Origin = Anchor.TopCentre,
                             Text = TabletSettingsStrings.NoTabletDetected,
                         },
-                        new LinkFlowContainer
+                        new SettingsNoticeText
                         {
                             TextAnchor = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
                         }.With(t =>
                         {
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                             {
                                 t.NewLine();
-                                t.AddText("If your tablet is not detected, please read ", s => s.Colour = colours.Yellow);
+                                t.AddText("If your tablet is not detected, please read ");
                                 t.AddLink("this FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
                                     ? @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Windows-FAQ"
                                     : @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Linux-FAQ");
-                                t.AddText(" for troubleshooting steps.", s => s.Colour = colours.Yellow);
+                                t.AddText(" for troubleshooting steps.");
                             }
                         }),
                     }
