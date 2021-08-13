@@ -6,6 +6,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Mvis.SideBar.Tabs;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
@@ -17,9 +20,10 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         private readonly BindableFloat iG = new BindableFloat();
         private readonly BindableFloat iB = new BindableFloat();
         private ColourPreviewer preview;
+        private FunctionBarPluginDropDown dropdown;
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load(MConfigManager config, MvisPluginManager pluginManager)
         {
             config.BindWith(MSetting.MvisInterfaceRed, iR);
             config.BindWith(MSetting.MvisInterfaceGreen, iG);
@@ -79,8 +83,38 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     LabelText = "启用背景动画",
                     Current = config.GetBindable<bool>(MSetting.MvisEnableBgTriangles),
                     TooltipText = "如果条件允许,播放器将会在背景显示动画"
+                },
+                dropdown = new FunctionBarPluginDropDown
+                {
+                    LabelText = "底栏插件"
                 }
             };
+
+            var plugins = pluginManager.GetAllFunctionBarProviders();
+            var currentFunctionBar = config.Get<string>(MSetting.MvisCurrentFunctionBar);
+
+            foreach (var pl in plugins)
+            {
+                if (currentFunctionBar == pluginManager.ToPath(pl))
+                {
+                    dropdown.Current.Value = pl;
+                }
+            }
+
+            dropdown.Items = plugins;
+            dropdown.Current.BindValueChanged(v =>
+            {
+                if (v.NewValue == null)
+                {
+                    config.SetValue(MSetting.MvisCurrentFunctionBar, string.Empty);
+                    return;
+                }
+
+                var pl = (MvisPlugin)v.NewValue;
+                var type = pl.GetType();
+
+                config.SetValue(MSetting.MvisCurrentFunctionBar, type.Name + "@" + type.Namespace);
+            });
         }
 
         protected override void LoadComplete()
@@ -91,5 +125,19 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         }
 
         private void updateColor() => preview.UpdateColor(iR.Value, iG.Value, iB.Value);
+
+        private class FunctionBarPluginDropDown : SettingsDropdown<IFunctionBarProvider>
+        {
+            protected override OsuDropdown<IFunctionBarProvider> CreateDropdown()
+                => new PluginDropDownControl();
+
+            private class PluginDropDownControl : DropdownControl
+            {
+                protected override LocalisableString GenerateItemText(IFunctionBarProvider item)
+                {
+                    return ((MvisPlugin)item).Name;
+                }
+            }
+        }
     }
 }

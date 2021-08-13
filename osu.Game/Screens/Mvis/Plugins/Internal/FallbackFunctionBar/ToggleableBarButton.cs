@@ -4,7 +4,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Screens.Mvis.Plugins.Types;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
@@ -29,7 +28,8 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
         {
             AddInternal(indicator = new Box
             {
-                Size = new Vector2(5)
+                Height = 5,
+                RelativeSizeAxes = Axes.X
             });
         }
 
@@ -41,12 +41,12 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
 
         private void onDisableChanged(bool value)
         {
-            this.FadeColour(value ? Color4.Gray : Color4.White);
+            this.FadeColour(value ? Color4.Gray : Color4.White, 300, Easing.OutQuint);
         }
 
         private void onValueChanged(ValueChangedEvent<bool> v)
         {
-            indicator.FadeColour(v.NewValue ? Color4.Green : Color4.Red);
+            indicator.FadeColour(v.NewValue ? Color4.Green : Color4.Gold, 300, Easing.OutQuint);
         }
 
         protected override bool OnClick(ClickEvent e)

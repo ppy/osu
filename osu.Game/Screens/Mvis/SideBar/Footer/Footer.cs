@@ -4,8 +4,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Screens.Mvis.Skinning;
-using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis.SideBar.Footer
 {
@@ -31,24 +29,6 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Masking = true;
-
-            InternalChildren = new Drawable[]
-            {
-                new SkinnableComponent(
-                    "MSidebar-BottomBox",
-                    confineMode: ConfineMode.ScaleToFill,
-                    defaultImplementation: _ => createDefaultFooter())
-                {
-                    Name = "侧边栏底部横条",
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    ChildAnchor = Anchor.BottomRight,
-                    ChildOrigin = Anchor.BottomRight,
-                    RelativeSizeAxes = Axes.Both,
-                    CentreComponent = false,
-                    OverrideChildAnchor = true,
-                }
-            };
         }
 
         private Drawable createDefaultFooter()

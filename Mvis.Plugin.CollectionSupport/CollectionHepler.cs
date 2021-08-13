@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
-using osu.Game.Screens.Mvis.Skinning;
+using osu.Game.Screens.Mvis.SideBar.Settings.Items;
 
 namespace Mvis.Plugin.CollectionSupport
 {

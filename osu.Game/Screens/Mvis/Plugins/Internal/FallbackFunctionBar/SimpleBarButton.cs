@@ -1,4 +1,5 @@
 using System;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -15,19 +16,58 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
 {
     public class SimpleBarButton : CompositeDrawable, IHasTooltip
     {
+        private readonly SpriteIcon spriteIcon = new SpriteIcon
+        {
+            Size = new Vector2(13),
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Colour = Color4.White
+        };
+
+        private readonly OsuSpriteText spriteText = new OsuSpriteText
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Colour = Color4.White
+        };
+
+        private readonly Box flashBox;
+
         public LocalisableString TooltipText { get; }
 
         public IFunctionProvider Provider { get; set; }
 
         private Action action { get; set; }
 
+        protected LocalisableString Title
+        {
+            get => spriteText.Text;
+            set => spriteText.Text = value;
+        }
+
+        private IconUsage emptyIcon => new IconUsage();
+
+        protected IconUsage Icon
+        {
+            get => spriteIcon.Icon;
+            set
+            {
+                if (!value.Equals(emptyIcon))
+                    spriteIcon.Icon = value;
+                else
+                    spriteIcon.FadeOut();
+            }
+        }
+
         public SimpleBarButton(IFunctionProvider provider)
         {
             TooltipText = provider.Description;
-            Size = provider.Size;
+            Width = Math.Max(provider.Size.X, 40);
             action = provider.Action;
 
-            Height = 1;
+            Title = provider.Title;
+            Icon = provider.Icon;
+
             RelativeSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
@@ -35,31 +75,36 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.DarkGreen
+                    Colour = Color4Extensions.FromHex("#365960")
                 },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new SpriteIcon
-                        {
-                            Icon = provider.Icon,
-                            Size = new Vector2(13),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Colour = Color4.Black
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = provider.Title,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Colour = Color4.Black
-                        }
+                        spriteIcon,
+                        spriteText,
                     }
+                },
+                flashBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                    Alpha = 0,
                 }
             };
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            flashBox.FadeTo(0.1f, 300);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            flashBox.FadeTo(0f, 300);
         }
 
         protected override bool OnClick(ClickEvent e)

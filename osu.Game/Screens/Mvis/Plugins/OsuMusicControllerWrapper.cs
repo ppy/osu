@@ -3,7 +3,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Game.Overlays;
 using osu.Game.Screens.Mvis.Plugins.Types;
-using osu.Game.Screens.Mvis.Skinning;
+using osu.Game.Screens.Mvis.SideBar.Settings.Items;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {

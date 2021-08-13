@@ -8,16 +8,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.Mvis.SideBar.Settings.Items;
 using osuTK;
 
 namespace Mvis.Plugin.BottomBar
 {
     internal class LegacyBottomBar : MvisPlugin, IFunctionBarProvider
     {
-        protected override Drawable CreateContent()
-        {
-            throw new NotImplementedException();
-        }
+        protected override Drawable CreateContent() => new PlaceHolder();
 
         protected override bool OnContentLoaded(Drawable content) => true;
 
@@ -44,6 +42,12 @@ namespace Mvis.Plugin.BottomBar
             Description = "mf-osu默认功能条";
             Author = "MATRIX-夜翎";
             Depth = -1;
+
+            Flags.AddRange(new[]
+            {
+                PluginFlags.CanDisable,
+                PluginFlags.CanUnload
+            });
 
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
@@ -245,6 +249,13 @@ namespace Mvis.Plugin.BottomBar
         public void ShowFunctionControlTemporary() => pluginEntriesFillFlow.FadeIn(500, Easing.OutQuint).Then().Delay(2000).FadeOut(500, Easing.OutQuint);
 
         public List<IPluginFunctionProvider> GetAllPluginFunctionButton() => pluginButtons;
+        public Action OnDisable { get; set; }
+
+        public override bool Disable()
+        {
+            OnDisable?.Invoke();
+            return base.Disable();
+        }
 
         public class ButtonNotFoundException : Exception
         {

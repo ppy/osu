@@ -237,6 +237,7 @@ namespace osu.Game.Screens.Mvis
         private readonly BindableBool nightcoreBeat = new BindableBool();
         private readonly BindableBool allowProxy = new BindableBool();
         private Bindable<string> currentAudioControlProviderSetting;
+        private Bindable<string> currentFunctionbarSetting;
 
         #endregion
 
@@ -301,7 +302,6 @@ namespace osu.Game.Screens.Mvis
         public Bindable<bool> HideScreenBackground = new Bindable<bool>();
 
         private IProvideAudioControlPlugin audioControlProvider;
-        public readonly OsuMusicControllerWrapper MusicControllerWrapper = new OsuMusicControllerWrapper();
         private SettingsButton songSelectButton;
         private PlayerSettings settingsScroll;
 
@@ -351,11 +351,11 @@ namespace osu.Game.Screens.Mvis
             config.BindWith(MSetting.MvisEnableNightcoreBeat, nightcoreBeat);
             config.BindWith(MSetting.MvisStoryboardProxy, allowProxy);
             currentAudioControlProviderSetting = config.GetBindable<string>(MSetting.MvisCurrentAudioProvider);
+            currentFunctionbarSetting = config.GetBindable<string>(MSetting.MvisCurrentFunctionBar);
 
             InternalChildren = new Drawable[]
             {
                 colourProvider,
-                MusicControllerWrapper,
                 nightcoreBeatContainer = new NightcoreBeatContainer
                 {
                     Alpha = 0
@@ -396,7 +396,7 @@ namespace osu.Game.Screens.Mvis
             };
 
             //todo: 找出为啥audioControlProvider会在被赋值前访问
-            audioControlProvider = MusicControllerWrapper;
+            audioControlProvider = pluginManager.DefaultAudioController;
 
             functionProviders.AddRange(new IFunctionProvider[]
             {
@@ -487,7 +487,11 @@ namespace osu.Game.Screens.Mvis
                 lockButton = new ToggleableFakeButton
                 {
                     Description = MvisBaseStrings.LockInterface,
-                    Action = showPluginEntriesTemporary,
+                    Action = () =>
+                    {
+                        showPluginEntriesTemporary();
+                        lockButton.Active();
+                    },
                     Type = FunctionType.Plugin,
                     Icon = FontAwesome.Solid.Lock
                 }
@@ -573,11 +577,6 @@ namespace osu.Game.Screens.Mvis
                         case MvisPlugin.TargetLayer.Foreground:
                             foreground.Add(pl);
                             break;
-
-                        case MvisPlugin.TargetLayer.FunctionBar:
-                            if (pl.GetType().IsSubclassOf(typeof(IFunctionBarProvider)))
-                                functionBarProviders.Add(pl as IFunctionBarProvider);
-                            break;
                     }
 
                     var pluginSidebarPage = pl.CreateSidebarPage();
@@ -623,12 +622,17 @@ namespace osu.Game.Screens.Mvis
             currentAudioControlProviderSetting.BindValueChanged(v =>
             {
                 //获取与新值匹配的控制插件
-                var pl = (IProvideAudioControlPlugin)pluginManager.GetAllPlugins(false).FirstOrDefault(p => v.NewValue == $"{p.GetType().Namespace}+{p.GetType().Name}");
+                var pl = pluginManager.GetAudioControlByPath(v.NewValue);
                 changeAudioControlProvider(pl);
             }, true);
 
-            //todo: 实现切换功能
-            changeFunctionBarProvider(null);
+            //更新当前功能条
+            currentFunctionbarSetting.BindValueChanged(v =>
+            {
+                //获取与新值匹配的控制插件
+                var pl = pluginManager.GetFunctionBarProviderByPath(v.NewValue);
+                changeFunctionBarProvider(pl);
+            }, true);
 
             currentFunctionBarProvider.Hide();
             base.LoadComplete();
@@ -637,29 +641,46 @@ namespace osu.Game.Screens.Mvis
         private void changeAudioControlProvider(IProvideAudioControlPlugin pacp)
         {
             //如果没找到(为null)，则解锁Beatmap.Disabled
-            Beatmap.Disabled = pacp != null;
+            Beatmap.Disabled = (pacp != null) && (pacp != pluginManager.DefaultAudioController);
 
             //设置当前控制插件IsCurrent为false
             audioControlProvider.IsCurrent = false;
 
             //切换并设置当前控制插件IsCurrent为true
-            audioControlProvider = pacp ?? MusicControllerWrapper;
+            audioControlProvider = pacp ?? pluginManager.DefaultAudioController;
             audioControlProvider.IsCurrent = true;
 
-            songSelectButton.Enabled.Value = audioControlProvider == MusicControllerWrapper;
+            songSelectButton.Enabled.Value = audioControlProvider == pluginManager.DefaultAudioController;
+            //Logger.Log($"更改控制插件到{audioControlProvider}");
         }
+
+        private void onFunctionBarPluginDisable() => changeFunctionBarProvider(null);
 
         private void changeFunctionBarProvider(IFunctionBarProvider target)
         {
-            var targetDrawable = overlay.FirstOrDefault(d => d.GetType().IsSubclassOf(typeof(IFunctionBarProvider)));
+            //找到旧的Functionbar
+            var targetDrawable = overlay.FirstOrDefault(d => d is IFunctionBarProvider);
 
+            //移除
             if (targetDrawable != null)
                 overlay.Remove(targetDrawable);
 
-            currentFunctionBarProvider = target ?? fallbackFunctionBar;
-            currentFunctionBarProvider.SetFunctionControls(functionProviders);
+            //不要在此功能条禁用时再调用onFunctionBarPluginDisable
+            currentFunctionBarProvider.OnDisable -= onFunctionBarPluginDisable;
 
+            //如果新的目标是null，则使用后备功能条
+            var newProvider = target ?? fallbackFunctionBar;
+
+            //更新控制按钮
+            newProvider.SetFunctionControls(functionProviders);
+            newProvider.OnDisable += onFunctionBarPluginDisable;
+
+            //更新currentFunctionBarProvider
+            currentFunctionBarProvider = newProvider;
+
+            //添加新的功能条
             overlay.Add((Drawable)currentFunctionBarProvider);
+            //Logger.Log($"更改底栏到{currentFunctionBarProvider}");
         }
 
         private void setupKeyBindings()
@@ -667,7 +688,7 @@ namespace osu.Game.Screens.Mvis
             keyBindings[GlobalAction.MvisMusicPrev] = () => prevButton.Active();
             keyBindings[GlobalAction.MvisMusicNext] = () => nextButton.Active();
             keyBindings[GlobalAction.MvisOpenInSongSelect] = () => soloButton.Active();
-            keyBindings[GlobalAction.MvisToggleOverlayLock] = () => lockButton.Active();
+            keyBindings[GlobalAction.MvisToggleOverlayLock] = () => lockButton.Active(true);
             keyBindings[GlobalAction.MvisTogglePluginPage] = () => pluginButton.Active();
             keyBindings[GlobalAction.MvisTogglePause] = () => songProgressButton.Active(true);
             keyBindings[GlobalAction.MvisToggleTrackLoop] = () => loopToggleButton.Active();
@@ -717,6 +738,9 @@ namespace osu.Game.Screens.Mvis
                     }
                 }
             }
+
+            if ((MvisPlugin)currentFunctionBarProvider == pl)
+                changeFunctionBarProvider(null);
         }
 
         internal bool RemovePluginFromLoadList(MvisPlugin pl)
@@ -865,7 +889,7 @@ namespace osu.Game.Screens.Mvis
 
             Mods.Value = timeRateMod;
 
-            Beatmap.Disabled = audioControlProvider != null && audioControlProvider != MusicControllerWrapper;
+            Beatmap.Disabled = audioControlProvider != null && audioControlProvider != pluginManager.DefaultAudioController;
             this.FadeIn(duration * 0.6f)
                 .ScaleTo(1, duration * 0.6f, Easing.OutQuint);
 

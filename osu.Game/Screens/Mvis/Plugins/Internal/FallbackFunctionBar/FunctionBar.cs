@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -13,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
 {
-    public class FunctionBar : Container, IFunctionBarProvider, IHasTooltip
+    public class FunctionBar : MvisPlugin, IFunctionBarProvider, IHasTooltip
     {
         public float GetSafeAreaPadding() => Height;
 
@@ -22,6 +24,8 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
         private readonly FillFlowContainer<SimpleBarButton> contentContainer;
 
         private readonly List<IPluginFunctionProvider> pluginButtons = new List<IPluginFunctionProvider>();
+        private readonly Box idleIndicator;
+        private readonly Box hideIndicator;
 
         public FunctionBar()
         {
@@ -35,7 +39,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Green
+                    Colour = Color4Extensions.FromHex("#2d353f")
                 },
                 new OsuScrollContainer(Direction.Horizontal)
                 {
@@ -47,16 +51,86 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
                         RelativeSizeAxes = Axes.Y,
                         Spacing = new Vector2(5)
                     }
+                },
+                idleIndicator = new Box
+                {
+                    Width = 5,
+                    RelativeSizeAxes = Axes.Y,
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Colour = Color4.Gold
+                },
+                hideIndicator = new Box
+                {
+                    Width = 5,
+                    RelativeSizeAxes = Axes.Y,
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Colour = Color4Extensions.FromHex("#365960"),
+                    Margin = new MarginPadding { Right = 5 }
                 }
             };
         }
 
+        protected override Drawable CreateContent()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override bool OnContentLoaded(Drawable content) => true;
+
+        protected override bool PostInit() => true;
+
+        public override int Version => 0;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            MvisScreen.OnIdle += onIdle;
+            MvisScreen.OnResumeFromIdle += resumeFromIdle;
+        }
+
+        private void resumeFromIdle()
+        {
+            hideIndicator.FadeOut(300, Easing.OutQuint);
+        }
+
+        private void onIdle()
+        {
+            hideIndicator.FadeIn(300, Easing.OutQuint);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (MvisScreen != null)
+            {
+                MvisScreen.OnIdle -= onIdle;
+                MvisScreen.OnResumeFromIdle -= resumeFromIdle;
+            }
+
+            base.Dispose(isDisposing);
+        }
+
         public bool AddFunctionControl(IFunctionProvider provider)
         {
+            SimpleBarButton button;
+
             if (provider is IToggleableFunctionProvider toggleableFunctionProvider)
-                contentContainer.Add(new ToggleableBarButton(toggleableFunctionProvider));
+                button = new ToggleableBarButton(toggleableFunctionProvider);
             else
-                contentContainer.Add(new SimpleBarButton(provider));
+                button = new SimpleBarButton(provider);
+
+            switch (provider.Type)
+            {
+                case FunctionType.ProgressDisplay:
+                    button.Dispose();
+                    contentContainer.Add(new SongProgressButton((IToggleableFunctionProvider)provider));
+                    break;
+
+                default:
+                    contentContainer.Add(button);
+                    break;
+            }
 
             return true;
         }
@@ -95,10 +169,18 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
 
         public void ShowFunctionControlTemporary()
         {
-            this.FadeIn().Delay(300).FadeTo(0.8f);
+            idleIndicator.FlashColour(Color4.Green, 500);
         }
 
         public List<IPluginFunctionProvider> GetAllPluginFunctionButton() => pluginButtons;
+
+        public Action OnDisable { get; set; }
+
+        public override bool Disable()
+        {
+            OnDisable?.Invoke();
+            return base.Disable();
+        }
 
         public class ButtonNotFoundException : Exception
         {

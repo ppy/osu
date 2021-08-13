@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 
@@ -62,5 +63,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         /// </summary>
         /// <returns>插件按钮列表</returns>
         public List<IPluginFunctionProvider> GetAllPluginFunctionButton();
+
+        public Action OnDisable { get; set; }
     }
 }

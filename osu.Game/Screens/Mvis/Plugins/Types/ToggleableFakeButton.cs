@@ -2,7 +2,6 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Plugins.Types
@@ -20,8 +19,6 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         {
             if (!Bindable.Disabled)
                 Bindable.Toggle();
-            else
-                Logger.Log($"无法更改 \"{Title}\" 的值, 因为此Bindable已禁用", level: LogLevel.Important);
         }
 
         public void Active(bool performAction)
