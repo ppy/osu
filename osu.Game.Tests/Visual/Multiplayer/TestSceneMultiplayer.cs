@@ -25,7 +25,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
@@ -396,7 +396,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddStep("open mod overlay", () => this.ChildrenOfType<PurpleTriangleButton>().ElementAt(2).TriggerClick());
+            AddStep("open mod overlay", () => this.ChildrenOfType<RoomSubScreen.UserModSelectButton>().Single().TriggerClick());
 
             AddStep("invoke on back button", () => multiplayerScreen.OnBackButton());
 

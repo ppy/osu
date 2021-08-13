@@ -17,6 +17,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
@@ -248,6 +249,10 @@ namespace osu.Game.Screens.OnlinePlay.Match
         }
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
+        {
+        }
+
+        public class UserModSelectButton : PurpleTriangleButton
         {
         }
     }
