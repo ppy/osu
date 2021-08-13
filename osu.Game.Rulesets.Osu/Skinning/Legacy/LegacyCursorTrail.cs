@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shaders;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.UI.Cursor;
@@ -31,10 +30,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            Shader = shaders.Load(@"LegacyCursorTrail", FragmentShaderDescriptor.TEXTURE);
-
             Texture = skin.GetTexture("cursortrail");
             disjointTrail = skin.GetTexture("cursormiddle") == null;
 
@@ -60,6 +57,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         }
 
         protected override double FadeDuration => disjointTrail ? 150 : 500;
+        protected override float FadeExponent => 1;
 
         protected override bool InterpolateMovements => !disjointTrail;
 
