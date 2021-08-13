@@ -4,7 +4,6 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
 using osu.Game.Online.Multiplayer;
@@ -18,18 +17,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; }
-
-        private readonly IBindable<bool> isConnected = new Bindable<bool>();
-        private readonly Bindable<bool> allowPolling = new Bindable<bool>();
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            isConnected.BindTo(multiplayerClient.IsConnected);
-            isConnected.BindValueChanged(_ => Scheduler.AddOnce(updatePolling));
-            JoinedRoom.BindValueChanged(_ => Scheduler.AddOnce(updatePolling), true);
-        }
 
         public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
             => base.CreateRoom(room, r => joinMultiplayerRoom(r, r.Password.Value, onSuccess, onError), onError);
@@ -81,15 +68,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     Schedule(() => onError?.Invoke(t.Exception?.AsSingular().Message ?? message));
                 }
             });
-        }
-
-        private void updatePolling()
-        {
-            if (!isConnected.Value)
-                ClearRooms();
-
-            // Don't poll when not connected or when a room has been joined.
-            allowPolling.Value = isConnected.Value && JoinedRoom.Value == null;
         }
     }
 }
