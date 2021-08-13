@@ -42,6 +42,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override string ShortTitle => "room";
 
+        public readonly Room Room;
+
         [Resolved]
         private MultiplayerClient client { get; set; }
 
@@ -61,6 +63,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public MultiplayerMatchSubScreen(Room room)
         {
+            Room = room;
+
             Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
         }
@@ -323,10 +327,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override bool OnExiting(IScreen next)
         {
-            // We don't know whether we're the only participant in the room, and whether the room will close after we leave it as a result.
-            // To work around this, temporarily remove the room until the next listing poll retrieves it.
-            RoomManager?.RemoveRoom(currentRoom.Value);
-
             // the room may not be left immediately after a disconnection due to async flow,
             // so checking the IsConnected status is also required.
             if (client.Room == null || !client.IsConnected.Value)

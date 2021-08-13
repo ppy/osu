@@ -41,7 +41,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
-            listingPollingComponent.PollImmediately();
+
+            // Upon having left a room, we don't know whether we were the only participant, and whether the room is now closed as a result of leaving it.
+            // To work around this, temporarily clear all rooms until the next listing poll.
+            if (last is MultiplayerMatchSubScreen match)
+            {
+                RoomManager.RemoveRoom(match.Room);
+                listingPollingComponent.PollImmediately();
+            }
         }
 
         protected override FilterCriteria CreateFilterCriteria()
