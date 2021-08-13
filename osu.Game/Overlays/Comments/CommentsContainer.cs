@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Comments
         private FillFlowContainer content;
         private DeletedCommentsCounter deletedCommentsCounter;
         private CommentsShowMoreButton moreButton;
-        protected TotalCommentsCounter CommentCounter;
+        private TotalCommentsCounter commentCounter;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        CommentCounter = new TotalCommentsCounter(),
+                        commentCounter = new TotalCommentsCounter(),
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Comments
                 return;
 
             // only reset when changing ID/type. other refetch ops are generally just changing sort order.
-            CommentCounter.Current.Value = 0;
+            commentCounter.Current.Value = 0;
 
             refetchComments();
         }
@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.Comments
 
         protected void OnSuccess(CommentBundle response)
         {
-            CommentCounter.Current.Value = response.Total;
+            commentCounter.Current.Value = response.Total;
 
             if (!response.Comments.Any())
             {

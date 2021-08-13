@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
@@ -12,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 using JetBrains.Annotations;
+using osu.Framework.Testing;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -186,7 +188,7 @@ namespace osu.Game.Tests.Visual.Online
 
             public void ShowComments(CommentBundle bundle)
             {
-                CommentCounter.Current.Value = 0;
+                this.ChildrenOfType<TotalCommentsCounter>().Single().Current.Value = 0;
                 ClearComments();
                 OnSuccess(bundle);
             }
