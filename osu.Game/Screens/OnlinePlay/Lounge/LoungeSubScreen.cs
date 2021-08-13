@@ -59,9 +59,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private IdleTracker idleTracker { get; set; }
-
         [CanBeNull]
         private IDisposable joiningRoomOperation { get; set; }
 
@@ -73,9 +70,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private Dropdown<RoomStatusFilter> statusDropdown;
         private ListingPollingComponent listingPollingComponent;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] IdleTracker idleTracker)
         {
+            if (idleTracker != null)
+                isIdle.BindTo(idleTracker.IsIdle);
+
             filter ??= new Bindable<FilterCriteria>(new FilterCriteria());
 
             OsuScrollContainer scrollContainer;
@@ -184,11 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             listingPollingComponent.HasPolledOnce.BindValueChanged(_ => updateLoadingLayer());
 
-            if (idleTracker != null)
-            {
-                isIdle.BindTo(idleTracker.IsIdle);
-                isIdle.BindValueChanged(_ => updatePollingRate(), true);
-            }
+            isIdle.BindValueChanged(_ => updatePollingRate(), true);
 
             if (ongoingOperationTracker != null)
             {
