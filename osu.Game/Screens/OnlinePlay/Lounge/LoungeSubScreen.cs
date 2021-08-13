@@ -184,7 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             listingPollingComponent.HasPolledOnce.BindValueChanged(_ => updateLoadingLayer());
 
-            isIdle.BindValueChanged(_ => updatePollingRate(), true);
+            isIdle.BindValueChanged(_ => updatePollingRate(this.IsCurrentScreen()), true);
 
             if (ongoingOperationTracker != null)
             {
@@ -272,13 +272,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void onReturning()
         {
-            updatePollingRate();
+            updatePollingRate(true);
             searchTextBox.HoldFocus = true;
         }
 
         private void onLeaving()
         {
-            updatePollingRate();
+            updatePollingRate(false);
             searchTextBox.HoldFocus = false;
 
             // ensure any password prompt is dismissed.
@@ -332,9 +332,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 loadingLayer.Hide();
         }
 
-        private void updatePollingRate()
+        private void updatePollingRate(bool isCurrentScreen)
         {
-            if (!this.IsCurrentScreen())
+            if (!isCurrentScreen)
                 listingPollingComponent.TimeBetweenPolls.Value = 0;
             else
                 listingPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 120000 : 15000;
