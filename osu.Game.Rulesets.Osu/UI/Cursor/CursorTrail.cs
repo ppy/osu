@@ -26,11 +26,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
     {
         private const int max_sprites = 2048;
 
+        /// <summary>
+        /// An exponentiating factor to ease the trail fade.
+        /// </summary>
+        protected virtual float FadeExponent => 1.7f;
+
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
         private int currentIndex;
-
-        protected IShader Shader;
-
+        private IShader shader;
         private double timeOffset;
         private float time;
 
@@ -65,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            Shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
+            shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
         }
 
         protected override void LoadComplete()
@@ -217,10 +220,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private Texture texture;
 
             private float time;
+            private float fadeExponent;
 
             private readonly TrailPart[] parts = new TrailPart[max_sprites];
             private Vector2 size;
-
             private Vector2 originPosition;
 
             private readonly QuadBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites, 1);
@@ -234,10 +237,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 base.ApplyState();
 
-                shader = Source.Shader;
+                shader = Source.shader;
                 texture = Source.texture;
                 size = Source.partSize;
                 time = Source.time;
+                fadeExponent = Source.FadeExponent;
 
                 originPosition = Vector2.Zero;
 
@@ -260,6 +264,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 shader.Bind();
                 shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
+                shader.GetUniform<float>("g_FadeExponent").UpdateValue(ref fadeExponent);
 
                 texture.TextureGL.Bind();
 
