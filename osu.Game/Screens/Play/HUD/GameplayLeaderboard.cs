@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play.HUD
             if (isTracked)
             {
                 if (trackedScore != null)
-                    throw new InvalidOperationException("Cannot track more than one scores.");
+                    throw new InvalidOperationException("Cannot track more than one score.");
 
                 trackedScore = drawable;
             }
