@@ -190,8 +190,7 @@ namespace osu.Game.Online.Multiplayer
             return joinOrLeaveTaskChain.Add(async () =>
             {
                 await scheduledReset.ConfigureAwait(false);
-                if (Room != null)
-                    await LeaveRoomInternal().ConfigureAwait(false);
+                await LeaveRoomInternal().ConfigureAwait(false);
             });
         }
 
