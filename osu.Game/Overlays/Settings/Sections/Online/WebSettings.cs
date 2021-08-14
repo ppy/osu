@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = OnlineSettingsStrings.AutomaticallyDownload,
+                    LabelText = OnlineSettingsStrings.AutomaticallyDownloadWhenSpectating,
                     Keywords = new[] { "spectator" },
                     Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating),
                 },

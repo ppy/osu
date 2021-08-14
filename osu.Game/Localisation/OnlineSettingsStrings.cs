@@ -27,7 +27,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Show a notification when you receive a private message"
         /// </summary>
-        public static LocalisableString NotifyOnPM => new TranslatableString(getKey(@"notify_on_pm"), @"Show a notification when you receive a private message");
+        public static LocalisableString NotifyOnPrivateMessage => new TranslatableString(getKey(@"notify_on_private_message"), @"Show a notification when you receive a private message");
 
         /// <summary>
         /// "Integrations"
@@ -57,7 +57,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Automatically download beatmaps when spectating"
         /// </summary>
-        public static LocalisableString AutomaticallyDownload => new TranslatableString(getKey(@"automatically_download"), @"Automatically download beatmaps when spectating");
+        public static LocalisableString AutomaticallyDownloadWhenSpectating => new TranslatableString(getKey(@"automatically_download_when_spectating"), @"Automatically download beatmaps when spectating");
 
         /// <summary>
         /// "Show explicit content in search results"

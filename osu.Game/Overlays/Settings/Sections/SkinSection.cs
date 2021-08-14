@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new ExportSkinButton(),
                 new SettingsSlider<float, SizeSlider>
                 {
-                    LabelText = SkinSettingsStrings.CursorSize,
+                    LabelText = SkinSettingsStrings.GameplayCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
                 },
