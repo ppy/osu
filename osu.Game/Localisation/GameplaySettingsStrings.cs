@@ -42,7 +42,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Show difficulty graph on progress bar"
         /// </summary>
-        public static LocalisableString ShowProgressGraph => new TranslatableString(getKey(@"show_progress_graph"), @"Show difficulty graph on progress bar");
+        public static LocalisableString ShowDifficultyGraph => new TranslatableString(getKey(@"show_progress_graph"), @"Show difficulty graph on progress bar");
 
         /// <summary>
         /// "Show health display even when you can't fail"

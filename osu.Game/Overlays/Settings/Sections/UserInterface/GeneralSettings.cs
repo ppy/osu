@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 },
                 new SettingsSlider<float, TimeSlider>
                 {
-                    LabelText = UserInterfaceStrings.HoldActivationDelay,
+                    LabelText = UserInterfaceStrings.HoldToConfirmActivationTime,
                     Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
                     KeyboardStep = 50
                 },

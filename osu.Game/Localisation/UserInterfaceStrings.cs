@@ -37,7 +37,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Hold-to-confirm activation time"
         /// </summary>
-        public static LocalisableString HoldActivationDelay => new TranslatableString(getKey(@"hold_activation_delay"), @"Hold-to-confirm activation time");
+        public static LocalisableString HoldToConfirmActivationTime => new TranslatableString(getKey(@"hold_to_confirm_activation_time"), @"Hold-to-confirm activation time");
 
         /// <summary>
         /// "Main Menu"
