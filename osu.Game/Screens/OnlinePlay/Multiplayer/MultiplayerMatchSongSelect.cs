@@ -11,21 +11,15 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class MultiplayerMatchSongSelect : OnlinePlaySongSelect
     {
         [Resolved]
-        private MultiplayerClient client { get; set; }
-
-        [Resolved]
-        private Room room { get; set; }
+        private MultiplayerClient client { get; set; }   
 
         private LoadingLayer loadingLayer;
-
-        protected override UserActivity InitialActivity => new UserActivity.InLobby(room);
 
         /// <summary>
         /// Construct a new instance of multiplayer song select.
