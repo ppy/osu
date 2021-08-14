@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -104,7 +105,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             Team1Score.BindValueChanged(_ => updateScores());
-            Team2Score.BindValueChanged(_ => updateScores());
+            Team2Score.BindValueChanged(_ => updateScores(), true);
         }
 
         private void updateScores()
@@ -171,6 +172,8 @@ namespace osu.Game.Screens.Play.HUD
                 => displayedSpriteText.Font = winning
                     ? OsuFont.Torus.With(weight: FontWeight.Bold, size: font_size, fixedWidth: true)
                     : OsuFont.Torus.With(weight: FontWeight.Regular, size: font_size * 0.8f, fixedWidth: true);
+
+            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(@"N0");
         }
     }
 }
