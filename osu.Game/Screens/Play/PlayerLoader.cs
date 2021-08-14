@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// A fill flow containing the player settings groups, exposed for the ability to hide it from inheritors of the player loader.
         /// </summary>
-        protected FillFlowContainer<PlayerSettingsGroup> PlayerSettingsGroups;
+        protected FillFlowContainer<PlayerSettingsGroup> PlayerSettings;
 
         protected VisualSettings VisualSettings;
 
@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                PlayerSettingsGroups = new FillFlowContainer<PlayerSettingsGroup>
+                PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
