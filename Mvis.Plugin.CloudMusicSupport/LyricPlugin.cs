@@ -44,12 +44,12 @@ namespace Mvis.Plugin.CloudMusicSupport
         public override int Version => 5;
 
         private WorkingBeatmap currentWorkingBeatmap;
-        private LyricLine lrcLine;
+        private LyricLineHandler lrcLine;
 
         /// <summary>
         /// 请参阅 <see cref="MvisPlugin.CreateContent()"/>
         /// </summary>
-        protected override Drawable CreateContent() => lrcLine = new LyricLine();
+        protected override Drawable CreateContent() => lrcLine = new LyricLineHandler();
 
         private readonly LyricProcessor processor = new LyricProcessor();
 
@@ -116,8 +116,7 @@ namespace Mvis.Plugin.CloudMusicSupport
                 PluginFlags.CanUnload
             });
 
-            RelativeSizeAxes = Axes.X;
-            Height = 300;
+            RelativeSizeAxes = Axes.Both;
             Anchor = Origin = Anchor.BottomCentre;
         }
 
@@ -223,7 +222,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             base.Update();
 
-            Margin = new MarginPadding { Bottom = (MvisScreen?.BottombarHeight ?? 0) + 20 };
+            Padding = new MarginPadding { Bottom = (MvisScreen?.BottombarHeight ?? 0) + 20 };
 
             if (ContentLoaded)
             {

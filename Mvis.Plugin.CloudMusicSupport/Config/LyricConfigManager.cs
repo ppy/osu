@@ -1,4 +1,5 @@
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Screens.Mvis.Plugins.Config;
 
@@ -24,6 +25,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
             SetDefault(LyricSettings.NoExtraShadow, true);
             SetDefault(LyricSettings.UseDrawablePool, false);
             SetDefault(LyricSettings.AutoScrollToCurrent, false);
+            SetDefault(LyricSettings.LyricDirection, Anchor.BottomCentre);
+            SetDefault(LyricSettings.LyricPositionX, 0f, -1f, 1f);
+            SetDefault(LyricSettings.LyricPositionY, 0f, -1f, 1f);
             base.InitialiseDefaults();
         }
 
@@ -40,6 +44,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
         SaveLrcWhenFetchFinish,
         NoExtraShadow,
         UseDrawablePool,
-        AutoScrollToCurrent
+        AutoScrollToCurrent,
+        LyricDirection,
+        LyricPositionX,
+        LyricPositionY
     }
 }
