@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
@@ -18,6 +19,8 @@ namespace osu.Game.Screens.Play
         protected Bindable<long?> RoomId { get; private set; }
 
         protected readonly PlaylistItem PlaylistItem;
+
+        protected override UserActivity InitialActivity => new UserActivity.MultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         protected RoomSubmittingPlayer(PlaylistItem playlistItem, PlayerConfiguration configuration = null)
             : base(configuration)

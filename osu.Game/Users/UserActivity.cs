@@ -74,7 +74,7 @@ namespace osu.Game.Users
 
         public class InLobby : UserActivity
         {
-            public override string Status => @"In a multiplayer lobby";
+            public override string Status => @"In a lobby";
 
             public readonly Room Room;
 
