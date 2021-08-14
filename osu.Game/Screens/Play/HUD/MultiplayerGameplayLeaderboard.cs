@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play.HUD
                     continue;
 
                 if (TeamScores.TryGetValue(u.Team.Value, out var team))
-                    team.Value += (int)u.Score.Value;
+                    team.Value += (int)Math.Round(u.Score.Value);
             }
         }
 
