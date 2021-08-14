@@ -25,9 +25,14 @@ namespace osu.Game.Users
             public override string Status => "Choosing a beatmap";
         }
 
-        public class MultiplayerGame : UserActivity
+        public class MultiplayerGame : SoloGame
         {
-            public override string Status => "Playing with others";
+            public MultiplayerGame(BeatmapInfo beatmap, RulesetInfo ruleset)
+                : base(beatmap, ruleset)
+            {
+            }
+
+            public override string Status => $@"{base.Status} with others";
         }
 
         public class Editing : UserActivity
