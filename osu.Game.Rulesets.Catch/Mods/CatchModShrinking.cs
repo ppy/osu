@@ -25,11 +25,11 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override IconUsage? Icon => FontAwesome.Solid.CompressArrowsAlt;
 
         /// <summary>
-        /// The point in the beatmap at which the final ramping rate should be reached.
+        /// The point in the beatmap at which the final scale should be reached.
         /// </summary>
-        public const double FINAL_RATE_PROGRESS = 0.75f;
+        public const double FINAL_SCALE_PROGRESS = 0.75f;
 
-        private double finalRateTime;
+        private double finalScaleTime;
         private double beginRampTime;
 
         [SettingSource("Initial scale", "The initial scale of the playfield.")]
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             double lastObjectEnd = beatmap.HitObjects.LastOrDefault()?.GetEndTime() ?? 0;
 
             beginRampTime = firstObjectStart;
-            finalRateTime = firstObjectStart + FINAL_RATE_PROGRESS * (lastObjectEnd - firstObjectStart);
+            finalScaleTime = firstObjectStart + FINAL_SCALE_PROGRESS * (lastObjectEnd - firstObjectStart);
         }
 
         public void Update(Playfield playfield)
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             playfield.Anchor = Anchor.Centre;
             playfield.Origin = Anchor.Centre;
 
-            double amount = (track.CurrentTime - beginRampTime) / Math.Max(1, finalRateTime - beginRampTime);
+            double amount = (track.CurrentTime - beginRampTime) / Math.Max(1, finalScaleTime - beginRampTime);
             float scale = (float)(InitialScale.Value + (FinalScale.Value - InitialScale.Value) * Math.Clamp(amount, 0, 1));
 
             switch (ActiveAxes.Value)
