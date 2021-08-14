@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Origin = Anchor.TopCentre,
                             Text = TabletSettingsStrings.NoTabletDetected,
                         },
-                        new SettingsNoticeText
+                        new SettingsNoticeText(colours)
                         {
                             TextAnchor = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
