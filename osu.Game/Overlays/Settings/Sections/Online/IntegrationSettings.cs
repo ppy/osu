@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class IntegrationSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => OnlineSettingsStrings.IntegrationHeader;
+        protected override LocalisableString Header => OnlineSettingsStrings.IntegrationsHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

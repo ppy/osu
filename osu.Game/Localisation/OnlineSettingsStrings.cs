@@ -32,7 +32,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Integrations"
         /// </summary>
-        public static LocalisableString IntegrationHeader => new TranslatableString(getKey(@"integration_header"), @"Integrations");
+        public static LocalisableString IntegrationsHeader => new TranslatableString(getKey(@"integrations_header"), @"Integrations");
 
         /// <summary>
         /// "Discord Rich Presence"

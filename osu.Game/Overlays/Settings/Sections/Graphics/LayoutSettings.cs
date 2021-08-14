@@ -146,7 +146,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 updateResolutionDropdown();
 
-                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? GraphicsSettingsStrings.NotFullscreenNote : string.Empty;
+                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? GraphicsSettingsStrings.NotFullscreenNote : default;
             }, true);
 
             windowModes.BindCollectionChanged((sender, args) =>
