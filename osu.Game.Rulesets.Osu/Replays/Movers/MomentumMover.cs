@@ -13,9 +13,8 @@ namespace osu.Game.Rulesets.Osu.Replays.Movers
     {
         private float offset => restrictAngle * MathF.PI / 180.0f;
 
-        private Vector2 p1;
-        private Vector2 p2;
         private Vector2 last;
+        private BezierCurveCubic curve;
         private readonly float jumpMult;
         private readonly float offsetMult;
         private readonly bool skipStacks;
@@ -126,10 +125,12 @@ namespace osu.Game.Rulesets.Osu.Replays.Movers
             if (durationTrigger > 0 && duration >= durationTrigger)
                 mult *= durationMult * (duration / durationTrigger);
 
-            p1 = V2FromRad(a1, distance * mult) + StartPos;
-            p2 = V2FromRad(a2, distance * mult) + EndPos;
+            var p1 = V2FromRad(a1, distance * mult) + StartPos;
+            var p2 = V2FromRad(a2, distance * mult) + EndPos;
 
             if (!(End is Slider) && !isSame(Start, End)) last = p2;
+
+            curve = new BezierCurveCubic(StartPos, EndPos, p1, p2);
         }
 
         private float anorm(float a)
@@ -153,22 +154,6 @@ namespace osu.Game.Rulesets.Osu.Replays.Movers
             return a;
         }
 
-        public override Vector2 Update(double time)
-        {
-            var t = T(time);
-            var r = 1 - t;
-
-            // cubic bézier curve
-            return new Vector2(
-                r * r * r * StartX
-                + r * r * t * p1.X * 3
-                + r * t * t * p2.X * 3
-                + t * t * t * EndX,
-                r * r * r * StartY
-                + r * r * t * p1.Y * 3
-                + r * t * t * p2.Y * 3
-                + t * t * t * EndY
-            );
-        }
+        public override Vector2 Update(double time) => curve.CalculatePoint(T(time));
     }
 }

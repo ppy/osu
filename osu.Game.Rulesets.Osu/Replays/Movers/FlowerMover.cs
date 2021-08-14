@@ -16,12 +16,10 @@ namespace osu.Game.Rulesets.Osu.Replays.Movers
         private readonly float offsetMult;
         private float offset => MathF.PI * offsetMult;
 
-        private Vector2 p1;
-        private Vector2 p2;
-
         private float invert = 1;
         private float lastAngle;
         private Vector2 lastPoint;
+        private BezierCurveCubic curve;
 
         public FlowerMover()
         {
@@ -33,6 +31,7 @@ namespace osu.Game.Rulesets.Osu.Replays.Movers
 
         public override void OnObjChange()
         {
+            Vector2 p1, p2;
             var dst = Vector2.Distance(StartPos, EndPos);
             var scaled = mult * dst;
             var next = nmult * dst;
@@ -75,23 +74,9 @@ namespace osu.Game.Rulesets.Osu.Replays.Movers
             }
 
             lastPoint = StartPos;
+            curve = new BezierCurveCubic(StartPos, EndPos, p1, p2);
         }
 
-        public override Vector2 Update(double time)
-        {
-            var t = T(time);
-            var r = 1 - t;
-
-            return new Vector2(
-                r * r * r * StartX
-              + r * r * t * p1.X * 3
-              + r * t * t * p2.X * 3
-              + t * t * t * EndX,
-                r * r * r * StartY
-              + r * r * t * p1.Y * 3
-              + r * t * t * p2.Y * 3
-              + t * t * t * EndY
-            );
-        }
+        public override Vector2 Update(double time) => curve.CalculatePoint(T(time));
     }
 }

@@ -29,6 +29,9 @@ namespace osu.Game.Rulesets.Osu.Replays
                 OsuDanceMover.Flower => new FlowerMover(),
                 OsuDanceMover.Momentum => new MomentumMover(),
                 OsuDanceMover.Pippi => new PippiMover(),
+                OsuDanceMover.Aggresive => new AggressiveMover(),
+                OsuDanceMover.AxisAligned => new AxisAlignedMover(),
+                OsuDanceMover.Bezier => new BezierMover(),
                 _ => new MomentumMover()
             };
 
@@ -125,7 +128,6 @@ namespace osu.Game.Rulesets.Osu.Replays
                             var point = points[i];
                             var next = points[i + 1];
                             var duration = next.StartTime - point.StartTime;
-                            var rad = OsuHitObject.OBJECT_RADIUS * 1.2f * h.Scale;
 
                             for (double j = GetFrameDelay(point.StartTime); j < duration; j += GetFrameDelay(point.StartTime + j))
                             {
@@ -190,6 +192,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             float yf = baseSize.Y / 0.8f;
             float y0 = (baseSize.Y - yf) / 2f;
             float y1 = yf + y0;
+            mover.OnObjChange();
 
             for (int i = 0; i < Beatmap.HitObjects.Count - 1; i++)
             {

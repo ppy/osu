@@ -47,6 +47,10 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.StreamRestrict, false);
             SetDefault(OsuRulesetSetting.RestrictInvert, true);
             SetDefault(OsuRulesetSetting.SkipStackAngles, false);
+
+            //Bezier mover settings
+            SetDefault(OsuRulesetSetting.BezierAggressiveness, 60f, 1f, 180f);
+            SetDefault(OsuRulesetSetting.BezierSliderAggressiveness, 3f, 1f, 20f);
         }
     }
 
@@ -55,7 +59,10 @@ namespace osu.Game.Rulesets.Osu.Configuration
         HalfCircle,
         Flower,
         Momentum,
-        Pippi
+        Pippi,
+        AxisAligned,
+        Aggresive,
+        Bezier
     }
 
     public enum OsuRulesetSetting
@@ -84,5 +91,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
         StreamRestrict,
         DurationTrigger,
         DurationMult,
+        BezierAggressiveness,
+        BezierSliderAggressiveness,
     }
 }
