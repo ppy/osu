@@ -190,7 +190,8 @@ namespace osu.Game.Online.Multiplayer
             return joinOrLeaveTaskChain.Add(async () =>
             {
                 await scheduledReset.ConfigureAwait(false);
-                await LeaveRoomInternal().ConfigureAwait(false);
+                if (Room != null)
+                    await LeaveRoomInternal().ConfigureAwait(false);
             });
         }
 
@@ -387,6 +388,18 @@ namespace osu.Game.Online.Multiplayer
             }, false);
 
             return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user)
+        {
+            if (LocalUser == null)
+                return Task.CompletedTask;
+
+            if (user.Equals(LocalUser))
+                LeaveRoom();
+
+            // TODO: also inform users of the kick operation.
+            return ((IMultiplayerClient)this).UserLeft(user);
         }
 
         Task IMultiplayerClient.HostChanged(int userId)
