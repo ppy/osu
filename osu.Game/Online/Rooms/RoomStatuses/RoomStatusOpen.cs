@@ -8,7 +8,7 @@ namespace osu.Game.Online.Rooms.RoomStatuses
 {
     public class RoomStatusOpen : RoomStatus
     {
-        public override string Message => @"开放中";
+        public override string Message => "开放中";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.GreenLight;
     }
 }

@@ -8,7 +8,7 @@ namespace osu.Game.Online.Rooms.RoomStatuses
 {
     public class RoomStatusEnded : RoomStatus
     {
-        public override string Message => @"已结束";
+        public override string Message => "已结束";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.YellowDarker;
     }
 }

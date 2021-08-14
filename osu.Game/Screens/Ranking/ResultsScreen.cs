@@ -41,6 +41,8 @@ namespace osu.Game.Screens.Ranking
 
         protected ScorePanelList ScorePanelList { get; private set; }
 
+        protected VerticalScrollContainer VerticalScrollContent { get; private set; }
+
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
 
@@ -78,7 +80,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     new Drawable[]
                     {
-                        new VerticalScrollContainer
+                        VerticalScrollContent = new VerticalScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             ScrollbarVisible = false,
@@ -383,7 +385,7 @@ namespace osu.Game.Screens.Ranking
         {
         }
 
-        private class VerticalScrollContainer : OsuScrollContainer
+        protected class VerticalScrollContainer : OsuScrollContainer
         {
             protected override Container<Drawable> Content => content;
 
@@ -391,6 +393,8 @@ namespace osu.Game.Screens.Ranking
 
             public VerticalScrollContainer()
             {
+                Masking = false;
+
                 base.Content.Add(content = new Container { RelativeSizeAxes = Axes.X });
             }
 

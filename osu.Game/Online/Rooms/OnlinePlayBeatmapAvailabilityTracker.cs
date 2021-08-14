@@ -59,8 +59,8 @@ namespace osu.Game.Online.Rooms
 
         protected override bool VerifyDatabasedModel(BeatmapSetInfo databasedSet)
         {
-            int? beatmapId = SelectedItem.Value.Beatmap.Value.OnlineBeatmapID;
-            string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
+            int? beatmapId = SelectedItem.Value?.Beatmap.Value.OnlineBeatmapID;
+            string checksum = SelectedItem.Value?.Beatmap.Value.MD5Hash;
 
             var matchingBeatmap = databasedSet.Beatmaps.FirstOrDefault(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
 
