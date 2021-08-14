@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Osu.Replays.Movers
 {
     public class PippiMover : DanceMover
     {
-        public override Vector2 Update(double time) => ApplyPippiOffset(Interpolation.ValueAt(time, StartPos, EndPos, StartTime, EndTime), time);
+        public override Vector2 Update(double time) => ApplyPippiOffset(Interpolation.ValueAt(time, StartPos, EndPos, StartTime, EndTime), time, -1);
     }
 }

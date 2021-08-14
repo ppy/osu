@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
         private OsuSpriteText infoText;
         private bool canOpenInBrowser;
 
-        private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
+        private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Mvis);
 
         private readonly BindableBool optUI = new BindableBool();
 

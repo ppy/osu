@@ -50,7 +50,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public void Disconnect() => isConnected.Value = false;
 
-        public void AddUser(User user) => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(user.Id) { User = user });
+        public MultiplayerRoomUser AddUser(User user, bool markAsPlaying = false)
+        {
+            var roomUser = new MultiplayerRoomUser(user.Id) { User = user };
+            ((IMultiplayerClient)this).UserJoined(roomUser);
+
+            if (markAsPlaying)
+                PlayingUserIds.Add(user.Id);
+
+            return roomUser;
+        }
 
         public void AddNullUser(int userId) => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(userId));
 
@@ -164,6 +173,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override Task LeaveRoomInternal() => Task.CompletedTask;
 
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
+
+        public override Task KickUser(int userId)
+        {
+            Debug.Assert(Room != null);
+
+            return ((IMultiplayerClient)this).UserKicked(Room.Users.Single(u => u.UserID == userId));
+        }
 
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
         {

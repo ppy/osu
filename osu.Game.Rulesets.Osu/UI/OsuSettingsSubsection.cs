@@ -62,13 +62,13 @@ namespace osu.Game.Rulesets.Osu.UI
                 new SettingsSlider<float, MultiplierSlider>
                 {
                     LabelText = "跳跃倍率(Jump Multiplier)",
-                    Current = config.GetBindable<float>(OsuRulesetSetting.JumpMulti),
+                    Current = config.GetBindable<float>(OsuRulesetSetting.JumpMult),
                     KeyboardStep = 1f / 12f
                 },
                 new SettingsSlider<float, MultiplierSlider>
                 {
                     LabelText = "下一跳倍率(Next Jump Multiplier)",
-                    Current = config.GetBindable<float>(OsuRulesetSetting.NextJumpMulti),
+                    Current = config.GetBindable<float>(OsuRulesetSetting.NextJumpMult),
                     KeyboardStep = 1f / 12f
                 },
                 new SettingsCheckbox
@@ -98,12 +98,6 @@ namespace osu.Game.Rulesets.Osu.UI
                     Current = config.GetBindable<float>(OsuRulesetSetting.SpinnerRadiusEnd),
                     KeyboardStep = 1f / 12f
                 },
-                new SettingsSlider<float, MultiplierSlider>
-                {
-                    LabelText = "下一跳倍率(Next Jump Multiplier)",
-                    Current = config.GetBindable<float>(OsuRulesetSetting.NextJumpMulti),
-                    KeyboardStep = 1f / 12f
-                },
                 new SettingsCheckbox
                 {
                     LabelText = "遇到边界时反弹",
@@ -123,7 +117,41 @@ namespace osu.Game.Rulesets.Osu.UI
                 {
                     LabelText = "强制为note串启用pippi移动方式",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.PippiStream)
-                }
+                },
+                new SettingsSlider<float, MultiplierSlider>
+                {
+                    LabelText = "打串倍率",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.StreamMult),
+                    KeyboardStep = 1f / 12f
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "限制角度",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.RestrictAngle),
+                    KeyboardStep = 1
+                },
+                new SettingsSlider<float, MultiplierSlider>
+                {
+                    LabelText = "时长倍率",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.DurationMult),
+                    KeyboardStep = 0.05f
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "时长倍率触发值",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.DurationTrigger),
+                    KeyboardStep = 100f
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "限制反转",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.RestrictInvert)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "打串限制",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.StreamRestrict)
+                },
             };
         }
 
