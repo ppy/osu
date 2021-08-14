@@ -4,7 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
@@ -120,18 +123,6 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsSlider<float, MultiplierSlider>
                 {
-                    LabelText = "打串倍率",
-                    Current = config.GetBindable<float>(OsuRulesetSetting.StreamMult),
-                    KeyboardStep = 1f / 12f
-                },
-                new SettingsSlider<float>
-                {
-                    LabelText = "限制角度",
-                    Current = config.GetBindable<float>(OsuRulesetSetting.RestrictAngle),
-                    KeyboardStep = 1
-                },
-                new SettingsSlider<float, MultiplierSlider>
-                {
                     LabelText = "时长倍率",
                     Current = config.GetBindable<float>(OsuRulesetSetting.DurationMult),
                     KeyboardStep = 0.05f
@@ -152,6 +143,44 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "打串限制",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.StreamRestrict)
                 },
+                //某人做功能不留翻译
+                //一些拉满都看不出来啥明显差异的功能我都不知道我翻译的准不准确
+                new OsuSpriteText
+                {
+                    Text = "Momentum 移动设置",
+                    Margin = new MarginPadding { Vertical = 15, Left = SettingsPanel.CONTENT_MARGINS },
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                },
+                new SettingsSlider<float, MultiplierSlider>
+                {
+                    LabelText = "打串倍率",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.StreamMult),
+                    KeyboardStep = 1f / 12f
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "限制角度",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.RestrictAngle),
+                    KeyboardStep = 1
+                },
+                new OsuSpriteText
+                {
+                    Text = "Bezier 移动设置",
+                    Margin = new MarginPadding { Vertical = 15, Left = SettingsPanel.CONTENT_MARGINS },
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "倍率",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.BezierAggressiveness),
+                    KeyboardStep = 1
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "滑条倍率",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.BezierSliderAggressiveness),
+                    KeyboardStep = 1
+                }
             };
         }
 
