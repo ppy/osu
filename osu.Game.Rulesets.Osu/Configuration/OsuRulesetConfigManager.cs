@@ -28,10 +28,6 @@ namespace osu.Game.Rulesets.Osu.Configuration
 
             SetDefault(OsuRulesetSetting.ReplayFramerate, 120f, 24f, 990f, 2f);
             SetDefault(OsuRulesetSetting.DanceMover, OsuDanceMover.Momentum);
-            SetDefault(OsuRulesetSetting.AngleOffset, 8f / 18f, 0f, 2f, float.Epsilon);
-            SetDefault(OsuRulesetSetting.JumpMulti, 2f / 3f, 0f, 2f, float.Epsilon);
-            SetDefault(OsuRulesetSetting.NextJumpMulti, 2f / 3f, 0f, 2f, float.Epsilon);
-            SetDefault(OsuRulesetSetting.SkipStackAngles, true);
             SetDefault(OsuRulesetSetting.BorderBounce, true);
             SetDefault(OsuRulesetSetting.PippiSpinner, false);
             SetDefault(OsuRulesetSetting.PippiStream, false);
@@ -39,6 +35,22 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.SliderDance, true);
             SetDefault(OsuRulesetSetting.SpinnerRadiusStart, 235f, 10f, 350f, 1f);
             SetDefault(OsuRulesetSetting.SpinnerRadiusEnd, 15f, 10f, 250f, 1f);
+
+            SetDefault(OsuRulesetSetting.AngleOffset, 0.45f, 0f, 2f, 0.01f);
+            SetDefault(OsuRulesetSetting.JumpMult, 0.6f, 0f, 2f, 0.01f);
+            SetDefault(OsuRulesetSetting.NextJumpMult, 0.25f, 0f, 2f, 0.01f);
+            SetDefault(OsuRulesetSetting.DurationTrigger, 500f, 0f, 5000f, 1f);
+            SetDefault(OsuRulesetSetting.DurationMult, 2f, 0f, 50f, 0.1f);
+            SetDefault(OsuRulesetSetting.StreamMult, 0.7f, 0f, 50f, 0.1f);
+            SetDefault(OsuRulesetSetting.RestrictAngle, 90f, 1f, 180f);
+            SetDefault(OsuRulesetSetting.RestrictArea, 40f, 1f, 180f);
+            SetDefault(OsuRulesetSetting.StreamRestrict, false);
+            SetDefault(OsuRulesetSetting.RestrictInvert, true);
+            SetDefault(OsuRulesetSetting.SkipStackAngles, false);
+
+            //Bezier mover settings
+            SetDefault(OsuRulesetSetting.BezierAggressiveness, 60f, 1f, 180f);
+            SetDefault(OsuRulesetSetting.BezierSliderAggressiveness, 3f, 1f, 20f);
         }
     }
 
@@ -47,7 +59,10 @@ namespace osu.Game.Rulesets.Osu.Configuration
         HalfCircle,
         Flower,
         Momentum,
-        Pippi
+        Pippi,
+        AxisAligned,
+        Aggresive,
+        Bezier
     }
 
     public enum OsuRulesetSetting
@@ -58,8 +73,8 @@ namespace osu.Game.Rulesets.Osu.Configuration
         ReplayFramerate,
         DanceMover,
         AngleOffset,
-        JumpMulti,
-        NextJumpMulti,
+        JumpMult,
+        NextJumpMult,
         BorderBounce,
         SkipStackAngles,
         PippiSpinner,
@@ -68,6 +83,15 @@ namespace osu.Game.Rulesets.Osu.Configuration
         SpinnerRadiusStart,
         SpinnerRadiusEnd,
         SpinnerDance,
-        SliderDance
+        SliderDance,
+        StreamMult,
+        RestrictInvert,
+        RestrictArea,
+        RestrictAngle,
+        StreamRestrict,
+        DurationTrigger,
+        DurationMult,
+        BezierAggressiveness,
+        BezierSliderAggressiveness,
     }
 }

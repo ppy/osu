@@ -4,7 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
@@ -62,13 +65,13 @@ namespace osu.Game.Rulesets.Osu.UI
                 new SettingsSlider<float, MultiplierSlider>
                 {
                     LabelText = "跳跃倍率(Jump Multiplier)",
-                    Current = config.GetBindable<float>(OsuRulesetSetting.JumpMulti),
+                    Current = config.GetBindable<float>(OsuRulesetSetting.JumpMult),
                     KeyboardStep = 1f / 12f
                 },
                 new SettingsSlider<float, MultiplierSlider>
                 {
                     LabelText = "下一跳倍率(Next Jump Multiplier)",
-                    Current = config.GetBindable<float>(OsuRulesetSetting.NextJumpMulti),
+                    Current = config.GetBindable<float>(OsuRulesetSetting.NextJumpMult),
                     KeyboardStep = 1f / 12f
                 },
                 new SettingsCheckbox
@@ -98,12 +101,6 @@ namespace osu.Game.Rulesets.Osu.UI
                     Current = config.GetBindable<float>(OsuRulesetSetting.SpinnerRadiusEnd),
                     KeyboardStep = 1f / 12f
                 },
-                new SettingsSlider<float, MultiplierSlider>
-                {
-                    LabelText = "下一跳倍率(Next Jump Multiplier)",
-                    Current = config.GetBindable<float>(OsuRulesetSetting.NextJumpMulti),
-                    KeyboardStep = 1f / 12f
-                },
                 new SettingsCheckbox
                 {
                     LabelText = "遇到边界时反弹",
@@ -123,6 +120,66 @@ namespace osu.Game.Rulesets.Osu.UI
                 {
                     LabelText = "强制为note串启用pippi移动方式",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.PippiStream)
+                },
+                new SettingsSlider<float, MultiplierSlider>
+                {
+                    LabelText = "时长倍率",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.DurationMult),
+                    KeyboardStep = 0.05f
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "时长倍率触发值",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.DurationTrigger),
+                    KeyboardStep = 100f
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "限制反转",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.RestrictInvert)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "打串限制",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.StreamRestrict)
+                },
+                //某人做功能不留翻译
+                //一些拉满都看不出来啥明显差异的功能我都不知道我翻译的准不准确
+                new OsuSpriteText
+                {
+                    Text = "Momentum 移动设置",
+                    Margin = new MarginPadding { Vertical = 15, Left = SettingsPanel.CONTENT_MARGINS },
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                },
+                new SettingsSlider<float, MultiplierSlider>
+                {
+                    LabelText = "打串倍率",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.StreamMult),
+                    KeyboardStep = 1f / 12f
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "限制角度",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.RestrictAngle),
+                    KeyboardStep = 1
+                },
+                new OsuSpriteText
+                {
+                    Text = "Bezier 移动设置",
+                    Margin = new MarginPadding { Vertical = 15, Left = SettingsPanel.CONTENT_MARGINS },
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "倍率",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.BezierAggressiveness),
+                    KeyboardStep = 1
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "滑条倍率",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.BezierSliderAggressiveness),
+                    KeyboardStep = 1
                 }
             };
         }

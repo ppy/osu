@@ -18,6 +18,7 @@ namespace osu.Game.Overlays
         public static OverlayColourProvider Green { get; } = new OverlayColourProvider(OverlayColourScheme.Green);
         public static OverlayColourProvider Purple { get; } = new OverlayColourProvider(OverlayColourScheme.Purple);
         public static OverlayColourProvider Blue { get; } = new OverlayColourProvider(OverlayColourScheme.Blue);
+        public static OverlayColourProvider Plum { get; } = new OverlayColourProvider(OverlayColourScheme.Plum);
 
         public OverlayColourProvider(OverlayColourScheme colourScheme)
         {
@@ -81,8 +82,8 @@ namespace osu.Game.Overlays
                 case OverlayColourScheme.Blue:
                     return 200 / 360f;
 
-                case OverlayColourScheme.Blue1:
-                    return 212 / 360f;
+                case OverlayColourScheme.Plum:
+                    return 320 / 360f;
 
                 case OverlayColourScheme.Mvis:
                     return 212 / 360f;
@@ -99,7 +100,7 @@ namespace osu.Game.Overlays
         Green,
         Purple,
         Blue,
-        Blue1,
+        Plum,
         Mvis
     }
 }

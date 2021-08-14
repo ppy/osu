@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
@@ -20,7 +21,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -28,6 +28,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 using osuTK.Graphics;
@@ -37,21 +38,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable, IHasContextMenu, IHasPopover, IKeyBindingHandler<GlobalAction>
     {
         public const float SELECTION_BORDER_WIDTH = 4;
-        private const float corner_radius = 5;
+        private const float corner_radius = 10;
         private const float transition_duration = 60;
-        private const float content_padding = 10;
-        private const float height = 110;
-        private const float side_strip_width = 5;
-        private const float cover_width = 145;
+        private const float height = 100;
 
         public event Action<SelectionState> StateChanged;
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 
-        private readonly Box selectionBox;
+        private Drawable selectionBox;
 
         [Resolved(canBeNull: true)]
-        private OnlinePlayScreen parentScreen { get; set; }
+        private LoungeSubScreen loungeScreen { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -74,14 +72,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             get => state;
             set
             {
-                if (value == state) return;
+                if (value == state)
+                    return;
 
                 state = value;
 
-                if (state == SelectionState.Selected)
-                    selectionBox.FadeIn(transition_duration);
-                else
-                    selectionBox.FadeOut(transition_duration);
+                if (selectionBox != null)
+                {
+                    if (state == SelectionState.Selected)
+                        selectionBox.FadeIn(transition_duration);
+                    else
+                        selectionBox.FadeOut(transition_duration);
+                }
 
                 StateChanged?.Invoke(State);
             }
@@ -108,6 +110,25 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
+        private int numberOfAvatars = 7;
+
+        public int NumberOfAvatars
+        {
+            get => numberOfAvatars;
+            set
+            {
+                numberOfAvatars = value;
+
+                if (recentParticipantsList != null)
+                    recentParticipantsList.NumberOfCircles = value;
+            }
+        }
+
+        private readonly Bindable<RoomCategory> roomCategory = new Bindable<RoomCategory>();
+
+        private RecentParticipantsList recentParticipantsList;
+        private RoomSpecialCategoryPill specialCategoryPill;
+
         public bool FilteringActive { get; set; }
 
         private PasswordProtectedIcon passwordIcon;
@@ -119,113 +140,207 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             Room = room;
 
             RelativeSizeAxes = Axes.X;
-            Height = height + SELECTION_BORDER_WIDTH * 2;
-            CornerRadius = corner_radius + SELECTION_BORDER_WIDTH / 2;
-            Masking = true;
+            Height = height;
 
-            // create selectionBox here so State can be set before being loaded
-            selectionBox = new Box
+            Masking = true;
+            CornerRadius = corner_radius + SELECTION_BORDER_WIDTH / 2;
+            EdgeEffect = new EdgeEffectParameters
             {
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0f,
+                Type = EdgeEffectType.Shadow,
+                Colour = Color4.Black.Opacity(40),
+                Radius = 5,
             };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OverlayColourProvider colours, AudioManager audio)
         {
-            float stripWidth = side_strip_width * (Room.Category.Value == RoomCategory.Spotlight ? 2 : 1);
-
             Children = new Drawable[]
             {
-                new StatusColouredContainer(transition_duration)
+                // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
+                new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = selectionBox
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.Background5,
+                        },
+                        new OnlinePlayBackgroundSprite
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        },
+                    }
                 },
                 new Container
                 {
+                    Name = @"Room content",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(SELECTION_BORDER_WIDTH),
+                    // This negative padding resolves 1px gaps between this background and the background above.
+                    Padding = new MarginPadding { Left = 20, Vertical = -0.5f },
                     Child = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         CornerRadius = corner_radius,
-                        EdgeEffect = new EdgeEffectParameters
-                        {
-                            Type = EdgeEffectType.Shadow,
-                            Colour = Color4.Black.Opacity(40),
-                            Radius = 5,
-                        },
                         Children = new Drawable[]
                         {
-                            new Box
+                            // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
+                            new BufferedContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex(@"212121"),
-                            },
-                            new StatusColouredContainer(transition_duration)
-                            {
-                                RelativeSizeAxes = Axes.Y,
-                                Width = stripWidth,
-                                Child = new Box { RelativeSizeAxes = Axes.Both }
+                                Children = new Drawable[]
+                                {
+                                    new GridContainer
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        ColumnDimensions = new[]
+                                        {
+                                            new Dimension(GridSizeMode.Relative, 0.2f)
+                                        },
+                                        Content = new[]
+                                        {
+                                            new Drawable[]
+                                            {
+                                                new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Colour = colours.Background5,
+                                                },
+                                                new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f))
+                                                },
+                                            }
+                                        }
+                                    },
+                                },
                             },
                             new Container
                             {
-                                RelativeSizeAxes = Axes.Y,
-                                Width = cover_width,
-                                Masking = true,
-                                Margin = new MarginPadding { Left = stripWidth },
-                                Child = new OnlinePlayBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both }
-                            },
-                            new Container
-                            {
+                                Name = @"Left details",
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding
                                 {
-                                    Vertical = content_padding,
-                                    Left = stripWidth + cover_width + content_padding,
-                                    Right = content_padding,
+                                    Left = 20,
+                                    Vertical = 5
                                 },
                                 Children = new Drawable[]
                                 {
                                     new FillFlowContainer
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
+                                        AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            new RoomName { Font = OsuFont.GetFont(size: 18) },
-                                            new ParticipantInfo(),
+                                            new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(5),
+                                                Children = new Drawable[]
+                                                {
+                                                    new RoomStatusPill
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft
+                                                    },
+                                                    specialCategoryPill = new RoomSpecialCategoryPill
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft
+                                                    },
+                                                    new EndDateInfo
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft
+                                                    },
+                                                }
+                                            },
+                                            new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Top = 3 },
+                                                Direction = FillDirection.Vertical,
+                                                Children = new Drawable[]
+                                                {
+                                                    new RoomNameText(),
+                                                    new RoomHostText(),
+                                                }
+                                            }
                                         },
                                     },
                                     new FillFlowContainer
                                     {
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(0, 5),
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(5),
                                         Children = new Drawable[]
                                         {
-                                            new RoomStatusInfo(),
-                                            new BeatmapTitle { TextSize = 14 },
-                                        },
-                                    },
-                                    new ModeTypeInfo
-                                    {
-                                        Anchor = Anchor.BottomRight,
-                                        Origin = Anchor.BottomRight,
-                                    },
+                                            new PlaylistCountPill
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                            },
+                                            new StarRatingRangeDisplay
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Scale = new Vector2(0.8f)
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            new FillFlowContainer
+                            {
+                                Name = "Right content",
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                AutoSizeAxes = Axes.X,
+                                RelativeSizeAxes = Axes.Y,
+                                Padding = new MarginPadding
+                                {
+                                    Right = 10,
+                                    Vertical = 5
                                 },
+                                Children = new Drawable[]
+                                {
+                                    recentParticipantsList = new RecentParticipantsList
+                                    {
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        NumberOfCircles = NumberOfAvatars
+                                    }
+                                }
                             },
                             passwordIcon = new PasswordProtectedIcon { Alpha = 0 }
                         },
                     },
+                },
+                new StatusColouredContainer(transition_duration)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = selectionBox = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = state == SelectionState.Selected ? 1 : 0,
+                        Masking = true,
+                        CornerRadius = corner_radius,
+                        BorderThickness = SELECTION_BORDER_WIDTH,
+                        BorderColour = Color4.White,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        }
+                    }
                 },
             };
 
@@ -250,6 +365,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             else
                 Alpha = 0;
 
+            roomCategory.BindTo(Room.Category);
+            roomCategory.BindValueChanged(c =>
+            {
+                if (c.NewValue == RoomCategory.Spotlight)
+                    specialCategoryPill.Show();
+                else
+                    specialCategoryPill.Hide();
+            }, true);
+
             hasPassword.BindTo(Room.HasPassword);
             hasPassword.BindValueChanged(v => passwordIcon.Alpha = v.NewValue ? 1 : 0, true);
         }
@@ -260,7 +384,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
             {
-                parentScreen?.OpenNewRoom(Room.DeepClone());
+                lounge?.Open(Room.DeepClone());
             })
         };
 
@@ -307,15 +431,55 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             return base.OnClick(e);
         }
 
-        private class RoomName : OsuSpriteText
+        private class RoomNameText : OsuSpriteText
         {
             [Resolved(typeof(Room), nameof(Online.Rooms.Room.Name))]
             private Bindable<string> name { get; set; }
+
+            public RoomNameText()
+            {
+                Font = OsuFont.GetFont(size: 28);
+            }
 
             [BackgroundDependencyLoader]
             private void load()
             {
                 Current = name;
+            }
+        }
+
+        private class RoomHostText : OnlinePlayComposite
+        {
+            private LinkFlowContainer hostText;
+
+            public RoomHostText()
+            {
+                AutoSizeAxes = Axes.Both;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChild = hostText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 16))
+                {
+                    AutoSizeAxes = Axes.Both
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Host.BindValueChanged(host =>
+                {
+                    hostText.Clear();
+
+                    if (host.NewValue != null)
+                    {
+                        hostText.AddText("hosted by ");
+                        hostText.AddUserLink(host.NewValue);
+                    }
+                }, true);
             }
         }
 
@@ -366,7 +530,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             private OsuPasswordTextBox passwordTextbox;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
                 Child = new FillFlowContainer
                 {

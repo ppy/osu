@@ -25,7 +25,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
@@ -87,6 +87,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestEmpty()
         {
             // used to test the flow of multiplayer from visual tests.
+            AddStep("empty step", () => { });
         }
 
         [Test]
@@ -312,6 +313,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
+            AddUntilStep("wait for spectating user state", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
+
             AddStep("start match externally", () => client.StartMatch());
 
             AddAssert("play not started", () => multiplayerScreen.IsCurrentScreen());
@@ -347,6 +350,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerSpectateButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
+
+            AddUntilStep("wait for spectating user state", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
 
             AddStep("start match externally", () => client.StartMatch());
 
@@ -396,15 +401,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddStep("open mod overlay", () => this.ChildrenOfType<PurpleTriangleButton>().ElementAt(2).TriggerClick());
+            AddStep("open mod overlay", () => this.ChildrenOfType<RoomSubScreen.UserModSelectButton>().Single().TriggerClick());
 
             AddStep("invoke on back button", () => multiplayerScreen.OnBackButton());
 
             AddAssert("mod overlay is hidden", () => this.ChildrenOfType<LocalPlayerModSelectOverlay>().Single().State.Value == Visibility.Hidden);
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
-
-            testLeave("lounge tab item", () => this.ChildrenOfType<BreadcrumbControl<IScreen>.BreadcrumbTabItem>().First().TriggerClick());
 
             testLeave("back button", () => multiplayerScreen.OnBackButton());
 
@@ -423,10 +426,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createRoom(Func<Room> room)
         {
-            AddStep("open room", () =>
-            {
-                multiplayerScreen.OpenNewRoom(room());
-            });
+            AddUntilStep("wait for lounge", () => multiplayerScreen.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
+            AddStep("open room", () => multiplayerScreen.ChildrenOfType<LoungeSubScreen>().Single().Open(room()));
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddWaitStep("wait for transition", 2);

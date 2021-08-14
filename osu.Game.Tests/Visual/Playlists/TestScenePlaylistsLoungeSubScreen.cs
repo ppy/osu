@@ -62,6 +62,24 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("last room is not masked", () => checkRoomVisible(roomsContainer.Rooms[^1]));
         }
 
+        [Test]
+        public void TestEnteringRoomTakesLeaseOnSelection()
+        {
+            AddStep("add rooms", () => RoomManager.AddRooms(1));
+
+            AddAssert("selected room is not disabled", () => !OnlinePlayDependencies.SelectedRoom.Disabled);
+
+            AddStep("select room", () => roomsContainer.Rooms[0].TriggerClick());
+            AddAssert("selected room is non-null", () => OnlinePlayDependencies.SelectedRoom.Value != null);
+
+            AddStep("enter room", () => roomsContainer.Rooms[0].TriggerClick());
+
+            AddUntilStep("wait for match load", () => Stack.CurrentScreen is PlaylistsRoomSubScreen);
+
+            AddAssert("selected room is non-null", () => OnlinePlayDependencies.SelectedRoom.Value != null);
+            AddAssert("selected room is disabled", () => OnlinePlayDependencies.SelectedRoom.Disabled);
+        }
+
         private bool checkRoomVisible(DrawableRoom room) =>
             loungeScreen.ChildrenOfType<OsuScrollContainer>().First().ScreenSpaceDrawQuad
                         .Contains(room.ScreenSpaceDrawQuad.Centre);
