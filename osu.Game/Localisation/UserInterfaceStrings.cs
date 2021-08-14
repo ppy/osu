@@ -77,7 +77,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Song Select"
         /// </summary>
-        public static LocalisableString SoneSelectHeader => new TranslatableString(getKey(@"song_select_header"), @"Song Select");
+        public static LocalisableString SongSelectHeader => new TranslatableString(getKey(@"song_select_header"), @"Song Select");
 
         /// <summary>
         /// "Right mouse drag to absolute scroll"

@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
         private Bindable<double> minStars;
         private Bindable<double> maxStars;
 
-        protected override LocalisableString Header => UserInterfaceStrings.SoneSelectHeader;
+        protected override LocalisableString Header => UserInterfaceStrings.SongSelectHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
