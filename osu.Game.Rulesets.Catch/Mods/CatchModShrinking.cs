@@ -81,9 +81,17 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             switch (ActiveAxes.Value)
             {
-                case Axes.Both: playfield.Scale = new Vector2(scale, scale); break;
-                case Axes.X: playfield.Scale = new Vector2(scale, 1); break;
-                case Axes.Y: playfield.Scale = new Vector2(1, scale); break;
+                case Axes.Both:
+                    playfield.Scale = new Vector2(scale, scale);
+                    break;
+
+                case Axes.X:
+                    playfield.Scale = new Vector2(scale, 1);
+                    break;
+
+                case Axes.Y:
+                    playfield.Scale = new Vector2(1, scale);
+                    break;
             }
         }
 
