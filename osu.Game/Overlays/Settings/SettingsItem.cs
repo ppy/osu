@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Settings
                         return;
 
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    FlowContent.Add(warningText = new SettingsNoticeText { Margin = new MarginPadding { Bottom = 5 } });
+                    FlowContent.Add(warningText = new SettingsNoticeText(colours) { Margin = new MarginPadding { Bottom = 5 } });
                 }
 
                 warningText.Alpha = hasValue ? 0 : 1;
