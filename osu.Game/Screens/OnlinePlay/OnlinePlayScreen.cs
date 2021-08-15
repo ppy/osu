@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
@@ -104,14 +105,9 @@ namespace osu.Game.Screens.OnlinePlay
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new BufferedContainer
+                            new BeatmapBackgroundSprite
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                BlurSigma = new Vector2(10),
-                                Child = new BeatmapBackgroundSprite
-                                {
-                                    RelativeSizeAxes = Axes.Both
-                                }
+                                RelativeSizeAxes = Axes.Both
                             },
                             new Box
                             {
@@ -306,11 +302,45 @@ namespace osu.Game.Screens.OnlinePlay
 
         private class BeatmapBackgroundSprite : OnlinePlayBackgroundSprite
         {
-            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BackgroundSprite { RelativeSizeAxes = Axes.Both };
+            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BlurredBackgroundSprite(BeatmapSetCoverType) { RelativeSizeAxes = Axes.Both };
 
-            private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
+            public class BlurredBackgroundSprite : UpdateableBeatmapBackgroundSprite
             {
+                public BlurredBackgroundSprite(BeatmapSetCoverType type)
+                    : base(type)
+                {
+                }
+
                 protected override double LoadDelay => 200;
+
+                protected override Drawable CreateDrawable(BeatmapInfo model) =>
+                    new BufferedLoader(base.CreateDrawable(model));
+            }
+
+            // This class is an unfortunate requirement due to `LongRunningLoad` requiring direct async loading.
+            // It means that if the web request fetching the beatmap background takes too long, it will suddenly appear.
+            internal class BufferedLoader : BufferedContainer
+            {
+                private readonly Drawable drawable;
+
+                public BufferedLoader(Drawable drawable)
+                {
+                    this.drawable = drawable;
+
+                    RelativeSizeAxes = Axes.Both;
+                    BlurSigma = new Vector2(10);
+                    CacheDrawnFrameBuffer = true;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    LoadComponentAsync(drawable, d =>
+                    {
+                        Add(d);
+                        ForceRedraw();
+                    });
+                }
             }
         }
 
