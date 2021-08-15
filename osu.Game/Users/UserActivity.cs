@@ -25,7 +25,7 @@ namespace osu.Game.Users
             public override string Status => "Choosing a beatmap";
         }
 
-        public abstract class InGame : UserActivity
+        public class InGame : UserActivity
         {
             public BeatmapInfo Beatmap { get; }
 
@@ -36,6 +36,8 @@ namespace osu.Game.Users
                 Beatmap = info;
                 Ruleset = ruleset;
             }
+
+            public override string Status => Ruleset.CreateInstance().PlayingVerb;
         }
 
         public class InMultiplayerGame : InGame
@@ -45,7 +47,7 @@ namespace osu.Game.Users
             {
             }
 
-            public override string Status => $@"{Ruleset.CreateInstance().PlayingVerb} with others";
+            public override string Status => $@"{base.Status} with others";
         }
 
         public class InSoloGame : InGame
@@ -54,8 +56,6 @@ namespace osu.Game.Users
                 : base(info, ruleset)
             {
             }
-
-            public override string Status => Ruleset.CreateInstance().PlayingVerb;
         }
 
         public class Editing : UserActivity
