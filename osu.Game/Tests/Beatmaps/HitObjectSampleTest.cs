@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Beatmaps
                 this.resources = resources;
             }
 
-            protected override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resourceStore, resources);
+            protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resourceStore, resources);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Beatmaps
 
         protected override Storyboard GetStoryboard() => storyboard ?? base.GetStoryboard();
 
-        protected override ISkin GetSkin() => null;
+        protected internal override ISkin GetSkin() => null;
 
         public override Stream GetStream(string storagePath) => null;
 
