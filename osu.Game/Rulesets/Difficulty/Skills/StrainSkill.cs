@@ -71,7 +71,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             CurrentStrain *= strainDecay(current.DeltaTime);
             CurrentStrain += StrainValueOf(current) * SkillMultiplier;
 
-            currentSectionPeak = Math.Max(CurrentStrain, currentSectionPeak);
+            currentSectionPeak = Math.Max(GetTotalCurrentStrain(current), currentSectionPeak);
+        }
+
+        protected virtual double GetTotalCurrentStrain(DifficultyHitObject current)
+        {
+            return CurrentStrain;
         }
 
         /// <summary>
