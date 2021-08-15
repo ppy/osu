@@ -17,7 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class MultiplayerMatchSongSelect : OnlinePlaySongSelect
     {
         [Resolved]
-        private MultiplayerClient client { get; set; }   
+        private MultiplayerClient client { get; set; }
 
         private LoadingLayer loadingLayer;
 
