@@ -134,6 +134,7 @@ namespace osu.Game.Overlays.Changelog
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Margin = new MarginPadding { Bottom = 28 },
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fill,
                     Texture = textures.Get(@"Online/supporter-pippi"),
@@ -144,7 +145,7 @@ namespace osu.Game.Overlays.Changelog
                     Origin = Anchor.TopCentre,
                     Width = 75,
                     Height = 75,
-                    Margin = new MarginPadding { Top = 83 },
+                    Margin = new MarginPadding { Top = 70 },
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
                     {
