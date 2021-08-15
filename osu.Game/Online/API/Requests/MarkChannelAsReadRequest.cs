@@ -14,8 +14,8 @@ namespace osu.Game.Online.API.Requests
 
         public MarkChannelAsReadRequest(Channel channel, Message message)
         {
-            this.Channel = channel;
-            this.Message = message;
+            Channel = channel;
+            Message = message;
         }
 
         protected override string Target => $"chat/channels/{Channel.Id}/mark-as-read/{Message.Id}";

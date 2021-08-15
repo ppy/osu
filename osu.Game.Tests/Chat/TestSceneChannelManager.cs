@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Chat
     {
         private ChannelManager channelManager;
         private int currentMessageId;
-        List<Message> sentMessages;
+        private List<Message> sentMessages;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -90,46 +90,49 @@ namespace osu.Game.Tests.Chat
         }
 
         [Test]
-        public void TestMarkAsReadIgnoringLocalMessages() {
+        public void TestMarkAsReadIgnoringLocalMessages()
+        {
             Channel channel = null;
 
             AddStep("join channel and select it", () =>
             {
                 channelManager.JoinChannel(channel = createChannel(1, ChannelType.Public));
-                
                 channelManager.CurrentChannel.Value = channel;
             });
 
             AddStep("post message", () => channelManager.PostMessage("Something interesting"));
             AddUntilStep("wait until the message is posted", () => channel.Messages.Count == sentMessages.Count);
-            
             AddStep("post /help command", () => channelManager.PostCommand("help", channel));
             AddStep("post /me command with no action", () => channelManager.PostCommand("me", channel));
             AddStep("post /join command with no channel", () => channelManager.PostCommand("join", channel));
             AddStep("post /join command with non-existent channel", () => channelManager.PostCommand("join i-dont-exist", channel));
             AddStep("post non-existent command", () => channelManager.PostCommand("non-existent-cmd arg", channel));
 
-            AddStep("register mark channel as read request handler", () => {
+            AddStep("register mark channel as read request handler", () =>
+            {
                 ((DummyAPIAccess)API).HandleRequest = req =>
+                {
+                    switch (req)
                     {
-                        switch (req)
-                        {
-                            case MarkChannelAsReadRequest markRead:
-                                var isSentMessage = sentMessages.Contains(markRead.Message);
+                        case MarkChannelAsReadRequest markRead:
+                            var isSentMessage = sentMessages.Contains(markRead.Message);
 
-                                AddAssert("mark channel as read called with a real message", () => isSentMessage);
+                            AddAssert("mark channel as read called with a real message", () => isSentMessage);
 
-                                if(isSentMessage) {
-                                    markRead.TriggerSuccess();
-                                } else {
-                                    markRead.TriggerFailure(new APIException("unknown message!", null));
-                                }
+                            if (isSentMessage)
+                            {
+                                markRead.TriggerSuccess();
+                            }
+                            else
+                            {
+                                markRead.TriggerFailure(new APIException("unknown message!", null));
+                            }
 
-                                return true;
-                        }
+                            return true;
+                    }
 
-                        return false;
-                    };
+                    return false;
+                };
             });
 
             AddStep("mark channel as read", () => channelManager.MarkChannelAsRead(channel));
