@@ -129,10 +129,20 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Rotation = 45,
                                 Colour = Color4Extensions.FromHex(@"441288"),
                             },
-                            new BeatmapStatisticIcon(icon){
+                            new SpriteIcon
+                            {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
-                                Size = new Vector2(12),
+                                Icon = FontAwesome.Regular.Circle,
+                                Size = new Vector2(10),
+                                Rotation = 0,
+                                Colour = Color4Extensions.FromHex(@"f7dd55"),
+                            },
+                            new BeatmapStatisticIcon(icon)
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(10),
                                 Colour = Color4Extensions.FromHex(@"f7dd55"),
                                 Scale = new Vector2(0.8f),
                             },
