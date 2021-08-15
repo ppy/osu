@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Settings
                 new TabletSettings(tabletHandler)
                 {
                     RelativeSizeAxes = Axes.None,
-                    Width = SettingsPanel.WIDTH,
+                    Width = SettingsPanel.PANEL_WIDTH,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                 }

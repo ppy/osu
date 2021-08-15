@@ -293,6 +293,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task TransferHost(int userId);
 
+        public abstract Task KickUser(int userId);
+
         public abstract Task ChangeSettings(MultiplayerRoomSettings settings);
 
         public abstract Task ChangeState(MultiplayerUserState newState);
@@ -385,6 +387,18 @@ namespace osu.Game.Online.Multiplayer
             }, false);
 
             return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user)
+        {
+            if (LocalUser == null)
+                return Task.CompletedTask;
+
+            if (user.Equals(LocalUser))
+                LeaveRoom();
+
+            // TODO: also inform users of the kick operation.
+            return ((IMultiplayerClient)this).UserLeft(user);
         }
 
         Task IMultiplayerClient.HostChanged(int userId)
