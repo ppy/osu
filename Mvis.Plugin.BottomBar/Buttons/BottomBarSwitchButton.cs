@@ -15,15 +15,12 @@ namespace Mvis.Plugin.BottomBar.Buttons
         protected Color4 ActivateColor => ColourProvider.Highlight1;
         protected Color4 InActivateColor => ColourProvider.Background3;
 
-        public BottomBarSwitchButton(IFunctionProvider provider = null)
+        public BottomBarSwitchButton(IToggleableFunctionProvider provider)
             : base(provider)
         {
             Value.Value = Default;
 
-            if (provider is IToggleableFunctionProvider toggleableProvider)
-            {
-                Value.BindTo(toggleableProvider.Bindable);
-            }
+            Value.BindTo(provider.Bindable);
         }
 
         protected override void LoadComplete()
@@ -43,16 +40,13 @@ namespace Mvis.Plugin.BottomBar.Buttons
 
         protected override bool OnClick(ClickEvent e)
         {
-            Toggle();
-            return base.OnClick(e);
-        }
-
-        public void Toggle()
-        {
             if (Value.Disabled)
+            {
                 this.FlashColour(Color4.Red, 1000, Easing.OutQuint);
-            else
-                Value.Toggle();
+                return false;
+            }
+
+            return base.OnClick(e);
         }
 
         private void updateVisuals(bool animate = false)

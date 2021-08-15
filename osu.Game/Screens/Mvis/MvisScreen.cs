@@ -681,19 +681,15 @@ namespace osu.Game.Screens.Mvis
 
         private void setupKeyBindings()
         {
-            keyBindings[GlobalAction.MvisMusicPrev] = () => prevButton.Active();
-            keyBindings[GlobalAction.MvisMusicNext] = () => nextButton.Active();
-            keyBindings[GlobalAction.MvisOpenInSongSelect] = () => soloButton.Active();
-            keyBindings[GlobalAction.MvisToggleOverlayLock] = () =>
-            {
-                lockButton.Active(true);
-                lockButton.Active();
-            }; //todo: 修复会在Bottombar中重复调用的问题
-            keyBindings[GlobalAction.MvisTogglePluginPage] = () => pluginButton.Active();
-            keyBindings[GlobalAction.MvisTogglePause] = () => songProgressButton.Active(true);
-            keyBindings[GlobalAction.MvisToggleTrackLoop] = () => loopToggleButton.Active();
-            keyBindings[GlobalAction.MvisTogglePlayList] = () => sidebarToggleButton.Active();
-            keyBindings[GlobalAction.MvisForceLockOverlayChanges] = () => disableChangesButton.Active();
+            keyBindings[GlobalAction.MvisMusicPrev] = prevButton.Active;
+            keyBindings[GlobalAction.MvisMusicNext] = nextButton.Active;
+            keyBindings[GlobalAction.MvisOpenInSongSelect] = soloButton.Active;
+            keyBindings[GlobalAction.MvisToggleOverlayLock] = lockButton.Active;
+            keyBindings[GlobalAction.MvisTogglePluginPage] = pluginButton.Active;
+            keyBindings[GlobalAction.MvisTogglePause] = songProgressButton.Active;
+            keyBindings[GlobalAction.MvisToggleTrackLoop] = loopToggleButton.Active;
+            keyBindings[GlobalAction.MvisTogglePlayList] = sidebarToggleButton.Active;
+            keyBindings[GlobalAction.MvisForceLockOverlayChanges] = disableChangesButton.Active;
             keyBindings[GlobalAction.Back] = () =>
             {
                 if (sidebar.IsPresent && sidebar.State.Value == Visibility.Visible)

@@ -1,4 +1,3 @@
-using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -47,7 +46,6 @@ namespace Mvis.Plugin.BottomBar.Buttons
         private Container content;
         private IconUsage emptyIcon => new IconUsage();
 
-        public Action Action { get; set; }
         public LocalisableString TooltipText { get; set; }
 
         protected readonly OsuSpriteText SpriteText = new OsuSpriteText
@@ -81,7 +79,6 @@ namespace Mvis.Plugin.BottomBar.Buttons
 
             if (provider != null)
             {
-                Action = provider.Action;
                 Icon = provider.Icon;
                 SpriteText.Text = provider.Title;
                 SpriteIcon.Icon = provider.Icon;
@@ -203,7 +200,7 @@ namespace Mvis.Plugin.BottomBar.Buttons
         protected override bool OnClick(ClickEvent e)
         {
             OnClickAnimation();
-            Action?.Invoke();
+            Provider.Active();
 
             return true;
         }

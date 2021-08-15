@@ -17,10 +17,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
         public ToggleableBarButton(IToggleableFunctionProvider provider)
             : base(provider)
         {
-            if (provider is IToggleableFunctionProvider toggleableFunctionProvider)
-            {
-                Value.BindTo(toggleableFunctionProvider.Bindable);
-            }
+            Value.BindTo(provider.Bindable);
         }
 
         [BackgroundDependencyLoader]
@@ -51,16 +48,13 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
 
         protected override bool OnClick(ClickEvent e)
         {
-            Toggle();
-            return base.OnClick(e);
-        }
-
-        public void Toggle()
-        {
             if (Value.Disabled)
+            {
                 this.FlashColour(Color4.Red, 1000, Easing.OutQuint);
-            else
-                Value.Toggle();
+                return false;
+            }
+
+            return base.OnClick(e);
         }
     }
 }

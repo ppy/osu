@@ -19,14 +19,8 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         {
             if (!Bindable.Disabled)
                 Bindable.Toggle();
-        }
 
-        public void Active(bool performAction)
-        {
-            if (performAction)
-                Action?.Invoke();
-            else
-                Active();
+            Action?.Invoke();
         }
 
         public BindableBool Bindable { get; set; } = new BindableBool();

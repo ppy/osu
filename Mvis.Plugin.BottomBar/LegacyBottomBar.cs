@@ -175,7 +175,7 @@ namespace Mvis.Plugin.BottomBar
 
                 case FunctionType.ProgressDisplay:
                     button.Dispose();
-                    centreContent.Add(new SongProgressButton(provider));
+                    centreContent.Add(new SongProgressButton((IToggleableFunctionProvider)provider));
                     break;
 
                 default:

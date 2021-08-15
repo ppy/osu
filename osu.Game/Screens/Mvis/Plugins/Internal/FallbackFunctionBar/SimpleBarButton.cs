@@ -35,9 +35,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
 
         public LocalisableString TooltipText { get; }
 
-        public IFunctionProvider Provider { get; set; }
-
-        private Action action { get; set; }
+        public readonly IFunctionProvider Provider;
 
         protected LocalisableString Title
         {
@@ -63,7 +61,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
         {
             TooltipText = provider.Description;
             Width = Math.Max(provider.Size.X, 40);
-            action = provider.Action;
+            Provider = provider;
 
             Title = provider.Title;
             Icon = provider.Icon;
@@ -109,7 +107,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
 
         protected override bool OnClick(ClickEvent e)
         {
-            action?.Invoke();
+            Provider.Active();
             return base.OnClick(e);
         }
     }

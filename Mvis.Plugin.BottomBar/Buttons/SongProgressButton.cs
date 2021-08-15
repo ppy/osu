@@ -19,7 +19,7 @@ namespace Mvis.Plugin.BottomBar.Buttons
 
         private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
 
-        public SongProgressButton(IFunctionProvider provider)
+        public SongProgressButton(IToggleableFunctionProvider provider)
             : base(provider)
         {
             AutoSizeAxes = Axes.X;
