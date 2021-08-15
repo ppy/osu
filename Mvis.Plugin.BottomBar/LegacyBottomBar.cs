@@ -38,14 +38,13 @@ namespace Mvis.Plugin.BottomBar
 
         public LegacyBottomBar()
         {
-            Name = "功能条";
+            Name = "底栏";
             Description = "mf-osu默认功能条";
             Author = "MATRIX-夜翎";
             Depth = -1;
 
             Flags.AddRange(new[]
             {
-                PluginFlags.CanDisable,
                 PluginFlags.CanUnload
             });
 

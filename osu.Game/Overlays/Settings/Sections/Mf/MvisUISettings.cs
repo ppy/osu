@@ -91,6 +91,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             };
 
             var plugins = pluginManager.GetAllFunctionBarProviders();
+            plugins.Insert(0, pluginManager.DummyFunctionBar);
+
             var currentFunctionBar = config.Get<string>(MSetting.MvisCurrentFunctionBar);
 
             foreach (var pl in plugins)
@@ -111,9 +113,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 }
 
                 var pl = (MvisPlugin)v.NewValue;
-                var type = pl.GetType();
 
-                config.SetValue(MSetting.MvisCurrentFunctionBar, type.Name + "@" + type.Namespace);
+                config.SetValue(MSetting.MvisCurrentFunctionBar, pluginManager.ToPath(pl));
             });
         }
 

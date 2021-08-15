@@ -395,9 +395,6 @@ namespace osu.Game.Screens.Mvis
                 }
             };
 
-            //todo: 找出为啥audioControlProvider会在被赋值前访问
-            audioControlProvider = pluginManager.DefaultAudioController;
-
             functionProviders.AddRange(new IFunctionProvider[]
             {
                 new FakeButton
@@ -487,11 +484,7 @@ namespace osu.Game.Screens.Mvis
                 lockButton = new ToggleableFakeButton
                 {
                     Description = MvisBaseStrings.LockInterface,
-                    Action = () =>
-                    {
-                        showPluginEntriesTemporary();
-                        lockButton.Active();
-                    },
+                    Action = showPluginEntriesTemporary,
                     Type = FunctionType.Plugin,
                     Icon = FontAwesome.Solid.Lock
                 }
@@ -500,6 +493,9 @@ namespace osu.Game.Screens.Mvis
 
         protected override void LoadComplete()
         {
+            //todo: 找出为啥audioControlProvider会在被赋值前访问
+            audioControlProvider = pluginManager.DefaultAudioController;
+
             //各种BindValueChanged
             //这部分放load会导致当前屏幕为主界面时，播放器会在后台相应设置变动
             loadList.BindCollectionChanged(onLoadListChanged);
@@ -688,7 +684,11 @@ namespace osu.Game.Screens.Mvis
             keyBindings[GlobalAction.MvisMusicPrev] = () => prevButton.Active();
             keyBindings[GlobalAction.MvisMusicNext] = () => nextButton.Active();
             keyBindings[GlobalAction.MvisOpenInSongSelect] = () => soloButton.Active();
-            keyBindings[GlobalAction.MvisToggleOverlayLock] = () => lockButton.Active(true);
+            keyBindings[GlobalAction.MvisToggleOverlayLock] = () =>
+            {
+                lockButton.Active(true);
+                lockButton.Active();
+            }; //todo: 修复会在Bottombar中重复调用的问题
             keyBindings[GlobalAction.MvisTogglePluginPage] = () => pluginButton.Active();
             keyBindings[GlobalAction.MvisTogglePause] = () => songProgressButton.Active(true);
             keyBindings[GlobalAction.MvisToggleTrackLoop] = () => loopToggleButton.Active();

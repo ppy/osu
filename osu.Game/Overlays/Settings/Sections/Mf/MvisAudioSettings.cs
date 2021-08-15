@@ -53,9 +53,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
             foreach (var pl in plugins)
             {
-                var type = pl.GetType();
-
-                if (currentAudioControlPlugin == type.Name + "@" + type.Namespace)
+                if (currentAudioControlPlugin == pluginManager.ToPath(pl))
                 {
                     dropdown.Current.Value = pl;
                 }
@@ -71,9 +69,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 }
 
                 var pl = (MvisPlugin)v.NewValue;
-                var type = pl.GetType();
 
-                config.SetValue(MSetting.MvisCurrentAudioProvider, type.Name + "@" + type.Namespace);
+                config.SetValue(MSetting.MvisCurrentAudioProvider, pluginManager.ToPath(pl));
             });
         }
 

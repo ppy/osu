@@ -28,13 +28,11 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
             config.BindWith(MSetting.MvisInterfaceGreen, iG);
             config.BindWith(MSetting.MvisInterfaceBlue, iB);
 
-            var audioControlProviders = pluginManager.GetAllAudioControlPlugin();
             var functionBarProviders = pluginManager.GetAllFunctionBarProviders();
+            functionBarProviders.Insert(0, pluginManager.DummyFunctionBar);
 
             var currentAudioControlPlugin = config.Get<string>(MSetting.MvisCurrentAudioProvider);
             var currentFunctionbar = config.Get<string>(MSetting.MvisCurrentFunctionBar);
-
-            audioControlProviders.Add(pluginManager.DefaultAudioController);
 
             Bindable<IProvideAudioControlPlugin> audioConfigBindable;
             Bindable<IFunctionBarProvider> functionBarConfigBindable;
@@ -65,15 +63,16 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
                         Value = pluginManager.GetAudioControlByPath(currentAudioControlPlugin),
                         Default = pluginManager.DefaultAudioController
                     },
-                    Values = audioControlProviders
+                    Values = pluginManager.GetAllAudioControlPlugin()
                 },
                 new ProviderSettingsPiece<IFunctionBarProvider>
                 {
                     Icon = FontAwesome.Solid.Bullseye,
-                    Description = "音乐控制插件",
+                    Description = "底栏插件",
                     Bindable = functionBarConfigBindable = new Bindable<IFunctionBarProvider>
                     {
-                        Value = pluginManager.GetFunctionBarProviderByPath(currentFunctionbar)
+                        Value = pluginManager.GetFunctionBarProviderByPath(currentFunctionbar),
+                        Default = pluginManager.DummyFunctionBar
                     },
                     Values = functionBarProviders
                 },

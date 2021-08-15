@@ -13,6 +13,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Screens.Mvis.Misc.PluginResolvers;
 using osu.Game.Screens.Mvis.Plugins.Config;
+using osu.Game.Screens.Mvis.Plugins.Internal;
 using osu.Game.Screens.Mvis.Plugins.Types;
 
 namespace osu.Game.Screens.Mvis.Plugins
@@ -40,6 +41,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         private const bool experimental = true;
 
         public readonly IProvideAudioControlPlugin DefaultAudioController = new OsuMusicControllerWrapper();
+        public readonly IFunctionBarProvider DummyFunctionBar = new DummyFunctionBar();
+
         private readonly MvisPluginResolver resolver;
 
         private string blockedPluginFilePath => storage.GetFullPath("custom/blocked_plugins.json");
@@ -119,6 +122,12 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             try
             {
+                if (pl is IFunctionBarProvider functionBarProvider)
+                    resolver.RemoveFunctionBarProvider(functionBarProvider);
+
+                if (pl is IProvideAudioControlPlugin provideAudioControlPlugin)
+                    resolver.RemoveAudioControlProvider(provideAudioControlPlugin);
+
                 pl.UnLoad();
                 OnPluginUnLoad?.Invoke(pl);
 
@@ -146,6 +155,9 @@ namespace osu.Game.Screens.Mvis.Plugins
                     container.Remove(pl);
                     pl.Dispose();
                 }
+
+                //刷新列表
+                resolver.UpdatePluginDictionary(GetAllPlugins(false));
             }
 
             return true;

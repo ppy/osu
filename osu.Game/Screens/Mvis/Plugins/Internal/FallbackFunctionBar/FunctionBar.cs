@@ -5,9 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osuTK;
@@ -15,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
 {
-    public class FunctionBar : MvisPlugin, IFunctionBarProvider, IHasTooltip
+    public class FunctionBar : MvisPlugin, IFunctionBarProvider
     {
         public float GetSafeAreaPadding() => Height;
 
@@ -189,7 +187,5 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
             {
             }
         }
-
-        public LocalisableString TooltipText => "这是一个后备功能条，如果你没在开发功能条插件，那么这很可能是个错误。\n请检查你的插件配置";
     }
 }
