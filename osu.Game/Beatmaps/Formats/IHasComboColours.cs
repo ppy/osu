@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps.Formats
         /// <summary>
         /// Adds combo colours to the list.
         /// </summary>
-        [Obsolete("Use SkinConfiguration.ComboColours directly.")] // can be removed 20220215
+        [Obsolete("Use CustomComboColours directly.")] // can be removed 20220215
         void AddComboColours(params Color4[] colours);
     }
 }
