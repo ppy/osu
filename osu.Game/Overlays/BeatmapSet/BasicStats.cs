@@ -78,10 +78,10 @@ namespace osu.Game.Overlays.BeatmapSet
                 Direction = FillDirection.Horizontal,
                 Children = new[]
                 {
-                    length = new Statistic(FontAwesome.Regular.Clock, "Length") { Width = 0.25f },
-                    bpm = new Statistic(FontAwesome.Regular.Circle, "BPM") { Width = 0.25f },
-                    circleCount = new Statistic(FontAwesome.Regular.Circle, "Circle Count") { Width = 0.25f },
-                    sliderCount = new Statistic(FontAwesome.Regular.Circle, "Slider Count") { Width = 0.25f },
+                    length = new Statistic(BeatmapStatisticsIconType.Length, "Length") { Width = 0.25f },
+                    bpm = new Statistic(BeatmapStatisticsIconType.Bpm, "BPM") { Width = 0.25f },
+                    circleCount = new Statistic(BeatmapStatisticsIconType.Circles, "Circle Count") { Width = 0.25f },
+                    sliderCount = new Statistic(BeatmapStatisticsIconType.Sliders, "Slider Count") { Width = 0.25f },
                 },
             };
         }
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 set => this.value.Text = value;
             }
 
-            public Statistic(IconUsage icon, string name)
+            public Statistic(BeatmapStatisticsIconType icon, string name)
             {
                 TooltipText = name;
                 RelativeSizeAxes = Axes.X;
@@ -129,11 +129,9 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Rotation = 45,
                                 Colour = Color4Extensions.FromHex(@"441288"),
                             },
-                            new SpriteIcon
-                            {
+                            new BeatmapStatisticIcon(icon){
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
-                                Icon = icon,
                                 Size = new Vector2(12),
                                 Colour = Color4Extensions.FromHex(@"f7dd55"),
                                 Scale = new Vector2(0.8f),
