@@ -41,9 +41,9 @@ namespace osu.Game.Online.Chat
 
             switch (api.Activity.Value)
             {
-                case UserActivity.SoloGame solo:
+                case UserActivity.InGame game:
                     verb = "playing";
-                    beatmap = solo.Beatmap;
+                    beatmap = game.Beatmap;
                     break;
 
                 case UserActivity.Editing edit:
