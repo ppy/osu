@@ -17,7 +17,7 @@ namespace Mvis.Plugin.Sandbox
     public class SandboxPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
-        public override int Version => 5;
+        public override int Version => 6;
         public Bindable<WorkingBeatmap> CurrentBeatmap = new Bindable<WorkingBeatmap>();
 
         public SandboxPanel()

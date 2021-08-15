@@ -54,7 +54,8 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.MvisInterfaceRed, value: 0, 0, 255f);
             SetDefault(MSetting.MvisInterfaceGreen, value: 119f, 0, 255f);
             SetDefault(MSetting.MvisInterfaceBlue, value: 255f, 0, 255f);
-            SetDefault(MSetting.MvisCurrentAudioProvider, "osu.Game.Screens.Mvis.Plugins+OsuMusicControllerWrapper");
+            SetDefault(MSetting.MvisCurrentAudioProvider, "a@b");
+            SetDefault(MSetting.MvisCurrentFunctionBar, "LegacyBottomBar@Mvis.Plugin.BottomBar");
             SetDefault(MSetting.MvisTabControlPosition, TabControlPosition.Right);
 
             //实验性功能
@@ -119,7 +120,8 @@ namespace osu.Game.Configuration
         MvisCurrentAudioProvider,
         Gamemode,
         DoNotShowDisclaimer,
-        LoaderBackgroundColor
+        LoaderBackgroundColor,
+        MvisCurrentFunctionBar
     }
 
     public enum GamemodeActivateCondition

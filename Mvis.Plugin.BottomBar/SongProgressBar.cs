@@ -3,9 +3,10 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Misc;
 
-namespace osu.Game.Screens.Mvis.BottomBar
+namespace Mvis.Plugin.BottomBar
 {
     public class SongProgressBar : ProgressBar
     {
@@ -89,9 +90,11 @@ namespace osu.Game.Screens.Mvis.BottomBar
             fill.Width = value;
 
             if (mvisScreen.OverlaysHidden)
+            {
                 songProgressIndicator.MoveToX(
                     getFinalPosX(songProgressIndicator, (value * UsableWidth) - (songProgressIndicator.Width / 2)),
                     300, Easing.OutQuint);
+            }
         }
 
         private bool indicatorsOverlaps;

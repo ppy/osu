@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -48,23 +47,15 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 }
             };
 
-            var plugins = new List<IProvideAudioControlPlugin>();
+            var plugins = pluginManager.GetAllAudioControlPlugin();
+
             var currentAudioControlPlugin = config.Get<string>(MSetting.MvisCurrentAudioProvider);
 
-            plugins.Add(new OsuMusicControllerWrapper());
-
-            foreach (var pl in pluginManager.GetAllPlugins(false))
+            foreach (var pl in plugins)
             {
-                if (pl is IProvideAudioControlPlugin pacp)
+                if (currentAudioControlPlugin == pluginManager.ToPath(pl))
                 {
-                    plugins.Add(pacp);
-
-                    var type = pl.GetType();
-
-                    if (currentAudioControlPlugin == $"{type.Namespace}+{type.Name}")
-                    {
-                        dropdown.Current.Value = pacp;
-                    }
+                    dropdown.Current.Value = pl;
                 }
             }
 
@@ -78,9 +69,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 }
 
                 var pl = (MvisPlugin)v.NewValue;
-                var type = pl.GetType();
 
-                config.SetValue(MSetting.MvisCurrentAudioProvider, $"{type.Namespace}+{type.Name}");
+                config.SetValue(MSetting.MvisCurrentAudioProvider, pluginManager.ToPath(pl));
             });
         }
 

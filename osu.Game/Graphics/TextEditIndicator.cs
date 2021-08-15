@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis.Skinning;
+using osu.Game.Screens.Mvis.SideBar.Settings.Items;
 using osuTK;
 using osuTK.Graphics;
 

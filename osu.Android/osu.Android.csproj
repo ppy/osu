@@ -54,6 +54,7 @@
       <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
       <Name>osu.Game</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mvis.Plugin.BottomBar\Mvis.Plugin.BottomBar.csproj" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\lazer.png" />

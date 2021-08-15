@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Types;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 {
@@ -26,8 +27,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             Icon = FontAwesome.Solid.Music;
         }
 
-        public override PluginBottomBarButton CreateBottomBarButton()
-            => new LyricBottombarButton(this);
+        public override IPluginFunctionProvider GetFunctionEntry()
+            => new LyricFunctionProvider(this);
 
         [Resolved]
         private MvisScreen mvisScreen { get; set; }

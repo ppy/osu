@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -29,28 +28,15 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
             config.BindWith(MSetting.MvisInterfaceGreen, iG);
             config.BindWith(MSetting.MvisInterfaceBlue, iB);
 
-            var plugins = new List<IProvideAudioControlPlugin>();
+            var functionBarProviders = pluginManager.GetAllFunctionBarProviders();
+            functionBarProviders.Insert(0, pluginManager.DummyFunctionBar);
+
             var currentAudioControlPlugin = config.Get<string>(MSetting.MvisCurrentAudioProvider);
-            IProvideAudioControlPlugin currentprovider = mvisScreen.MusicControllerWrapper;
+            var currentFunctionbar = config.Get<string>(MSetting.MvisCurrentFunctionBar);
 
-            foreach (var pl in pluginManager.GetAllPlugins(false))
-            {
-                if (pl is IProvideAudioControlPlugin pacp)
-                {
-                    plugins.Add(pacp);
+            Bindable<IProvideAudioControlPlugin> audioConfigBindable;
+            Bindable<IFunctionBarProvider> functionBarConfigBindable;
 
-                    var type = pl.GetType();
-
-                    if (currentAudioControlPlugin == $"{type.Namespace}+{type.Name}")
-                    {
-                        currentprovider = pacp;
-                    }
-                }
-            }
-
-            plugins.Add(mvisScreen.MusicControllerWrapper);
-
-            Bindable<IProvideAudioControlPlugin> configBindable;
             AddRange(new Drawable[]
             {
                 new SettingsSliderPiece<float>
@@ -72,12 +58,23 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
                 {
                     Icon = FontAwesome.Solid.Bullseye,
                     Description = "音乐控制插件",
-                    Bindable = configBindable = new Bindable<IProvideAudioControlPlugin>
+                    Bindable = audioConfigBindable = new Bindable<IProvideAudioControlPlugin>
                     {
-                        Value = currentprovider,
-                        Default = mvisScreen.MusicControllerWrapper
+                        Value = pluginManager.GetAudioControlByPath(currentAudioControlPlugin),
+                        Default = pluginManager.DefaultAudioController
                     },
-                    Values = plugins
+                    Values = pluginManager.GetAllAudioControlPlugin()
+                },
+                new ProviderSettingsPiece<IFunctionBarProvider>
+                {
+                    Icon = FontAwesome.Solid.Bullseye,
+                    Description = "底栏插件",
+                    Bindable = functionBarConfigBindable = new Bindable<IFunctionBarProvider>
+                    {
+                        Value = pluginManager.GetFunctionBarProviderByPath(currentFunctionbar),
+                        Default = pluginManager.DummyFunctionBar
+                    },
+                    Values = functionBarProviders
                 },
                 new SettingsEnumPiece<TabControlPosition>
                 {
@@ -115,7 +112,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
                 },
             });
 
-            configBindable.BindValueChanged(v =>
+            audioConfigBindable.BindValueChanged(v =>
             {
                 if (v.NewValue == null)
                 {
@@ -123,15 +120,22 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
                     return;
                 }
 
-                var pl = (MvisPlugin)v.NewValue;
-                var type = pl.GetType();
+                config.SetValue(MSetting.MvisCurrentAudioProvider, pluginManager.ToPath(v.NewValue));
+            });
 
-                config.SetValue(MSetting.MvisCurrentAudioProvider, $"{type.Namespace}+{type.Name}");
+            functionBarConfigBindable.BindValueChanged(v =>
+            {
+                if (v.NewValue == null)
+                {
+                    config.SetValue(MSetting.MvisCurrentFunctionBar, string.Empty);
+                    return;
+                }
+
+                config.SetValue(MSetting.MvisCurrentFunctionBar, pluginManager.ToPath(v.NewValue));
             });
         }
 
         private class ProviderSettingsPiece<T> : SettingsListPiece<T>
-            where T : IProvideAudioControlPlugin
         {
             protected override string GetValueText(T newValue)
             {

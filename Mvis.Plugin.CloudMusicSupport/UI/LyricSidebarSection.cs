@@ -68,19 +68,19 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                 },
                 new SettingsAnchorPiece
                 {
-                    Description = "Direction",
+                    Description = CloudMusicStrings.LocationDirection,
                     Icon = FontAwesome.Solid.Anchor,
                     Bindable = config.GetBindable<Anchor>(LyricSettings.LyricDirection)
                 },
                 new SettingsSliderPiece<float>
                 {
-                    Description = "横向位移",
+                    Description = CloudMusicStrings.PositionX,
                     Bindable = config.GetBindable<float>(LyricSettings.LyricPositionX),
                     DisplayAsPercentage = true
                 },
                 new SettingsSliderPiece<float>
                 {
-                    Description = "纵向位移",
+                    Description = CloudMusicStrings.PositionY,
                     Bindable = config.GetBindable<float>(LyricSettings.LyricPositionY),
                     DisplayAsPercentage = true
                 }

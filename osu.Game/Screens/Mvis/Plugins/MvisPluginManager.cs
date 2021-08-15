@@ -3,19 +3,22 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Screens.Mvis.Misc.PluginResolvers;
 using osu.Game.Screens.Mvis.Plugins.Config;
+using osu.Game.Screens.Mvis.Plugins.Internal;
+using osu.Game.Screens.Mvis.Plugins.Types;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
-    public class MvisPluginManager : Component
+    public class MvisPluginManager : CompositeDrawable
     {
         private readonly BindableList<MvisPlugin> avaliablePlugins = new BindableList<MvisPlugin>();
         private readonly BindableList<MvisPlugin> activePlugins = new BindableList<MvisPlugin>();
@@ -33,11 +36,23 @@ namespace osu.Game.Screens.Mvis.Plugins
         internal Action<MvisPlugin> OnPluginAdd;
         internal Action<MvisPlugin> OnPluginUnLoad;
 
-        public int PluginVersion => 5;
-        public int MinimumPluginVersion => 4;
+        public int PluginVersion => 6;
+        public int MinimumPluginVersion => 6;
         private const bool experimental = false;
 
+        public readonly IProvideAudioControlPlugin DefaultAudioController = new OsuMusicControllerWrapper();
+        public readonly IFunctionBarProvider DummyFunctionBar = new DummyFunctionBar();
+
+        private readonly MvisPluginResolver resolver;
+
         private string blockedPluginFilePath => storage.GetFullPath("custom/blocked_plugins.json");
+
+        public MvisPluginManager()
+        {
+            resolver = new MvisPluginResolver(this);
+
+            InternalChild = (OsuMusicControllerWrapper)DefaultAudioController;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -66,6 +81,8 @@ namespace osu.Game.Screens.Mvis.Plugins
                     providers.Add(provider);
                 }
             }
+
+            resolver.UpdatePluginDictionary(GetAllPlugins(false));
 
             if (!DebugUtils.IsDebugBuild && experimental)
             {
@@ -105,6 +122,12 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             try
             {
+                if (pl is IFunctionBarProvider functionBarProvider)
+                    resolver.RemoveFunctionBarProvider(functionBarProvider);
+
+                if (pl is IProvideAudioControlPlugin provideAudioControlPlugin)
+                    resolver.RemoveAudioControlProvider(provideAudioControlPlugin);
+
                 pl.UnLoad();
                 OnPluginUnLoad?.Invoke(pl);
 
@@ -132,6 +155,9 @@ namespace osu.Game.Screens.Mvis.Plugins
                     container.Remove(pl);
                     pl.Dispose();
                 }
+
+                //刷新列表
+                resolver.UpdatePluginDictionary(GetAllPlugins(false));
             }
 
             return true;
@@ -188,6 +214,8 @@ namespace osu.Game.Screens.Mvis.Plugins
                 {
                     avaliablePlugins.Add(p.CreatePlugin);
                 }
+
+                resolver.UpdatePluginDictionary(avaliablePlugins.ToList());
             }
 
             return avaliablePlugins.ToList();
@@ -203,5 +231,14 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             avaliablePlugins.Clear();
         }
+
+        internal List<IFunctionBarProvider> GetAllFunctionBarProviders() => resolver.GetAllFunctionBarProviders();
+
+        internal List<IProvideAudioControlPlugin> GetAllAudioControlPlugin() => resolver.GetAllAudioControlPlugin();
+
+        internal IProvideAudioControlPlugin GetAudioControlByPath([NotNull] string path) => resolver.GetAudioControlPluginByPath(path);
+        internal IFunctionBarProvider GetFunctionBarProviderByPath([NotNull] string path) => resolver.GetFunctionBarProviderByPath(path);
+
+        public string ToPath([NotNull] object target) => resolver.ToPath(target);
     }
 }

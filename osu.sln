@@ -114,6 +114,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvis.Plugin.CloudMusicSuppo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvis.Plugin.Yasp", "Mvis.Plugin.Yasp\Mvis.Plugin.Yasp.csproj", "{EE35BF67-5705-405E-B403-F63EBF206AA5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvis.Plugin.BottomBar", "Mvis.Plugin.BottomBar\Mvis.Plugin.BottomBar.csproj", "{7606289A-E139-48B0-9F76-9D4552AC50D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -652,6 +654,18 @@ Global
 		{EE35BF67-5705-405E-B403-F63EBF206AA5}.Release|iPhone.Build.0 = Release|Any CPU
 		{EE35BF67-5705-405E-B403-F63EBF206AA5}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{EE35BF67-5705-405E-B403-F63EBF206AA5}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Release|iPhone.Build.0 = Release|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{7606289A-E139-48B0-9F76-9D4552AC50D8}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

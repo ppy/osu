@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
-using osu.Game.Screens.Mvis.Skinning;
+using osu.Game.Screens.Mvis.SideBar.Settings.Items;
 
 namespace Mvis.Plugin.CollectionSupport
 {
@@ -43,7 +43,7 @@ namespace Mvis.Plugin.CollectionSupport
 
         protected override bool PostInit() => true;
 
-        public override int Version => 5;
+        public override int Version => 6;
 
         public override PluginSidebarPage CreateSidebarPage()
             => new CollectionPluginPage(this);

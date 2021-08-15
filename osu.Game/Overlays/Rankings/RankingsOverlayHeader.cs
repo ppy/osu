@@ -7,7 +7,6 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Users;
-using System.ComponentModel;
 
 namespace osu.Game.Overlays.Rankings
 {

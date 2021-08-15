@@ -67,6 +67,35 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                     LabelText = CloudMusicStrings.LyricAutoScrollMain,
                     Current = config.GetBindable<bool>(LyricSettings.AutoScrollToCurrent)
                 },
+                new SettingsDropdown<Anchor>
+                {
+                    LabelText = CloudMusicStrings.LocationDirection,
+                    Current = config.GetBindable<Anchor>(LyricSettings.LyricDirection),
+                    Items = new[]
+                    {
+                        Anchor.TopLeft,
+                        Anchor.TopCentre,
+                        Anchor.TopRight,
+                        Anchor.CentreLeft,
+                        Anchor.Centre,
+                        Anchor.CentreRight,
+                        Anchor.BottomLeft,
+                        Anchor.BottomCentre,
+                        Anchor.BottomRight,
+                    }
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = CloudMusicStrings.PositionX,
+                    Current = config.GetBindable<float>(LyricSettings.LyricPositionX),
+                    DisplayAsPercentage = true
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = CloudMusicStrings.PositionY,
+                    Current = config.GetBindable<float>(LyricSettings.LyricPositionY),
+                    DisplayAsPercentage = true
+                }
             };
 
             useDrawablePoolCheckBox.WarningText = CloudMusicStrings.ExperimentalWarning;
