@@ -7,6 +7,12 @@ namespace M.Resources.Localisation.Mvis.Plugins
         private const string prefix = @"M.Resources.Localisation.Mvis.Plugins.CloudMusicStrings";
 
         //设置
+        public static LocalisableString LocationDirection => new TranslatableString(getKey(@"location_direction"), @"位置方向");
+
+        public static LocalisableString PositionX => new TranslatableString(getKey(@"pos_x"), @"横向位移");
+
+        public static LocalisableString PositionY => new TranslatableString(getKey(@"pox_y"), @"纵向位移");
+
         public static LocalisableString UseDrawablePool => new TranslatableString(getKey(@"use_drawable_pool"), @"使用DrawablePool");
 
         public static LocalisableString ExperimentalWarning => new TranslatableString(getKey(@"experimental_warning"), @"试验性功能！");
