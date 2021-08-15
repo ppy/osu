@@ -34,6 +34,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
+        private double calculateRhythmBonus(double time)
+        {
+            return 1.0;
+        }
+
+
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
@@ -65,6 +71,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / osuCurrent.StrainTime;
+        }
+        protected override double GetTotalCurrentStrain(DifficultyHitObject current)
+        {
+            return base.GetTotalCurrentStrain(current) * calculateRhythmBonus(current.StartTime);
+        }
+
+        protected override double GetPeakStrain(double time)
+        {
+            return base.GetPeakStrain(time) * calculateRhythmBonus(time);
         }
     }
 }
