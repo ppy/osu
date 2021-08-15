@@ -36,6 +36,9 @@ namespace osu.Game.Screens.OnlinePlay
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         [Resolved(typeof(Room))]
+        protected Bindable<RoomCategory> Category { get; private set; }
+
+        [Resolved(typeof(Room))]
         protected BindableList<User> RecentParticipants { get; private set; }
 
         [Resolved(typeof(Room))]

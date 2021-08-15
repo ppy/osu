@@ -54,6 +54,10 @@ namespace osu.Game.Screens.Play.HUD
         public BindableInt Combo { get; } = new BindableInt();
         public BindableBool HasQuit { get; } = new BindableBool();
 
+        public Color4? BackgroundColour { get; set; }
+
+        public Color4? TextColour { get; set; }
+
         private int? scorePosition;
 
         public int? ScorePosition
@@ -77,7 +81,10 @@ namespace osu.Game.Screens.Play.HUD
         [CanBeNull]
         public User User { get; }
 
-        private readonly bool trackedPlayer;
+        /// <summary>
+        /// Whether this score is the local user or a replay player (and should be focused / always visible).
+        /// </summary>
+        public readonly bool Tracked;
 
         private Container mainFillContainer;
 
@@ -93,11 +100,11 @@ namespace osu.Game.Screens.Play.HUD
         /// Creates a new <see cref="GameplayLeaderboardScore"/>.
         /// </summary>
         /// <param name="user">The score's player.</param>
-        /// <param name="trackedPlayer">Whether the player is the local user or a replay player.</param>
-        public GameplayLeaderboardScore([CanBeNull] User user, bool trackedPlayer)
+        /// <param name="tracked">Whether the player is the local user or a replay player.</param>
+        public GameplayLeaderboardScore([CanBeNull] User user, bool tracked)
         {
             User = user;
-            this.trackedPlayer = trackedPlayer;
+            Tracked = tracked;
 
             AutoSizeAxes = Axes.X;
             Height = PANEL_HEIGHT;
@@ -331,19 +338,19 @@ namespace osu.Game.Screens.Play.HUD
             if (scorePosition == 1)
             {
                 widthExtension = true;
-                panelColour = Color4Extensions.FromHex("7fcc33");
-                textColour = Color4.White;
+                panelColour = BackgroundColour ?? Color4Extensions.FromHex("7fcc33");
+                textColour = TextColour ?? Color4.White;
             }
-            else if (trackedPlayer)
+            else if (Tracked)
             {
                 widthExtension = true;
-                panelColour = Color4Extensions.FromHex("ffd966");
-                textColour = Color4Extensions.FromHex("2e576b");
+                panelColour = BackgroundColour ?? Color4Extensions.FromHex("ffd966");
+                textColour = TextColour ?? Color4Extensions.FromHex("2e576b");
             }
             else
             {
-                panelColour = Color4Extensions.FromHex("3399cc");
-                textColour = Color4.White;
+                panelColour = BackgroundColour ?? Color4Extensions.FromHex("3399cc");
+                textColour = TextColour ?? Color4.White;
             }
 
             this.TransformTo(nameof(SizeContainerLeftPadding), widthExtension ? -top_player_left_width_extension : 0, panel_transition_duration, Easing.OutElastic);

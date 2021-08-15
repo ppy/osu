@@ -28,6 +28,14 @@ namespace osu.Game.Online.Multiplayer
         Task TransferHost(int userId);
 
         /// <summary>
+        /// As the host, kick another user from the room.
+        /// </summary>
+        /// <param name="userId">The user to kick..</param>
+        /// <exception cref="NotHostException">A user other than the current host is attempting to kick a user.</exception>
+        /// <exception cref="NotJoinedRoomException">If the user is not in a room.</exception>
+        Task KickUser(int userId);
+
+        /// <summary>
         /// As the host, update the settings of the currently joined room.
         /// </summary>
         /// <param name="settings">The new settings to apply.</param>

@@ -174,6 +174,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
 
+        public override Task KickUser(int userId)
+        {
+            Debug.Assert(Room != null);
+
+            return ((IMultiplayerClient)this).UserKicked(Room.Users.Single(u => u.UserID == userId));
+        }
+
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
         {
             Debug.Assert(Room != null);

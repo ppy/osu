@@ -3,84 +3,52 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
-using osu.Game.Graphics.UserInterface;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osuTK;
 using JetBrains.Annotations;
-using NUnit.Framework;
+using osu.Framework.Testing;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneCommentsPage : OsuTestScene
+    public class TestSceneOfflineCommentsContainer : OsuTestScene
     {
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly BindableBool showDeleted = new BindableBool();
-        private readonly Container content;
+        private TestCommentsContainer comments;
 
-        private TestCommentsPage commentsPage;
-
-        public TestSceneCommentsPage()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            Add(new FillFlowContainer
+            Clear();
+            Add(new BasicScrollContainer
             {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 10),
-                Children = new Drawable[]
-                {
-                    new Container
-                    {
-                        AutoSizeAxes = Axes.Y,
-                        Width = 200,
-                        Child = new OsuCheckbox
-                        {
-                            Current = showDeleted,
-                            LabelText = @"Show Deleted"
-                        }
-                    },
-                    content = new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                    }
-                }
+                RelativeSizeAxes = Axes.Both,
+                Child = comments = new TestCommentsContainer()
             });
-        }
+        });
 
         [Test]
         public void TestAppendDuplicatedComment()
         {
-            AddStep("Create page", () => createPage(getCommentBundle()));
-            AddAssert("Dictionary length is 10", () => commentsPage?.DictionaryLength == 10);
-            AddStep("Append existing comment", () => commentsPage?.AppendComments(getCommentSubBundle()));
-            AddAssert("Dictionary length is 10", () => commentsPage?.DictionaryLength == 10);
+            AddStep("Add comment bundle", () => comments.ShowComments(getCommentBundle()));
+            AddUntilStep("Dictionary length is 10", () => comments.DictionaryLength == 10);
+            AddStep("Append existing comment", () => comments.AppendComments(getCommentSubBundle()));
+            AddAssert("Dictionary length is 10", () => comments.DictionaryLength == 10);
         }
 
         [Test]
-        public void TestEmptyBundle()
+        public void TestLocalCommentBundle()
         {
-            AddStep("Create page", () => createPage(getEmptyCommentBundle()));
-            AddAssert("Dictionary length is 0", () => commentsPage?.DictionaryLength == 0);
-        }
-
-        private void createPage(CommentBundle commentBundle)
-        {
-            commentsPage = null;
-            content.Clear();
-            content.Add(commentsPage = new TestCommentsPage(commentBundle)
-            {
-                ShowDeleted = { BindTarget = showDeleted }
-            });
+            AddStep("Add comment bundle", () => comments.ShowComments(getCommentBundle()));
+            AddStep("Add empty comment bundle", () => comments.ShowComments(getEmptyCommentBundle()));
         }
 
         private CommentBundle getEmptyCommentBundle() => new CommentBundle
@@ -193,6 +161,7 @@ namespace osu.Game.Tests.Visual.Online
                     Username = "Good_Admin"
                 }
             },
+            Total = 10
         };
 
         private CommentBundle getCommentSubBundle() => new CommentBundle
@@ -211,16 +180,18 @@ namespace osu.Game.Tests.Visual.Online
             IncludedComments = new List<Comment>(),
         };
 
-        private class TestCommentsPage : CommentsPage
+        private class TestCommentsContainer : CommentsContainer
         {
-            public TestCommentsPage(CommentBundle commentBundle)
-                : base(commentBundle)
-            {
-            }
-
             public new void AppendComments([NotNull] CommentBundle bundle) => base.AppendComments(bundle);
 
             public int DictionaryLength => CommentDictionary.Count;
+
+            public void ShowComments(CommentBundle bundle)
+            {
+                this.ChildrenOfType<TotalCommentsCounter>().Single().Current.Value = 0;
+                ClearComments();
+                OnSuccess(bundle);
+            }
         }
     }
 }
