@@ -118,6 +118,7 @@ namespace osu.Game.Screens.Edit
 
             if (!snapped || ControlPointInfo.TimingPoints.Count == 0)
             {
+                seekTime = Math.Clamp(seekTime, 0, TrackLength);
                 SeekSmoothlyTo(seekTime);
                 return;
             }
