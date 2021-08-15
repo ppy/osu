@@ -149,8 +149,7 @@ namespace osu.Game.Overlays.Changelog
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
-                        Colour = Color4.HotPink.Opacity(0.88f),
-                        Offset = new Vector2(0, 0),
+                        Colour = colour.Pink,
                         Radius = 17,
                         Roundness = 39f,
                     },
