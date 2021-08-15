@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play
 
         protected readonly PlaylistItem PlaylistItem;
 
-        protected override UserActivity InitialActivity => new UserActivity.MultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
+        protected override UserActivity InitialActivity => new UserActivity.InMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         protected RoomSubmittingPlayer(PlaylistItem playlistItem, PlayerConfiguration configuration = null)
             : base(configuration)

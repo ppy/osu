@@ -25,14 +25,37 @@ namespace osu.Game.Users
             public override string Status => "Choosing a beatmap";
         }
 
-        public class MultiplayerGame : SoloGame
+        public abstract class InGame : UserActivity
         {
-            public MultiplayerGame(BeatmapInfo beatmap, RulesetInfo ruleset)
+            public BeatmapInfo Beatmap { get; }
+
+            public RulesetInfo Ruleset { get; }
+
+            public InGame(BeatmapInfo info, RulesetInfo ruleset)
+            {
+                Beatmap = info;
+                Ruleset = ruleset;
+            }
+        }
+
+        public class InMultiplayerGame : InGame
+        {
+            public InMultiplayerGame(BeatmapInfo beatmap, RulesetInfo ruleset)
                 : base(beatmap, ruleset)
             {
             }
 
-            public override string Status => $@"{base.Status} with others";
+            public override string Status => $@"{Ruleset.CreateInstance().PlayingVerb} with others";
+        }
+
+        public class InSoloGame : InGame
+        {
+            public InSoloGame(BeatmapInfo info, RulesetInfo ruleset)
+                : base(info, ruleset)
+            {
+            }
+
+            public override string Status => Ruleset.CreateInstance().PlayingVerb;
         }
 
         public class Editing : UserActivity
@@ -45,21 +68,6 @@ namespace osu.Game.Users
             }
 
             public override string Status => @"Editing a beatmap";
-        }
-
-        public class SoloGame : UserActivity
-        {
-            public BeatmapInfo Beatmap { get; }
-
-            public RulesetInfo Ruleset { get; }
-
-            public SoloGame(BeatmapInfo info, RulesetInfo ruleset)
-            {
-                Beatmap = info;
-                Ruleset = ruleset;
-            }
-
-            public override string Status => Ruleset.CreateInstance().PlayingVerb;
         }
 
         public class Spectating : UserActivity
