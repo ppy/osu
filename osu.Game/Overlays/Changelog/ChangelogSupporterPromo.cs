@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.Changelog
     public class ChangelogSupporterPromo : CompositeDrawable
     {
         private const float image_container_width = 164;
+        private const float heart_size = 75;
 
         private readonly FillFlowContainer textContainer;
         private readonly Container imageContainer;
@@ -143,21 +144,21 @@ namespace osu.Game.Overlays.Changelog
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Width = 75,
-                    Height = 75,
+                    Width = heart_size,
+                    Height = heart_size,
                     Margin = new MarginPadding { Top = 70 },
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = colour.Pink,
-                        Radius = 17,
-                        Roundness = 39f,
+                        Radius = 10,
+                        Roundness = heart_size / 2,
                     },
                     Child = new Sprite
                     {
-                        Width = 75,
-                        Height = 75,
+                        Width = heart_size,
+                        Height = heart_size,
                         Texture = textures.Get(@"Online/supporter-heart"),
                     },
                 },
