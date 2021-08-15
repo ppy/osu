@@ -138,14 +138,28 @@ namespace osu.Game.Overlays.Changelog
                     FillMode = FillMode.Fill,
                     Texture = textures.Get(@"Online/supporter-pippi"),
                 },
-                new Sprite
+                new Container
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Width = 75,
                     Height = 75,
-                    Margin = new MarginPadding { Top = 70 },
-                    Texture = textures.Get(@"Online/supporter-heart"),
+                    Margin = new MarginPadding { Top = 83 },
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4.HotPink.Opacity(0.88f),
+                        Offset = new Vector2(0, 0),
+                        Radius = 17,
+                        Roundness = 39f,
+                    },
+                    Child = new Sprite
+                    {
+                        Width = 75,
+                        Height = 75,
+                        Texture = textures.Get(@"Online/supporter-heart"),
+                    },
                 },
             };
         }
