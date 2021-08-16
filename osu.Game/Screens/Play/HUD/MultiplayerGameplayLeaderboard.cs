@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Play.HUD
 
                     var trackedUser = UserScores[user.Id];
 
-                    var leaderboardScore = AddPlayer(user, user.Id == api.LocalUser.Value.Id);
+                    var leaderboardScore = Add(user, user.Id == api.LocalUser.Value.Id);
                     leaderboardScore.Accuracy.BindTo(trackedUser.Accuracy);
                     leaderboardScore.TotalScore.BindTo(trackedUser.Score);
                     leaderboardScore.Combo.BindTo(trackedUser.CurrentCombo);
@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play.HUD
                     continue;
 
                 if (TeamScores.TryGetValue(u.Team.Value, out var team))
-                    team.Value += (int)u.Score.Value;
+                    team.Value += (int)Math.Round(u.Score.Value);
             }
         }
 
