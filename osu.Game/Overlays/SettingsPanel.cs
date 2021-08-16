@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -58,6 +60,8 @@ namespace osu.Game.Overlays
 
         private readonly bool showSidebar;
 
+        private LoadingLayer loading;
+
         protected SettingsPanel(bool showSidebar)
         {
             this.showSidebar = showSidebar;
@@ -86,43 +90,67 @@ namespace osu.Game.Overlays
                         Colour = OsuColour.Gray(0.05f),
                         Alpha = 1,
                     },
-                    SectionsContainer = new SettingsSectionsContainer
+                    loading = new LoadingLayer
                     {
-                        Masking = true,
-                        RelativeSizeAxes = Axes.Both,
-                        ExpandableHeader = CreateHeader(),
-                        FixedHeader = searchTextBox = new SeekLimitedSearchTextBox
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Width = 0.95f,
-                            Margin = new MarginPadding
-                            {
-                                Top = 20,
-                                Bottom = 20
-                            },
-                        },
-                        Footer = CreateFooter()
-                    },
+                        State = { Value = Visibility.Visible }
+                    }
                 }
+            };
+
+            SectionsContainer = new SettingsSectionsContainer
+            {
+                Masking = true,
+                RelativeSizeAxes = Axes.Both,
+                ExpandableHeader = CreateHeader(),
+                FixedHeader = searchTextBox = new SeekLimitedSearchTextBox
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.TopCentre,
+                    Width = 0.95f,
+                    Margin = new MarginPadding
+                    {
+                        Top = 20,
+                        Bottom = 20
+                    },
+                },
+                Footer = CreateFooter()
             };
 
             if (showSidebar)
             {
                 AddInternal(Sidebar = new Sidebar { Width = sidebar_width });
-
-                SectionsContainer.SelectedSection.ValueChanged += section =>
-                {
-                    selectedSidebarButton.Selected = false;
-                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
-                    selectedSidebarButton.Selected = true;
-                };
             }
 
-            searchTextBox.Current.ValueChanged += term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue;
-
             CreateSections()?.ForEach(AddSection);
+        }
+
+        private void ensureContentLoaded()
+        {
+            if (SectionsContainer.LoadState > LoadState.NotLoaded)
+                return;
+
+            Debug.Assert(SectionsContainer != null);
+
+            LoadComponentAsync(SectionsContainer, d =>
+            {
+                ContentContainer.Add(d);
+                d.FadeInFromZero(500);
+                loading.Hide();
+
+                if (Sidebar != null)
+                {
+                    SectionsContainer.SelectedSection.ValueChanged += section =>
+                    {
+                        selectedSidebarButton.Selected = false;
+                        selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
+                        selectedSidebarButton.Selected = true;
+                    };
+                }
+
+                searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue, true);
+                searchTextBox.TakeFocus();
+            });
         }
 
         protected void AddSection(SettingsSection section)
@@ -136,6 +164,10 @@ namespace osu.Game.Overlays
                     Section = section,
                     Action = () =>
                     {
+                        // may not be loaded yet.
+                        if (SectionsContainer == null)
+                            return;
+
                         SectionsContainer.ScrollTo(section);
                         Sidebar.State = ExpandedState.Contracted;
                     },
@@ -159,7 +191,8 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            ContentContainer.MoveToX(ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
+            ContentContainer.MoveToX(ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint)
+                            .OnComplete(_ => ensureContentLoaded());
 
             Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
@@ -187,7 +220,7 @@ namespace osu.Game.Overlays
 
         protected override void OnFocus(FocusEvent e)
         {
-            searchTextBox.TakeFocus();
+            searchTextBox?.TakeFocus();
             base.OnFocus(e);
         }
 
@@ -208,6 +241,8 @@ namespace osu.Game.Overlays
         public class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
             public SearchContainer<SettingsSection> SearchContainer;
+
+            public new ScheduledDelegate Schedule(Action action) => Scheduler.AddDelayed(action, TransformDelay);
 
             protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
                 => SearchContainer = new SearchContainer<SettingsSection>
