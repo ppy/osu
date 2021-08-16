@@ -15,7 +15,6 @@ using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
-using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit.Compose
 {
@@ -73,7 +72,7 @@ namespace osu.Game.Screens.Edit.Compose
         {
             Debug.Assert(ruleset != null);
 
-            return new RulesetSkinProvidingContainer(ruleset, EditorBeatmap.PlayableBeatmap, beatmap.Value.Skin).WithChild(content);
+            return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(content);
         }
 
         #region Input Handling

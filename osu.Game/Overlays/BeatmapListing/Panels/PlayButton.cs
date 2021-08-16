@@ -139,19 +139,24 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
                 LoadComponentAsync(Preview = previewTrackManager.Get(beatmapSet), preview =>
                 {
-                    // beatmapset may have changed.
-                    if (Preview != preview)
-                        return;
+                    // Make sure that we schedule to after the next audio frame to fix crashes in single-threaded execution.
+                    // See: https://github.com/ppy/osu-framework/issues/4692
+                    Schedule(() =>
+                    {
+                        // beatmapset may have changed.
+                        if (Preview != preview)
+                            return;
 
-                    AddInternal(preview);
-                    loading = false;
-                    // make sure that the update of value of Playing (and the ensuing value change callbacks)
-                    // are marshaled back to the update thread.
-                    preview.Stopped += () => Schedule(() => playing.Value = false);
+                        AddInternal(preview);
+                        loading = false;
+                        // make sure that the update of value of Playing (and the ensuing value change callbacks)
+                        // are marshaled back to the update thread.
+                        preview.Stopped += () => Schedule(() => playing.Value = false);
 
-                    // user may have changed their mind.
-                    if (playing.Value)
-                        attemptStart();
+                        // user may have changed their mind.
+                        if (playing.Value)
+                            attemptStart();
+                    });
                 });
             }
             else

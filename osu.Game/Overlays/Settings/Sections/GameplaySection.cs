@@ -9,12 +9,14 @@ using osu.Game.Rulesets;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
     public class GameplaySection : SettingsSection
     {
-        public override string Header => "Gameplay";
+        public override LocalisableString Header => GameplaySettingsStrings.GameplaySectionHeader;
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
