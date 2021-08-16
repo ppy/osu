@@ -32,6 +32,15 @@ namespace osu.Game.Online.Multiplayer
         Task UserLeft(MultiplayerRoomUser user);
 
         /// <summary>
+        /// Signals that a user has been kicked from the room.
+        /// </summary>
+        /// <remarks>
+        /// This will also be sent to the user that was kicked.
+        /// </remarks>
+        /// <param name="user">The user.</param>
+        Task UserKicked(MultiplayerRoomUser user);
+
+        /// <summary>
         /// Signal that the host of the room has changed.
         /// </summary>
         /// <param name="userId">The user ID of the new host.</param>

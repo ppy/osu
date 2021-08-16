@@ -327,7 +327,15 @@ namespace osu.Game.Beatmaps
         public bool SkinLoaded => skin.IsResultAvailable;
         public ISkin Skin => skin.Value;
 
-        protected abstract ISkin GetSkin();
+        /// <summary>
+        /// Creates a new skin instance for this beatmap.
+        /// </summary>
+        /// <remarks>
+        /// This should only be called externally in scenarios where it is explicitly desired to get a new instance of a skin
+        /// (e.g. for editing purposes, to avoid state pollution).
+        /// For standard reading purposes, <see cref="Skin"/> should always be used directly.
+        /// </remarks>
+        protected internal abstract ISkin GetSkin();
 
         private readonly RecyclableLazy<ISkin> skin;
 

@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -30,10 +29,9 @@ using osu.Game.Skinning;
 using osu.Game.Utils;
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Tests.Visual.Navigation
 {
     [TestFixture]
-    [HeadlessTest]
     public class TestSceneOsuGame : OsuTestScene
     {
         private IReadOnlyList<Type> requiredGameDependencies => new[]

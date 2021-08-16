@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -20,6 +21,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Tests.Visual.Spectator;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -50,22 +52,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 OsuScoreProcessor scoreProcessor;
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
 
-                var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
+                var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
+                var multiplayerUsers = new List<MultiplayerRoomUser>();
 
                 foreach (var user in users)
+                {
                     SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
-
-                // Todo: This is REALLY bad.
-                Client.CurrentMatchPlayingUserIds.AddRange(users);
+                    multiplayerUsers.Add(OnlinePlayDependencies.Client.AddUser(new User { Id = user }, true));
+                }
 
                 Children = new Drawable[]
                 {
                     scoreProcessor = new OsuScoreProcessor(),
                 };
 
-                scoreProcessor.ApplyBeatmap(playable);
+                scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, users.ToArray())
+                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, multiplayerUsers.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

@@ -62,7 +62,9 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The users in the joined <see cref="Room"/> which are participating in the current gameplay loop.
         /// </summary>
-        public readonly BindableList<int> CurrentMatchPlayingUserIds = new BindableList<int>();
+        public IBindableList<int> CurrentMatchPlayingUserIds => PlayingUserIds;
+
+        protected readonly BindableList<int> PlayingUserIds = new BindableList<int>();
 
         public readonly Bindable<PlaylistItem?> CurrentMatchPlayingItem = new Bindable<PlaylistItem?>();
 
@@ -179,7 +181,8 @@ namespace osu.Game.Online.Multiplayer
             {
                 APIRoom = null;
                 Room = null;
-                CurrentMatchPlayingUserIds.Clear();
+                CurrentMatchPlayingItem.Value = null;
+                PlayingUserIds.Clear();
 
                 RoomUpdated?.Invoke();
             });
@@ -290,6 +293,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task TransferHost(int userId);
 
+        public abstract Task KickUser(int userId);
+
         public abstract Task ChangeSettings(MultiplayerRoomSettings settings);
 
         public abstract Task ChangeState(MultiplayerUserState newState);
@@ -376,12 +381,24 @@ namespace osu.Game.Online.Multiplayer
                     return;
 
                 Room.Users.Remove(user);
-                CurrentMatchPlayingUserIds.Remove(user.UserID);
+                PlayingUserIds.Remove(user.UserID);
 
                 RoomUpdated?.Invoke();
             }, false);
 
             return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user)
+        {
+            if (LocalUser == null)
+                return Task.CompletedTask;
+
+            if (user.Equals(LocalUser))
+                LeaveRoom();
+
+            // TODO: also inform users of the kick operation.
+            return ((IMultiplayerClient)this).UserLeft(user);
         }
 
         Task IMultiplayerClient.HostChanged(int userId)
@@ -659,16 +676,16 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="state">The new state of the user.</param>
         private void updateUserPlayingState(int userId, MultiplayerUserState state)
         {
-            bool wasPlaying = CurrentMatchPlayingUserIds.Contains(userId);
+            bool wasPlaying = PlayingUserIds.Contains(userId);
             bool isPlaying = state >= MultiplayerUserState.WaitingForLoad && state <= MultiplayerUserState.FinishedPlay;
 
             if (isPlaying == wasPlaying)
                 return;
 
             if (isPlaying)
-                CurrentMatchPlayingUserIds.Add(userId);
+                PlayingUserIds.Add(userId);
             else
-                CurrentMatchPlayingUserIds.Remove(userId);
+                PlayingUserIds.Remove(userId);
         }
 
         private Task scheduleAsync(Action action, CancellationToken cancellationToken = default)

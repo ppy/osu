@@ -42,6 +42,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private ModDisplay userModsDisplay;
         private StateDisplay userStateDisplay;
 
+        private IconButton kickButton;
+
         public ParticipantPanel(MultiplayerRoomUser user)
         {
             User = user;
@@ -64,7 +66,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 {
                     new Dimension(GridSizeMode.Absolute, 18),
                     new Dimension(GridSizeMode.AutoSize),
-                    new Dimension()
+                    new Dimension(),
+                    new Dimension(GridSizeMode.AutoSize),
                 },
                 Content = new[]
                 {
@@ -79,7 +82,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Colour = Color4Extensions.FromHex("#F7E65D"),
                             Alpha = 0
                         },
-                        new TeamDisplay(user),
+                        new TeamDisplay(User),
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -157,7 +160,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                     Margin = new MarginPadding { Right = 10 },
                                 }
                             }
-                        }
+                        },
+                        kickButton = new KickButton
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Alpha = 0,
+                            Margin = new MarginPadding(4),
+                            Action = () => Client.KickUser(User.UserID),
+                        },
                     },
                 }
             };
@@ -167,7 +178,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         {
             base.OnRoomUpdated();
 
-            if (Room == null)
+            if (Room == null || Client.LocalUser == null)
                 return;
 
             const double fade_time = 50;
@@ -178,6 +189,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
+
+            if (Client.IsHost && !User.Equals(Client.LocalUser))
+                kickButton.FadeIn(fade_time);
+            else
+                kickButton.FadeOut(fade_time);
 
             if (Room.Host?.Equals(User) == true)
                 crown.FadeIn(fade_time);
@@ -211,12 +227,35 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     new OsuMenuItem("Give host", MenuItemType.Standard, () =>
                     {
                         // Ensure the local user is still host.
-                        if (Room.Host?.UserID != api.LocalUser.Value.Id)
+                        if (!Client.IsHost)
                             return;
 
                         Client.TransferHost(targetUser);
+                    }),
+                    new OsuMenuItem("Kick", MenuItemType.Destructive, () =>
+                    {
+                        // Ensure the local user is still host.
+                        if (!Client.IsHost)
+                            return;
+
+                        Client.KickUser(targetUser);
                     })
                 };
+            }
+        }
+
+        public class KickButton : IconButton
+        {
+            public KickButton()
+            {
+                Icon = FontAwesome.Solid.UserTimes;
+                TooltipText = "Kick";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                IconHoverColour = colours.Red;
             }
         }
     }

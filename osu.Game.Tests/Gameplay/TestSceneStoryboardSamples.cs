@@ -204,7 +204,7 @@ namespace osu.Game.Tests.Gameplay
                 this.resources = resources;
             }
 
-            protected override ISkin GetSkin() => new TestSkin("test-sample", resources);
+            protected internal override ISkin GetSkin() => new TestSkin("test-sample", resources);
         }
 
         private class TestDrawableStoryboardSample : DrawableStoryboardSample

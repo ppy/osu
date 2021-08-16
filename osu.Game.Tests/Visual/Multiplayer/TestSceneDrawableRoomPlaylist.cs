@@ -14,7 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Rooms;
-using osu.Game.Overlays;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertDownloadButtonVisible(false);
 
             void assertDownloadButtonVisible(bool visible) => AddUntilStep($"download button {(visible ? "shown" : "hidden")}",
-                () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().Alpha == (visible ? 1 : 0));
+                () => playlist.ChildrenOfType<BeatmapPanelDownloadButton>().Single().Alpha == (visible ? 1 : 0));
         }
 
         [Test]
@@ -229,7 +229,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             createPlaylist(byOnlineId, byChecksum);
 
-            AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().All(d => d.IsPresent));
+            AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapPanelDownloadButton>().All(d => d.IsPresent));
         }
 
         [Test]

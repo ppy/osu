@@ -21,6 +21,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float border_width = 3;
 
+        private const double animate_in_duration = 150;
+        private const double animate_out_duration = 500;
+
         public Nub()
         {
             Box fill;
@@ -77,20 +80,26 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (value)
                 {
-                    this.FadeColour(GlowingAccentColour, 500, Easing.OutQuint);
-                    FadeEdgeEffectTo(1, 500, Easing.OutQuint);
+                    this.FadeColour(GlowingAccentColour, animate_in_duration, Easing.OutQuint);
+                    FadeEdgeEffectTo(1, animate_in_duration, Easing.OutQuint);
                 }
                 else
                 {
-                    FadeEdgeEffectTo(0, 500);
-                    this.FadeColour(AccentColour, 500);
+                    FadeEdgeEffectTo(0, animate_out_duration);
+                    this.FadeColour(AccentColour, animate_out_duration);
                 }
             }
         }
 
         public bool Expanded
         {
-            set => this.ResizeTo(new Vector2(value ? EXPANDED_SIZE : COLLAPSED_SIZE, 12), 500, Easing.OutQuint);
+            set
+            {
+                if (value)
+                    this.ResizeTo(new Vector2(EXPANDED_SIZE, 12), animate_in_duration, Easing.OutQuint);
+                else
+                    this.ResizeTo(new Vector2(COLLAPSED_SIZE, 12), animate_out_duration, Easing.OutQuint);
+            }
         }
 
         private readonly Bindable<bool> current = new Bindable<bool>();
