@@ -11,6 +11,7 @@ using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections
     {
         private readonly KeyBindingPanel keyConfig;
 
-        public override string Header => "Input";
+        public override LocalisableString Header => InputSettingsStrings.InputSectionHeader;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -95,7 +96,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     new SettingsCheckbox
                     {
-                        LabelText = "Enabled",
+                        LabelText = CommonStrings.Enabled,
                         Current = handler.Enabled
                     },
                 };
