@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -130,8 +129,6 @@ namespace osu.Game.Overlays
             if (SectionsContainer.LoadState > LoadState.NotLoaded)
                 return;
 
-            Debug.Assert(SectionsContainer != null);
-
             LoadComponentAsync(SectionsContainer, d =>
             {
                 ContentContainer.Add(d);
@@ -207,8 +204,13 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            ContentContainer.MoveToX(ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint)
-                            .OnComplete(_ => ensureContentLoaded());
+            ContentContainer.MoveToX(ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
+
+            // delay load enough to ensure it doesn't overlap with the initial animation.
+            // this is done as there is still a brief stutter during load completion which is more visible if the transition is in progress.
+            // the eventual goal would be to remove the need for this by splitting up load into smaller work pieces, or fixing the remaining
+            // load complete overheads.
+            Scheduler.AddDelayed(ensureContentLoaded, TRANSITION_LENGTH / 3);
 
             Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
