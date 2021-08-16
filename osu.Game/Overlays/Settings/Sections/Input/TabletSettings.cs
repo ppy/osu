@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         private readonly ITabletHandler tabletHandler;
 
+        private readonly Bindable<bool> enabled = new BindableBool(true);
+
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
@@ -74,7 +76,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = CommonStrings.Enabled,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Current = tabletHandler.Enabled
+                    Current = enabled,
                 },
                 noTabletMessage = new FillFlowContainer
                 {
@@ -194,6 +196,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.LoadComplete();
 
+            enabled.BindTo(tabletHandler.Enabled);
+            enabled.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
+
             rotation.BindTo(tabletHandler.Rotation);
 
             areaOffset.BindTo(tabletHandler.AreaOffset);
@@ -239,7 +244,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             tablet.BindTo(tabletHandler.Tablet);
             tablet.BindValueChanged(val =>
             {
-                Scheduler.AddOnce(toggleVisibility);
+                Scheduler.AddOnce(updateVisibility);
 
                 var tab = val.NewValue;
 
@@ -259,19 +264,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }, true);
         }
 
-        private void toggleVisibility()
+        private void updateVisibility()
         {
-            bool tabletFound = tablet.Value != null;
-
-            if (!tabletFound)
-            {
-                mainSettings.Hide();
-                noTabletMessage.Show();
-                return;
-            }
-
-            mainSettings.Show();
+            mainSettings.Hide();
             noTabletMessage.Hide();
+
+            if (!tabletHandler.Enabled.Value)
+                return;
+
+            if (tablet.Value != null)
+                mainSettings.Show();
+            else
+                noTabletMessage.Show();
         }
 
         private void applyAspectRatio(BindableNumber<float> sizeChanged)
