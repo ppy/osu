@@ -158,21 +158,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             Children = new Drawable[]
             {
                 // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
-                new BufferedContainer
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colours.Background5,
-                        },
-                        new OnlinePlayBackgroundSprite
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        },
-                    }
+                    Colour = colours.Background5,
+                },
+                new OnlinePlayBackgroundSprite
+                {
+                    RelativeSizeAxes = Axes.Both
                 },
                 new Container
                 {
@@ -187,37 +180,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         CornerRadius = corner_radius,
                         Children = new Drawable[]
                         {
-                            // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
-                            new BufferedContainer
+                            new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Children = new Drawable[]
+                                ColumnDimensions = new[]
                                 {
-                                    new GridContainer
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        ColumnDimensions = new[]
-                                        {
-                                            new Dimension(GridSizeMode.Relative, 0.2f)
-                                        },
-                                        Content = new[]
-                                        {
-                                            new Drawable[]
-                                            {
-                                                new Box
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Colour = colours.Background5,
-                                                },
-                                                new Box
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f))
-                                                },
-                                            }
-                                        }
-                                    },
+                                    new Dimension(GridSizeMode.Relative, 0.2f)
                                 },
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = colours.Background5,
+                                        },
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f))
+                                        },
+                                    }
+                                }
                             },
                             new Container
                             {

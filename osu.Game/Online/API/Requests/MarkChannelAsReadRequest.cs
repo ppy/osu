@@ -9,16 +9,16 @@ namespace osu.Game.Online.API.Requests
 {
     public class MarkChannelAsReadRequest : APIRequest
     {
-        private readonly Channel channel;
-        private readonly Message message;
+        public readonly Channel Channel;
+        public readonly Message Message;
 
         public MarkChannelAsReadRequest(Channel channel, Message message)
         {
-            this.channel = channel;
-            this.message = message;
+            Channel = channel;
+            Message = message;
         }
 
-        protected override string Target => $"chat/channels/{channel.Id}/mark-as-read/{message.Id}";
+        protected override string Target => $"chat/channels/{Channel.Id}/mark-as-read/{Message.Id}";
 
         protected override WebRequest CreateWebRequest()
         {
