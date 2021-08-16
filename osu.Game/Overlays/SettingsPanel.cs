@@ -135,52 +135,68 @@ namespace osu.Game.Overlays
             LoadComponentAsync(SectionsContainer, d =>
             {
                 ContentContainer.Add(d);
-                d.FadeInFromZero(500);
+                d.FadeInFromZero(750, Easing.OutQuint);
                 loading.Hide();
-
-                if (Sidebar != null)
-                {
-                    SectionsContainer.SelectedSection.ValueChanged += section =>
-                    {
-                        selectedSidebarButton.Selected = false;
-                        selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
-                        selectedSidebarButton.Selected = true;
-                    };
-                }
 
                 searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue, true);
                 searchTextBox.TakeFocus();
+
+                if (Sidebar == null)
+                    return;
+
+                LoadComponentsAsync(createSidebarButtons(), buttons =>
+                {
+                    float delay = 0;
+
+                    foreach (var button in buttons)
+                    {
+                        Sidebar.Add(button);
+
+                        button.FadeOut()
+                              .Delay(delay)
+                              .FadeInFromZero(1000, Easing.OutQuint);
+
+                        delay += 30;
+                    }
+
+                    SectionsContainer.SelectedSection.BindValueChanged(section =>
+                    {
+                        if (selectedSidebarButton != null)
+                            selectedSidebarButton.Selected = false;
+
+                        selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
+                        selectedSidebarButton.Selected = true;
+                    }, true);
+                });
             });
         }
 
-        protected void AddSection(SettingsSection section)
+        private IEnumerable<SidebarButton> createSidebarButtons()
         {
-            SectionsContainer.Add(section);
-
-            if (Sidebar != null)
+            foreach (var section in SectionsContainer)
             {
-                var button = new SidebarButton
+                yield return new SidebarButton
                 {
                     Section = section,
                     Action = () =>
                     {
-                        // may not be loaded yet.
-                        if (SectionsContainer == null)
+                        if (!SectionsContainer.IsLoaded)
                             return;
 
                         SectionsContainer.ScrollTo(section);
                         Sidebar.State = ExpandedState.Contracted;
                     },
                 };
-
-                Sidebar.Add(button);
-
-                if (selectedSidebarButton == null)
-                {
-                    selectedSidebarButton = Sidebar.Children.First();
-                    selectedSidebarButton.Selected = true;
-                }
             }
+        }
+
+        protected void AddSection(SettingsSection section)
+        {
+            if (IsLoaded)
+                // just to keep things simple. can be accommodated for if we ever need it.
+                throw new InvalidOperationException("All sections must be added before the panel is loaded.");
+
+            SectionsContainer.Add(section);
         }
 
         protected virtual Drawable CreateHeader() => new Container();
