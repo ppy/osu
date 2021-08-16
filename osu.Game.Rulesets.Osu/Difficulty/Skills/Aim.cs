@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
     /// </summary>
-    public class Aim : OsuStrainDecaySkill
+    public class Aim : OsuStrainSkill
     {
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
