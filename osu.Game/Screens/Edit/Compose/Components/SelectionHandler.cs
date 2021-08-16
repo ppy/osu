@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return true;
             }
 
-            // while holding control, we only want to add to selection, not replace an existing selection.
+            // while holding control or shift, we only want to add to selection, not replace an existing selection.
             if ((e.ControlPressed || e.ShiftPressed) && e.Button == MouseButton.Left && !blueprint.IsSelected)
             {
                 blueprint.ToggleSelection();
