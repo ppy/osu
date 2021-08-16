@@ -77,9 +77,9 @@ namespace osu.Game.Screens.Play
 
         protected readonly Bindable<bool> LocalUserPlaying = new Bindable<bool>();
 
-        protected readonly Bindable<bool> AllowUserSeekingState = new Bindable<bool>();
+        private readonly Bindable<bool> allowUserSeeking = new Bindable<bool>();
 
-        public IBindable<bool> AllowUserSeeking => AllowUserSeekingState;
+        public IBindable<bool> AllowUserSeeking => allowUserSeeking;
 
         public int RestartCount;
 
@@ -275,8 +275,8 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(r =>
             {
-                if (!AllowUserSeekingState.Disabled)
-                    AllowUserSeekingState.Value = r.NewValue;
+                if (Configuration.AllowSeeking)
+                    allowUserSeeking.Value = r.NewValue;
 
                 updateGameplayState();
             });
