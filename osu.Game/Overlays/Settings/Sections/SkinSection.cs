@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 using osuTK;
@@ -23,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections
     {
         private SkinSettingsDropdown skinDropdown;
 
-        public override string Header => "Skin";
+        public override LocalisableString Header => SkinSettingsStrings.SkinSectionHeader;
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
@@ -69,34 +70,34 @@ namespace osu.Game.Overlays.Settings.Sections
                 skinDropdown = new SkinSettingsDropdown(),
                 new SettingsButton
                 {
-                    Text = "Skin layout editor",
+                    Text = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.Toggle(),
                 },
                 new ExportSkinButton(),
                 new SettingsSlider<float, SizeSlider>
                 {
-                    LabelText = "Gameplay cursor size",
+                    LabelText = SkinSettingsStrings.GameplayCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Adjust gameplay cursor size based on current beatmap",
+                    LabelText = SkinSettingsStrings.AutoCursorSize,
                     Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Beatmap skins",
+                    LabelText = SkinSettingsStrings.BeatmapSkins,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Beatmap colours",
+                    LabelText = SkinSettingsStrings.BeatmapColours,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Beatmap hitsounds",
+                    LabelText = SkinSettingsStrings.BeatmapHitsounds,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
             };
@@ -200,7 +201,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                Text = "Export selected skin";
+                Text = SkinSettingsStrings.ExportSkinButton;
                 Action = export;
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();

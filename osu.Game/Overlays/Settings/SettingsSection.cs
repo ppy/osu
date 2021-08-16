@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
@@ -19,10 +20,10 @@ namespace osu.Game.Overlays.Settings
         protected override Container<Drawable> Content => FlowContent;
 
         public abstract Drawable CreateIcon();
-        public abstract string Header { get; }
+        public abstract LocalisableString Header { get; }
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
-        public virtual IEnumerable<string> FilterTerms => new[] { Header };
+        public virtual IEnumerable<string> FilterTerms => new[] { Header.ToString() };
 
         private const int header_size = 26;
         private const int margin = 20;

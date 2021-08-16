@@ -24,9 +24,9 @@ namespace osu.Game.Screens.Spectate
     /// </summary>
     public abstract class SpectatorScreen : OsuScreen
     {
-        protected IReadOnlyList<int> UserIds => userIds;
+        protected IReadOnlyList<int> Users => users;
 
-        private readonly List<int> userIds = new List<int>();
+        private readonly List<int> users = new List<int>();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -50,17 +50,17 @@ namespace osu.Game.Screens.Spectate
         /// <summary>
         /// Creates a new <see cref="SpectatorScreen"/>.
         /// </summary>
-        /// <param name="userIds">The users to spectate.</param>
-        protected SpectatorScreen(params int[] userIds)
+        /// <param name="users">The users to spectate.</param>
+        protected SpectatorScreen(params int[] users)
         {
-            this.userIds.AddRange(userIds);
+            this.users.AddRange(users);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            userLookupCache.GetUsersAsync(userIds.ToArray()).ContinueWith(users => Schedule(() =>
+            userLookupCache.GetUsersAsync(users.ToArray()).ContinueWith(users => Schedule(() =>
             {
                 foreach (var u in users.Result)
                 {
@@ -207,7 +207,7 @@ namespace osu.Game.Screens.Spectate
         {
             onUserStateRemoved(userId);
 
-            userIds.Remove(userId);
+            users.Remove(userId);
             userMap.Remove(userId);
 
             spectatorClient.StopWatchingUser(userId);

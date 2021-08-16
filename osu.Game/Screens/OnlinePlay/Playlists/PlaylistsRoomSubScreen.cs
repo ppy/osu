@@ -163,7 +163,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                                 Spacing = new Vector2(10, 0),
                                                                                 Children = new Drawable[]
                                                                                 {
-                                                                                    new PurpleTriangleButton
+                                                                                    new UserModSelectButton
                                                                                     {
                                                                                         Anchor = Anchor.CentreLeft,
                                                                                         Origin = Anchor.CentreLeft,

@@ -50,6 +50,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            // account for the fact we are in a scroll container and want a bit of spacing from the scroll bar.
+            Padding = new MarginPadding { Right = 5 };
+
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -59,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2),
+                    Spacing = new Vector2(10),
                 }
             };
         }
@@ -137,7 +140,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 roomFlow.Remove(toRemove);
 
-                selectedRoom.Value = null;
+                // selection may have a lease due to being in a sub screen.
+                if (!selectedRoom.Disabled)
+                    selectedRoom.Value = null;
             }
         }
 
@@ -149,7 +154,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            selectedRoom.Value = null;
+            if (!selectedRoom.Disabled)
+                selectedRoom.Value = null;
             return base.OnClick(e);
         }
 
@@ -211,6 +217,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void selectNext(int direction)
         {
+            if (selectedRoom.Disabled)
+                return;
+
             var visibleRooms = Rooms.AsEnumerable().Where(r => r.IsPresent);
 
             Room room;
