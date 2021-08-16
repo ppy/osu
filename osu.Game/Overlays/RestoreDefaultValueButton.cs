@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
@@ -38,7 +39,9 @@ namespace osu.Game.Overlays
                 current.ValueChanged += _ => UpdateState();
                 current.DefaultChanged += _ => UpdateState();
                 current.DisabledChanged += _ => UpdateState();
-                UpdateState();
+
+                if (IsLoaded)
+                    UpdateState();
             }
         }
 
@@ -81,7 +84,10 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            UpdateState();
+
+            // avoid unnecessary transforms on first display.
+            Alpha = currentAlpha;
+            Colour = currentColour;
         }
 
         public LocalisableString TooltipText => "revert to default";
@@ -101,14 +107,16 @@ namespace osu.Game.Overlays
 
         public void UpdateState() => Scheduler.AddOnce(updateState);
 
+        private float currentAlpha => current.IsDefault ? 0f : hovering && !current.Disabled ? 1f : 0.65f;
+        private ColourInfo currentColour => current.Disabled ? Color4.Gray : buttonColour;
+
         private void updateState()
         {
             if (current == null)
                 return;
 
-            this.FadeTo(current.IsDefault ? 0f :
-                hovering && !current.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
-            this.FadeColour(current.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
+            this.FadeTo(currentAlpha, 200, Easing.OutQuint);
+            this.FadeColour(currentColour, 200, Easing.OutQuint);
         }
     }
 }
