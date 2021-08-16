@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
 
+        private const double rhythmMultiplier = 1.0;
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecayBase => 0.3;
         protected override int ReducedSectionCount => 5;
@@ -31,16 +32,91 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override int HistoryLength => 32;
 
+        private const int HistoryTimeMax = 4; // 4 seconds of calculatingRhythmBonus max.
+
         public Speed(Mod[] mods)
             : base(mods)
         {
         }
 
-        private double calculateRhythmBonus(double time)
+        private bool isRatioEqual(double ratio, double a, double b)
         {
-            return 1.0;
+            return a + 15 > ratio * b && a - 15 < ratio * b;
         }
 
+        /// <summary>
+        /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        private double calculateRhythmBonus(double startTime)
+        {
+            // {doubles, triplets, quads, quints, 6-tuplets, 7 Tuplets, greater}
+            int previousIslandSize = -1;
+            double[] islandTimes = {0, 0, 0, 0, 0, 0, 0};
+            int islandSize = 0;
+
+            bool firstDeltaSwitch = false;
+
+            for (int i = Previous.Count - 1; i < 0; i--)
+            {
+                double currDelta = ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime;
+                double prevDelta = ((OsuDifficultyHitObject)Previous[i]).StrainTime;
+                double effectiveRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
+
+                double currHistoricalDecay = Math.Max(0, (HistoryTimeMax - (startTime - Previous[i - 1].StartTime))) / HistoryTimeMax;
+
+                // if (historyTime > HistoryTimeMax)
+                //     break; // not sure if this even does what I want..
+
+                if (firstDeltaSwitch)
+                {
+                    if (isRatioEqual(1.0, prevDelta, currDelta))
+                    {
+                        islandSize++; // island is still progressing, count size.
+                    }
+
+                    else
+                    {
+                        if (islandSize > 6)
+                            islandSize = 6;
+
+                        if (Previous[i - 1].BaseObject is Slider) // bpm change is into slider, this is easy acc window
+                            effectiveRatio *= 0.5;
+
+                        if (Previous[i].BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
+                            effectiveRatio *= 0.75;
+
+                        if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
+                            effectiveRatio *= 0.5;
+
+                        islandTimes[islandSize] = islandTimes[islandSize] + effectiveRatio * currHistoricalDecay;
+
+                        previousIslandSize = islandSize; // log the last island size.
+
+                        if (prevDelta * 1.25 < currDelta) // we're slowing down, stop counting
+                            firstDeltaSwitch = false; // if we're speeding up, this stays true and  we keep counting island size.
+
+                        islandSize = 0;
+                    }
+                }
+                else if (prevDelta > 1.25 * currDelta) // we want to be speeding up.
+                {
+                    // Begin counting island until we change speed again.
+                    firstDeltaSwitch = true;
+                    islandSize = 0;
+                }
+            }
+
+            double rhythmComplexitySum = 0.0;
+
+            for (int i = 0; i < islandTimes.Length; i++)
+            {
+                rhythmComplexitySum += islandTimes[i]; // sum the total amount of rhythm variance
+            }
+
+Console.WriteLine(Math.Sqrt(4 + rhythmComplexitySum * rhythmMultiplier) / 2);
+
+            return Math.Min(1.5, Math.Sqrt(4 + rhythmComplexitySum * rhythmMultiplier) / 2);
+        }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -81,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double GetPeakStrain(double time)
         {
-            return base.GetPeakStrain(time) * calculateRhythmBonus(time);
+            return base.GetPeakStrain(time);// * calculateRhythmBonus(current.StartTime);
         }
     }
 }
