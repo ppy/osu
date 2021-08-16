@@ -22,7 +22,10 @@ namespace osu.Game.Graphics.UserInterface
 
         public void TakeFocus()
         {
-            if (allowImmediateFocus) GetContainingInputManager().ChangeFocus(this);
+            if (!allowImmediateFocus)
+                return;
+
+            Schedule(() => GetContainingInputManager().ChangeFocus(this));
         }
 
         public bool HoldFocus
