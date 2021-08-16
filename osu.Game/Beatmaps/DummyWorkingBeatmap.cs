@@ -50,7 +50,7 @@ namespace osu.Game.Beatmaps
 
         protected override Track GetBeatmapTrack() => GetVirtualTrack();
 
-        protected override ISkin GetSkin() => null;
+        protected internal override ISkin GetSkin() => null;
 
         public override Stream GetStream(string storagePath) => null;
 
