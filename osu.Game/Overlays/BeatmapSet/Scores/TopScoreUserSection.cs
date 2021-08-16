@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -126,7 +127,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public int? ScorePosition
         {
-            set => rankText.Text = value == null ? "-" : $"#{value}";
+            set => rankText.Text = value == null ? (LocalisableString)"-" : value.ToLocalisableString(@"\##");
         }
 
         /// <summary>
