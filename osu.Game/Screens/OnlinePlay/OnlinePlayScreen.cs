@@ -329,6 +329,7 @@ namespace osu.Game.Screens.OnlinePlay
 
                     RelativeSizeAxes = Axes.Both;
                     BlurSigma = new Vector2(10);
+                    FrameBufferScale = new Vector2(0.5f);
                     CacheDrawnFrameBuffer = true;
                 }
 
