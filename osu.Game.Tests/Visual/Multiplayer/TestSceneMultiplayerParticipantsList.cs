@@ -53,6 +53,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("null user added", () => Client.Room.AsNonNull().Users.Count(u => u.User == null) == 1);
 
             AddUntilStep("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
+
+            AddStep("kick null user", () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.User.User == null)
+                                                .ChildrenOfType<ParticipantPanel.KickButton>().Single().TriggerClick());
+
+            AddAssert("null user kicked", () => Client.Room.AsNonNull().Users.Count == 1);
         }
 
         [Test]
