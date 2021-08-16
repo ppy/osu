@@ -67,8 +67,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 length.TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(TimeSpan.FromMilliseconds(beatmap.Length).ToFormattedDuration());
                 length.Value = TimeSpan.FromMilliseconds(beatmap.Length).ToFormattedDuration();
 
-                circleCount.Value = beatmap.OnlineInfo.CircleCount.ToLocalisableString("N0");
-                sliderCount.Value = beatmap.OnlineInfo.SliderCount.ToLocalisableString("N0");
+                circleCount.Value = beatmap.OnlineInfo.CircleCount.ToLocalisableString(@"N0");
+                sliderCount.Value = beatmap.OnlineInfo.SliderCount.ToLocalisableString(@"N0");
             }
         }
 

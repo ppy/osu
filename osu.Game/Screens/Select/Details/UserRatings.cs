@@ -37,8 +37,8 @@ namespace osu.Game.Screens.Select.Details
 
                 if (metrics == null)
                 {
-                    negativeRatings.Text = 0.ToLocalisableString("N0");
-                    positiveRatings.Text = 0.ToLocalisableString("N0");
+                    negativeRatings.Text = 0.ToLocalisableString(@"N0");
+                    positiveRatings.Text = 0.ToLocalisableString(@"N0");
                     ratingsBar.Length = 0;
                     graph.Values = new float[rating_range];
                 }
@@ -49,8 +49,8 @@ namespace osu.Game.Screens.Select.Details
                     var negativeCount = ratings.Take(rating_range / 2).Sum();
                     var totalCount = ratings.Sum();
 
-                    negativeRatings.Text = negativeCount.ToLocalisableString("N0");
-                    positiveRatings.Text = (totalCount - negativeCount).ToLocalisableString("N0");
+                    negativeRatings.Text = negativeCount.ToLocalisableString(@"N0");
+                    positiveRatings.Text = (totalCount - negativeCount).ToLocalisableString(@"N0");
                     ratingsBar.Length = totalCount == 0 ? 0 : (float)negativeCount / totalCount;
                     graph.Values = ratings.Take(rating_range).Select(r => (float)r);
                 }
@@ -90,14 +90,14 @@ namespace osu.Game.Screens.Select.Details
                             {
                                 negativeRatings = new OsuSpriteText
                                 {
-                                    Text = 0.ToLocalisableString("N0"),
+                                    Text = 0.ToLocalisableString(@"N0"),
                                     Font = OsuFont.GetFont(size: 12)
                                 },
                                 positiveRatings = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Text = 0.ToLocalisableString("N0"),
+                                    Text = 0.ToLocalisableString(@"N0"),
                                     Font = OsuFont.GetFont(size: 12)
                                 },
                             },
