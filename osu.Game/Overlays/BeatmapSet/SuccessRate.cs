@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.BeatmapSet
             int playCount = beatmap?.OnlineInfo?.PlayCount ?? 0;
 
             var rate = playCount != 0 ? (float)passCount / playCount : 0;
-            successPercent.Text = rate.ToLocalisableString("0.#%");
+            successPercent.Text = rate.ToLocalisableString(@"0.#%");
             successRate.Length = rate;
             percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
