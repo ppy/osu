@@ -27,14 +27,14 @@ namespace osu.Game.Skinning
             new Color4(242, 24, 57, 255),
         };
 
-        private readonly List<Color4> comboColours = new List<Color4>();
+        public List<Color4> CustomComboColours { get; set; } = new List<Color4>();
 
         public IReadOnlyList<Color4> ComboColours
         {
             get
             {
-                if (comboColours.Count > 0)
-                    return comboColours;
+                if (CustomComboColours.Count > 0)
+                    return CustomComboColours;
 
                 if (AllowDefaultComboColoursFallback)
                     return DefaultComboColours;
@@ -43,7 +43,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public void AddComboColours(params Color4[] colours) => comboColours.AddRange(colours);
+        void IHasComboColours.AddComboColours(params Color4[] colours) => CustomComboColours.AddRange(colours);
 
         public Dictionary<string, Color4> CustomColours { get; } = new Dictionary<string, Color4>();
 
