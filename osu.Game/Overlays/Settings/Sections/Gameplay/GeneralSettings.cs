@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = "Show difficulty graph on progress bar",
-                    Current = config.GetBindable<bool>(OsuSetting.ShowDifficultyGraph)
+                    Current = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
                 },
                 new SettingsCheckbox
                 {
