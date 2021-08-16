@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Debug.Assert(Room != null);
 
-            return ((IMultiplayerClient)this).UserLeft(Room.Users.Single(u => u.UserID == userId));
+            return ((IMultiplayerClient)this).UserKicked(Room.Users.Single(u => u.UserID == userId));
         }
 
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
