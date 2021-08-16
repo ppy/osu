@@ -20,16 +20,25 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private SettingsDropdown<string> dropdown;
 
-        protected override void Dispose(bool isDisposing)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.Dispose(isDisposing);
-
-            if (audio != null)
+            Children = new Drawable[]
             {
-                audio.OnNewDevice -= onDeviceChanged;
-                audio.OnLostDevice -= onDeviceChanged;
-            }
+                dropdown = new AudioDeviceSettingsDropdown
+                {
+                    Keywords = new[] { "speaker", "headphone", "output" }
+                }
+            };
+
+            updateItems();
+
+            audio.OnNewDevice += onDeviceChanged;
+            audio.OnLostDevice += onDeviceChanged;
+            dropdown.Current = audio.AudioDevice;
         }
+
+        private void onDeviceChanged(string name) => updateItems();
 
         private void updateItems()
         {
@@ -49,26 +58,15 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             dropdown.Items = deviceItems.Distinct().ToList();
         }
 
-        private void onDeviceChanged(string name) => updateItems();
-
-        protected override void LoadComplete()
+        protected override void Dispose(bool isDisposing)
         {
-            base.LoadComplete();
+            base.Dispose(isDisposing);
 
-            Children = new Drawable[]
+            if (audio != null)
             {
-                dropdown = new AudioDeviceSettingsDropdown
-                {
-                    Keywords = new[] { "speaker", "headphone", "output" }
-                }
-            };
-
-            updateItems();
-
-            dropdown.Current = audio.AudioDevice;
-
-            audio.OnNewDevice += onDeviceChanged;
-            audio.OnLostDevice += onDeviceChanged;
+                audio.OnNewDevice -= onDeviceChanged;
+                audio.OnLostDevice -= onDeviceChanged;
+            }
         }
 
         private class AudioDeviceSettingsDropdown : SettingsDropdown<string>
