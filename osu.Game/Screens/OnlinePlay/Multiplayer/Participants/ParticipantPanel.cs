@@ -83,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Colour = Color4Extensions.FromHex("#F7E65D"),
                             Alpha = 0
                         },
-                        new TeamDisplay(user),
+                        new TeamDisplay(User),
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
