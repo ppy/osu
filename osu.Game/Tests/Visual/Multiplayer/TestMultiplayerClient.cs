@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return roomUser;
         }
 
-        public void AddNullUser(int userId) => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(userId));
+        public void AddNullUser() => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(TestUserLookupCache.NULL_USER_ID));
 
         public void RemoveUser(User user)
         {
@@ -173,6 +173,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override Task LeaveRoomInternal() => Task.CompletedTask;
 
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
+
+        public override Task KickUser(int userId)
+        {
+            Debug.Assert(Room != null);
+
+            return ((IMultiplayerClient)this).UserKicked(Room.Users.Single(u => u.UserID == userId));
+        }
 
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
         {

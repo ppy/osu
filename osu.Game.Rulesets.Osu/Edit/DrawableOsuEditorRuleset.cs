@@ -41,6 +41,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             protected override GameplayCursorContainer CreateCursor() => null;
 
+            public OsuEditorPlayfield()
+            {
+                HitPolicy = new AnyOrderHitPolicy();
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {

@@ -5,12 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class AlertsAndPrivacySettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Alerts and Privacy";
+        protected override LocalisableString Header => OnlineSettingsStrings.AlertsAndPrivacyHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -19,12 +20,12 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Show a notification when someone mentions your name",
+                    LabelText = OnlineSettingsStrings.NotifyOnMentioned,
                     Current = config.GetBindable<bool>(OsuSetting.NotifyOnUsernameMentioned)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show a notification when you receive a private message",
+                    LabelText = OnlineSettingsStrings.NotifyOnPrivateMessage,
                     Current = config.GetBindable<bool>(OsuSetting.NotifyOnPrivateMessage)
                 },
             };
