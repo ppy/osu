@@ -36,16 +36,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
         }
 
-        /// <summary>
-        /// Retrieves the peak strain at a point in time.
-        /// </summary>
-        /// <param name="time">The time to retrieve the peak strain at.</param>
-        /// <returns>The peak strain.</returns>
         protected override double CalculateInitialStrain(double time) => CurrentStrain * strainDecay(time - Previous[0].StartTime);
 
-        /// <summary>
-        /// Returns the strain value of <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
-        /// </summary>
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             CurrentStrain *= strainDecay(current.DeltaTime);
