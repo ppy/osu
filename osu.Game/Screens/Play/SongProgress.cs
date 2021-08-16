@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Play
                 Objects = drawableRuleset.Objects;
             }
 
-            config.BindWith(OsuSetting.ShowProgressGraph, ShowGraph);
+            config.BindWith(OsuSetting.ShowDifficultyGraph, ShowGraph);
 
             graph.FillColour = bar.FillColour = colours.BlueLighter;
         }

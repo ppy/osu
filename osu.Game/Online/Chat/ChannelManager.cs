@@ -553,7 +553,7 @@ namespace osu.Game.Online.Chat
             if (channel.LastMessageId == channel.LastReadId)
                 return;
 
-            var message = channel.Messages.LastOrDefault();
+            var message = channel.Messages.FindLast(msg => !(msg is LocalMessage));
 
             if (message == null)
                 return;

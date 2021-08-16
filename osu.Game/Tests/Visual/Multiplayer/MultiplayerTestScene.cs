@@ -36,23 +36,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             if (joinRoom)
             {
-                var room = new Room
-                {
-                    Name = { Value = "test name" },
-                    Playlist =
-                    {
-                        new PlaylistItem
-                        {
-                            Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                            Ruleset = { Value = Ruleset.Value }
-                        }
-                    }
-                };
+                var room = CreateRoom();
 
                 RoomManager.CreateRoom(room);
                 SelectedRoom.Value = room;
             }
         });
+
+        protected virtual Room CreateRoom()
+        {
+            return new Room
+            {
+                Name = { Value = "test name" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
+                        Ruleset = { Value = Ruleset.Value }
+                    }
+                }
+            };
+        }
 
         public override void SetUpSteps()
         {

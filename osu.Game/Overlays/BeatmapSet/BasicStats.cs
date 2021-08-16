@@ -81,10 +81,10 @@ namespace osu.Game.Overlays.BeatmapSet
                 Direction = FillDirection.Horizontal,
                 Children = new[]
                 {
-                    length = new Statistic(FontAwesome.Regular.Clock, BeatmapsetsStrings.ShowStatsTotalLength(string.Empty)) { Width = 0.25f },
-                    bpm = new Statistic(FontAwesome.Regular.Circle, BeatmapsetsStrings.ShowStatsBpm) { Width = 0.25f },
-                    circleCount = new Statistic(FontAwesome.Regular.Circle, BeatmapsetsStrings.ShowStatsCountCircles) { Width = 0.25f },
-                    sliderCount = new Statistic(FontAwesome.Regular.Circle, BeatmapsetsStrings.ShowStatsCountSliders) { Width = 0.25f },
+                    length = new Statistic(BeatmapStatisticsIconType.Length, BeatmapsetsStrings.ShowStatsTotalLength(string.Empty)) { Width = 0.25f },
+                    bpm = new Statistic(BeatmapStatisticsIconType.Bpm, BeatmapsetsStrings.ShowStatsBpm) { Width = 0.25f },
+                    circleCount = new Statistic(BeatmapStatisticsIconType.Circles, BeatmapsetsStrings.ShowStatsCountCircles) { Width = 0.25f },
+                    sliderCount = new Statistic(BeatmapStatisticsIconType.Sliders, BeatmapsetsStrings.ShowStatsCountSliders) { Width = 0.25f },
                 },
             };
         }
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 set => this.value.Text = value;
             }
 
-            public Statistic(IconUsage icon, LocalisableString name)
+            public Statistic(BeatmapStatisticsIconType icon, string name)
             {
                 TooltipText = name;
                 RelativeSizeAxes = Axes.X;
@@ -136,8 +136,16 @@ namespace osu.Game.Overlays.BeatmapSet
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
-                                Icon = icon,
-                                Size = new Vector2(12),
+                                Icon = FontAwesome.Regular.Circle,
+                                Size = new Vector2(10),
+                                Rotation = 0,
+                                Colour = Color4Extensions.FromHex(@"f7dd55"),
+                            },
+                            new BeatmapStatisticIcon(icon)
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(10),
                                 Colour = Color4Extensions.FromHex(@"f7dd55"),
                                 Scale = new Vector2(0.8f),
                             },
