@@ -20,7 +20,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
 
-        private const double rhythmMultiplier = 1.0;
+        private const double rhythmMultiplier = 1.5;
+
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecayBase => 0.3;
         protected override int ReducedSectionCount => 5;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override int HistoryLength => 32;
 
-        private const int HistoryTimeMax = 4; // 4 seconds of calculatingRhythmBonus max.
+        private const int HistoryTimeMax = 3000; // 4 seconds of calculatingRhythmBonus max.
 
         public Speed(Mod[] mods)
             : base(mods)
@@ -56,16 +57,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             bool firstDeltaSwitch = false;
 
-            for (int i = Previous.Count - 1; i < 0; i--)
+            for (int i = Previous.Count - 1; i > 0; i--)
             {
                 double currDelta = ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime;
                 double prevDelta = ((OsuDifficultyHitObject)Previous[i]).StrainTime;
                 double effectiveRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
 
-                double currHistoricalDecay = Math.Max(0, (HistoryTimeMax - (startTime - Previous[i - 1].StartTime))) / HistoryTimeMax;
+                if (effectiveRatio > 0.5)
+                    effectiveRatio = 0.5 + (effectiveRatio - 0.5) * 5; // extra buff for 1/3 -> 1/4 etc transitions.
 
-                // if (historyTime > HistoryTimeMax)
-                //     break; // not sure if this even does what I want..
+                double currHistoricalDecay = Math.Max(0, (HistoryTimeMax - (startTime - Previous[i - 1].StartTime))) / HistoryTimeMax;
 
                 if (firstDeltaSwitch)
                 {
@@ -113,9 +114,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 rhythmComplexitySum += islandTimes[i]; // sum the total amount of rhythm variance
             }
 
-Console.WriteLine(Math.Sqrt(4 + rhythmComplexitySum * rhythmMultiplier) / 2);
+// Console.WriteLine(Math.Sqrt(4 + rhythmComplexitySum * rhythmMultiplier) / 2);
 
-            return Math.Min(1.5, Math.Sqrt(4 + rhythmComplexitySum * rhythmMultiplier) / 2);
+            return Math.Sqrt(4 + rhythmComplexitySum * rhythmMultiplier) / 2;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
