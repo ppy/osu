@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return roomUser;
         }
 
-        public void AddNullUser(int userId) => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(userId));
+        public void AddNullUser() => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(TestUserLookupCache.NULL_USER_ID));
 
         public void RemoveUser(User user)
         {
