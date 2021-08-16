@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
     /// </summary>
-    public class Speed : OsuStrainSkill
+    public class Speed : OsuStrainDecaySkill
     {
         private const double single_spacing_threshold = 125;
 
@@ -150,15 +150,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / osuCurrent.StrainTime;
-        }
-        protected override double GetTotalCurrentStrain(DifficultyHitObject current)
-        {
-            return base.GetTotalCurrentStrain(current) * calculateRhythmBonus(current.StartTime);
-        }
-
-        protected override double GetPeakStrain(double time)
-        {
-            return base.GetPeakStrain(time);// * calculateRhythmBonus(current.StartTime);
         }
     }
 }
