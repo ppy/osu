@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit
         /// The combo colours of this skin.
         /// If empty, the default combo colours will be used.
         /// </summary>
-        public BindableList<Colour4> ComboColours;
+        public readonly BindableList<Colour4> ComboColours;
 
         private readonly Skin skin;
 
