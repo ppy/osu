@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
-        /// Returns the strain value of <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
+        /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
         /// </summary>
         protected abstract double StrainValueAt(DifficultyHitObject current);
 
