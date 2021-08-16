@@ -15,8 +15,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
     /// </summary>
     public class ListingPollingComponent : RoomPollingComponent
     {
-        public IBindable<bool> HasPolledOnce => hasPolledOnce;
-        private readonly Bindable<bool> hasPolledOnce = new Bindable<bool>();
+        public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
+        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
 
         [Resolved]
         private Bindable<FilterCriteria> currentFilter { get; set; }
@@ -30,7 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             currentFilter.BindValueChanged(_ =>
             {
                 RoomManager.ClearRooms();
-                hasPolledOnce.Value = false;
+                initialRoomsReceived.Value = false;
 
                 if (IsLoaded)
                     PollImmediately();
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 foreach (var incoming in result)
                     RoomManager.AddOrUpdateRoom(incoming);
 
-                hasPolledOnce.Value = true;
+                initialRoomsReceived.Value = true;
                 tcs.SetResult(true);
             };
 

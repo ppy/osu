@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
-        private MultiplayerListingPollingComponent listingPollingComponent;
+        private MultiplayerListingPollingComponent multiplayerListingPollingComponent => (MultiplayerListingPollingComponent)ListingPollingComponent;
 
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
 
@@ -34,8 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             isConnected.BindTo(client.IsConnected);
-            isConnected.BindValueChanged(c => Scheduler.AddOnce(() => listingPollingComponent.AllowPolling = c.NewValue));
-            listingPollingComponent.AllowPolling = isConnected.Value;
+            isConnected.BindValueChanged(c => Scheduler.AddOnce(() => multiplayerListingPollingComponent.AllowPolling = c.NewValue));
+            multiplayerListingPollingComponent.AllowPolling = isConnected.Value;
         }
 
         public override void OnResuming(IScreen last)
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (last is MultiplayerMatchSubScreen match)
             {
                 RoomManager.RemoveRoom(match.Room);
-                listingPollingComponent.PollImmediately();
+                multiplayerListingPollingComponent.PollImmediately();
             }
         }
 
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
 
-        protected override ListingPollingComponent CreatePollingComponent() => listingPollingComponent = new MultiplayerListingPollingComponent();
+        protected override ListingPollingComponent CreatePollingComponent() => new MultiplayerListingPollingComponent();
 
         protected override void OpenNewRoom(Room room)
         {
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 }
             }
 
-            protected override Task Poll() => !AllowPolling ? Task.CompletedTask : base.Poll();
+            protected override Task Poll() => AllowPolling ? base.Poll() : Task.CompletedTask;
         }
     }
 }
