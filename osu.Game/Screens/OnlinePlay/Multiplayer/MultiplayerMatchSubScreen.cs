@@ -277,7 +277,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             isConnected.BindValueChanged(connected =>
             {
                 if (!connected.NewValue)
-                    Schedule(this.Exit);
+                    handleRoomLost();
             }, true);
 
             currentRoom.BindValueChanged(room =>
@@ -287,7 +287,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     // the room has gone away.
                     // this could mean something happened during the join process, or an external connection issue occurred.
                     // one specific scenario is where the underlying room is created, but the signalr server returns an error during the join process. this triggers a PartRoom operation (see https://github.com/ppy/osu/blob/7654df94f6f37b8382be7dfcb4f674e03bd35427/osu.Game/Screens/OnlinePlay/Multiplayer/MultiplayerRoomManager.cs#L97)
-                    Schedule(this.Exit);
+                    handleRoomLost();
                 }
             }, true);
         }
@@ -451,8 +451,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onRoomUpdated()
         {
+            // may happen if the client is kicked or otherwise removed from the room.
+            if (client.Room == null)
+            {
+                handleRoomLost();
+                return;
+            }
+
             Scheduler.AddOnce(UpdateMods);
         }
+
+        private void handleRoomLost() => Schedule(() =>
+        {
+            if (this.IsCurrentScreen())
+                this.Exit();
+            else
+                ValidForResume = false;
+        });
 
         private void onLoadRequested()
         {
