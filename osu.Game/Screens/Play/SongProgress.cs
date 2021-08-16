@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Play
 
             if (drawableRuleset != null)
             {
-                if (player?.Configuration.AllowSeeking == true)
+                if (player?.Configuration.AllowUserInteraction == true)
                     ((IBindable<bool>)AllowSeeking).BindTo(drawableRuleset.HasReplayLoaded);
 
                 referenceClock = drawableRuleset.FrameStableClock;

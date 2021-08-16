@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <param name="score">The score containing the player's replay.</param>
         /// <param name="spectatorPlayerClock">The clock controlling the gameplay running state.</param>
         public MultiSpectatorPlayer([NotNull] Score score, [NotNull] ISpectatorPlayerClock spectatorPlayerClock)
-            : base(score, new PlayerConfiguration { AllowSeeking = false })
+            : base(score, new PlayerConfiguration { AllowUserInteraction = false })
         {
             this.spectatorPlayerClock = spectatorPlayerClock;
         }

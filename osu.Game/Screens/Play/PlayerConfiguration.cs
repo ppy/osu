@@ -21,9 +21,9 @@ namespace osu.Game.Screens.Play
         public bool AllowRestart { get; set; } = true;
 
         /// <summary>
-        /// Whether the player should be allowed to seek in a displayed replay.
+        /// Whether the player should be able to interact with this player instance.
         /// </summary>
-        public bool AllowSeeking { get; set; } = true;
+        public bool AllowUserInteraction { get; set; } = true;
 
         /// <summary>
         /// Whether the player should be allowed to skip intros/outros, advancing to the start of gameplay or the end of a storyboard.
