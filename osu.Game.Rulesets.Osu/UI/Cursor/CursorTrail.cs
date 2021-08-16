@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                     float interval = partSize.X / 2.5f * IntervalMultiplier;
 
-                    for (float d = interval; d < distance; d += interval)
+                    for (float d = interval; d < distance - interval; d += interval)
                     {
                         lastPosition = pos1 + direction * d;
                         addPart(lastPosition.Value);
