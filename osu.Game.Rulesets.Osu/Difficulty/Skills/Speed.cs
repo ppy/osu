@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double max_speed_bonus = 45; // ~330BPM
         private const double speed_balancing_factor = 40;
 
+        protected override int HistoryLength => 32;
+
         public Speed(Mod[] mods)
             : base(mods)
         {
