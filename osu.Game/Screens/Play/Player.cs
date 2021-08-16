@@ -77,10 +77,6 @@ namespace osu.Game.Screens.Play
 
         protected readonly Bindable<bool> LocalUserPlaying = new Bindable<bool>();
 
-        private readonly Bindable<bool> allowUserSeeking = new Bindable<bool>();
-
-        public IBindable<bool> AllowUserSeeking => allowUserSeeking;
-
         public int RestartCount;
 
         [Resolved]
@@ -273,13 +269,7 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset.FrameStableClock.IsCatchingUp.BindValueChanged(_ => updateSampleDisabledState());
 
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(r =>
-            {
-                if (Configuration.AllowSeeking)
-                    allowUserSeeking.Value = r.NewValue;
-
-                updateGameplayState();
-            });
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
@@ -592,7 +582,13 @@ namespace osu.Game.Screens.Play
         /// Seek to a specific time in gameplay.
         /// </summary>
         /// <param name="time">The destination time to seek to.</param>
-        public void Seek(double time) => GameplayClockContainer.Seek(time);
+        public void Seek(double time)
+        {
+            if (!Configuration.AllowSeeking)
+                throw new InvalidOperationException($"Seeking has ben disabled by the current {nameof(Configuration)}.");
+
+            GameplayClockContainer.Seek(time);
+        }
 
         private ScheduledDelegate frameStablePlaybackResetDelegate;
 
