@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 set => this.value.Text = value;
             }
 
-            public Statistic(BeatmapStatisticsIconType icon, string name)
+            public Statistic(BeatmapStatisticsIconType icon, LocalisableString name)
             {
                 TooltipText = name;
                 RelativeSizeAxes = Axes.X;
