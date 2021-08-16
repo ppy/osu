@@ -38,7 +38,13 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         public void AddOrUpdateRoom(Room room)
         {
-            Rooms.Add(room);
+            var existing = Rooms.FirstOrDefault(r => r.RoomID.Value != null && r.RoomID.Value == room.RoomID.Value);
+
+            if (existing != null)
+                existing.CopyFrom(room);
+            else
+                Rooms.Add(room);
+
             RoomsUpdated?.Invoke();
         }
 
