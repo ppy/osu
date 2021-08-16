@@ -57,11 +57,10 @@ namespace osu.Game.Screens.OnlinePlay.Components
             {
                 joinedRoom.Value = room;
 
-                update(room, result);
-                addRoom(room);
+                AddOrUpdateRoom(result);
+                room.CopyFrom(result); // Also copy back to the source model, since this is likely to have been stored elsewhere.
 
-                RoomsUpdated?.Invoke();
-                onSuccess?.Invoke(room);
+                onSuccess?.Invoke(result);
             };
 
             req.Failure += exception =>
@@ -119,8 +118,14 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             try
             {
-                update(room, room);
-                addRoom(room);
+                foreach (var pi in room.Playlist)
+                    pi.MapObjects(beatmaps, rulesets);
+
+                var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
+                if (existing == null)
+                    rooms.Add(room);
+                else
+                    existing.CopyFrom(room);
             }
             catch (Exception ex)
             {
@@ -143,32 +148,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             rooms.Clear();
             notifyRoomsUpdated();
-        }
-
-        /// <summary>
-        /// Updates a local <see cref="Room"/> with a remote copy.
-        /// </summary>
-        /// <param name="local">The local <see cref="Room"/> to update.</param>
-        /// <param name="remote">The remote <see cref="Room"/> to update with.</param>
-        private void update(Room local, Room remote)
-        {
-            foreach (var pi in remote.Playlist)
-                pi.MapObjects(beatmaps, rulesets);
-
-            local.CopyFrom(remote);
-        }
-
-        /// <summary>
-        /// Adds a <see cref="Room"/> to the list of available rooms.
-        /// </summary>
-        /// <param name="room">The <see cref="Room"/> to add.</param>
-        private void addRoom(Room room)
-        {
-            var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
-            if (existing == null)
-                rooms.Add(room);
-            else
-                existing.CopyFrom(room);
         }
 
         private void notifyRoomsUpdated() => Scheduler.AddOnce(() => RoomsUpdated?.Invoke());
