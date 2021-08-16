@@ -12,6 +12,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Skinning;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -140,6 +141,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
 
             AddStep("return value", () => config.SetValue(OsuSetting.KeyOverlay, keyCounterVisibleValue));
+        }
+
+        [Test]
+        public void TestHiddenHUDDoesntBlockSkinnableComponentsLoad()
+        {
+            HUDVisibilityMode originalConfigValue = default;
+
+            AddStep("get original config value", () => originalConfigValue = config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
+
+            AddStep("set hud to never show", () => config.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
+
+            createNew();
+            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
+            AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().ComponentsLoaded);
+
+            AddStep("set original config value", () => config.SetValue(OsuSetting.HUDVisibilityMode, originalConfigValue));
         }
 
         private void createNew(Action<HUDOverlay> action = null)

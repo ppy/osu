@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -19,6 +20,7 @@ namespace osu.Game.Tests.Chat
     {
         private ChannelManager channelManager;
         private int currentMessageId;
+        private List<Message> sentMessages;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -34,6 +36,7 @@ namespace osu.Game.Tests.Chat
             AddStep("register request handling", () =>
             {
                 currentMessageId = 0;
+                sentMessages = new List<Message>();
 
                 ((DummyAPIAccess)API).HandleRequest = req =>
                 {
@@ -44,16 +47,11 @@ namespace osu.Game.Tests.Chat
                             return true;
 
                         case PostMessageRequest postMessage:
-                            postMessage.TriggerSuccess(new Message(++currentMessageId)
-                            {
-                                IsAction = postMessage.Message.IsAction,
-                                ChannelId = postMessage.Message.ChannelId,
-                                Content = postMessage.Message.Content,
-                                Links = postMessage.Message.Links,
-                                Timestamp = postMessage.Message.Timestamp,
-                                Sender = postMessage.Message.Sender
-                            });
+                            handlePostMessageRequest(postMessage);
+                            return true;
 
+                        case MarkChannelAsReadRequest markRead:
+                            handleMarkChannelAsReadRequest(markRead);
                             return true;
                     }
 
@@ -83,12 +81,65 @@ namespace osu.Game.Tests.Chat
             AddAssert("/np command received by channel 2", () => channel2.Messages.Last().Content.Contains("is listening to"));
         }
 
+        [Test]
+        public void TestMarkAsReadIgnoringLocalMessages()
+        {
+            Channel channel = null;
+
+            AddStep("join channel and select it", () =>
+            {
+                channelManager.JoinChannel(channel = createChannel(1, ChannelType.Public));
+                channelManager.CurrentChannel.Value = channel;
+            });
+
+            AddStep("post message", () => channelManager.PostMessage("Something interesting"));
+
+            AddStep("post /help command", () => channelManager.PostCommand("help", channel));
+            AddStep("post /me command with no action", () => channelManager.PostCommand("me", channel));
+            AddStep("post /join command with no channel", () => channelManager.PostCommand("join", channel));
+            AddStep("post /join command with non-existent channel", () => channelManager.PostCommand("join i-dont-exist", channel));
+            AddStep("post non-existent command", () => channelManager.PostCommand("non-existent-cmd arg", channel));
+
+            AddStep("mark channel as read", () => channelManager.MarkChannelAsRead(channel));
+            AddAssert("channel's last read ID is set to the latest message", () => channel.LastReadId == sentMessages.Last().Id);
+        }
+
+        private void handlePostMessageRequest(PostMessageRequest request)
+        {
+            var message = new Message(++currentMessageId)
+            {
+                IsAction = request.Message.IsAction,
+                ChannelId = request.Message.ChannelId,
+                Content = request.Message.Content,
+                Links = request.Message.Links,
+                Timestamp = request.Message.Timestamp,
+                Sender = request.Message.Sender
+            };
+
+            sentMessages.Add(message);
+            request.TriggerSuccess(message);
+        }
+
+        private void handleMarkChannelAsReadRequest(MarkChannelAsReadRequest request)
+        {
+            // only accept messages that were sent through the API
+            if (sentMessages.Contains(request.Message))
+            {
+                request.TriggerSuccess();
+            }
+            else
+            {
+                request.TriggerFailure(new APIException("unknown message!", null));
+            }
+        }
+
         private Channel createChannel(int id, ChannelType type) => new Channel(new User())
         {
             Id = id,
             Name = $"Channel {id}",
             Topic = $"Topic of channel {id} with type {type}",
             Type = type,
+            LastMessageId = 0,
         };
 
         private class ChannelManagerContainer : CompositeDrawable

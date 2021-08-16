@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
@@ -48,9 +49,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 1);
 
-            AddStep("add non-resolvable user", () => Client.AddNullUser(-3));
+            AddStep("add non-resolvable user", () => Client.AddNullUser());
+            AddAssert("null user added", () => Client.Room.AsNonNull().Users.Count(u => u.User == null) == 1);
 
             AddUntilStep("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
+
+            AddStep("kick null user", () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.User.User == null)
+                                                .ChildrenOfType<ParticipantPanel.KickButton>().Single().TriggerClick());
+
+            AddAssert("null user kicked", () => Client.Room.AsNonNull().Users.Count == 1);
         }
 
         [Test]

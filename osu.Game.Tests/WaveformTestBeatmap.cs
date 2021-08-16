@@ -53,7 +53,7 @@ namespace osu.Game.Tests
 
         protected override Waveform GetWaveform() => new Waveform(trackStore.GetStream(firstAudioFile));
 
-        protected override ISkin GetSkin() => null;
+        protected internal override ISkin GetSkin() => null;
 
         public override Stream GetStream(string storagePath) => null;
 
