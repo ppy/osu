@@ -266,24 +266,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateVisibility()
         {
-            if (!tabletHandler.Enabled.Value)
-            {
-                mainSettings.Hide();
-                noTabletMessage.Hide();
-                return;
-            }
-
-            bool tabletFound = tablet.Value != null;
-
-            if (!tabletFound)
-            {
-                mainSettings.Hide();
-                noTabletMessage.Show();
-                return;
-            }
-
-            mainSettings.Show();
+            mainSettings.Hide();
             noTabletMessage.Hide();
+
+            if (!tabletHandler.Enabled.Value)
+                return;
+
+            if (tablet.Value != null)
+                mainSettings.Show();
+            else
+                noTabletMessage.Show();
         }
 
         private void applyAspectRatio(BindableNumber<float> sizeChanged)
