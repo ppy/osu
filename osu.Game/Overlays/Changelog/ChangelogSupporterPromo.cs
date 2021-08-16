@@ -144,8 +144,7 @@ namespace osu.Game.Overlays.Changelog
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Width = heart_size,
-                    Height = heart_size,
+                    Size = new Vector2(heart_size),
                     Margin = new MarginPadding { Top = 70 },
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
@@ -157,8 +156,7 @@ namespace osu.Game.Overlays.Changelog
                     },
                     Child = new Sprite
                     {
-                        Width = heart_size,
-                        Height = heart_size,
+                        Size = new Vector2(heart_size),
                         Texture = textures.Get(@"Online/supporter-heart"),
                     },
                 },
