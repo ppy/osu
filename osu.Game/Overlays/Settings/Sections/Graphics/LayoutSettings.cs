@@ -97,8 +97,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    AutoSizeDuration = transition_duration,
-                    AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
                     Children = new[]
                     {
@@ -177,6 +175,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingMode.BindValueChanged(mode =>
             {
                 scalingSettings.ClearTransforms();
+
+                scalingSettings.AutoSizeDuration = transition_duration;
+                scalingSettings.AutoSizeEasing = Easing.OutQuint;
                 scalingSettings.AutoSizeAxes = mode.NewValue != ScalingMode.Off ? Axes.Y : Axes.None;
 
                 if (mode.NewValue == ScalingMode.Off)
