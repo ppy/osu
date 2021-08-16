@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <param name="score">The score containing the player's replay.</param>
         /// <param name="spectatorPlayerClock">The clock controlling the gameplay running state.</param>
         public MultiSpectatorPlayer([NotNull] Score score, [NotNull] ISpectatorPlayerClock spectatorPlayerClock)
-            : base(score)
+            : base(score, new PlayerConfiguration { AllowSeeking = false })
         {
             this.spectatorPlayerClock = spectatorPlayerClock;
         }
@@ -35,8 +35,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             spectatorPlayerClock.WaitingOnFrames.BindTo(waitingOnFrames);
 
-            AllowUserSeekingState.Value = false;
-            AllowUserSeekingState.Disabled = true;
             HUDOverlay.PlayerSettingsOverlay.Expire();
             HUDOverlay.HoldToQuit.Expire();
         }
