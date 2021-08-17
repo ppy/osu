@@ -64,12 +64,11 @@ namespace osu.Game.Tests.Gameplay
         [Test]
         public void TestTrueGameplayRate()
         {
-            WorkingBeatmap working = null;
             MasterGameplayClockContainer gcc = null;
 
             AddStep("create container", () =>
             {
-                working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
                 Add(gcc = new MasterGameplayClockContainer(working, 0));
@@ -97,14 +96,13 @@ namespace osu.Game.Tests.Gameplay
         public void TestHardwareCorrectionOffsetClock()
         {
             OsuConfigManager config = null;
-            WorkingBeatmap working = null;
             TestMasterGameplayClockContainer gcc = null;
 
             AddStep("create container", () =>
             {
                 config = new OsuConfigManager(LocalStorage);
 
-                working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
                 Add(new DependencyProvidingContainer
