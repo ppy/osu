@@ -928,8 +928,17 @@ namespace osu.Game.Screens.Play
             // This is done through the music controller (for now), because resetting speed adjustments on the beatmap track also removes adjustments provided by DrawableTrack.
             // Todo: In the future, player will receive in a track and will probably not have to worry about this...
             musicController.ResetTrackAdjustments();
-            foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
-                mod.ApplyToTrack(musicController.CurrentTrack);
+
+            if (GameplayClockContainer is MasterGameplayClockContainer gameplayTrack)
+            {
+                foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
+                    mod.ApplyToTrack(gameplayTrack);
+            }
+            else
+            {
+                foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
+                    mod.ApplyToTrack(musicController.CurrentTrack);
+            }
 
             updateGameplayState();
 

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -26,7 +25,7 @@ namespace osu.Game.Screens.Play
     /// <remarks>
     /// This is intended to be used as a single controller for gameplay, or as a reference source for other <see cref="GameplayClockContainer"/>s.
     /// </remarks>
-    public class MasterGameplayClockContainer : GameplayClockContainer
+    public class MasterGameplayClockContainer : GameplayClockContainer, ITrack
     {
         /// <summary>
         /// Duration before gameplay start time required before skip button displays.
@@ -43,6 +42,8 @@ namespace osu.Game.Screens.Play
             Precision = 0.1,
         };
 
+        private readonly AudioAdjustments gameplayAdjustments = new AudioAdjustments();
+
         private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
 
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
@@ -54,7 +55,6 @@ namespace osu.Game.Screens.Play
 
         private FramedOffsetClock userOffsetClock;
         private FramedOffsetClock platformOffsetClock;
-        private MasterGameplayClock masterGameplayClock;
         private Bindable<double> userAudioOffset;
         private double startOffset;
 
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
         {
             // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
             // we may want to consider reversing the application of offsets in the future as it may feel more correct.
-            base.Seek(time - totalOffset);
+            base.Seek(time - totalOffset * PlaybackRate);
         }
 
         /// <summary>
@@ -158,12 +158,12 @@ namespace osu.Game.Screens.Play
         {
             // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
             // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            platformOffsetClock = new HardwareCorrectionOffsetClock(source) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+            platformOffsetClock = new HardwareCorrectionOffsetClock(source, this) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
             // the final usable gameplay clock with user-set offsets applied.
-            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock);
+            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock, this);
 
-            return masterGameplayClock = new MasterGameplayClock(userOffsetClock);
+            return new MasterGameplayClock(userOffsetClock, this);
         }
 
         /// <summary>
@@ -183,11 +183,9 @@ namespace osu.Game.Screens.Play
             if (speedAdjustmentsApplied)
                 return;
 
+            Track.BindAdjustments(gameplayAdjustments);
             Track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
             Track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
-
-            masterGameplayClock.MutableNonGameplayAdjustments.Add(pauseFreqAdjust);
-            masterGameplayClock.MutableNonGameplayAdjustments.Add(UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -199,9 +197,7 @@ namespace osu.Game.Screens.Play
 
             Track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
             Track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
-
-            masterGameplayClock.MutableNonGameplayAdjustments.Remove(pauseFreqAdjust);
-            masterGameplayClock.MutableNonGameplayAdjustments.Remove(UserPlaybackRate);
+            Track.UnbindAdjustments(gameplayAdjustments);
 
             speedAdjustmentsApplied = false;
         }
@@ -211,6 +207,76 @@ namespace osu.Game.Screens.Play
             base.Dispose(isDisposing);
             removeSourceClockAdjustments();
         }
+
+        #region Delegated IAdjustableAudioComponent implementation (gameplay adjustments)
+
+        public IBindable<double> AggregateVolume => gameplayAdjustments.AggregateVolume;
+        public IBindable<double> AggregateBalance => gameplayAdjustments.AggregateBalance;
+        public IBindable<double> AggregateFrequency => gameplayAdjustments.AggregateFrequency;
+        public IBindable<double> AggregateTempo => gameplayAdjustments.AggregateTempo;
+
+        public void BindAdjustments(IAggregateAudioAdjustment component) => gameplayAdjustments.BindAdjustments(component);
+        public void UnbindAdjustments(IAggregateAudioAdjustment component) => gameplayAdjustments.UnbindAdjustments(component);
+
+        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => gameplayAdjustments.AddAdjustment(type, adjustBindable);
+        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => gameplayAdjustments.RemoveAdjustment(type, adjustBindable);
+        public void RemoveAllAdjustments(AdjustableProperty type) => gameplayAdjustments.RemoveAllAdjustments(type);
+
+        public BindableNumber<double> Volume => gameplayAdjustments.Volume;
+        public BindableNumber<double> Balance => gameplayAdjustments.Balance;
+        public BindableNumber<double> Frequency => gameplayAdjustments.Frequency;
+        public BindableNumber<double> Tempo => gameplayAdjustments.Tempo;
+
+        #endregion
+
+        #region Delegated ITrack implementation
+
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => Track.CurrentAmplitudes;
+
+        void ITrack.Restart()
+        {
+            Track.Restart();
+        }
+
+        bool ITrack.Looping
+        {
+            get => Track.Looping;
+            set => Track.Looping = value;
+        }
+
+        bool ITrack.IsDummyDevice => Track.IsDummyDevice;
+
+        double ITrack.RestartPoint
+        {
+            get => Track.RestartPoint;
+            set => Track.RestartPoint = value;
+        }
+
+        double ITrack.Length
+        {
+            get => Track.Length;
+            set => Track.Length = value;
+        }
+
+        int? ITrack.Bitrate => Track.Bitrate;
+
+        bool ITrack.IsReversed => Track.IsReversed;
+
+        bool ITrack.HasCompleted => Track.HasCompleted;
+
+        event Action ITrack.Completed
+        {
+            add => Track.Completed += value;
+            remove => Track.Completed -= value;
+        }
+
+        event Action ITrack.Failed
+        {
+            add => Track.Failed += value;
+            remove => Track.Failed -= value;
+        }
+
+        #endregion
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
         {
