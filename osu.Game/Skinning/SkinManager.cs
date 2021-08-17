@@ -95,7 +95,7 @@ namespace osu.Game.Skinning
         /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUsableSkins()
         {
-            var userSkins = GetAllUserSkins();
+            var userSkins = GetAllUserSkins(false);
             userSkins.Insert(0, DefaultSkin.SkinInfo);
             userSkins.Insert(1, DefaultLegacySkin.SkinInfo);
             return userSkins;
@@ -105,7 +105,13 @@ namespace osu.Game.Skinning
         /// Returns a list of all usable <see cref="SkinInfo"/>s that have been loaded by the user.
         /// </summary>
         /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
-        public List<SkinInfo> GetAllUserSkins() => ModelStore.Items.Where(s => !s.DeletePending).ToList();
+        public List<SkinInfo> GetAllUserSkins(bool includeFiles = false)
+        {
+            if (includeFiles)
+                return ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+
+            return ModelStore.Items.Where(s => !s.DeletePending).ToList();
+        }
 
         public void SelectRandomSkin()
         {
