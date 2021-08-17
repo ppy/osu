@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 MuteComboCount = { Value = 0 },
             },
-            PassCondition = () => Player.ChildrenOfType<MasterGameplayClockContainer>().SingleOrDefault()?.AggregateVolume.Value == 0.0 &&
+            PassCondition = () => Player.ChildrenOfType<MasterGameplayClockContainer>().SingleOrDefault()?.GameplayTrack.AggregateVolume.Value == 0.0 &&
                                   Player.ChildrenOfType<Metronome>().SingleOrDefault()?.AggregateVolume.Value == 1.0,
         });
 

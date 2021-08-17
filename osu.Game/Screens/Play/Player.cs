@@ -929,10 +929,10 @@ namespace osu.Game.Screens.Play
             // Todo: In the future, player will receive in a track and will probably not have to worry about this...
             musicController.ResetTrackAdjustments();
 
-            if (GameplayClockContainer is MasterGameplayClockContainer gameplayTrack)
+            if (GameplayClockContainer is MasterGameplayClockContainer master)
             {
                 foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
-                    mod.ApplyToTrack(gameplayTrack);
+                    mod.ApplyToTrack(master.GameplayTrack);
             }
             else
             {
