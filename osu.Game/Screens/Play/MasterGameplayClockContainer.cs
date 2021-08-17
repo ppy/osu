@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
     /// <remarks>
     /// This is intended to be used as a single controller for gameplay, or as a reference source for other <see cref="GameplayClockContainer"/>s.
     /// </remarks>
-    public class MasterGameplayClockContainer : GameplayClockContainer, ITrack
+    public class MasterGameplayClockContainer : GameplayClockContainer
     {
         /// <summary>
         /// Duration before gameplay start time required before skip button displays.
@@ -42,20 +42,23 @@ namespace osu.Game.Screens.Play
             Precision = 0.1,
         };
 
-        private readonly AudioAdjustments gameplayAdjustments = new AudioAdjustments();
+        /// <summary>
+        /// An <see cref="ITrack"/> whose applied adjustments are considered as part of the gameplay itself, unrelated to the playback.
+        /// </summary>
+        public ITrack GameplayTrack { get; }
 
         /// <summary>
         /// The rate of gameplay when playback is at 100%.
         /// This excludes any seeking / user adjustments.
         /// </summary>
-        public double TrueGameplayRate => gameplayAdjustments.AggregateFrequency.Value * gameplayAdjustments.AggregateTempo.Value;
+        public double TrueGameplayRate => GameplayTrack.AggregateFrequency.Value * GameplayTrack.AggregateTempo.Value;
 
         /// <summary>
         /// The true gameplay rate combined with the <see cref="UserPlaybackRate"/> value.
         /// </summary>
         public double PlaybackRate => TrueGameplayRate * UserPlaybackRate.Value;
 
-        private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
+        private double totalOffset => userOffsetClock.Offset + (platformOffsetClock?.Offset ?? 0);
 
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
@@ -63,6 +66,8 @@ namespace osu.Game.Screens.Play
         private readonly double gameplayStartTime;
         private readonly bool startAtGameplayStart;
         private readonly double firstHitObjectTime;
+
+        protected virtual bool ApplyPlatformOffset => true;
 
         private FramedOffsetClock userOffsetClock;
         private FramedOffsetClock platformOffsetClock;
@@ -75,6 +80,8 @@ namespace osu.Game.Screens.Play
             this.beatmap = beatmap;
             this.gameplayStartTime = gameplayStartTime;
             this.startAtGameplayStart = startAtGameplayStart;
+
+            GameplayTrack = new MasterGameplayTrack(Track);
 
             firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
         }
@@ -167,12 +174,15 @@ namespace osu.Game.Screens.Play
 
         protected override GameplayClock CreateGameplayClock(IFrameBasedClock source)
         {
-            // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
-            // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            platformOffsetClock = new HardwareCorrectionOffsetClock(source, this) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+            if (ApplyPlatformOffset)
+            {
+                // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
+                // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
+                platformOffsetClock = new HardwareCorrectionOffsetClock(source, this) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+            }
 
             // the final usable gameplay clock with user-set offsets applied.
-            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock, this);
+            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock ?? source, this);
 
             return new MasterGameplayClock(userOffsetClock, this);
         }
@@ -194,7 +204,7 @@ namespace osu.Game.Screens.Play
             if (speedAdjustmentsApplied)
                 return;
 
-            Track.BindAdjustments(gameplayAdjustments);
+            Track.BindAdjustments(GameplayTrack);
             Track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
             Track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
@@ -208,7 +218,7 @@ namespace osu.Game.Screens.Play
 
             Track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
             Track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
-            Track.UnbindAdjustments(gameplayAdjustments);
+            Track.UnbindAdjustments(GameplayTrack);
 
             speedAdjustmentsApplied = false;
         }
@@ -218,76 +228,6 @@ namespace osu.Game.Screens.Play
             base.Dispose(isDisposing);
             removeSourceClockAdjustments();
         }
-
-        #region Delegated IAdjustableAudioComponent implementation (gameplay adjustments)
-
-        public IBindable<double> AggregateVolume => gameplayAdjustments.AggregateVolume;
-        public IBindable<double> AggregateBalance => gameplayAdjustments.AggregateBalance;
-        public IBindable<double> AggregateFrequency => gameplayAdjustments.AggregateFrequency;
-        public IBindable<double> AggregateTempo => gameplayAdjustments.AggregateTempo;
-
-        public void BindAdjustments(IAggregateAudioAdjustment component) => gameplayAdjustments.BindAdjustments(component);
-        public void UnbindAdjustments(IAggregateAudioAdjustment component) => gameplayAdjustments.UnbindAdjustments(component);
-
-        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => gameplayAdjustments.AddAdjustment(type, adjustBindable);
-        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => gameplayAdjustments.RemoveAdjustment(type, adjustBindable);
-        public void RemoveAllAdjustments(AdjustableProperty type) => gameplayAdjustments.RemoveAllAdjustments(type);
-
-        public BindableNumber<double> Volume => gameplayAdjustments.Volume;
-        public BindableNumber<double> Balance => gameplayAdjustments.Balance;
-        public BindableNumber<double> Frequency => gameplayAdjustments.Frequency;
-        public BindableNumber<double> Tempo => gameplayAdjustments.Tempo;
-
-        #endregion
-
-        #region Delegated ITrack implementation
-
-        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => Track.CurrentAmplitudes;
-
-        void ITrack.Restart()
-        {
-            Track.Restart();
-        }
-
-        bool ITrack.Looping
-        {
-            get => Track.Looping;
-            set => Track.Looping = value;
-        }
-
-        bool ITrack.IsDummyDevice => Track.IsDummyDevice;
-
-        double ITrack.RestartPoint
-        {
-            get => Track.RestartPoint;
-            set => Track.RestartPoint = value;
-        }
-
-        double ITrack.Length
-        {
-            get => Track.Length;
-            set => Track.Length = value;
-        }
-
-        int? ITrack.Bitrate => Track.Bitrate;
-
-        bool ITrack.IsReversed => Track.IsReversed;
-
-        bool ITrack.HasCompleted => Track.HasCompleted;
-
-        event Action ITrack.Completed
-        {
-            add => Track.Completed += value;
-            remove => Track.Completed -= value;
-        }
-
-        event Action ITrack.Failed
-        {
-            add => Track.Failed += value;
-            remove => Track.Failed -= value;
-        }
-
-        #endregion
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
         {
@@ -315,6 +255,110 @@ namespace osu.Game.Screens.Play
             {
                 this.gameplayClockContainer = gameplayClockContainer;
             }
+        }
+
+        /// <summary>
+        /// An <see cref="ITrack"/> whose applied adjustments are considered as part of the gameplay, unrelated to the playback.
+        /// </summary>
+        private class MasterGameplayTrack : ITrack
+        {
+            private readonly ITrack track;
+
+            private readonly AudioAdjustments adjustments = new AudioAdjustments();
+
+            public MasterGameplayTrack(ITrack track)
+            {
+                this.track = track;
+            }
+
+            #region Delegated IAdjustableAudioComponent implementation (gameplay adjustments)
+
+            public IBindable<double> AggregateVolume => adjustments.AggregateVolume;
+            public IBindable<double> AggregateBalance => adjustments.AggregateBalance;
+            public IBindable<double> AggregateFrequency => adjustments.AggregateFrequency;
+            public IBindable<double> AggregateTempo => adjustments.AggregateTempo;
+
+            public void BindAdjustments(IAggregateAudioAdjustment component) => adjustments.BindAdjustments(component);
+            public void UnbindAdjustments(IAggregateAudioAdjustment component) => adjustments.UnbindAdjustments(component);
+
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => adjustments.AddAdjustment(type, adjustBindable);
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => adjustments.RemoveAdjustment(type, adjustBindable);
+            public void RemoveAllAdjustments(AdjustableProperty type) => adjustments.RemoveAllAdjustments(type);
+
+            public BindableNumber<double> Volume => adjustments.Volume;
+            public BindableNumber<double> Balance => adjustments.Balance;
+            public BindableNumber<double> Frequency => adjustments.Frequency;
+            public BindableNumber<double> Tempo => adjustments.Tempo;
+
+            #endregion
+
+            #region Delegated ITrack implementation
+
+            ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => track.CurrentAmplitudes;
+
+            double IClock.Rate => track.Rate;
+
+            public double Rate
+            {
+                get => track.Rate;
+                set => track.Rate = value;
+            }
+
+            public bool IsRunning => track.IsRunning;
+
+            public double CurrentTime => track.CurrentTime;
+
+            public void Reset() => track.Reset();
+
+            public void Start() => track.Start();
+
+            public void Stop() => track.Stop();
+
+            public bool Seek(double position) => track.Seek(position);
+
+            public void Restart() => track.Restart();
+
+            public bool Looping
+            {
+                get => track.Looping;
+                set => track.Looping = value;
+            }
+
+            public bool IsDummyDevice => track.IsDummyDevice;
+
+            public double RestartPoint
+            {
+                get => track.RestartPoint;
+                set => track.RestartPoint = value;
+            }
+
+            public double Length
+            {
+                get => track.Length;
+                set => track.Length = value;
+            }
+
+            public int? Bitrate => track.Bitrate;
+
+            public bool IsReversed => track.IsReversed;
+
+            public bool HasCompleted => track.HasCompleted;
+
+            public event Action Completed
+            {
+                add => track.Completed += value;
+                remove => track.Completed -= value;
+            }
+
+            public event Action Failed
+            {
+                add => track.Failed += value;
+                remove => track.Failed -= value;
+            }
+
+            public void ResetSpeedAdjustments() => track.ResetSpeedAdjustments();
+
+            #endregion
         }
     }
 }

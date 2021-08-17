@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 MuteComboCount = { Value = 0 },
             },
-            PassCondition = () => Beatmap.Value.Track.AggregateVolume.Value == 0.0 &&
+            PassCondition = () => Player.ChildrenOfType<MasterGameplayClockContainer>().SingleOrDefault()?.GameplayTrack.AggregateVolume.Value == 0.0 &&
                                   Player.ChildrenOfType<Metronome>().SingleOrDefault()?.AggregateVolume.Value == 1.0,
         });
 

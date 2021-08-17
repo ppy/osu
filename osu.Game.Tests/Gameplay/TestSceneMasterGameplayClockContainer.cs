@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gcc = new MasterGameplayClockContainer(working, 0));
+                Add(gcc = new TestMasterGameplayClockContainer(working, 0));
             });
 
             AddStep("start clock", () => gcc.Start());
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gcc = new MasterGameplayClockContainer(working, 0));
+                Add(gcc = new TestMasterGameplayClockContainer(working, 0));
             });
 
             AddStep("start clock", () => gcc.Start());
@@ -64,15 +64,14 @@ namespace osu.Game.Tests.Gameplay
         [Test]
         public void TestTrueGameplayRate()
         {
-            WorkingBeatmap working = null;
             MasterGameplayClockContainer gcc = null;
 
             AddStep("create container", () =>
             {
-                working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gcc = new MasterGameplayClockContainer(working, 0));
+                Add(gcc = new TestMasterGameplayClockContainer(working, 0));
 
                 gcc.Start();
             });
@@ -88,7 +87,7 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("gameplay clock rate = 0", () => gcc.GameplayClock.Rate == 0f);
             AddAssert("true gameplay rate = 1", () => gcc.TrueGameplayRate == 1f);
 
-            AddStep("add 1.5 gameplay freq adjustment", () => gcc.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(1.5f)));
+            AddStep("add 1.5 gameplay freq adjustment", () => gcc.GameplayTrack.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(1.5f)));
             AddAssert("gameplay clock rate = 0", () => gcc.GameplayClock.Rate == 0f);
             AddAssert("true gameplay rate = 1.5", () => gcc.TrueGameplayRate == 1.5f);
         }
@@ -119,28 +118,22 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("set audio offset to 100ms", () => config.SetValue(OsuSetting.AudioOffset, 100.0));
 
-            checkAppliedOffset(100);
+            AddAssert("current time has 100% offset", () => gcc.GameplayClock.CurrentTime == 100);
+
+            AddStep("add 0 track freq adjustment", () => working.Track.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble()));
+            AddAssert("current time still has 100% offset", () => gcc.GameplayClock.CurrentTime == 100);
 
             AddStep("start gcc", () => gcc.Start());
-            checkAppliedOffset(100);
-
-            AddStep("stop gcc", () => gcc.Stop());
-            checkAppliedOffset(100);
+            AddAssert("current time still has 100% offset", () => gcc.GameplayClock.CurrentTime == 100);
 
             AddStep("change user playback rate to 2", () => gcc.UserPlaybackRate.Value = 2f);
-            checkAppliedOffset(200);
+            AddAssert("current time has 200% offset", () => gcc.GameplayClock.CurrentTime == 200);
 
             AddStep("change user playback rate to 0.5", () => gcc.UserPlaybackRate.Value = 0.5f);
-            checkAppliedOffset(50);
+            AddAssert("current time has 50% offset", () => gcc.GameplayClock.CurrentTime == 50);
 
-            AddStep("add 1.5 gameplay freq adjustment", () => gcc.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(0.5f)));
-            checkAppliedOffset(25);
-
-            void checkAppliedOffset(double expectedOffset)
-            {
-                AddAssert($"current time has {expectedOffset}% offset", () =>
-                    gcc.GameplayClock.CurrentTime == gcc.AdjustableSource.CurrentTime + expectedOffset);
-            }
+            AddStep("add 0.5 gameplay freq adjustment", () => gcc.GameplayTrack.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(0.5f)));
+            AddAssert("current time has 25% offset", () => gcc.GameplayClock.CurrentTime == 25);
         }
 
         [Test]
@@ -162,7 +155,7 @@ namespace osu.Game.Tests.Gameplay
                 Add(new DependencyProvidingContainer
                 {
                     CachedDependencies = new (Type, object)[] { (typeof(OsuConfigManager), config) },
-                    Child = gcc = new MasterGameplayClockContainer(working, 0),
+                    Child = gcc = new TestMasterGameplayClockContainer(working, 0),
                 });
 
                 gcc.Stop();
@@ -187,6 +180,8 @@ namespace osu.Game.Tests.Gameplay
 
         private class TestMasterGameplayClockContainer : MasterGameplayClockContainer
         {
+            protected override bool ApplyPlatformOffset => false;
+
             public new DecoupleableInterpolatingFramedClock AdjustableSource => base.AdjustableSource;
 
             public TestMasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
