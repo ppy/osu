@@ -24,12 +24,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplier => 1400;
         private double strainDecayBase => 0.3;
-        private double difficultyMultiplier => 1.04;
 
         private double currentTapStrain = 1;
         private double currentMovementStrain = 1;
 
         protected override int ReducedSectionCount => 5;
+        protected override double DifficultyMultiplier => 1.04;
 
         private const double min_speed_bonus = 75; // ~200BPM
         private const double max_speed_bonus = 45; // ~330BPM
@@ -67,10 +67,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double prevDelta = ((OsuDifficultyHitObject)Previous[i]).StrainTime;
                 double effectiveRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
 
-                effectiveRatio *= Math.Sqrt(100 / ((currDelta + prevDelta) / 2)); // scale with bpm.
+                effectiveRatio *= Math.Sqrt(100 / ((currDelta + prevDelta) / 2)); // scale with bpm slightly
 
                 if (effectiveRatio > 0.5)
-                    effectiveRatio = 0.5 + (effectiveRatio - 0.5) * 5; // extra buff for 1/3 -> 1/4 etc transitions.
+                    effectiveRatio = 0.5 + (effectiveRatio - 0.5) * 10; // extra buff for 1/3 -> 1/4 etc transitions.
 
                 double currHistoricalDecay = Math.Max(0, (HistoryTimeMax - (startTime - Previous[i - 1].StartTime))) / HistoryTimeMax;
 
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int i = 0; i < islandTimes.Length; i++)
             {
-                rhythmComplexitySum += islandTimes[i]; // sum the total amount of rhythm variance
+                rhythmComplexitySum += islandTimes[i] * ((double)(i + islandTimes.Length) / (2 * islandTimes.Length)); // sum the total amount of rhythm variance
             }
 
 // Console.WriteLine(Math.Sqrt(4 + rhythmComplexitySum * rhythmMultiplier) / 2);
@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
-            return ((1 + (speedBonus - 1) * 0.75) * angleBonus * 0.95) / osuCurrent.StrainTime;
+            return ((1 + (speedBonus - 1) * 0.75) * 0.95) / osuCurrent.StrainTime;
         }
 
         private double movementStrainOf(DifficultyHitObject current)
@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
-        protected override double CalculateInitialStrain(double time) => (currentMovementStrain + currentTapStrain) * strainDecay(time - Previous[0].StartTime);
+        protected override double CalculateInitialStrain(double time) => (currentMovementStrain + currentTapStrain * calculateRhythmBonus(time)) * strainDecay(time - Previous[0].StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentMovementStrain *= strainDecay(current.DeltaTime);
             currentMovementStrain += movementStrainOf(current) * skillMultiplier;
 
-            return currentMovementStrain + currentTapStrain;// * calculateRhythmBonus(current.StartTime);
+            return currentMovementStrain + currentTapStrain * calculateRhythmBonus(current.StartTime);
         }
     }
 }
