@@ -4,12 +4,14 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class GameplayChatDisplay : MatchChatDisplay
+    public class GameplayChatDisplay : MatchChatDisplay, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
         private ILocalUserPlayInfo localUserInfo { get; set; }
@@ -57,6 +59,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }, true);
 
             Expanded.BindValueChanged(expandedChanged, true);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.FocusChatInput:
+                    Textbox.TakeFocus();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 }
