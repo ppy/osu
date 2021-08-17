@@ -7,6 +7,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Configuration;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Input
 {
@@ -24,14 +25,14 @@ namespace osu.Game.Input
         private IBindable<bool> localUserPlaying;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game, FrameworkConfigManager frameworkConfigManager, OsuConfigManager osuConfigManager)
+        private void load(ILocalUserPlayInfo localUserInfo, FrameworkConfigManager frameworkConfigManager, OsuConfigManager osuConfigManager)
         {
             frameworkConfineMode = frameworkConfigManager.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode);
             frameworkWindowMode = frameworkConfigManager.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
             frameworkWindowMode.BindValueChanged(_ => updateConfineMode());
 
             osuConfineMode = osuConfigManager.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode);
-            localUserPlaying = game.LocalUserPlaying.GetBoundCopy();
+            localUserPlaying = localUserInfo.IsPlaying.GetBoundCopy();
 
             osuConfineMode.ValueChanged += _ => updateConfineMode();
             localUserPlaying.BindValueChanged(_ => updateConfineMode(), true);

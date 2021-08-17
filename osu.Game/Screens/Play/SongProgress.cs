@@ -119,13 +119,14 @@ namespace osu.Game.Screens.Play
 
             if (drawableRuleset != null)
             {
-                AllowSeeking.BindTo(drawableRuleset.HasReplayLoaded);
+                if (player?.Configuration.AllowUserInteraction == true)
+                    ((IBindable<bool>)AllowSeeking).BindTo(drawableRuleset.HasReplayLoaded);
 
                 referenceClock = drawableRuleset.FrameStableClock;
                 Objects = drawableRuleset.Objects;
             }
 
-            config.BindWith(OsuSetting.ShowDifficultyGraph, ShowGraph);
+            config.BindWith(OsuSetting.ShowProgressGraph, ShowGraph);
 
             graph.FillColour = bar.FillColour = colours.BlueLighter;
         }
