@@ -55,10 +55,10 @@ namespace osu.Game.Screens.Edit.Setup
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 CornerRadius = CORNER_RADIUS,
-                OnFocused = DisplayFileChooser
+                OnFocused = ToggleFileChooser
             };
 
-        public void DisplayFileChooser()
+        public void ToggleFileChooser()
         {
             if (!IsExpanded)
             {
