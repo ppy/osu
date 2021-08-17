@@ -383,6 +383,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                                 if (closestGlobalDifficulty.IsRedundant(localDifficulty))
                                     hitObject.LocalDifficultyControlPoint = null;
+
+                                beatmap.Update(hitObject);
                             }
                             else
                             {
