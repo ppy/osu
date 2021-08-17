@@ -10,12 +10,12 @@ namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class OnlinePlayBackgroundSprite : OnlinePlayComposite
     {
-        private readonly BeatmapSetCoverType beatmapSetCoverType;
+        protected readonly BeatmapSetCoverType BeatmapSetCoverType;
         private UpdateableBeatmapBackgroundSprite sprite;
 
         public OnlinePlayBackgroundSprite(BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
         {
-            this.beatmapSetCoverType = beatmapSetCoverType;
+            BeatmapSetCoverType = beatmapSetCoverType;
         }
 
         [BackgroundDependencyLoader]
@@ -33,6 +33,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
             sprite.Beatmap.Value = Playlist.FirstOrDefault()?.Beatmap.Value;
         }
 
-        protected virtual UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(beatmapSetCoverType) { RelativeSizeAxes = Axes.Both };
+        protected virtual UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType) { RelativeSizeAxes = Axes.Both };
     }
 }

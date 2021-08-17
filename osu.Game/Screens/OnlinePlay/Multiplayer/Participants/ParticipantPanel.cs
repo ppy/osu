@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -83,7 +82,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Colour = Color4Extensions.FromHex("#F7E65D"),
                             Alpha = 0
                         },
-                        new TeamDisplay(user),
+                        new TeamDisplay(User),
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -168,12 +167,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Origin = Anchor.Centre,
                             Alpha = 0,
                             Margin = new MarginPadding(4),
-                            Action = () =>
-                            {
-                                Debug.Assert(user != null);
-
-                                Client.KickUser(user.Id);
-                            }
+                            Action = () => Client.KickUser(User.UserID),
                         },
                     },
                 }

@@ -91,7 +91,13 @@ namespace osu.Game.Rulesets.Mods
         {
             // This is required as SettingsItem relies heavily on this bindable for internal use.
             // The actual update flow is done via the bindable provided in the constructor.
-            public Bindable<float?> Current { get; set; } = new Bindable<float?>();
+            private readonly BindableWithCurrent<float?> current = new BindableWithCurrent<float?>();
+
+            public Bindable<float?> Current
+            {
+                get => current.Current;
+                set => current.Current = value;
+            }
 
             public SliderControl(BindableNumber<float> currentNumber)
             {

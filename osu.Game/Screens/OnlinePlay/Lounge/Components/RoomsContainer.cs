@@ -140,7 +140,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 roomFlow.Remove(toRemove);
 
-                selectedRoom.Value = null;
+                // selection may have a lease due to being in a sub screen.
+                if (!selectedRoom.Disabled)
+                    selectedRoom.Value = null;
             }
         }
 
@@ -152,7 +154,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            selectedRoom.Value = null;
+            if (!selectedRoom.Disabled)
+                selectedRoom.Value = null;
             return base.OnClick(e);
         }
 
@@ -214,6 +217,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void selectNext(int direction)
         {
+            if (selectedRoom.Disabled)
+                return;
+
             var visibleRooms = Rooms.AsEnumerable().Where(r => r.IsPresent);
 
             Room room;

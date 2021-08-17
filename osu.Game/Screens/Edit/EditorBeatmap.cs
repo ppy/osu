@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit
         private readonly Bindable<bool> hasTiming = new Bindable<bool>();
 
         [CanBeNull]
-        public readonly ISkin BeatmapSkin;
+        public readonly EditorBeatmapSkin BeatmapSkin;
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
@@ -69,7 +69,8 @@ namespace osu.Game.Screens.Edit
         public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null)
         {
             PlayableBeatmap = playableBeatmap;
-            BeatmapSkin = beatmapSkin;
+            if (beatmapSkin is Skin skin)
+                BeatmapSkin = new EditorBeatmapSkin(skin);
 
             beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset?.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
 

@@ -8,8 +8,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -17,6 +19,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
@@ -61,8 +64,15 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected RoomSubScreen()
         {
+            Padding = new MarginPadding { Top = Header.HEIGHT };
+
             AddRangeInternal(new Drawable[]
             {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4Extensions.FromHex(@"3e3a44") // This is super temporary.
+                },
                 BeatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
                 {
                     SelectedItem = { BindTarget = SelectedItem }
@@ -248,6 +258,10 @@ namespace osu.Game.Screens.OnlinePlay.Match
         }
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
+        {
+        }
+
+        public class UserModSelectButton : PurpleTriangleButton
         {
         }
     }
