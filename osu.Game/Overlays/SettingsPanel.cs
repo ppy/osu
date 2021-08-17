@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -61,6 +62,10 @@ namespace osu.Game.Overlays
 
         private LoadingLayer loading;
 
+        private readonly List<SettingsSection> loadableSections = new List<SettingsSection>();
+
+        private Task sectionsLoadingTask;
+
         protected SettingsPanel(bool showSidebar)
         {
             this.showSidebar = showSidebar;
@@ -96,7 +101,7 @@ namespace osu.Game.Overlays
                 }
             };
 
-            SectionsContainer = new SettingsSectionsContainer
+            Add(SectionsContainer = new SettingsSectionsContainer
             {
                 Masking = true,
                 RelativeSizeAxes = Axes.Both,
@@ -113,8 +118,8 @@ namespace osu.Game.Overlays
                         Bottom = 20
                     },
                 },
-                Footer = CreateFooter()
-            };
+                Footer = CreateFooter().With(f => f.Alpha = 0)
+            });
 
             if (showSidebar)
             {
@@ -124,76 +129,13 @@ namespace osu.Game.Overlays
             CreateSections()?.ForEach(AddSection);
         }
 
-        private void ensureContentLoaded()
-        {
-            if (SectionsContainer.LoadState > LoadState.NotLoaded)
-                return;
-
-            LoadComponentAsync(SectionsContainer, d =>
-            {
-                ContentContainer.Add(d);
-                d.FadeInFromZero(750, Easing.OutQuint);
-                loading.Hide();
-
-                searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue, true);
-                searchTextBox.TakeFocus();
-
-                if (Sidebar == null)
-                    return;
-
-                LoadComponentsAsync(createSidebarButtons(), buttons =>
-                {
-                    float delay = 0;
-
-                    foreach (var button in buttons)
-                    {
-                        Sidebar.Add(button);
-
-                        button.FadeOut()
-                              .Delay(delay)
-                              .FadeInFromZero(1000, Easing.OutQuint);
-
-                        delay += 30;
-                    }
-
-                    SectionsContainer.SelectedSection.BindValueChanged(section =>
-                    {
-                        if (selectedSidebarButton != null)
-                            selectedSidebarButton.Selected = false;
-
-                        selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
-                        selectedSidebarButton.Selected = true;
-                    }, true);
-                });
-            });
-        }
-
-        private IEnumerable<SidebarButton> createSidebarButtons()
-        {
-            foreach (var section in SectionsContainer)
-            {
-                yield return new SidebarButton
-                {
-                    Section = section,
-                    Action = () =>
-                    {
-                        if (!SectionsContainer.IsLoaded)
-                            return;
-
-                        SectionsContainer.ScrollTo(section);
-                        Sidebar.State = ExpandedState.Contracted;
-                    },
-                };
-            }
-        }
-
         protected void AddSection(SettingsSection section)
         {
             if (IsLoaded)
                 // just to keep things simple. can be accommodated for if we ever need it.
                 throw new InvalidOperationException("All sections must be added before the panel is loaded.");
 
-            SectionsContainer.Add(section);
+            loadableSections.Add(section);
         }
 
         protected virtual Drawable CreateHeader() => new Container();
@@ -210,7 +152,7 @@ namespace osu.Game.Overlays
             // this is done as there is still a brief stutter during load completion which is more visible if the transition is in progress.
             // the eventual goal would be to remove the need for this by splitting up load into smaller work pieces, or fixing the remaining
             // load complete overheads.
-            Scheduler.AddDelayed(ensureContentLoaded, TRANSITION_LENGTH / 3);
+            Scheduler.AddDelayed(loadSections, TRANSITION_LENGTH / 3);
 
             Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
@@ -248,6 +190,78 @@ namespace osu.Game.Overlays
 
             ContentContainer.Margin = new MarginPadding { Left = Sidebar?.DrawWidth ?? 0 };
             Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
+        }
+
+        private const double fade_in_duration = 1000;
+
+        private void loadSections()
+        {
+            if (sectionsLoadingTask != null)
+                return;
+
+            sectionsLoadingTask = LoadComponentsAsync(loadableSections, sections =>
+            {
+                SectionsContainer.AddRange(sections);
+                SectionsContainer.Footer.FadeInFromZero(fade_in_duration, Easing.OutQuint);
+                SectionsContainer.SearchContainer.FadeInFromZero(fade_in_duration, Easing.OutQuint);
+
+                loading.Hide();
+
+                searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue, true);
+                searchTextBox.TakeFocus();
+
+                loadSidebarButtons();
+            });
+        }
+
+        private void loadSidebarButtons()
+        {
+            if (Sidebar == null)
+                return;
+
+            LoadComponentsAsync(createSidebarButtons(), buttons =>
+            {
+                float delay = 0;
+
+                foreach (var button in buttons)
+                {
+                    Sidebar.Add(button);
+
+                    button.FadeOut()
+                          .Delay(delay)
+                          .FadeInFromZero(fade_in_duration, Easing.OutQuint);
+
+                    delay += 40;
+                }
+
+                SectionsContainer.SelectedSection.BindValueChanged(section =>
+                {
+                    if (selectedSidebarButton != null)
+                        selectedSidebarButton.Selected = false;
+
+                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
+                    selectedSidebarButton.Selected = true;
+                }, true);
+            });
+        }
+
+        private IEnumerable<SidebarButton> createSidebarButtons()
+        {
+            foreach (var section in SectionsContainer)
+            {
+                yield return new SidebarButton
+                {
+                    Section = section,
+                    Action = () =>
+                    {
+                        if (!SectionsContainer.IsLoaded)
+                            return;
+
+                        SectionsContainer.ScrollTo(section);
+                        Sidebar.State = ExpandedState.Contracted;
+                    },
+                };
+            }
         }
 
         private class NonMaskedContent : Container<Drawable>
