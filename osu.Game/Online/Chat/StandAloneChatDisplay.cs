@@ -22,7 +22,7 @@ namespace osu.Game.Online.Chat
     {
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
 
-        private readonly FocusedTextBox textbox;
+        protected readonly FocusedTextBox Textbox;
 
         protected ChannelManager ChannelManager;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Online.Chat
 
             if (postingTextbox)
             {
-                AddInternal(textbox = new FocusedTextBox
+                AddInternal(Textbox = new FocusedTextBox
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = textbox_height,
@@ -65,7 +65,7 @@ namespace osu.Game.Online.Chat
                     Origin = Anchor.BottomLeft,
                 });
 
-                textbox.OnCommit += postMessage;
+                Textbox.OnCommit += postMessage;
             }
 
             Channel.BindValueChanged(channelChanged);
@@ -82,7 +82,7 @@ namespace osu.Game.Online.Chat
 
         private void postMessage(TextBox sender, bool newtext)
         {
-            var text = textbox.Text.Trim();
+            var text = Textbox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
                 return;
@@ -92,7 +92,7 @@ namespace osu.Game.Online.Chat
             else
                 ChannelManager?.PostMessage(text, target: Channel.Value);
 
-            textbox.Text = string.Empty;
+            Textbox.Text = string.Empty;
         }
 
         protected virtual ChatLine CreateMessage(Message message) => new StandAloneMessage(message);
