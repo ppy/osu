@@ -132,11 +132,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestExitMidJoin()
         {
-            Room room = null;
-
             AddStep("create room", () =>
             {
-                room = new Room
+                multiplayerScreen.RoomManager.AddRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Playlist =
@@ -147,14 +145,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         }
                     }
-                };
+                });
             });
 
-            AddStep("refresh rooms", () => multiplayerScreen.RoomManager.Filter.Value = new FilterCriteria());
+            AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+
             AddStep("select room", () => InputManager.Key(Key.Down));
-            AddStep("join room and immediately exit", () =>
+            AddStep("join room and immediately exit select", () =>
             {
-                multiplayerScreen.ChildrenOfType<LoungeSubScreen>().Single().Open(room);
+                InputManager.Key(Key.Enter);
                 Schedule(() => Stack.CurrentScreen.Exit());
             });
         }
@@ -178,7 +178,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             });
 
-            AddStep("refresh rooms", () => multiplayerScreen.RoomManager.Filter.Value = new FilterCriteria());
+            AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("join room", () => InputManager.Key(Key.Enter));
 
@@ -226,7 +228,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             });
 
-            AddStep("refresh rooms", () => multiplayerScreen.RoomManager.Filter.Value = new FilterCriteria());
+            AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("join room", () => InputManager.Key(Key.Enter));
 
