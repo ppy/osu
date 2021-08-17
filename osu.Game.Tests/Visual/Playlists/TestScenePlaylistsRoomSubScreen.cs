@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("move mouse to create button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<PlaylistsMatchSettingsOverlay.CreateRoomButton>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<PlaylistsRoomSettingsOverlay.CreateRoomButton>().Single());
             });
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("create room", () =>
             {
-                InputManager.MoveMouseTo(match.ChildrenOfType<PlaylistsMatchSettingsOverlay.CreateRoomButton>().Single());
+                InputManager.MoveMouseTo(match.ChildrenOfType<PlaylistsRoomSettingsOverlay.CreateRoomButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 

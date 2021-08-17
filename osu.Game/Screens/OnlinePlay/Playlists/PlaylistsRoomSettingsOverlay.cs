@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsMatchSettingsOverlay : MatchSettingsOverlay
+    public class PlaylistsRoomSettingsOverlay : RoomSettingsOverlay
     {
         public Action EditPlaylist;
 
