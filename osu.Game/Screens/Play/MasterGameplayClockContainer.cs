@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public double PlaybackRate => TrueGameplayRate * UserPlaybackRate.Value;
 
-        private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
+        private double totalOffset => userOffsetClock.Offset + (platformOffsetClock?.Offset ?? 0);
 
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 

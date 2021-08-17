@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gcc = new MasterGameplayClockContainer(working, 0));
+                Add(gcc = new TestMasterGameplayClockContainer(working, 0));
             });
 
             AddStep("start clock", () => gcc.Start());
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gcc = new MasterGameplayClockContainer(working, 0));
+                Add(gcc = new TestMasterGameplayClockContainer(working, 0));
             });
 
             AddStep("start clock", () => gcc.Start());
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gcc = new MasterGameplayClockContainer(working, 0));
+                Add(gcc = new TestMasterGameplayClockContainer(working, 0));
 
                 gcc.Start();
             });
@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Gameplay
                 Add(new DependencyProvidingContainer
                 {
                     CachedDependencies = new (Type, object)[] { (typeof(OsuConfigManager), config) },
-                    Child = gcc = new MasterGameplayClockContainer(working, 0),
+                    Child = gcc = new TestMasterGameplayClockContainer(working, 0),
                 });
 
                 gcc.Stop();
