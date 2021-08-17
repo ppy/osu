@@ -8,12 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class AudioDevicesSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Devices";
+        protected override LocalisableString Header => AudioSettingsStrings.AudioDevicesHeader;
 
         [Resolved]
         private AudioManager audio { get; set; }
@@ -76,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             private class AudioDeviceDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(string item)
-                    => string.IsNullOrEmpty(item) ? "Default" : base.GenerateItemText(item);
+                    => string.IsNullOrEmpty(item) ? CommonStrings.Default : base.GenerateItemText(item);
             }
         }
     }
