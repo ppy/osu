@@ -33,12 +33,14 @@ namespace osu.Game.Screens.Edit.Setup
 
         private OsuFileSelector fileSelector;
 
+        public bool IsExpanded => fileSelector != null;
+
         private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
 
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private SectionsContainer<SetupSection> sectionsContainer { get; set; }
 
         public FileChooserLabelledTextBox(params string[] handledExtensions)
@@ -67,7 +69,7 @@ namespace osu.Game.Screens.Edit.Setup
                     CurrentFile = { BindTarget = currentFile }
                 };
 
-                sectionsContainer.ScrollTo(fileSelector);
+                sectionsContainer?.ScrollTo(fileSelector);
             }
             else
             {
