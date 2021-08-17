@@ -45,8 +45,6 @@ namespace osu.Game.Overlays
             }
         }
 
-        private Color4 buttonColour;
-
         private bool hovering;
 
         public RestoreDefaultValueButton()
@@ -61,12 +59,11 @@ namespace osu.Game.Overlays
         private void load(OsuColour colour)
         {
             BackgroundColour = colour.Yellow;
-            buttonColour = colour.Yellow;
             Content.Width = 0.33f;
             Content.CornerRadius = 3;
             Content.EdgeEffect = new EdgeEffectParameters
             {
-                Colour = buttonColour.Opacity(0.1f),
+                Colour = BackgroundColour.Opacity(0.1f),
                 Type = EdgeEffectType.Glow,
                 Radius = 2,
             };
@@ -87,7 +84,7 @@ namespace osu.Game.Overlays
 
             // avoid unnecessary transforms on first display.
             Alpha = currentAlpha;
-            Colour = currentColour;
+            Background.Colour = currentColour;
         }
 
         public LocalisableString TooltipText => "revert to default";
@@ -108,7 +105,7 @@ namespace osu.Game.Overlays
         public void UpdateState() => Scheduler.AddOnce(updateState);
 
         private float currentAlpha => current.IsDefault ? 0f : hovering && !current.Disabled ? 1f : 0.65f;
-        private ColourInfo currentColour => current.Disabled ? Color4.Gray : buttonColour;
+        private ColourInfo currentColour => current.Disabled ? Color4.Gray : BackgroundColour;
 
         private void updateState()
         {
@@ -116,7 +113,7 @@ namespace osu.Game.Overlays
                 return;
 
             this.FadeTo(currentAlpha, 200, Easing.OutQuint);
-            this.FadeColour(currentColour, 200, Easing.OutQuint);
+            Background.FadeColour(currentColour, 200, Easing.OutQuint);
         }
     }
 }
