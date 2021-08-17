@@ -41,11 +41,13 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected override void PopIn()
         {
+            base.PopIn();
             Settings.MoveToY(0, TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
+            base.PopOut();
             Settings.MoveToY(-1, TRANSITION_DURATION, Easing.InSine);
         }
 
