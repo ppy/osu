@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         public void DisplayFileChooser()
         {
-            if (fileSelector == null)
+            if (!IsExpanded)
             {
                 Target.Child = fileSelector = new OsuFileSelector(currentFile.Value?.DirectoryName, handledExtensions)
                 {
