@@ -332,8 +332,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("send frame on gameplay start", () => getInstance(PLAYER_1_ID).OnGameplayStarted += () => SpectatorClient.SendFrames(PLAYER_1_ID, 100));
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && spectatorScreen.AllPlayersLoaded);
 
-            AddWaitStep("wait for progression", 3);
-
             assertNotCatchingUp(PLAYER_1_ID);
             assertRunning(PLAYER_1_ID);
 
