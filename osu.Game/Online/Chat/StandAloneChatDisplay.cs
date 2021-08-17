@@ -30,6 +30,8 @@ namespace osu.Game.Online.Chat
 
         private readonly bool postingTextbox;
 
+        protected readonly Box Background;
+
         private const float textbox_height = 30;
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace osu.Game.Online.Chat
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                Background = new Box
                 {
                     Colour = Color4.Black,
                     Alpha = 0.8f,
@@ -54,7 +56,7 @@ namespace osu.Game.Online.Chat
 
             if (postingTextbox)
             {
-                AddInternal(Textbox = new FocusedTextBox
+                AddInternal(Textbox = new ChatTextBox
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = textbox_height,
@@ -108,6 +110,17 @@ namespace osu.Game.Online.Chat
             drawableChannel.Padding = new MarginPadding { Bottom = postingTextbox ? textbox_height : 0 };
 
             AddInternal(drawableChannel);
+        }
+
+        public class ChatTextBox : FocusedTextBox
+        {
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                BackgroundUnfocused = new Color4(10, 10, 10, 10);
+                BackgroundFocused = new Color4(10, 10, 10, 255);
+            }
         }
 
         public class StandAloneDrawableChannel : DrawableChannel
