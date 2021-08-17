@@ -64,6 +64,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private readonly Room room;
 
         private ModSelectOverlay userModsSelectOverlay;
+        private RoomSettingsOverlay settingsOverlay;
 
         protected RoomSubScreen(Room room)
         {
@@ -81,6 +82,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private void load(AudioManager audio)
         {
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
+
+            Drawable mainContent;
 
             InternalChildren = new Drawable[]
             {
@@ -106,59 +109,62 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                     Horizontal = WaveOverlayContainer.WIDTH_PADDING,
                                     Bottom = 30
                                 },
-                                // Main content
-                                Child = new GridContainer
+                                Children = new[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    RowDimensions = new[]
+                                    mainContent = new GridContainer
                                     {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(GridSizeMode.Absolute, 10)
-                                    },
-                                    Content = new[]
-                                    {
-                                        new Drawable[]
+                                        RelativeSizeAxes = Axes.Both,
+                                        RowDimensions = new[]
                                         {
-                                            CreateDrawableRoom(room).With(d => d.MatchingFilter = true),
+                                            new Dimension(GridSizeMode.AutoSize),
+                                            new Dimension(GridSizeMode.Absolute, 10)
                                         },
-                                        null,
-                                        new Drawable[]
+                                        Content = new[]
                                         {
-                                            new Container
+                                            new Drawable[]
                                             {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Children = new[]
+                                                CreateDrawableRoom(room).With(d => d.MatchingFilter = true),
+                                            },
+                                            null,
+                                            new Drawable[]
+                                            {
+                                                new Container
                                                 {
-                                                    new Container
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Children = new[]
                                                     {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        Masking = true,
-                                                        CornerRadius = 10,
-                                                        Child = new Box
+                                                        new Container
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
-                                                            Colour = Color4Extensions.FromHex(@"3e3a44") // This is super temporary.
+                                                            Masking = true,
+                                                            CornerRadius = 10,
+                                                            Child = new Box
+                                                            {
+                                                                RelativeSizeAxes = Axes.Both,
+                                                                Colour = Color4Extensions.FromHex(@"3e3a44") // This is super temporary.
+                                                            },
                                                         },
-                                                    },
-                                                    CreateMainContent(),
-                                                    new Container
-                                                    {
-                                                        Anchor = Anchor.BottomLeft,
-                                                        Origin = Anchor.BottomLeft,
-                                                        RelativeSizeAxes = Axes.X,
-                                                        AutoSizeAxes = Axes.Y,
-                                                        Child = userModsSelectOverlay = new UserModSelectOverlay
+                                                        CreateMainContent(),
+                                                        new Container
                                                         {
-                                                            SelectedMods = { BindTarget = UserMods },
-                                                            IsValidMod = _ => false
-                                                        }
-                                                    },
+                                                            Anchor = Anchor.BottomLeft,
+                                                            Origin = Anchor.BottomLeft,
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y,
+                                                            Child = userModsSelectOverlay = new UserModSelectOverlay
+                                                            {
+                                                                SelectedMods = { BindTarget = UserMods },
+                                                                IsValidMod = _ => false
+                                                            }
+                                                        },
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                }
-                            }
+                                    },
+                                    settingsOverlay = CreateRoomSettingsOverlay()
+                                },
+                            },
                         },
                         // Footer
                         new[]
@@ -168,6 +174,19 @@ namespace osu.Game.Screens.OnlinePlay.Match
                     }
                 }
             };
+
+            if (room.RoomID.Value == null)
+            {
+                // A new room is being created.
+                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
+                mainContent.Hide();
+
+                settingsOverlay.State.BindValueChanged(visibility =>
+                {
+                    if (visibility.NewValue == Visibility.Hidden)
+                        mainContent.Show();
+                }, true);
+            }
         }
 
         protected override void LoadComplete()
@@ -184,9 +203,21 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         public override bool OnBackButton()
         {
+            if (room.RoomID.Value == null)
+            {
+                // room has not been created yet; exit immediately.
+                return base.OnBackButton();
+            }
+
             if (userModsSelectOverlay.State.Value == Visibility.Visible)
             {
                 userModsSelectOverlay.Hide();
+                return true;
+            }
+
+            if (settingsOverlay.State.Value == Visibility.Visible)
+            {
+                settingsOverlay.Hide();
                 return true;
             }
 
@@ -329,6 +360,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected abstract Drawable CreateMainContent();
 
         protected abstract Drawable CreateFooter();
+
+        protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay();
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
         {

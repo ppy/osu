@@ -303,5 +303,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         protected override Drawable CreateMainContent() => Empty();
 
         protected override Drawable CreateFooter() => Empty();
+
+        protected override RoomSettingsOverlay CreateRoomSettingsOverlay() => new PlaylistsRoomSettingsOverlay();
     }
 }
