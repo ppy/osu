@@ -119,19 +119,19 @@ namespace osu.Game.Overlays.Settings
                     },
                 },
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            // all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
+            // IMPORTANT: all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
             // never loaded, but requires bindable storage.
             if (controlWithCurrent == null)
                 throw new ArgumentException(@$"Control created via {nameof(CreateControl)} must implement {nameof(IHasCurrentValue<T>)}");
 
             controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
             controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             // intentionally done before LoadComplete to avoid overhead.
             if (ShowsDefaultIndicator)
             {
