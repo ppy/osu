@@ -113,13 +113,15 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                     RowDimensions = new[]
                                     {
                                         new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(GridSizeMode.Absolute, 10)
                                     },
                                     Content = new[]
                                     {
                                         new Drawable[]
                                         {
-                                            CreateDrawableRoom(room),
+                                            CreateDrawableRoom(room).With(d => d.MatchingFilter = true),
                                         },
+                                        null,
                                         new Drawable[]
                                         {
                                             new Container
