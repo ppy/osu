@@ -30,7 +30,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        public readonly List<Room> ServerSideRooms = new List<Room>();
+        public IReadOnlyList<Room> ServerSideRooms => serverSideRooms;
+        private readonly List<Room> serverSideRooms = new List<Room>();
 
         private int currentRoomId;
         private int currentPlaylistItemId;
@@ -133,7 +134,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             for (int i = 0; i < room.Playlist.Count; i++)
                 room.Playlist[i].ID = currentPlaylistItemId++;
 
-            ServerSideRooms.Add(room);
+            serverSideRooms.Add(room);
         }
 
         private Room createResponseRoom(Room room, bool withParticipants)
