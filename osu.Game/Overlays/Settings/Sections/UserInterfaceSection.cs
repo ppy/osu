@@ -3,13 +3,15 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
     public class UserInterfaceSection : SettingsSection
     {
-        public override string Header => "User Interface";
+        public override LocalisableString Header => UserInterfaceStrings.UserInterfaceSectionHeader;
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
