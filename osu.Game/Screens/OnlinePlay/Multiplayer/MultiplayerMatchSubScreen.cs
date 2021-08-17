@@ -42,6 +42,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override string ShortTitle => "room";
 
+        public readonly Room Room;
+
         [Resolved]
         private MultiplayerClient client { get; set; }
 
@@ -49,9 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
         [Resolved]
-        private Bindable<Room> currentRoom { get; set; }
-
-        private MultiplayerMatchSettingsOverlay settingsOverlay;
+        private Bindable<Room> currentRoom { get; set; } // Todo: This should not exist.
 
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
 
@@ -59,9 +59,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private IDisposable readyClickOperation;
 
         private GridContainer mainContent;
+        private MultiplayerMatchSettingsOverlay settingsOverlay;
 
         public MultiplayerMatchSubScreen(Room room)
         {
+            Room = room;
+
             Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
         }

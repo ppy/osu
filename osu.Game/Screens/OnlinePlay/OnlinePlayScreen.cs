@@ -14,14 +14,12 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
-using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -44,16 +42,11 @@ namespace osu.Game.Screens.OnlinePlay
         private LoungeSubScreen loungeSubScreen;
         private ScreenStack screenStack;
 
-        private readonly IBindable<bool> isIdle = new BindableBool();
-
         [Cached(Type = typeof(IRoomManager))]
         protected RoomManager RoomManager { get; private set; }
 
         [Cached]
         private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
-
-        [Cached]
-        private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
         [Cached]
         private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
@@ -66,9 +59,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved]
         protected IAPIProvider API { get; private set; }
-
-        [Resolved(CanBeNull = true)]
-        private IdleTracker idleTracker { get; set; }
 
         [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
@@ -147,12 +137,6 @@ namespace osu.Game.Screens.OnlinePlay
 
             apiState.BindTo(API.State);
             apiState.BindValueChanged(onlineStateChanged, true);
-
-            if (idleTracker != null)
-            {
-                isIdle.BindTo(idleTracker.IsIdle);
-                isIdle.BindValueChanged(idle => UpdatePollingRate(idle.NewValue), true);
-            }
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -161,8 +145,6 @@ namespace osu.Game.Screens.OnlinePlay
             dependencies.Model.BindTo(selectedRoom);
             return dependencies;
         }
-
-        protected abstract void UpdatePollingRate(bool isIdle);
 
         private void forcefullyExit()
         {
@@ -199,8 +181,6 @@ namespace osu.Game.Screens.OnlinePlay
             screenStack.CurrentScreen.OnResuming(last);
 
             base.OnResuming(last);
-
-            UpdatePollingRate(isIdle.Value);
         }
 
         public override void OnSuspending(IScreen next)
@@ -210,8 +190,6 @@ namespace osu.Game.Screens.OnlinePlay
 
             Debug.Assert(screenStack.CurrentScreen != null);
             screenStack.CurrentScreen.OnSuspending(next);
-
-            UpdatePollingRate(isIdle.Value);
         }
 
         public override bool OnExiting(IScreen next)
@@ -275,15 +253,13 @@ namespace osu.Game.Screens.OnlinePlay
 
             if (newScreen is IOsuScreen newOsuScreen)
                 ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
-
-            UpdatePollingRate(isIdle.Value);
         }
 
         protected IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
         protected abstract string ScreenTitle { get; }
 
-        protected abstract RoomManager CreateRoomManager();
+        protected virtual RoomManager CreateRoomManager() => new RoomManager();
 
         protected abstract LoungeSubScreen CreateLounge();
 
