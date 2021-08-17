@@ -27,11 +27,15 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected abstract bool IsLoading { get; }
 
+        protected RoomSettingsOverlay()
+        {
+            RelativeSizeAxes = Axes.Both;
+            Masking = true;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Masking = true;
-
             Add(Settings = CreateSettings());
         }
 

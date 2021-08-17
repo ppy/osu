@@ -60,7 +60,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private IDisposable readyClickOperation;
 
         // private GridContainer mainContent;
-        private MultiplayerMatchSettingsOverlay settingsOverlay;
 
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
@@ -69,23 +68,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (client.Room == null)
-            {
-                // A new room is being created.
-                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
-                // mainContent.Hide();
-
-                settingsOverlay.State.BindValueChanged(visibility =>
-                {
-                    // if (visibility.NewValue == Visibility.Hidden)
-                    //     mainContent.Show();
-                }, true);
-            }
         }
 
         protected override void LoadComplete()
@@ -159,7 +141,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             {
                                 new MultiplayerMatchHeader
                                 {
-                                    OpenSettings = () => settingsOverlay.Show()
+                                    // OpenSettings = () => settingsOverlay.Show()
                                 }
                             },
                             new Drawable[]
@@ -280,11 +262,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         },
                     }
                 },
-                settingsOverlay = new MultiplayerMatchSettingsOverlay
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    // State = { Value = client.Room == null ? Visibility.Visible : Visibility.Hidden }
-                }
             }
         };
 
@@ -294,27 +271,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             OnSpectateClick = onSpectateClick
         };
 
+        protected override RoomSettingsOverlay CreateRoomSettingsOverlay() => new MultiplayerMatchSettingsOverlay();
+
         [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
 
         private bool exitConfirmed;
-
-        public override bool OnBackButton()
-        {
-            if (client.Room == null)
-            {
-                // room has not been created yet; exit immediately.
-                return base.OnBackButton();
-            }
-
-            if (settingsOverlay.State.Value == Visibility.Visible)
-            {
-                settingsOverlay.Hide();
-                return true;
-            }
-
-            return base.OnBackButton();
-        }
 
         public override bool OnExiting(IScreen next)
         {
