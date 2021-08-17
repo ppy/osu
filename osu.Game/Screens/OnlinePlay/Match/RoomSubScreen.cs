@@ -88,6 +88,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    RowDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
                     Content = new[]
                     {
                         // Padded main content (drawable room + main content)
@@ -96,7 +101,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Horizontal = 60 },
+                                Padding = new MarginPadding
+                                {
+                                    Horizontal = WaveOverlayContainer.WIDTH_PADDING,
+                                    Bottom = 30
+                                },
                                 // Main content
                                 Child = new GridContainer
                                 {
