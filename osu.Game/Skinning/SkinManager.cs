@@ -95,7 +95,7 @@ namespace osu.Game.Skinning
         /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUsableSkins()
         {
-            var userSkins = GetAllUserSkins(false);
+            var userSkins = GetAllUserSkins();
             userSkins.Insert(0, DefaultSkin.SkinInfo);
             userSkins.Insert(1, DefaultLegacySkin.SkinInfo);
             return userSkins;
