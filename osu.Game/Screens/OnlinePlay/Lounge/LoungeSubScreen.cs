@@ -186,15 +186,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             searchTextBox.Current.BindValueChanged(_ => updateFilterDebounced());
             ruleset.BindValueChanged(_ => UpdateFilter());
 
-            ListingPollingComponent.InitialRoomsReceived.BindValueChanged(_ => updateLoadingLayer());
-
             isIdle.BindValueChanged(_ => updatePollingRate(this.IsCurrentScreen()), true);
 
             if (ongoingOperationTracker != null)
             {
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
-                operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
+                operationInProgress.BindValueChanged(_ => updateLoadingLayer());
             }
+
+            ListingPollingComponent.InitialRoomsReceived.BindValueChanged(_ => updateLoadingLayer(), true);
 
             updateFilter();
         }
