@@ -18,8 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
         private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
 
-        [Resolved]
-        private Bindable<FilterCriteria> currentFilter { get; set; }
+        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
 
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
@@ -27,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            currentFilter.BindValueChanged(_ =>
+            Filter.BindValueChanged(_ =>
             {
                 RoomManager.ClearRooms();
                 initialRoomsReceived.Value = false;
@@ -44,10 +43,13 @@ namespace osu.Game.Screens.OnlinePlay.Components
             if (!API.IsLoggedIn)
                 return base.Poll();
 
+            if (Filter.Value == null)
+                return base.Poll();
+
             var tcs = new TaskCompletionSource<bool>();
 
             pollReq?.Cancel();
-            pollReq = new GetRoomsRequest(currentFilter.Value.Status, currentFilter.Value.Category);
+            pollReq = new GetRoomsRequest(Filter.Value.Status, Filter.Value.Category);
 
             pollReq.Success += result =>
             {

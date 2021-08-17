@@ -20,7 +20,6 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -48,9 +47,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Cached]
         private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
-
-        [Cached]
-        private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
         [Cached]
         private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();

@@ -56,9 +56,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [Resolved(CanBeNull = true)]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private Bindable<FilterCriteria> filter { get; set; }
-
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
@@ -68,6 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [CanBeNull]
         private LeasedBindable<Room> selectionLease;
 
+        private readonly Bindable<FilterCriteria> filter = new Bindable<FilterCriteria>(new FilterCriteria());
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly IBindable<bool> isIdle = new BindableBool();
         private LoadingLayer loadingLayer;
@@ -81,13 +79,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
 
-            filter ??= new Bindable<FilterCriteria>(new FilterCriteria());
-
             OsuScrollContainer scrollContainer;
 
             InternalChildren = new Drawable[]
             {
-                ListingPollingComponent = CreatePollingComponent(),
+                ListingPollingComponent = CreatePollingComponent().With(c => c.Filter.BindTarget = filter),
                 loadingLayer = new LoadingLayer(true),
                 new Container
                 {
@@ -161,7 +157,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             ScrollbarOverlapsContent = false,
-                                            Child = roomsContainer = new RoomsContainer()
+                                            Child = roomsContainer = new RoomsContainer
+                                            {
+                                                Filter = { BindTarget = filter }
+                                            }
                                         },
                                     }
                                 },
@@ -202,7 +201,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         #region Filtering
 
-        protected void UpdateFilter() => Scheduler.AddOnce(updateFilter);
+        public void UpdateFilter() => Scheduler.AddOnce(updateFilter);
 
         private ScheduledDelegate scheduledFilterUpdate;
 
