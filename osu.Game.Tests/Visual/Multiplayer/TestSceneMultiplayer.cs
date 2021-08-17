@@ -44,6 +44,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private TestMultiplayer multiplayerScreen;
         private TestMultiplayerClient client;
 
+        private TestRequestHandlingMultiplayerRoomManager roomManager => multiplayerScreen.RoomManager;
+
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
 
@@ -68,7 +70,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("load dependencies", () =>
             {
-                client = new TestMultiplayerClient(multiplayerScreen.RoomManager);
+                client = new TestMultiplayerClient(roomManager);
 
                 // The screen gets suspended so it stops receiving updates.
                 Child = client;
@@ -134,7 +136,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                multiplayerScreen.RoomManager.AddServerSideRoom(new Room
+                roomManager.AddServerSideRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Playlist =
@@ -164,7 +166,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                multiplayerScreen.RoomManager.AddServerSideRoom(new Room
+                roomManager.AddServerSideRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Playlist =
@@ -213,7 +215,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                multiplayerScreen.RoomManager.AddServerSideRoom(new Room
+                roomManager.AddServerSideRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Password = { Value = "password" },
