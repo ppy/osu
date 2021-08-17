@@ -60,7 +60,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 AddOrUpdateRoom(result);
                 room.CopyFrom(result); // Also copy back to the source model, since this is likely to have been stored elsewhere.
 
-                onSuccess?.Invoke(result);
+                // The server may not contain all properties (such as password), so invoke success with the given room.
+                onSuccess?.Invoke(room);
             };
 
             req.Failure += exception =>
