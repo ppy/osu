@@ -73,8 +73,7 @@ namespace osu.Game.Screens.Edit.Setup
             }
             else
             {
-                fileSelector = null;
-                Target.Clear();
+                hideFileSelector();
             }
         }
 
@@ -91,8 +90,14 @@ namespace osu.Game.Screens.Edit.Setup
             if (file.NewValue == null)
                 return;
 
-            Target.Clear();
+            hideFileSelector();
             Current.Value = file.NewValue.FullName;
+        }
+
+        private void hideFileSelector()
+        {
+            fileSelector = null;
+            Target.Clear();
         }
 
         Task ICanAcceptFiles.Import(params string[] paths)
