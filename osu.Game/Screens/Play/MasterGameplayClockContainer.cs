@@ -67,6 +67,8 @@ namespace osu.Game.Screens.Play
         private readonly bool startAtGameplayStart;
         private readonly double firstHitObjectTime;
 
+        protected virtual bool ApplyPlatformOffset => true;
+
         private FramedOffsetClock userOffsetClock;
         private FramedOffsetClock platformOffsetClock;
         private Bindable<double> userAudioOffset;
@@ -172,12 +174,15 @@ namespace osu.Game.Screens.Play
 
         protected override GameplayClock CreateGameplayClock(IFrameBasedClock source)
         {
-            // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
-            // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            platformOffsetClock = new HardwareCorrectionOffsetClock(source, this) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+            if (ApplyPlatformOffset)
+            {
+                // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
+                // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
+                platformOffsetClock = new HardwareCorrectionOffsetClock(source, this) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+            }
 
             // the final usable gameplay clock with user-set offsets applied.
-            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock, this);
+            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock ?? source, this);
 
             return new MasterGameplayClock(userOffsetClock, this);
         }

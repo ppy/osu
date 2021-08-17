@@ -180,6 +180,8 @@ namespace osu.Game.Tests.Gameplay
 
         private class TestMasterGameplayClockContainer : MasterGameplayClockContainer
         {
+            protected override bool ApplyPlatformOffset => false;
+
             public new DecoupleableInterpolatingFramedClock AdjustableSource => base.AdjustableSource;
 
             public TestMasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
