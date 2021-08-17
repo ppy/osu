@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
-        private MatchSettingsOverlay settingsOverlay;
+        private RoomSettingsOverlay settingsOverlay;
         private MatchLeaderboard leaderboard;
         private OverlinedHeader participantsHeader;
         private GridContainer mainContent;
@@ -237,7 +237,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         new Dimension(GridSizeMode.AutoSize),
                     }
                 },
-                settingsOverlay = new PlaylistsMatchSettingsOverlay
+                settingsOverlay = new PlaylistsRoomSettingsOverlay
                 {
                     RelativeSizeAxes = Axes.Both,
                     EditPlaylist = () =>

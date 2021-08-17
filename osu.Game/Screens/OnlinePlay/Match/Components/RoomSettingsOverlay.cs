@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public abstract class MatchSettingsOverlay : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
+    public abstract class RoomSettingsOverlay : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         protected const float TRANSITION_DURATION = 350;
         protected const float FIELD_PADDING = 45;
