@@ -197,6 +197,18 @@ namespace osu.Game.Rulesets.Mods
                            ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(other))));
         }
 
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+
+            hashCode.Add(GetType());
+
+            foreach (var (_, prop) in this.GetSettingsSourceProperties())
+                hashCode.Add(ModUtils.GetSettingUnderlyingValue(prop.GetValue(this)));
+
+            return hashCode.ToHashCode();
+        }
+
         /// <summary>
         /// Reset all custom settings for this mod back to their defaults.
         /// </summary>
