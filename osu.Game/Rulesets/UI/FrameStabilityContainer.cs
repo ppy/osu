@@ -146,8 +146,12 @@ namespace osu.Game.Rulesets.UI
             frameStableClock.WaitingOnFrames.Value = state == PlaybackState.NotValid;
 
             manualClock.CurrentTime = proposedTime;
-            manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
             manualClock.IsRunning = parentGameplayClock.IsRunning;
+
+            manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
+
+            if (parentGameplayClock is GameplayClock gameplayClock)
+                frameStableClock.CurrentTrueGameplayRate = Math.Abs(gameplayClock.TrueGameplayRate) * direction;
 
             // determine whether catch-up is required.
             if (state == PlaybackState.Valid && timeBehind > 0)
@@ -263,6 +267,10 @@ namespace osu.Game.Rulesets.UI
             public readonly Bindable<bool> IsCatchingUp = new Bindable<bool>();
 
             public readonly Bindable<bool> WaitingOnFrames = new Bindable<bool>();
+
+            public double? CurrentTrueGameplayRate { get; set; }
+
+            public override double TrueGameplayRate => CurrentTrueGameplayRate ?? base.TrueGameplayRate;
 
             public FrameStabilityClock(FramedClock underlyingClock)
                 : base(underlyingClock)
