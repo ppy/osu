@@ -83,6 +83,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
             AddUntilStep("wait for multiplayer to load", () => multiplayerScreen.IsLoaded);
             AddUntilStep("wait for lounge to load", () => this.ChildrenOfType<MultiplayerLoungeSubScreen>().FirstOrDefault()?.IsLoaded == true);
+
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
         }
 
         [Test]

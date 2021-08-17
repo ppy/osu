@@ -19,6 +19,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Match
@@ -30,8 +31,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
-
-        private readonly ModSelectOverlay userModsSelectOverlay;
 
         /// <summary>
         /// A container that provides controls for selection of user mods.
@@ -58,49 +57,106 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
         [Cached]
-        protected OnlinePlayBeatmapAvailabilityTracker BeatmapAvailabilityTracker { get; }
+        protected OnlinePlayBeatmapAvailabilityTracker BeatmapAvailabilityTracker { get; private set; }
 
         protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapAvailabilityTracker.Availability;
 
-        protected RoomSubScreen()
+        private readonly Room room;
+
+        private ModSelectOverlay userModsSelectOverlay;
+
+        protected RoomSubScreen(Room room)
         {
+            this.room = room;
+
             Padding = new MarginPadding { Top = Header.HEIGHT };
 
-            AddRangeInternal(new Drawable[]
+            BeatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex(@"3e3a44") // This is super temporary.
-                },
-                BeatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
-                {
-                    SelectedItem = { BindTarget = SelectedItem }
-                },
-                new Container
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Depth = float.MinValue,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
-                    Child = userModsSelectOverlay = new UserModSelectOverlay
-                    {
-                        SelectedMods = { BindTarget = UserMods },
-                        IsValidMod = _ => false
-                    }
-                },
-            });
+                SelectedItem = { BindTarget = SelectedItem }
+            };
         }
-
-        protected override void ClearInternal(bool disposeChildren = true) =>
-            throw new InvalidOperationException($"{nameof(RoomSubScreen)}'s children should not be cleared as it will remove required components");
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
+
+            InternalChildren = new Drawable[]
+            {
+                BeatmapAvailabilityTracker,
+                new GridContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Content = new[]
+                    {
+                        // Padded main content (drawable room + main content)
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Horizontal = 60 },
+                                // Main content
+                                Child = new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    Content = new[]
+                                    {
+                                        new Drawable[]
+                                        {
+                                            CreateDrawableRoom(room),
+                                        },
+                                        new Drawable[]
+                                        {
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Children = new[]
+                                                {
+                                                    new Container
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Masking = true,
+                                                        CornerRadius = 10,
+                                                        Child = new Box
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Colour = Color4Extensions.FromHex(@"3e3a44") // This is super temporary.
+                                                        },
+                                                    },
+                                                    CreateMainContent(),
+                                                    new Container
+                                                    {
+                                                        Anchor = Anchor.BottomLeft,
+                                                        Origin = Anchor.BottomLeft,
+                                                        RelativeSizeAxes = Axes.X,
+                                                        AutoSizeAxes = Axes.Y,
+                                                        Child = userModsSelectOverlay = new UserModSelectOverlay
+                                                        {
+                                                            SelectedMods = { BindTarget = UserMods },
+                                                            IsValidMod = _ => false
+                                                        }
+                                                    },
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        // Footer
+                        new[]
+                        {
+                            CreateFooter()
+                        }
+                    }
+                }
+            };
         }
 
         protected override void LoadComplete()
@@ -256,6 +312,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (track != null)
                 track.Looping = false;
         }
+
+        protected abstract DrawableRoom CreateDrawableRoom(Room room);
+
+        protected abstract Drawable CreateMainContent();
+
+        protected abstract Drawable CreateFooter();
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
         {

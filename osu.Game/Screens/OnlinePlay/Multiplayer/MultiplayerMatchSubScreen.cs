@@ -22,6 +22,7 @@ using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
@@ -58,10 +59,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [CanBeNull]
         private IDisposable readyClickOperation;
 
-        private GridContainer mainContent;
+        // private GridContainer mainContent;
         private MultiplayerMatchSettingsOverlay settingsOverlay;
 
         public MultiplayerMatchSubScreen(Room room)
+            : base(room)
         {
             Room = room;
 
@@ -72,191 +74,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRangeInternal(new Drawable[]
-            {
-                mainContent = new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding
-                                {
-                                    Horizontal = HORIZONTAL_OVERFLOW_PADDING + 55,
-                                    Vertical = 20
-                                },
-                                Child = new GridContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    RowDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(),
-                                    },
-                                    Content = new[]
-                                    {
-                                        new Drawable[]
-                                        {
-                                            new MultiplayerMatchHeader
-                                            {
-                                                OpenSettings = () => settingsOverlay.Show()
-                                            }
-                                        },
-                                        new Drawable[]
-                                        {
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Horizontal = 5, Vertical = 10 },
-                                                Child = new GridContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    ColumnDimensions = new[]
-                                                    {
-                                                        new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 400),
-                                                        new Dimension(),
-                                                        new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 600),
-                                                    },
-                                                    Content = new[]
-                                                    {
-                                                        new Drawable[]
-                                                        {
-                                                            // Main left column
-                                                            new GridContainer
-                                                            {
-                                                                RelativeSizeAxes = Axes.Both,
-                                                                RowDimensions = new[]
-                                                                {
-                                                                    new Dimension(GridSizeMode.AutoSize)
-                                                                },
-                                                                Content = new[]
-                                                                {
-                                                                    new Drawable[] { new ParticipantsListHeader() },
-                                                                    new Drawable[]
-                                                                    {
-                                                                        new ParticipantsList
-                                                                        {
-                                                                            RelativeSizeAxes = Axes.Both
-                                                                        },
-                                                                    }
-                                                                }
-                                                            },
-                                                            // Spacer
-                                                            null,
-                                                            // Main right column
-                                                            new FillFlowContainer
-                                                            {
-                                                                RelativeSizeAxes = Axes.X,
-                                                                AutoSizeAxes = Axes.Y,
-                                                                Children = new[]
-                                                                {
-                                                                    new FillFlowContainer
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        AutoSizeAxes = Axes.Y,
-                                                                        Children = new Drawable[]
-                                                                        {
-                                                                            new OverlinedHeader("Beatmap"),
-                                                                            new BeatmapSelectionControl { RelativeSizeAxes = Axes.X }
-                                                                        }
-                                                                    },
-                                                                    UserModsSection = new FillFlowContainer
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        AutoSizeAxes = Axes.Y,
-                                                                        Margin = new MarginPadding { Top = 10 },
-                                                                        Children = new Drawable[]
-                                                                        {
-                                                                            new OverlinedHeader("Extra mods"),
-                                                                            new FillFlowContainer
-                                                                            {
-                                                                                AutoSizeAxes = Axes.Both,
-                                                                                Direction = FillDirection.Horizontal,
-                                                                                Spacing = new Vector2(10, 0),
-                                                                                Children = new Drawable[]
-                                                                                {
-                                                                                    new UserModSelectButton
-                                                                                    {
-                                                                                        Anchor = Anchor.CentreLeft,
-                                                                                        Origin = Anchor.CentreLeft,
-                                                                                        Width = 90,
-                                                                                        Text = "Select",
-                                                                                        Action = ShowUserModSelect,
-                                                                                    },
-                                                                                    new ModDisplay
-                                                                                    {
-                                                                                        Anchor = Anchor.CentreLeft,
-                                                                                        Origin = Anchor.CentreLeft,
-                                                                                        Current = UserMods,
-                                                                                        Scale = new Vector2(0.8f),
-                                                                                    },
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        new Drawable[]
-                                        {
-                                            new GridContainer
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                RowDimensions = new[]
-                                                {
-                                                    new Dimension(GridSizeMode.AutoSize)
-                                                },
-                                                Content = new[]
-                                                {
-                                                    new Drawable[] { new OverlinedHeader("Chat") },
-                                                    new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
-                                                }
-                                            }
-                                        }
-                                    },
-                                }
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            new MultiplayerMatchFooter
-                            {
-                                OnReadyClick = onReadyClick,
-                                OnSpectateClick = onSpectateClick
-                            }
-                        }
-                    },
-                    RowDimensions = new[]
-                    {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize),
-                    }
-                },
-                settingsOverlay = new MultiplayerMatchSettingsOverlay
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    State = { Value = client.Room == null ? Visibility.Visible : Visibility.Hidden }
-                }
-            });
-
             if (client.Room == null)
             {
                 // A new room is being created.
                 // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
-                mainContent.Hide();
+                // mainContent.Hide();
 
                 settingsOverlay.State.BindValueChanged(visibility =>
                 {
-                    if (visibility.NewValue == Visibility.Hidden)
-                        mainContent.Show();
+                    // if (visibility.NewValue == Visibility.Hidden)
+                    //     mainContent.Show();
                 }, true);
             }
         }
@@ -302,6 +129,170 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             var ruleset = Ruleset.Value.CreateInstance();
             Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods).ToList();
         }
+
+        protected override DrawableRoom CreateDrawableRoom(Room room) => new DrawableRoom(room);
+
+        protected override Drawable CreateMainContent() => new Container
+        {
+            RelativeSizeAxes = Axes.Both,
+            Children = new Drawable[]
+            {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding
+                    {
+                        Horizontal = HORIZONTAL_OVERFLOW_PADDING + 55,
+                        Vertical = 20
+                    },
+                    Child = new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(),
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
+                            {
+                                new MultiplayerMatchHeader
+                                {
+                                    OpenSettings = () => settingsOverlay.Show()
+                                }
+                            },
+                            new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Horizontal = 5, Vertical = 10 },
+                                    Child = new GridContainer
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        ColumnDimensions = new[]
+                                        {
+                                            new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 400),
+                                            new Dimension(),
+                                            new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 600),
+                                        },
+                                        Content = new[]
+                                        {
+                                            new Drawable[]
+                                            {
+                                                // Main left column
+                                                new GridContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    RowDimensions = new[]
+                                                    {
+                                                        new Dimension(GridSizeMode.AutoSize)
+                                                    },
+                                                    Content = new[]
+                                                    {
+                                                        new Drawable[] { new ParticipantsListHeader() },
+                                                        new Drawable[]
+                                                        {
+                                                            new ParticipantsList
+                                                            {
+                                                                RelativeSizeAxes = Axes.Both
+                                                            },
+                                                        }
+                                                    }
+                                                },
+                                                // Spacer
+                                                null,
+                                                // Main right column
+                                                new FillFlowContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Children = new[]
+                                                    {
+                                                        new FillFlowContainer
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new OverlinedHeader("Beatmap"),
+                                                                new BeatmapSelectionControl { RelativeSizeAxes = Axes.X }
+                                                            }
+                                                        },
+                                                        UserModsSection = new FillFlowContainer
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y,
+                                                            Margin = new MarginPadding { Top = 10 },
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new OverlinedHeader("Extra mods"),
+                                                                new FillFlowContainer
+                                                                {
+                                                                    AutoSizeAxes = Axes.Both,
+                                                                    Direction = FillDirection.Horizontal,
+                                                                    Spacing = new Vector2(10, 0),
+                                                                    Children = new Drawable[]
+                                                                    {
+                                                                        new UserModSelectButton
+                                                                        {
+                                                                            Anchor = Anchor.CentreLeft,
+                                                                            Origin = Anchor.CentreLeft,
+                                                                            Width = 90,
+                                                                            Text = "Select",
+                                                                            Action = ShowUserModSelect,
+                                                                        },
+                                                                        new ModDisplay
+                                                                        {
+                                                                            Anchor = Anchor.CentreLeft,
+                                                                            Origin = Anchor.CentreLeft,
+                                                                            Current = UserMods,
+                                                                            Scale = new Vector2(0.8f),
+                                                                        },
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            new Drawable[]
+                            {
+                                new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize)
+                                    },
+                                    Content = new[]
+                                    {
+                                        new Drawable[] { new OverlinedHeader("Chat") },
+                                        new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
+                                    }
+                                }
+                            }
+                        },
+                    }
+                },
+                settingsOverlay = new MultiplayerMatchSettingsOverlay
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    // State = { Value = client.Room == null ? Visibility.Visible : Visibility.Hidden }
+                }
+            }
+        };
+
+        protected override Drawable CreateFooter() => new MultiplayerMatchFooter
+        {
+            OnReadyClick = onReadyClick,
+            OnSpectateClick = onSpectateClick
+        };
 
         [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }

@@ -14,6 +14,7 @@ using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
@@ -45,6 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private SelectionPollingComponent selectionPollingComponent;
 
         public PlaylistsRoomSubScreen(Room room)
+            : base(room)
         {
             Title = room.RoomID.Value == null ? "New playlist" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
@@ -295,5 +297,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             Exited = () => leaderboard.RefreshScores()
         });
+
+        protected override DrawableRoom CreateDrawableRoom(Room room) => new DrawableRoom(room);
+
+        protected override Drawable CreateMainContent() => Empty();
+
+        protected override Drawable CreateFooter() => Empty();
     }
 }
