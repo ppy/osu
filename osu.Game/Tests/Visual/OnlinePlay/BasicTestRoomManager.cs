@@ -28,6 +28,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         IBindableList<Room> IRoomManager.Rooms => Rooms;
 
+        private int currentRoomId;
+
         public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             room.RoomID.Value ??= Rooms.Select(r => r.RoomID.Value).Where(id => id != null).Select(id => id.Value).DefaultIfEmpty().Max() + 1;
@@ -76,9 +78,9 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             {
                 var room = new Room
                 {
-                    RoomID = { Value = i },
-                    Position = { Value = i },
-                    Name = { Value = $"Room {i}" },
+                    RoomID = { Value = currentRoomId },
+                    Position = { Value = currentRoomId },
+                    Name = { Value = $"Room {currentRoomId}" },
                     Host = { Value = new User { Username = "Host" } },
                     EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) },
                     Category = { Value = i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal },
@@ -101,6 +103,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 }
 
                 CreateRoom(room);
+
+                currentRoomId++;
             }
         }
     }
