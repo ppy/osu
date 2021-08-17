@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -62,7 +60,7 @@ namespace osu.Game.Rulesets.UI
         {
             if (clock != null)
             {
-                parentGameplayClock = frameStableClock.ParentGameplayClock = clock;
+                parentGameplayClock = clock;
                 frameStableClock.IsPaused.BindTo(clock.IsPaused);
             }
         }
@@ -262,13 +260,9 @@ namespace osu.Game.Rulesets.UI
 
         private class FrameStabilityClock : GameplayClock, IFrameStableClock
         {
-            public GameplayClock ParentGameplayClock;
-
             public readonly Bindable<bool> IsCatchingUp = new Bindable<bool>();
 
             public readonly Bindable<bool> WaitingOnFrames = new Bindable<bool>();
-
-            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
 
             public FrameStabilityClock(FramedClock underlyingClock)
                 : base(underlyingClock)

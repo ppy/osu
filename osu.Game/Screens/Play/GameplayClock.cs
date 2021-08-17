@@ -1,11 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 
 namespace osu.Game.Screens.Play
 {
@@ -23,11 +20,6 @@ namespace osu.Game.Screens.Play
 
         public readonly BindableBool IsPaused = new BindableBool();
 
-        /// <summary>
-        /// All adjustments applied to this clock which don't come from gameplay or mods.
-        /// </summary>
-        public virtual IEnumerable<Bindable<double>> NonGameplayAdjustments => Enumerable.Empty<Bindable<double>>();
-
         public GameplayClock(IFrameBasedClock underlyingClock)
         {
             UnderlyingClock = underlyingClock;
@@ -41,23 +33,7 @@ namespace osu.Game.Screens.Play
         /// The rate of gameplay when playback is at 100%.
         /// This excludes any seeking / user adjustments.
         /// </summary>
-        public double TrueGameplayRate
-        {
-            get
-            {
-                double baseRate = Rate;
-
-                foreach (var adjustment in NonGameplayAdjustments)
-                {
-                    if (Precision.AlmostEquals(adjustment.Value, 0))
-                        return 0;
-
-                    baseRate /= adjustment.Value;
-                }
-
-                return baseRate;
-            }
-        }
+        public virtual double TrueGameplayRate => Rate;
 
         public bool IsRunning => UnderlyingClock.IsRunning;
 
