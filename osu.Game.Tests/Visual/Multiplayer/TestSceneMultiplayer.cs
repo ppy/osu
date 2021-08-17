@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                multiplayerScreen.RoomManager.AddRoom(new Room
+                multiplayerScreen.RoomManager.AddServerSideRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Playlist =
@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                multiplayerScreen.RoomManager.AddRoom(new Room
+                multiplayerScreen.RoomManager.AddServerSideRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Playlist =
@@ -213,7 +213,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                multiplayerScreen.RoomManager.AddRoom(new Room
+                multiplayerScreen.RoomManager.AddServerSideRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Password = { Value = "password" },
