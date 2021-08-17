@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Edit.Setup
         /// </summary>
         public Container Target;
 
+        private OsuFileSelector fileSelector;
+
         private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
 
         [Resolved]
@@ -56,16 +58,22 @@ namespace osu.Game.Screens.Edit.Setup
 
         public void DisplayFileChooser()
         {
-            OsuFileSelector fileSelector;
-
-            Target.Child = fileSelector = new OsuFileSelector(currentFile.Value?.DirectoryName, handledExtensions)
+            if (fileSelector == null)
             {
-                RelativeSizeAxes = Axes.X,
-                Height = 400,
-                CurrentFile = { BindTarget = currentFile }
-            };
+                Target.Child = fileSelector = new OsuFileSelector(currentFile.Value?.DirectoryName, handledExtensions)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 400,
+                    CurrentFile = { BindTarget = currentFile }
+                };
 
-            sectionsContainer.ScrollTo(fileSelector);
+                sectionsContainer.ScrollTo(fileSelector);
+            }
+            else
+            {
+                fileSelector = null;
+                Target.Clear();
+            }
         }
 
         protected override void LoadComplete()
