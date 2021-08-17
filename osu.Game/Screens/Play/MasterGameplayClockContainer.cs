@@ -44,6 +44,17 @@ namespace osu.Game.Screens.Play
 
         private readonly AudioAdjustments gameplayAdjustments = new AudioAdjustments();
 
+        /// <summary>
+        /// The rate of gameplay when playback is at 100%.
+        /// This excludes any seeking / user adjustments.
+        /// </summary>
+        public double TrueGameplayRate => gameplayAdjustments.AggregateFrequency.Value * gameplayAdjustments.AggregateTempo.Value;
+
+        /// <summary>
+        /// The true gameplay rate combined with the <see cref="UserPlaybackRate"/> value.
+        /// </summary>
+        public double PlaybackRate => TrueGameplayRate * UserPlaybackRate.Value;
+
         private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
 
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
@@ -280,23 +291,29 @@ namespace osu.Game.Screens.Play
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
         {
+            private readonly MasterGameplayClockContainer gameplayClockContainer;
+
             // we always want to apply the same real-time offset, so it should be adjusted by the difference in playback rate (from realtime) to achieve this.
             // base implementation already adds offset at 1.0 rate, so we only add the difference from that here.
-            public override double CurrentTime => base.CurrentTime + Offset * (Rate - 1);
+            public override double CurrentTime => base.CurrentTime + Offset * (gameplayClockContainer.PlaybackRate - 1);
 
-            public HardwareCorrectionOffsetClock(IClock source, bool processSource = true)
-                : base(source, processSource)
+            public HardwareCorrectionOffsetClock(IClock source, MasterGameplayClockContainer gameplayClockContainer)
+                : base(source)
             {
+                this.gameplayClockContainer = gameplayClockContainer;
             }
         }
 
         private class MasterGameplayClock : GameplayClock
         {
+            private readonly MasterGameplayClockContainer gameplayClockContainer;
 
+            public override double TrueGameplayRate => gameplayClockContainer.TrueGameplayRate;
 
-            public MasterGameplayClock(FramedOffsetClock underlyingClock)
+            public MasterGameplayClock(FramedOffsetClock underlyingClock, MasterGameplayClockContainer gameplayClockContainer)
                 : base(underlyingClock)
             {
+                this.gameplayClockContainer = gameplayClockContainer;
             }
         }
     }
