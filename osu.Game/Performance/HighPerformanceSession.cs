@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Performance
 {
@@ -12,9 +13,9 @@ namespace osu.Game.Performance
         private readonly IBindable<bool> localUserPlaying = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        private void load(ILocalUserPlayInfo localUserInfo)
         {
-            localUserPlaying.BindTo(game.LocalUserPlaying);
+            localUserPlaying.BindTo(localUserInfo.IsPlaying);
         }
 
         protected override void LoadComplete()
