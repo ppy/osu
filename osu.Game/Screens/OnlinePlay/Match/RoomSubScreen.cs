@@ -64,7 +64,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private readonly Room room;
 
         private ModSelectOverlay userModsSelectOverlay;
-        private RoomSettingsOverlay settingsOverlay;
+        protected RoomSettingsOverlay SettingsOverlay { get; private set; }
 
         protected RoomSubScreen(Room room)
         {
@@ -162,7 +162,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                             }
                                         }
                                     },
-                                    settingsOverlay = CreateRoomSettingsOverlay()
+                                    SettingsOverlay = CreateRoomSettingsOverlay()
                                 },
                             },
                         },
@@ -181,7 +181,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
                 mainContent.Hide();
 
-                settingsOverlay.State.BindValueChanged(visibility =>
+                SettingsOverlay.State.BindValueChanged(visibility =>
                 {
                     if (visibility.NewValue == Visibility.Hidden)
                         mainContent.Show();
@@ -215,9 +215,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 return true;
             }
 
-            if (settingsOverlay.State.Value == Visibility.Visible)
+            if (SettingsOverlay.State.Value == Visibility.Visible)
             {
-                settingsOverlay.Hide();
+                SettingsOverlay.Hide();
                 return true;
             }
 

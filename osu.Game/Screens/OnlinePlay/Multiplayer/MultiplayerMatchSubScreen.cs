@@ -141,7 +141,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             {
                                 new MultiplayerMatchHeader
                                 {
-                                    // OpenSettings = () => settingsOverlay.Show()
+                                    OpenSettings = () => SettingsOverlay.Show()
                                 }
                             },
                             new Drawable[]
