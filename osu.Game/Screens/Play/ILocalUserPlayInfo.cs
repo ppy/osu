@@ -12,6 +12,6 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Whether the local user is currently playing.
         /// </summary>
-        public IBindable<bool> IsPlaying { get; }
+        IBindable<bool> IsPlaying { get; }
     }
 }
