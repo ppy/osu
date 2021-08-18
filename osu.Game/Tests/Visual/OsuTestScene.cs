@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -100,7 +99,7 @@ namespace osu.Game.Tests.Visual
                 return factory;
             });
 
-            RecycleLocalStorage();
+            RecycleLocalStorage(false);
 
             var baseDependencies = base.CreateChildDependencies(parent);
 
@@ -140,7 +139,7 @@ namespace osu.Game.Tests.Visual
 
         protected virtual bool UseFreshStoragePerRun => false;
 
-        public virtual void RecycleLocalStorage()
+        public virtual void RecycleLocalStorage(bool isDisposing)
         {
             if (localStorage?.IsValueCreated == true)
             {
@@ -199,7 +198,7 @@ namespace osu.Game.Tests.Visual
             if (contextFactory?.IsValueCreated == true)
                 contextFactory.Value.ResetDatabase();
 
-            RecycleLocalStorage();
+            RecycleLocalStorage(true);
         }
 
         protected override ITestSceneTestRunner CreateRunner() => new OsuTestSceneTestRunner();
