@@ -48,14 +48,22 @@ namespace osu.Game.Screens.Play
         public ITrack GameplayTrack { get; }
 
         /// <summary>
-        /// The rate of gameplay when playback is at 100%.
-        /// This excludes any seeking / user adjustments.
+        /// The true rate of the gameplay components, adjustable by mods via <see cref="GameplayTrack"/>.
+        /// This is used for components that require performing calculations based on the true gameplay rate, away from side playback adjustments.
         /// </summary>
         public double TrueGameplayRate => GameplayTrack.AggregateFrequency.Value * GameplayTrack.AggregateTempo.Value;
 
         /// <summary>
-        /// The true gameplay rate combined with the <see cref="UserPlaybackRate"/> value.
+        /// The rate at which the gameplay clock is playing at, away from side audio adjustments such as <see cref="pauseFreqAdjust"/>.
+        /// This is used for clocks inside this <see cref="MasterGameplayClockContainer"/> which require scaling time adjustments based on the playback rate,
+        /// without getting affected by irrelevant audio adjustments.
         /// </summary>
+        /// <remarks>
+        /// The track's rate is supposed to be considered the actual playback rate,
+        /// but certain audio adjustments like the mentioned <see cref="pauseFreqAdjust"/>
+        /// could permanently affect the rate and hide the true playback rate.
+        /// Therefore this is defined as the "ground truth" for offset-applied clocks to function properly.
+        /// </remarks>
         public double PlaybackRate => TrueGameplayRate * UserPlaybackRate.Value;
 
         private double totalOffset => userOffsetClock.Offset + (platformOffsetClock?.Offset ?? 0);
