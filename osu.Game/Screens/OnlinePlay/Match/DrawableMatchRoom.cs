@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -22,31 +23,40 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private IAPIProvider api { get; set; }
 
         private readonly IBindable<User> host = new Bindable<User>();
+        private readonly bool allowEdit;
 
+        [CanBeNull]
         private Drawable editButton;
 
-        public DrawableMatchRoom(Room room)
+        public DrawableMatchRoom(Room room, bool allowEdit = true)
             : base(room)
         {
+            this.allowEdit = allowEdit;
+
             host.BindTo(room.Host);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            ButtonsContainer.Add(editButton = new PurpleTriangleButton
+            if (allowEdit)
             {
-                RelativeSizeAxes = Axes.Y,
-                Size = new Vector2(100, 1),
-                Text = "Edit",
-                Action = () => OnEdit?.Invoke()
-            });
+                ButtonsContainer.Add(editButton = new PurpleTriangleButton
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Size = new Vector2(100, 1),
+                    Text = "Edit",
+                    Action = () => OnEdit?.Invoke()
+                });
+            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            host.BindValueChanged(h => editButton.Alpha = h.NewValue?.Equals(api.LocalUser.Value) == true ? 1 : 0, true);
+
+            if (editButton != null)
+                host.BindValueChanged(h => editButton.Alpha = h.NewValue?.Equals(api.LocalUser.Value) == true ? 1 : 0, true);
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;

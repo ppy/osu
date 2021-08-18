@@ -63,14 +63,21 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapAvailabilityTracker.Availability;
 
         public readonly Room Room;
+        private readonly bool allowEdit;
 
         private ModSelectOverlay userModsSelectOverlay;
         private RoomSettingsOverlay settingsOverlay;
         private Drawable mainContent;
 
-        protected RoomSubScreen(Room room)
+        /// <summary>
+        /// Creates a new <see cref="RoomSubScreen"/>.
+        /// </summary>
+        /// <param name="room">The <see cref="Room"/>.</param>
+        /// <param name="allowEdit">Whether to allow editing room settings post-creation.</param>
+        protected RoomSubScreen(Room room, bool allowEdit = true)
         {
             Room = room;
+            this.allowEdit = allowEdit;
 
             Padding = new MarginPadding { Top = Header.HEIGHT };
 
@@ -125,7 +132,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                         {
                                             new Drawable[]
                                             {
-                                                new DrawableMatchRoom(Room)
+                                                new DrawableMatchRoom(Room, allowEdit)
                                                 {
                                                     MatchingFilter = true,
                                                     OnEdit = () => settingsOverlay.Show()
