@@ -59,8 +59,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [CanBeNull]
         private IDisposable readyClickOperation;
 
-        // private GridContainer mainContent;
-
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
         {
@@ -130,20 +128,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     Child = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        RowDimensions = new[]
-                        {
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(),
-                        },
                         Content = new[]
                         {
-                            new Drawable[]
-                            {
-                                new MultiplayerMatchHeader
-                                {
-                                    OpenSettings = () => SettingsOverlay.Show()
-                                }
-                            },
                             new Drawable[]
                             {
                                 new Container
