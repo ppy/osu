@@ -50,6 +50,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestCantClickWhenPlaying()
+        {
+            setLocalUserPlaying(true);
+
+            AddStep("attempt focus chat", () =>
+            {
+                InputManager.MoveMouseTo(textBox);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            assertChatFocused(false);
+        }
+
+        [Test]
         public void TestFocusDroppedWhenPlaying()
         {
             assertChatFocused(false);
