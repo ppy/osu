@@ -18,6 +18,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private IBindable<bool> localUserPlaying = new Bindable<bool>();
 
+        public override bool PropagatePositionalInputSubTree => !localUserPlaying.Value;
+
         public Bindable<bool> Expanded = new Bindable<bool>();
 
         private const float height = 100;
