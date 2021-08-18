@@ -4,7 +4,6 @@
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
-using osu.Game.Tests.Visual.Navigation;
 
 namespace osu.Game.Tests.Visual.Menus
 {

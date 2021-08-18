@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     Game.Dispose();
                 }
 
-                RecycleLocalStorage();
+                RecycleLocalStorage(false);
 
                 CreateGame();
             });
@@ -71,6 +71,13 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
 
             ConfirmAtMainMenu();
+        }
+
+        [TearDownSteps]
+        public void TearDownSteps()
+        {
+            AddStep("exit game", () => Game.Exit());
+            AddUntilStep("wait for game exit", () => Game.Parent == null);
         }
 
         protected void CreateGame()
