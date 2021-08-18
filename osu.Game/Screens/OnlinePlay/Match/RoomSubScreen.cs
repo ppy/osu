@@ -134,7 +134,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                             {
                                                 new DrawableMatchRoom(Room, allowEdit)
                                                 {
-                                                    MatchingFilter = true,
                                                     OnEdit = () => settingsOverlay.Show()
                                                 }
                                             },

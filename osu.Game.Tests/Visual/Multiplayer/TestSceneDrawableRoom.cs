@@ -10,11 +10,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
@@ -159,10 +159,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }));
             }
 
-            var drawableRoom = new DrawableRoom(room) { MatchingFilter = true };
-            drawableRoom.Action = () => drawableRoom.State = drawableRoom.State == SelectionState.Selected ? SelectionState.NotSelected : SelectionState.Selected;
-
-            return drawableRoom;
+            return new DrawableLoungeRoom(room) { MatchingFilter = true };
         }
     }
 }
