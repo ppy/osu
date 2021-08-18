@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -62,7 +63,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
             else
             {
-                length.Value = TimeSpan.FromMilliseconds(beatmap.Length).ToString(@"m\:ss");
+                length.Value = TimeSpan.FromMilliseconds(beatmap.Length).ToFormattedDuration();
                 circleCount.Value = beatmap.OnlineInfo.CircleCount.ToString();
                 sliderCount.Value = beatmap.OnlineInfo.SliderCount.ToString();
             }
@@ -77,10 +78,10 @@ namespace osu.Game.Overlays.BeatmapSet
                 Direction = FillDirection.Horizontal,
                 Children = new[]
                 {
-                    length = new Statistic(FontAwesome.Regular.Clock, "Length") { Width = 0.25f },
-                    bpm = new Statistic(FontAwesome.Regular.Circle, "BPM") { Width = 0.25f },
-                    circleCount = new Statistic(FontAwesome.Regular.Circle, "Circle Count") { Width = 0.25f },
-                    sliderCount = new Statistic(FontAwesome.Regular.Circle, "Slider Count") { Width = 0.25f },
+                    length = new Statistic(BeatmapStatisticsIconType.Length, "Length") { Width = 0.25f },
+                    bpm = new Statistic(BeatmapStatisticsIconType.Bpm, "BPM") { Width = 0.25f },
+                    circleCount = new Statistic(BeatmapStatisticsIconType.Circles, "Circle Count") { Width = 0.25f },
+                    sliderCount = new Statistic(BeatmapStatisticsIconType.Sliders, "Slider Count") { Width = 0.25f },
                 },
             };
         }
@@ -103,7 +104,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 set => this.value.Text = value;
             }
 
-            public Statistic(IconUsage icon, string name)
+            public Statistic(BeatmapStatisticsIconType icon, string name)
             {
                 TooltipText = name;
                 RelativeSizeAxes = Axes.X;
@@ -132,8 +133,16 @@ namespace osu.Game.Overlays.BeatmapSet
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
-                                Icon = icon,
-                                Size = new Vector2(12),
+                                Icon = FontAwesome.Regular.Circle,
+                                Size = new Vector2(10),
+                                Rotation = 0,
+                                Colour = Color4Extensions.FromHex(@"f7dd55"),
+                            },
+                            new BeatmapStatisticIcon(icon)
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(10),
                                 Colour = Color4Extensions.FromHex(@"f7dd55"),
                                 Scale = new Vector2(0.8f),
                             },

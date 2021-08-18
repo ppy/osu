@@ -26,6 +26,7 @@ namespace osu.Game.Online
         private readonly string clientName;
         private readonly string endpoint;
         private readonly string versionHash;
+        private readonly bool preferMessagePack;
         private readonly IAPIProvider api;
 
         /// <summary>
@@ -51,12 +52,14 @@ namespace osu.Game.Online
         /// <param name="endpoint">The endpoint to the hub.</param>
         /// <param name="api"> An API provider used to react to connection state changes.</param>
         /// <param name="versionHash">The hash representing the current game version, used for verification purposes.</param>
-        public HubClientConnector(string clientName, string endpoint, IAPIProvider api, string versionHash)
+        /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
+        public HubClientConnector(string clientName, string endpoint, IAPIProvider api, string versionHash, bool preferMessagePack = true)
         {
             this.clientName = clientName;
             this.endpoint = endpoint;
             this.api = api;
             this.versionHash = versionHash;
+            this.preferMessagePack = preferMessagePack;
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(state =>
@@ -116,10 +119,7 @@ namespace osu.Game.Online
                     }
                     catch (Exception e)
                     {
-                        Logger.Log($"{clientName} connection error: {e}", LoggingTarget.Network);
-
-                        // retry on any failure.
-                        await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
+                        await handleErrorAndDelay(e, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -127,6 +127,15 @@ namespace osu.Game.Online
             {
                 connectionLock.Release();
             }
+        }
+
+        /// <summary>
+        /// Handles an exception and delays an async flow.
+        /// </summary>
+        private async Task handleErrorAndDelay(Exception exception, CancellationToken cancellationToken)
+        {
+            Logger.Log($"{clientName} connection error: {exception}", LoggingTarget.Network);
+            await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
         }
 
         private HubConnection buildConnection(CancellationToken cancellationToken)
@@ -138,13 +147,19 @@ namespace osu.Game.Online
                     options.Headers.Add("OsuVersionHash", versionHash);
                 });
 
-            if (RuntimeInfo.SupportsJIT)
+            if (RuntimeInfo.SupportsJIT && preferMessagePack)
                 builder.AddMessagePackProtocol();
             else
             {
                 // eventually we will precompile resolvers for messagepack, but this isn't working currently
                 // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
-                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+                builder.AddNewtonsoftJsonProtocol(options =>
+                {
+                    options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    // TODO: This should only be required to be `TypeNameHandling.Auto`.
+                    // See usage in osu-server-spectator for further documentation as to why this is required.
+                    options.PayloadSerializerSettings.TypeNameHandling = TypeNameHandling.All;
+                });
             }
 
             var newConnection = builder.Build();
@@ -155,17 +170,18 @@ namespace osu.Game.Online
             return newConnection;
         }
 
-        private Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
+        private async Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
         {
             isConnected.Value = false;
 
-            Logger.Log(ex != null ? $"{clientName} lost connection: {ex}" : $"{clientName} disconnected", LoggingTarget.Network);
+            if (ex != null)
+                await handleErrorAndDelay(ex, cancellationToken).ConfigureAwait(false);
+            else
+                Logger.Log($"{clientName} disconnected", LoggingTarget.Network);
 
             // make sure a disconnect wasn't triggered (and this is still the active connection).
             if (!cancellationToken.IsCancellationRequested)
-                Task.Run(connect, default);
-
-            return Task.CompletedTask;
+                await Task.Run(connect, default).ConfigureAwait(false);
         }
 
         private async Task disconnect(bool takeLock)

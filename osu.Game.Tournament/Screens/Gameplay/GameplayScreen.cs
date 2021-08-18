@@ -86,7 +86,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         },
                     }
                 },
-                scoreDisplay = new MatchScoreDisplay
+                scoreDisplay = new TournamentMatchScoreDisplay
                 {
                     Y = -147,
                     Anchor = Anchor.BottomCentre,
@@ -148,7 +148,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         }
 
         private ScheduledDelegate scheduledOperation;
-        private MatchScoreDisplay scoreDisplay;
+        private TournamentMatchScoreDisplay scoreDisplay;
 
         private TourneyState lastState;
         private MatchHeader header;

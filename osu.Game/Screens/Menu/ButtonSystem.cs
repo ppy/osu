@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Menu
             {
                 if (buttonsTopLevel.Any(b => e.Key == b.TriggerKey))
                 {
-                    logo?.Click();
+                    logo?.TriggerClick();
                     return true;
                 }
             }
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Menu
                     return goBack();
 
                 case GlobalAction.Select:
-                    logo?.Click();
+                    logo?.TriggerClick();
                     return true;
 
                 default:
@@ -248,7 +248,7 @@ namespace osu.Game.Screens.Menu
                     return true;
 
                 case ButtonSystemState.Play:
-                    backButton.Click();
+                    backButton.TriggerClick();
                     return true;
 
                 default:
@@ -268,11 +268,11 @@ namespace osu.Game.Screens.Menu
                     return true;
 
                 case ButtonSystemState.TopLevel:
-                    buttonsTopLevel.First().Click();
+                    buttonsTopLevel.First().TriggerClick();
                     return false;
 
                 case ButtonSystemState.Play:
-                    buttonsPlay.First().Click();
+                    buttonsPlay.First().TriggerClick();
                     return false;
             }
         }

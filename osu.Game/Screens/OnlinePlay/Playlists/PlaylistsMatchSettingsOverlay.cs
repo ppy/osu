@@ -26,8 +26,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         public Action EditPlaylist;
 
+        private MatchSettings settings;
+
+        protected override OsuButton SubmitButton => settings.ApplyButton;
+
+        protected override bool IsLoading => settings.IsLoading; // should probably be replaced with an OngoingOperationTracker.
+
+        protected override void SelectBeatmap() => settings.SelectBeatmap();
+
         protected override OnlinePlayComposite CreateSettings()
-            => new MatchSettings
+            => settings = new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Y,
@@ -45,11 +53,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             public RoomAvailabilityPicker AvailabilityPicker;
             public TriangleButton ApplyButton;
 
+            public bool IsLoading => loadingLayer.State.Value == Visibility.Visible;
+
             public OsuSpriteText ErrorText;
 
             private LoadingLayer loadingLayer;
             private DrawableRoomPlaylist playlist;
             private OsuSpriteText playlistLength;
+
+            private PurpleTriangleButton editPlaylistButton;
 
             [Resolved(CanBeNull = true)]
             private IRoomManager manager { get; set; }
@@ -199,7 +211,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                     },
                                                                     new Drawable[]
                                                                     {
-                                                                        new PurpleTriangleButton
+                                                                        editPlaylistButton = new PurpleTriangleButton
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Height = 40,
@@ -291,6 +303,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 ApplyButton.Enabled.Value = hasValidSettings;
             }
+
+            public void SelectBeatmap() => editPlaylistButton.TriggerClick();
 
             private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
                 playlistLength.Text = $"Length: {Playlist.GetTotalDuration()}";

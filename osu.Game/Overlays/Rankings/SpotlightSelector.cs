@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -92,10 +94,10 @@ namespace osu.Game.Overlays.Rankings
                                         Margin = new MarginPadding { Bottom = 5 },
                                         Children = new Drawable[]
                                         {
-                                            startDateColumn = new InfoColumn(@"Start Date"),
-                                            endDateColumn = new InfoColumn(@"End Date"),
-                                            mapCountColumn = new InfoColumn(@"Map Count"),
-                                            participantsColumn = new InfoColumn(@"Participants")
+                                            startDateColumn = new InfoColumn(RankingsStrings.SpotlightStartDate),
+                                            endDateColumn = new InfoColumn(RankingsStrings.SpotlightEndDate),
+                                            mapCountColumn = new InfoColumn(RankingsStrings.SpotlightMapCount),
+                                            participantsColumn = new InfoColumn(RankingsStrings.SpotlightParticipants)
                                         }
                                     },
                                     new RankingsSortTabControl
@@ -122,22 +124,22 @@ namespace osu.Game.Overlays.Rankings
         {
             startDateColumn.Value = dateToString(response.Spotlight.StartDate);
             endDateColumn.Value = dateToString(response.Spotlight.EndDate);
-            mapCountColumn.Value = response.BeatmapSets.Count.ToString();
-            participantsColumn.Value = response.Spotlight.Participants?.ToString("N0");
+            mapCountColumn.Value = response.BeatmapSets.Count.ToLocalisableString(@"N0");
+            participantsColumn.Value = response.Spotlight.Participants?.ToLocalisableString(@"N0");
         }
 
-        private string dateToString(DateTimeOffset date) => date.ToString("yyyy-MM-dd");
+        private LocalisableString dateToString(DateTimeOffset date) => date.ToLocalisableString(@"yyyy-MM-dd");
 
         private class InfoColumn : FillFlowContainer
         {
-            public string Value
+            public LocalisableString Value
             {
                 set => valueText.Text = value;
             }
 
             private readonly OsuSpriteText valueText;
 
-            public InfoColumn(string name)
+            public InfoColumn(LocalisableString name)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Vertical;

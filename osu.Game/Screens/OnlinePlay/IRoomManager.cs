@@ -19,14 +19,27 @@ namespace osu.Game.Screens.OnlinePlay
         event Action RoomsUpdated;
 
         /// <summary>
-        /// Whether an initial listing of rooms has been received.
-        /// </summary>
-        IBindable<bool> InitialRoomsReceived { get; }
-
-        /// <summary>
         /// All the active <see cref="Room"/>s.
         /// </summary>
         IBindableList<Room> Rooms { get; }
+
+        /// <summary>
+        /// Adds a <see cref="Room"/> to this <see cref="IRoomManager"/>.
+        /// If already existing, the local room will be updated with the given one.
+        /// </summary>
+        /// <param name="room">The incoming <see cref="Room"/>.</param>
+        void AddOrUpdateRoom(Room room);
+
+        /// <summary>
+        /// Removes a <see cref="Room"/> from this <see cref="IRoomManager"/>.
+        /// </summary>
+        /// <param name="room">The <see cref="Room"/> to remove.</param>
+        void RemoveRoom(Room room);
+
+        /// <summary>
+        /// Removes all <see cref="Room"/>s from this <see cref="IRoomManager"/>.
+        /// </summary>
+        void ClearRooms();
 
         /// <summary>
         /// Creates a new <see cref="Room"/>.

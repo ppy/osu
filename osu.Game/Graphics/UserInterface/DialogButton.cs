@@ -56,6 +56,7 @@ namespace osu.Game.Graphics.UserInterface
         private Vector2 hoverSpacing => new Vector2(3f, 0f);
 
         public DialogButton()
+            : base(HoverSampleSet.Submit)
         {
             RelativeSizeAxes = Axes.X;
 

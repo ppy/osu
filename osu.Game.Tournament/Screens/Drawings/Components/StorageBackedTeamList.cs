@@ -27,6 +27,9 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             {
                 var teams = new List<TournamentTeam>();
 
+                if (!storage.Exists(teams_filename))
+                    return teams;
+
                 try
                 {
                     using (Stream stream = storage.GetStream(teams_filename, FileAccess.Read, FileMode.Open))

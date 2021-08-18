@@ -9,7 +9,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 {
     public abstract class DisableableTabControl<T> : TabControl<T>
     {
-        public readonly BindableBool Enabled = new BindableBool();
+        public readonly BindableBool Enabled = new BindableBool(true);
 
         protected override void AddTabItem(TabItem<T> tab, bool addToDropdown = true)
         {

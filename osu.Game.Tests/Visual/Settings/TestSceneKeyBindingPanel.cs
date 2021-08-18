@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 var resetButton = settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First();
 
-                resetButton.Click();
+                resetButton.TriggerClick();
             });
 
             AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 var resetButton = panel.ChildrenOfType<ResetButton>().First();
 
-                resetButton.Click();
+                resetButton.TriggerClick();
             });
 
             AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);

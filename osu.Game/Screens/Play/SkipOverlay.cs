@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Play
                     if (!button.Enabled.Value)
                         return false;
 
-                    button.Click();
+                    button.TriggerClick();
                     return true;
             }
 

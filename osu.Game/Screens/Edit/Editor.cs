@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        public override bool AllowRateAdjustments => false;
+        public override bool AllowTrackAdjustments => false;
 
         protected bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
 
@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.Skin));
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin()));
             dependencies.CacheAs(editorBeatmap);
             changeHandler = new EditorChangeHandler(editorBeatmap);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);

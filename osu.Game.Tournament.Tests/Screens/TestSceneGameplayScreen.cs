@@ -40,6 +40,6 @@ namespace osu.Game.Tournament.Tests.Screens
                 () => this.ChildrenOfType<TeamScore>().All(score => score.Alpha == (visible ? 1 : 0)));
 
         private void toggleWarmup()
-            => AddStep("toggle warmup", () => this.ChildrenOfType<TourneyButton>().First().Click());
+            => AddStep("toggle warmup", () => this.ChildrenOfType<TourneyButton>().First().TriggerClick());
     }
 }

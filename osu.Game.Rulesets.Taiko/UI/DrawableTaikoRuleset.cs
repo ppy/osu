@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -24,11 +25,13 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
     {
-        private SkinnableDrawable scroller;
+        public new BindableDouble TimeRange => base.TimeRange;
 
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
         protected override bool UserScrollSpeedAdjustment => false;
+
+        private SkinnableDrawable scroller;
 
         public DrawableTaikoRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)

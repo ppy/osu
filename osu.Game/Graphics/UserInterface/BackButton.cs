@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Size = TwoLayerButton.SIZE_EXTENDED;
 
-            Child = button = new TwoLayerButton
+            Child = button = new TwoLayerButton(HoverSampleSet.Submit)
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.UserInterface
                 Add(receptor = new Receptor());
             }
 
-            receptor.OnBackPressed = () => button.Click();
+            receptor.OnBackPressed = () => button.TriggerClick();
         }
 
         [BackgroundDependencyLoader]

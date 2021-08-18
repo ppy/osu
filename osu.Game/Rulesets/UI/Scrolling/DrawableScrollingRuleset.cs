@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// The maximum span of time that may be visible by the length of the scrolling axes.
         /// </summary>
-        private const double time_span_max = 10000;
+        private const double time_span_max = 20000;
 
         /// <summary>
         /// The step increase/decrease of the span of time visible by the length of the scrolling axes.

@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 var skin = new TestSkin { FlipCatcherPlate = flip };
                 container.Child = new SkinProvidingContainer(skin)
                 {
-                    Child = catcher = new Catcher(new Container(), new DroppedObjectContainer())
+                    Child = catcher = new Catcher(new DroppedObjectContainer())
                     {
                         Anchor = Anchor.Centre
                     }

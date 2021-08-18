@@ -3,11 +3,14 @@
 
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -33,12 +36,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved(typeof(Room), nameof(Room.Playlist))]
         private BindableList<PlaylistItem> playlist { get; set; }
 
+        private readonly IBindable<bool> isIdle = new BindableBool();
+
         private MatchSettingsOverlay settingsOverlay;
         private MatchLeaderboard leaderboard;
-
         private OverlinedHeader participantsHeader;
-
         private GridContainer mainContent;
+        private SelectionPollingComponent selectionPollingComponent;
 
         public PlaylistsRoomSubScreen(Room room)
         {
@@ -46,11 +50,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             Activity.Value = new UserActivity.InLobby(room);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] IdleTracker idleTracker)
         {
+            if (idleTracker != null)
+                isIdle.BindTo(idleTracker.IsIdle);
+
             AddRangeInternal(new Drawable[]
             {
+                selectionPollingComponent = new SelectionPollingComponent(),
                 mainContent = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -163,7 +171,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                                 Spacing = new Vector2(10, 0),
                                                                                 Children = new Drawable[]
                                                                                 {
-                                                                                    new PurpleTriangleButton
+                                                                                    new UserModSelectButton
                                                                                     {
                                                                                         Anchor = Anchor.CentreLeft,
                                                                                         Origin = Anchor.CentreLeft,
@@ -230,7 +238,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 settingsOverlay = new PlaylistsMatchSettingsOverlay
                 {
                     RelativeSizeAxes = Axes.Both,
-                    EditPlaylist = () => this.Push(new PlaylistsSongSelect()),
+                    EditPlaylist = () =>
+                    {
+                        if (this.IsCurrentScreen())
+                            this.Push(new PlaylistsSongSelect());
+                    },
                     State = { Value = roomId.Value == null ? Visibility.Visible : Visibility.Hidden }
                 }
             });
@@ -256,6 +268,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             base.LoadComplete();
 
+            isIdle.BindValueChanged(_ => updatePollingRate(), true);
+
             roomId.BindValueChanged(id =>
             {
                 if (id.NewValue == null)
@@ -269,6 +283,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     Schedule(() => SelectedItem.Value = playlist.FirstOrDefault());
                 }
             }, true);
+        }
+
+        private void updatePollingRate()
+        {
+            selectionPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
+            Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
         }
 
         protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(SelectedItem.Value)

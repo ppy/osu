@@ -8,7 +8,7 @@ namespace osu.Game.Online.Rooms.RoomStatuses
 {
     public class RoomStatusPlaying : RoomStatus
     {
-        public override string Message => @"Now Playing";
+        public override string Message => "Playing";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.Purple;
     }
 }

@@ -47,7 +47,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         RelativeSizeAxes = Axes.X,
                         Height = 40,
                         Text = "Select beatmap",
-                        Action = () => matchSubScreen.Push(new MultiplayerMatchSongSelect()),
+                        Action = () =>
+                        {
+                            if (matchSubScreen.IsCurrentScreen())
+                                matchSubScreen.Push(new MultiplayerMatchSongSelect());
+                        },
                         Alpha = 0
                     }
                 }
@@ -67,6 +71,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     selectButton.Hide();
             }, true);
         }
+
+        public void BeginSelection() => selectButton.TriggerClick();
 
         private void updateBeatmap()
         {

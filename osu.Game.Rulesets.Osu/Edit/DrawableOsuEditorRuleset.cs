@@ -41,6 +41,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             protected override GameplayCursorContainer CreateCursor() => null;
 
+            public OsuEditorPlayfield()
+            {
+                HitPolicy = new AnyOrderHitPolicy();
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
@@ -59,11 +64,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (hitObject is DrawableHitCircle circle)
                 {
-                    circle.ApproachCircle
-                          .FadeOutFromOne(EDITOR_HIT_OBJECT_FADE_OUT_EXTENSION * 4)
-                          .Expire();
+                    using (circle.BeginAbsoluteSequence(circle.HitStateUpdateTime))
+                    {
+                        circle.ApproachCircle
+                              .FadeOutFromOne(EDITOR_HIT_OBJECT_FADE_OUT_EXTENSION * 4)
+                              .Expire();
 
-                    circle.ApproachCircle.ScaleTo(1.1f, 300, Easing.OutQuint);
+                        circle.ApproachCircle.ScaleTo(1.1f, 300, Easing.OutQuint);
+                    }
                 }
 
                 if (hitObject is IHasMainCirclePiece mainPieceContainer)

@@ -133,11 +133,12 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestEmptyComboColoursNoFallback()
         {
-            AddStep("Add custom combo colours to user skin", () => userSource.Configuration.AddComboColours(
+            AddStep("Add custom combo colours to user skin", () => userSource.Configuration.CustomComboColours = new List<Color4>
+            {
                 new Color4(100, 150, 200, 255),
                 new Color4(55, 110, 166, 255),
                 new Color4(75, 125, 175, 255)
-            ));
+            });
 
             AddStep("Disallow default colours fallback in beatmap skin", () => beatmapSource.Configuration.AllowDefaultComboColoursFallback = false);
 

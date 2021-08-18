@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -172,6 +174,60 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             checkSliderAtValue("Circle Size", 5);
             checkBindableAtValue("Circle Size", null);
+        }
+
+        [Test]
+        public void TestModSettingChangeTracker()
+        {
+            ModSettingChangeTracker tracker = null;
+            Queue<Mod> settingsChangedQueue = null;
+
+            setBeatmapWithDifficultyParameters(5);
+
+            AddStep("add mod settings change tracker", () =>
+            {
+                settingsChangedQueue = new Queue<Mod>();
+
+                tracker = new ModSettingChangeTracker(modDifficultyAdjust.Yield())
+                {
+                    SettingChanged = settingsChangedQueue.Enqueue
+                };
+            });
+
+            AddAssert("no settings changed", () => settingsChangedQueue.Count == 0);
+
+            setSliderValue("Circle Size", 3);
+
+            settingsChangedFired();
+
+            setSliderValue("Circle Size", 5);
+            checkBindableAtValue("Circle Size", 5);
+
+            settingsChangedFired();
+
+            AddStep("reset mod settings", () => modDifficultyAdjust.CircleSize.SetDefault());
+            checkBindableAtValue("Circle Size", null);
+
+            settingsChangedFired();
+
+            setExtendedLimits(true);
+
+            settingsChangedFired();
+
+            AddStep("dispose tracker", () =>
+            {
+                tracker.Dispose();
+                tracker = null;
+            });
+
+            void settingsChangedFired()
+            {
+                AddAssert("setting changed event fired", () =>
+                {
+                    settingsChangedQueue.Dequeue();
+                    return settingsChangedQueue.Count == 0;
+                });
+            }
         }
 
         private void resetToDefault(string name)
