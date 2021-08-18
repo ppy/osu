@@ -4,9 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -18,6 +20,10 @@ namespace osu.Game.Overlays.Settings
     {
         protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
+
+        private IBindable<SettingsSection> selectedSection;
+
+        private Container content;
 
         public abstract Drawable CreateIcon();
         public abstract LocalisableString Header { get; }
@@ -35,6 +41,9 @@ namespace osu.Game.Overlays.Settings
         }
 
         public bool FilteringActive { get; set; }
+
+        [Resolved]
+        private SettingsPanel settingsPanel { get; set; }
 
         protected SettingsSection()
         {
@@ -65,7 +74,7 @@ namespace osu.Game.Overlays.Settings
                     RelativeSizeAxes = Axes.X,
                     Height = border_size,
                 },
-                new Container
+                content = new Container
                 {
                     Padding = new MarginPadding
                     {
@@ -91,6 +100,44 @@ namespace osu.Game.Overlays.Settings
                     }
                 },
             });
+
+            selectedSection = settingsPanel.CurrentSection.GetBoundCopy();
+            selectedSection.BindValueChanged(selected =>
+            {
+                if (selected.NewValue == this)
+                    content.FadeIn(500, Easing.OutQuint);
+                else
+                    content.FadeTo(0.25f, 500, Easing.OutQuint);
+            }, true);
+        }
+
+        private bool isCurrentSection => selectedSection.Value == this;
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            if (!isCurrentSection)
+                content.FadeTo(0.6f, 500, Easing.OutQuint);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            if (!isCurrentSection)
+                content.FadeTo(0.25f, 500, Easing.OutQuint);
+            base.OnHoverLost(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (!isCurrentSection)
+                settingsPanel.SectionsContainer.ScrollTo(this);
+
+            return base.OnClick(e);
+        }
+
+        protected override bool ShouldBeConsideredForInput(Drawable child)
+        {
+            return isCurrentSection;
         }
     }
 }
