@@ -8,17 +8,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneStarRatingDisplay : OsuTestScene
     {
-        [TestCase(52f, 20f)]
-        [TestCase(52f, 16f)]
-        [TestCase(50f, 14f)]
-        public void TestDisplay(float width, float height)
+        [TestCase(StarRatingDisplaySize.Regular)]
+        [TestCase(StarRatingDisplaySize.Small)]
+        public void TestDisplay(StarRatingDisplaySize size)
         {
             AddStep("load displays", () =>
             {
@@ -36,11 +34,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                         AutoSizeAxes = Axes.Both,
                         Spacing = new Vector2(2f),
                         Direction = FillDirection.Vertical,
-                        ChildrenEnumerable = Enumerable.Range(0, 10).Select(j => new StarRatingDisplay(new StarDifficulty(i * (i >= 11 ? 25f : 1f) + j * 0.1f, 0))
+                        ChildrenEnumerable = Enumerable.Range(0, 10).Select(j => new StarRatingDisplay(new StarDifficulty(i * (i >= 11 ? 25f : 1f) + j * 0.1f, 0), size)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(width, height),
                         }),
                     })
                 };
