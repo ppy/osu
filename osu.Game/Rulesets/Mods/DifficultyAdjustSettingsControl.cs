@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 // Intercept and extract the internal number bindable from DifficultyBindable.
                 // This will provide bounds and precision specifications for the slider bar.
-                difficultyBindable = ((DifficultyBindable)value).GetBoundCopy();
+                difficultyBindable = (DifficultyBindable)value.GetBoundCopy();
                 sliderDisplayCurrent.BindTo(difficultyBindable.CurrentNumber);
 
                 base.Current = difficultyBindable;
