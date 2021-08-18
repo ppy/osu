@@ -63,6 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     Child = selectionBox = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
                         Masking = true,
                         CornerRadius = CORNER_RADIUS,
                         BorderThickness = selection_border_width,
