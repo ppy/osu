@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Dependencies.Cache(localConfig = new OsuConfigManager(LocalStorage));
         }
 
-        [SetUpSteps]
+        [SetUp]
         public void SetUp() => Schedule(() => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always));
 
         [Test]
