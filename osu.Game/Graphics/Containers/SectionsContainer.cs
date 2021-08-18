@@ -22,6 +22,7 @@ namespace osu.Game.Graphics.Containers
         where T : Drawable
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();
+
         private Drawable lastClickedSection;
 
         public Drawable ExpandableHeader
@@ -233,15 +234,17 @@ namespace osu.Game.Graphics.Containers
 
                 float scrollCentre = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_y_centre + selectionLenienceAboveSection;
 
+                var presentChildren = Children.Where(c => c.IsPresent);
+
                 if (Precision.AlmostBigger(0, scrollContainer.Current))
-                    SelectedSection.Value = lastClickedSection as T ?? Children.FirstOrDefault();
+                    SelectedSection.Value = lastClickedSection as T ?? presentChildren.FirstOrDefault();
                 else if (Precision.AlmostBigger(scrollContainer.Current, scrollContainer.ScrollableExtent))
-                    SelectedSection.Value = lastClickedSection as T ?? Children.LastOrDefault();
+                    SelectedSection.Value = lastClickedSection as T ?? presentChildren.LastOrDefault();
                 else
                 {
-                    SelectedSection.Value = Children
+                    SelectedSection.Value = presentChildren
                                             .TakeWhile(section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollCentre <= 0)
-                                            .LastOrDefault() ?? Children.FirstOrDefault();
+                                            .LastOrDefault() ?? presentChildren.FirstOrDefault();
                 }
             }
         }
