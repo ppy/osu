@@ -25,6 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private const float height = 100;
 
         public GameplayChatDisplay()
+            : base(leaveChannelOnDispose: false)
         {
             RelativeSizeAxes = Axes.X;
 
