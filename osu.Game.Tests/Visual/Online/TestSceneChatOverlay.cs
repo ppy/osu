@@ -330,22 +330,11 @@ namespace osu.Game.Tests.Visual.Online
             InputManager.ReleaseKey(Key.AltLeft);
         }
 
-        private void pressCloseDocumentKeys() => pressKeysFor(PlatformAction.DocumentClose);
+        private void pressCloseDocumentKeys() => InputManager.Keys(PlatformAction.DocumentClose);
 
-        private void pressNewTabKeys() => pressKeysFor(PlatformAction.TabNew);
+        private void pressNewTabKeys() => InputManager.Keys(PlatformAction.TabNew);
 
-        private void pressRestoreTabKeys() => pressKeysFor(PlatformAction.TabRestore);
-
-        private void pressKeysFor(PlatformAction type)
-        {
-            var binding = host.PlatformKeyBindings.First(b => (PlatformAction)b.Action == type);
-
-            foreach (var k in binding.KeyCombination.Keys)
-                InputManager.PressKey((Key)k);
-
-            foreach (var k in binding.KeyCombination.Keys)
-                InputManager.ReleaseKey((Key)k);
-        }
+        private void pressRestoreTabKeys() => InputManager.Keys(PlatformAction.TabRestore);
 
         private void clickDrawable(Drawable d)
         {

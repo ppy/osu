@@ -6,13 +6,14 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
+using osu.Game.Localisation;
 using osu.Game.Screens.Import;
 
 namespace osu.Game.Overlays.Settings.Sections.Debug
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "General";
+        protected override LocalisableString Header => DebugSettingsStrings.GeneralHeader;
 
         [BackgroundDependencyLoader(true)]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, OsuGame game)
@@ -21,18 +22,18 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Show log overlay",
+                    LabelText = DebugSettingsStrings.ShowLogOverlay,
                     Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Bypass front-to-back render pass",
+                    LabelText = DebugSettingsStrings.BypassFrontToBackPass,
                     Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
                 }
             };
             Add(new SettingsButton
             {
-                Text = "Import files",
+                Text = DebugSettingsStrings.ImportFiles,
                 Action = () => game?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
             });
         }

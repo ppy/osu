@@ -20,6 +20,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -138,7 +139,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             },
                         }
                     }
-                }
+                },
+                new HoverClickSounds()
             };
 
             foreach (var b in bindings)
@@ -384,7 +386,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public CancelButton()
             {
-                Text = "Cancel";
+                Text = CommonStrings.Cancel;
                 Size = new Vector2(80, 20);
             }
         }
@@ -393,7 +395,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public ClearButton()
             {
-                Text = "Clear";
+                Text = CommonStrings.Clear;
                 Size = new Vector2(80, 20);
             }
         }
@@ -458,6 +460,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         Origin = Anchor.Centre,
                         Text = keyBinding.KeyCombination.ReadableString(),
                     },
+                    new HoverSounds()
                 };
             }
 

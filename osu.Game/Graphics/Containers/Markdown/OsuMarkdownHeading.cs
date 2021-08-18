@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             public FontWeight FontWeight;
 
             protected override SpriteText CreateSpriteText()
-                => base.CreateSpriteText().With(t => t.Font = t.Font.With(size: FontSize, weight: FontWeight));
+                => base.CreateSpriteText().With(t => t.Font = t.Font.With(Typeface.Torus, size: FontSize, weight: FontWeight));
         }
     }
 }

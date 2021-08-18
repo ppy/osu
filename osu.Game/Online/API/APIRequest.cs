@@ -86,8 +86,6 @@ namespace osu.Game.Online.API
         /// </summary>
         private APIRequestCompletionState completionState;
 
-        private Action pendingFailure;
-
         public void Perform(IAPIProvider api)
         {
             if (!(api is APIAccess apiAccess))
@@ -99,29 +97,23 @@ namespace osu.Game.Online.API
             API = apiAccess;
             User = apiAccess.LocalUser.Value;
 
-            if (checkAndScheduleFailure())
-                return;
+            if (isFailing) return;
 
             WebRequest = CreateWebRequest();
             WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
             WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
 
-            if (checkAndScheduleFailure())
-                return;
+            if (isFailing) return;
 
-            if (!WebRequest.Aborted) // could have been aborted by a Cancel() call
-            {
-                Logger.Log($@"Performing request {this}", LoggingTarget.Network);
-                WebRequest.Perform();
-            }
+            Logger.Log($@"Performing request {this}", LoggingTarget.Network);
+            WebRequest.Perform();
 
-            if (checkAndScheduleFailure())
-                return;
+            if (isFailing) return;
 
             PostProcess();
 
-            API.Schedule(TriggerSuccess);
+            TriggerSuccess();
         }
 
         /// <summary>
@@ -141,7 +133,10 @@ namespace osu.Game.Online.API
                 completionState = APIRequestCompletionState.Completed;
             }
 
-            Success?.Invoke();
+            if (API == null)
+                Success?.Invoke();
+            else
+                API.Schedule(() => Success?.Invoke());
         }
 
         internal void TriggerFailure(Exception e)
@@ -154,7 +149,10 @@ namespace osu.Game.Online.API
                 completionState = APIRequestCompletionState.Failed;
             }
 
-            Failure?.Invoke(e);
+            if (API == null)
+                Failure?.Invoke(e);
+            else
+                API.Schedule(() => Failure?.Invoke(e));
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
@@ -163,54 +161,47 @@ namespace osu.Game.Online.API
         {
             lock (completionStateLock)
             {
-                // while it doesn't matter if code following this check is run more than once,
-                // this avoids unnecessarily performing work where we are already sure the user has been informed.
                 if (completionState != APIRequestCompletionState.Waiting)
                     return;
-            }
 
-            WebRequest?.Abort();
+                WebRequest?.Abort();
 
-            string responseString = WebRequest?.GetResponseString();
-
-            if (!string.IsNullOrEmpty(responseString))
-            {
-                try
+                // in the case of a cancellation we don't care about whether there's an error in the response.
+                if (!(e is OperationCanceledException))
                 {
-                    // attempt to decode a displayable error string.
-                    var error = JsonConvert.DeserializeObject<DisplayableError>(responseString);
-                    if (error != null)
-                        e = new APIException(error.ErrorMessage, e);
-                }
-                catch
-                {
-                }
-            }
+                    string responseString = WebRequest?.GetResponseString();
 
-            Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
-            pendingFailure = () => TriggerFailure(e);
-            checkAndScheduleFailure();
+                    // naive check whether there's an error in the response to avoid unnecessary JSON deserialisation.
+                    if (!string.IsNullOrEmpty(responseString) && responseString.Contains(@"""error"""))
+                    {
+                        try
+                        {
+                            // attempt to decode a displayable error string.
+                            var error = JsonConvert.DeserializeObject<DisplayableError>(responseString);
+                            if (error != null)
+                                e = new APIException(error.ErrorMessage, e);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+
+                Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
+                TriggerFailure(e);
+            }
         }
 
         /// <summary>
-        /// Checked for cancellation or error. Also queues up the Failed event if we can.
+        /// Whether this request is in a failing or failed state.
         /// </summary>
-        /// <returns>Whether we are in a failed or cancelled state.</returns>
-        private bool checkAndScheduleFailure()
+        private bool isFailing
         {
-            lock (completionStateLock)
+            get
             {
-                if (pendingFailure == null)
+                lock (completionStateLock)
                     return completionState == APIRequestCompletionState.Failed;
             }
-
-            if (API == null)
-                pendingFailure();
-            else
-                API.Schedule(pendingFailure);
-
-            pendingFailure = null;
-            return true;
         }
 
         private class DisplayableError

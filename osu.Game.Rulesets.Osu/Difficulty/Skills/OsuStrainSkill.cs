@@ -10,7 +10,7 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public abstract class OsuStrainSkill : StrainSkill
+    public abstract class OsuStrainSkill : StrainDecaySkill
     {
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.

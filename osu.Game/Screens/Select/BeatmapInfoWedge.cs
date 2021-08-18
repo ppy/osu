@@ -24,16 +24,17 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
     public class BeatmapInfoWedge : VisibilityContainer
     {
+        public const float BORDER_THICKNESS = 2.5f;
         private const float shear_width = 36.75f;
 
         private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGE_HEIGHT, 0);
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.Select
             Shear = wedged_container_shear;
             Masking = true;
             BorderColour = new Color4(221, 255, 255, 255);
-            BorderThickness = 2.5f;
+            BorderThickness = BORDER_THICKNESS;
             Alpha = 0;
             EdgeEffect = new EdgeEffectParameters
             {
@@ -333,7 +334,7 @@ namespace osu.Game.Screens.Select
                     {
                         Name = "Length",
                         CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
-                        Content = TimeSpan.FromMilliseconds(beatmap.BeatmapInfo.Length).ToString(@"m\:ss"),
+                        Content = beatmap.BeatmapInfo.Length.ToFormattedDuration().ToString(),
                     }),
                     bpmLabelContainer = new Container
                     {
@@ -502,7 +503,7 @@ namespace osu.Game.Screens.Select
                 {
                     const float full_opacity_ratio = 0.7f;
 
-                    var difficultyColour = colours.ForDifficultyRating(difficulty.DifficultyRating);
+                    var difficultyColour = colours.ForStarDifficulty(difficulty.Stars);
 
                     Children = new Drawable[]
                     {
