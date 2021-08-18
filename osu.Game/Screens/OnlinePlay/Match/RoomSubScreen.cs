@@ -165,10 +165,16 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                             }
                                         }
                                     },
-                                    settingsOverlay = CreateRoomSettingsOverlay().With(s =>
+                                    new Container
                                     {
-                                        s.State.Value = room.RoomID.Value == null ? Visibility.Visible : Visibility.Hidden;
-                                    })
+                                        RelativeSizeAxes = Axes.Both,
+                                        // Resolves 1px masking errors between the settings overlay and the room panel.
+                                        Padding = new MarginPadding(-1),
+                                        Child = settingsOverlay = CreateRoomSettingsOverlay().With(s =>
+                                        {
+                                            s.State.Value = room.RoomID.Value == null ? Visibility.Visible : Visibility.Hidden;
+                                        })
+                                    }
                                 },
                             },
                         },
