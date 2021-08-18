@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private SelectionPollingComponent selectionPollingComponent;
 
         public PlaylistsRoomSubScreen(Room room)
-            : base(room)
+            : base(room, false) // Editing is temporarily not allowed.
         {
             Title = room.RoomID.Value == null ? "New playlist" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
