@@ -105,8 +105,8 @@ namespace osu.Game.Beatmaps.Drawables
                                 Empty(),
                                 starsText = new OsuSpriteText
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
                                     Margin = new MarginPadding { Bottom = 1.5f },
                                     // todo: this should be size: 12f, but to match up with the design, it needs to be 14.4f
                                     // see https://github.com/ppy/osu-framework/issues/3271.
