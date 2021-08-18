@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -180,7 +179,7 @@ namespace osu.Game.Overlays
 
         protected override void OnFocus(FocusEvent e)
         {
-            searchTextBox?.TakeFocus();
+            searchTextBox.TakeFocus();
             base.OnFocus(e);
         }
 
@@ -273,8 +272,6 @@ namespace osu.Game.Overlays
         public class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
             public SearchContainer<SettingsSection> SearchContainer;
-
-            public new ScheduledDelegate Schedule(Action action) => Scheduler.AddDelayed(action, TransformDelay);
 
             protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
                 => SearchContainer = new SearchContainer<SettingsSection>
