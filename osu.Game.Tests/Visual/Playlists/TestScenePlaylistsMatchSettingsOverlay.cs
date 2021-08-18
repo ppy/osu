@@ -141,6 +141,12 @@ namespace osu.Game.Tests.Visual.Playlists
 
             public IBindableList<Room> Rooms => null;
 
+            public void AddOrUpdateRoom(Room room) => throw new NotImplementedException();
+
+            public void RemoveRoom(Room room) => throw new NotImplementedException();
+
+            public void ClearRooms() => throw new NotImplementedException();
+
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
             {
                 if (CreateRequested == null)
