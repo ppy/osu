@@ -162,7 +162,10 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                             }
                                         }
                                     },
-                                    SettingsOverlay = CreateRoomSettingsOverlay()
+                                    SettingsOverlay = CreateRoomSettingsOverlay().With(s =>
+                                    {
+                                        s.State.Value = room.RoomID.Value == null ? Visibility.Visible : Visibility.Hidden;
+                                    })
                                 },
                             },
                         },
