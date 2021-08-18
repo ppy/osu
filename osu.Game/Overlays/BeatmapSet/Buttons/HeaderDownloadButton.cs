@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly bool noVideo;
 
-        public LocalisableString TooltipText => button.Enabled.Value ? BeatmapsetsStrings.ShowDetailsDownloadDefault : BeatmapsetsStrings.ShowDetailsLoggedOut;
+        public LocalisableString TooltipText => BeatmapsetsStrings.ShowDetailsDownloadDefault;
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
