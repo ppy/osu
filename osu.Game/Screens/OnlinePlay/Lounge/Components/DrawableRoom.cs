@@ -124,16 +124,22 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
+        public bool FilteringActive { get; set; }
+
+        protected readonly Container ButtonsContainer = new Container
+        {
+            Anchor = Anchor.CentreRight,
+            Origin = Anchor.CentreRight,
+            RelativeSizeAxes = Axes.Y,
+            AutoSizeAxes = Axes.X
+        };
+
         private readonly Bindable<RoomCategory> roomCategory = new Bindable<RoomCategory>();
+        private readonly Bindable<bool> hasPassword = new Bindable<bool>();
 
         private RecentParticipantsList recentParticipantsList;
         private RoomSpecialCategoryPill specialCategoryPill;
-
-        public bool FilteringActive { get; set; }
-
         private PasswordProtectedIcon passwordIcon;
-
-        private readonly Bindable<bool> hasPassword = new Bindable<bool>();
 
         public DrawableRoom(Room room)
         {
@@ -289,13 +295,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 Origin = Anchor.CentreRight,
                                 AutoSizeAxes = Axes.X,
                                 RelativeSizeAxes = Axes.Y,
+                                Spacing = new Vector2(5),
                                 Padding = new MarginPadding
                                 {
                                     Right = 10,
-                                    Vertical = 5
+                                    Vertical = 20,
                                 },
                                 Children = new Drawable[]
                                 {
+                                    ButtonsContainer,
                                     recentParticipantsList = new RecentParticipantsList
                                     {
                                         Anchor = Anchor.CentreRight,

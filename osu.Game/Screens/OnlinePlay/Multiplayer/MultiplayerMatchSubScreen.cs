@@ -110,7 +110,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods).ToList();
         }
 
-        protected override DrawableRoom CreateDrawableRoom(Room room) => new DrawableRoom(room);
+        protected override DrawableRoom CreateDrawableRoom(Room room) => new DrawableMultiplayerRoom(room)
+        {
+            OnEdit = () => SettingsOverlay.Show()
+        };
 
         protected override Drawable CreateMainContent() => new Container
         {
