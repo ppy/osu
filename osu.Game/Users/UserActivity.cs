@@ -25,13 +25,13 @@ namespace osu.Game.Users
             public override string Status => "Choosing a beatmap";
         }
 
-        public class InGame : UserActivity
+        public abstract class InGame : UserActivity
         {
             public BeatmapInfo Beatmap { get; }
 
             public RulesetInfo Ruleset { get; }
 
-            public InGame(BeatmapInfo info, RulesetInfo ruleset)
+            protected InGame(BeatmapInfo info, RulesetInfo ruleset)
             {
                 Beatmap = info;
                 Ruleset = ruleset;
