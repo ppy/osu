@@ -147,7 +147,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                                                 Colour = Color4Extensions.FromHex(@"3e3a44") // This is super temporary.
                                                             },
                                                         },
-                                                        CreateMainContent(),
+                                                        new Container
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Padding = new MarginPadding(10),
+                                                            Child = CreateMainContent(),
+                                                        },
                                                         new Container
                                                         {
                                                             Anchor = Anchor.BottomLeft,
