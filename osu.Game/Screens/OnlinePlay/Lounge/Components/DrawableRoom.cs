@@ -149,7 +149,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             Height = height;
 
             Masking = true;
-            CornerRadius = corner_radius + SELECTION_BORDER_WIDTH / 2;
+            CornerRadius = corner_radius;
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
