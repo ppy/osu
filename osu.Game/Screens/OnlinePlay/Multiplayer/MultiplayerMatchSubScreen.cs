@@ -42,8 +42,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override string ShortTitle => "room";
 
-        public readonly Room Room;
-
         [Resolved]
         private MultiplayerClient client { get; set; }
 
@@ -61,8 +59,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
         {
-            Room = room;
-
             Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
         }

@@ -44,6 +44,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// </summary>
         protected readonly Bindable<IReadOnlyList<Mod>> UserMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
+        protected readonly IBindable<long?> RoomId = new Bindable<long?>();
+
         [Resolved]
         private MusicController music { get; set; }
 
@@ -60,14 +62,15 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapAvailabilityTracker.Availability;
 
-        private readonly Room room;
+        public readonly Room Room;
 
         private ModSelectOverlay userModsSelectOverlay;
         private RoomSettingsOverlay settingsOverlay;
+        private Drawable mainContent;
 
         protected RoomSubScreen(Room room)
         {
-            this.room = room;
+            Room = room;
 
             Padding = new MarginPadding { Top = Header.HEIGHT };
 
@@ -75,14 +78,14 @@ namespace osu.Game.Screens.OnlinePlay.Match
             {
                 SelectedItem = { BindTarget = SelectedItem }
             };
+
+            RoomId.BindTo(room.RoomID);
         }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
-
-            Drawable mainContent;
 
             InternalChildren = new Drawable[]
             {
@@ -122,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                         {
                                             new Drawable[]
                                             {
-                                                new DrawableMatchRoom(room)
+                                                new DrawableMatchRoom(Room)
                                                 {
                                                     MatchingFilter = true,
                                                     OnEdit = () => settingsOverlay.Show()
@@ -175,10 +178,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                         RelativeSizeAxes = Axes.Both,
                                         // Resolves 1px masking errors between the settings overlay and the room panel.
                                         Padding = new MarginPadding(-1),
-                                        Child = settingsOverlay = CreateRoomSettingsOverlay().With(s =>
-                                        {
-                                            s.State.Value = room.RoomID.Value == null ? Visibility.Visible : Visibility.Hidden;
-                                        })
+                                        Child = settingsOverlay = CreateRoomSettingsOverlay()
                                     }
                                 },
                             },
@@ -191,24 +191,27 @@ namespace osu.Game.Screens.OnlinePlay.Match
                     }
                 }
             };
-
-            if (room.RoomID.Value == null)
-            {
-                // A new room is being created.
-                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
-                mainContent.Hide();
-
-                settingsOverlay.State.BindValueChanged(visibility =>
-                {
-                    if (visibility.NewValue == Visibility.Hidden)
-                        mainContent.Show();
-                }, true);
-            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            RoomId.BindValueChanged(id =>
+            {
+                if (id.NewValue == null)
+                {
+                    // A new room is being created.
+                    // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
+                    mainContent.Hide();
+                    settingsOverlay.Show();
+                }
+                else
+                {
+                    mainContent.Show();
+                    settingsOverlay.Hide();
+                }
+            }, true);
 
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
 
@@ -220,7 +223,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         public override bool OnBackButton()
         {
-            if (room.RoomID.Value == null)
+            if (Room.RoomID.Value == null)
             {
                 // room has not been created yet; exit immediately.
                 return base.OnBackButton();
