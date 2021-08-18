@@ -6,13 +6,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "General";
+        protected override LocalisableString Header => GameplaySettingsStrings.GeneralHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -21,62 +22,62 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsSlider<double>
                 {
-                    LabelText = "Background dim",
+                    LabelText = GameplaySettingsStrings.BackgroundDim,
                     Current = config.GetBindable<double>(OsuSetting.DimLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = "Background blur",
+                    LabelText = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<double>(OsuSetting.BlurLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Lighten playfield during breaks",
+                    LabelText = GameplaySettingsStrings.LightenDuringBreaks,
                     Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
                 },
                 new SettingsEnumDropdown<HUDVisibilityMode>
                 {
-                    LabelText = "HUD overlay visibility mode",
+                    LabelText = GameplaySettingsStrings.HUDVisibilityMode,
                     Current = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show difficulty graph on progress bar",
+                    LabelText = GameplaySettingsStrings.ShowDifficultyGraph,
                     Current = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show health display even when you can't fail",
+                    LabelText = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
                     Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
                     Keywords = new[] { "hp", "bar" }
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Fade playfield to red when health is low",
+                    LabelText = GameplaySettingsStrings.FadePlayfieldWhenHealthLow,
                     Current = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Always show key overlay",
+                    LabelText = GameplaySettingsStrings.AlwaysShowKeyOverlay,
                     Current = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Positional hitsounds",
+                    LabelText = GameplaySettingsStrings.PositionalHitsounds,
                     Current = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Always play first combo break sound",
+                    LabelText = GameplaySettingsStrings.AlwaysPlayFirstComboBreak,
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
                 },
                 new SettingsEnumDropdown<ScoringMode>
                 {
-                    LabelText = "Score display mode",
+                    LabelText = GameplaySettingsStrings.ScoreDisplayMode,
                     Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
                     Keywords = new[] { "scoring" }
                 },
@@ -86,7 +87,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 Add(new SettingsCheckbox
                 {
-                    LabelText = "Disable Windows key during gameplay",
+                    LabelText = GameplaySettingsStrings.DisableWinKey,
                     Current = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey)
                 });
             }

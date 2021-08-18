@@ -30,8 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
 
-        [Resolved(CanBeNull = true)]
-        private Bindable<FilterCriteria> filter { get; set; }
+        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
 
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
@@ -50,6 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            // account for the fact we are in a scroll container and want a bit of spacing from the scroll bar.
+            Padding = new MarginPadding { Right = 5 };
+
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -59,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2),
+                    Spacing = new Vector2(10),
                 }
             };
         }
@@ -71,7 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             rooms.BindTo(roomManager.Rooms);
 
-            filter?.BindValueChanged(criteria => Filter(criteria.NewValue));
+            Filter?.BindValueChanged(criteria => applyFilterCriteria(criteria.NewValue), true);
 
             selectedRoom.BindValueChanged(selection =>
             {
@@ -82,7 +84,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void updateSelection() =>
             roomFlow.Children.ForEach(r => r.State = r.Room == selectedRoom.Value ? SelectionState.Selected : SelectionState.NotSelected);
 
-        public void Filter(FilterCriteria criteria)
+        private void applyFilterCriteria(FilterCriteria criteria)
         {
             roomFlow.Children.ForEach(r =>
             {
@@ -123,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomFlow.Add(new DrawableRoom(room));
             }
 
-            Filter(filter?.Value);
+            applyFilterCriteria(Filter?.Value);
 
             updateSelection();
         }
@@ -137,7 +139,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 roomFlow.Remove(toRemove);
 
-                selectedRoom.Value = null;
+                // selection may have a lease due to being in a sub screen.
+                if (!selectedRoom.Disabled)
+                    selectedRoom.Value = null;
             }
         }
 
@@ -149,7 +153,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            selectedRoom.Value = null;
+            if (!selectedRoom.Disabled)
+                selectedRoom.Value = null;
             return base.OnClick(e);
         }
 
@@ -211,6 +216,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void selectNext(int direction)
         {
+            if (selectedRoom.Disabled)
+                return;
+
             var visibleRooms = Rooms.AsEnumerable().Where(r => r.IsPresent);
 
             Room room;

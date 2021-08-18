@@ -3,9 +3,9 @@
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 // Roughly matches osu!stable's slider border portions.
                 => base.CalculatedBorderPortion * 0.77f;
 
-            public new Color4 AccentColour => new Color4(base.AccentColour.R, base.AccentColour.G, base.AccentColour.B, base.AccentColour.A * 0.70f);
+            public new Color4 AccentColour => new Color4(base.AccentColour.R, base.AccentColour.G, base.AccentColour.B, 0.7f);
 
             protected override Color4 ColourAt(float position)
             {
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 Color4 outerColour = AccentColour.Darken(0.1f);
                 Color4 innerColour = lighten(AccentColour, 0.5f);
 
-                return Interpolation.ValueAt(position / realGradientPortion, outerColour, innerColour, 0, 1);
+                return LegacyUtils.InterpolateNonLinear(position / realGradientPortion, outerColour, innerColour, 0, 1);
             }
 
             /// <summary>

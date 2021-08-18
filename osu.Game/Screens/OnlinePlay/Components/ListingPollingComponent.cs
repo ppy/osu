@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,8 +15,10 @@ namespace osu.Game.Screens.OnlinePlay.Components
     /// </summary>
     public class ListingPollingComponent : RoomPollingComponent
     {
-        [Resolved]
-        private Bindable<FilterCriteria> currentFilter { get; set; }
+        public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
+        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
+
+        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
 
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
@@ -23,9 +26,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            currentFilter.BindValueChanged(_ =>
+            Filter.BindValueChanged(_ =>
             {
-                NotifyRoomsReceived(null);
+                RoomManager.ClearRooms();
+                initialRoomsReceived.Value = false;
+
                 if (IsLoaded)
                     PollImmediately();
             });
@@ -38,24 +43,26 @@ namespace osu.Game.Screens.OnlinePlay.Components
             if (!API.IsLoggedIn)
                 return base.Poll();
 
+            if (Filter.Value == null)
+                return base.Poll();
+
             var tcs = new TaskCompletionSource<bool>();
 
             pollReq?.Cancel();
-            pollReq = new GetRoomsRequest(currentFilter.Value.Status, currentFilter.Value.Category);
+            pollReq = new GetRoomsRequest(Filter.Value.Status, Filter.Value.Category);
 
             pollReq.Success += result =>
             {
-                for (int i = 0; i < result.Count; i++)
+                foreach (var existing in RoomManager.Rooms.ToArray())
                 {
-                    if (result[i].RoomID.Value == selectedRoom.Value?.RoomID.Value)
-                    {
-                        // The listing request always has less information than the opened room, so don't include it.
-                        result[i] = selectedRoom.Value;
-                        break;
-                    }
+                    if (result.All(r => r.RoomID.Value != existing.RoomID.Value))
+                        RoomManager.RemoveRoom(existing);
                 }
 
-                NotifyRoomsReceived(result);
+                foreach (var incoming in result)
+                    RoomManager.AddOrUpdateRoom(incoming);
+
+                initialRoomsReceived.Value = true;
                 tcs.SetResult(true);
             };
 

@@ -2,24 +2,42 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Performance;
+using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Judgements;
 using osuTK.Graphics;
+
+#nullable enable
 
 namespace osu.Game.Rulesets.Catch.UI
 {
     public class HitExplosionEntry : LifetimeEntry
     {
-        public readonly float Position;
-        public readonly float Scale;
-        public readonly Color4 ObjectColour;
-        public readonly int RNGSeed;
+        /// <summary>
+        /// The judgement result that triggered this explosion.
+        /// </summary>
+        public JudgementResult JudgementResult { get; }
 
-        public HitExplosionEntry(double startTime, float position, float scale, Color4 objectColour, int rngSeed)
+        /// <summary>
+        /// The hitobject which triggered this explosion.
+        /// </summary>
+        public CatchHitObject HitObject => (CatchHitObject)JudgementResult.HitObject;
+
+        /// <summary>
+        /// The accent colour of the object caught.
+        /// </summary>
+        public Color4 ObjectColour { get; }
+
+        /// <summary>
+        /// The position at which the object was caught.
+        /// </summary>
+        public float Position { get; }
+
+        public HitExplosionEntry(double startTime, JudgementResult judgementResult, Color4 objectColour, float position)
         {
             LifetimeStart = startTime;
             Position = position;
-            Scale = scale;
+            JudgementResult = judgementResult;
             ObjectColour = objectColour;
-            RNGSeed = rngSeed;
         }
     }
 }

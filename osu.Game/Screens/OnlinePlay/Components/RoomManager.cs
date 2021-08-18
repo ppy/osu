@@ -8,7 +8,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
@@ -17,14 +16,11 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public abstract class RoomManager : CompositeDrawable, IRoomManager
+    public class RoomManager : Component, IRoomManager
     {
         public event Action RoomsUpdated;
 
         private readonly BindableList<Room> rooms = new BindableList<Room>();
-
-        public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
-        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
 
         public IBindableList<Room> Rooms => rooms;
 
@@ -40,15 +36,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        protected RoomManager()
+        public RoomManager()
         {
             RelativeSizeAxes = Axes.Both;
-
-            InternalChildren = CreatePollingComponents().Select(p =>
-            {
-                p.RoomsReceived = onRoomsReceived;
-                return p;
-            }).ToList();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -67,10 +57,10 @@ namespace osu.Game.Screens.OnlinePlay.Components
             {
                 joinedRoom.Value = room;
 
-                update(room, result);
-                addRoom(room);
+                AddOrUpdateRoom(result);
+                room.CopyFrom(result); // Also copy back to the source model, since this is likely to have been stored elsewhere.
 
-                RoomsUpdated?.Invoke();
+                // The server may not contain all properties (such as password), so invoke success with the given room.
                 onSuccess?.Invoke(room);
             };
 
@@ -118,84 +108,49 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         private readonly HashSet<long> ignoredRooms = new HashSet<long>();
 
-        private void onRoomsReceived(List<Room> received)
+        public void AddOrUpdateRoom(Room room)
         {
-            if (received == null)
-            {
-                ClearRooms();
+            Debug.Assert(room.RoomID.Value != null);
+
+            if (ignoredRooms.Contains(room.RoomID.Value.Value))
                 return;
-            }
 
-            // Remove past matches
-            foreach (var r in rooms.ToList())
+            room.Position.Value = -room.RoomID.Value.Value;
+
+            try
             {
-                if (received.All(e => e.RoomID.Value != r.RoomID.Value))
-                    rooms.Remove(r);
-            }
+                foreach (var pi in room.Playlist)
+                    pi.MapObjects(beatmaps, rulesets);
 
-            for (int i = 0; i < received.Count; i++)
+                var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
+                if (existing == null)
+                    rooms.Add(room);
+                else
+                    existing.CopyFrom(room);
+            }
+            catch (Exception ex)
             {
-                var room = received[i];
+                Logger.Error(ex, $"Failed to update room: {room.Name.Value}.");
 
-                Debug.Assert(room.RoomID.Value != null);
-
-                if (ignoredRooms.Contains(room.RoomID.Value.Value))
-                    continue;
-
-                room.Position.Value = i;
-
-                try
-                {
-                    update(room, room);
-                    addRoom(room);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex, $"Failed to update room: {room.Name.Value}.");
-
-                    ignoredRooms.Add(room.RoomID.Value.Value);
-                    rooms.Remove(room);
-                }
+                ignoredRooms.Add(room.RoomID.Value.Value);
+                rooms.Remove(room);
             }
 
-            RoomsUpdated?.Invoke();
-            initialRoomsReceived.Value = true;
+            notifyRoomsUpdated();
         }
 
-        protected void RemoveRoom(Room room) => rooms.Remove(room);
+        public void RemoveRoom(Room room)
+        {
+            rooms.Remove(room);
+            notifyRoomsUpdated();
+        }
 
-        protected void ClearRooms()
+        public void ClearRooms()
         {
             rooms.Clear();
-            initialRoomsReceived.Value = false;
+            notifyRoomsUpdated();
         }
 
-        /// <summary>
-        /// Updates a local <see cref="Room"/> with a remote copy.
-        /// </summary>
-        /// <param name="local">The local <see cref="Room"/> to update.</param>
-        /// <param name="remote">The remote <see cref="Room"/> to update with.</param>
-        private void update(Room local, Room remote)
-        {
-            foreach (var pi in remote.Playlist)
-                pi.MapObjects(beatmaps, rulesets);
-
-            local.CopyFrom(remote);
-        }
-
-        /// <summary>
-        /// Adds a <see cref="Room"/> to the list of available rooms.
-        /// </summary>
-        /// <param name="room">The <see cref="Room"/> to add.</param>
-        private void addRoom(Room room)
-        {
-            var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
-            if (existing == null)
-                rooms.Add(room);
-            else
-                existing.CopyFrom(room);
-        }
-
-        protected abstract IEnumerable<RoomPollingComponent> CreatePollingComponents();
+        private void notifyRoomsUpdated() => Scheduler.AddOnce(() => RoomsUpdated?.Invoke());
     }
 }

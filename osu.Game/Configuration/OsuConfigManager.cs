@@ -201,6 +201,8 @@ namespace osu.Game.Configuration
         public Func<GlobalAction, string> LookupKeyBindings { get; set; }
     }
 
+    // IMPORTANT: These are used in user configuration files.
+    // The naming of these keys should not be changed once they are deployed in a release, unless migration logic is also added.
     public enum OsuSetting
     {
         Ruleset,

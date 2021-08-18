@@ -288,7 +288,7 @@ namespace osu.Game.Graphics.UserInterface
                     },
                 };
 
-                AddInternal(new HoverSounds());
+                AddInternal(new HoverClickSounds());
             }
 
             [BackgroundDependencyLoader]
