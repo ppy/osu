@@ -46,9 +46,14 @@ namespace osu.Game.Screens.Play
 
         protected override bool PlayResumeSound => false;
 
-        protected BeatmapMetadataDisplay MetadataInfo;
+        protected BeatmapMetadataDisplay MetadataInfo { get; private set; }
 
-        protected VisualSettings VisualSettings;
+        /// <summary>
+        /// A fill flow containing the player settings groups, exposed for the ability to hide it from inheritors of the player loader.
+        /// </summary>
+        protected FillFlowContainer<PlayerSettingsGroup> PlayerSettings { get; private set; }
+
+        protected VisualSettings VisualSettings { get; private set; }
 
         protected Task LoadTask { get; private set; }
 
@@ -140,7 +145,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                new FillFlowContainer<PlayerSettingsGroup>
+                PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,

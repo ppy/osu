@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -95,6 +96,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         public class TestOsuGame : OsuGame
         {
+            public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
+
             public new ScreenStack ScreenStack => base.ScreenStack;
 
             public new BackButton BackButton => base.BackButton;
@@ -103,7 +106,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public new ScoreManager ScoreManager => base.ScoreManager;
 
-            public new SettingsPanel Settings => base.Settings;
+            public new Container ScreenOffsetContainer => base.ScreenOffsetContainer;
+
+            public new SettingsOverlay Settings => base.Settings;
+
+            public new NotificationOverlay Notifications => base.Notifications;
 
             public new MusicController MusicController => base.MusicController;
 

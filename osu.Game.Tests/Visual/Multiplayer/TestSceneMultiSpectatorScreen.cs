@@ -6,12 +6,19 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -21,11 +28,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private OsuGameBase game { get; set; }
 
         [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
         private MultiSpectatorScreen spectatorScreen;
 
-        private readonly List<int> playingUserIds = new List<int>();
+        private readonly List<MultiplayerRoomUser> playingUsers = new List<MultiplayerRoomUser>();
 
         private BeatmapSetInfo importedSet;
         private BeatmapInfo importedBeatmap;
@@ -40,17 +50,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [SetUp]
-        public new void Setup() => Schedule(() => playingUserIds.Clear());
+        public new void Setup() => Schedule(() => playingUsers.Clear());
 
         [Test]
         public void TestDelayedStart()
         {
             AddStep("start players silently", () =>
             {
-                Client.CurrentMatchPlayingUserIds.Add(PLAYER_1_ID);
-                Client.CurrentMatchPlayingUserIds.Add(PLAYER_2_ID);
-                playingUserIds.Add(PLAYER_1_ID);
-                playingUserIds.Add(PLAYER_2_ID);
+                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID }, true);
+                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID }, true);
+
+                playingUsers.Add(new MultiplayerRoomUser(PLAYER_1_ID));
+                playingUsers.Add(new MultiplayerRoomUser(PLAYER_2_ID));
             });
 
             loadSpectateScreen(false);
@@ -73,6 +84,64 @@ namespace osu.Game.Tests.Visual.Multiplayer
             loadSpectateScreen();
 
             sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+        }
+
+        [Test]
+        public void TestSpectatorPlayerInteractiveElementsHidden()
+        {
+            HUDVisibilityMode originalConfigValue = default;
+
+            AddStep("get original config hud visibility", () => originalConfigValue = config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
+            AddStep("set config hud visibility to always", () => config.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always));
+
+            start(new[] { PLAYER_1_ID, PLAYER_2_ID });
+            loadSpectateScreen(false);
+
+            AddUntilStep("wait for player loaders", () => this.ChildrenOfType<PlayerLoader>().Count() == 2);
+            AddAssert("all player loader settings hidden", () => this.ChildrenOfType<PlayerLoader>().All(l => !l.ChildrenOfType<FillFlowContainer<PlayerSettingsGroup>>().Any()));
+
+            AddUntilStep("wait for players to load", () => spectatorScreen.AllPlayersLoaded);
+
+            // components wrapped in skinnable target containers load asynchronously, potentially taking more than one frame to load.
+            // therefore use until step rather than direct assert to account for that.
+            AddUntilStep("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
+                !p.ChildrenOfType<PlayerSettingsOverlay>().Any() &&
+                !p.ChildrenOfType<HoldForMenuButton>().Any() &&
+                p.ChildrenOfType<SongProgressBar>().SingleOrDefault()?.ShowHandle == false));
+
+            AddStep("restore config hud visibility", () => config.SetValue(OsuSetting.HUDVisibilityMode, originalConfigValue));
+        }
+
+        [Test]
+        public void TestTeamDisplay()
+        {
+            AddStep("start players", () =>
+            {
+                var player1 = OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID }, true);
+                player1.MatchState = new TeamVersusUserState
+                {
+                    TeamID = 0,
+                };
+
+                var player2 = OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID }, true);
+                player2.MatchState = new TeamVersusUserState
+                {
+                    TeamID = 1,
+                };
+
+                SpectatorClient.StartPlay(player1.UserID, importedBeatmapId);
+                SpectatorClient.StartPlay(player2.UserID, importedBeatmapId);
+
+                playingUsers.Add(player1);
+                playingUsers.Add(player2);
+            });
+
+            loadSpectateScreen();
+
+            sendFrames(PLAYER_1_ID, 1000);
+            sendFrames(PLAYER_2_ID, 1000);
+
             AddWaitStep("wait a bit", 20);
         }
 
@@ -252,7 +321,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(importedBeatmap);
                 Ruleset.Value = importedBeatmap.Ruleset;
 
-                LoadScreen(spectatorScreen = new MultiSpectatorScreen(playingUserIds.ToArray()));
+                LoadScreen(spectatorScreen = new MultiSpectatorScreen(playingUsers.ToArray()));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
@@ -264,9 +333,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 foreach (int id in userIds)
                 {
-                    Client.CurrentMatchPlayingUserIds.Add(id);
+                    OnlinePlayDependencies.Client.AddUser(new User { Id = id }, true);
+
                     SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
-                    playingUserIds.Add(id);
+                    playingUsers.Add(new MultiplayerRoomUser(id));
                 }
             });
         }

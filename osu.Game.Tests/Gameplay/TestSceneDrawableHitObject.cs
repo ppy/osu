@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Gameplay
@@ -121,6 +123,18 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("Drawable lifetime is restored", () => dho.LifetimeStart == 666 && dho.LifetimeEnd == 999);
         }
 
+        [Test]
+        public void TestStateChangeBeforeLoadComplete()
+        {
+            TestDrawableHitObject dho = null;
+            AddStep("Add DHO and apply result", () =>
+            {
+                Child = dho = new TestDrawableHitObject(new HitObject { StartTime = Time.Current });
+                dho.MissForcefully();
+            });
+            AddAssert("DHO state is correct", () => dho.State.Value == ArmedState.Miss);
+        }
+
         private class TestDrawableHitObject : DrawableHitObject
         {
             public const double INITIAL_LIFETIME_OFFSET = 100;
@@ -140,6 +154,19 @@ namespace osu.Game.Tests.Gameplay
 
                 if (SetLifetimeStartOnApply)
                     LifetimeStart = LIFETIME_ON_APPLY;
+            }
+
+            public void MissForcefully() => ApplyResult(r => r.Type = HitResult.Miss);
+
+            protected override void UpdateHitStateTransforms(ArmedState state)
+            {
+                if (state != ArmedState.Miss)
+                {
+                    base.UpdateHitStateTransforms(state);
+                    return;
+                }
+
+                this.FadeOut(1000);
             }
         }
 

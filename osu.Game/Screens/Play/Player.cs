@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
 {
     [Cached]
     [Cached(typeof(ISamplePlaybackDisabler))]
-    public abstract class Player : ScreenWithBeatmapBackground, ISamplePlaybackDisabler
+    public abstract class Player : ScreenWithBeatmapBackground, ISamplePlaybackDisabler, ILocalUserPlayInfo
     {
         /// <summary>
         /// The delay upon completion of the beatmap before displaying the results screen.
@@ -1052,5 +1052,7 @@ namespace osu.Game.Screens.Play
         #endregion
 
         IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
+
+        IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
     }
 }

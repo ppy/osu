@@ -5,14 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Components;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -32,10 +30,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        [Cached]
-        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>(new FilterCriteria());
-
-        public new readonly List<Room> Rooms = new List<Room>();
+        public IReadOnlyList<Room> ServerSideRooms => serverSideRooms;
+        private readonly List<Room> serverSideRooms = new List<Room>();
 
         private int currentRoomId;
         private int currentPlaylistItemId;
@@ -60,7 +56,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         apiRoom.HasPassword.Value = !string.IsNullOrEmpty(createRoomRequest.Room.Password.Value);
                         apiRoom.Password.Value = createRoomRequest.Room.Password.Value;
 
-                        AddRoom(apiRoom);
+                        AddServerSideRoom(apiRoom);
 
                         var responseRoom = new APICreatedRoom();
                         responseRoom.CopyFrom(createResponseRoom(apiRoom, false));
@@ -70,7 +66,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                     case JoinRoomRequest joinRoomRequest:
                     {
-                        var room = Rooms.Single(r => r.RoomID.Value == joinRoomRequest.Room.RoomID.Value);
+                        var room = ServerSideRooms.Single(r => r.RoomID.Value == joinRoomRequest.Room.RoomID.Value);
 
                         if (joinRoomRequest.Password != room.Password.Value)
                         {
@@ -89,14 +85,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     case GetRoomsRequest getRoomsRequest:
                         var roomsWithoutParticipants = new List<Room>();
 
-                        foreach (var r in Rooms)
+                        foreach (var r in ServerSideRooms)
                             roomsWithoutParticipants.Add(createResponseRoom(r, false));
 
                         getRoomsRequest.TriggerSuccess(roomsWithoutParticipants);
                         return true;
 
                     case GetRoomRequest getRoomRequest:
-                        getRoomRequest.TriggerSuccess(createResponseRoom(Rooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId), true));
+                        getRoomRequest.TriggerSuccess(createResponseRoom(ServerSideRooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId), true));
                         return true;
 
                     case GetBeatmapSetRequest getBeatmapSetRequest:
@@ -132,16 +128,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             };
         }
 
-        public void AddRoom(Room room)
+        public void AddServerSideRoom(Room room)
         {
             room.RoomID.Value ??= currentRoomId++;
             for (int i = 0; i < room.Playlist.Count; i++)
                 room.Playlist[i].ID = currentPlaylistItemId++;
 
-            Rooms.Add(room);
+            serverSideRooms.Add(room);
         }
-
-        public new void RemoveRoom(Room room) => base.RemoveRoom(room);
 
         private Room createResponseRoom(Room room, bool withParticipants)
         {
@@ -152,9 +146,5 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 responseRoom.RecentParticipants.Clear();
             return responseRoom;
         }
-
-        public new void ClearRooms() => base.ClearRooms();
-
-        public new void Schedule(Action action) => base.Schedule(action);
     }
 }

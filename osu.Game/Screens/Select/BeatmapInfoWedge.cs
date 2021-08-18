@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapInfoWedge : VisibilityContainer
     {
+        public const float BORDER_THICKNESS = 2.5f;
         private const float shear_width = 36.75f;
 
         private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGE_HEIGHT, 0);
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.Select
             Shear = wedged_container_shear;
             Masking = true;
             BorderColour = new Color4(221, 255, 255, 255);
-            BorderThickness = 2.5f;
+            BorderThickness = BORDER_THICKNESS;
             Alpha = 0;
             EdgeEffect = new EdgeEffectParameters
             {

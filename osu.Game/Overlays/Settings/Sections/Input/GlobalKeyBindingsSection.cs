@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             Icon = FontAwesome.Solid.Globe
         };
 
-        public override string Header => "Global";
+        public override LocalisableString Header => InputSettingsStrings.GlobalKeyBindingHeader;
 
         public GlobalKeyBindingsSection(GlobalActionContainer manager)
         {
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class SongSelectKeyBindingSubsection : KeyBindingsSubsection
         {
-            protected override LocalisableString Header => "Song Select";
+            protected override LocalisableString Header => InputSettingsStrings.SongSelectSection;
 
             public SongSelectKeyBindingSubsection(GlobalActionContainer manager)
                 : base(null)
@@ -50,7 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class InGameKeyBindingsSubsection : KeyBindingsSubsection
         {
-            protected override LocalisableString Header => "In Game";
+            protected override LocalisableString Header => InputSettingsStrings.InGameSection;
 
             public InGameKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
@@ -61,7 +62,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class AudioControlKeyBindingsSubsection : KeyBindingsSubsection
         {
-            protected override LocalisableString Header => "Audio";
+            protected override LocalisableString Header => InputSettingsStrings.AudioSection;
 
             public AudioControlKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
@@ -72,7 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class EditorKeyBindingsSubsection : KeyBindingsSubsection
         {
-            protected override LocalisableString Header => "Editor";
+            protected override LocalisableString Header => InputSettingsStrings.EditorSection;
 
             public EditorKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
