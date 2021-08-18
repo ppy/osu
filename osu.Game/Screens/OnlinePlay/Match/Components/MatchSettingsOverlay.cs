@@ -48,6 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             {
                 BackgroundUnfocused = Color4.Black;
                 BackgroundFocused = Color4.Black;
+                LengthLimit = 100;
             }
         }
 
@@ -63,6 +64,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             {
                 BackgroundUnfocused = Color4.Black;
                 BackgroundFocused = Color4.Black;
+                LengthLimit = 255;
             }
         }
 
