@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -41,6 +42,31 @@ namespace osu.Game.Tests.Visual.UserInterface
                         }),
                     })
                 };
+            });
+        }
+
+        [Test]
+        public void TestSpectrum()
+        {
+            StarRatingDisplay starRating = null;
+
+            BindableDouble starRatingNumeric;
+
+            AddStep("load display", () =>
+            {
+                Child = starRating = new StarRatingDisplay(new StarDifficulty(5.55, 1))
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(3f),
+                };
+            });
+
+            AddStep("transform over spectrum", () =>
+            {
+                starRatingNumeric = new BindableDouble();
+                starRatingNumeric.BindValueChanged(val => starRating.Current.Value = new StarDifficulty(val.NewValue, 1));
+                this.TransformBindableTo(starRatingNumeric, 10, 10000, Easing.OutQuint);
             });
         }
 
