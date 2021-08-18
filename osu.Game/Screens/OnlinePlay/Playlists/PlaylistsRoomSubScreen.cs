@@ -20,7 +20,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
-using Footer = osu.Game.Screens.OnlinePlay.Match.Components.Footer;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -69,17 +68,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 }
             }, true);
         }
-
-        private void updatePollingRate()
-        {
-            selectionPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
-            Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
-        }
-
-        protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(SelectedItem.Value)
-        {
-            Exited = () => leaderboard.RefreshScores()
-        });
 
         protected override Drawable CreateMainContent() => new GridContainer
         {
@@ -190,7 +178,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         };
 
-        protected override Drawable CreateFooter() => new Footer
+        protected override Drawable CreateFooter() => new PlaylistsRoomFooter
         {
             OnStart = StartPlay
         };
@@ -203,5 +191,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     this.Push(new PlaylistsSongSelect());
             },
         };
+
+        private void updatePollingRate()
+        {
+            selectionPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
+            Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
+        }
+
+        protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(SelectedItem.Value)
+        {
+            Exited = () => leaderboard.RefreshScores()
+        });
     }
 }
