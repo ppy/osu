@@ -170,11 +170,20 @@ namespace osu.Game.Graphics.Containers
 
             if (source == InvalidationSource.Child && (invalidation & Invalidation.DrawSize) != 0)
             {
-                lastKnownScroll = null;
+                InvalidateScrollPosition();
                 result = true;
             }
 
             return result;
+        }
+
+        protected void InvalidateScrollPosition()
+        {
+            Schedule(() =>
+            {
+                lastKnownScroll = null;
+                lastClickedSection = null;
+            });
         }
 
         protected override void UpdateAfterChildren()
