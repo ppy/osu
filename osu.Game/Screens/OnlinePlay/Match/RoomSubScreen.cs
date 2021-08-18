@@ -19,7 +19,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Match
@@ -64,7 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private readonly Room room;
 
         private ModSelectOverlay userModsSelectOverlay;
-        protected RoomSettingsOverlay SettingsOverlay { get; private set; }
+        private RoomSettingsOverlay settingsOverlay;
 
         protected RoomSubScreen(Room room)
         {
@@ -123,7 +122,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                         {
                                             new Drawable[]
                                             {
-                                                CreateDrawableRoom(room).With(d => d.MatchingFilter = true),
+                                                new DrawableMatchRoom(room)
+                                                {
+                                                    MatchingFilter = true,
+                                                    OnEdit = () => settingsOverlay.Show()
+                                                }
                                             },
                                             null,
                                             new Drawable[]
@@ -162,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                             }
                                         }
                                     },
-                                    SettingsOverlay = CreateRoomSettingsOverlay().With(s =>
+                                    settingsOverlay = CreateRoomSettingsOverlay().With(s =>
                                     {
                                         s.State.Value = room.RoomID.Value == null ? Visibility.Visible : Visibility.Hidden;
                                     })
@@ -184,7 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
                 mainContent.Hide();
 
-                SettingsOverlay.State.BindValueChanged(visibility =>
+                settingsOverlay.State.BindValueChanged(visibility =>
                 {
                     if (visibility.NewValue == Visibility.Hidden)
                         mainContent.Show();
@@ -218,9 +221,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 return true;
             }
 
-            if (SettingsOverlay.State.Value == Visibility.Visible)
+            if (settingsOverlay.State.Value == Visibility.Visible)
             {
-                SettingsOverlay.Hide();
+                settingsOverlay.Hide();
                 return true;
             }
 
@@ -357,8 +360,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (track != null)
                 track.Looping = false;
         }
-
-        protected abstract DrawableRoom CreateDrawableRoom(Room room);
 
         protected abstract Drawable CreateMainContent();
 

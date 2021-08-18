@@ -22,7 +22,6 @@ using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
@@ -109,11 +108,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             var ruleset = Ruleset.Value.CreateInstance();
             Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods).ToList();
         }
-
-        protected override DrawableRoom CreateDrawableRoom(Room room) => new DrawableMultiplayerRoom(room)
-        {
-            OnEdit = () => SettingsOverlay.Show()
-        };
 
         protected override Drawable CreateMainContent() => new Container
         {

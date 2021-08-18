@@ -14,7 +14,6 @@ using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
@@ -297,8 +296,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             Exited = () => leaderboard.RefreshScores()
         });
-
-        protected override DrawableRoom CreateDrawableRoom(Room room) => new DrawableRoom(room);
 
         protected override Drawable CreateMainContent() => Empty();
 
