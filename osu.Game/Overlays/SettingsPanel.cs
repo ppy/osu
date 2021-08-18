@@ -273,6 +273,16 @@ namespace osu.Game.Overlays
         {
             public SearchContainer<SettingsSection> SearchContainer;
 
+            public string SearchTerm
+            {
+                get => SearchContainer.SearchTerm;
+                set
+                {
+                    SearchContainer.SearchTerm = value;
+                    InvalidateScrollPosition();
+                }
+            }
+
             protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
                 => SearchContainer = new SearchContainer<SettingsSection>
                 {
