@@ -22,7 +22,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public Bindable<bool> Expanded = new Bindable<bool>();
 
+        private readonly Bindable<bool> expandedFromTextboxFocus = new Bindable<bool>();
+
         private const float height = 100;
+
+        public override bool PropagateNonPositionalInputSubTree => true;
 
         public GameplayChatDisplay()
             : base(leaveChannelOnDispose: false)
@@ -30,20 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             RelativeSizeAxes = Axes.X;
 
             Background.Alpha = 0.2f;
-        }
 
-        private void expandedChanged(ValueChangedEvent<bool> expanded)
-        {
-            if (expanded.NewValue)
-            {
-                this.FadeIn(300, Easing.OutQuint);
-                this.ResizeHeightTo(height, 500, Easing.OutQuint);
-            }
-            else
-            {
-                this.FadeOut(300, Easing.OutQuint);
-                this.ResizeHeightTo(0, 500, Easing.OutQuint);
-            }
+            Textbox.FocusLost = () => expandedFromTextboxFocus.Value = false;
         }
 
         protected override void LoadComplete()
@@ -61,7 +53,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Textbox.ReleaseFocusOnCommit = playing.NewValue;
             }, true);
 
-            Expanded.BindValueChanged(expandedChanged, true);
+            Expanded.BindValueChanged(_ => updateExpandedState(), true);
+            expandedFromTextboxFocus.BindValueChanged(focus =>
+            {
+                if (focus.NewValue)
+                    updateExpandedState();
+                else
+                {
+                    // on finishing typing a message there should be a brief delay before hiding.
+                    using (BeginDelayedSequence(600))
+                        updateExpandedState();
+                }
+            }, true);
         }
 
         public bool OnPressed(GlobalAction action)
@@ -69,7 +72,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             switch (action)
             {
                 case GlobalAction.FocusChatInput:
-                    Textbox.TakeFocus();
+                    expandedFromTextboxFocus.Value = true;
+
+                    // schedule required to ensure the textbox has become present from above bindable update.
+                    Schedule(() => Textbox.TakeFocus());
                     return true;
             }
 
@@ -78,6 +84,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public void OnReleased(GlobalAction action)
         {
+        }
+
+        private void updateExpandedState()
+        {
+            if (Expanded.Value || expandedFromTextboxFocus.Value)
+            {
+                this.FadeIn(300, Easing.OutQuint);
+                this.ResizeHeightTo(height, 500, Easing.OutQuint);
+            }
+            else
+            {
+                this.FadeOut(300, Easing.OutQuint);
+                this.ResizeHeightTo(0, 500, Easing.OutQuint);
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Chat;
@@ -22,7 +23,7 @@ namespace osu.Game.Online.Chat
     {
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
 
-        protected readonly FocusedTextBox Textbox;
+        protected readonly ChatTextBox Textbox;
 
         protected ChannelManager ChannelManager;
 
@@ -121,6 +122,14 @@ namespace osu.Game.Online.Chat
                 BackgroundUnfocused = new Color4(10, 10, 10, 10);
                 BackgroundFocused = new Color4(10, 10, 10, 255);
             }
+
+            protected override void OnFocusLost(FocusLostEvent e)
+            {
+                base.OnFocusLost(e);
+                FocusLost?.Invoke();
+            }
+
+            public Action FocusLost;
         }
 
         public class StandAloneDrawableChannel : DrawableChannel

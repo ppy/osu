@@ -83,11 +83,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestFocusOnTabKey()
+        public void TestFocusOnTabKeyWhenExpanded()
         {
             assertChatFocused(false);
             AddStep("press tab", () => InputManager.Key(Key.Tab));
             assertChatFocused(true);
+        }
+
+        [Test]
+        public void TestFocusOnTabKeyWhenNotExpanded()
+        {
+            AddStep("set not expanded", () => chatDisplay.Expanded.Value = false);
+            AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
+
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            assertChatFocused(true);
+            AddUntilStep("is visible", () => chatDisplay.IsPresent);
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+            assertChatFocused(false);
+            AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
         }
 
         private void assertChatFocused(bool isFocused) =>
