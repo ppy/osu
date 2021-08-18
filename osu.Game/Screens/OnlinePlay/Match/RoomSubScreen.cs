@@ -103,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                     RowDimensions = new[]
                     {
                         new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize)
+                        new Dimension(GridSizeMode.Absolute, 50)
                     },
                     Content = new[]
                     {
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                                             Child = new Box
                                                             {
                                                                 RelativeSizeAxes = Axes.Both,
-                                                                Colour = Color4Extensions.FromHex(@"3e3a44") // This is super temporary.
+                                                                Colour = Color4Extensions.FromHex(@"3e3a44") // Temporary.
                                                             },
                                                         },
                                                         new Container
@@ -191,9 +191,21 @@ namespace osu.Game.Screens.OnlinePlay.Match
                             },
                         },
                         // Footer
-                        new[]
+                        new Drawable[]
                         {
-                            CreateFooter()
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4Extensions.FromHex(@"28242d") // Temporary.
+                                    },
+                                    CreateFooter()
+                                }
+                            }
                         }
                     }
                 }
@@ -382,10 +394,19 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 track.Looping = false;
         }
 
+        /// <summary>
+        /// Creates the main centred content.
+        /// </summary>
         protected abstract Drawable CreateMainContent();
 
+        /// <summary>
+        /// Creates the footer content.
+        /// </summary>
         protected abstract Drawable CreateFooter();
 
+        /// <summary>
+        /// Creates the room settings overlay.
+        /// </summary>
         protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay();
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
