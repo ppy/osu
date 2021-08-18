@@ -64,8 +64,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        minDisplay = new StarRatingDisplay(default) { Size = new Vector2(52f, 16f) },
-                        maxDisplay = new StarRatingDisplay(default) { Size = new Vector2(52f, 16f) }
+                        minDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range),
+                        maxDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range)
                     }
                 }
             };

@@ -51,6 +51,23 @@ namespace osu.Game.Beatmaps.Drawables
 
             AutoSizeAxes = Axes.Both;
 
+            MarginPadding margin = default;
+
+            switch (size)
+            {
+                case StarRatingDisplaySize.Small:
+                    margin = new MarginPadding { Horizontal = 7f };
+                    break;
+
+                case StarRatingDisplaySize.Range:
+                    margin = new MarginPadding { Horizontal = 8f };
+                    break;
+
+                case StarRatingDisplaySize.Regular:
+                    margin = new MarginPadding { Horizontal = 8f, Vertical = 2f };
+                    break;
+            }
+
             InternalChild = new CircularContainer
             {
                 Masking = true,
@@ -66,9 +83,7 @@ namespace osu.Game.Beatmaps.Drawables
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
-                        Margin = size == StarRatingDisplaySize.Small
-                            ? new MarginPadding { Horizontal = 7f }
-                            : new MarginPadding { Horizontal = 8f, Vertical = 2f },
+                        Margin = margin,
                         ColumnDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
@@ -124,6 +139,7 @@ namespace osu.Game.Beatmaps.Drawables
     public enum StarRatingDisplaySize
     {
         Small,
+        Range,
         Regular,
     }
 }
