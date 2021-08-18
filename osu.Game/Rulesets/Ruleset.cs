@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets
         public abstract string ShortName { get; }
 
         /// <summary>
-        /// The playing verb to be shown in the <see cref="UserActivity.InGame.Status"/>.
+        /// The playing verb to be shown in the <see cref="UserActivity.InGame"/> activities.
         /// </summary>
         public virtual string PlayingVerb => "Playing";
 
