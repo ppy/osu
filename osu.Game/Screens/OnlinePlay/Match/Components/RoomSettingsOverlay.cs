@@ -17,7 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
     public abstract class RoomSettingsOverlay : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         protected const float TRANSITION_DURATION = 350;
-        protected const float FIELD_PADDING = 45;
+        protected const float FIELD_PADDING = 25;
 
         protected OnlinePlayComposite Settings { get; set; }
 

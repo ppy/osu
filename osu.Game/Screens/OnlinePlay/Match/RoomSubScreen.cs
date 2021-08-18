@@ -160,7 +160,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                                         new Container
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
-                                                            Padding = new MarginPadding(10),
+                                                            Padding = new MarginPadding(20),
                                                             Child = CreateMainContent(),
                                                         },
                                                         new Container
