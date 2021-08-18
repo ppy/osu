@@ -84,7 +84,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             InternalChildren = new Drawable[]
             {
                 ListingPollingComponent = CreatePollingComponent().With(c => c.Filter.BindTarget = filter),
-                loadingLayer = new LoadingLayer(true),
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -162,6 +161,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                                 Filter = { BindTarget = filter }
                                             }
                                         },
+                                        loadingLayer = new LoadingLayer(true),
                                     }
                                 },
                             }
