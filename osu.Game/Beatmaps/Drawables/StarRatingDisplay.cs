@@ -44,40 +44,63 @@ namespace osu.Game.Beatmaps.Drawables
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
         /// </summary>
         /// <param name="starDifficulty">The already computed <see cref="StarDifficulty"/> to display.</param>
-        public StarRatingDisplay(StarDifficulty starDifficulty)
+        /// <param name="size">The size of the star rating display.</param>
+        public StarRatingDisplay(StarDifficulty starDifficulty, StarRatingDisplaySize size = StarRatingDisplaySize.Regular)
         {
             Current.Value = starDifficulty;
 
-            Size = new Vector2(52f, 20f);
+            AutoSizeAxes = Axes.Both;
 
             InternalChild = new CircularContainer
             {
                 Masking = true,
-                RelativeSizeAxes = Axes.Both,
+                AutoSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
                     background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    starIcon = new SpriteIcon
+                    new GridContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Margin = new MarginPadding { Right = 30f },
-                        Icon = FontAwesome.Solid.Star,
-                        Size = new Vector2(8f),
+                        AutoSizeAxes = Axes.Both,
+                        Margin = size == StarRatingDisplaySize.Small
+                            ? new MarginPadding { Horizontal = 7f }
+                            : new MarginPadding { Horizontal = 8f, Vertical = 2f },
+                        ColumnDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.Absolute, 3f),
+                            new Dimension(GridSizeMode.AutoSize, minSize: 25f),
+                        },
+                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                        Content = new[]
+                        {
+                            new[]
+                            {
+                                starIcon = new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Icon = FontAwesome.Solid.Star,
+                                    Size = new Vector2(8f),
+                                },
+                                Empty(),
+                                starsText = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Margin = new MarginPadding { Bottom = 1.5f },
+                                    // todo: this should be size: 12f, but to match up with the design, it needs to be 14.4f
+                                    // see https://github.com/ppy/osu-framework/issues/3271.
+                                    Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold),
+                                    Shadow = false,
+                                }
+                            }
+                        }
                     },
-                    starsText = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Margin = new MarginPadding { Left = 10f, Bottom = 2f },
-                        // todo: this should be size: 12f, but to match up with the design, it needs to be 14.4f
-                        // see https://github.com/ppy/osu-framework/issues/3271.
-                        Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold),
-                        Shadow = false,
-                    }
                 }
             };
         }
@@ -96,5 +119,11 @@ namespace osu.Game.Beatmaps.Drawables
                 starsText.Colour = c.NewValue.Stars >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
             }, true);
         }
+    }
+
+    public enum StarRatingDisplaySize
+    {
+        Small,
+        Regular,
     }
 }
