@@ -58,7 +58,5 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (editButton != null)
                 host.BindValueChanged(h => editButton.Alpha = h.NewValue?.Equals(api.LocalUser.Value) == true ? 1 : 0, true);
         }
-
-        protected override bool ShouldBeConsideredForInput(Drawable child) => true;
     }
 }
