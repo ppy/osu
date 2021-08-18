@@ -12,9 +12,9 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
+namespace osu.Game.Screens.OnlinePlay.Match
 {
-    public class DrawableMultiplayerRoom : DrawableRoom
+    public class DrawableMatchRoom : DrawableRoom
     {
         public Action OnEdit;
 
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private Drawable editButton;
 
-        public DrawableMultiplayerRoom(Room room)
+        public DrawableMatchRoom(Room room)
             : base(room)
         {
             host.BindTo(room.Host);
