@@ -128,6 +128,6 @@ namespace osu.Game.Rulesets.Mods
             ExtendedLimits.UnbindFrom(otherDifficultyBindable.ExtendedLimits);
         }
 
-        public new DifficultyBindable GetBoundCopy() => new DifficultyBindable { BindTarget = this };
+        protected override Bindable<float?> CreateInstance() => new DifficultyBindable();
     }
 }
