@@ -2,14 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Runtime.CompilerServices;
-using osu.Framework.Platform;
+using osu.Framework.Testing;
 
 namespace osu.Game.Tests
 {
     /// <summary>
     /// A headless host which cleans up before running (removing any remnants from a previous execution).
     /// </summary>
-    public class CleanRunHeadlessGameHost : HeadlessGameHost
+    public class CleanRunHeadlessGameHost : TestRunHeadlessGameHost
     {
         /// <summary>
         /// Create a new instance.

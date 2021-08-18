@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual
             }
 
             localStorage =
-                new Lazy<Storage>(() => isolatedHostStorage ?? new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
+                new Lazy<Storage>(() => isolatedHostStorage ?? new TemporaryNativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
         }
 
         [Resolved]
