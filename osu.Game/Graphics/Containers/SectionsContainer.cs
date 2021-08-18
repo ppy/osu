@@ -111,7 +111,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// The percentage of the container to consider the centre-point for deciding the active section (and scrolling to a requested section).
         /// </summary>
-        private const float scroll_y_centre = 0.1f;
+        private const float scroll_y_centre = 0.2f;
 
         public SectionsContainer()
         {
