@@ -239,6 +239,14 @@ namespace osu.Game.Screens.OnlinePlay.Match
             UserMods.BindValueChanged(_ => Scheduler.AddOnce(UpdateMods));
         }
 
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            return new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
+            {
+                Model = { Value = Room }
+            };
+        }
+
         public override bool OnBackButton()
         {
             if (Room.RoomID.Value == null)
