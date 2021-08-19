@@ -61,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
                 new Box
@@ -69,10 +69,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Background5,
                 },
-                new OnlinePlayBackgroundSprite
+                CreateBackground().With(d =>
                 {
-                    RelativeSizeAxes = Axes.Both
-                },
+                    d.RelativeSizeAxes = Axes.Both;
+                }),
                 new Container
                 {
                     Name = @"Room content",
@@ -263,6 +263,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     recentParticipantsList.NumberOfCircles = value;
             }
         }
+
+        protected virtual Drawable CreateBackground() => new OnlinePlayBackgroundSprite();
 
         private class RoomNameText : OsuSpriteText
         {
