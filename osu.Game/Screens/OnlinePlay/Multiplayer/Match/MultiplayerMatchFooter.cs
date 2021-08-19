@@ -53,7 +53,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 {
                     new Dimension(),
                     new Dimension(maxSize: spectate_button_width),
-                    new Dimension(GridSizeMode.Absolute, 10),
+                    new Dimension(GridSizeMode.Absolute, 5),
                     new Dimension(maxSize: ready_button_width),
                     new Dimension()
                 }
