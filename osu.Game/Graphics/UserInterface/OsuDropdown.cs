@@ -69,6 +69,7 @@ namespace osu.Game.Graphics.UserInterface
                 BackgroundColour = Color4.Black.Opacity(0.5f);
 
                 MaskingContainer.CornerRadius = corner_radius;
+                Alpha = 0;
 
                 // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
                 ItemsContainer.Padding = new MarginPadding(5);
@@ -94,9 +95,11 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override void AnimateClose()
             {
-                this.FadeOut(300, Easing.OutQuint);
                 if (wasOpened)
+                {
+                    this.FadeOut(300, Easing.OutQuint);
                     sampleClose?.Play();
+                }
             }
 
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
