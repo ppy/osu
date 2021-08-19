@@ -34,12 +34,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected Container ButtonsContainer { get; private set; }
 
+        private readonly Bindable<MatchType> roomType = new Bindable<MatchType>();
         private readonly Bindable<RoomCategory> roomCategory = new Bindable<RoomCategory>();
         private readonly Bindable<bool> hasPassword = new Bindable<bool>();
 
         private RecentParticipantsList recentParticipantsList;
         private RoomSpecialCategoryPill specialCategoryPill;
         private PasswordProtectedIcon passwordIcon;
+        private EndDateInfo endDateInfo;
 
         public DrawableRoom(Room room)
         {
@@ -144,10 +146,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                         Anchor = Anchor.CentreLeft,
                                                         Origin = Anchor.CentreLeft
                                                     },
-                                                    new EndDateInfo
+                                                    endDateInfo = new EndDateInfo
                                                     {
                                                         Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft
+                                                        Origin = Anchor.CentreLeft,
                                                     },
                                                 }
                                             },
@@ -236,6 +238,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     specialCategoryPill.Show();
                 else
                     specialCategoryPill.Hide();
+            }, true);
+
+            roomType.BindTo(Room.Type);
+            roomType.BindValueChanged(t =>
+            {
+                endDateInfo.Alpha = t.NewValue == MatchType.Playlists ? 1 : 0;
             }, true);
 
             hasPassword.BindTo(Room.HasPassword);
