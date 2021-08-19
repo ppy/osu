@@ -35,13 +35,16 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override void OnEntering(IScreen last)
         {
-            this.FadeInFromZero(APPEAR_DURATION, Easing.OutQuint);
+            base.OnEntering(last);
+
             this.FadeInFromZero(APPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(X_SHIFT).MoveToX(0, X_MOVE_DURATION, Easing.OutQuint);
         }
 
         public override bool OnExiting(IScreen next)
         {
+            base.OnExiting(next);
+
             this.FadeOut(DISAPPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(X_SHIFT, X_MOVE_DURATION, Easing.OutQuint);
 
@@ -50,12 +53,16 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override void OnResuming(IScreen last)
         {
+            base.OnResuming(last);
+
             this.Delay(RESUME_TRANSITION_DELAY).FadeIn(APPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(0, X_MOVE_DURATION, Easing.OutQuint);
         }
 
         public override void OnSuspending(IScreen next)
         {
+            base.OnSuspending(next);
+
             this.FadeOut(DISAPPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(-X_SHIFT, X_MOVE_DURATION, Easing.OutQuint);
         }
