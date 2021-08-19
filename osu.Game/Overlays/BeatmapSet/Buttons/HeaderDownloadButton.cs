@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text =  BeatmapsetsStrings.ShowDetailsDownloadDefault,
+                                Text = BeatmapsetsStrings.ShowDetailsDownloadDefault,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
