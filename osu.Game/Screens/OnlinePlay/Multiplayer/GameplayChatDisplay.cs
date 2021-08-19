@@ -71,11 +71,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             switch (action)
             {
-                case GlobalAction.FocusChatInput:
-                    expandedFromTextboxFocus.Value = true;
+                case GlobalAction.ToggleChatFocus:
+                    if (Textbox.HasFocus)
+                    {
+                        Schedule(() => Textbox.KillFocus());
+                    }
+                    else
+                    {
+                        expandedFromTextboxFocus.Value = true;
 
-                    // schedule required to ensure the textbox has become present from above bindable update.
-                    Schedule(() => Textbox.TakeFocus());
+                        // schedule required to ensure the textbox has become present from above bindable update.
+                        Schedule(() => Textbox.TakeFocus());
+                    }
+
                     return true;
             }
 
