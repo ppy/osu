@@ -79,8 +79,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     handleRoomLost();
             }, true);
 
-            if (client.Room == null)
-                handleRoomLost();
+            // if (client.Room == null)
+            //     handleRoomLost();
         }
 
         protected override Drawable CreateMainContent() => new GridContainer
