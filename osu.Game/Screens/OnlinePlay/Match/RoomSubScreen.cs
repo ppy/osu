@@ -244,6 +244,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (Room.RoomID.Value == null)
             {
                 // room has not been created yet; exit immediately.
+                settingsOverlay.Hide();
                 return base.OnBackButton();
             }
 
