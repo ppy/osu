@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Rooms;
 using osuTK;
 using osuTK.Graphics;
 
@@ -27,8 +28,12 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected abstract bool IsLoading { get; }
 
-        protected RoomSettingsOverlay()
+        private readonly Room room;
+
+        protected RoomSettingsOverlay(Room room)
         {
+            this.room = room;
+
             RelativeSizeAxes = Axes.Both;
             Masking = true;
             CornerRadius = 10;
@@ -37,12 +42,12 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(Settings = CreateSettings());
+            Add(Settings = CreateSettings(room));
         }
 
         protected abstract void SelectBeatmap();
 
-        protected abstract OnlinePlayComposite CreateSettings();
+        protected abstract OnlinePlayComposite CreateSettings(Room room);
 
         protected override void PopIn()
         {
