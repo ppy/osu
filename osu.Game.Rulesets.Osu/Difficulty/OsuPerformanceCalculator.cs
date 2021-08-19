@@ -161,8 +161,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Scale the speed value with accuracy and OD
             speedValue *= (0.95 + Math.Pow(Attributes.OverallDifficulty, 2) / 750) * Math.Pow(accuracy, (14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
-            // Punish low OD severely prevent OD abuse on rhythmically complex songs.
-            speedValue *= Math.Max(0.75, (Math.Min(8, Attributes.OverallDifficulty) / 8));
+            // Punish high speed values with low OD to prevent OD abuse on rhythmically complex songs.
+            if (speedValue > 100 && Attributes.OverallDifficulty < 8)
+                speedValue = 100 + (speedValue - 100) * Math.Max(0.5, (Attributes.OverallDifficulty - 4) / 4);
             // Scale the speed value with # of 50s to punish doubletapping.
             speedValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
 
