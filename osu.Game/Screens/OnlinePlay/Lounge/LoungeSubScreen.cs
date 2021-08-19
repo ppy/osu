@@ -23,7 +23,6 @@ using osu.Game.Input;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -37,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     {
         public override string Title => "Lounge";
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
+        protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen();
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
@@ -180,6 +179,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 var drawable = roomsContainer.Rooms.FirstOrDefault(r => r.Room == val.NewValue);
                 if (drawable != null)
                     scrollContainer.ScrollIntoView(drawable);
+
+                ApplyToBackground(b => ((RoomBackgroundScreen)b).Room = val.NewValue);
             });
         }
 
@@ -246,6 +247,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
             onReturning();
         }
 
