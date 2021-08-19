@@ -243,6 +243,7 @@ namespace osu.Game.Screens.Select
                         Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
                         AutoSizeAxes = Axes.Both,
                         Shear = wedged_container_shear,
+                        Spacing = new Vector2(0f, 5f),
                         Children = new Drawable[]
                         {
                             starRatingDisplay = new StarRatingDisplay(default, animated: true)
