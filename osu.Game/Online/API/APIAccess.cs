@@ -309,7 +309,7 @@ namespace osu.Game.Online.API
                 if (IsLoggedIn) state.Value = APIState.Online;
 
                 failureCount = 0;
-                return true;
+                return req.CompletionState == APIRequestCompletionState.Completed;
             }
             catch (HttpRequestException re)
             {
@@ -381,7 +381,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        public bool IsLoggedIn => localUser.Value.Id > 1;
+        public bool IsLoggedIn => localUser.Value.Id > 1; // TODO: should this also be true if attempting to connect?
 
         public void Queue(APIRequest request)
         {
