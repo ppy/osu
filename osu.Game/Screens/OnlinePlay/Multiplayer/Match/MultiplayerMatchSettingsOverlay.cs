@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerMatchSettingsOverlay : MatchSettingsOverlay
+    public class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
     {
         private MatchSettings settings;
 

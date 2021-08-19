@@ -19,7 +19,6 @@ using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
-using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Playlists
@@ -66,7 +65,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 SelectedRoom.Value.RoomID.Value = 1;
                 SelectedRoom.Value.Name.Value = "my awesome room";
-                SelectedRoom.Value.Host.Value = new User { Id = 2, Username = "peppy" };
+                SelectedRoom.Value.Host.Value = API.LocalUser.Value;
                 SelectedRoom.Value.RecentParticipants.Add(SelectedRoom.Value.Host.Value);
                 SelectedRoom.Value.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
                 SelectedRoom.Value.Playlist.Add(new PlaylistItem
@@ -86,7 +85,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("set room properties", () =>
             {
                 SelectedRoom.Value.Name.Value = "my awesome room";
-                SelectedRoom.Value.Host.Value = new User { Id = 2, Username = "peppy" };
+                SelectedRoom.Value.Host.Value = API.LocalUser.Value;
                 SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
@@ -96,7 +95,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("move mouse to create button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<PlaylistsMatchSettingsOverlay.CreateRoomButton>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<PlaylistsRoomSettingsOverlay.CreateRoomButton>().Single());
             });
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
@@ -137,7 +136,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("load room", () =>
             {
                 SelectedRoom.Value.Name.Value = "my awesome room";
-                SelectedRoom.Value.Host.Value = new User { Id = 2, Username = "peppy" };
+                SelectedRoom.Value.Host.Value = API.LocalUser.Value;
                 SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = importedSet.Beatmaps[0] },
@@ -147,7 +146,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("create room", () =>
             {
-                InputManager.MoveMouseTo(match.ChildrenOfType<PlaylistsMatchSettingsOverlay.CreateRoomButton>().Single());
+                InputManager.MoveMouseTo(match.ChildrenOfType<PlaylistsRoomSettingsOverlay.CreateRoomButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 
