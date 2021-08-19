@@ -34,11 +34,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private const float transition_duration = 60;
         private const float selection_border_width = 4;
 
-        [Resolved(canBeNull: true)]
-        private LoungeSubScreen lounge { get; set; }
+        public readonly Bindable<Room> SelectedRoom = new Bindable<Room>();
 
         [Resolved(canBeNull: true)]
-        private Bindable<Room> selectedRoom { get; set; }
+        private LoungeSubScreen lounge { get; set; }
 
         private Sample sampleSelect;
         private Sample sampleJoin;
@@ -89,7 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             else
                 Alpha = 0;
 
-            selectedRoom.BindValueChanged(updateSelectedRoom, true);
+            SelectedRoom.BindValueChanged(updateSelectedRoom, true);
         }
 
         private void updateSelectedRoom(ValueChangedEvent<Room> selected)
@@ -135,7 +134,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public bool OnPressed(GlobalAction action)
         {
-            if (selectedRoom.Value != Room)
+            if (SelectedRoom.Value != Room)
                 return false;
 
             switch (action)
@@ -152,14 +151,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
         }
 
-        protected override bool ShouldBeConsideredForInput(Drawable child) => selectedRoom.Value == Room || child is HoverSounds;
+        protected override bool ShouldBeConsideredForInput(Drawable child) => SelectedRoom.Value == Room || child is HoverSounds;
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Room != selectedRoom.Value)
+            if (Room != SelectedRoom.Value)
             {
                 sampleSelect?.Play();
-                selectedRoom.Value = Room;
+                SelectedRoom.Value = Room;
                 return true;
             }
 

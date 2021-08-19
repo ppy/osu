@@ -30,6 +30,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Width = 0.5f,
+                SelectedRoom = { BindTarget = SelectedRoom }
             };
         });
 
