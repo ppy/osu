@@ -109,12 +109,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }),
                         createDrawableRoom(new Room
                         {
-                            Name = { Value = "Room 4 (realtime)" },
-                            Status = { Value = new RoomStatusOpen() },
-                            Category = { Value = RoomCategory.Realtime },
-                        }),
-                        createDrawableRoom(new Room
-                        {
                             Name = { Value = "Room 4 (spotlight)" },
                             Status = { Value = new RoomStatusOpen() },
                             Category = { Value = RoomCategory.Spotlight },
@@ -134,7 +128,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Name = { Value = "Room with password" },
                 Status = { Value = new RoomStatusOpen() },
-                Category = { Value = RoomCategory.Realtime },
+                Type = { Value = MatchType.HeadToHead },
             }));
 
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
