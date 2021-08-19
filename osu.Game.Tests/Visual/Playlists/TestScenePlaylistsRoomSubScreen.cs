@@ -11,7 +11,6 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -36,18 +35,6 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-
-            ((DummyAPIAccess)API).HandleRequest = req =>
-            {
-                switch (req)
-                {
-                    case CreateRoomScoreRequest createRoomScoreRequest:
-                        createRoomScoreRequest.TriggerSuccess(new APIScoreToken { ID = 1 });
-                        return true;
-                }
-
-                return false;
-            };
         }
 
         [SetUpSteps]
