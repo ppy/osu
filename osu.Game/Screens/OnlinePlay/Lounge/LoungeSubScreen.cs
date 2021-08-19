@@ -86,20 +86,24 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             InternalChildren = new Drawable[]
             {
                 ListingPollingComponent = CreatePollingComponent().With(c => c.Filter.BindTarget = filter),
-                scrollContainer = new OsuScrollContainer
+                new Container
                 {
-                    Name = @"Scrollable rooms container",
+                    Name = @"Rooms area",
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding
                     {
                         Horizontal = WaveOverlayContainer.WIDTH_PADDING,
                         Top = Header.HEIGHT + controls_area_height + 20,
                     },
-                    ScrollbarOverlapsContent = false,
-                    Child = roomsContainer = new RoomsContainer
+                    Child = scrollContainer = new OsuScrollContainer
                     {
-                        Filter = { BindTarget = filter }
-                    }
+                        RelativeSizeAxes = Axes.Both,
+                        ScrollbarOverlapsContent = false,
+                        Child = roomsContainer = new RoomsContainer
+                        {
+                            Filter = { BindTarget = filter }
+                        }
+                    },
                 },
                 loadingLayer = new LoadingLayer(true),
                 new FillFlowContainer
