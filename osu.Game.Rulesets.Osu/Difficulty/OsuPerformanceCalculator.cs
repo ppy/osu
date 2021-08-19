@@ -190,15 +190,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double m300 = 79.5 - 6.0 * Attributes.OverallDifficulty;
             double m100 = 139.5 - 8.0 * Attributes.OverallDifficulty;
             double m50 = 199.5 - 10.0 * Attributes.OverallDifficulty;
-            double acc = p300 + 1.0 / 3.0 * p100 + 1.0 / 6.0 * p50;
 
             double variance = p300 * Math.Pow(m300 / 2.0, 2.0) +
-                                p100 * Math.Pow((m300 + m100) / 2.0, 2.0) +
-                                p50 * Math.Pow((m100 + m50) / 2.0, 2.0) +
-                                pm * Math.Pow(229.5 - 11 * Attributes.OverallDifficulty, 2.0);
+                              p100 * Math.Pow((m300 + m100) / 2.0, 2.0) +
+                              p50 * Math.Pow((m100 + m50) / 2.0, 2.0) +
+                              pm * Math.Pow(229.5 - 11 * Attributes.OverallDifficulty, 2.0);
 
             double accuracyValue = 2.83 * Math.Pow(1.52163, (79.5 - 2 * Math.Sqrt(variance)) / 6.0)
-                                * Math.Pow(Math.Log(1.0 + (Math.E - 1.0) * (Math.Min(amountHitObjectsWithAccuracy, 1600) / 1000.0)), 0.5);
+                                   * Math.Pow(Math.Log(1.0 + (Math.E - 1.0) * (Math.Min(amountHitObjectsWithAccuracy, 1600) / 1000.0)), 0.5);
 
 
             if (mods.Any(m => m is OsuModHidden))

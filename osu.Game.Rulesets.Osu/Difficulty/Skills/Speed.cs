@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
 
-        private const double rhythmMultiplier = 2.0;
-        private const int HistoryTimeMax = 3000; // 3 seconds of calculatingRhythmBonus max.
+        private const double rhythm_multiplier = 2.0;
+        private const int history_time_max = 3000; // 3 seconds of calculatingRhythmBonus max.
 
         private double skillMultiplier => 1375;
         private double strainDecayBase => 0.3;
@@ -65,11 +65,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int i = Previous.Count - 1; i > 0; i--)
             {
-                double currHistoricalDecay = Math.Max(0, (HistoryTimeMax - (current.StartTime - Previous[i - 1].StartTime))) / HistoryTimeMax; // scales note 0 to 1 from history to now
+                double currHistoricalDecay = Math.Max(0, (history_time_max - (current.StartTime - Previous[i - 1].StartTime))) / history_time_max; // scales note 0 to 1 from history to now
 
                 if (currHistoricalDecay != 0)
                 {
-                    currHistoricalDecay = Math.Max(currHistoricalDecay, (Previous.Count - i) / Previous.Count); // either we're limited by time or limited by object count.
+                    // below was bugged in initial version. fixed now, but will change values, will do more testing
+                    // currHistoricalDecay = Math.Min(currHistoricalDecay, (double)(Previous.Count - i) / Previous.Count); // either we're limited by time or limited by object count.
 
                     double currDelta = ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime;
                     double prevDelta = ((OsuDifficultyHitObject)Previous[i]).StrainTime;
@@ -120,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
-            return Math.Sqrt(4 + rhythmComplexitySum * rhythmMultiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity)
+            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity)
         }
 
         private double tapStrainOf(DifficultyHitObject current, double speedBonus)
@@ -151,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 if (angle < pi_over_2)
                     angleBonus = 1.25;
                 else if (angle < angle_bonus_begin)
-                angleBonus = 1 + Math.Pow(Math.Sin(1.5 * (angle_bonus_begin - angle)), 2) / 4;
+                    angleBonus = 1 + Math.Pow(Math.Sin(1.5 * (angle_bonus_begin - angle)), 2) / 4;
 
             }
 
