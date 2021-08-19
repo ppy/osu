@@ -21,7 +21,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
@@ -157,7 +156,7 @@ namespace osu.Game.Screens.Select
             public BeatmapSetOnlineStatusPill StatusPill { get; private set; }
             public FillFlowContainer MapperContainer { get; private set; }
 
-            private DifficultyColourBar difficultyColourBar;
+            private Container difficultyColourBar;
             private StarRatingDisplay starRatingDisplay;
 
             private ILocalisedBindableString titleBinding;
@@ -182,7 +181,7 @@ namespace osu.Game.Screens.Select
             private IBindable<StarDifficulty?> starDifficulty;
 
             [BackgroundDependencyLoader]
-            private void load(LocalisationManager localisation, BeatmapDifficultyCache difficultyCache)
+            private void load(OsuColour colours, LocalisationManager localisation, BeatmapDifficultyCache difficultyCache)
             {
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
@@ -194,10 +193,26 @@ namespace osu.Game.Screens.Select
 
                 Children = new Drawable[]
                 {
-                    difficultyColourBar = new DifficultyColourBar
+                    difficultyColourBar = new Container
                     {
                         RelativeSizeAxes = Axes.Y,
-                        Width = 20,
+                        Width = 20f,
+                        Children = new[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.7f,
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                RelativePositionAxes = Axes.Both,
+                                Alpha = 0.5f,
+                                X = 0.7f,
+                                Width = 1 - 0.7f,
+                            }
+                        }
                     },
                     new FillFlowContainer
                     {
@@ -230,7 +245,7 @@ namespace osu.Game.Screens.Select
                         Shear = wedged_container_shear,
                         Children = new Drawable[]
                         {
-                            starRatingDisplay = new StarRatingDisplay(default)
+                            starRatingDisplay = new StarRatingDisplay(default, animated: true)
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
@@ -292,11 +307,14 @@ namespace osu.Game.Screens.Select
                 titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
                 artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
 
+                starRatingDisplay.DisplayedStars.BindValueChanged(s =>
+                {
+                    difficultyColourBar.Colour = colours.ForStarDifficulty(s.NewValue);
+                }, true);
+
                 starDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
                 starDifficulty.BindValueChanged(s =>
                 {
-                    difficultyColourBar.Current.Value = s.NewValue ?? default;
-
                     starRatingDisplay.FadeIn(transition_duration);
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
                 });
@@ -478,55 +496,6 @@ namespace osu.Game.Screens.Select
                             Text = statistic.Content,
                         }
                     };
-                }
-            }
-
-            public class DifficultyColourBar : Container, IHasCurrentValue<StarDifficulty>
-            {
-                private readonly BindableWithCurrent<StarDifficulty> current = new BindableWithCurrent<StarDifficulty>();
-
-                public Bindable<StarDifficulty> Current
-                {
-                    get => current.Current;
-                    set => current.Current = value;
-                }
-
-                [Resolved]
-                private OsuColour colours { get; set; }
-
-                [BackgroundDependencyLoader]
-                private void load()
-                {
-                    const float full_opacity_ratio = 0.7f;
-
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = full_opacity_ratio,
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            RelativePositionAxes = Axes.Both,
-                            Alpha = 0.5f,
-                            X = full_opacity_ratio,
-                            Width = 1 - full_opacity_ratio,
-                        }
-                    };
-                }
-
-                protected override void LoadComplete()
-                {
-                    base.LoadComplete();
-
-                    Current.BindValueChanged(c =>
-                    {
-                        this.FadeColour(colours.ForStarDifficulty(c.NewValue.Stars), transition_duration, Easing.OutQuint);
-                    }, true);
-
-                    FinishTransforms(true);
                 }
             }
         }
