@@ -37,6 +37,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("reset mouse", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddStep("add rooms", () => RoomManager.AddRooms(30));
+            AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 30);
 
             AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.Rooms[0]));
 
@@ -53,6 +54,7 @@ namespace osu.Game.Tests.Visual.Playlists
         public void TestScrollSelectedIntoView()
         {
             AddStep("add rooms", () => RoomManager.AddRooms(30));
+            AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 30);
 
             AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.Rooms[0]));
 

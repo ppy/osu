@@ -9,6 +9,7 @@ using osu.Framework.Testing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK.Input;
@@ -150,6 +151,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private bool checkRoomSelected(Room room) => SelectedRoom.Value == room;
 
         private Room getRoomInFlow(int index) =>
-            (container.ChildrenOfType<FillFlowContainer<DrawableRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;
+            (container.ChildrenOfType<FillFlowContainer<DrawableLoungeRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;
     }
 }
