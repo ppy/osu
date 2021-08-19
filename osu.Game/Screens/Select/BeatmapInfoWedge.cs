@@ -73,17 +73,19 @@ namespace osu.Game.Screens.Select
             ruleset.BindValueChanged(_ => updateDisplay());
         }
 
+        private const double animation_duration = 800;
+
         protected override void PopIn()
         {
-            this.MoveToX(0, 800, Easing.OutQuint);
-            this.RotateTo(0, 800, Easing.OutQuint);
+            this.MoveToX(0, animation_duration, Easing.OutQuint);
+            this.RotateTo(0, animation_duration, Easing.OutQuint);
             this.FadeIn(transition_duration);
         }
 
         protected override void PopOut()
         {
-            this.MoveToX(-100, 800, Easing.In);
-            this.RotateTo(10, 800, Easing.In);
+            this.MoveToX(-100, animation_duration, Easing.In);
+            this.RotateTo(10, animation_duration, Easing.In);
             this.FadeOut(transition_duration * 2, Easing.In);
         }
 
@@ -191,6 +193,8 @@ namespace osu.Game.Screens.Select
                 titleBinding = localisation.GetLocalisedString(new RomanisableString(metadata.TitleUnicode, metadata.Title));
                 artistBinding = localisation.GetLocalisedString(new RomanisableString(metadata.ArtistUnicode, metadata.Artist));
 
+                const float top_height = 0.7f;
+
                 Children = new Drawable[]
                 {
                     difficultyColourBar = new Container
@@ -202,15 +206,15 @@ namespace osu.Game.Screens.Select
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Width = 0.7f,
+                                Width = top_height,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 RelativePositionAxes = Axes.Both,
                                 Alpha = 0.5f,
-                                X = 0.7f,
-                                Width = 1 - 0.7f,
+                                X = top_height,
+                                Width = 1 - top_height,
                             }
                         }
                     },
