@@ -159,7 +159,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                             ScrollbarOverlapsContent = false,
                                             Child = roomsContainer = new RoomsContainer
                                             {
-                                                Filter = { BindTarget = filter }
+                                                Filter = { BindTarget = filter },
+                                                SelectedRoom = { BindTarget = selectedRoom }
                                             }
                                         },
                                     }
