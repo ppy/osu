@@ -173,6 +173,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             int amountHitObjectsWithAccuracy = Attributes.HitCircleCount;
 
+            if (amountHitObjectsWithAccuracy == 0)
+                return 0;
+
             // This section should be documented by Tr3, but effectively we're calculating the exact same way as before, but
             // we calculate a variance based on the object count and # of 50s, 100s, etc. This prevents us from having cases
             // where an SS on lower OD is actually worth more than a 95% on OD11, even though the OD11 requires a greater
