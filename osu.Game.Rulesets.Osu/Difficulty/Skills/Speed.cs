@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
 
-        private const double rhythmMultiplier = 2.5;
+        private const double rhythmMultiplier = 2.0;
         private const int HistoryTimeMax = 3000; // 3 seconds of calculatingRhythmBonus max.
 
         private double skillMultiplier => 1375;
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                             if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
                                 effectiveRatio *= 0.25;
 
-                            rhythmComplexitySum += effectiveRatio * currHistoricalDecay;
+                            rhythmComplexitySum += effectiveRatio;
 
                             previousIslandSize = islandSize; // log the last island size.
 
