@@ -120,6 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
+                                    Alpha = 0,
                                     Margin = new MarginPadding { Bottom = 10 },
                                     Children = new Drawable[]
                                     {

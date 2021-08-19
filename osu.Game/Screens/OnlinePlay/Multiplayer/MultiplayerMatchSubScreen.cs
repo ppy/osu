@@ -155,6 +155,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
                                                     Margin = new MarginPadding { Top = 10 },
+                                                    Alpha = 0,
                                                     Children = new Drawable[]
                                                     {
                                                         new OverlinedHeader("Extra mods"),
