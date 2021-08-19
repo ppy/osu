@@ -85,6 +85,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFocusOnTabKeyWhenExpanded()
         {
+            setLocalUserPlaying(true);
+
             assertChatFocused(false);
             AddStep("press tab", () => InputManager.Key(Key.Tab));
             assertChatFocused(true);
