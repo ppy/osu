@@ -78,32 +78,16 @@ namespace osu.Game.Screens.OnlinePlay
         [BackgroundDependencyLoader]
         private void load()
         {
-            var backgroundColour = Color4Extensions.FromHex(@"3e3a44");
-
             InternalChild = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = backgroundColour,
-                    },
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new BeatmapBackgroundSprite
-                            {
-                                RelativeSizeAxes = Axes.Both
-                            },
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.9f), Color4.Black.Opacity(0.6f))
-                            },
                             screenStack = new OnlinePlaySubScreenStack
                             {
                                 RelativeSizeAxes = Axes.Both
@@ -273,51 +257,6 @@ namespace osu.Game.Screens.OnlinePlay
                 SecondWaveColour = Color4Extensions.FromHex(@"554075");
                 ThirdWaveColour = Color4Extensions.FromHex(@"44325e");
                 FourthWaveColour = Color4Extensions.FromHex(@"392850");
-            }
-        }
-
-        private class BeatmapBackgroundSprite : OnlinePlayBackgroundSprite
-        {
-            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BlurredBackgroundSprite(BeatmapSetCoverType) { RelativeSizeAxes = Axes.Both };
-
-            public class BlurredBackgroundSprite : UpdateableBeatmapBackgroundSprite
-            {
-                public BlurredBackgroundSprite(BeatmapSetCoverType type)
-                    : base(type)
-                {
-                }
-
-                protected override double LoadDelay => 200;
-
-                protected override Drawable CreateDrawable(BeatmapInfo model) =>
-                    new BufferedLoader(base.CreateDrawable(model));
-            }
-
-            // This class is an unfortunate requirement due to `LongRunningLoad` requiring direct async loading.
-            // It means that if the web request fetching the beatmap background takes too long, it will suddenly appear.
-            internal class BufferedLoader : BufferedContainer
-            {
-                private readonly Drawable drawable;
-
-                public BufferedLoader(Drawable drawable)
-                {
-                    this.drawable = drawable;
-
-                    RelativeSizeAxes = Axes.Both;
-                    BlurSigma = new Vector2(10);
-                    FrameBufferScale = new Vector2(0.5f);
-                    CacheDrawnFrameBuffer = true;
-                }
-
-                [BackgroundDependencyLoader]
-                private void load()
-                {
-                    LoadComponentAsync(drawable, d =>
-                    {
-                        Add(d);
-                        ForceRedraw();
-                    });
-                }
             }
         }
 

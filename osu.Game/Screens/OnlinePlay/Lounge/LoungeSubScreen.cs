@@ -23,6 +23,7 @@ using osu.Game.Input;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     public abstract class LoungeSubScreen : OnlinePlaySubScreen
     {
         public override string Title => "Lounge";
+
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
