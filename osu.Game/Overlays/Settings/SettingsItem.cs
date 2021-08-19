@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Settings
         {
             set
             {
-                bool hasValue = string.IsNullOrWhiteSpace(value.ToString());
+                bool hasValue = !string.IsNullOrWhiteSpace(value.ToString());
 
                 if (warningText == null)
                 {
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Settings
                     FlowContent.Add(warningText = new SettingsNoticeText(colours) { Margin = new MarginPadding { Bottom = 5 } });
                 }
 
-                warningText.Alpha = hasValue ? 0 : 1;
+                warningText.Alpha = hasValue ? 1 : 0;
                 warningText.Text = value.ToString(); // TODO: Remove ToString() call after TextFlowContainer supports localisation (see https://github.com/ppy/osu-framework/issues/4636).
             }
         }
