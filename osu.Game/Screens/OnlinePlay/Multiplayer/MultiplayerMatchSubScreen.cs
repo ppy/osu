@@ -48,9 +48,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
-        [Resolved]
-        private Bindable<Room> currentRoom { get; set; } // Todo: This should not exist.
-
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
 
         [CanBeNull]
@@ -82,16 +79,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     handleRoomLost();
             }, true);
 
-            currentRoom.BindValueChanged(room =>
-            {
-                if (room.NewValue == null)
-                {
-                    // the room has gone away.
-                    // this could mean something happened during the join process, or an external connection issue occurred.
-                    // one specific scenario is where the underlying room is created, but the signalr server returns an error during the join process. this triggers a PartRoom operation (see https://github.com/ppy/osu/blob/7654df94f6f37b8382be7dfcb4f674e03bd35427/osu.Game/Screens/OnlinePlay/Multiplayer/MultiplayerRoomManager.cs#L97)
-                    handleRoomLost();
-                }
-            }, true);
+            if (client.Room == null)
+                handleRoomLost();
         }
 
         protected override Drawable CreateMainContent() => new GridContainer
@@ -223,7 +212,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             OnSpectateClick = onSpectateClick
         };
 
-        protected override RoomSettingsOverlay CreateRoomSettingsOverlay() => new MultiplayerMatchSettingsOverlay();
+        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
 
         protected override void UpdateMods()
         {
