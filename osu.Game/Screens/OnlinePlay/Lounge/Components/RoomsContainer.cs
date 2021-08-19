@@ -30,8 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
 
-        [Resolved(CanBeNull = true)]
-        private Bindable<FilterCriteria> filter { get; set; }
+        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
 
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
@@ -74,7 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             rooms.BindTo(roomManager.Rooms);
 
-            filter?.BindValueChanged(criteria => Filter(criteria.NewValue));
+            Filter?.BindValueChanged(criteria => applyFilterCriteria(criteria.NewValue), true);
 
             selectedRoom.BindValueChanged(selection =>
             {
@@ -85,7 +84,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void updateSelection() =>
             roomFlow.Children.ForEach(r => r.State = r.Room == selectedRoom.Value ? SelectionState.Selected : SelectionState.NotSelected);
 
-        public void Filter(FilterCriteria criteria)
+        private void applyFilterCriteria(FilterCriteria criteria)
         {
             roomFlow.Children.ForEach(r =>
             {
@@ -126,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomFlow.Add(new DrawableRoom(room));
             }
 
-            Filter(filter?.Value);
+            applyFilterCriteria(Filter?.Value);
 
             updateSelection();
         }

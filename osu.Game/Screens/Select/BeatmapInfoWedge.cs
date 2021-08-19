@@ -29,7 +29,6 @@ using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select

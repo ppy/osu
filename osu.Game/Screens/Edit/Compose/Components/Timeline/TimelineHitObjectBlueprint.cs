@@ -166,14 +166,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             if (IsSelected)
-            {
                 border.Show();
-                colour = colour.Lighten(0.3f);
-            }
             else
-            {
                 border.Hide();
-            }
 
             if (Item is IHasDuration duration && duration.Duration > 0)
                 circle.Colour = ColourInfo.GradientHorizontal(colour, colour.Lighten(0.4f));
@@ -212,14 +207,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             for (int i = 0; i < repeats.RepeatCount; i++)
             {
-                repeatsContainer.Add(new Circle
+                repeatsContainer.Add(new Tick
                 {
-                    Size = new Vector2(circle_size / 3),
-                    Alpha = 0.2f,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = (float)(i + 1) / (repeats.RepeatCount + 1),
+                    X = (float)(i + 1) / (repeats.RepeatCount + 1)
                 });
             }
         }
@@ -232,6 +222,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public override Quad SelectionQuad => circle.ScreenSpaceDrawQuad;
 
         public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
+
+        private class Tick : Circle
+        {
+            public Tick()
+            {
+                Size = new Vector2(circle_size / 4);
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.Centre;
+                RelativePositionAxes = Axes.X;
+            }
+        }
 
         public class DragArea : Circle
         {
@@ -304,20 +305,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private void updateState()
             {
-                if (hasMouseDown)
-                {
-                    this.ScaleTo(0.7f, 200, Easing.OutQuint);
-                }
-                else if (IsHovered)
-                {
-                    this.ScaleTo(0.8f, 200, Easing.OutQuint);
-                }
-                else
-                {
-                    this.ScaleTo(0.6f, 200, Easing.OutQuint);
-                }
+                float scale = 0.5f;
 
-                this.FadeTo(IsHovered || hasMouseDown ? 0.8f : 0.2f, 200, Easing.OutQuint);
+                if (hasMouseDown)
+                    scale = 0.6f;
+                else if (IsHovered)
+                    scale = 0.7f;
+
+                this.ScaleTo(scale, 200, Easing.OutQuint);
+                this.FadeTo(IsHovered || hasMouseDown ? 1f : 0.9f, 200, Easing.OutQuint);
             }
 
             [Resolved]
