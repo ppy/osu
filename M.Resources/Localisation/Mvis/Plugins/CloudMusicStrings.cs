@@ -52,9 +52,9 @@ namespace M.Resources.Localisation.Mvis.Plugins
 
         public static LocalisableString Delete => new TranslatableString(getKey(@"delete"), @"删除");
 
-        public static LocalisableString SeekToNext => new TranslatableString(getKey(@"seek_next"), @"前往上一拍");
+        public static LocalisableString SeekToNext => new TranslatableString(getKey(@"seek_next"), @"前往下一拍");
 
-        public static LocalisableString SeekToPrev => new TranslatableString(getKey(@"seek_prev"), @"前往下一拍");
+        public static LocalisableString SeekToPrev => new TranslatableString(getKey(@"seek_prev"), @"前往上一拍");
 
         public static LocalisableString InsertNewLine => new TranslatableString(getKey(@"insert_new_line"), @"插入新歌词");
 
@@ -64,9 +64,9 @@ namespace M.Resources.Localisation.Mvis.Plugins
 
         public static LocalisableString LyricTranslated => new TranslatableString(getKey(@"lyric_translated"), @"歌词翻译");
 
-        public static LocalisableString LyricTimeToTrack => new TranslatableString(getKey(@"lyric_time_to_track"), @"调整歌曲到歌词时间");
+        public static LocalisableString LyricTimeToTrack => new TranslatableString(getKey(@"lyric_time_to_track"), @"调整歌词到歌曲时间");
 
-        public static LocalisableString TrackTimeToLyric => new TranslatableString(getKey(@"track_time_to_lyric"), @"调整歌词到歌曲时间");
+        public static LocalisableString TrackTimeToLyric => new TranslatableString(getKey(@"track_time_to_lyric"), @"调整歌曲到歌词时间");
 
         //其他
         public static LocalisableString AdjustOffsetToLyric => new TranslatableString(getKey(@"offset_adjust_to_lyric"), @"对其偏移至该歌词");
