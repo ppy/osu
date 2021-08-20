@@ -172,8 +172,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             sampleJoin?.Play();
             lounge?.Join(Room, null);
-
-            return base.OnClick(e);
+            return true;
         }
 
         public class PasswordEntryPopover : OsuPopover
