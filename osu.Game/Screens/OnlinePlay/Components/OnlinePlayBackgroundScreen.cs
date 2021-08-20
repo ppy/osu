@@ -1,57 +1,47 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
-using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Online.Rooms;
 using osuTK;
 
+#nullable enable
+
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class RoomBackgroundScreen : BackgroundScreen
+    public abstract class OnlinePlayBackgroundScreen : BackgroundScreen
     {
         private CancellationTokenSource? cancellationSource;
         private PlaylistItemBackground? background;
 
-        private readonly BindableList<PlaylistItem> playlist = new BindableList<PlaylistItem>();
-
-        public RoomBackgroundScreen()
+        protected OnlinePlayBackgroundScreen()
             : base(false)
         {
-            playlist.BindCollectionChanged((_, __) => updateBackground());
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            switchBackground(new PlaylistItemBackground(null));
+            switchBackground(new PlaylistItemBackground(playlistItem));
         }
 
-        private Room? room;
+        private PlaylistItem? playlistItem;
 
-        public Room? Room
+        protected PlaylistItem? PlaylistItem
         {
-            get => room;
+            get => playlistItem;
             set
             {
-                if (room == value)
+                if (playlistItem == value)
                     return;
 
-                if (room != null)
-                    playlist.UnbindFrom(room.Playlist);
+                playlistItem = value;
 
-                room = value;
-
-                if (room != null)
-                    playlist.BindTo(room.Playlist);
-                else
-                    playlist.Clear();
+                if (LoadState > LoadState.Ready)
+                    updateBackground();
             }
         }
 
@@ -59,7 +49,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             Schedule(() =>
             {
-                var playlistItem = playlist.FirstOrDefault();
                 var beatmap = playlistItem?.Beatmap.Value;
 
                 if (background?.BeatmapInfo?.BeatmapSet?.OnlineInfo?.Covers?.Cover == beatmap?.BeatmapSet?.OnlineInfo?.Covers?.Cover)
