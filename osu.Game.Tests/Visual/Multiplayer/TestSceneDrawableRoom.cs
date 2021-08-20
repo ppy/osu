@@ -10,11 +10,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
@@ -109,12 +109,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }),
                         createDrawableRoom(new Room
                         {
-                            Name = { Value = "Room 4 (realtime)" },
-                            Status = { Value = new RoomStatusOpen() },
-                            Category = { Value = RoomCategory.Realtime },
-                        }),
-                        createDrawableRoom(new Room
-                        {
                             Name = { Value = "Room 4 (spotlight)" },
                             Status = { Value = new RoomStatusOpen() },
                             Category = { Value = RoomCategory.Spotlight },
@@ -134,7 +128,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Name = { Value = "Room with password" },
                 Status = { Value = new RoomStatusOpen() },
-                Category = { Value = RoomCategory.Realtime },
+                Type = { Value = MatchType.HeadToHead },
             }));
 
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
@@ -159,10 +153,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }));
             }
 
-            var drawableRoom = new DrawableRoom(room) { MatchingFilter = true };
-            drawableRoom.Action = () => drawableRoom.State = drawableRoom.State == SelectionState.Selected ? SelectionState.NotSelected : SelectionState.Selected;
-
-            return drawableRoom;
+            return new DrawableLoungeRoom(room) { MatchingFilter = true };
         }
     }
 }

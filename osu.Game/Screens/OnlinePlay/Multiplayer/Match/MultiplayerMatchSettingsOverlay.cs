@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerMatchSettingsOverlay : MatchSettingsOverlay
+    public class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
     {
         private MatchSettings settings;
 
@@ -150,6 +150,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
+                                                                        LengthLimit = 100,
                                                                     },
                                                                 },
                                                                 new Section("Room visibility")
@@ -207,6 +208,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
+                                                                        LengthLimit = 255,
                                                                     },
                                                                 },
                                                             }

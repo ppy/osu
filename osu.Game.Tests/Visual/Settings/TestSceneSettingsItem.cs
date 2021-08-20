@@ -76,5 +76,23 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("restore default", () => sliderBar.Current.SetDefault());
             AddUntilStep("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
         }
+
+        [Test]
+        public void TestWarningTextVisibility()
+        {
+            SettingsNumberBox numberBox = null;
+
+            AddStep("create settings item", () => Child = numberBox = new SettingsNumberBox());
+            AddAssert("warning text not created", () => !numberBox.ChildrenOfType<SettingsNoticeText>().Any());
+
+            AddStep("set warning text", () => numberBox.WarningText = "this is a warning!");
+            AddAssert("warning text created", () => numberBox.ChildrenOfType<SettingsNoticeText>().Single().Alpha == 1);
+
+            AddStep("unset warning text", () => numberBox.WarningText = default);
+            AddAssert("warning text hidden", () => numberBox.ChildrenOfType<SettingsNoticeText>().Single().Alpha == 0);
+
+            AddStep("set warning text again", () => numberBox.WarningText = "another warning!");
+            AddAssert("warning text shown again", () => numberBox.ChildrenOfType<SettingsNoticeText>().Single().Alpha == 1);
+        }
     }
 }

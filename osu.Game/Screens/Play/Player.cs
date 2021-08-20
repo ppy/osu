@@ -75,7 +75,9 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
-        protected readonly Bindable<bool> LocalUserPlaying = new Bindable<bool>();
+        public IBindable<bool> LocalUserPlaying => localUserPlaying;
+
+        private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
 
         public int RestartCount;
 
@@ -442,7 +444,7 @@ namespace osu.Game.Screens.Play
         {
             bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value;
             OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
-            LocalUserPlaying.Value = inGameplay;
+            localUserPlaying.Value = inGameplay;
         }
 
         private void updateSampleDisabledState()
