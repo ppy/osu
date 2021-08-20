@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneLoungeRoomsContainer : OnlinePlayTestScene
     {
-        protected new BasicTestRoomManager RoomManager => (BasicTestRoomManager)base.RoomManager;
+        protected new TestRequestHandlingRoomManager RoomManager => (TestRequestHandlingRoomManager)base.RoomManager;
 
         private RoomsContainer container;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add rooms", () => RoomManager.AddRooms(3));
 
             AddAssert("has 3 rooms", () => container.Rooms.Count == 3);
-            AddStep("remove first room", () => RoomManager.Rooms.Remove(RoomManager.Rooms.FirstOrDefault()));
+            AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.FirstOrDefault()));
             AddAssert("has 2 rooms", () => container.Rooms.Count == 2);
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 

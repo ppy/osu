@@ -98,8 +98,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    AutoSizeDuration = transition_duration,
-                    AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
                     Children = new[]
                     {
@@ -176,13 +174,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingMode.BindValueChanged(mode =>
             {
                 scalingSettings.ClearTransforms();
-                scalingSettings.AutoSizeAxes = mode.NewValue != ScalingMode.Off ? Axes.Y : Axes.None;
+                scalingSettings.AutoSizeDuration = transition_duration;
+                scalingSettings.AutoSizeEasing = Easing.OutQuint;
 
-                if (mode.NewValue == ScalingMode.Off)
-                    scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+                updateScalingModeVisibility();
+            });
 
-                scalingSettings.ForEach(s => s.TransferValueOnCommit = mode.NewValue == ScalingMode.Everything);
-            }, true);
+            // initial update bypasses transforms
+            updateScalingModeVisibility();
 
             void updateResolutionDropdown()
             {
@@ -190,6 +189,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     resolutionDropdown.Show();
                 else
                     resolutionDropdown.Hide();
+            }
+
+            void updateScalingModeVisibility()
+            {
+                if (scalingMode.Value == ScalingMode.Off)
+                    scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+
+                scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
+                scalingSettings.ForEach(s => s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything);
             }
         }
 

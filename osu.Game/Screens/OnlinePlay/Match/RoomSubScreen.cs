@@ -195,14 +195,19 @@ namespace osu.Game.Screens.OnlinePlay.Match
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Children = new[]
+                                Children = new Drawable[]
                                 {
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = Color4Extensions.FromHex(@"28242d") // Temporary.
                                     },
-                                    CreateFooter()
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding(5),
+                                        Child = CreateFooter()
+                                    },
                                 }
                             }
                         }
@@ -252,6 +257,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (Room.RoomID.Value == null)
             {
                 // room has not been created yet; exit immediately.
+                settingsOverlay.Hide();
                 return base.OnBackButton();
             }
 
