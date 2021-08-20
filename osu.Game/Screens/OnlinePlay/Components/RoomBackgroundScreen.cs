@@ -5,6 +5,7 @@
 
 using System.Linq;
 using System.Threading;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.Rooms;
@@ -20,8 +21,15 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private readonly BindableList<PlaylistItem> playlist = new BindableList<PlaylistItem>();
 
         public RoomBackgroundScreen()
+            : base(false)
         {
             playlist.BindCollectionChanged((_, __) => updateBackground());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            switchBackground(new PlaylistItemBackground(null));
         }
 
         private Room? room;
