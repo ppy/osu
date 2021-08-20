@@ -10,8 +10,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Screens.Ranking.Expanded;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
@@ -64,8 +64,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        minDisplay = new StarRatingDisplay(default),
-                        maxDisplay = new StarRatingDisplay(default)
+                        minDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range),
+                        maxDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range)
                     }
                 }
             };

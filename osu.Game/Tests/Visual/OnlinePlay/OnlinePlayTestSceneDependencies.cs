@@ -71,6 +71,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 drawableComponents.Add(drawable);
         }
 
-        protected virtual IRoomManager CreateRoomManager() => new BasicTestRoomManager();
+        protected virtual IRoomManager CreateRoomManager() => new TestRequestHandlingRoomManager();
     }
 }
