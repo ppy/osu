@@ -36,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     {
         public override string Title => "Lounge";
 
-        protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen();
+        protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen();
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 if (drawable != null)
                     scrollContainer.ScrollIntoView(drawable);
 
-                ApplyToBackground(b => ((RoomBackgroundScreen)b).Room = val.NewValue);
+                ApplyToBackground(b => ((LoungeBackgroundScreen)b).SelectedRoom = val.NewValue);
             });
         }
 
