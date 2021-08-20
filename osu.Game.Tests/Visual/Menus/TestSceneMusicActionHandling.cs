@@ -10,7 +10,6 @@ using osu.Game.Database;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Tests.Resources;
-using osu.Game.Tests.Visual.Navigation;
 
 namespace osu.Game.Tests.Visual.Menus
 {
