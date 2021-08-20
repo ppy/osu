@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Collections.IO
@@ -127,7 +128,7 @@ namespace osu.Game.Tests.Collections.IO
         [Test]
         public async Task TestSaveAndReload()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost("TestSaveAndReload", bypassCleanup: true))
             {
                 try
                 {
@@ -148,7 +149,7 @@ namespace osu.Game.Tests.Collections.IO
                 }
             }
 
-            using (HeadlessGameHost host = new HeadlessGameHost("TestSaveAndReload"))
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost("TestSaveAndReload"))
             {
                 try
                 {
