@@ -77,17 +77,7 @@ namespace osu.Game.Screens.OnlinePlay
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            screenStack = new OnlinePlaySubScreenStack
-                            {
-                                RelativeSizeAxes = Axes.Both
-                            }
-                        }
-                    },
+                    screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both },
                     new Header(ScreenTitle, screenStack),
                     RoomManager,
                     ongoingOperationTracker
