@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.Containers
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();
 
-        private Drawable lastClickedSection;
+        private T lastClickedSection;
 
         public Drawable ExpandableHeader
         {
@@ -145,10 +145,12 @@ namespace osu.Game.Graphics.Containers
             footerHeight = null;
         }
 
-        public void ScrollTo(Drawable section)
+        public void ScrollTo(Drawable target)
         {
-            lastClickedSection = section;
-            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - scrollContainer.DisplayableContent * scroll_y_centre - (FixedHeader?.BoundingBox.Height ?? 0));
+            if (target is T section)
+                lastClickedSection = section;
+
+            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(target) - scrollContainer.DisplayableContent * scroll_y_centre - (FixedHeader?.BoundingBox.Height ?? 0));
         }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
@@ -236,10 +238,12 @@ namespace osu.Game.Graphics.Containers
 
                 var presentChildren = Children.Where(c => c.IsPresent);
 
-                if (Precision.AlmostBigger(0, scrollContainer.Current))
-                    SelectedSection.Value = lastClickedSection as T ?? presentChildren.FirstOrDefault();
+                if (lastClickedSection != null)
+                    SelectedSection.Value = lastClickedSection;
+                else if (Precision.AlmostBigger(0, scrollContainer.Current))
+                    SelectedSection.Value = presentChildren.FirstOrDefault();
                 else if (Precision.AlmostBigger(scrollContainer.Current, scrollContainer.ScrollableExtent))
-                    SelectedSection.Value = lastClickedSection as T ?? presentChildren.LastOrDefault();
+                    SelectedSection.Value = presentChildren.LastOrDefault();
                 else
                 {
                     SelectedSection.Value = presentChildren
