@@ -43,7 +43,7 @@ namespace osu.Game.Online.Chat
             RegexOptions.IgnoreCase);
 
         // 00:00:000 (1,2,3) - test
-        private static readonly Regex time_regex = new Regex(@"\d\d:\d\d:\d\d\d? [^-]*");
+        private static readonly Regex time_regex = new Regex(@"\d\d:\d\d:\d\d\d? \((\d,?)+\)");
 
         // #osu
         private static readonly Regex channel_regex = new Regex(@"(#[a-zA-Z]+[a-zA-Z0-9]+)");
