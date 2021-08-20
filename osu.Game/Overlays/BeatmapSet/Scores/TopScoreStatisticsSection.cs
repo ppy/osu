@@ -235,7 +235,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
 
             private ModsInfoColumn(FillFlowContainer modsContainer)
-                : base("mods", modsContainer)
+                : base(BeatmapsetsStrings.ShowScoreboardHeadersMods, modsContainer)
             {
                 this.modsContainer = modsContainer;
             }
