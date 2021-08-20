@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
@@ -38,11 +39,11 @@ namespace osu.Game.Overlays
                 current.ValueChanged += _ => UpdateState();
                 current.DefaultChanged += _ => UpdateState();
                 current.DisabledChanged += _ => UpdateState();
-                UpdateState();
+
+                if (IsLoaded)
+                    UpdateState();
             }
         }
-
-        private Color4 buttonColour;
 
         private bool hovering;
 
@@ -58,12 +59,11 @@ namespace osu.Game.Overlays
         private void load(OsuColour colour)
         {
             BackgroundColour = colour.Yellow;
-            buttonColour = colour.Yellow;
             Content.Width = 0.33f;
             Content.CornerRadius = 3;
             Content.EdgeEffect = new EdgeEffectParameters
             {
-                Colour = buttonColour.Opacity(0.1f),
+                Colour = BackgroundColour.Opacity(0.1f),
                 Type = EdgeEffectType.Glow,
                 Radius = 2,
             };
@@ -81,7 +81,10 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            UpdateState();
+
+            // avoid unnecessary transforms on first display.
+            Alpha = currentAlpha;
+            Background.Colour = currentColour;
         }
 
         public LocalisableString TooltipText => "revert to default";
@@ -101,14 +104,16 @@ namespace osu.Game.Overlays
 
         public void UpdateState() => Scheduler.AddOnce(updateState);
 
+        private float currentAlpha => current.IsDefault ? 0f : hovering && !current.Disabled ? 1f : 0.65f;
+        private ColourInfo currentColour => current.Disabled ? Color4.Gray : BackgroundColour;
+
         private void updateState()
         {
             if (current == null)
                 return;
 
-            this.FadeTo(current.IsDefault ? 0f :
-                hovering && !current.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
-            this.FadeColour(current.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
+            this.FadeTo(currentAlpha, 200, Easing.OutQuint);
+            Background.FadeColour(currentColour, 200, Easing.OutQuint);
         }
     }
 }

@@ -3,7 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Bindables;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 
@@ -66,7 +65,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected class OverlayTestPlayer : TestPlayer
         {
             public new OverlayActivation OverlayActivationMode => base.OverlayActivationMode.Value;
-            public new Bindable<bool> LocalUserPlaying => base.LocalUserPlaying;
         }
     }
 }
