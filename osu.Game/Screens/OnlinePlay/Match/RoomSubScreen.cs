@@ -139,7 +139,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                             {
                                                 new DrawableMatchRoom(Room, allowEdit)
                                                 {
-                                                    OnEdit = () => settingsOverlay.Show()
+                                                    OnEdit = () => settingsOverlay.Show(),
+                                                    SelectedItem = { BindTarget = SelectedItem }
                                                 }
                                             },
                                             null,
