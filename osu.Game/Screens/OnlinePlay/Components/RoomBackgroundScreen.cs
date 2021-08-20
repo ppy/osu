@@ -8,6 +8,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Screens;
 using osu.Game.Online.Rooms;
 using osuTK;
 
@@ -85,6 +86,27 @@ namespace osu.Game.Screens.OnlinePlay.Components
             newBackground.BlurTo(new Vector2(10));
 
             AddInternal(background = newBackground);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // This is a static screen, so override the scale set in base.Update(), but also the scale set by the screen stack.
+            Scale = new Vector2(1f / BackgroundScreenStack.BACKGROUND_SCALE);
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            base.OnSuspending(next);
+            this.MoveToX(0, TRANSITION_LENGTH);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            var result = base.OnExiting(next);
+            this.MoveToX(0);
+            return result;
         }
     }
 }
