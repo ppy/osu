@@ -313,9 +313,13 @@ namespace osu.Game.Tests.NonVisual
             {
                 base.Dispose(isDisposing);
 
-                // the storage may have changed from the initial location.
-                // this handles cleanup of the initial location.
-                InitialStorage.DeleteDirectory(string.Empty);
+                try
+                {
+                    // the storage may have changed from the initial location.
+                    // this handles cleanup of the initial location.
+                    InitialStorage.DeleteDirectory(string.Empty);
+                }
+                catch { }
             }
         }
     }
