@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Beatmaps
                 starDifficultyBindable = difficultyCache.GetBindableDifficulty(importedSet.Beatmaps.First());
             });
 
-            AddAssert($"star difficulty -> {BASE_STARS}", () => starDifficultyBindable.Value?.Stars == BASE_STARS);
+            AddUntilStep($"star difficulty -> {BASE_STARS}", () => starDifficultyBindable.Value?.Stars == BASE_STARS);
         }
 
         [Test]
@@ -59,13 +59,13 @@ namespace osu.Game.Tests.Beatmaps
             OsuModDoubleTime dt = null;
 
             AddStep("change selected mod to DT", () => SelectedMods.Value = new[] { dt = new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
-            AddAssert($"star difficulty -> {BASE_STARS + 1.5}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.5);
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.5}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.5);
 
             AddStep("change DT speed to 1.25", () => dt.SpeedChange.Value = 1.25);
-            AddAssert($"star difficulty -> {BASE_STARS + 1.25}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.25);
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.25}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.25);
 
             AddStep("change selected mod to NC", () => SelectedMods.Value = new[] { new OsuModNightcore { SpeedChange = { Value = 1.75 } } });
-            AddAssert($"star difficulty -> {BASE_STARS + 1.75}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.75);
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.75}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.75);
         }
 
         [Test]
