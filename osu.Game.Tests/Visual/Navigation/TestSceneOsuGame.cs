@@ -114,7 +114,6 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for load", () => game.IsLoaded);
         }
 
-
         [Test]
         public void TestNullRulesetHandled()
         {
