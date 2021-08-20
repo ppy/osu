@@ -5,6 +5,7 @@
 
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Screens;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using PlaylistItem = osu.Game.Online.Rooms.PlaylistItem;
@@ -40,6 +41,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 else
                     playlist.Clear();
             }
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            // This screen never exits.
+            return true;
         }
     }
 }
