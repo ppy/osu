@@ -68,6 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
+                Spacing = new Vector2(5)
             });
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
@@ -78,7 +79,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 ((IBindable<bool>)leaderboard.Expanded).BindTo(HUDOverlay.ShowHud);
 
-                leaderboardFlow.Add(l);
+                leaderboardFlow.Insert(0, l);
 
                 if (leaderboard.TeamScores.Count >= 2)
                 {
@@ -87,9 +88,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         Team1Score = { BindTarget = leaderboard.TeamScores.First().Value },
                         Team2Score = { BindTarget = leaderboard.TeamScores.Last().Value },
                         Expanded = { BindTarget = HUDOverlay.ShowHud },
-                    }, leaderboardFlow.Add);
+                    }, scoreDisplay => leaderboardFlow.Insert(1, scoreDisplay));
                 }
             });
+
+            LoadComponentAsync(new GameplayChatDisplay
+            {
+                Expanded = { BindTarget = HUDOverlay.ShowHud },
+            }, chat => leaderboardFlow.Insert(2, chat));
 
             HUDOverlay.Add(loadingDisplay = new LoadingLayer(true) { Depth = float.MaxValue });
         }

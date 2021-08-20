@@ -50,10 +50,10 @@ namespace osu.Game.Tests.Skins.IO
                     var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin2.osk"));
 
                     Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().Count, Is.EqualTo(1));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Count, Is.EqualTo(1));
 
                     // the first should be overwritten by the second import.
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().First().Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).First().Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
                 }
                 finally
                 {
@@ -76,10 +76,10 @@ namespace osu.Game.Tests.Skins.IO
                     var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
 
                     Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().Count, Is.EqualTo(2));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Count, Is.EqualTo(2));
 
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().First().Files.First().FileInfoID, Is.EqualTo(imported.Files.First().FileInfoID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().Last().Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).First().Files.First().FileInfoID, Is.EqualTo(imported.Files.First().FileInfoID));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Last().Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
                 }
                 finally
                 {
@@ -101,10 +101,10 @@ namespace osu.Game.Tests.Skins.IO
                     var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin v2.1", "skinner"), "skin2.osk"));
 
                     Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().Count, Is.EqualTo(2));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Count, Is.EqualTo(2));
 
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().First().Files.First().FileInfoID, Is.EqualTo(imported.Files.First().FileInfoID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().Last().Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).First().Files.First().FileInfoID, Is.EqualTo(imported.Files.First().FileInfoID));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Last().Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
                 }
                 finally
                 {
