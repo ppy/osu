@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,6 +22,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Overlays
 {
+    [Cached]
     public abstract class SettingsPanel : OsuFocusedOverlayContainer
     {
         public const float CONTENT_MARGINS = 15;
@@ -46,7 +48,7 @@ namespace osu.Game.Overlays
         protected Sidebar Sidebar;
         private SidebarButton selectedSidebarButton;
 
-        protected SettingsSectionsContainer SectionsContainer;
+        public SettingsSectionsContainer SectionsContainer { get; private set; }
 
         private SeekLimitedSearchTextBox searchTextBox;
 
@@ -64,6 +66,8 @@ namespace osu.Game.Overlays
         private readonly List<SettingsSection> loadableSections = new List<SettingsSection>();
 
         private Task sectionsLoadingTask;
+
+        public IBindable<SettingsSection> CurrentSection = new Bindable<SettingsSection>();
 
         protected SettingsPanel(bool showSidebar)
         {
@@ -105,6 +109,7 @@ namespace osu.Game.Overlays
                 Masking = true,
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = CreateHeader(),
+                SelectedSection = { BindTarget = CurrentSection },
                 FixedHeader = searchTextBox = new SeekLimitedSearchTextBox
                 {
                     RelativeSizeAxes = Axes.X,
@@ -238,8 +243,10 @@ namespace osu.Game.Overlays
                     if (selectedSidebarButton != null)
                         selectedSidebarButton.Selected = false;
 
-                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
-                    selectedSidebarButton.Selected = true;
+                    selectedSidebarButton = Sidebar.Children.FirstOrDefault(b => b.Section == section.NewValue);
+
+                    if (selectedSidebarButton != null)
+                        selectedSidebarButton.Selected = true;
                 }, true);
             });
         }
@@ -272,6 +279,16 @@ namespace osu.Game.Overlays
         public class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
             public SearchContainer<SettingsSection> SearchContainer;
+
+            public string SearchTerm
+            {
+                get => SearchContainer.SearchTerm;
+                set
+                {
+                    SearchContainer.SearchTerm = value;
+                    InvalidateScrollPosition();
+                }
+            }
 
             protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
                 => SearchContainer = new SearchContainer<SettingsSection>
