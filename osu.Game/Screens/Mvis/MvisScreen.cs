@@ -319,11 +319,7 @@ namespace osu.Game.Screens.Mvis
         [BackgroundDependencyLoader]
         private void load(MConfigManager config, IdleTracker idleTracker)
         {
-            //早期设置
-            var iR = config.Get<float>(MSetting.MvisInterfaceRed);
-            var iG = config.Get<float>(MSetting.MvisInterfaceGreen);
-            var iB = config.Get<float>(MSetting.MvisInterfaceBlue);
-            dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
+            dependencies.Cache(colourProvider = new CustomColourProvider());
             dependencies.Cache(this);
 
             //向侧边栏添加内容

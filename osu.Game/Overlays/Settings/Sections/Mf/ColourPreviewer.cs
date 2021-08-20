@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class ColourPreviewer : Container
     {
-        private readonly CustomColourProvider provider = new CustomColourProvider(0, 0, 0);
+        private readonly CustomColourProvider provider = new CustomColourProvider();
         private Box bg6;
         private Box bg5;
         private Box bg4;
