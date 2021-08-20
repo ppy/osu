@@ -9,6 +9,7 @@ using osu.Framework.Testing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK.Input;
@@ -17,7 +18,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneLoungeRoomsContainer : OnlinePlayTestScene
     {
-        protected new BasicTestRoomManager RoomManager => (BasicTestRoomManager)base.RoomManager;
+        protected new TestRequestHandlingRoomManager RoomManager => (TestRequestHandlingRoomManager)base.RoomManager;
 
         private RoomsContainer container;
 
@@ -38,7 +39,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add rooms", () => RoomManager.AddRooms(3));
 
             AddAssert("has 3 rooms", () => container.Rooms.Count == 3);
-            AddStep("remove first room", () => RoomManager.Rooms.Remove(RoomManager.Rooms.FirstOrDefault()));
+            AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.FirstOrDefault()));
             AddAssert("has 2 rooms", () => container.Rooms.Count == 2);
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
@@ -74,7 +75,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var room = RoomManager.Rooms[1];
 
                 RoomManager.RemoveRoom(room);
-                RoomManager.AddRoom(room);
+                RoomManager.AddOrUpdateRoom(room);
             });
 
             AddAssert("no selection", () => checkRoomSelected(null));
@@ -115,11 +116,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("4 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 4);
 
-            AddStep("filter one room", () => container.Filter(new FilterCriteria { SearchString = "1" }));
+            AddStep("filter one room", () => container.Filter.Value = new FilterCriteria { SearchString = "1" });
 
             AddUntilStep("1 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 1);
 
-            AddStep("remove filter", () => container.Filter(null));
+            AddStep("remove filter", () => container.Filter.Value = null);
 
             AddUntilStep("4 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 4);
         }
@@ -131,13 +132,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add rooms", () => RoomManager.AddRooms(3, new CatchRuleset().RulesetInfo));
 
             // Todo: What even is this case...?
-            AddStep("set empty filter criteria", () => container.Filter(null));
+            AddStep("set empty filter criteria", () => container.Filter.Value = null);
             AddUntilStep("5 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 5);
 
-            AddStep("filter osu! rooms", () => container.Filter(new FilterCriteria { Ruleset = new OsuRuleset().RulesetInfo }));
+            AddStep("filter osu! rooms", () => container.Filter.Value = new FilterCriteria { Ruleset = new OsuRuleset().RulesetInfo });
             AddUntilStep("2 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 2);
 
-            AddStep("filter catch rooms", () => container.Filter(new FilterCriteria { Ruleset = new CatchRuleset().RulesetInfo }));
+            AddStep("filter catch rooms", () => container.Filter.Value = new FilterCriteria { Ruleset = new CatchRuleset().RulesetInfo });
             AddUntilStep("3 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 3);
         }
 
@@ -150,6 +151,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private bool checkRoomSelected(Room room) => SelectedRoom.Value == room;
 
         private Room getRoomInFlow(int index) =>
-            (container.ChildrenOfType<FillFlowContainer<DrawableRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;
+            (container.ChildrenOfType<FillFlowContainer<DrawableLoungeRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;
     }
 }

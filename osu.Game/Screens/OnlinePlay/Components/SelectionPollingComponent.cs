@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -48,17 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             pollReq.Success += result =>
             {
-                // existing rooms need to be ordered by their position because the received of NotifyRoomsReceives expects to be able to sort them based on this order.
-                var rooms = new List<Room>(roomManager.Rooms.OrderBy(r => r.Position.Value));
-
-                int index = rooms.FindIndex(r => r.RoomID.Value == result.RoomID.Value);
-
-                if (index < 0)
-                    return;
-
-                rooms[index] = result;
-
-                NotifyRoomsReceived(rooms);
+                RoomManager.AddOrUpdateRoom(result);
                 tcs.SetResult(true);
             };
 
