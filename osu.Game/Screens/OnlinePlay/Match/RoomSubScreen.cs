@@ -29,10 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached(typeof(IBindable<PlaylistItem>))]
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
-        protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen
-        {
-            SelectedItem = { BindTarget = SelectedItem }
-        };
+        protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen { SelectedItem = { BindTarget = SelectedItem } };
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 

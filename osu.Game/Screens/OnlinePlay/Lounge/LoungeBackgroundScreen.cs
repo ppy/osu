@@ -14,33 +14,24 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 {
     public class LoungeBackgroundScreen : OnlinePlayBackgroundScreen
     {
+        public readonly Bindable<Room> SelectedRoom = new Bindable<Room>();
         private readonly BindableList<PlaylistItem> playlist = new BindableList<PlaylistItem>();
 
         public LoungeBackgroundScreen()
         {
+            SelectedRoom.BindValueChanged(onSelectedRoomChanged);
             playlist.BindCollectionChanged((_, __) => PlaylistItem = playlist.FirstOrDefault());
         }
 
-        private Room? selectedRoom;
-
-        public Room? SelectedRoom
+        private void onSelectedRoomChanged(ValueChangedEvent<Room> room)
         {
-            get => selectedRoom;
-            set
-            {
-                if (selectedRoom == value)
-                    return;
+            if (room.OldValue != null)
+                playlist.UnbindFrom(room.OldValue.Playlist);
 
-                if (selectedRoom != null)
-                    playlist.UnbindFrom(selectedRoom.Playlist);
-
-                selectedRoom = value;
-
-                if (selectedRoom != null)
-                    playlist.BindTo(selectedRoom.Playlist);
-                else
-                    playlist.Clear();
-            }
+            if (room.NewValue != null)
+                playlist.BindTo(room.NewValue.Playlist);
+            else
+                playlist.Clear();
         }
 
         public override bool OnExiting(IScreen next)
