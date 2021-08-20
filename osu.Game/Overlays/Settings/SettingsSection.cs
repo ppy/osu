@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings
 
         private IBindable<SettingsSection> selectedSection;
 
-        private Container content;
+        private OsuSpriteText header;
 
         public abstract Drawable CreateIcon();
         public abstract LocalisableString Header { get; }
@@ -70,11 +70,12 @@ namespace osu.Game.Overlays.Settings
             {
                 new Box
                 {
+                    Name = "separator",
                     Colour = new Color4(0, 0, 0, 255),
                     RelativeSizeAxes = Axes.X,
                     Height = border_size,
                 },
-                content = new Container
+                new Container
                 {
                     Padding = new MarginPadding
                     {
@@ -85,7 +86,7 @@ namespace osu.Game.Overlays.Settings
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        header = new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(size: header_size),
                             Text = Header,
@@ -134,12 +135,17 @@ namespace osu.Game.Overlays.Settings
 
         private void updateContentFade()
         {
-            float targetFade = 1;
+            float contentFade = 1;
+            float headerFade = 1;
 
             if (!isCurrentSection)
-                targetFade = IsHovered ? 0.6f : 0.25f;
+            {
+                contentFade = 0.25f;
+                headerFade = IsHovered ? 0.5f : 0.25f;
+            }
 
-            content.FadeTo(targetFade, 500, Easing.OutQuint);
+            header.FadeTo(headerFade, 500, Easing.OutQuint);
+            FlowContent.FadeTo(contentFade, 500, Easing.OutQuint);
         }
     }
 }
