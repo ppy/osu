@@ -10,7 +10,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
-using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -37,9 +36,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Cached(Type = typeof(IRoomManager))]
         protected RoomManager RoomManager { get; private set; }
-
-        [Cached]
-        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
 
         [Cached]
         private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
@@ -104,13 +100,6 @@ namespace osu.Game.Screens.OnlinePlay
 
             apiState.BindTo(API.State);
             apiState.BindValueChanged(onlineStateChanged, true);
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
-            dependencies.Model.BindTo(selectedRoom);
-            return dependencies;
         }
 
         private void forcefullyExit()

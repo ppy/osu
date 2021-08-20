@@ -50,9 +50,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         protected ListingPollingComponent ListingPollingComponent { get; private set; }
 
         [Resolved]
-        private Bindable<Room> selectedRoom { get; set; }
-
-        [Resolved]
         private MusicController music { get; set; }
 
         [Resolved(CanBeNull = true)]
@@ -68,6 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private LeasedBindable<Room> selectionLease;
 
         private readonly Bindable<FilterCriteria> filter = new Bindable<FilterCriteria>(new FilterCriteria());
+        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly IBindable<bool> isIdle = new BindableBool();
         private LoadingLayer loadingLayer;
