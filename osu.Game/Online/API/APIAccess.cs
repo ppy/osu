@@ -305,11 +305,13 @@ namespace osu.Game.Online.API
             {
                 req.Perform(this);
 
+                if (req.CompletionState != APIRequestCompletionState.Completed)
+                    return false;
+
                 // we could still be in initialisation, at which point we don't want to say we're Online yet.
                 if (IsLoggedIn) state.Value = APIState.Online;
-
                 failureCount = 0;
-                return req.CompletionState == APIRequestCompletionState.Completed;
+                return true;
             }
             catch (HttpRequestException re)
             {
