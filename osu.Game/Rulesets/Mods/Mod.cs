@@ -129,6 +129,17 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual Type[] IncompatibleMods => Array.Empty<Type>();
 
+        private IReadOnlyList<IBindable> settingsBacking;
+
+        /// <summary>
+        /// A list of the all <see cref="IBindable"/> settings within this mod.
+        /// </summary>
+        internal IReadOnlyList<IBindable> Settings =>
+            settingsBacking ??= this.GetSettingsSourceProperties()
+                                    .Select(p => p.Item2.GetValue(this))
+                                    .Cast<IBindable>()
+                                    .ToList();
+
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
@@ -191,15 +202,39 @@ namespace osu.Game.Rulesets.Mods
             if (ReferenceEquals(this, other)) return true;
 
             return GetType() == other.GetType() &&
-                   this.GetSettingsSourceProperties().All(pair =>
-                       EqualityComparer<object>.Default.Equals(
-                           ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(this)),
-                           ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(other))));
+                   Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+
+            hashCode.Add(GetType());
+
+            foreach (var setting in Settings)
+                hashCode.Add(ModUtils.GetSettingUnderlyingValue(setting));
+
+            return hashCode.ToHashCode();
         }
 
         /// <summary>
         /// Reset all custom settings for this mod back to their defaults.
         /// </summary>
         public virtual void ResetSettingsToDefaults() => CopyFrom((Mod)Activator.CreateInstance(GetType()));
+
+        private class ModSettingsEqualityComparer : IEqualityComparer<IBindable>
+        {
+            public static ModSettingsEqualityComparer Default { get; } = new ModSettingsEqualityComparer();
+
+            public bool Equals(IBindable x, IBindable y)
+            {
+                object xValue = x == null ? null : ModUtils.GetSettingUnderlyingValue(x);
+                object yValue = y == null ? null : ModUtils.GetSettingUnderlyingValue(y);
+
+                return EqualityComparer<object>.Default.Equals(xValue, yValue);
+            }
+
+            public int GetHashCode(IBindable obj) => ModUtils.GetSettingUnderlyingValue(obj).GetHashCode();
+        }
     }
 }

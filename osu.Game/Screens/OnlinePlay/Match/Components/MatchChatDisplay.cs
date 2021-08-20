@@ -19,9 +19,12 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         [Resolved(CanBeNull = true)]
         private ChannelManager channelManager { get; set; }
 
-        public MatchChatDisplay()
+        private readonly bool leaveChannelOnDispose;
+
+        public MatchChatDisplay(bool leaveChannelOnDispose = true)
             : base(true)
         {
+            this.leaveChannelOnDispose = leaveChannelOnDispose;
         }
 
         protected override void LoadComplete()
@@ -42,7 +45,9 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            channelManager?.LeaveChannel(Channel.Value);
+
+            if (leaveChannelOnDispose)
+                channelManager?.LeaveChannel(Channel.Value);
         }
     }
 }

@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
@@ -64,6 +65,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddWaitStep("wait for hide", 3);
 
             AddStep("show", () => { infoWedge.Show(); });
+
+            AddSliderStep("change star difficulty", 0, 11.9, 5.55, v =>
+            {
+                foreach (var hasCurrentValue in infoWedge.Info.ChildrenOfType<IHasCurrentValue<StarDifficulty>>())
+                    hasCurrentValue.Current.Value = new StarDifficulty(v, 0);
+            });
 
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
