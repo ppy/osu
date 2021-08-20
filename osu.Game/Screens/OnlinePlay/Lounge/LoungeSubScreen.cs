@@ -36,7 +36,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     {
         public override string Title => "Lounge";
 
-        protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen { SelectedRoom = { BindTarget = selectedRoom } };
+        protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
+        {
+            SelectedRoom = { BindTarget = selectedRoom }
+        };
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
