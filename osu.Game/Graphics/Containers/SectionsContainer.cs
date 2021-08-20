@@ -112,7 +112,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// The percentage of the container to consider the centre-point for deciding the active section (and scrolling to a requested section).
         /// </summary>
-        private const float scroll_y_centre = 0.2f;
+        private const float scroll_y_centre = 0.1f;
 
         public SectionsContainer()
         {
@@ -147,10 +147,22 @@ namespace osu.Game.Graphics.Containers
 
         public void ScrollTo(Drawable target)
         {
+            lastKnownScroll = null;
+
+            float fixedHeaderSize = FixedHeader?.BoundingBox.Height ?? 0;
+
+            // implementation similar to ScrollIntoView but a bit more nuanced.
+            float top = scrollContainer.GetChildPosInContent(target);
+
+            var bottomScrollExtent = scrollContainer.ScrollableExtent - fixedHeaderSize;
+
+            if (top > bottomScrollExtent)
+                scrollContainer.ScrollToEnd();
+            else
+                scrollContainer.ScrollTo(top - fixedHeaderSize - scrollContainer.DisplayableContent * scroll_y_centre);
+
             if (target is T section)
                 lastClickedSection = section;
-
-            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(target) - scrollContainer.DisplayableContent * scroll_y_centre - (FixedHeader?.BoundingBox.Height ?? 0));
         }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
