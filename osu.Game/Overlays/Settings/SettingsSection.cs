@@ -102,28 +102,20 @@ namespace osu.Game.Overlays.Settings
             });
 
             selectedSection = settingsPanel.CurrentSection.GetBoundCopy();
-            selectedSection.BindValueChanged(selected =>
-            {
-                if (selected.NewValue == this)
-                    content.FadeIn(500, Easing.OutQuint);
-                else
-                    content.FadeTo(0.25f, 500, Easing.OutQuint);
-            }, true);
+            selectedSection.BindValueChanged(_ => updateContentFade(), true);
         }
 
         private bool isCurrentSection => selectedSection.Value == this;
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (!isCurrentSection)
-                content.FadeTo(0.6f, 500, Easing.OutQuint);
+            updateContentFade();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!isCurrentSection)
-                content.FadeTo(0.25f, 500, Easing.OutQuint);
+            updateContentFade();
             base.OnHoverLost(e);
         }
 
@@ -135,9 +127,19 @@ namespace osu.Game.Overlays.Settings
             return base.OnClick(e);
         }
 
-        protected override bool ShouldBeConsideredForInput(Drawable child)
+        protected override bool ShouldBeConsideredForInput(Drawable child) =>
+            // only the current section should accept input.
+            // this provides the behaviour of the first click scrolling the target section to the centre of the screen.
+            isCurrentSection;
+
+        private void updateContentFade()
         {
-            return isCurrentSection;
+            float targetFade = 1;
+
+            if (!isCurrentSection)
+                targetFade = IsHovered ? 0.6f : 0.25f;
+
+            content.FadeTo(targetFade, 500, Easing.OutQuint);
         }
     }
 }
