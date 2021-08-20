@@ -6,6 +6,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -57,16 +58,11 @@ namespace osu.Game.Graphics.UserInterface
 
             EdgeEffect = new EdgeEffectParameters
             {
-                Colour = GlowColour,
+                Colour = GlowColour.Opacity(0),
                 Type = EdgeEffectType.Glow,
                 Radius = 10,
                 Roundness = 8,
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            FadeEdgeEffectTo(0);
         }
 
         private bool glowing;

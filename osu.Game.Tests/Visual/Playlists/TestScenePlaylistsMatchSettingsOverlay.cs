@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
         }
 
-        private class TestRoomSettings : PlaylistsMatchSettingsOverlay
+        private class TestRoomSettings : PlaylistsRoomSettingsOverlay
         {
             public TriangleButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
 

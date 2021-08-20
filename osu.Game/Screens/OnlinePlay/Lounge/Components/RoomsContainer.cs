@@ -15,7 +15,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
 using osuTK;
@@ -26,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     {
         private readonly IBindableList<Room> rooms = new BindableList<Room>();
 
-        private readonly FillFlowContainer<DrawableRoom> roomFlow;
+        private readonly FillFlowContainer<DrawableLoungeRoom> roomFlow;
 
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
 
@@ -56,7 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = roomFlow = new FillFlowContainer<DrawableRoom>
+                Child = roomFlow = new FillFlowContainer<DrawableLoungeRoom>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -74,15 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             rooms.BindTo(roomManager.Rooms);
 
             Filter?.BindValueChanged(criteria => applyFilterCriteria(criteria.NewValue), true);
-
-            selectedRoom.BindValueChanged(selection =>
-            {
-                updateSelection();
-            }, true);
         }
-
-        private void updateSelection() =>
-            roomFlow.Children.ForEach(r => r.State = r.Room == selectedRoom.Value ? SelectionState.Selected : SelectionState.NotSelected);
 
         private void applyFilterCriteria(FilterCriteria criteria)
         {
@@ -122,22 +113,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             foreach (var room in rooms)
             {
-                roomFlow.Add(new DrawableRoom(room));
+                roomFlow.Add(new DrawableLoungeRoom(room));
             }
 
             applyFilterCriteria(Filter?.Value);
-
-            updateSelection();
         }
 
         private void removeRooms(IEnumerable<Room> rooms)
         {
             foreach (var r in rooms)
             {
-                var toRemove = roomFlow.Single(d => d.Room == r);
-                toRemove.Action = null;
-
-                roomFlow.Remove(toRemove);
+                roomFlow.RemoveAll(d => d.Room == r);
 
                 // selection may have a lease due to being in a sub screen.
                 if (!selectedRoom.Disabled)
