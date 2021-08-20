@@ -69,8 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 if (currHistoricalDecay != 0)
                 {
-                    // below was bugged in initial version. fixed now, but will change values, will do more testing
-                    // currHistoricalDecay = Math.Min(currHistoricalDecay, (double)(Previous.Count - i) / Previous.Count); // either we're limited by time or limited by object count.
+                    currHistoricalDecay = Math.Min(currHistoricalDecay, (double)(Previous.Count - i) / Previous.Count); // either we're limited by time or limited by object count.
 
                     double currDelta = ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime;
                     double prevDelta = ((OsuDifficultyHitObject)Previous[i]).StrainTime;
