@@ -36,9 +36,7 @@ namespace osu.Game.Screens.OnlinePlay
         public override bool OnExiting(IScreen next)
         {
             base.OnExiting(next);
-
             this.FadeOut(DISAPPEAR_DURATION, Easing.OutQuint);
-
             return false;
         }
 
@@ -51,7 +49,6 @@ namespace osu.Game.Screens.OnlinePlay
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
-
             this.FadeOut(DISAPPEAR_DURATION, Easing.OutQuint);
         }
 

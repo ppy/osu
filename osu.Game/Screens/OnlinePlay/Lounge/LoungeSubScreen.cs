@@ -235,7 +235,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-
             onReturning();
         }
 
