@@ -14,6 +14,7 @@ using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -56,12 +57,28 @@ namespace osu.Game.Beatmaps
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> currentMods { get; set; }
 
+        private ModSettingChangeTracker modSettingChangeTracker;
+        private ScheduledDelegate debouncedModSettingsChange;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             currentRuleset.BindValueChanged(_ => updateTrackedBindables());
-            currentMods.BindValueChanged(_ => updateTrackedBindables(), true);
+
+            currentMods.BindValueChanged(mods =>
+            {
+                modSettingChangeTracker?.Dispose();
+
+                updateTrackedBindables();
+
+                modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+                modSettingChangeTracker.SettingChanged += _ =>
+                {
+                    debouncedModSettingsChange?.Cancel();
+                    debouncedModSettingsChange = Scheduler.AddDelayed(updateTrackedBindables, 100);
+                };
+            }, true);
         }
 
         /// <summary>
@@ -84,7 +101,7 @@ namespace osu.Game.Beatmaps
         /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> with a given <see cref="RulesetInfo"/> and <see cref="Mod"/> combination.
         /// </summary>
         /// <remarks>
-        /// The bindable will not update to follow the currently-selected ruleset and mods.
+        /// The bindable will not update to follow the currently-selected ruleset and mods or its settings.
         /// </remarks>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
         /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to get the difficulty with. If <c>null</c>, the <paramref name="beatmapInfo"/>'s ruleset is used.</param>
@@ -275,6 +292,8 @@ namespace osu.Game.Beatmaps
         {
             base.Dispose(isDisposing);
 
+            modSettingChangeTracker?.Dispose();
+
             cancelTrackedBindableUpdate();
             updateScheduler?.Dispose();
         }
@@ -297,7 +316,7 @@ namespace osu.Game.Beatmaps
             public bool Equals(DifficultyCacheLookup other)
                 => Beatmap.ID == other.Beatmap.ID
                    && Ruleset.ID == other.Ruleset.ID
-                   && OrderedMods.Select(m => m.Acronym).SequenceEqual(other.OrderedMods.Select(m => m.Acronym));
+                   && OrderedMods.SequenceEqual(other.OrderedMods);
 
             public override int GetHashCode()
             {
@@ -307,7 +326,7 @@ namespace osu.Game.Beatmaps
                 hashCode.Add(Ruleset.ID);
 
                 foreach (var mod in OrderedMods)
-                    hashCode.Add(mod.Acronym);
+                    hashCode.Add(mod);
 
                 return hashCode.ToHashCode();
             }

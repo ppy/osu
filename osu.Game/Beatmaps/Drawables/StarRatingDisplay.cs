@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -22,6 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
     /// </summary>
     public class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
+        private readonly bool animated;
         private readonly Box background;
         private readonly SpriteIcon starIcon;
         private readonly OsuSpriteText starsText;
@@ -34,6 +36,14 @@ namespace osu.Game.Beatmaps.Drawables
             set => current.Current = value;
         }
 
+        private readonly Bindable<double> displayedStars = new BindableDouble();
+
+        /// <summary>
+        /// The currently displayed stars of this display wrapped in a bindable.
+        /// This bindable gets transformed on change rather than instantaneous, if animation is enabled.
+        /// </summary>
+        public IBindable<double> DisplayedStars => displayedStars;
+
         [Resolved]
         private OsuColour colours { get; set; }
 
@@ -45,8 +55,11 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         /// <param name="starDifficulty">The already computed <see cref="StarDifficulty"/> to display.</param>
         /// <param name="size">The size of the star rating display.</param>
-        public StarRatingDisplay(StarDifficulty starDifficulty, StarRatingDisplaySize size = StarRatingDisplaySize.Regular)
+        /// <param name="animated">Whether the star rating display will perform transforms on change rather than updating instantaneously.</param>
+        public StarRatingDisplay(StarDifficulty starDifficulty, StarRatingDisplaySize size = StarRatingDisplaySize.Regular, bool animated = false)
         {
+            this.animated = animated;
+
             Current.Value = starDifficulty;
 
             AutoSizeAxes = Axes.Both;
@@ -112,7 +125,7 @@ namespace osu.Game.Beatmaps.Drawables
                                     // see https://github.com/ppy/osu-framework/issues/3271.
                                     Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold),
                                     Shadow = false,
-                                }
+                                },
                             }
                         }
                     },
@@ -126,12 +139,22 @@ namespace osu.Game.Beatmaps.Drawables
 
             Current.BindValueChanged(c =>
             {
-                starsText.Text = c.NewValue.Stars.ToString("0.00");
+                if (animated)
+                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, 750, Easing.OutQuint);
+                else
+                    displayedStars.Value = c.NewValue.Stars;
+            });
 
-                background.Colour = colours.ForStarDifficulty(c.NewValue.Stars);
+            displayedStars.Value = Current.Value.Stars;
 
-                starIcon.Colour = c.NewValue.Stars >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
-                starsText.Colour = c.NewValue.Stars >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
+            displayedStars.BindValueChanged(s =>
+            {
+                starsText.Text = s.NewValue.ToLocalisableString("0.00");
+
+                background.Colour = colours.ForStarDifficulty(s.NewValue);
+
+                starIcon.Colour = s.NewValue >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
+                starsText.Colour = s.NewValue >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
             }, true);
         }
     }
