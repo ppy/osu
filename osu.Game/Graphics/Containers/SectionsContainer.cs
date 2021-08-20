@@ -154,12 +154,13 @@ namespace osu.Game.Graphics.Containers
             // implementation similar to ScrollIntoView but a bit more nuanced.
             float top = scrollContainer.GetChildPosInContent(target);
 
-            var bottomScrollExtent = scrollContainer.ScrollableExtent - fixedHeaderSize;
+            float bottomScrollExtent = scrollContainer.ScrollableExtent - fixedHeaderSize;
+            float scrollTarget = top - fixedHeaderSize - scrollContainer.DisplayableContent * scroll_y_centre;
 
-            if (top > bottomScrollExtent)
+            if (scrollTarget > bottomScrollExtent)
                 scrollContainer.ScrollToEnd();
             else
-                scrollContainer.ScrollTo(top - fixedHeaderSize - scrollContainer.DisplayableContent * scroll_y_centre);
+                scrollContainer.ScrollTo(scrollTarget);
 
             if (target is T section)
                 lastClickedSection = section;
