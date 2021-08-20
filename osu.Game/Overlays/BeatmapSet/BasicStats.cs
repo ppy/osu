@@ -81,10 +81,26 @@ namespace osu.Game.Overlays.BeatmapSet
                 Direction = FillDirection.Horizontal,
                 Children = new[]
                 {
-                    length = new Statistic(BeatmapStatisticsIconType.Length, BeatmapsetsStrings.ShowStatsTotalLength(string.Empty)) { Width = 0.25f },
-                    bpm = new Statistic(BeatmapStatisticsIconType.Bpm, BeatmapsetsStrings.ShowStatsBpm) { Width = 0.25f },
-                    circleCount = new Statistic(BeatmapStatisticsIconType.Circles, BeatmapsetsStrings.ShowStatsCountCircles) { Width = 0.25f },
-                    sliderCount = new Statistic(BeatmapStatisticsIconType.Sliders, BeatmapsetsStrings.ShowStatsCountSliders) { Width = 0.25f },
+                    length = new Statistic(BeatmapStatisticsIconType.Length)
+                    {
+                        Width = 0.25f,
+                        TooltipText = default,
+                    },
+                    bpm = new Statistic(BeatmapStatisticsIconType.Bpm)
+                    {
+                        Width = 0.25f,
+                        TooltipText = BeatmapsetsStrings.ShowStatsBpm
+                    },
+                    circleCount = new Statistic(BeatmapStatisticsIconType.Circles)
+                    {
+                        Width = 0.25f,
+                        TooltipText = BeatmapsetsStrings.ShowStatsCountCircles
+                    },
+                    sliderCount = new Statistic(BeatmapStatisticsIconType.Sliders)
+                    {
+                        Width = 0.25f,
+                        TooltipText = BeatmapsetsStrings.ShowStatsCountSliders
+                    },
                 },
             };
         }
@@ -107,9 +123,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 set => this.value.Text = value;
             }
 
-            public Statistic(BeatmapStatisticsIconType icon, LocalisableString name)
+            public Statistic(BeatmapStatisticsIconType icon)
             {
-                TooltipText = name;
                 RelativeSizeAxes = Axes.X;
                 Height = 24f;
 
