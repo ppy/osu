@@ -140,7 +140,7 @@ namespace osu.Game
 
         private FileStore fileStore;
 
-        private SettingsStore settingsStore;
+        private RealmSettingsStore settingsStore;
 
         private RulesetConfigCache rulesetConfigCache;
 
@@ -279,7 +279,7 @@ namespace osu.Game
 
             migrateDataToRealm();
 
-            dependencies.Cache(settingsStore = new SettingsStore(contextFactory));
+            dependencies.Cache(settingsStore = new RealmSettingsStore(realmFactory));
             dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(settingsStore));
 
             var powerStatus = CreateBatteryInfo();
