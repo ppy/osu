@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsMatchSettingsOverlay : MatchSettingsOverlay
+    public class PlaylistsRoomSettingsOverlay : RoomSettingsOverlay
     {
         public Action EditPlaylist;
 
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Child = new GridContainer
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                Height = 500,
+                                                                Height = 448,
                                                                 Content = new[]
                                                                 {
                                                                     new Drawable[]

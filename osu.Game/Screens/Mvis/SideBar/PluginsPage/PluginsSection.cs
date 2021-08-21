@@ -70,11 +70,8 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
                 addPiece(pl);
             }
 
-            foreach (var flow in Containers)
-            {
-                flow.LayoutEasing = Easing.OutQuint;
-                flow.LayoutDuration = 250;
-            }
+            FillFlow.LayoutEasing = Easing.OutQuint;
+            FillFlow.LayoutDuration = 250;
 
             base.LoadComplete();
         }
@@ -90,17 +87,14 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
         {
             int childrenCount = 0;
 
-            foreach (var flow in Containers)
+            foreach (var d in FillFlow)
             {
-                foreach (var d in flow)
-                {
-                    childrenCount += flow.Children.Count;
+                childrenCount += FillFlow.Children.Count;
 
-                    if (d is PluginPiece piece && piece.Plugin == plugin)
-                    {
-                        piece.Hide();
-                        break;
-                    }
+                if (d is PluginPiece piece && piece.Plugin == plugin)
+                {
+                    piece.Hide();
+                    break;
                 }
             }
 

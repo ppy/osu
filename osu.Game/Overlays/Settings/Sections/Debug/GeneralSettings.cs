@@ -5,12 +5,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Screens;
+using osu.Game.Localisation;
+using osu.Game.Screens.Import;
 
 namespace osu.Game.Overlays.Settings.Sections.Debug
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "整体";
+        protected override LocalisableString Header => DebugSettingsStrings.GeneralHeader;
 
         [BackgroundDependencyLoader(true)]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, OsuGame game)
@@ -19,15 +22,20 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "在左下角显示调试日志",
+                    LabelText = DebugSettingsStrings.ShowLogOverlay,
                     Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "绕过front-to-back渲染检查",
+                    LabelText = DebugSettingsStrings.BypassFrontToBackPass,
                     Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
                 }
             };
+            Add(new SettingsButton
+            {
+                Text = DebugSettingsStrings.ImportFiles,
+                Action = () => game?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
+            });
         }
     }
 }

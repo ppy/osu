@@ -43,11 +43,6 @@ namespace osu.Game.Screens.Mvis
         private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(HueColour.Value, saturation, lightness, 1));
         public BindableFloat HueColour = new BindableFloat();
 
-        public CustomColourProvider(float r, float g, float b)
-        {
-            HueColour.Value = Color4.ToHsl(new Color4(r, g, b, 1)).X;
-        }
-
         private readonly BindableFloat iR = new BindableFloat();
         private readonly BindableFloat iG = new BindableFloat();
         private readonly BindableFloat iB = new BindableFloat();
@@ -61,7 +56,7 @@ namespace osu.Game.Screens.Mvis
 
             iR.BindValueChanged(_ => updateColor());
             iG.BindValueChanged(_ => updateColor());
-            iB.BindValueChanged(_ => updateColor());
+            iB.BindValueChanged(_ => updateColor(), true);
         }
 
         private void updateColor() => UpdateHueColor(iR.Value, iG.Value, iB.Value);

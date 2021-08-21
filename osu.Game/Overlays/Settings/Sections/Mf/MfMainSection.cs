@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
@@ -13,7 +14,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             Icon = FontAwesome.Solid.Globe
         };
 
-        public override string Header => "整体";
+        public override LocalisableString Header => "整体";
 
         public MfMainSection()
         {

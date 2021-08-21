@@ -5,12 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class WebSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "网络";
+        protected override LocalisableString Header => OnlineSettingsStrings.WebHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -19,24 +20,24 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "在打开外部链接前确认",
+                    LabelText = OnlineSettingsStrings.ExternalLinkWarning,
                     Current = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "下图时倾向于不带视频",
+                    LabelText = OnlineSettingsStrings.PreferNoVideo,
                     Keywords = new[] { "no-video" },
                     Current = config.GetBindable<bool>(OsuSetting.PreferNoVideo)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "旁观时自动下图",
+                    LabelText = OnlineSettingsStrings.AutomaticallyDownloadWhenSpectating,
                     Keywords = new[] { "spectator" },
                     Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "在搜索结果中显示不合适的内容",
+                    LabelText = OnlineSettingsStrings.ShowExplicitContent,
                     Keywords = new[] { "nsfw", "18+", "offensive" },
                     Current = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent),
                 }

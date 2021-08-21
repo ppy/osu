@@ -6,13 +6,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "整体";
+        protected override LocalisableString Header => GameplaySettingsStrings.GeneralHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -21,62 +22,62 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsSlider<double>
                 {
-                    LabelText = "背景暗化",
+                    LabelText = GameplaySettingsStrings.BackgroundDim,
                     Current = config.GetBindable<double>(OsuSetting.DimLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = "背景模糊",
+                    LabelText = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<double>(OsuSetting.BlurLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "在休息时段使背景变亮",
+                    LabelText = GameplaySettingsStrings.LightenDuringBreaks,
                     Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
                 },
                 new SettingsEnumDropdown<HUDVisibilityMode>
                 {
-                    LabelText = "分数计界面显示模式",
+                    LabelText = GameplaySettingsStrings.HUDVisibilityMode,
                     Current = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "显示难度分布图",
+                    LabelText = GameplaySettingsStrings.ShowDifficultyGraph,
                     Current = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "即使你无法失败，也显示分数计界面",
+                    LabelText = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
                     Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
                     Keywords = new[] { "hp", "bar" }
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "生命值低时游戏区域泛红",
+                    LabelText = GameplaySettingsStrings.FadePlayfieldWhenHealthLow,
                     Current = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "总是显示按键表示框",
+                    LabelText = GameplaySettingsStrings.AlwaysShowKeyOverlay,
                     Current = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "立体音效",
+                    LabelText = GameplaySettingsStrings.PositionalHitsounds,
                     Current = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "在第一次断连时播放音效",
+                    LabelText = GameplaySettingsStrings.AlwaysPlayFirstComboBreak,
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
                 },
                 new SettingsEnumDropdown<ScoringMode>
                 {
-                    LabelText = "分数显示模式",
+                    LabelText = GameplaySettingsStrings.ScoreDisplayMode,
                     Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
                     Keywords = new[] { "scoring" }
                 },
@@ -86,7 +87,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 Add(new SettingsCheckbox
                 {
-                    LabelText = "在游戏时禁用Windows键",
+                    LabelText = GameplaySettingsStrings.DisableWinKey,
                     Current = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey)
                 });
             }

@@ -7,7 +7,7 @@ using osu.Game.Screens.Mvis.SideBar.Settings.Items;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
-    public class OsuMusicControllerWrapper : MvisPlugin, IProvideAudioControlPlugin
+    internal class OsuMusicControllerWrapper : MvisPlugin, IProvideAudioControlPlugin
     {
         [Resolved]
         private MusicController controller { get; set; }

@@ -166,7 +166,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "New"
+                            Text = "新建"
                         }
                     }
                 };

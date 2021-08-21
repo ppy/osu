@@ -14,6 +14,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -104,7 +105,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     Origin = Anchor.Centre,
                                     Width = 300,
                                     Margin = new MarginPadding(10),
-                                    Text = "选择目录",
+                                    Text = MaintenanceSettingsStrings.SelectDirectory,
                                     Action = () => OnSelection(directorySelector.CurrentPath.Value)
                                 },
                             }

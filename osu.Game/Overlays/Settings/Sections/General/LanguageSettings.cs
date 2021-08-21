@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private SettingsDropdown<Language> languageSelection;
         private Bindable<string> frameworkLocale;
 
-        protected override LocalisableString Header => "语言";
+        protected override LocalisableString Header => GeneralSettingsStrings.LanguageHeader;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
@@ -27,11 +27,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 languageSelection = new SettingsEnumDropdown<Language>
                 {
-                    LabelText = "界面语言",
+                    LabelText = GeneralSettingsStrings.LanguageDropdown,
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "以原语言显示歌曲信息",
+                    LabelText = GeneralSettingsStrings.PreferOriginalMetadataLanguage,
                     Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
                 },
             };

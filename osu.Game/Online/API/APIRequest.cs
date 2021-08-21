@@ -84,7 +84,7 @@ namespace osu.Game.Online.API
         /// The state of this request, from an outside perspective.
         /// This is used to ensure correct notification events are fired.
         /// </summary>
-        private APIRequestCompletionState completionState;
+        public APIRequestCompletionState CompletionState { get; private set; }
 
         public void Perform(IAPIProvider api)
         {
@@ -127,10 +127,10 @@ namespace osu.Game.Online.API
         {
             lock (completionStateLock)
             {
-                if (completionState != APIRequestCompletionState.Waiting)
+                if (CompletionState != APIRequestCompletionState.Waiting)
                     return;
 
-                completionState = APIRequestCompletionState.Completed;
+                CompletionState = APIRequestCompletionState.Completed;
             }
 
             if (API == null)
@@ -143,10 +143,10 @@ namespace osu.Game.Online.API
         {
             lock (completionStateLock)
             {
-                if (completionState != APIRequestCompletionState.Waiting)
+                if (CompletionState != APIRequestCompletionState.Waiting)
                     return;
 
-                completionState = APIRequestCompletionState.Failed;
+                CompletionState = APIRequestCompletionState.Failed;
             }
 
             if (API == null)
@@ -161,7 +161,7 @@ namespace osu.Game.Online.API
         {
             lock (completionStateLock)
             {
-                if (completionState != APIRequestCompletionState.Waiting)
+                if (CompletionState != APIRequestCompletionState.Waiting)
                     return;
 
                 WebRequest?.Abort();
@@ -200,7 +200,7 @@ namespace osu.Game.Online.API
             get
             {
                 lock (completionStateLock)
-                    return completionState == APIRequestCompletionState.Failed;
+                    return CompletionState == APIRequestCompletionState.Failed;
             }
         }
 

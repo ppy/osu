@@ -19,16 +19,35 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected override Container<Drawable> Content => content;
 
+        /// <summary>
+        /// 初始化内容使用
+        /// </summary>
+        /// <param name="plugin">初始化内容所使用的插件</param>
         protected virtual void InitContent(MvisPlugin plugin)
         {
         }
 
+        /// <summary>
+        /// 获取侧边栏入口
+        /// </summary>
+        /// <returns>一个侧边栏插件功能控制器</returns>
         public virtual IPluginFunctionProvider GetFunctionEntry() => null;
+
+        /// <summary>
+        /// 激活快捷键
+        /// </summary>
         public virtual Key ShortcutKey => Key.Unknown;
 
         private bool contentInit;
 
+        /// <summary>
+        /// 源插件
+        /// </summary>
         public MvisPlugin Plugin { get; }
+
+        /// <summary>
+        /// 插件的ConfigManager
+        /// </summary>
         protected IPluginConfigManager Config => Dependencies.Get<MvisPluginManager>().GetConfigManager(Plugin);
 
         [Resolved]

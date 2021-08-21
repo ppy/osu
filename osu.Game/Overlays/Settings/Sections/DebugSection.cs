@@ -3,13 +3,16 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Debug;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
     public class DebugSection : SettingsSection
     {
-        public override string Header => "调试";
+        public override LocalisableString Header => DebugSettingsStrings.DebugSectionHeader;
+
         public override Drawable CreateIcon() => new SpriteIcon
         {
             Icon = FontAwesome.Solid.Bug

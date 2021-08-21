@@ -9,6 +9,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Updater;
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [Resolved(CanBeNull = true)]
         private UpdateManager updateManager { get; set; }
 
-        protected override LocalisableString Header => "更新";
+        protected override LocalisableString Header => GeneralSettingsStrings.UpdateHeader;
 
         private SettingsButton checkForUpdatesButton;
 
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
-                LabelText = "更新频道",
+                LabelText = GeneralSettingsStrings.ReleaseStream,
                 Current = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
             });
 
@@ -40,7 +41,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 Add(checkForUpdatesButton = new SettingsButton
                 {
-                    Text = "检查更新",
+                    Text = GeneralSettingsStrings.CheckUpdate,
                     Action = () =>
                     {
                         checkForUpdatesButton.Enabled.Value = false;
@@ -65,13 +66,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 Add(new SettingsButton
                 {
-                    Text = "打开osu!文件夹",
+                    Text = GeneralSettingsStrings.OpenOsuFolder,
                     Action = storage.OpenInNativeExplorer,
                 });
 
                 Add(new SettingsButton
                 {
-                    Text = "数据迁移",
+                    Text = GeneralSettingsStrings.ChangeFolderLocation,
                     Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
                 });
             }

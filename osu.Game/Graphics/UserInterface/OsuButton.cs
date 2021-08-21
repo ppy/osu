@@ -42,6 +42,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 BackgroundColour
         {
+            get => backgroundColour ?? Color4.White;
             set
             {
                 backgroundColour = value;

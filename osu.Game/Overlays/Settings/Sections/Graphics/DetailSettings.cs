@@ -5,12 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class DetailSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "细节设置";
+        protected override LocalisableString Header => GraphicsSettingsStrings.DetailSettingsHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -19,22 +20,22 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "故事版 / 背景视频",
+                    LabelText = GraphicsSettingsStrings.StoryboardVideo,
                     Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "击打闪光",
+                    LabelText = GraphicsSettingsStrings.HitLighting,
                     Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
                 new SettingsEnumDropdown<ScreenshotFormat>
                 {
-                    LabelText = "截图格式",
+                    LabelText = GraphicsSettingsStrings.ScreenshotFormat,
                     Current = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "在截图中显示光标",
+                    LabelText = GraphicsSettingsStrings.ShowCursorInScreenshots,
                     Current = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
                 }
             };

@@ -5,8 +5,19 @@ namespace osu.Game.Screens.Mvis.Plugins
 {
     public class PluginKeybind
     {
+        /// <summary>
+        /// 目标按键
+        /// </summary>
         public readonly Key Key;
+
+        /// <summary>
+        /// 触发后要执行的动作
+        /// </summary>
         public readonly Action Action;
+
+        /// <summary>
+        /// 名称
+        /// </summary>
         public string Name;
 
         internal int Id;

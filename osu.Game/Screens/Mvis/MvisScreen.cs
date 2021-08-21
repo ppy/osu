@@ -319,11 +319,7 @@ namespace osu.Game.Screens.Mvis
         [BackgroundDependencyLoader]
         private void load(MConfigManager config, IdleTracker idleTracker)
         {
-            //早期设置
-            var iR = config.Get<float>(MSetting.MvisInterfaceRed);
-            var iG = config.Get<float>(MSetting.MvisInterfaceGreen);
-            var iB = config.Get<float>(MSetting.MvisInterfaceBlue);
-            dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
+            dependencies.Cache(colourProvider = new CustomColourProvider());
             dependencies.Cache(this);
 
             //向侧边栏添加内容
@@ -415,7 +411,7 @@ namespace osu.Game.Screens.Mvis
                 {
                     Size = new Vector2(50, 30),
                     Icon = FontAwesome.Solid.StepBackward,
-                    Action = prevTrack,
+                    Action = () => audioControlProvider?.PrevTrack(),
                     Description = MvisBaseStrings.PrevOrRestart,
                     Type = FunctionType.Audio
                 },
@@ -429,7 +425,7 @@ namespace osu.Game.Screens.Mvis
                 {
                     Size = new Vector2(50, 30),
                     Icon = FontAwesome.Solid.StepForward,
-                    Action = nextTrack,
+                    Action = () => audioControlProvider?.NextTrack(),
                     Description = MvisBaseStrings.Next,
                     Type = FunctionType.Audio,
                 },
@@ -630,7 +626,6 @@ namespace osu.Game.Screens.Mvis
                 changeFunctionBarProvider(pl);
             }, true);
 
-            currentFunctionBarProvider.Hide();
             base.LoadComplete();
         }
 
@@ -815,7 +810,7 @@ namespace osu.Game.Screens.Mvis
 
             originalMods = Mods.Value;
 
-            //override mod列表
+            //覆盖mod列表
             timeRateMod = new List<Mod> { modRateAdjust };
             Mods.Value = timeRateMod;
 
@@ -883,13 +878,15 @@ namespace osu.Game.Screens.Mvis
         {
             base.OnResuming(last);
 
+            //更新Mod
+            originalMods = ((OsuScreen)last).Mods.Value;
+
             Mods.Value = timeRateMod;
 
             Beatmap.Disabled = audioControlProvider != null && audioControlProvider != pluginManager.DefaultAudioController;
             this.FadeIn(duration * 0.6f)
                 .ScaleTo(1, duration * 0.6f, Easing.OutQuint);
 
-            CurrentTrack.ResetSpeedAdjustments();
             applyTrackAdjustments();
 
             Beatmap.BindValueChanged(onBeatmapChanged);
@@ -964,8 +961,6 @@ namespace osu.Game.Screens.Mvis
                 return;
             }
 
-            foreground.FadeTo(1, duration, Easing.OutQuint);
-
             currentFunctionBarProvider.Show();
 
             OverlaysHidden = false;
@@ -979,12 +974,6 @@ namespace osu.Game.Screens.Mvis
             audioControlProvider?.TogglePause();
             OnTrackRunningToggle?.Invoke(CurrentTrack.IsRunning);
         }
-
-        private void prevTrack() =>
-            audioControlProvider?.PrevTrack();
-
-        private void nextTrack() =>
-            audioControlProvider?.NextTrack();
 
         public void SeekTo(double position)
         {
