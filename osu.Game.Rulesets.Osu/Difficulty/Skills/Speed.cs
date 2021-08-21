@@ -58,7 +58,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             int previousIslandSize = -1;
-            int prevPreviousIslandSize = -1;
             double rhythmComplexitySum = 0;
             int islandSize = 0;
 
@@ -99,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                             if (Previous[i].BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
                                 effectiveRatio *= 0.5;
 
-                            if (prevPreviousIslandSize % 2 == islandSize % 2) // repeated island size (ex: triplet -> triplet)
+                            if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
                                 effectiveRatio *= 0.25;
 
                             if (prevPrevDelta > prevDelta + 10 && prevDelta > currDelta + 10) // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
@@ -108,7 +107,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                             rhythmComplexitySum += effectiveRatio;
 
                             previousIslandSize = islandSize; // log the last island size.
-                            prevPreviousIslandSize = previousIslandSize; // yep
 
                             if (prevDelta * 1.25 < currDelta) // we're slowing down, stop counting
                                 firstDeltaSwitch = false; // if we're speeding up, this stays true and  we keep counting island size.
