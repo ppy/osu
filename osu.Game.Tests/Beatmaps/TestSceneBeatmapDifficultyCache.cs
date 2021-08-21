@@ -58,6 +58,12 @@ namespace osu.Game.Tests.Beatmaps
         {
             OsuModDoubleTime dt = null;
 
+            AddStep("set computation function", () => difficultyCache.ComputeDifficulty = lookup =>
+            {
+                var modRateAdjust = (ModRateAdjust)lookup.OrderedMods.SingleOrDefault(mod => mod is ModRateAdjust);
+                return new StarDifficulty(BASE_STARS + modRateAdjust?.SpeedChange.Value ?? 0, 0);
+            });
+
             AddStep("change selected mod to DT", () => SelectedMods.Value = new[] { dt = new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
             AddUntilStep($"star difficulty -> {BASE_STARS + 1.5}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.5);
 
@@ -133,13 +139,11 @@ namespace osu.Game.Tests.Beatmaps
 
         private class TestBeatmapDifficultyCache : BeatmapDifficultyCache
         {
+            public Func<DifficultyCacheLookup, StarDifficulty> ComputeDifficulty { get; set; }
+
             protected override Task<StarDifficulty> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken token = default)
             {
-                var rateAdjust = lookup.OrderedMods.OfType<ModRateAdjust>().SingleOrDefault();
-                if (rateAdjust != null)
-                    return Task.FromResult(new StarDifficulty(BASE_STARS + rateAdjust.SpeedChange.Value, 0));
-
-                return Task.FromResult(new StarDifficulty(BASE_STARS, 0));
+                return Task.FromResult(ComputeDifficulty?.Invoke(lookup) ?? new StarDifficulty(BASE_STARS, 0));
             }
         }
     }
