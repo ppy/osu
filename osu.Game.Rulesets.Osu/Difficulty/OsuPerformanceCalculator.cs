@@ -197,8 +197,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                               pm * Math.Pow(229.5 - 11 * Attributes.OverallDifficulty, 2.0);
 
             double accuracyValue = 2.83 * Math.Pow(1.52163, (79.5 - 2 * Math.Sqrt(variance)) / 6.0)
-                                   * Math.Pow(Math.Log(1.0 + (Math.E - 1.0) * (Math.Min(amountHitObjectsWithAccuracy, 1600) / 1000.0)), 0.5);
-
+                                        * Math.Pow(Math.Log(1.0 + (Math.E - 1.0) * (Math.Min(amountHitObjectsWithAccuracy, 1600) / 1000.0)), 0.5);
 
             if (mods.Any(m => m is OsuModHidden))
                 accuracyValue *= 1.08;
