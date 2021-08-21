@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double p100 = (2 * (double)countOk) / amountHitObjectsWithAccuracy; // this is multiplied by two to encourage better accuracy. (scales better)
             double p50 = (1 * (double)countMeh) / amountHitObjectsWithAccuracy;
             double pm = (1 * (double)countMiss) / amountHitObjectsWithAccuracy;
-            double p300 = 1.0 - pm - p100 - p50;
+            double p300 = Math.Max(0, 1.0 - pm - p100 - p50);
 
             double m300 = 79.5 - 6.0 * Attributes.OverallDifficulty;
             double m100 = 139.5 - 8.0 * Attributes.OverallDifficulty;
@@ -193,8 +193,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double variance = p300 * Math.Pow(m300 / 2.0, 2.0) +
                               p100 * Math.Pow((m300 + m100) / 2.0, 2.0) +
-                              p50 * Math.Pow((m100 + m50) / 2.0, 2.0) +
-                              pm * Math.Pow(229.5 - 11 * Attributes.OverallDifficulty, 2.0);
+                              p50 * Math.Pow((m100 + m50) / 2.0, 2.0);
 
             double accuracyValue = 2.83 * Math.Pow(1.52163, (79.5 - 2 * Math.Sqrt(variance)) / 6.0)
                                         * Math.Pow(Math.Log(1.0 + (Math.E - 1.0) * (Math.Min(amountHitObjectsWithAccuracy, 1600) / 1000.0)), 0.5);
