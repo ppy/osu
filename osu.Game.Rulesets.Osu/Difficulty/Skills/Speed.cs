@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
 
-        private const double rhythm_multiplier = 2.0;
+        private const double rhythm_multiplier = 2.5;
         private const int history_time_max = 3000; // 3 seconds of calculatingRhythmBonus max.
 
         private double skillMultiplier => 1375;
@@ -58,12 +58,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             int previousIslandSize = -1;
+            int prevPreviousIslandSize = -1;
             double rhythmComplexitySum = 0;
             int islandSize = 0;
 
             bool firstDeltaSwitch = false;
 
-            for (int i = Previous.Count - 1; i > 0; i--)
+            for (int i = Previous.Count - 2; i > 0; i--)
             {
                 double currHistoricalDecay = Math.Max(0, (history_time_max - (current.StartTime - Previous[i - 1].StartTime))) / history_time_max; // scales note 0 to 1 from history to now
 
@@ -73,6 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                     double currDelta = ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime;
                     double prevDelta = ((OsuDifficultyHitObject)Previous[i]).StrainTime;
+                    double prevPrevDelta = ((OsuDifficultyHitObject)Previous[i + 1]).StrainTime;
                     double effectiveRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
 
                     if (effectiveRatio > 0.5)
@@ -98,12 +100,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                             if (Previous[i].BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
                                 effectiveRatio *= 0.5;
 
-                            if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
+                            if (prevPreviousIslandSize % 2 == islandSize % 2) // repeated island size (ex: triplet -> triplet)
                                 effectiveRatio *= 0.25;
+
+                            if (prevPrevDelta > prevDelta + 10 && prevDelta > currDelta + 10) // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
+                                effectiveRatio *= 0.125;
 
                             rhythmComplexitySum += effectiveRatio;
 
                             previousIslandSize = islandSize; // log the last island size.
+                            prevPreviousIslandSize = previousIslandSize; // yep
 
                             if (prevDelta * 1.25 < currDelta) // we're slowing down, stop counting
                                 firstDeltaSwitch = false; // if we're speeding up, this stays true and  we keep counting island size.
