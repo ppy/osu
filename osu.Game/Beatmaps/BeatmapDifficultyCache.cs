@@ -310,7 +310,7 @@ namespace osu.Game.Beatmaps
                 Beatmap = beatmap;
                 // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
                 Ruleset = ruleset ?? Beatmap.Ruleset;
-                OrderedMods = mods?.OrderBy(m => m.Acronym).ToArray() ?? Array.Empty<Mod>();
+                OrderedMods = mods?.OrderBy(m => m.Acronym).Select(mod => mod.DeepClone()).ToArray() ?? Array.Empty<Mod>();
             }
 
             public bool Equals(DifficultyCacheLookup other)
