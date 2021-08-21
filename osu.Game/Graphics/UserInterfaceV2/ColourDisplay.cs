@@ -139,7 +139,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             public MenuItem[] ContextMenuItems => new MenuItem[]
             {
-                new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke())
+                new OsuMenuItem("删除", MenuItemType.Destructive, () => DeleteRequested?.Invoke())
             };
         }
     }

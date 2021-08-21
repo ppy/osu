@@ -103,11 +103,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                             {
                                 t.NewLine();
-                                t.AddText("If your tablet is not detected, please read ");
-                                t.AddLink("this FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
+                                t.AddText("如果你的数位板没被检测到, 请阅读 ");
+                                t.AddLink("此FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
                                     ? @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Windows-FAQ"
                                     : @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Linux-FAQ");
-                                t.AddText(" for troubleshooting steps.");
+                                t.AddText(" 以排查故障");
                             }
                         }),
                     }
