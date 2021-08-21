@@ -4,6 +4,7 @@ using Mvis.Plugin.Sandbox.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Mvis.Plugins;
@@ -62,8 +63,6 @@ namespace Mvis.Plugin.Sandbox
                     MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
                 };
             }
-
-            AddInternal(new Particles());
         }
 
         private void onIdleAlphaChanged(ValueChangedEvent<float> v)
@@ -84,7 +83,15 @@ namespace Mvis.Plugin.Sandbox
         public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
             => new RulesetPanelSidebarSection(this);
 
-        protected override Drawable CreateContent() => new LayoutController();
+        protected override Drawable CreateContent() => new Container
+        {
+            RelativeSizeAxes = Axes.Both,
+            Children = new Drawable[]
+            {
+                new Particles(),
+                new LayoutController()
+            }
+        };
 
         protected override bool OnContentLoaded(Drawable content) => true;
 

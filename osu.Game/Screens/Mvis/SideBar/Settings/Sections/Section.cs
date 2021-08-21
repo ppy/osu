@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -26,41 +25,28 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
 
         private readonly OsuSpriteText title = new OsuSpriteText
         {
-            Font = OsuFont.GetFont(size: 30),
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight
+            Font = OsuFont.GetFont(size: 30)
         };
 
-        protected readonly List<FillFlowContainer> Containers = new List<FillFlowContainer>();
-
         protected virtual float PieceWidth => 150;
-
-        protected FillFlowContainer CreateFillFlowContainer()
-        {
-            var target = new FillFlowContainer
-            {
-                AutoSizeAxes = Axes.Both,
-                Spacing = new Vector2(5),
-                Direction = FillDirection.Vertical,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight
-            };
-
-            Containers.Add(target);
-            target.Margin = new MarginPadding { Top = 40, Right = (PieceWidth * Containers.IndexOf(target)) + (5 * Containers.IndexOf(target)) };
-
-            return target;
-        }
 
         protected Section()
         {
             AutoSizeAxes = Axes.Both;
             Anchor = Origin = Anchor.TopRight;
-            InternalChild = title;
             Padding = new MarginPadding(10);
 
-            for (int i = 0; i <= Columns; i++)
-                AddInternal(CreateFillFlowContainer());
+            InternalChildren = new Drawable[]
+            {
+                title,
+                FillFlow = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Y,
+                    Width = (PieceWidth * Columns) + (5 * (Columns - 1)),
+                    Spacing = new Vector2(5),
+                    Margin = new MarginPadding { Top = 40 }
+                }
+            };
         }
 
         private Bindable<TabControlPosition> currentTabPosition;
@@ -98,7 +84,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
             }
         }
 
-        private int index;
+        protected readonly FillFlowContainer FillFlow;
 
         protected void AddRange(Drawable[] drawables)
         {
@@ -108,10 +94,6 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
             }
         }
 
-        protected void Add(Drawable drawable)
-        {
-            Containers[index % Columns].Add(drawable);
-            index++;
-        }
+        protected void Add(Drawable drawable) => FillFlow.Add(drawable);
     }
 }

@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         public bool OkForHide();
 
         /// <summary>
-        /// 设置功能控制
+        /// 添加功能控制器
         /// </summary>
         /// <param name="provider"></param>
         /// <returns>
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         public bool AddFunctionControl(IFunctionProvider provider);
 
         /// <summary>
-        /// 添加一些控制按钮
+        /// 添加一些控制器
         /// </summary>
         /// <param name="providers"></param>
         /// <returns>
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         public bool AddFunctionControls(List<IFunctionProvider> providers);
 
         /// <summary>
-        /// 设置一些控制按钮
+        /// 设置一些控制器
         /// </summary>
         /// <param name="providers"></param>
         /// <returns>
@@ -51,6 +51,10 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         /// </returns>
         public bool SetFunctionControls(List<IFunctionProvider> providers);
 
+        /// <summary>
+        /// 移除某一功能控制器
+        /// </summary>
+        /// <param name="provider">要移除的功能控制器</param>
         public void Remove(IFunctionProvider provider);
 
         /// <summary>
@@ -59,11 +63,14 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         public void ShowFunctionControlTemporary();
 
         /// <summary>
-        /// 获取所有插件按钮
+        /// 获取所有插件功能控制器
         /// </summary>
         /// <returns>插件按钮列表</returns>
         public List<IPluginFunctionProvider> GetAllPluginFunctionButton();
 
+        /// <summary>
+        /// 被禁用时触发
+        /// </summary>
         public Action OnDisable { get; set; }
     }
 }
