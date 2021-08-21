@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Beatmaps
             // hash code of 0 (the value) conflicts with the hash code of null (the initial/default value).
             // it's important that the mod reference and its underlying bindable references stay the same to demonstrate this failure.
             AddStep("change DA difficulty to 0", () => difficultyAdjust.OverallDifficulty.Value = 0);
-            AddUntilStep($"star difficulty -> 0", () => starDifficultyBindable.Value?.Stars == 0);
+            AddUntilStep("star difficulty -> 0", () => starDifficultyBindable.Value?.Stars == 0);
         }
 
         [Test]
