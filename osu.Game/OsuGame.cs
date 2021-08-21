@@ -1018,6 +1018,8 @@ namespace osu.Game
 
             var horizontalOffset = 0f;
 
+            // Calculate the horizontal offset using Content, as it gets nested inside a ScalingMode.Everything container
+            // which should apply to overlays, but not get affected by modes like ScalingMode.ExcludeOverlays which shouldn't.
             if (Settings.IsLoaded && Settings.IsPresent)
                 horizontalOffset += Content.ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X * SIDE_OVERLAY_OFFSET_RATIO;
             if (Notifications.IsLoaded && Notifications.IsPresent)
