@@ -1019,9 +1019,9 @@ namespace osu.Game
             var horizontalOffset = 0f;
 
             if (Settings.IsLoaded && Settings.IsPresent)
-                horizontalOffset += ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X * SIDE_OVERLAY_OFFSET_RATIO;
+                horizontalOffset += Content.ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X * SIDE_OVERLAY_OFFSET_RATIO;
             if (Notifications.IsLoaded && Notifications.IsPresent)
-                horizontalOffset += (ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - DrawWidth) * SIDE_OVERLAY_OFFSET_RATIO;
+                horizontalOffset += (Content.ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - Content.DrawWidth) * SIDE_OVERLAY_OFFSET_RATIO;
 
             ScreenOffsetContainer.X = horizontalOffset;
 
