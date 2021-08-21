@@ -86,7 +86,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                         {
                             islandSize++; // island is still progressing, count size.
                         }
-
                         else
                         {
                             if (islandSize > 6)
@@ -152,7 +151,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     angleBonus = 1.25;
                 else if (angle < angle_bonus_begin)
                     angleBonus = 1 + Math.Pow(Math.Sin(1.5 * (angle_bonus_begin - angle)), 2) / 4;
-
             }
 
             return (angleBonus * speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / osuCurrObj.StrainTime;
