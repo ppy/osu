@@ -16,9 +16,9 @@ namespace osu.Game.Rulesets
     public class RulesetConfigCache : Component
     {
         private readonly ConcurrentDictionary<int, IRulesetConfigManager> configCache = new ConcurrentDictionary<int, IRulesetConfigManager>();
-        private readonly SettingsStore settingsStore;
+        private readonly RealmSettingsStore settingsStore;
 
-        public RulesetConfigCache(SettingsStore settingsStore)
+        public RulesetConfigCache(RealmSettingsStore settingsStore)
         {
             this.settingsStore = settingsStore;
         }
