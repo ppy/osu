@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 using osuTK;
@@ -23,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections
     {
         private SkinSettingsDropdown skinDropdown;
 
-        public override string Header => "皮肤";
+        public override LocalisableString Header => SkinSettingsStrings.SkinSectionHeader;
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
@@ -69,34 +70,34 @@ namespace osu.Game.Overlays.Settings.Sections
                 skinDropdown = new SkinSettingsDropdown(),
                 new SettingsButton
                 {
-                    Text = "Skin layout editor",
+                    Text = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.Toggle(),
                 },
                 new ExportSkinButton(),
                 new SettingsSlider<float, SizeSlider>
                 {
-                    LabelText = "游戏内光标大小",
+                    LabelText = SkinSettingsStrings.GameplayCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "根据谱面调整光标大小",
+                    LabelText = SkinSettingsStrings.AutoCursorSize,
                     Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "使用谱面自带皮肤",
+                    LabelText = SkinSettingsStrings.BeatmapSkins,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "使用谱面颜色",
+                    LabelText = SkinSettingsStrings.BeatmapColours,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "使用谱面击打音效",
+                    LabelText = SkinSettingsStrings.BeatmapHitsounds,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
             };
@@ -200,7 +201,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                Text = "导出已选中的皮肤";
+                Text = SkinSettingsStrings.ExportSkinButton;
                 Action = export;
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();

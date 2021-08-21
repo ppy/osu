@@ -57,8 +57,6 @@ namespace osu.Game.Screens.Play
 
         private Bindable<HUDVisibilityMode> configVisibilityMode;
 
-        private readonly Container visibilityContainer;
-
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
@@ -72,7 +70,7 @@ namespace osu.Game.Screens.Play
 
         private readonly SkinnableTargetContainer mainComponents;
 
-        private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter, topRightElements };
+        private IEnumerable<Drawable> hideTargets => new Drawable[] { mainComponents, KeyCounter, topRightElements };
 
         public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
@@ -84,13 +82,9 @@ namespace osu.Game.Screens.Play
             Children = new Drawable[]
             {
                 CreateFailingLayer(),
-                visibilityContainer = new Container
+                mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
                 },
                 topRightElements = new FillFlowContainer
                 {

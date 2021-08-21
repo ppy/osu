@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
         private Bindable<double> minStars;
         private Bindable<double> maxStars;
 
-        protected override LocalisableString Header => "歌曲选择";
+        protected override LocalisableString Header => UserInterfaceStrings.SongSelectHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -31,31 +32,31 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "右键鼠标拖拽列表",
+                    LabelText = UserInterfaceStrings.RightMouseScroll,
                     Current = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "显示转谱",
+                    LabelText = UserInterfaceStrings.ShowConvertedBeatmaps,
                     Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
                 new SettingsSlider<double, StarsSlider>
                 {
-                    LabelText = "显示星级，从 ",
+                    LabelText = UserInterfaceStrings.StarsMinimum,
                     Current = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
                 },
                 new SettingsSlider<double, MaximumStarsSlider>
                 {
-                    LabelText = "到",
+                    LabelText = UserInterfaceStrings.StarsMaximum,
                     Current = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
-                    LabelText = "随机选择算法",
+                    LabelText = UserInterfaceStrings.RandomSelectionAlgorithm,
                     Current = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
                 }
             };
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
         private class MaximumStarsSlider : StarsSlider
         {
-            public override LocalisableString TooltipText => Current.IsDefault ? "无限制" : base.TooltipText;
+            public override LocalisableString TooltipText => Current.IsDefault ? UserInterfaceStrings.NoLimit : base.TooltipText;
         }
 
         private class StarsSlider : OsuSliderBar<double>

@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
@@ -20,7 +19,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     {
         public Bindable<Room> SelectedRoom => OnlinePlayDependencies?.SelectedRoom;
         public IRoomManager RoomManager => OnlinePlayDependencies?.RoomManager;
-        public Bindable<FilterCriteria> Filter => OnlinePlayDependencies?.Filter;
         public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies?.OngoingOperationTracker;
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies?.AvailabilityTracker;
 

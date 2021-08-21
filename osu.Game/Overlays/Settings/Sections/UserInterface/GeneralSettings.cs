@@ -6,12 +6,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "整体";
+        protected override LocalisableString Header => UserInterfaceStrings.GeneralHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -20,23 +21,23 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "在拖拽时旋转光标",
+                    LabelText = UserInterfaceStrings.CursorRotation,
                     Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
                 new SettingsSlider<float, SizeSlider>
                 {
-                    LabelText = "菜单光标大小",
+                    LabelText = UserInterfaceStrings.MenuCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "视差效果",
+                    LabelText = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
                 new SettingsSlider<float, TimeSlider>
                 {
-                    LabelText = "\"按压以确认\" 激活时间",
+                    LabelText = UserInterfaceStrings.HoldToConfirmActivationTime,
                     Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
                     KeyboardStep = 50
                 },

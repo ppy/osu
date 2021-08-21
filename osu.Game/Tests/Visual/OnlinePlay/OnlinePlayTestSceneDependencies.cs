@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
@@ -20,7 +19,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     {
         public Bindable<Room> SelectedRoom { get; }
         public IRoomManager RoomManager { get; }
-        public Bindable<FilterCriteria> Filter { get; }
         public OngoingOperationTracker OngoingOperationTracker { get; }
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker { get; }
 
@@ -36,7 +34,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         {
             SelectedRoom = new Bindable<Room>();
             RoomManager = CreateRoomManager();
-            Filter = new Bindable<FilterCriteria>(new FilterCriteria());
             OngoingOperationTracker = new OngoingOperationTracker();
             AvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
 
@@ -44,7 +41,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
             CacheAs(SelectedRoom);
             CacheAs(RoomManager);
-            CacheAs(Filter);
             CacheAs(OngoingOperationTracker);
             CacheAs(AvailabilityTracker);
             CacheAs(new OverlayColourProvider(OverlayColourScheme.Plum));
@@ -75,6 +71,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 drawableComponents.Add(drawable);
         }
 
-        protected virtual IRoomManager CreateRoomManager() => new BasicTestRoomManager();
+        protected virtual IRoomManager CreateRoomManager() => new TestRequestHandlingRoomManager();
     }
 }

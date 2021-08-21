@@ -105,6 +105,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
             new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
+            new KeyBinding(InputKey.Tab, GlobalAction.ToggleChatFocus),
         };
 
         public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
@@ -325,5 +326,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Seek replay backward")]
         SeekReplayBackward,
+
+        [Description("Toggle chat focus")]
+        ToggleChatFocus
     }
 }

@@ -6,12 +6,13 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class VolumeSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "音量";
+        protected override LocalisableString Header => AudioSettingsStrings.VolumeHeader;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -20,28 +21,28 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 new SettingsSlider<double>
                 {
-                    LabelText = "整体",
+                    LabelText = AudioSettingsStrings.MasterVolume,
                     Current = audio.Volume,
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = "整体（失去焦点时）",
+                    LabelText = AudioSettingsStrings.MasterVolumeInactive,
                     Current = config.GetBindable<double>(OsuSetting.VolumeInactive),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = "音效",
+                    LabelText = AudioSettingsStrings.EffectVolume,
                     Current = audio.VolumeSample,
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = "音乐",
+                    LabelText = AudioSettingsStrings.MusicVolume,
                     Current = audio.VolumeTrack,
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true

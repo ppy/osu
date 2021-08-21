@@ -1,17 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class OffsetSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "偏移量调整";
+        protected override LocalisableString Header => AudioSettingsStrings.OffsetHeader;
+
+        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "universal", "uo", "timing" });
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -20,13 +25,13 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 new SettingsSlider<double, OffsetSlider>
                 {
-                    LabelText = "音频偏移量",
+                    LabelText = AudioSettingsStrings.AudioOffset,
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
                     KeyboardStep = 1f
                 },
                 new SettingsButton
                 {
-                    Text = "设置向导"
+                    Text = AudioSettingsStrings.OffsetWizard
                 }
             };
         }

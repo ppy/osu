@@ -22,7 +22,8 @@ namespace osu.Game.Graphics.Containers
         where T : Drawable
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();
-        private Drawable lastClickedSection;
+
+        private T lastClickedSection;
 
         public Drawable ExpandableHeader
         {
@@ -144,10 +145,25 @@ namespace osu.Game.Graphics.Containers
             footerHeight = null;
         }
 
-        public void ScrollTo(Drawable section)
+        public void ScrollTo(Drawable target)
         {
-            lastClickedSection = section;
-            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - scrollContainer.DisplayableContent * scroll_y_centre - (FixedHeader?.BoundingBox.Height ?? 0));
+            lastKnownScroll = null;
+
+            float fixedHeaderSize = FixedHeader?.BoundingBox.Height ?? 0;
+
+            // implementation similar to ScrollIntoView but a bit more nuanced.
+            float top = scrollContainer.GetChildPosInContent(target);
+
+            float bottomScrollExtent = scrollContainer.ScrollableExtent - fixedHeaderSize;
+            float scrollTarget = top - fixedHeaderSize - scrollContainer.DisplayableContent * scroll_y_centre;
+
+            if (scrollTarget > bottomScrollExtent)
+                scrollContainer.ScrollToEnd();
+            else
+                scrollContainer.ScrollTo(scrollTarget);
+
+            if (target is T section)
+                lastClickedSection = section;
         }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
@@ -170,11 +186,20 @@ namespace osu.Game.Graphics.Containers
 
             if (source == InvalidationSource.Child && (invalidation & Invalidation.DrawSize) != 0)
             {
-                lastKnownScroll = null;
+                InvalidateScrollPosition();
                 result = true;
             }
 
             return result;
+        }
+
+        protected void InvalidateScrollPosition()
+        {
+            Schedule(() =>
+            {
+                lastKnownScroll = null;
+                lastClickedSection = null;
+            });
         }
 
         protected override void UpdateAfterChildren()
@@ -224,15 +249,19 @@ namespace osu.Game.Graphics.Containers
 
                 float scrollCentre = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_y_centre + selectionLenienceAboveSection;
 
-                if (Precision.AlmostBigger(0, scrollContainer.Current))
-                    SelectedSection.Value = lastClickedSection as T ?? Children.FirstOrDefault();
+                var presentChildren = Children.Where(c => c.IsPresent);
+
+                if (lastClickedSection != null)
+                    SelectedSection.Value = lastClickedSection;
+                else if (Precision.AlmostBigger(0, scrollContainer.Current))
+                    SelectedSection.Value = presentChildren.FirstOrDefault();
                 else if (Precision.AlmostBigger(scrollContainer.Current, scrollContainer.ScrollableExtent))
-                    SelectedSection.Value = lastClickedSection as T ?? Children.LastOrDefault();
+                    SelectedSection.Value = presentChildren.LastOrDefault();
                 else
                 {
-                    SelectedSection.Value = Children
+                    SelectedSection.Value = presentChildren
                                             .TakeWhile(section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollCentre <= 0)
-                                            .LastOrDefault() ?? Children.FirstOrDefault();
+                                            .LastOrDefault() ?? presentChildren.FirstOrDefault();
                 }
             }
         }

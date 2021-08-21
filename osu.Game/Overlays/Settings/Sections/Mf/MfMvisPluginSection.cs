@@ -1,6 +1,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Screens.Mvis.Plugins;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
@@ -23,6 +24,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             }
         }
 
-        public override string Header => "M-vis播放器 - 插件";
+        public override LocalisableString Header => "M-vis播放器 - 插件";
     }
 }

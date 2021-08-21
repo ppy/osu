@@ -6,12 +6,13 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public class ModsSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Mods";
+        protected override LocalisableString Header => GameplaySettingsStrings.ModsHeader;
 
         public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "mod" });
 
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "当视觉效果Mods启用时,增强第一个物件的可见度",
+                    LabelText = GameplaySettingsStrings.IncreaseFirstObjectVisibility,
                     Current = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility),
                 },
             };

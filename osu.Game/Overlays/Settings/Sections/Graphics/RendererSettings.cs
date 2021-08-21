@@ -7,12 +7,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class RendererSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "渲染";
+        protected override LocalisableString Header => GraphicsSettingsStrings.RendererHeader;
 
         private SettingsEnumDropdown<FrameSync> frameLimiterDropdown;
 
@@ -25,17 +26,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 // TODO: this needs to be a custom dropdown at some point
                 frameLimiterDropdown = new SettingsEnumDropdown<FrameSync>
                 {
-                    LabelText = "帧数限制",
+                    LabelText = GraphicsSettingsStrings.FrameLimiter,
                     Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync)
                 },
                 new SettingsEnumDropdown<ExecutionMode>
                 {
-                    LabelText = "渲染(运行)模式",
+                    LabelText = GraphicsSettingsStrings.ThreadingMode,
                     Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "显示FPS",
+                    LabelText = GraphicsSettingsStrings.ShowFPS,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };
@@ -47,9 +48,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             frameLimiterDropdown.Current.BindValueChanged(limit =>
             {
-                const string unlimited_frames_note = "使用无限制会导致顿卡, 性能下降和设备过热, 并不会改善感知到的延迟。 我们建议使用\"2倍刷新率\"。";
-
-                frameLimiterDropdown.WarningText = limit.NewValue == FrameSync.Unlimited ? unlimited_frames_note : string.Empty;
+                frameLimiterDropdown.WarningText = limit.NewValue == FrameSync.Unlimited ? GraphicsSettingsStrings.UnlimitedFramesNote : default;
             }, true);
         }
     }
