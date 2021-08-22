@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 
@@ -80,35 +79,6 @@ namespace osu.Game.Overlays.Mods
 
         protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
         protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
-
-        private Drawable getModItem(Mod mod)
-        {
-            return new FillFlowContainer
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Children = new Drawable[]
-                {
-                    new ModIcon(mod, false)
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        AutoSizeAxes = Axes.Both,
-                        Scale = new Vector2(0.4f)
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Margin = new MarginPadding { Left = 5 },
-                        Font = OsuFont.GetFont(weight: FontWeight.Regular),
-                        Text = mod.Name,
-                    },
-                }
-            };
-        }
 
         private string lastMod;
 
