@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Chat;
@@ -22,13 +23,15 @@ namespace osu.Game.Online.Chat
     {
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
 
-        private readonly FocusedTextBox textbox;
+        protected readonly ChatTextBox Textbox;
 
         protected ChannelManager ChannelManager;
 
         private StandAloneDrawableChannel drawableChannel;
 
         private readonly bool postingTextbox;
+
+        protected readonly Box Background;
 
         private const float textbox_height = 30;
 
@@ -44,7 +47,7 @@ namespace osu.Game.Online.Chat
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                Background = new Box
                 {
                     Colour = Color4.Black,
                     Alpha = 0.8f,
@@ -54,7 +57,7 @@ namespace osu.Game.Online.Chat
 
             if (postingTextbox)
             {
-                AddInternal(textbox = new FocusedTextBox
+                AddInternal(Textbox = new ChatTextBox
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = textbox_height,
@@ -65,7 +68,7 @@ namespace osu.Game.Online.Chat
                     Origin = Anchor.BottomLeft,
                 });
 
-                textbox.OnCommit += postMessage;
+                Textbox.OnCommit += postMessage;
             }
 
             Channel.BindValueChanged(channelChanged);
@@ -82,7 +85,7 @@ namespace osu.Game.Online.Chat
 
         private void postMessage(TextBox sender, bool newtext)
         {
-            var text = textbox.Text.Trim();
+            var text = Textbox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
                 return;
@@ -92,7 +95,7 @@ namespace osu.Game.Online.Chat
             else
                 ChannelManager?.PostMessage(text, target: Channel.Value);
 
-            textbox.Text = string.Empty;
+            Textbox.Text = string.Empty;
         }
 
         protected virtual ChatLine CreateMessage(Message message) => new StandAloneMessage(message);
@@ -108,6 +111,25 @@ namespace osu.Game.Online.Chat
             drawableChannel.Padding = new MarginPadding { Bottom = postingTextbox ? textbox_height : 0 };
 
             AddInternal(drawableChannel);
+        }
+
+        public class ChatTextBox : FocusedTextBox
+        {
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                BackgroundUnfocused = new Color4(10, 10, 10, 10);
+                BackgroundFocused = new Color4(10, 10, 10, 255);
+            }
+
+            protected override void OnFocusLost(FocusLostEvent e)
+            {
+                base.OnFocusLost(e);
+                FocusLost?.Invoke();
+            }
+
+            public Action FocusLost;
         }
 
         public class StandAloneDrawableChannel : DrawableChannel

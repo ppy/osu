@@ -62,6 +62,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         protected override bool InterpolateMovements => !disjointTrail;
 
         protected override float IntervalMultiplier => 1 / Math.Max(cursorSize.Value, 1);
+        protected override bool AvoidDrawingNearCursor => !disjointTrail;
 
         protected override void Update()
         {

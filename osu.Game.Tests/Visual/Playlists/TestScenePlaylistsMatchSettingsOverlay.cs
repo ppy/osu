@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
         }
 
-        private class TestRoomSettings : PlaylistsMatchSettingsOverlay
+        private class TestRoomSettings : PlaylistsRoomSettingsOverlay
         {
             public TriangleButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
 
@@ -140,6 +140,12 @@ namespace osu.Game.Tests.Visual.Playlists
             public IBindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
 
             public IBindableList<Room> Rooms => null;
+
+            public void AddOrUpdateRoom(Room room) => throw new NotImplementedException();
+
+            public void RemoveRoom(Room room) => throw new NotImplementedException();
+
+            public void ClearRooms() => throw new NotImplementedException();
 
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
             {
