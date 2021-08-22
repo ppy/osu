@@ -31,12 +31,11 @@ namespace osu.Game.Rulesets
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
             loadFromAppDomain();
 
-            // This null check prevents Android from attempting to load the rulesets from disk.
-            // RuntimeInfo.StartupDirectory returns null on Android, and returns a path on other platforms.
+            // This null check prevents Android from attempting to load the rulesets from disk,
+            // as the underlying path "AppContext.BaseDirectory", despite being non-nullable, it returns null on android.
+            // See https://github.com/xamarin/xamarin-android/issues/3489.
             if (RuntimeInfo.StartupDirectory != null)
-            {
                 loadFromDisk();
-            }
 
             // the event handler contains code for resolving dependency on the game assembly for rulesets located outside the base game directory.
             // It needs to be attached to the assembly lookup event before the actual call to loadUserRulesets() else rulesets located out of the base game directory will fail
