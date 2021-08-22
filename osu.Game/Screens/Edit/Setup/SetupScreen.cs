@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
@@ -21,22 +22,28 @@ namespace osu.Game.Screens.Edit.Setup
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(EditorBeatmap beatmap)
         {
+            var sectionsEnumerable = new List<SetupSection>
+            {
+                new ResourcesSection(),
+                new MetadataSection(),
+                new DifficultySection(),
+                new ColoursSection(),
+                new DesignSection(),
+            };
+
+            var rulesetSpecificSection = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateEditorSetupSectionForRuleset();
+            if (rulesetSpecificSection != null)
+                sectionsEnumerable.Add(rulesetSpecificSection);
+
             AddRange(new Drawable[]
             {
                 sections = new SetupScreenSectionsContainer
                 {
-                    FixedHeader = header,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new SetupSection[]
-                    {
-                        new ResourcesSection(),
-                        new MetadataSection(),
-                        new DifficultySection(),
-                        new ColoursSection(),
-                        new DesignSection(),
-                    }
+                    ChildrenEnumerable = sectionsEnumerable,
+                    FixedHeader = header
                 },
             });
         }
