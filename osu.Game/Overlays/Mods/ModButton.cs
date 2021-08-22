@@ -11,12 +11,16 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Utils;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -42,6 +46,9 @@ namespace osu.Game.Overlays.Mods
 
         // A selected index of -1 means not selected.
         private int selectedIndex = -1;
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> globalSelectedMods { get; set; }
 
         /// <summary>
         /// Change the selected mod index of this button.
@@ -236,7 +243,28 @@ namespace osu.Game.Overlays.Mods
                 backgroundIcon.Mod = foregroundIcon.Mod;
             foregroundIcon.Mod = mod;
             text.Text = mod.Name;
-            Colour = mod.HasImplementation ? Color4.White : Color4.Gray;
+            updateColour(mod);
+        }
+
+        private Colour4 lightRed;
+        private Colour4 darkRed;
+
+        private void updateColour(Mod mod)
+        {
+            var baseColour = mod.HasImplementation ? Color4.White : Color4.Gray;
+
+            if (globalSelectedMods != null)
+            {
+                if (!globalSelectedMods.Value.Contains(mod))
+                {
+                    if (!ModUtils.CheckCompatibleSet(globalSelectedMods.Value.Concat(new[] { mod })))
+                    {
+                        baseColour = mod.HasImplementation ? lightRed : darkRed;
+                    }
+                }
+            }
+
+            Colour = baseColour;
         }
 
         private void createIcons()
@@ -307,6 +335,14 @@ namespace osu.Game.Overlays.Mods
             };
 
             Mod = mod;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colour)
+        {
+            lightRed = colour.RedLight;
+            darkRed = colour.RedDark;
+            globalSelectedMods.BindValueChanged(_ => updateColour(SelectedMod ?? Mods.FirstOrDefault()), true);
         }
 
         public ITooltip GetCustomTooltip() => new ModButtonTooltip();

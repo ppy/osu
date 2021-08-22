@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Mods
 
             var allMods = ruleset.Value.CreateInstance().GetAllMods();
 
-            incompatibleMods.Value = allMods.Where(m => incompatibleTypes.Any(t => t.IsInstanceOfType(m))).ToList();
+            incompatibleMods.Value = allMods.Where(m => m.GetType() != mod.GetType() && incompatibleTypes.Any(t => t.IsInstanceOfType(m))).ToList();
 
             if (!incompatibleMods.Value.Any())
             {
