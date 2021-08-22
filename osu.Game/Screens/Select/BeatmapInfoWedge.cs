@@ -71,6 +71,7 @@ namespace osu.Game.Screens.Select
         private void load()
         {
             ruleset.BindValueChanged(_ => updateDisplay());
+            mods.BindValueChanged(_ => updateDisplay());
         }
 
         private const double animation_duration = 800;
