@@ -30,7 +30,13 @@ namespace osu.Game.Rulesets
             // On android in release configuration assemblies are loaded from the apk directly into memory.
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
             loadFromAppDomain();
-            loadFromDisk();
+
+            // This null check prevents Android from attempting to load the rulesets from disk.
+            // RuntimeInfo.StartupDirectory returns null on Android, and returns a path on other platforms.
+            if (RuntimeInfo.StartupDirectory != null)
+            {
+                loadFromDisk();
+            }
 
             // the event handler contains code for resolving dependency on the game assembly for rulesets located outside the base game directory.
             // It needs to be attached to the assembly lookup event before the actual call to loadUserRulesets() else rulesets located out of the base game directory will fail
