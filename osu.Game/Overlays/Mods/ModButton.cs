@@ -311,6 +311,6 @@ namespace osu.Game.Overlays.Mods
 
         public ITooltip GetCustomTooltip() => new ModButtonTooltip();
 
-        public object TooltipContent => SelectedMod ?? Mods[0];
+        public object TooltipContent => SelectedMod ?? Mods.FirstOrDefault();
     }
 }
