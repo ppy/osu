@@ -449,8 +449,11 @@ namespace osu.Game.Screens.Select
             {
                 public LocalisableString TooltipText { get; }
 
+                internal BeatmapStatistic Statistic { get; }
+
                 public InfoLabel(BeatmapStatistic statistic)
                 {
+                    Statistic = statistic;
                     TooltipText = statistic.Name;
                     AutoSizeAxes = Axes.Both;
 
