@@ -15,15 +15,13 @@ namespace osu.Game.Overlays
 {
     public class RankingsOverlay : TabbableOnlineOverlay<RankingsOverlayHeader, RankingsScope>
     {
+        protected Bindable<RulesetInfo> Ruleset => Header.Ruleset;
         protected Bindable<Country> Country => Header.Country;
 
         private APIRequest lastRequest;
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
 
         public RankingsOverlay()
             : base(OverlayColourScheme.Green)
@@ -34,8 +32,6 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            Header.Ruleset.BindTo(ruleset);
-
             Country.BindValueChanged(_ =>
             {
                 // if a country is requested, force performance scope.
@@ -45,7 +41,7 @@ namespace osu.Game.Overlays
                 Scheduler.AddOnce(triggerTabChanged);
             });
 
-            ruleset.BindValueChanged(_ =>
+            Ruleset.BindValueChanged(_ =>
             {
                 if (Header.Current.Value == RankingsScope.Spotlights)
                     return;
@@ -85,7 +81,7 @@ namespace osu.Game.Overlays
             {
                 LoadDisplay(new SpotlightsLayout
                 {
-                    Ruleset = { BindTarget = ruleset }
+                    Ruleset = { BindTarget = Ruleset }
                 });
                 return;
             }
@@ -110,13 +106,13 @@ namespace osu.Game.Overlays
             switch (Header.Current.Value)
             {
                 case RankingsScope.Performance:
-                    return new GetUserRankingsRequest(ruleset.Value, country: Country.Value?.FlagName);
+                    return new GetUserRankingsRequest(Ruleset.Value, country: Country.Value?.FlagName);
 
                 case RankingsScope.Country:
-                    return new GetCountryRankingsRequest(ruleset.Value);
+                    return new GetCountryRankingsRequest(Ruleset.Value);
 
                 case RankingsScope.Score:
-                    return new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score);
+                    return new GetUserRankingsRequest(Ruleset.Value, UserRankingsType.Score);
             }
 
             return null;
