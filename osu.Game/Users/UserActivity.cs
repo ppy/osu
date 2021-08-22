@@ -50,6 +50,14 @@ namespace osu.Game.Users
             public override string Status => $@"{base.Status} with others";
         }
 
+        public class InPlaylistGame : InGame
+        {
+            public InPlaylistGame(BeatmapInfo beatmap, RulesetInfo ruleset)
+                : base(beatmap, ruleset)
+            {
+            }
+        }
+
         public class InSoloGame : InGame
         {
             public InSoloGame(BeatmapInfo info, RulesetInfo ruleset)
