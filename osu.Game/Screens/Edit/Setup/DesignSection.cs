@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Setup
                 epilepsyWarning = new LabelledSwitchButton
                 {
                     Label = "Epilepsy warning",
-                    Description = "Setting this is recommended if the storyboard contains scenes with rapidly flashing colours.",
+                    Description = "Recommended if the storyboard contains scenes with rapidly flashing colours.",
                     Current = { Value = Beatmap.BeatmapInfo.EpilepsyWarning }
                 },
                 letterboxDuringBreaks = new LabelledSwitchButton
