@@ -101,7 +101,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.HitLighting, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
-            SetDefault(OsuSetting.ShowDifficultyGraph, true);
+            SetDefault(OsuSetting.ShowProgressGraph, true);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
@@ -201,6 +201,8 @@ namespace osu.Game.Configuration
         public Func<GlobalAction, string> LookupKeyBindings { get; set; }
     }
 
+    // IMPORTANT: These are used in user configuration files.
+    // The naming of these keys should not be changed once they are deployed in a release, unless migration logic is also added.
     public enum OsuSetting
     {
         Ruleset,
@@ -217,7 +219,7 @@ namespace osu.Game.Configuration
         AlwaysPlayFirstComboBreak,
         FloatingComments,
         HUDVisibilityMode,
-        ShowDifficultyGraph,
+        ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
         MouseDisableButtons,

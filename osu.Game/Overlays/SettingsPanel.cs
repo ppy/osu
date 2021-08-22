@@ -4,9 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,6 +22,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Overlays
 {
+    [Cached]
     public abstract class SettingsPanel : OsuFocusedOverlayContainer
     {
         public const float CONTENT_MARGINS = 15;
@@ -45,7 +48,7 @@ namespace osu.Game.Overlays
         protected Sidebar Sidebar;
         private SidebarButton selectedSidebarButton;
 
-        protected SettingsSectionsContainer SectionsContainer;
+        public SettingsSectionsContainer SectionsContainer { get; private set; }
 
         private SeekLimitedSearchTextBox searchTextBox;
 
@@ -57,6 +60,14 @@ namespace osu.Game.Overlays
         public Func<float> GetToolbarHeight;
 
         private readonly bool showSidebar;
+
+        private LoadingLayer loading;
+
+        private readonly List<SettingsSection> loadableSections = new List<SettingsSection>();
+
+        private Task sectionsLoadingTask;
+
+        public IBindable<SettingsSection> CurrentSection = new Bindable<SettingsSection>();
 
         protected SettingsPanel(bool showSidebar)
         {
@@ -86,69 +97,49 @@ namespace osu.Game.Overlays
                         Colour = OsuColour.Gray(0.05f),
                         Alpha = 1,
                     },
-                    SectionsContainer = new SettingsSectionsContainer
+                    loading = new LoadingLayer
                     {
-                        Masking = true,
-                        RelativeSizeAxes = Axes.Both,
-                        ExpandableHeader = CreateHeader(),
-                        FixedHeader = searchTextBox = new SeekLimitedSearchTextBox
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Width = 0.95f,
-                            Margin = new MarginPadding
-                            {
-                                Top = 20,
-                                Bottom = 20
-                            },
-                        },
-                        Footer = CreateFooter()
-                    },
+                        State = { Value = Visibility.Visible }
+                    }
                 }
             };
+
+            Add(SectionsContainer = new SettingsSectionsContainer
+            {
+                Masking = true,
+                RelativeSizeAxes = Axes.Both,
+                ExpandableHeader = CreateHeader(),
+                SelectedSection = { BindTarget = CurrentSection },
+                FixedHeader = searchTextBox = new SeekLimitedSearchTextBox
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.TopCentre,
+                    Width = 0.95f,
+                    Margin = new MarginPadding
+                    {
+                        Top = 20,
+                        Bottom = 20
+                    },
+                },
+                Footer = CreateFooter().With(f => f.Alpha = 0)
+            });
 
             if (showSidebar)
             {
                 AddInternal(Sidebar = new Sidebar { Width = sidebar_width });
-
-                SectionsContainer.SelectedSection.ValueChanged += section =>
-                {
-                    selectedSidebarButton.Selected = false;
-                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
-                    selectedSidebarButton.Selected = true;
-                };
             }
-
-            searchTextBox.Current.ValueChanged += term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue;
 
             CreateSections()?.ForEach(AddSection);
         }
 
         protected void AddSection(SettingsSection section)
         {
-            SectionsContainer.Add(section);
+            if (IsLoaded)
+                // just to keep things simple. can be accommodated for if we ever need it.
+                throw new InvalidOperationException("All sections must be added before the panel is loaded.");
 
-            if (Sidebar != null)
-            {
-                var button = new SidebarButton
-                {
-                    Section = section,
-                    Action = () =>
-                    {
-                        SectionsContainer.ScrollTo(section);
-                        Sidebar.State = ExpandedState.Contracted;
-                    },
-                };
-
-                Sidebar.Add(button);
-
-                if (selectedSidebarButton == null)
-                {
-                    selectedSidebarButton = Sidebar.Children.First();
-                    selectedSidebarButton.Selected = true;
-                }
-            }
+            loadableSections.Add(section);
         }
 
         protected virtual Drawable CreateHeader() => new Container();
@@ -160,6 +151,12 @@ namespace osu.Game.Overlays
             base.PopIn();
 
             ContentContainer.MoveToX(ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
+
+            // delay load enough to ensure it doesn't overlap with the initial animation.
+            // this is done as there is still a brief stutter during load completion which is more visible if the transition is in progress.
+            // the eventual goal would be to remove the need for this by splitting up load into smaller work pieces, or fixing the remaining
+            // load complete overheads.
+            Scheduler.AddDelayed(loadSections, TRANSITION_LENGTH / 3);
 
             Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
@@ -199,6 +196,80 @@ namespace osu.Game.Overlays
             Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
+        private const double fade_in_duration = 1000;
+
+        private void loadSections()
+        {
+            if (sectionsLoadingTask != null)
+                return;
+
+            sectionsLoadingTask = LoadComponentsAsync(loadableSections, sections =>
+            {
+                SectionsContainer.AddRange(sections);
+                SectionsContainer.Footer.FadeInFromZero(fade_in_duration, Easing.OutQuint);
+                SectionsContainer.SearchContainer.FadeInFromZero(fade_in_duration, Easing.OutQuint);
+
+                loading.Hide();
+
+                searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue, true);
+                searchTextBox.TakeFocus();
+
+                loadSidebarButtons();
+            });
+        }
+
+        private void loadSidebarButtons()
+        {
+            if (Sidebar == null)
+                return;
+
+            LoadComponentsAsync(createSidebarButtons(), buttons =>
+            {
+                float delay = 0;
+
+                foreach (var button in buttons)
+                {
+                    Sidebar.Add(button);
+
+                    button.FadeOut()
+                          .Delay(delay)
+                          .FadeInFromZero(fade_in_duration, Easing.OutQuint);
+
+                    delay += 40;
+                }
+
+                SectionsContainer.SelectedSection.BindValueChanged(section =>
+                {
+                    if (selectedSidebarButton != null)
+                        selectedSidebarButton.Selected = false;
+
+                    selectedSidebarButton = Sidebar.Children.FirstOrDefault(b => b.Section == section.NewValue);
+
+                    if (selectedSidebarButton != null)
+                        selectedSidebarButton.Selected = true;
+                }, true);
+            });
+        }
+
+        private IEnumerable<SidebarButton> createSidebarButtons()
+        {
+            foreach (var section in SectionsContainer)
+            {
+                yield return new SidebarButton
+                {
+                    Section = section,
+                    Action = () =>
+                    {
+                        if (!SectionsContainer.IsLoaded)
+                            return;
+
+                        SectionsContainer.ScrollTo(section);
+                        Sidebar.State = ExpandedState.Contracted;
+                    },
+                };
+            }
+        }
+
         private class NonMaskedContent : Container<Drawable>
         {
             // masking breaks the pan-out transform with nested sub-settings panels.
@@ -208,6 +279,16 @@ namespace osu.Game.Overlays
         public class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
             public SearchContainer<SettingsSection> SearchContainer;
+
+            public string SearchTerm
+            {
+                get => SearchContainer.SearchTerm;
+                set
+                {
+                    SearchContainer.SearchTerm = value;
+                    InvalidateScrollPosition();
+                }
+            }
 
             protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
                 => SearchContainer = new SearchContainer<SettingsSection>

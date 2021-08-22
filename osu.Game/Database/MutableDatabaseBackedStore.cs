@@ -37,6 +37,11 @@ namespace osu.Game.Database
         public IQueryable<T> ConsumableItems => AddIncludesForConsumption(ContextFactory.Get().Set<T>());
 
         /// <summary>
+        /// Access barebones items with no includes.
+        /// </summary>
+        public IQueryable<T> Items => ContextFactory.Get().Set<T>();
+
+        /// <summary>
         /// Add a <typeparamref name="T"/> to the database.
         /// </summary>
         /// <param name="item">The item to add.</param>

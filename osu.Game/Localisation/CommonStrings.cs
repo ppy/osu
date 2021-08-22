@@ -15,9 +15,19 @@ namespace osu.Game.Localisation
         public static LocalisableString Cancel => new TranslatableString(getKey(@"cancel"), @"Cancel");
 
         /// <summary>
+        /// "Clear"
+        /// </summary>
+        public static LocalisableString Clear => new TranslatableString(getKey(@"clear"), @"Clear");
+
+        /// <summary>
         /// "Enabled"
         /// </summary>
         public static LocalisableString Enabled => new TranslatableString(getKey(@"enabled"), @"Enabled");
+
+        /// <summary>
+        /// "Default"
+        /// </summary>
+        public static LocalisableString Default => new TranslatableString(getKey(@"default"), @"Default");
 
         /// <summary>
         /// "Width"

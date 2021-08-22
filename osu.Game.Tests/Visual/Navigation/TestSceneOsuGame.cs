@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -88,21 +89,27 @@ namespace osu.Game.Tests.Visual.Navigation
         [Resolved]
         private OsuGameBase gameBase { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load(GameHost host)
-        {
-            game = new OsuGame();
-            game.SetHost(host);
+        [Resolved]
+        private GameHost host { get; set; }
 
-            Children = new Drawable[]
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("create game", () =>
             {
-                new Box
+                game = new OsuGame();
+                game.SetHost(host);
+
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
-                game
-            };
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                    },
+                    game
+                };
+            });
 
             AddUntilStep("wait for load", () => game.IsLoaded);
         }
