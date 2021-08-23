@@ -3,10 +3,11 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.OnlinePlay.Lounge;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -18,13 +19,13 @@ namespace osu.Game.Tests.Visual.Playlists
     {
         protected new TestRequestHandlingRoomManager RoomManager => (TestRequestHandlingRoomManager)base.RoomManager;
 
-        private LoungeSubScreen loungeScreen;
+        private TestLoungeSubScreen loungeScreen;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            AddStep("push screen", () => LoadScreen(loungeScreen = new PlaylistsLoungeSubScreen()));
+            AddStep("push screen", () => LoadScreen(loungeScreen = new TestLoungeSubScreen()));
 
             AddUntilStep("wait for present", () => loungeScreen.IsCurrentScreen());
         }
@@ -69,21 +70,26 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("add rooms", () => RoomManager.AddRooms(1));
 
-            AddAssert("selected room is not disabled", () => !OnlinePlayDependencies.SelectedRoom.Disabled);
+            AddAssert("selected room is not disabled", () => !loungeScreen.SelectedRoom.Disabled);
 
             AddStep("select room", () => roomsContainer.Rooms[0].TriggerClick());
-            AddAssert("selected room is non-null", () => OnlinePlayDependencies.SelectedRoom.Value != null);
+            AddAssert("selected room is non-null", () => loungeScreen.SelectedRoom.Value != null);
 
             AddStep("enter room", () => roomsContainer.Rooms[0].TriggerClick());
 
             AddUntilStep("wait for match load", () => Stack.CurrentScreen is PlaylistsRoomSubScreen);
 
-            AddAssert("selected room is non-null", () => OnlinePlayDependencies.SelectedRoom.Value != null);
-            AddAssert("selected room is disabled", () => OnlinePlayDependencies.SelectedRoom.Disabled);
+            AddAssert("selected room is non-null", () => loungeScreen.SelectedRoom.Value != null);
+            AddAssert("selected room is disabled", () => loungeScreen.SelectedRoom.Disabled);
         }
 
         private bool checkRoomVisible(DrawableRoom room) =>
             loungeScreen.ChildrenOfType<OsuScrollContainer>().First().ScreenSpaceDrawQuad
                         .Contains(room.ScreenSpaceDrawQuad.Centre);
+
+        private class TestLoungeSubScreen : PlaylistsLoungeSubScreen
+        {
+            public new Bindable<Room> SelectedRoom => base.SelectedRoom;
+        }
     }
 }
