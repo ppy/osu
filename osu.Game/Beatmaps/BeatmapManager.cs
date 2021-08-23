@@ -128,6 +128,7 @@ namespace osu.Game.Beatmaps
                         BaseDifficulty = new BeatmapDifficulty(),
                         Ruleset = ruleset,
                         Metadata = metadata,
+                        WidescreenStoryboard = true,
                     }
                 }
             };
