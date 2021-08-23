@@ -6,7 +6,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using System.Linq;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
