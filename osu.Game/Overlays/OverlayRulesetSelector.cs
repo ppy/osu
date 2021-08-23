@@ -21,10 +21,13 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(RulesetStore store, IAPIProvider api)
         {
-            var preferredRuleset = store.GetRuleset(api.LocalUser.Value.PlayMode);
+            if (SelectInitialRuleset)
+            {
+                var preferredRuleset = store.GetRuleset(api.LocalUser.Value.PlayMode);
 
-            if (preferredRuleset != null)
-                Current.Value = preferredRuleset;
+                if (preferredRuleset != null)
+                    Current.Value = preferredRuleset;
+            }
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new OverlayRulesetTabItem(value);
