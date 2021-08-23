@@ -77,19 +77,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             OverlayRulesetSelector localSelector = null;
 
             AddStep("Set osu! preferred ruleset", () => API.LocalUser.Value.PlayMode = OsuRuleset.SHORT_NAME);
-            AddStep("load overlay ruleset selector", () => Child = localSelector = new OverlayRulesetSelector());
+            AddStep("load overlay ruleset selector", () => Child = new ColourProvidedContainer(OverlayColourScheme.Red, localSelector = new OverlayRulesetSelector()));
             AddAssert("Check osu! selected", () => localSelector.Current.Value.Equals(new OsuRuleset().RulesetInfo));
 
             AddStep("Set osu!taiko preferred ruleset", () => API.LocalUser.Value.PlayMode = TaikoRuleset.SHORT_NAME);
-            AddStep("load overlay ruleset selector", () => Child = localSelector = new OverlayRulesetSelector());
+            AddStep("load overlay ruleset selector", () => Child = new ColourProvidedContainer(OverlayColourScheme.Red, localSelector = new OverlayRulesetSelector()));
             AddAssert("Check osu!taiko selected", () => localSelector.Current.Value.Equals(new TaikoRuleset().RulesetInfo));
 
             AddStep("Set osu!catch preferred ruleset", () => API.LocalUser.Value.PlayMode = CatchRuleset.SHORT_NAME);
-            AddStep("load overlay ruleset selector", () => Child = localSelector = new OverlayRulesetSelector());
+            AddStep("load overlay ruleset selector", () => Child = new ColourProvidedContainer(OverlayColourScheme.Red, localSelector = new OverlayRulesetSelector()));
             AddAssert("Check osu!catch selected", () => localSelector.Current.Value.Equals(new CatchRuleset().RulesetInfo));
 
             AddStep("Set osu!mania preferred ruleset", () => API.LocalUser.Value.PlayMode = ManiaRuleset.SHORT_NAME);
-            AddStep("load overlay ruleset selector", () => Child = localSelector = new OverlayRulesetSelector());
+            AddStep("load overlay ruleset selector", () => Child = new ColourProvidedContainer(OverlayColourScheme.Red, localSelector = new OverlayRulesetSelector()));
             AddAssert("Check osu!mania selected", () => localSelector.Current.Value.Equals(new ManiaRuleset().RulesetInfo));
         }
     }
