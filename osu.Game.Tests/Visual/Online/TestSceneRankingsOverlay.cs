@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -24,11 +26,20 @@ namespace osu.Game.Tests.Visual.Online
         public void SetUp() => Schedule(loadRankingsOverlay);
 
         [Test]
-        public void TestParentRulesetCopiedOnInitialShow()
+        public void TestParentRulesetDecoupledAfterInitialShow()
         {
-            AddStep("set ruleset", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
+            AddStep("enable global ruleset", () => Ruleset.Disabled = false);
+            AddStep("set global ruleset to osu!catch", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
             AddStep("reload rankings overlay", loadRankingsOverlay);
-            AddAssert("catch ruleset selected", () => Ruleset.Value.Equals(new CatchRuleset().RulesetInfo));
+            AddAssert("rankings ruleset set to osu!catch", () => rankingsOverlay.Header.Ruleset.Value.ShortName == CatchRuleset.SHORT_NAME);
+
+            AddStep("set global ruleset to osu!", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddAssert("rankings ruleset still osu!catch", () => rankingsOverlay.Header.Ruleset.Value.ShortName == CatchRuleset.SHORT_NAME);
+
+            AddStep("disable global ruleset", () => Ruleset.Disabled = true);
+            AddAssert("rankings ruleset still enabled", () => rankingsOverlay.Header.Ruleset.Disabled == false);
+            AddStep("set rankings ruleset to osu!mania", () => rankingsOverlay.Header.Ruleset.Value = new ManiaRuleset().RulesetInfo);
+            AddAssert("rankings ruleset set to osu!mania", () => rankingsOverlay.Header.Ruleset.Value.ShortName == ManiaRuleset.SHORT_NAME);
         }
 
         [Test]
