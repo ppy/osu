@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
                 var preferredRuleset = store.GetRuleset(api.LocalUser.Value.PlayMode);
 
                 if (preferredRuleset != null)
-                    Current.Value = preferredRuleset;
+                    Current.Value = Current.Default = preferredRuleset;
             }
         }
 
