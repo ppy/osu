@@ -1,0 +1,172 @@
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osuTK;
+
+namespace osu.Game.Graphics.Particles
+{
+    public abstract class ParticleSpewer : Sprite
+    {
+        private readonly FallingParticle[] particles;
+        private int currentIndex;
+        private double lastParticleAdded;
+
+        private readonly double cooldown;
+        private readonly double maxLifetime;
+
+        /// <summary>
+        /// Determines whether particles are being spawned.
+        /// </summary>
+        public bool Active { get; set; }
+
+        public bool HasActiveParticles => Active || (lastParticleAdded + maxLifetime) > Time.Current;
+        public override bool IsPresent => base.IsPresent && HasActiveParticles;
+
+        protected virtual float ParticleGravity => 0.5f;
+
+        protected ParticleSpewer(Texture texture, int perSecond, double maxLifetime)
+        {
+            Texture = texture;
+            Blending = BlendingParameters.Additive;
+
+            particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxLifetime / 1000)];
+
+            cooldown = 1000f / perSecond;
+            this.maxLifetime = maxLifetime;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Active && Time.Current > lastParticleAdded + cooldown)
+            {
+                addParticle(SpawnParticle());
+            }
+
+            Invalidate(Invalidation.DrawNode);
+        }
+
+        /// <summary>
+        /// Called each time a new particle should be spawned.
+        /// </summary>
+        protected abstract FallingParticle SpawnParticle();
+
+        private void addParticle(FallingParticle fallingParticle)
+        {
+            particles[currentIndex] = fallingParticle;
+
+            currentIndex = (currentIndex + 1) % particles.Length;
+            lastParticleAdded = Time.Current;
+        }
+
+        protected override DrawNode CreateDrawNode() => new ParticleSpewerDrawNode(this);
+
+        private class ParticleSpewerDrawNode : SpriteDrawNode
+        {
+            private readonly FallingParticle[] particles;
+
+            protected new ParticleSpewer Source => (ParticleSpewer)base.Source;
+
+            private float currentTime;
+            private float gravity;
+
+            public ParticleSpewerDrawNode(Sprite source)
+                : base(source)
+            {
+                particles = new FallingParticle[Source.particles.Length];
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                Source.particles.CopyTo(particles, 0);
+
+                currentTime = (float)Source.Time.Current;
+                gravity = Source.ParticleGravity;
+            }
+
+            protected override void Blit(Action<TexturedVertex2D> vertexAction)
+            {
+                foreach (var p in particles)
+                {
+                    // ignore particles that weren't initialized.
+                    if (p.StartTime <= 0) continue;
+
+                    var timeSinceStart = currentTime - p.StartTime;
+
+                    var alpha = p.AlphaAtTime(timeSinceStart);
+                    if (alpha <= 0) continue;
+
+                    var scale = p.ScaleAtTime(timeSinceStart);
+                    var pos = p.PositionAtTime(timeSinceStart, gravity);
+                    var angle = p.AngleAtTime(timeSinceStart);
+
+                    var rect = new RectangleF(
+                        pos.X - Texture.DisplayWidth * scale / 2,
+                        pos.Y - Texture.DisplayHeight * scale / 2,
+                        Texture.DisplayWidth * scale,
+                        Texture.DisplayHeight * scale);
+
+                    var quad = new Quad(
+                        transformPosition(rect.TopLeft, rect.Centre, angle),
+                        transformPosition(rect.TopRight, rect.Centre, angle),
+                        transformPosition(rect.BottomLeft, rect.Centre, angle),
+                        transformPosition(rect.BottomRight, rect.Centre, angle)
+                    );
+
+                    DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
+                        new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
+                        null, TextureCoords);
+                }
+            }
+
+            private Vector2 transformPosition(Vector2 pos, Vector2 centre, float angle)
+            {
+                // rotate point around centre.
+                float cos = MathF.Cos(angle);
+                float sin = MathF.Sin(angle);
+
+                float x = centre.X + (pos.X - centre.X) * cos + (pos.Y - centre.Y) * sin;
+                float y = centre.Y + (pos.Y - centre.Y) * cos - (pos.X - centre.X) * sin;
+
+                // convert to screen space.
+                return Vector2Extensions.Transform(new Vector2(x, y), DrawInfo.Matrix);
+            }
+        }
+
+        protected struct FallingParticle
+        {
+            public float StartTime;
+            public Vector2 Position;
+            public Vector2 Velocity;
+            public float Duration;
+            public float AngularVelocity;
+            public float StartScale;
+            public float EndScale;
+
+            public float AlphaAtTime(float timeSinceStart) => 1 - progressAtTime(timeSinceStart);
+
+            public float ScaleAtTime(float timeSinceStart) => StartScale + (EndScale - StartScale) * progressAtTime(timeSinceStart);
+
+            public float AngleAtTime(float timeSinceStart) => AngularVelocity / 1000 * timeSinceStart;
+
+            public Vector2 PositionAtTime(float timeSinceStart, float gravity)
+            {
+                var progress = progressAtTime(timeSinceStart);
+                var grav = new Vector2(0, -gravity) * progress;
+
+                return Position + (Velocity - grav) * timeSinceStart;
+            }
+
+            private float progressAtTime(float timeSinceStart) => Math.Clamp(timeSinceStart / Duration, 0, 1);
+        }
+    }
+}
