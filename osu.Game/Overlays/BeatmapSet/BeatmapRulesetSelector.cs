@@ -11,8 +11,6 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapRulesetSelector : OverlayRulesetSelector
     {
-        protected override bool SelectInitialRuleset => false;
-
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
 
         public BeatmapSetInfo BeatmapSet
