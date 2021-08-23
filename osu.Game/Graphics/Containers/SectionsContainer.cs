@@ -202,7 +202,7 @@ namespace osu.Game.Graphics.Containers
             });
         }
 
-        private int lastKnownChildrenCount = 0;
+        private int lastKnownChildrenCount;
 
         protected override void UpdateAfterChildren()
         {
