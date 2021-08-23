@@ -15,13 +15,18 @@ namespace osu.Game.Overlays
 {
     public class RankingsOverlay : TabbableOnlineOverlay<RankingsOverlayHeader, RankingsScope>
     {
-        protected Bindable<RulesetInfo> Ruleset => Header.Ruleset;
         protected Bindable<Country> Country => Header.Country;
 
         private APIRequest lastRequest;
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private IBindable<RulesetInfo> parentRuleset { get; set; }
+
+        [Cached]
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public RankingsOverlay()
             : base(OverlayColourScheme.Green)
@@ -32,6 +37,8 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
+            Header.Ruleset.BindTo(ruleset);
+
             Country.BindValueChanged(_ =>
             {
                 // if a country is requested, force performance scope.
@@ -41,13 +48,26 @@ namespace osu.Game.Overlays
                 Scheduler.AddOnce(triggerTabChanged);
             });
 
-            Ruleset.BindValueChanged(_ =>
+            ruleset.BindValueChanged(_ =>
             {
                 if (Header.Current.Value == RankingsScope.Spotlights)
                     return;
 
                 Scheduler.AddOnce(triggerTabChanged);
             });
+        }
+
+        private bool requiresRulesetUpdate = true;
+
+        protected override void PopIn()
+        {
+            if (requiresRulesetUpdate)
+            {
+                ruleset.Value = parentRuleset.Value;
+                requiresRulesetUpdate = false;
+            }
+
+            base.PopIn();
         }
 
         protected override void OnTabChanged(RankingsScope tab)
@@ -81,7 +101,7 @@ namespace osu.Game.Overlays
             {
                 LoadDisplay(new SpotlightsLayout
                 {
-                    Ruleset = { BindTarget = Ruleset }
+                    Ruleset = { BindTarget = ruleset }
                 });
                 return;
             }
@@ -106,13 +126,13 @@ namespace osu.Game.Overlays
             switch (Header.Current.Value)
             {
                 case RankingsScope.Performance:
-                    return new GetUserRankingsRequest(Ruleset.Value, country: Country.Value?.FlagName);
+                    return new GetUserRankingsRequest(ruleset.Value, country: Country.Value?.FlagName);
 
                 case RankingsScope.Country:
-                    return new GetCountryRankingsRequest(Ruleset.Value);
+                    return new GetCountryRankingsRequest(ruleset.Value);
 
                 case RankingsScope.Score:
-                    return new GetUserRankingsRequest(Ruleset.Value, UserRankingsType.Score);
+                    return new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score);
             }
 
             return null;
