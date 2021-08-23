@@ -77,14 +77,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
             AddInternal(background = newBackground);
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            // This is a static screen, so override the scale set in base.Update(), but also the scale set by the screen stack.
-            Scale = new Vector2(1f / BackgroundScreenStack.BACKGROUND_SCALE);
-        }
-
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
