@@ -181,7 +181,7 @@ namespace osu.Game.Skinning
             bool isArchiveImport = archiveName?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true;
 
             if (archiveName != null && !isArchiveImport && archiveName != item.Name)
-                item.Name = $"{item.Name} ({archiveName})";
+                item.Name = $"{item.Name} [{archiveName}]";
         }
 
         /// <summary>
