@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets
                 // That can become an issue with overlays that require access to the initial ruleset value
                 // before the ruleset selectors reached a LoadComplete state.
                 // (e.g. displaying RankingsOverlay for the first time).
-                Current.Value = Current.Default = Items.First();
+                Current.Value = Items.First();
             }
         }
     }
