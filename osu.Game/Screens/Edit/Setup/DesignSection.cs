@@ -23,6 +23,7 @@ namespace osu.Game.Screens.Edit.Setup
                 widescreenSupport = new LabelledSwitchButton
                 {
                     Label = "Widescreen support",
+                    Description = "Allows storyboards to use the full screen space, rather than be confined to a 4:3 area.",
                     Current = { Value = Beatmap.BeatmapInfo.WidescreenStoryboard }
                 },
                 epilepsyWarning = new LabelledSwitchButton
@@ -34,6 +35,7 @@ namespace osu.Game.Screens.Edit.Setup
                 letterboxDuringBreaks = new LabelledSwitchButton
                 {
                     Label = "Letterbox during breaks",
+                    Description = "Adds horizontal letterboxing to give a cinematic look during breaks.",
                     Current = { Value = Beatmap.BeatmapInfo.LetterboxInBreaks }
                 }
             };
