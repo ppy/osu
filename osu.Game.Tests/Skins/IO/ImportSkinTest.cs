@@ -148,8 +148,12 @@ namespace osu.Game.Tests.Skins.IO
                     var osu = LoadOsuIntoHost(host);
 
                     var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1", false), "my custom skin 1"));
+                    Assert.That(imported.Name, Is.EqualTo("name 1 [my custom skin 1]"));
+                    Assert.That(imported.Creator, Is.EqualTo("author 1"));
 
                     var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1", false), "my custom skin 2"));
+                    Assert.That(imported2.Name, Is.EqualTo("name 1 [my custom skin 2]"));
+                    Assert.That(imported2.Creator, Is.EqualTo("author 1"));
 
                     Assert.That(imported2.Hash, Is.Not.EqualTo(imported.Hash));
                 }
