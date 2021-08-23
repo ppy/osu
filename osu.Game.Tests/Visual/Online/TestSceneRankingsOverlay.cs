@@ -1,16 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Overlays;
 using NUnit.Framework;
 using osu.Game.Users;
 using osu.Framework.Bindables;
-using osu.Framework.Testing;
 using osu.Game.Overlays.Rankings;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Taiko;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -37,44 +33,6 @@ namespace osu.Game.Tests.Visual.Online
         public void TestShow()
         {
             AddStep("Show", rankingsOverlay.Show);
-        }
-
-        [Test]
-        public void TestRulesetResetsOnNoFilters()
-        {
-            AddStep("Set different ruleset", () => rankingsOverlay.ChildrenOfType<RulesetSelector>().Single().SwitchTab(1));
-            AddAssert("Ruleset not default", () => !rankingsOverlay.Header.Ruleset.IsDefault);
-            AddStep("Hide overlay", () => rankingsOverlay.Hide());
-            AddUntilStep("Wait for hide", () => !rankingsOverlay.IsPresent);
-
-            AddStep("Show overlay again", () => rankingsOverlay.Show());
-            AddAssert("Ruleset reverted", () => rankingsOverlay.Header.Ruleset.IsDefault);
-        }
-
-        [Test]
-        public void TestRulesetDoesntResetOnCountryFilter()
-        {
-            AddStep("Set different ruleset", () => rankingsOverlay.ChildrenOfType<RulesetSelector>().Single().SwitchTab(1));
-            AddAssert("Ruleset not default", () => !rankingsOverlay.Header.Ruleset.IsDefault);
-            AddStep("Set country filter", () => countryBindable.Value = us_country);
-            AddStep("Hide overlay", () => rankingsOverlay.Hide());
-            AddUntilStep("Wait for hide", () => !rankingsOverlay.IsPresent);
-
-            AddStep("Show overlay again", () => rankingsOverlay.Show());
-            AddAssert("Ruleset not reverted", () => !rankingsOverlay.Header.Ruleset.IsDefault);
-        }
-
-        [Test]
-        public void TestRulesetDoesntResetOnScopeChange()
-        {
-            AddStep("Set ruleset to osu!taiko", () => rankingsOverlay.Header.Ruleset.Value = new TaikoRuleset().RulesetInfo);
-            AddAssert("Ruleset not default", () => !rankingsOverlay.Header.Ruleset.IsDefault);
-            AddStep("Set different scope", () => scope.Value = RankingsScope.Score);
-            AddStep("Hide overlay", () => rankingsOverlay.Hide());
-            AddUntilStep("Wait for hide", () => !rankingsOverlay.IsPresent);
-
-            AddStep("Show overlay again", () => rankingsOverlay.Show());
-            AddAssert("Ruleset not reverted", () => !rankingsOverlay.Header.Ruleset.IsDefault);
         }
 
         [Test]
