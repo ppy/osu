@@ -202,8 +202,6 @@ namespace osu.Game.Graphics.Containers
             });
         }
 
-        private int lastKnownChildrenCount;
-
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -222,12 +220,10 @@ namespace osu.Game.Graphics.Containers
             }
 
             float currentScroll = scrollContainer.Current;
-            var presentChildren = Children.Where(c => c.IsPresent);
 
-            if (currentScroll != lastKnownScroll || presentChildren.Count() != lastKnownChildrenCount)
+            if (currentScroll != lastKnownScroll)
             {
                 lastKnownScroll = currentScroll;
-                lastKnownChildrenCount = presentChildren.Count();
 
                 // reset last clicked section because user started scrolling themselves
                 if (scrollContainer.UserScrolling)
@@ -252,6 +248,8 @@ namespace osu.Game.Graphics.Containers
                 float selectionLenienceAboveSection = Math.Min(smallestSectionHeight / 2.0f, scrollContainer.DisplayableContent * 0.05f);
 
                 float scrollCentre = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_y_centre + selectionLenienceAboveSection;
+
+                var presentChildren = Children.Where(c => c.IsPresent);
 
                 if (lastClickedSection != null)
                     SelectedSection.Value = lastClickedSection;
