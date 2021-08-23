@@ -31,11 +31,6 @@ namespace osu.Game.Screens.Edit.Setup
 
         public IEnumerable<string> HandledExtensions => handledExtensions;
 
-        /// <summary>
-        /// The target container to display the file chooser in.
-        /// </summary>
-        public Container Target;
-
         private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
 
         [Resolved]
@@ -72,7 +67,7 @@ namespace osu.Game.Screens.Edit.Setup
             if (file.NewValue == null)
                 return;
 
-            Target.Clear();
+            this.HidePopover();
             Current.Value = file.NewValue.FullName;
         }
 
