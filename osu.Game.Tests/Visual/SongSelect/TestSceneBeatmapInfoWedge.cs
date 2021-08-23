@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using JetBrains.Annotations;
 using NUnit.Framework;
@@ -11,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -19,6 +21,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
 using osuTK;
@@ -139,6 +142,29 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestTruncation()
         {
             selectBeatmap(createLongMetadata());
+        }
+
+        [Test]
+        public void TestBPMUpdates()
+        {
+            const float bpm = 120;
+            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / bpm });
+
+            OsuModDoubleTime doubleTime = null;
+
+            selectBeatmap(beatmap);
+            checkDisplayedBPM(bpm);
+
+            AddStep("select DT", () => SelectedMods.Value = new[] { doubleTime = new OsuModDoubleTime() });
+            checkDisplayedBPM(bpm * 1.5f);
+
+            AddStep("change DT rate", () => doubleTime.SpeedChange.Value = 2);
+            checkDisplayedBPM(bpm * 2);
+
+            void checkDisplayedBPM(float target) =>
+                AddUntilStep($"displayed bpm is {target}", () => this.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any(
+                    label => label.Statistic.Name == "BPM" && label.Statistic.Content == target.ToString(CultureInfo.InvariantCulture)));
         }
 
         private void selectBeatmap([CanBeNull] IBeatmap b)
