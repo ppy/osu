@@ -18,6 +18,8 @@ namespace osu.Game.Overlays
         protected Bindable<RulesetInfo> Ruleset => Header.Ruleset;
         protected Bindable<Country> Country => Header.Country;
 
+        private bool requiresRulesetRevert;
+
         private APIRequest lastRequest;
 
         [Resolved]
@@ -48,6 +50,25 @@ namespace osu.Game.Overlays
 
                 Scheduler.AddOnce(triggerTabChanged);
             });
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            if (requiresRulesetRevert)
+            {
+                Ruleset.SetDefault();
+                requiresRulesetRevert = false;
+            }
+        }
+
+        protected override void PopOutComplete()
+        {
+            base.PopOutComplete();
+
+            if (Header.Current.Value == default && Country.Value == null)
+                requiresRulesetRevert = true;
         }
 
         protected override void OnTabChanged(RankingsScope tab)
