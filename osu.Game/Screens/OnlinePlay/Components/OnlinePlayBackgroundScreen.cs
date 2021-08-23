@@ -3,10 +3,14 @@
 
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Online.Rooms;
 using osuTK;
+using osuTK.Graphics;
 
 #nullable enable
 
@@ -20,6 +24,12 @@ namespace osu.Game.Screens.OnlinePlay.Components
         protected OnlinePlayBackgroundScreen()
             : base(false)
         {
+            AddInternal(new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Depth = float.MinValue,
+                Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.9f), Color4.Black.Opacity(0.6f))
+            });
         }
 
         [BackgroundDependencyLoader]
