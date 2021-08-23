@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osuTK;
 
@@ -16,18 +14,6 @@ namespace osu.Game.Overlays
         public OverlayRulesetSelector()
         {
             AutoSizeAxes = Axes.Both;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore store, IAPIProvider api)
-        {
-            if (SelectInitialRuleset)
-            {
-                var preferredRuleset = store.GetRuleset(api.LocalUser.Value.PlayMode);
-
-                if (preferredRuleset != null)
-                    Current.Value = preferredRuleset;
-            }
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new OverlayRulesetTabItem(value);
