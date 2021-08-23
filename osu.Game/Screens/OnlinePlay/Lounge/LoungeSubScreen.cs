@@ -38,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
-            SelectedRoom = { BindTarget = selectedRoom }
+            SelectedRoom = { BindTarget = SelectedRoom }
         };
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
@@ -51,6 +51,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         };
 
         protected ListingPollingComponent ListingPollingComponent { get; private set; }
+
+        protected readonly Bindable<Room> SelectedRoom = new Bindable<Room>();
 
         [Resolved]
         private MusicController music { get; set; }
@@ -68,7 +70,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private LeasedBindable<Room> selectionLease;
 
         private readonly Bindable<FilterCriteria> filter = new Bindable<FilterCriteria>(new FilterCriteria());
-        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly IBindable<bool> isIdle = new BindableBool();
         private LoadingLayer loadingLayer;
@@ -105,7 +106,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         Child = roomsContainer = new RoomsContainer
                         {
                             Filter = { BindTarget = filter },
-                            SelectedRoom = { BindTarget = selectedRoom }
+                            SelectedRoom = { BindTarget = SelectedRoom }
                         }
                     },
                 },
@@ -164,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             };
 
             // scroll selected room into view on selection.
-            selectedRoom.BindValueChanged(val =>
+            SelectedRoom.BindValueChanged(val =>
             {
                 var drawable = roomsContainer.Rooms.FirstOrDefault(r => r.Room == val.NewValue);
                 if (drawable != null)
@@ -247,8 +248,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             selectionLease.Return();
             selectionLease = null;
 
-            if (selectedRoom.Value?.RoomID.Value == null)
-                selectedRoom.Value = new Room();
+            if (SelectedRoom.Value?.RoomID.Value == null)
+                SelectedRoom.Value = new Room();
 
             music?.EnsurePlayingSomething();
 
@@ -321,7 +322,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected virtual void OpenNewRoom(Room room)
         {
-            selectionLease = selectedRoom.BeginLease(false);
+            selectionLease = SelectedRoom.BeginLease(false);
             Debug.Assert(selectionLease != null);
             selectionLease.Value = room;
 
