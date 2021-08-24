@@ -44,32 +44,44 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
-        private ISampleInfo[] playableSampleInfo;
+        private HitObject fallbackObject;
 
         /// <summary>
         /// Play the most appropriate hit sound for the current point in time.
         /// </summary>
         public void Play()
         {
-            var nextObject =
-                hitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current)?.HitObject ??
-                // fallback to non-alive objects to find next off-screen object
-                // TODO: make lookup more efficient?
-                drawableRuleset.Objects.FirstOrDefault(h => h.StartTime > Time.Current) ??
-                drawableRuleset.Objects.LastOrDefault();
+            var nextObject = hitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current)?.HitObject;
+
+            if (nextObject == null)
+            {
+                if (fallbackObject == null || fallbackObject.StartTime < Time.Current)
+                {
+                    // in the case a next object isn't available in drawable form, we need to do a somewhat expensive traversal to get a valid sound to play.
+                    // note that we don't want to cache the object if it is an alive object, as once it is hit we don't want to continue playing its sound.
+                    // check whether we can use the previous computed sample.
+
+                    // fallback to non-alive objects to find next off-screen object
+                    // TODO: make lookup more efficient?
+                    fallbackObject = hitObjectContainer.Entries
+                                                       .Where(e => e.Result?.HasResult != true && e.HitObject.StartTime > Time.Current)?
+                                                       .OrderBy(e => e.HitObject.StartTime)
+                                                       .FirstOrDefault()?.HitObject ?? hitObjectContainer.Entries.FirstOrDefault()?.HitObject;
+                }
+
+                nextObject = fallbackObject;
+            }
 
             if (nextObject != null)
             {
                 var hitSound = getNextSample();
-                playableSampleInfo = GetPlayableSampleInfo(nextObject);
-                hitSound.Samples = playableSampleInfo;
+                hitSound.Samples = GetPlayableSampleInfo(nextObject).Select(s => nextObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
                 hitSound.Play();
             }
         }
 
-        protected virtual ISampleInfo[] GetPlayableSampleInfo(HitObject nextObject) =>
-            // TODO: avoid cast somehow?
-            nextObject.Samples.Cast<ISampleInfo>().ToArray();
+        protected virtual HitSampleInfo[] GetPlayableSampleInfo(HitObject nextObject) =>
+            nextObject.Samples.ToArray();
 
         private SkinnableSound getNextSample()
         {
