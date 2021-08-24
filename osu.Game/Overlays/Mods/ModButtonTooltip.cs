@@ -80,16 +80,16 @@ namespace osu.Game.Overlays.Mods
         protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
         protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
 
-        private string lastMod;
+        private Mod lastMod;
 
         public bool SetContent(object content)
         {
             if (!(content is Mod mod))
                 return false;
 
-            if (mod.Acronym == lastMod) return true;
+            if (mod.Equals(lastMod)) return true;
 
-            lastMod = mod.Acronym;
+            lastMod = mod;
 
             descriptionText.Text = mod.Description;
 
