@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.Settings
         {
             public ControlDoesNotImplementCurrentException()
                 : base(@$"Control created via {nameof(CreateControl)} must implement {nameof(IHasCurrentValue<T>)}, "
-                       + @$"or override {nameof(Current)} on this item for custom implementation.")
+                       + @$"or, if custom implementation is intended, override {nameof(Current)} on this item instead.")
             {
             }
         }
