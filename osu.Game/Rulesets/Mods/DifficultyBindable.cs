@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         /// An internal numeric bindable to hold and propagate min/max/precision.
         /// The value of this bindable should not be set.
         /// </summary>
-        internal readonly BindableFloat CurrentNumber = new BindableFloat
+        internal readonly BindableFloat DisplayBindable = new BindableFloat
         {
             MinValue = 0,
             MaxValue = 10,
@@ -31,12 +31,12 @@ namespace osu.Game.Rulesets.Mods
 
         public float Precision
         {
-            set => CurrentNumber.Precision = value;
+            set => DisplayBindable.Precision = value;
         }
 
         public float MinValue
         {
-            set => CurrentNumber.MinValue = value;
+            set => DisplayBindable.MinValue = value;
         }
 
         private float maxValue;
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 // Ensure that in the case serialisation runs in the wrong order (and limit extensions aren't applied yet) the deserialised value is still propagated.
                 if (value != null)
-                    CurrentNumber.MaxValue = MathF.Max(CurrentNumber.MaxValue, value.Value);
+                    DisplayBindable.MaxValue = MathF.Max(DisplayBindable.MaxValue, value.Value);
 
                 base.Value = value;
             }
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Mods
 
         private void updateMaxValue()
         {
-            CurrentNumber.MaxValue = ExtendedLimits.Value && extendedMaxValue != null ? extendedMaxValue.Value : maxValue;
+            DisplayBindable.MaxValue = ExtendedLimits.Value && extendedMaxValue != null ? extendedMaxValue.Value : maxValue;
         }
 
         public override void BindTo(Bindable<float?> them)
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Mods
             ExtendedLimits.BindTarget = otherDifficultyBindable.ExtendedLimits;
 
             // the actual values need to be copied after the max value constraints.
-            CurrentNumber.BindTarget = otherDifficultyBindable.CurrentNumber;
+            DisplayBindable.BindTarget = otherDifficultyBindable.DisplayBindable;
             base.BindTo(them);
         }
 
@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Mods
 
             base.UnbindFrom(them);
 
-            CurrentNumber.UnbindFrom(otherDifficultyBindable.CurrentNumber);
+            DisplayBindable.UnbindFrom(otherDifficultyBindable.DisplayBindable);
             ExtendedLimits.UnbindFrom(otherDifficultyBindable.ExtendedLimits);
         }
 
