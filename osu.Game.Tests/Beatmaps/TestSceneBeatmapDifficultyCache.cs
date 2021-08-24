@@ -58,6 +58,12 @@ namespace osu.Game.Tests.Beatmaps
         {
             OsuModDoubleTime dt = null;
 
+            AddStep("set computation function", () => difficultyCache.ComputeDifficulty = lookup =>
+            {
+                var modRateAdjust = (ModRateAdjust)lookup.OrderedMods.SingleOrDefault(mod => mod is ModRateAdjust);
+                return new StarDifficulty(BASE_STARS + modRateAdjust?.SpeedChange.Value ?? 0, 0);
+            });
+
             AddStep("change selected mod to DT", () => SelectedMods.Value = new[] { dt = new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
             AddUntilStep($"star difficulty -> {BASE_STARS + 1.5}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.5);
 
@@ -66,6 +72,29 @@ namespace osu.Game.Tests.Beatmaps
 
             AddStep("change selected mod to NC", () => SelectedMods.Value = new[] { new OsuModNightcore { SpeedChange = { Value = 1.75 } } });
             AddUntilStep($"star difficulty -> {BASE_STARS + 1.75}", () => starDifficultyBindable.Value?.Stars == BASE_STARS + 1.75);
+        }
+
+        [Test]
+        public void TestStarDifficultyAdjustHashCodeConflict()
+        {
+            OsuModDifficultyAdjust difficultyAdjust = null;
+
+            AddStep("set computation function", () => difficultyCache.ComputeDifficulty = lookup =>
+            {
+                var modDifficultyAdjust = (ModDifficultyAdjust)lookup.OrderedMods.SingleOrDefault(mod => mod is ModDifficultyAdjust);
+                return new StarDifficulty(BASE_STARS * (modDifficultyAdjust?.OverallDifficulty.Value ?? 1), 0);
+            });
+
+            AddStep("change selected mod to DA", () => SelectedMods.Value = new[] { difficultyAdjust = new OsuModDifficultyAdjust() });
+            AddUntilStep($"star difficulty -> {BASE_STARS}", () => starDifficultyBindable.Value?.Stars == BASE_STARS);
+
+            AddStep("change DA difficulty to 0.5", () => difficultyAdjust.OverallDifficulty.Value = 0.5f);
+            AddUntilStep($"star difficulty -> {BASE_STARS * 0.5f}", () => starDifficultyBindable.Value?.Stars == BASE_STARS / 2);
+
+            // hash code of 0 (the value) conflicts with the hash code of null (the initial/default value).
+            // it's important that the mod reference and its underlying bindable references stay the same to demonstrate this failure.
+            AddStep("change DA difficulty to 0", () => difficultyAdjust.OverallDifficulty.Value = 0);
+            AddUntilStep("star difficulty -> 0", () => starDifficultyBindable.Value?.Stars == 0);
         }
 
         [Test]
@@ -133,13 +162,11 @@ namespace osu.Game.Tests.Beatmaps
 
         private class TestBeatmapDifficultyCache : BeatmapDifficultyCache
         {
+            public Func<DifficultyCacheLookup, StarDifficulty> ComputeDifficulty { get; set; }
+
             protected override Task<StarDifficulty> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken token = default)
             {
-                var rateAdjust = lookup.OrderedMods.OfType<ModRateAdjust>().SingleOrDefault();
-                if (rateAdjust != null)
-                    return Task.FromResult(new StarDifficulty(BASE_STARS + rateAdjust.SpeedChange.Value, 0));
-
-                return Task.FromResult(new StarDifficulty(BASE_STARS, 0));
+                return Task.FromResult(ComputeDifficulty?.Invoke(lookup) ?? new StarDifficulty(BASE_STARS, 0));
             }
         }
     }
