@@ -173,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                 },
                                             },
                                             new Drawable[] { new OverlinedHeader("Chat") { Margin = new MarginPadding { Vertical = 5 }, }, },
-                                            new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
+                                            new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
                                         },
                                         RowDimensions = new[]
                                         {
@@ -395,7 +395,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     return new MultiSpectatorScreen(users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
 
                 default:
-                    return new PlayerLoader(() => new MultiplayerPlayer(SelectedItem.Value, users));
+                    return new PlayerLoader(() => new MultiplayerPlayer(Room, SelectedItem.Value, users));
             }
         }
 
