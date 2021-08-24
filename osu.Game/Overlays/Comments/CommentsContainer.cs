@@ -38,6 +38,7 @@ namespace osu.Game.Overlays.Comments
         private CancellationTokenSource loadCancellation;
         private int currentPage;
 
+        private FillFlowContainer pinnedContent;
         private FillFlowContainer content;
         private DeletedCommentsCounter deletedCommentsCounter;
         private CommentsShowMoreButton moreButton;
@@ -63,6 +64,25 @@ namespace osu.Game.Overlays.Comments
                     Children = new Drawable[]
                     {
                         commentCounter = new TotalCommentsCounter(),
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background4,
+                                },
+                                pinnedContent = new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                },
+                            },
+                        },
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
@@ -173,6 +193,7 @@ namespace osu.Game.Overlays.Comments
             deletedCommentsCounter.Count.Value = 0;
             moreButton.Show();
             moreButton.IsLoading = true;
+            pinnedContent.Clear();
             content.Clear();
             CommentDictionary.Clear();
         }
@@ -202,7 +223,7 @@ namespace osu.Game.Overlays.Comments
             var topLevelComments = new List<DrawableComment>();
             var orphaned = new List<Comment>();
 
-            foreach (var comment in bundle.Comments.Concat(bundle.IncludedComments))
+            foreach (var comment in bundle.Comments.Concat(bundle.IncludedComments).Concat(bundle.PinnedComments))
             {
                 // Exclude possible duplicated comments.
                 if (CommentDictionary.ContainsKey(comment.Id))
@@ -219,13 +240,15 @@ namespace osu.Game.Overlays.Comments
             {
                 LoadComponentsAsync(topLevelComments, loaded =>
                 {
-                    content.AddRange(loaded);
+                    pinnedContent.AddRange(loaded.Where(d => d.Comment.Pinned));
+                    content.AddRange(loaded.Where(d => !d.Comment.Pinned));
 
                     deletedCommentsCounter.Count.Value += topLevelComments.Select(d => d.Comment).Count(c => c.IsDeleted && c.IsTopLevel);
 
                     if (bundle.HasMore)
                     {
                         int loadedTopLevelComments = 0;
+                        pinnedContent.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
                         content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
 
                         moreButton.Current.Value = bundle.TopLevelCount - loadedTopLevelComments;
@@ -300,11 +323,6 @@ namespace osu.Game.Overlays.Comments
                 RelativeSizeAxes = Axes.X;
                 AddRangeInternal(new Drawable[]
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4
-                    },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,

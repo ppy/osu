@@ -42,19 +42,21 @@ namespace osu.Game.Tests.Visual.Online
                 () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().IsLoading);
         }
 
-        [Test]
-        public void TestSingleCommentsPage()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestSingleCommentsPage(bool withPinned)
         {
-            setUpCommentsResponse(exampleComments);
+            setUpCommentsResponse(getExampleComments(withPinned));
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
             AddUntilStep("show more button hidden",
                 () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().Alpha == 0);
         }
 
-        [Test]
-        public void TestMultipleCommentPages()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestMultipleCommentPages(bool withPinned)
         {
-            var comments = exampleComments;
+            var comments = getExampleComments(withPinned);
             comments.HasMore = true;
             comments.TopLevelCount = 10;
 
@@ -64,11 +66,12 @@ namespace osu.Game.Tests.Visual.Online
                 () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().Alpha == 1);
         }
 
-        [Test]
-        public void TestMultipleLoads()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestMultipleLoads(bool withPinned)
         {
-            var comments = exampleComments;
-            int topLevelCommentCount = exampleComments.Comments.Count;
+            var comments = getExampleComments(withPinned);
+            int topLevelCommentCount = comments.Comments.Count;
 
             AddStep("hide container", () => commentsContainer.Hide());
             setUpCommentsResponse(comments);
@@ -77,6 +80,48 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("show container", () => commentsContainer.Show());
             AddUntilStep("comment count is correct",
                 () => commentsContainer.ChildrenOfType<DrawableComment>().Count() == topLevelCommentCount);
+        }
+
+        [Test]
+        public void TestNoComment()
+        {
+            var comments = getExampleComments();
+            comments.Comments.Clear();
+
+            setUpCommentsResponse(comments);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddAssert("no comment shown", () => !commentsContainer.ChildrenOfType<DrawableComment>().Any());
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestSingleComment(bool withPinned)
+        {
+            var comment = new Comment
+            {
+                Id = 1,
+                Message = "This is a single comment",
+                LegacyName = "SingleUser",
+                CreatedAt = DateTimeOffset.Now,
+                VotesCount = 0,
+                Pinned = withPinned,
+            };
+
+            var bundle = new CommentBundle
+            {
+                Comments = new List<Comment> { comment },
+                IncludedComments = new List<Comment>(),
+                PinnedComments = new List<Comment>(),
+            };
+
+            if (withPinned)
+                bundle.PinnedComments.Add(comment);
+
+            setUpCommentsResponse(bundle);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("wait comment load", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
+            AddAssert("only one comment shown", () =>
+                commentsContainer.ChildrenOfType<DrawableComment>().Count(d => d.Comment.Pinned == withPinned) == 1);
         }
 
         private void setUpCommentsResponse(CommentBundle commentBundle)
@@ -92,38 +137,71 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-        private CommentBundle exampleComments => new CommentBundle
+        private CommentBundle getExampleComments(bool withPinned = false)
         {
-            Comments = new List<Comment>
+            var bundle = new CommentBundle
             {
-                new Comment
+                Comments = new List<Comment>
                 {
-                    Id = 1,
-                    Message = "This is a comment",
-                    LegacyName = "FirstUser",
-                    CreatedAt = DateTimeOffset.Now,
-                    VotesCount = 19,
-                    RepliesCount = 1
+                    new Comment
+                    {
+                        Id = 1,
+                        Message = "This is a comment",
+                        LegacyName = "FirstUser",
+                        CreatedAt = DateTimeOffset.Now,
+                        VotesCount = 19,
+                        RepliesCount = 1
+                    },
+                    new Comment
+                    {
+                        Id = 5,
+                        ParentId = 1,
+                        Message = "This is a child comment",
+                        LegacyName = "SecondUser",
+                        CreatedAt = DateTimeOffset.Now,
+                        VotesCount = 4,
+                    },
+                    new Comment
+                    {
+                        Id = 10,
+                        Message = "This is another comment",
+                        LegacyName = "ThirdUser",
+                        CreatedAt = DateTimeOffset.Now,
+                        VotesCount = 0
+                    },
                 },
-                new Comment
+                IncludedComments = new List<Comment>(),
+                PinnedComments = new List<Comment>(),
+            };
+
+            if (withPinned)
+            {
+                var pinnedComment = new Comment
                 {
-                    Id = 5,
-                    ParentId = 1,
-                    Message = "This is a child comment",
-                    LegacyName = "SecondUser",
+                    Id = 15,
+                    Message = "This is pinned comment",
+                    LegacyName = "PinnedUser",
                     CreatedAt = DateTimeOffset.Now,
-                    VotesCount = 4,
-                },
-                new Comment
+                    VotesCount = 999,
+                    Pinned = true,
+                    RepliesCount = 1,
+                };
+
+                bundle.Comments.Add(pinnedComment);
+                bundle.PinnedComments.Add(pinnedComment);
+
+                bundle.Comments.Add(new Comment
                 {
-                    Id = 10,
-                    Message = "This is another comment",
-                    LegacyName = "ThirdUser",
+                    Id = 20,
+                    Message = "Reply to pinned comment",
+                    LegacyName = "AbandonedUser",
                     CreatedAt = DateTimeOffset.Now,
-                    VotesCount = 0
-                },
-            },
-            IncludedComments = new List<Comment>(),
-        };
+                    VotesCount = 0,
+                    ParentId = 15,
+                });
+            }
+
+            return bundle;
+        }
     }
 }
