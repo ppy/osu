@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Mods
         private int selectedIndex = -1;
 
         [Resolved]
-        private Bindable<IReadOnlyList<Mod>> globalSelectedMods { get; set; }
+        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
 
         /// <summary>
         /// Change the selected mod index of this button.
@@ -245,24 +245,20 @@ namespace osu.Game.Overlays.Mods
             foregroundIcon.Mod = mod;
             text.Text = mod.Name;
             Colour = mod.HasImplementation ? Color4.White : Color4.Gray;
-            updateCompatibility(mod);
+
+            Scheduler.AddOnce(updateCompatibility);
         }
 
-        private void updateCompatibility(Mod mod)
+        private void updateCompatibility()
         {
-            if (globalSelectedMods != null)
-            {
-                if (!globalSelectedMods.Value.Contains(mod))
-                {
-                    if (!ModUtils.CheckCompatibleSet(globalSelectedMods.Value.Concat(new[] { mod })))
-                    {
-                        incompatibleIcon.FadeIn();
-                        return;
-                    }
-                }
-            }
+            var m = SelectedMod ?? Mods.First();
 
-            incompatibleIcon.FadeOut();
+            bool isIncompatible = false;
+
+            if (selectedMods.Value.Count > 0 && !selectedMods.Value.Contains(m))
+                isIncompatible = !ModUtils.CheckCompatibleSet(selectedMods.Value.Append(m));
+
+            incompatibleIcon.FadeTo(isIncompatible ? 1 : 0, 200, Easing.OutQuint);
         }
 
         private void createIcons()
@@ -287,6 +283,7 @@ namespace osu.Game.Overlays.Mods
                     },
                 });
             }
+
             else
             {
                 iconsContainer.Add(foregroundIcon = new ModIcon(Mod, false)
@@ -344,14 +341,14 @@ namespace osu.Game.Overlays.Mods
                 },
                 new HoverSounds()
             };
-
             Mod = mod;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            globalSelectedMods.BindValueChanged(_ => updateCompatibility(SelectedMod ?? Mods.FirstOrDefault()), true);
+            base.LoadComplete();
+
+            selectedMods.BindValueChanged(_ => Scheduler.AddOnce(updateCompatibility), true);
         }
 
         public ITooltip GetCustomTooltip() => new ModButtonTooltip();
