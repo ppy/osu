@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
 
             setUpCommentsResponse(comments);
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
-            AddAssert("no comment showed", () => !commentsContainer.ChildrenOfType<DrawableComment>().Any());
+            AddAssert("no comment shown", () => !commentsContainer.ChildrenOfType<DrawableComment>().Any());
         }
 
         [TestCase(false)]
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Online
             setUpCommentsResponse(bundle);
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
             AddUntilStep("wait comment load", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
-            AddAssert("only one comment showed", () =>
+            AddAssert("only one comment shown", () =>
                 commentsContainer.ChildrenOfType<DrawableComment>().Count(d => d.Comment.Pinned == withPinned) == 1);
         }
 
