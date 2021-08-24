@@ -50,12 +50,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var beatmap = decodeAsJson(normal);
             var beatmapInfo = beatmap.BeatmapInfo;
             Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
-            Assert.AreEqual(false, beatmapInfo.Countdown);
             Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
             Assert.AreEqual(false, beatmapInfo.SpecialStyle);
             Assert.IsTrue(beatmapInfo.RulesetID == 0);
             Assert.AreEqual(false, beatmapInfo.LetterboxInBreaks);
             Assert.AreEqual(false, beatmapInfo.WidescreenStoryboard);
+            Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);
+            Assert.AreEqual(0, beatmapInfo.CountdownOffset);
         }
 
         [Test]
