@@ -128,6 +128,7 @@ namespace osu.Game.Beatmaps
                         BaseDifficulty = new BeatmapDifficulty(),
                         Ruleset = ruleset,
                         Metadata = metadata,
+                        WidescreenStoryboard = true,
                     }
                 }
             };
@@ -365,6 +366,10 @@ namespace osu.Game.Beatmaps
                     queryable = beatmaps.BeatmapSetsOverview;
                     break;
 
+                case IncludedDetails.AllButRuleset:
+                    queryable = beatmaps.BeatmapSetsWithoutRuleset;
+                    break;
+
                 case IncludedDetails.AllButFiles:
                     queryable = beatmaps.BeatmapSetsWithoutFiles;
                     break;
@@ -384,8 +389,33 @@ namespace osu.Game.Beatmaps
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
+        /// <param name="includes">The level of detail to include in the returned objects.</param>
         /// <returns>Results from the provided query.</returns>
-        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().Where(query);
+        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query, IncludedDetails includes = IncludedDetails.All)
+        {
+            IQueryable<BeatmapSetInfo> queryable;
+
+            switch (includes)
+            {
+                case IncludedDetails.Minimal:
+                    queryable = beatmaps.BeatmapSetsOverview;
+                    break;
+
+                case IncludedDetails.AllButRuleset:
+                    queryable = beatmaps.BeatmapSetsWithoutRuleset;
+                    break;
+
+                case IncludedDetails.AllButFiles:
+                    queryable = beatmaps.BeatmapSetsWithoutFiles;
+                    break;
+
+                default:
+                    queryable = beatmaps.ConsumableItems;
+                    break;
+            }
+
+            return queryable.AsNoTracking().Where(query);
+        }
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
@@ -534,7 +564,7 @@ namespace osu.Game.Beatmaps
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
             protected override Track GetBeatmapTrack() => null;
-            protected override ISkin GetSkin() => null;
+            protected internal override ISkin GetSkin() => null;
             public override Stream GetStream(string storagePath) => null;
         }
     }
@@ -553,6 +583,11 @@ namespace osu.Game.Beatmaps
         /// Include all difficulties, rulesets, difficulty metadata but no files.
         /// </summary>
         AllButFiles,
+
+        /// <summary>
+        /// Include everything except ruleset. Used for cases where we aren't sure the ruleset is present but still want to consume the beatmap.
+        /// </summary>
+        AllButRuleset,
 
         /// <summary>
         /// Include everything.

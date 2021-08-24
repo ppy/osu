@@ -5,23 +5,23 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
-using osu.Game;
 using osu.Game.Configuration;
+using osu.Game.Screens.Play;
 
 namespace osu.Desktop.Windows
 {
     public class GameplayWinKeyBlocker : Component
     {
         private Bindable<bool> disableWinKey;
-        private Bindable<bool> localUserPlaying;
+        private IBindable<bool> localUserPlaying;
 
         [Resolved]
         private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game, OsuConfigManager config)
+        private void load(ILocalUserPlayInfo localUserInfo, OsuConfigManager config)
         {
-            localUserPlaying = game.LocalUserPlaying.GetBoundCopy();
+            localUserPlaying = localUserInfo.IsPlaying.GetBoundCopy();
             localUserPlaying.BindValueChanged(_ => updateBlocking());
 
             disableWinKey = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey);

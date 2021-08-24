@@ -13,14 +13,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
@@ -33,6 +36,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     {
         public override string Title => "Lounge";
 
+        protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
+        {
+            SelectedRoom = { BindTarget = SelectedRoom }
+        };
+
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
         protected Container<OsuButton> Buttons { get; } = new Container<OsuButton>
@@ -42,13 +50,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             AutoSizeAxes = Axes.Both
         };
 
-        private readonly IBindable<bool> initialRoomsReceived = new Bindable<bool>();
-        private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
+        protected ListingPollingComponent ListingPollingComponent { get; private set; }
 
-        private LoadingLayer loadingLayer;
-
-        [Resolved]
-        private Bindable<Room> selectedRoom { get; set; }
+        protected readonly Bindable<Room> SelectedRoom = new Bindable<Room>();
 
         [Resolved]
         private MusicController music { get; set; }
@@ -56,108 +60,104 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [Resolved(CanBeNull = true)]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private Bindable<FilterCriteria> filter { get; set; }
-
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [CanBeNull]
         private IDisposable joiningRoomOperation { get; set; }
 
+        [CanBeNull]
+        private LeasedBindable<Room> selectionLease;
+
+        private readonly Bindable<FilterCriteria> filter = new Bindable<FilterCriteria>(new FilterCriteria());
+        private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
+        private readonly IBindable<bool> isIdle = new BindableBool();
+        private LoadingLayer loadingLayer;
         private RoomsContainer roomsContainer;
         private SearchTextBox searchTextBox;
         private Dropdown<RoomStatusFilter> statusDropdown;
 
-        [CanBeNull]
-        private LeasedBindable<Room> selectionLease;
-
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] IdleTracker idleTracker)
         {
-            filter ??= new Bindable<FilterCriteria>(new FilterCriteria());
+            const float controls_area_height = 25f;
+
+            if (idleTracker != null)
+                isIdle.BindTo(idleTracker.IsIdle);
 
             OsuScrollContainer scrollContainer;
 
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
-                loadingLayer = new LoadingLayer(true),
+                ListingPollingComponent = CreatePollingComponent().With(c => c.Filter.BindTarget = filter),
                 new Container
                 {
+                    Name = @"Rooms area",
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding
                     {
-                        Left = WaveOverlayContainer.WIDTH_PADDING,
-                        Right = WaveOverlayContainer.WIDTH_PADDING,
+                        Horizontal = WaveOverlayContainer.WIDTH_PADDING,
+                        Top = Header.HEIGHT + controls_area_height + 20,
                     },
-                    Child = new GridContainer
+                    Child = scrollContainer = new OsuScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        RowDimensions = new[]
+                        ScrollbarOverlapsContent = false,
+                        Child = roomsContainer = new RoomsContainer
                         {
-                            new Dimension(GridSizeMode.Absolute, Header.HEIGHT),
-                            new Dimension(GridSizeMode.Absolute, 25),
-                            new Dimension(GridSizeMode.Absolute, 20)
+                            Filter = { BindTarget = filter },
+                            SelectedRoom = { BindTarget = SelectedRoom }
+                        }
+                    },
+                },
+                loadingLayer = new LoadingLayer(true),
+                new FillFlowContainer
+                {
+                    Name = @"Header area flow",
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.WIDTH_PADDING },
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = Header.HEIGHT,
+                            Child = searchTextBox = new LoungeSearchTextBox
+                            {
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                RelativeSizeAxes = Axes.X,
+                                Width = 0.6f,
+                            },
                         },
-                        Content = new[]
+                        new Container
                         {
-                            new Drawable[]
+                            RelativeSizeAxes = Axes.X,
+                            Height = controls_area_height,
+                            Children = new Drawable[]
                             {
-                                searchTextBox = new LoungeSearchTextBox
+                                Buttons.WithChild(CreateNewRoomButton().With(d =>
                                 {
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    RelativeSizeAxes = Axes.X,
-                                    Width = 0.6f,
-                                },
-                            },
-                            new Drawable[]
-                            {
-                                new Container
+                                    d.Anchor = Anchor.BottomLeft;
+                                    d.Origin = Anchor.BottomLeft;
+                                    d.Size = new Vector2(150, 37.5f);
+                                    d.Action = () => Open();
+                                })),
+                                new FillFlowContainer
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Depth = float.MinValue, // Contained filters should appear over the top of rooms.
-                                    Children = new Drawable[]
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(10),
+                                    ChildrenEnumerable = CreateFilterControls().Select(f => f.With(d =>
                                     {
-                                        Buttons.WithChild(CreateNewRoomButton().With(d =>
-                                        {
-                                            d.Anchor = Anchor.BottomLeft;
-                                            d.Origin = Anchor.BottomLeft;
-                                            d.Size = new Vector2(150, 37.5f);
-                                            d.Action = () => Open();
-                                        })),
-                                        new FillFlowContainer
-                                        {
-                                            Anchor = Anchor.TopRight,
-                                            Origin = Anchor.TopRight,
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Spacing = new Vector2(10),
-                                            ChildrenEnumerable = CreateFilterControls().Select(f => f.With(d =>
-                                            {
-                                                d.Anchor = Anchor.TopRight;
-                                                d.Origin = Anchor.TopRight;
-                                            }))
-                                        }
-                                    }
+                                        d.Anchor = Anchor.TopRight;
+                                        d.Origin = Anchor.TopRight;
+                                    }))
                                 }
-                            },
-                            null,
-                            new Drawable[]
-                            {
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        scrollContainer = new OsuScrollContainer
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            ScrollbarOverlapsContent = false,
-                                            Child = roomsContainer = new RoomsContainer()
-                                        },
-                                    }
-                                },
                             }
                         }
                     },
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             };
 
             // scroll selected room into view on selection.
-            selectedRoom.BindValueChanged(val =>
+            SelectedRoom.BindValueChanged(val =>
             {
                 var drawable = roomsContainer.Rooms.FirstOrDefault(r => r.Room == val.NewValue);
                 if (drawable != null)
@@ -180,21 +180,22 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             searchTextBox.Current.BindValueChanged(_ => updateFilterDebounced());
             ruleset.BindValueChanged(_ => UpdateFilter());
 
-            initialRoomsReceived.BindTo(RoomManager.InitialRoomsReceived);
-            initialRoomsReceived.BindValueChanged(_ => updateLoadingLayer());
+            isIdle.BindValueChanged(_ => updatePollingRate(this.IsCurrentScreen()), true);
 
             if (ongoingOperationTracker != null)
             {
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
-                operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
+                operationInProgress.BindValueChanged(_ => updateLoadingLayer());
             }
+
+            ListingPollingComponent.InitialRoomsReceived.BindValueChanged(_ => updateLoadingLayer(), true);
 
             updateFilter();
         }
 
         #region Filtering
 
-        protected void UpdateFilter() => Scheduler.AddOnce(updateFilter);
+        public void UpdateFilter() => Scheduler.AddOnce(updateFilter);
 
         private ScheduledDelegate scheduledFilterUpdate;
 
@@ -235,7 +236,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-
             onReturning();
         }
 
@@ -248,8 +248,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             selectionLease.Return();
             selectionLease = null;
 
-            if (selectedRoom.Value?.RoomID.Value == null)
-                selectedRoom.Value = new Room();
+            if (SelectedRoom.Value?.RoomID.Value == null)
+                SelectedRoom.Value = new Room();
 
             music?.EnsurePlayingSomething();
 
@@ -275,11 +275,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void onReturning()
         {
+            updatePollingRate(true);
             searchTextBox.HoldFocus = true;
         }
 
         private void onLeaving()
         {
+            updatePollingRate(false);
             searchTextBox.HoldFocus = false;
 
             // ensure any password prompt is dismissed.
@@ -320,11 +322,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected virtual void OpenNewRoom(Room room)
         {
-            selectionLease = selectedRoom.BeginLease(false);
+            selectionLease = SelectedRoom.BeginLease(false);
             Debug.Assert(selectionLease != null);
             selectionLease.Value = room;
 
             this.Push(CreateRoomSubScreen(room));
+        }
+
+        private void updateLoadingLayer()
+        {
+            if (operationInProgress.Value || !ListingPollingComponent.InitialRoomsReceived.Value)
+                loadingLayer.Show();
+            else
+                loadingLayer.Hide();
+        }
+
+        private void updatePollingRate(bool isCurrentScreen)
+        {
+            if (!isCurrentScreen)
+                ListingPollingComponent.TimeBetweenPolls.Value = 0;
+            else
+                ListingPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 120000 : 15000;
+
+            Logger.Log($"Polling adjusted (listing: {ListingPollingComponent.TimeBetweenPolls.Value})");
         }
 
         protected abstract OsuButton CreateNewRoomButton();
@@ -337,13 +357,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
 
-        private void updateLoadingLayer()
-        {
-            if (operationInProgress.Value || !initialRoomsReceived.Value)
-                loadingLayer.Show();
-            else
-                loadingLayer.Hide();
-        }
+        protected abstract ListingPollingComponent CreatePollingComponent();
 
         private class LoungeSearchTextBox : SearchTextBox
         {

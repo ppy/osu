@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
-using osuTK;
 
 namespace osu.Game.Screens
 {
@@ -13,13 +12,10 @@ namespace osu.Game.Screens
         public BackgroundScreenStack()
             : base(false)
         {
-            Scale = new Vector2(1.06f);
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
         }
-
-        //public float ParallaxAmount { set => parallax.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * value; }
 
         public void Push(BackgroundScreen screen)
         {

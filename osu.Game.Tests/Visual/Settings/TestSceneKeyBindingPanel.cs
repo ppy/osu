@@ -32,6 +32,7 @@ namespace osu.Game.Tests.Visual.Settings
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddUntilStep("wait for load", () => panel.ChildrenOfType<GlobalKeyBindingsSection>().Any());
             AddStep("Scroll to top", () => panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollToTop());
             AddWaitStep("wait for scroll", 5);
         }

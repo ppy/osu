@@ -3,6 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osuTK;
 
@@ -10,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public class MaintenanceSection : SettingsSection
     {
-        public override string Header => "Maintenance";
+        public override LocalisableString Header => MaintenanceSettingsStrings.MaintenanceSectionHeader;
 
         public override Drawable CreateIcon() => new SpriteIcon
         {

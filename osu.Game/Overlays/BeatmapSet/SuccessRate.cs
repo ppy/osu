@@ -4,10 +4,12 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Select.Details;
 
 namespace osu.Game.Overlays.BeatmapSet
@@ -42,7 +44,7 @@ namespace osu.Game.Overlays.BeatmapSet
             int playCount = beatmap?.OnlineInfo?.PlayCount ?? 0;
 
             var rate = playCount != 0 ? (float)passCount / playCount : 0;
-            successPercent.Text = rate.ToString("0.#%");
+            successPercent.Text = rate.ToLocalisableString(@"0.#%");
             successRate.Length = rate;
             percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
@@ -64,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "Success Rate",
+                            Text = BeatmapsetsStrings.ShowInfoSuccessRate,
                             Font = OsuFont.GetFont(size: 12)
                         },
                         successRate = new Bar
@@ -89,7 +91,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "Points of Failure",
+                            Text = BeatmapsetsStrings.ShowInfoPointsOfFailure,
                             Font = OsuFont.GetFont(size: 12),
                             Margin = new MarginPadding { Vertical = 20 },
                         },
