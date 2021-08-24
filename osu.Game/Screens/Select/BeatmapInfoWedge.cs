@@ -44,9 +44,6 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
-
         protected Container DisplayedContent { get; private set; }
 
         protected WedgeInfoText Info { get; private set; }
@@ -71,7 +68,6 @@ namespace osu.Game.Screens.Select
         private void load()
         {
             ruleset.BindValueChanged(_ => updateDisplay());
-            mods.BindValueChanged(_ => updateDisplay());
         }
 
         private const double animation_duration = 800;
@@ -138,7 +134,7 @@ namespace osu.Game.Screens.Select
                     Children = new Drawable[]
                     {
                         new BeatmapInfoWedgeBackground(beatmap),
-                        Info = new WedgeInfoText(beatmap, ruleset.Value, mods.Value),
+                        Info = new WedgeInfoText(beatmap, ruleset.Value),
                     }
                 }, loaded =>
                 {
@@ -169,15 +165,16 @@ namespace osu.Game.Screens.Select
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
-            private readonly IReadOnlyList<Mod> mods;
+
+            [Resolved]
+            private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
             private ModSettingChangeTracker settingChangeTracker;
 
-            public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset, IReadOnlyList<Mod> mods)
+            public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
-                this.mods = mods;
             }
 
             private CancellationTokenSource cancellationSource;
@@ -363,10 +360,15 @@ namespace osu.Game.Screens.Select
                     }
                 };
 
-                settingChangeTracker = new ModSettingChangeTracker(mods);
-                settingChangeTracker.SettingChanged += _ => refreshBPMLabel();
+                mods.BindValueChanged(m =>
+                {
+                    settingChangeTracker?.Dispose();
 
-                refreshBPMLabel();
+                    refreshBPMLabel();
+
+                    settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
+                    settingChangeTracker.SettingChanged += _ => refreshBPMLabel();
+                }, true);
             }
 
             private InfoLabel[] getRulesetInfoLabels()
@@ -404,7 +406,7 @@ namespace osu.Game.Screens.Select
 
                 // this doesn't consider mods which apply variable rates, yet.
                 double rate = 1;
-                foreach (var mod in mods.OfType<IApplicableToRate>())
+                foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                     rate = mod.ApplyToRate(0, rate);
 
                 double bpmMax = b.ControlPointInfo.BPMMaximum * rate;
