@@ -138,36 +138,13 @@ namespace osu.Game.Overlays.Comments
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10, 0),
-                                                    Children = new Drawable[]
+                                                    Children = new[]
                                                     {
                                                         username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold))
                                                         {
                                                             AutoSizeAxes = Axes.Both
                                                         },
-                                                        new FillFlowContainer
-                                                        {
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Direction = FillDirection.Horizontal,
-                                                            Spacing = new Vector2(2, 0),
-                                                            Alpha = Comment.Pinned ? 1 : 0,
-                                                            Children = new Drawable[]
-                                                            {
-                                                                new SpriteIcon
-                                                                {
-                                                                    Icon = FontAwesome.Solid.Thumbtack,
-                                                                    Size = new Vector2(14),
-                                                                    Anchor = Anchor.CentreLeft,
-                                                                    Origin = Anchor.CentreLeft,
-                                                                },
-                                                                new OsuSpriteText
-                                                                {
-                                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                                                    Text = CommentsStrings.Pinned,
-                                                                    Anchor = Anchor.CentreLeft,
-                                                                    Origin = Anchor.CentreLeft,
-                                                                }
-                                                            },
-                                                        },
+                                                        Comment.Pinned ? new PinnedCommentNotice() : Empty(),
                                                         new ParentUsername(Comment),
                                                         new OsuSpriteText
                                                         {
@@ -346,9 +323,7 @@ namespace osu.Game.Overlays.Comments
                     this.FadeTo(show.NewValue ? 1 : 0);
             }, true);
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
-
             updateButtonsState();
-
             base.LoadComplete();
         }
 
@@ -415,6 +390,33 @@ namespace osu.Game.Overlays.Comments
             {
                 Top = 10
             };
+        }
+
+        private class PinnedCommentNotice : FillFlowContainer
+        {
+            public PinnedCommentNotice()
+            {
+                AutoSizeAxes = Axes.Both;
+                Direction = FillDirection.Horizontal;
+                Spacing = new Vector2(2, 0);
+                Children = new Drawable[]
+                {
+                    new SpriteIcon
+                    {
+                        Icon = FontAwesome.Solid.Thumbtack,
+                        Size = new Vector2(14),
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    },
+                    new OsuSpriteText
+                    {
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
+                        Text = CommentsStrings.Pinned,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    }
+                };
+            }
         }
 
         private class ParentUsername : FillFlowContainer, IHasTooltip
