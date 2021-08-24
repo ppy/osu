@@ -18,6 +18,8 @@ namespace osu.Game.Skinning
 
         private readonly BindableList<ISkinnableDrawable> components = new BindableList<ISkinnableDrawable>();
 
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
         public bool ComponentsLoaded { get; private set; }
 
         public SkinnableTargetContainer(SkinnableTarget target)
