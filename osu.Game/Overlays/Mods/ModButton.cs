@@ -11,24 +11,29 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Utils;
 
 namespace osu.Game.Overlays.Mods
 {
     /// <summary>
     /// Represents a clickable button which can cycle through one of more mods.
     /// </summary>
-    public class ModButton : ModButtonEmpty, IHasTooltip
+    public class ModButton : ModButtonEmpty, IHasCustomTooltip
     {
         private ModIcon foregroundIcon;
         private ModIcon backgroundIcon;
         private readonly SpriteText text;
         private readonly Container<ModIcon> iconsContainer;
+        private readonly CompositeDrawable incompatibleIcon;
 
         /// <summary>
         /// Fired when the selection changes.
@@ -42,6 +47,9 @@ namespace osu.Game.Overlays.Mods
 
         // A selected index of -1 means not selected.
         private int selectedIndex = -1;
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
 
         /// <summary>
         /// Change the selected mod index of this button.
@@ -237,6 +245,23 @@ namespace osu.Game.Overlays.Mods
             foregroundIcon.Mod = mod;
             text.Text = mod.Name;
             Colour = mod.HasImplementation ? Color4.White : Color4.Gray;
+
+            Scheduler.AddOnce(updateCompatibility);
+        }
+
+        private void updateCompatibility()
+        {
+            var m = SelectedMod ?? Mods.First();
+
+            bool isIncompatible = false;
+
+            if (selectedMods.Value.Count > 0 && !selectedMods.Value.Contains(m))
+                isIncompatible = !ModUtils.CheckCompatibleSet(selectedMods.Value.Append(m));
+
+            if (isIncompatible)
+                incompatibleIcon.Show();
+            else
+                incompatibleIcon.Hide();
         }
 
         private void createIcons()
@@ -284,11 +309,20 @@ namespace osu.Game.Overlays.Mods
                     {
                         scaleContainer = new Container
                         {
-                            Child = iconsContainer = new Container<ModIcon>
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
+                                iconsContainer = new Container<ModIcon>
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                },
+                                incompatibleIcon = new IncompatibleIcon
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.BottomRight,
+                                    Position = new Vector2(-13),
+                                }
                             },
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
@@ -305,8 +339,18 @@ namespace osu.Game.Overlays.Mods
                 },
                 new HoverSounds()
             };
-
             Mod = mod;
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            selectedMods.BindValueChanged(_ => Scheduler.AddOnce(updateCompatibility), true);
+        }
+
+        public ITooltip GetCustomTooltip() => new ModButtonTooltip();
+
+        public object TooltipContent => SelectedMod ?? Mods.FirstOrDefault();
     }
 }

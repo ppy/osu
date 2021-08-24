@@ -138,16 +138,42 @@ namespace osu.Game.Tests.Skins.IO
             }
         }
 
-        private MemoryStream createOsk(string name, string author)
+        [Test]
+        public async Task TestSameMetadataNameDifferentFolderName()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1", false), "my custom skin 1"));
+                    Assert.That(imported.Name, Is.EqualTo("name 1 [my custom skin 1]"));
+                    Assert.That(imported.Creator, Is.EqualTo("author 1"));
+
+                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1", false), "my custom skin 2"));
+                    Assert.That(imported2.Name, Is.EqualTo("name 1 [my custom skin 2]"));
+                    Assert.That(imported2.Creator, Is.EqualTo("author 1"));
+
+                    Assert.That(imported2.Hash, Is.Not.EqualTo(imported.Hash));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        private MemoryStream createOsk(string name, string author, bool makeUnique = true)
         {
             var zipStream = new MemoryStream();
             using var zip = ZipArchive.Create();
-            zip.AddEntry("skin.ini", generateSkinIni(name, author));
+            zip.AddEntry("skin.ini", generateSkinIni(name, author, makeUnique));
             zip.SaveTo(zipStream);
             return zipStream;
         }
 
-        private MemoryStream generateSkinIni(string name, string author)
+        private MemoryStream generateSkinIni(string name, string author, bool makeUnique = true)
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -155,8 +181,12 @@ namespace osu.Game.Tests.Skins.IO
             writer.WriteLine("[General]");
             writer.WriteLine($"Name: {name}");
             writer.WriteLine($"Author: {author}");
-            writer.WriteLine();
-            writer.WriteLine($"# unique {Guid.NewGuid()}");
+
+            if (makeUnique)
+            {
+                writer.WriteLine();
+                writer.WriteLine($"# unique {Guid.NewGuid()}");
+            }
 
             writer.Flush();
 

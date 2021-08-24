@@ -23,8 +23,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override UserActivity InitialActivity => new UserActivity.InPlaylistGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
-        public PlaylistsPlayer(PlaylistItem playlistItem, PlayerConfiguration configuration = null)
-            : base(playlistItem, configuration)
+        public PlaylistsPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration configuration = null)
+            : base(room, playlistItem, configuration)
         {
         }
 
@@ -54,8 +54,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
-            Debug.Assert(RoomId.Value != null);
-            return new PlaylistsResultsScreen(score, RoomId.Value.Value, PlaylistItem, true);
+            Debug.Assert(Room.RoomID.Value != null);
+            return new PlaylistsResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, true);
         }
 
         protected override async Task PrepareScoreForResultsAsync(Score score)
