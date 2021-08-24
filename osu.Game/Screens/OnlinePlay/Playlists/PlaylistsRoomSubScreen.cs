@@ -50,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
 
-            AddInternal(selectionPollingComponent = new SelectionPollingComponent());
+            AddInternal(selectionPollingComponent = new SelectionPollingComponent(Room));
         }
 
         protected override void LoadComplete()
@@ -184,7 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             OnStart = StartPlay
         };
 
-        protected override RoomSettingsOverlay CreateRoomSettingsOverlay() => new PlaylistsRoomSettingsOverlay
+        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new PlaylistsRoomSettingsOverlay(room)
         {
             EditPlaylist = () =>
             {

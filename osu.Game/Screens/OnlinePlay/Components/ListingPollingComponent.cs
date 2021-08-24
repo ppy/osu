@@ -20,9 +20,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
 
-        [Resolved]
-        private Bindable<Room> selectedRoom { get; set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
