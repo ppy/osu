@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        protected override double SkillMultiplier => 0.13;
+        protected override double SkillMultiplier => 0.15;
         protected override double StrainDecayBase => 0.15;
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
@@ -53,10 +53,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                         cumulativeStrainTime += osuPrevious.StrainTime;
 
                         // We want to nerf objects that can be easily seen within the Flashlight circle radius.
-                        if (i == 0 && jumpDistance < 50.0)
-                            smallDistNerf = jumpDistance / 50.0;
+                        if (i == 0)
+                            smallDistNerf = Math.Min(1.0, jumpDistance / 50.0);
 
-                        result += Math.Pow(0.8, i) * scalingFactor * jumpDistance / cumulativeStrainTime;
+                        // We also want to nerf stacks so that only the first object of the stack is accounted for.
+                        double stackNerf = Math.Min(1.0, osuPrevious.JumpDistance * scalingFactor / 50.0);
+
+                        result += Math.Pow(0.8, i) * stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
                     }
                 }
             }
