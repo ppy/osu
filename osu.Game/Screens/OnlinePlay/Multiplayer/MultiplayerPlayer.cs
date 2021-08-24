@@ -45,10 +45,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// <summary>
         /// Construct a multiplayer player.
         /// </summary>
+        /// <param name="room">The room.</param>
         /// <param name="playlistItem">The playlist item to be played.</param>
         /// <param name="users">The users which are participating in this game.</param>
-        public MultiplayerPlayer(PlaylistItem playlistItem, MultiplayerRoomUser[] users)
-            : base(playlistItem, new PlayerConfiguration
+        public MultiplayerPlayer(Room room, PlaylistItem playlistItem, MultiplayerRoomUser[] users)
+            : base(room, playlistItem, new PlayerConfiguration
             {
                 AllowPause = false,
                 AllowRestart = false,
@@ -92,7 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 }
             });
 
-            LoadComponentAsync(new GameplayChatDisplay
+            LoadComponentAsync(new GameplayChatDisplay(Room)
             {
                 Expanded = { BindTarget = HUDOverlay.ShowHud },
             }, chat => leaderboardFlow.Insert(2, chat));
