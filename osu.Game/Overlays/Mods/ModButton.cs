@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Mods
         private ModIcon backgroundIcon;
         private readonly SpriteText text;
         private readonly Container<ModIcon> iconsContainer;
-        private readonly SpriteIcon incompatibleIcon;
+        private readonly CompositeDrawable incompatibleIcon;
 
         /// <summary>
         /// Fired when the selection changes.
@@ -258,7 +258,10 @@ namespace osu.Game.Overlays.Mods
             if (selectedMods.Value.Count > 0 && !selectedMods.Value.Contains(m))
                 isIncompatible = !ModUtils.CheckCompatibleSet(selectedMods.Value.Append(m));
 
-            incompatibleIcon.FadeTo(isIncompatible ? 1 : 0, 200, Easing.OutQuint);
+            if (isIncompatible)
+                incompatibleIcon.Show();
+            else
+                incompatibleIcon.Hide();
         }
 
         private void createIcons()
@@ -315,15 +318,11 @@ namespace osu.Game.Overlays.Mods
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.Centre,
                                 },
-                                incompatibleIcon = new SpriteIcon
+                                incompatibleIcon = new IncompatibleIcon
                                 {
-                                    Origin = Anchor.BottomRight,
+                                    Origin = Anchor.Centre,
                                     Anchor = Anchor.BottomRight,
-                                    Icon = FontAwesome.Solid.Ban,
-                                    Colour = Color4.Red,
-                                    Size = new Vector2(30),
-                                    Shadow = true,
-                                    Alpha = 0
+                                    Position = new Vector2(-13),
                                 }
                             },
                             RelativeSizeAxes = Axes.Both,
