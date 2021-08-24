@@ -93,8 +93,8 @@ namespace osu.Game.Beatmaps.Formats
             //     writer.WriteLine(@"OverlayPosition: " + b.OverlayPosition);
             // if (!string.IsNullOrEmpty(b.SkinPreference))
             //     writer.WriteLine(@"SkinPreference:" + b.SkinPreference);
-            // if (b.EpilepsyWarning)
-            //     writer.WriteLine(@"EpilepsyWarning: 1");
+            if (beatmap.BeatmapInfo.EpilepsyWarning)
+                writer.WriteLine(@"EpilepsyWarning: 1");
             // if (b.CountdownOffset > 0)
             //     writer.WriteLine(@"CountdownOffset: " + b.CountdownOffset.ToString());
             if (beatmap.BeatmapInfo.RulesetID == 3)

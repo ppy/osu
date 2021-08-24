@@ -9,15 +9,16 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Rooms;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public abstract class MatchSettingsOverlay : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
+    public abstract class RoomSettingsOverlay : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         protected const float TRANSITION_DURATION = 350;
-        protected const float FIELD_PADDING = 45;
+        protected const float FIELD_PADDING = 25;
 
         protected OnlinePlayComposite Settings { get; set; }
 
@@ -27,26 +28,39 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected abstract bool IsLoading { get; }
 
+        private readonly Room room;
+
+        protected RoomSettingsOverlay(Room room)
+        {
+            this.room = room;
+
+            RelativeSizeAxes = Axes.Both;
+            Masking = true;
+            CornerRadius = 10;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Masking = true;
-
-            Add(Settings = CreateSettings());
+            Add(Settings = CreateSettings(room));
         }
 
         protected abstract void SelectBeatmap();
 
-        protected abstract OnlinePlayComposite CreateSettings();
+        protected abstract OnlinePlayComposite CreateSettings(Room room);
 
         protected override void PopIn()
         {
+            base.PopIn();
             Settings.MoveToY(0, TRANSITION_DURATION, Easing.OutQuint);
+            Settings.FadeIn(TRANSITION_DURATION / 2);
         }
 
         protected override void PopOut()
         {
+            base.PopOut();
             Settings.MoveToY(-1, TRANSITION_DURATION, Easing.InSine);
+            Settings.Delay(TRANSITION_DURATION / 2).FadeOut(TRANSITION_DURATION / 2);
         }
 
         public bool OnPressed(GlobalAction action)

@@ -22,9 +22,8 @@ using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK.Graphics;
-using IntroSequence = osu.Game.Configuration.IntroSequence;
 
-namespace osu.Game.Tests.Visual.Navigation
+namespace osu.Game.Tests.Visual
 {
     /// <summary>
     /// A scene which tests full game flow.
@@ -62,7 +61,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     Game.Dispose();
                 }
 
-                RecycleLocalStorage();
+                RecycleLocalStorage(false);
 
                 CreateGame();
             });
@@ -73,14 +72,17 @@ namespace osu.Game.Tests.Visual.Navigation
             ConfirmAtMainMenu();
         }
 
+        [TearDownSteps]
+        public void TearDownSteps()
+        {
+            AddStep("exit game", () => Game.Exit());
+            AddUntilStep("wait for game exit", () => Game.Parent == null);
+        }
+
         protected void CreateGame()
         {
             Game = new TestOsuGame(LocalStorage, API);
             Game.SetHost(host);
-
-            // todo: this can be removed once we can run audio tracks without a device present
-            // see https://github.com/ppy/osu/issues/1302
-            Game.LocalConfig.SetValue(OsuSetting.IntroSequence, IntroSequence.Circles);
 
             Add(Game);
         }

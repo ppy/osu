@@ -62,7 +62,7 @@ namespace osu.Game
     /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
     /// for initial components that are generally retrieved via DI.
     /// </summary>
-    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
+    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo
     {
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
@@ -1018,10 +1018,13 @@ namespace osu.Game
 
             var horizontalOffset = 0f;
 
+            // Content.ToLocalSpace() is used instead of this.ToLocalSpace() to correctly calculate the offset with scaling modes active.
+            // Content is a child of a scaling container with ScalingMode.Everything set, while the game itself is never scaled.
+            // this avoids a visible jump in the positioning of the screen offset container.
             if (Settings.IsLoaded && Settings.IsPresent)
-                horizontalOffset += ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X * SIDE_OVERLAY_OFFSET_RATIO;
+                horizontalOffset += Content.ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X * SIDE_OVERLAY_OFFSET_RATIO;
             if (Notifications.IsLoaded && Notifications.IsPresent)
-                horizontalOffset += (ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - DrawWidth) * SIDE_OVERLAY_OFFSET_RATIO;
+                horizontalOffset += (Content.ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - Content.DrawWidth) * SIDE_OVERLAY_OFFSET_RATIO;
 
             ScreenOffsetContainer.X = horizontalOffset;
 
@@ -1085,5 +1088,7 @@ namespace osu.Game
             if (newScreen == null)
                 Exit();
         }
+
+        IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
     }
 }
