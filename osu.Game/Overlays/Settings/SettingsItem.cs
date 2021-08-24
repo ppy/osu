@@ -23,8 +23,6 @@ namespace osu.Game.Overlays.Settings
 
         protected Drawable Control { get; }
 
-        private IHasCurrentValue<T> controlWithCurrent => Control as IHasCurrentValue<T>;
-
         protected override Container<Drawable> Content => FlowContent;
 
         protected readonly FillFlowContainer FlowContent;
@@ -83,8 +81,20 @@ namespace osu.Game.Overlays.Settings
 
         public virtual Bindable<T> Current
         {
-            get => controlWithCurrent.Current;
-            set => controlWithCurrent.Current = value;
+            get
+            {
+                if (!(Control is IHasCurrentValue<T> controlWithCurrent))
+                    throw new ControlDoesNotImplementCurrentException();
+
+                return controlWithCurrent.Current;
+            }
+            set
+            {
+                if (!(Control is IHasCurrentValue<T> controlWithCurrent))
+                    throw new ControlDoesNotImplementCurrentException();
+
+                controlWithCurrent.Current = value;
+            }
         }
 
         public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
@@ -122,11 +132,8 @@ namespace osu.Game.Overlays.Settings
 
             // IMPORTANT: all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
             // never loaded, but requires bindable storage.
-            if (controlWithCurrent == null)
-                throw new ArgumentException(@$"Control created via {nameof(CreateControl)} must implement {nameof(IHasCurrentValue<T>)}");
-
-            controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
-            controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
+            Current.ValueChanged += _ => SettingChanged?.Invoke();
+            Current.DisabledChanged += _ => updateDisabled();
         }
 
         [BackgroundDependencyLoader]
@@ -137,7 +144,7 @@ namespace osu.Game.Overlays.Settings
             {
                 AddInternal(new RestoreDefaultValueButton<T>
                 {
-                    Current = controlWithCurrent.Current,
+                    Current = Current,
                 });
             }
         }
@@ -145,7 +152,16 @@ namespace osu.Game.Overlays.Settings
         private void updateDisabled()
         {
             if (labelText != null)
-                labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
+                labelText.Alpha = Current.Disabled ? 0.3f : 1;
+        }
+
+        private class ControlDoesNotImplementCurrentException : InvalidOperationException
+        {
+            public ControlDoesNotImplementCurrentException()
+                : base(@$"Control created via {nameof(CreateControl)} must implement {nameof(IHasCurrentValue<T>)}, "
+                       + @$"or override {nameof(Current)} on this item for custom implementation.")
+            {
+            }
         }
     }
 }
