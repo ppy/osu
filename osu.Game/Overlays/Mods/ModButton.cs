@@ -33,6 +33,7 @@ namespace osu.Game.Overlays.Mods
         private ModIcon backgroundIcon;
         private readonly SpriteText text;
         private readonly Container<ModIcon> iconsContainer;
+        private readonly SpriteIcon incompatibleIcon;
 
         /// <summary>
         /// Fired when the selection changes.
@@ -243,28 +244,25 @@ namespace osu.Game.Overlays.Mods
                 backgroundIcon.Mod = foregroundIcon.Mod;
             foregroundIcon.Mod = mod;
             text.Text = mod.Name;
-            updateColour(mod);
+            Colour = mod.HasImplementation ? Color4.White : Color4.Gray;
+            updateCompatibility(mod);
         }
 
-        private Colour4 lightRed;
-        private Colour4 darkRed;
-
-        private void updateColour(Mod mod)
+        private void updateCompatibility(Mod mod)
         {
-            var baseColour = mod.HasImplementation ? Color4.White : Color4.Gray;
-
             if (globalSelectedMods != null)
             {
                 if (!globalSelectedMods.Value.Contains(mod))
                 {
                     if (!ModUtils.CheckCompatibleSet(globalSelectedMods.Value.Concat(new[] { mod })))
                     {
-                        baseColour = mod.HasImplementation ? lightRed : darkRed;
+                        incompatibleIcon.FadeIn();
+                        return;
                     }
                 }
             }
 
-            Colour = baseColour;
+            incompatibleIcon.FadeOut();
         }
 
         private void createIcons()
@@ -312,11 +310,24 @@ namespace osu.Game.Overlays.Mods
                     {
                         scaleContainer = new Container
                         {
-                            Child = iconsContainer = new Container<ModIcon>
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
+                                iconsContainer = new Container<ModIcon>
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                },
+                                incompatibleIcon = new SpriteIcon
+                                {
+                                    Origin = Anchor.BottomRight,
+                                    Anchor = Anchor.BottomRight,
+                                    Icon = FontAwesome.Solid.Ban,
+                                    Colour = Color4.Red,
+                                    Size = new Vector2(30),
+                                    Shadow = true,
+                                    Alpha = 0
+                                }
                             },
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
@@ -338,11 +349,9 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load()
         {
-            lightRed = colour.RedLight;
-            darkRed = colour.RedDark;
-            globalSelectedMods.BindValueChanged(_ => updateColour(SelectedMod ?? Mods.FirstOrDefault()), true);
+            globalSelectedMods.BindValueChanged(_ => updateCompatibility(SelectedMod ?? Mods.FirstOrDefault()), true);
         }
 
         public ITooltip GetCustomTooltip() => new ModButtonTooltip();
