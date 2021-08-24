@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -21,9 +22,8 @@ using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK.Graphics;
-using IntroSequence = osu.Game.Configuration.IntroSequence;
 
-namespace osu.Game.Tests.Visual.Navigation
+namespace osu.Game.Tests.Visual
 {
     /// <summary>
     /// A scene which tests full game flow.
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     Game.Dispose();
                 }
 
-                RecycleLocalStorage();
+                RecycleLocalStorage(false);
 
                 CreateGame();
             });
@@ -72,14 +72,17 @@ namespace osu.Game.Tests.Visual.Navigation
             ConfirmAtMainMenu();
         }
 
+        [TearDownSteps]
+        public void TearDownSteps()
+        {
+            AddStep("exit game", () => Game.Exit());
+            AddUntilStep("wait for game exit", () => Game.Parent == null);
+        }
+
         protected void CreateGame()
         {
             Game = new TestOsuGame(LocalStorage, API);
             Game.SetHost(host);
-
-            // todo: this can be removed once we can run audio tracks without a device present
-            // see https://github.com/ppy/osu/issues/1302
-            Game.LocalConfig.SetValue(OsuSetting.IntroSequence, IntroSequence.Circles);
 
             Add(Game);
         }
@@ -95,6 +98,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         public class TestOsuGame : OsuGame
         {
+            public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
+
             public new ScreenStack ScreenStack => base.ScreenStack;
 
             public new BackButton BackButton => base.BackButton;
@@ -103,7 +108,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public new ScoreManager ScoreManager => base.ScoreManager;
 
-            public new SettingsPanel Settings => base.Settings;
+            public new Container ScreenOffsetContainer => base.ScreenOffsetContainer;
+
+            public new SettingsOverlay Settings => base.Settings;
+
+            public new NotificationOverlay Notifications => base.Notifications;
 
             public new MusicController MusicController => base.MusicController;
 

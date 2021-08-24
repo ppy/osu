@@ -70,13 +70,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                         if (version < 2.3m)
                         {
-                            if (GetTexture(@"fruit-ryuuta") != null ||
-                                GetTexture(@"fruit-ryuuta-0") != null)
+                            if (hasOldStyleCatcherSprite())
                                 return new LegacyCatcherOld();
                         }
 
-                        if (GetTexture(@"fruit-catcher-idle") != null ||
-                            GetTexture(@"fruit-catcher-idle-0") != null)
+                        if (hasNewStyleCatcherSprite())
                             return new LegacyCatcherNew();
 
                         return null;
@@ -86,11 +84,25 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             return new LegacyCatchComboCounter(Skin);
 
                         return null;
+
+                    case CatchSkinComponents.HitExplosion:
+                        if (hasOldStyleCatcherSprite() || hasNewStyleCatcherSprite())
+                            return new LegacyHitExplosion();
+
+                        return null;
                 }
             }
 
             return base.GetDrawableComponent(component);
         }
+
+        private bool hasOldStyleCatcherSprite() =>
+            GetTexture(@"fruit-ryuuta") != null
+            || GetTexture(@"fruit-ryuuta-0") != null;
+
+        private bool hasNewStyleCatcherSprite() =>
+            GetTexture(@"fruit-catcher-idle") != null
+            || GetTexture(@"fruit-catcher-idle-0") != null;
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {

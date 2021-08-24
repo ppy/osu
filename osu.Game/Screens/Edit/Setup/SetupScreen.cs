@@ -34,7 +34,8 @@ namespace osu.Game.Screens.Edit.Setup
                         new ResourcesSection(),
                         new MetadataSection(),
                         new DifficultySection(),
-                        new ColoursSection()
+                        new ColoursSection(),
+                        new DesignSection(),
                     }
                 },
             });

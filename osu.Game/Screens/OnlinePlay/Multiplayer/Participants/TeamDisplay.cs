@@ -11,7 +11,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -19,16 +18,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
     internal class TeamDisplay : MultiplayerRoomComposite
     {
-        private readonly User user;
+        private readonly MultiplayerRoomUser user;
+
         private Drawable box;
 
         [Resolved]
         private OsuColour colours { get; set; }
 
-        [Resolved]
-        private MultiplayerClient client { get; set; }
-
-        public TeamDisplay(User user)
+        public TeamDisplay(MultiplayerRoomUser user)
         {
             this.user = user;
 
@@ -61,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 }
             };
 
-            if (user.Id == client.LocalUser?.UserID)
+            if (Client.LocalUser?.Equals(user) == true)
             {
                 InternalChild = new OsuClickableContainer
                 {
@@ -79,9 +76,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
         private void changeTeam()
         {
-            client.SendMatchRequest(new ChangeTeamRequest
+            Client.SendMatchRequest(new ChangeTeamRequest
             {
-                TeamID = ((client.LocalUser?.MatchState as TeamVersusUserState)?.TeamID + 1) % 2 ?? 0,
+                TeamID = ((Client.LocalUser?.MatchState as TeamVersusUserState)?.TeamID + 1) % 2 ?? 0,
             });
         }
 
@@ -93,7 +90,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             // we don't have a way of knowing when an individual user's state has updated, so just handle on RoomUpdated for now.
 
-            var userRoomState = Room?.Users.FirstOrDefault(u => u.UserID == user.Id)?.MatchState;
+            var userRoomState = Room?.Users.FirstOrDefault(u => u.Equals(user))?.MatchState;
 
             const double duration = 400;
 

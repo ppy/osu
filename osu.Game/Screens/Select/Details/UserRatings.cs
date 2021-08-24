@@ -9,6 +9,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -35,8 +37,8 @@ namespace osu.Game.Screens.Select.Details
 
                 if (metrics == null)
                 {
-                    negativeRatings.Text = "0";
-                    positiveRatings.Text = "0";
+                    negativeRatings.Text = 0.ToLocalisableString(@"N0");
+                    positiveRatings.Text = 0.ToLocalisableString(@"N0");
                     ratingsBar.Length = 0;
                     graph.Values = new float[rating_range];
                 }
@@ -47,8 +49,8 @@ namespace osu.Game.Screens.Select.Details
                     var negativeCount = ratings.Take(rating_range / 2).Sum();
                     var totalCount = ratings.Sum();
 
-                    negativeRatings.Text = negativeCount.ToString();
-                    positiveRatings.Text = (totalCount - negativeCount).ToString();
+                    negativeRatings.Text = negativeCount.ToLocalisableString(@"N0");
+                    positiveRatings.Text = (totalCount - negativeCount).ToLocalisableString(@"N0");
                     ratingsBar.Length = totalCount == 0 ? 0 : (float)negativeCount / totalCount;
                     graph.Values = ratings.Take(rating_range).Select(r => (float)r);
                 }
@@ -70,7 +72,7 @@ namespace osu.Game.Screens.Select.Details
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "User Rating",
+                            Text = BeatmapsetsStrings.ShowStatsUserRating,
                             Font = OsuFont.GetFont(size: 12),
                             Margin = new MarginPadding { Bottom = 5 },
                         },
@@ -88,14 +90,14 @@ namespace osu.Game.Screens.Select.Details
                             {
                                 negativeRatings = new OsuSpriteText
                                 {
-                                    Text = "0",
+                                    Text = 0.ToLocalisableString(@"N0"),
                                     Font = OsuFont.GetFont(size: 12)
                                 },
                                 positiveRatings = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Text = @"0",
+                                    Text = 0.ToLocalisableString(@"N0"),
                                     Font = OsuFont.GetFont(size: 12)
                                 },
                             },
@@ -104,7 +106,7 @@ namespace osu.Game.Screens.Select.Details
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "Rating Spread",
+                            Text = BeatmapsetsStrings.ShowStatsRatingSpread,
                             Font = OsuFont.GetFont(size: 12),
                             Margin = new MarginPadding { Bottom = 5 },
                         },

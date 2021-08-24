@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
 
@@ -15,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             Icon = OsuIcon.Hot
         };
 
-        public override string Header => ruleset.Name;
+        public override LocalisableString Header => ruleset.Name;
 
         private readonly RulesetInfo ruleset;
 
