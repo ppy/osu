@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 this.beatmapSkin = beatmapSkin;
             }
 
-            protected override ISkin GetSkin() => beatmapSkin;
+            protected internal override ISkin GetSkin() => beatmapSkin;
         }
 
         private class TestOsuRuleset : OsuRuleset

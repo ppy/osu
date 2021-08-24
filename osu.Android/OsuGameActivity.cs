@@ -20,8 +20,21 @@ namespace osu.Android
     [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false, LaunchMode = LaunchMode.SingleInstance, Exported = true)]
     [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
     [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-archive")]
-    [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault }, DataMimeTypes = new[] { "application/zip", "application/octet-stream", "application/download", "application/x-zip", "application/x-zip-compressed", "application/x-osu-archive" })]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-beatmap-archive")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-skin-archive")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-replay")]
+    [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault }, DataMimeTypes = new[]
+    {
+        "application/zip",
+        "application/octet-stream",
+        "application/download",
+        "application/x-zip",
+        "application/x-zip-compressed",
+        // newer official mime types (see https://osu.ppy.sh/wiki/en/osu%21_File_Formats).
+        "application/x-osu-beatmap-archive",
+        "application/x-osu-skin-archive",
+        "application/x-osu-replay",
+    })]
     [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault }, DataSchemes = new[] { "osu", "osump" })]
     public class OsuGameActivity : AndroidGameActivity
     {
@@ -66,12 +79,14 @@ namespace osu.Android
                 case Intent.ActionSendMultiple:
                 {
                     var uris = new List<Uri>();
+
                     for (int i = 0; i < intent.ClipData?.ItemCount; i++)
                     {
                         var content = intent.ClipData?.GetItemAt(i);
                         if (content != null)
                             uris.Add(content.Uri);
                     }
+
                     handleImportFromUris(uris.ToArray());
                     break;
                 }

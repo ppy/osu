@@ -8,6 +8,5 @@ namespace osu.Game.Online.Rooms
         // used for osu-web deserialization so names shouldn't be changed.
         Normal,
         Spotlight,
-        Realtime,
     }
 }
