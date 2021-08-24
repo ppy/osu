@@ -18,7 +18,7 @@ namespace osu.Game.Skinning
 
         private readonly BindableList<ISkinnableDrawable> components = new BindableList<ISkinnableDrawable>();
 
-        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks; // ensure that components are loaded even if the target container is hidden (ie. due to user toggle).
 
         public bool ComponentsLoaded { get; private set; }
 
