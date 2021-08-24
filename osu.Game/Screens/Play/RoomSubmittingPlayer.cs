@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
@@ -14,15 +13,18 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public abstract class RoomSubmittingPlayer : SubmittingPlayer
     {
-        [Resolved(typeof(Room), nameof(Room.RoomID))]
-        protected Bindable<long?> RoomId { get; private set; }
+        protected readonly IBindable<long?> RoomId = new Bindable<long?>();
 
         protected readonly PlaylistItem PlaylistItem;
+        protected readonly Room Room;
 
-        protected RoomSubmittingPlayer(PlaylistItem playlistItem, PlayerConfiguration configuration = null)
+        protected RoomSubmittingPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration configuration = null)
             : base(configuration)
         {
+            Room = room;
             PlaylistItem = playlistItem;
+
+            RoomId.BindTo(room.RoomID);
         }
 
         protected override APIRequest<APIScoreToken> CreateTokenRequest()

@@ -10,21 +10,21 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public class MatchChatDisplay : StandAloneChatDisplay
     {
-        [Resolved(typeof(Room), nameof(Room.RoomID))]
-        private Bindable<long?> roomId { get; set; }
-
-        [Resolved(typeof(Room), nameof(Room.ChannelId))]
-        private Bindable<int> channelId { get; set; }
+        private readonly IBindable<long?> roomId = new Bindable<long?>();
+        private readonly IBindable<int> channelId = new Bindable<int>();
 
         [Resolved(CanBeNull = true)]
         private ChannelManager channelManager { get; set; }
 
         private readonly bool leaveChannelOnDispose;
 
-        public MatchChatDisplay(bool leaveChannelOnDispose = true)
+        public MatchChatDisplay(Room room, bool leaveChannelOnDispose = true)
             : base(true)
         {
             this.leaveChannelOnDispose = leaveChannelOnDispose;
+
+            roomId.BindTo(room.RoomID);
+            channelId.BindTo(room.ChannelId);
         }
 
         protected override void LoadComplete()

@@ -20,8 +20,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         public Action Exited;
 
-        public PlaylistsPlayer(PlaylistItem playlistItem, PlayerConfiguration configuration = null)
-            : base(playlistItem, configuration)
+        public PlaylistsPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration configuration = null)
+            : base(room, playlistItem, configuration)
         {
         }
 

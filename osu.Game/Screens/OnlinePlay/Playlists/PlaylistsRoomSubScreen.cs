@@ -158,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             },
                             new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
                             new Drawable[] { new OverlinedHeader("Chat"), },
-                            new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
+                            new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
                         },
                         RowDimensions = new[]
                         {
@@ -199,7 +199,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
         }
 
-        protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(SelectedItem.Value)
+        protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(Room, SelectedItem.Value)
         {
             Exited = () => leaderboard.RefreshScores()
         });
