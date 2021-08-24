@@ -286,7 +286,6 @@ namespace osu.Game.Overlays.Mods
                     },
                 });
             }
-
             else
             {
                 iconsContainer.Add(foregroundIcon = new ModIcon(Mod, false)
