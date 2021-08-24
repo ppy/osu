@@ -28,6 +28,8 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK.Input;
@@ -428,6 +430,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 AddStep("close dialog overlay", () => InputManager.Key(Key.Escape));
             }
+        }
+
+        [Test]
+        public void TestGameplayFlow()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddRepeatStep("click spectate button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            }, 2);
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+
+            // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
+            for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
+            {
+                var time = i;
+                AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.GameplayClock.CurrentTime > time);
+            }
+
+            AddUntilStep("wait for results", () => Stack.CurrentScreen is ResultsScreen);
         }
 
         private void createRoom(Func<Room> room)
