@@ -29,6 +29,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached(typeof(IBindable<PlaylistItem>))]
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
+        protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(Room.Playlist.FirstOrDefault())
+        {
+            SelectedItem = { BindTarget = SelectedItem }
+        };
+
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         /// <summary>
@@ -134,7 +139,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                             {
                                                 new DrawableMatchRoom(Room, allowEdit)
                                                 {
-                                                    OnEdit = () => settingsOverlay.Show()
+                                                    OnEdit = () => settingsOverlay.Show(),
+                                                    SelectedItem = { BindTarget = SelectedItem }
                                                 }
                                             },
                                             null,
@@ -184,7 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                         RelativeSizeAxes = Axes.Both,
                                         // Resolves 1px masking errors between the settings overlay and the room panel.
                                         Padding = new MarginPadding(-1),
-                                        Child = settingsOverlay = CreateRoomSettingsOverlay()
+                                        Child = settingsOverlay = CreateRoomSettingsOverlay(Room)
                                     }
                                 },
                             },
@@ -242,6 +248,14 @@ namespace osu.Game.Screens.OnlinePlay.Match
             managerUpdated.BindValueChanged(beatmapUpdated);
 
             UserMods.BindValueChanged(_ => Scheduler.AddOnce(UpdateMods));
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            return new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
+            {
+                Model = { Value = Room }
+            };
         }
 
         public override bool OnBackButton()
@@ -412,7 +426,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// <summary>
         /// Creates the room settings overlay.
         /// </summary>
-        protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay();
+        /// <param name="room">The room to change the settings of.</param>
+        protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay(Room room);
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
         {

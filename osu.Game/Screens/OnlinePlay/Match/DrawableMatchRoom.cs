@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
@@ -17,6 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 {
     public class DrawableMatchRoom : DrawableRoom
     {
+        public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
         public Action OnEdit;
 
         [Resolved]
@@ -27,6 +29,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         [CanBeNull]
         private Drawable editButton;
+
+        private BackgroundSprite background;
 
         public DrawableMatchRoom(Room room, bool allowEdit = true)
             : base(room)
@@ -57,8 +61,15 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             if (editButton != null)
                 host.BindValueChanged(h => editButton.Alpha = h.NewValue?.Equals(api.LocalUser.Value) == true ? 1 : 0, true);
+
+            SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap.Value, true);
         }
 
-        protected override Drawable CreateBackground() => new RoomBackgroundSprite();
+        protected override Drawable CreateBackground() => background = new BackgroundSprite();
+
+        private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
+        {
+            protected override double LoadDelay => 0;
+        }
     }
 }

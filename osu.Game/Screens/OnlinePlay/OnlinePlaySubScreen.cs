@@ -29,23 +29,26 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override void OnEntering(IScreen last)
         {
+            base.OnEntering(last);
             this.FadeInFromZero(APPEAR_DURATION, Easing.OutQuint);
         }
 
         public override bool OnExiting(IScreen next)
         {
+            base.OnExiting(next);
             this.FadeOut(DISAPPEAR_DURATION, Easing.OutQuint);
-
             return false;
         }
 
         public override void OnResuming(IScreen last)
         {
+            base.OnResuming(last);
             this.FadeIn(APPEAR_DURATION, Easing.OutQuint);
         }
 
         public override void OnSuspending(IScreen next)
         {
+            base.OnSuspending(next);
             this.FadeOut(DISAPPEAR_DURATION, Easing.OutQuint);
         }
 
