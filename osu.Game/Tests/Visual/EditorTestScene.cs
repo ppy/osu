@@ -3,6 +3,7 @@
 
 using System.Linq;
 using JetBrains.Annotations;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.IO.Stores;
@@ -27,6 +28,9 @@ namespace osu.Game.Tests.Visual
         protected TestEditor Editor { get; private set; }
 
         protected EditorClock EditorClock { get; private set; }
+
+        [Resolved]
+        private SkinManager skins { get; set; }
 
         /// <summary>
         /// Whether any saves performed by the editor should be isolate (and not persist) to the underlying <see cref="BeatmapManager"/>.
@@ -55,6 +59,12 @@ namespace osu.Game.Tests.Visual
             AddUntilStep("wait for editor to load", () => EditorComponentsReady);
             AddStep("get beatmap", () => EditorBeatmap = Editor.ChildrenOfType<EditorBeatmap>().Single());
             AddStep("get clock", () => EditorClock = Editor.ChildrenOfType<EditorClock>().Single());
+        }
+
+        [Test]
+        public void TestLegacySkin()
+        {
+            AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.Info);
         }
 
         protected virtual void LoadEditor()
