@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Settings;
@@ -38,8 +37,6 @@ namespace osu.Game.Rulesets.Mods
         /// When there is no override (ie. <see cref="Current"/> is null), this value will match the beatmap provided default via <see cref="updateCurrentFromSlider"/>.
         /// </remarks>
         private BindableNumber<float> sliderDisplayCurrent => current.DisplayBindable;
-
-        protected override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent);
 
         protected override void LoadComplete()
         {
@@ -80,6 +77,12 @@ namespace osu.Game.Rulesets.Mods
             isInternalChange = false;
         }
 
+        protected override Drawable CreateControl() => new SettingsSlider<float>
+        {
+            ShowsDefaultIndicator = false,
+            Current = sliderDisplayCurrent,
+        };
+
         private class DifficultyBindableWithCurrent : DifficultyBindable, IHasCurrentValue<float?>
         {
             private Bindable<float?> currentBound;
@@ -103,24 +106,6 @@ namespace osu.Game.Rulesets.Mods
             }
 
             protected override Bindable<float?> CreateInstance() => new DifficultyBindableWithCurrent();
-        }
-
-        private class SliderControl : CompositeDrawable
-        {
-            public SliderControl(BindableNumber<float> currentNumber)
-            {
-                InternalChildren = new Drawable[]
-                {
-                    new SettingsSlider<float>
-                    {
-                        ShowsDefaultIndicator = false,
-                        Current = currentNumber,
-                    }
-                };
-
-                AutoSizeAxes = Axes.Y;
-                RelativeSizeAxes = Axes.X;
-            }
         }
     }
 }
