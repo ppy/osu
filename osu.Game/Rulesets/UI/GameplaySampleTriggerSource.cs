@@ -16,14 +16,14 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     public class GameplaySampleTriggerSource : CompositeDrawable
     {
-        private readonly HitObjectContainer hitObjectContainer;
-
-        private int nextHitSoundIndex;
-
         /// <summary>
         /// The number of concurrent samples allowed to be played concurrently so that it feels better when spam-pressing a key.
         /// </summary>
         private const int max_concurrent_hitsounds = OsuGameBase.SAMPLE_CONCURRENCY;
+
+        private readonly HitObjectContainer hitObjectContainer;
+
+        private int nextHitSoundIndex;
 
         private readonly Container<SkinnableSound> hitSounds;
 
@@ -44,32 +44,38 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
-        private HitObject fallbackObject;
+        private HitObjectLifetimeEntry fallbackObject;
 
         /// <summary>
         /// Play the most appropriate hit sound for the current point in time.
         /// </summary>
         public void Play()
         {
+            // The most optimal lookup case we have is when an object is alive. There are usually very few alive objects so there's no drawbacks in attempting this lookup each time.
             var nextObject = hitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current)?.HitObject;
 
+            // In the case a next object isn't available in drawable form, we need to do a somewhat expensive traversal to get a valid sound to play.
             if (nextObject == null)
             {
-                if (fallbackObject == null || fallbackObject.StartTime < Time.Current)
+                // This lookup can be skipped if the last entry is still valid (in the future and not yet hit).
+                if (fallbackObject == null || fallbackObject.HitObject.StartTime < Time.Current || fallbackObject.Result.IsHit)
                 {
-                    // in the case a next object isn't available in drawable form, we need to do a somewhat expensive traversal to get a valid sound to play.
-                    // note that we don't want to cache the object if it is an alive object, as once it is hit we don't want to continue playing its sound.
-                    // check whether we can use the previous computed sample.
+                    // We need to use lifetime entries to find the next object (we can't just use `hitObjectContainer.Objects` due to pooling - it may even be empty).
+                    // If required, we can make this lookup more efficient by adding support to get next-future-entry in LifetimeEntryManager.
+                    var lookup = hitObjectContainer.Entries
+                                                   .Where(e => e.Result?.HasResult != true && e.HitObject.StartTime > Time.Current)
+                                                   .OrderBy(e => e.HitObject.StartTime)
+                                                   .FirstOrDefault();
 
-                    // fallback to non-alive objects to find next off-screen object
-                    // TODO: make lookup more efficient?
-                    fallbackObject = hitObjectContainer.Entries
-                                                       .Where(e => e.Result?.HasResult != true && e.HitObject.StartTime > Time.Current)?
-                                                       .OrderBy(e => e.HitObject.StartTime)
-                                                       .FirstOrDefault()?.HitObject ?? hitObjectContainer.Entries.FirstOrDefault()?.HitObject;
+                    // If the lookup failed, use the previously resolved lookup (we still want to play a sound, and it is still likely the most valid result).
+                    if (lookup != null)
+                        fallbackObject = lookup;
+
+                    // If we still can't find anything, just play whatever we can to get a sound out.
+                    fallbackObject ??= hitObjectContainer.Entries.FirstOrDefault();
                 }
 
-                nextObject = fallbackObject;
+                nextObject = fallbackObject?.HitObject;
             }
 
             if (nextObject != null)
