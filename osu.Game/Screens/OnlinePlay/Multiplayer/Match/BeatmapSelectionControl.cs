@@ -52,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         Action = () =>
                         {
                             if (matchSubScreen.IsCurrentScreen())
-                                matchSubScreen.Push(new MultiplayerMatchSongSelect());
+                                matchSubScreen.Push(new MultiplayerMatchSongSelect(matchSubScreen.Room));
                         },
                         Alpha = 0
                     }

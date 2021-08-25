@@ -17,6 +17,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
+using osu.Game.Users;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room), nameof(Room.Playlist))]
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
+        protected override UserActivity InitialActivity => new UserActivity.InLobby(room);
+
         protected readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         [CanBeNull]
@@ -39,14 +42,17 @@ namespace osu.Game.Screens.OnlinePlay
         private IBindable<PlaylistItem> selectedItem { get; set; }
 
         private readonly FreeModSelectOverlay freeModSelectOverlay;
+        private readonly Room room;
 
         private WorkingBeatmap initialBeatmap;
         private RulesetInfo initialRuleset;
         private IReadOnlyList<Mod> initialMods;
         private bool itemSelected;
 
-        protected OnlinePlaySongSelect()
+        protected OnlinePlaySongSelect(Room room)
         {
+            this.room = room;
+
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
 
             freeModSelectOverlay = new FreeModSelectOverlay
