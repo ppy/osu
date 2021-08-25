@@ -101,8 +101,29 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual CarouselItem GetNextToSelect()
         {
-            return Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
-                   Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
+            // our return value should be the item (that is not filtered and) that is nearest to the previously selected one
+
+            // find nearest such item going forwards in selection
+            int forwardsDistance = 0;
+            var forwards = Children.Skip(lastSelectedIndex).SkipWhile((c) =>
+            {
+                forwardsDistance++;
+                return c.Filtered.Value;
+            }).FirstOrDefault();
+            // and backwards
+            int backwardsDistance = 0;
+            var backwards = Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex - 1).SkipWhile((c) =>
+            {
+                backwardsDistance++;
+                return c.Filtered.Value;
+            }).FirstOrDefault();
+
+            // if only one direction had such an item, return that
+            if (forwards == null || backwards == null)
+                return forwards ?? backwards;
+
+            // else return the closest item
+            return forwardsDistance < backwardsDistance ? forwards : backwards;
         }
 
         protected virtual void PerformSelection()
