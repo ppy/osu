@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("last connection displayed", () =>
             {
-                var lastConnection = visualiser.Connections.Last(c => c.ControlPoint.Position.Value == new Vector2(300));
+                var lastConnection = visualiser.Connections.Last(c => c.ControlPoint.Position == new Vector2(300));
                 return lastConnection.DrawWidth > 50;
             });
         }
@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void assertControlPointPathType(int controlPointIndex, PathType? type)
         {
-            AddAssert($"point {controlPointIndex} is {type}", () => slider.Path.ControlPoints[controlPointIndex].Type.Value == type);
+            AddAssert($"point {controlPointIndex} is {type}", () => slider.Path.ControlPoints[controlPointIndex].Type == type);
         }
 
         private void addContextMenuItemStep(string contextMenuText)

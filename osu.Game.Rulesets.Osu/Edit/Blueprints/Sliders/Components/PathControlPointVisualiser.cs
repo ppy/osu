@@ -173,12 +173,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     int thirdPointIndex = indexInSegment + 2;
 
                     if (piece.PointsInSegment.Count > thirdPointIndex + 1)
-                        piece.PointsInSegment[thirdPointIndex].Type.Value = piece.PointsInSegment[0].Type.Value;
+                        piece.PointsInSegment[thirdPointIndex].Type = piece.PointsInSegment[0].Type;
 
                     break;
             }
 
-            piece.ControlPoint.Type.Value = type;
+            piece.ControlPoint.Type = type;
         }
 
         [Resolved(CanBeNull = true)]
