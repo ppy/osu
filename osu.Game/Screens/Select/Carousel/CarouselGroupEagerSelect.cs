@@ -105,17 +105,17 @@ namespace osu.Game.Screens.Select.Carousel
 
             // find nearest such item going forwards in selection
             int forwardsDistance = 0;
-            var forwards = Children.Skip(lastSelectedIndex).SkipWhile((c) =>
+            var forwards = Children.Skip(lastSelectedIndex).SkipWhile(item =>
             {
                 forwardsDistance++;
-                return c.Filtered.Value;
+                return item.Filtered.Value;
             }).FirstOrDefault();
             // and backwards
             int backwardsDistance = 0;
-            var backwards = Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex - 1).SkipWhile((c) =>
+            var backwards = Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex - 1).SkipWhile(item =>
             {
                 backwardsDistance++;
-                return c.Filtered.Value;
+                return item.Filtered.Value;
             }).FirstOrDefault();
 
             // if only one direction had such an item, return that
