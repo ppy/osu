@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -19,6 +20,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -314,6 +316,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("player 2 playing from correct point in time", () => getPlayer(PLAYER_2_ID).ChildrenOfType<DrawableRuleset>().Single().FrameStableClock.CurrentTime > 30000);
         }
 
+        [Test]
+        public void TestPlayersLeaveWhileSpectating()
+        {
+            start(Enumerable.Range(PLAYER_1_ID, 8).ToArray());
+            sendFrames(Enumerable.Range(PLAYER_1_ID, 8).ToArray(), 300);
+
+            loadSpectateScreen();
+
+            for (int i = 7; i >= 0; i--)
+            {
+                var id = PLAYER_1_ID + i;
+
+                end(new[] { id });
+                AddUntilStep("player area grayed", () => getInstance(id).Colour != Color4.White);
+                AddUntilStep("score quit set", () => getLeaderboardScore(id).HasQuit.Value);
+                sendFrames(Enumerable.Range(PLAYER_1_ID, i).ToArray(), 300);
+            }
+        }
+
         private void loadSpectateScreen(bool waitForPlayerLoad = true)
         {
             AddStep("load screen", () =>
@@ -333,10 +354,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 foreach (int id in userIds)
                 {
-                    OnlinePlayDependencies.Client.AddUser(new User { Id = id }, true);
+                    var user = new MultiplayerRoomUser(id)
+                    {
+                        User = new User { Id = id },
+                    };
 
+                    OnlinePlayDependencies.Client.AddUser(user.User, true);
                     SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
-                    playingUsers.Add(new MultiplayerRoomUser(id));
+
+                    playingUsers.Add(user);
+                }
+            });
+        }
+
+        private void end(int[] userIds)
+        {
+            AddStep("end play", () =>
+            {
+                foreach (int id in userIds)
+                {
+                    var user = playingUsers.Single(u => u.UserID == id);
+
+                    OnlinePlayDependencies.Client.RemoveUser(user.User.AsNonNull());
+                    SpectatorClient.EndPlay(id);
+
+                    playingUsers.Remove(user);
                 }
             });
         }
@@ -374,5 +416,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 
         private PlayerArea getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerArea>().Single(p => p.UserId == userId);
+
+        private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId);
     }
 }
