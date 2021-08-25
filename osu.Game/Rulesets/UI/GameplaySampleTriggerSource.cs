@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
@@ -27,20 +25,14 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Container<SkinnableSound> hitSounds;
 
-        [Resolved]
-        private DrawableRuleset drawableRuleset { get; set; }
-
         public GameplaySampleTriggerSource(HitObjectContainer hitObjectContainer)
         {
             this.hitObjectContainer = hitObjectContainer;
-            InternalChildren = new Drawable[]
+
+            InternalChild = hitSounds = new Container<SkinnableSound>
             {
-                hitSounds = new Container<SkinnableSound>
-                {
-                    Name = "concurrent sample pool",
-                    RelativeSizeAxes = Axes.Both,
-                    Children = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound()).ToArray()
-                },
+                Name = "concurrent sample pool",
+                ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound())
             };
         }
 
@@ -74,10 +66,10 @@ namespace osu.Game.Rulesets.UI
         protected HitObject GetMostValidObject()
         {
             // The most optimal lookup case we have is when an object is alive. There are usually very few alive objects so there's no drawbacks in attempting this lookup each time.
-            var nextObject = hitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current)?.HitObject;
+            var hitObject = hitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current)?.HitObject;
 
             // In the case a next object isn't available in drawable form, we need to do a somewhat expensive traversal to get a valid sound to play.
-            if (nextObject == null)
+            if (hitObject == null)
             {
                 // This lookup can be skipped if the last entry is still valid (in the future and not yet hit).
                 if (fallbackObject == null || fallbackObject.HitObject.StartTime < Time.Current || fallbackObject.Result?.IsHit == true)
@@ -97,15 +89,15 @@ namespace osu.Game.Rulesets.UI
                     fallbackObject ??= hitObjectContainer.Entries.FirstOrDefault();
                 }
 
-                nextObject = fallbackObject?.HitObject;
+                hitObject = fallbackObject?.HitObject;
             }
 
-            return nextObject;
+            return hitObject;
         }
 
         private SkinnableSound getNextSample()
         {
-            var hitSound = hitSounds[nextHitSoundIndex];
+            SkinnableSound hitSound = hitSounds[nextHitSoundIndex];
 
             // round robin over available samples to allow for concurrent playback.
             nextHitSoundIndex = (nextHitSoundIndex + 1) % max_concurrent_hitsounds;
