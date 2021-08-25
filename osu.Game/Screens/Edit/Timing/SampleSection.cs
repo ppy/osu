@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -42,15 +43,6 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        protected override SampleControlPoint CreatePoint()
-        {
-            var reference = Beatmap.ControlPointInfo.SamplePointAt(SelectedGroup.Value.Time);
-
-            return new SampleControlPoint
-            {
-                SampleBank = reference.SampleBank,
-                SampleVolume = reference.SampleVolume,
-            };
-        }
+        protected override SampleControlPoint CreatePoint() => new SampleControlPoint(); // TODO: remove
     }
 }
