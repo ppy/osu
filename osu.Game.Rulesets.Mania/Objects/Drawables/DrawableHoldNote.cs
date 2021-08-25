@@ -275,9 +275,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return false;
 
             beginHoldAt(Time.Current - Head.HitObject.StartTime);
-            Head.UpdateResult();
 
-            return true;
+            return Head.UpdateResult();
         }
 
         private void beginHoldAt(double timeOffset)
