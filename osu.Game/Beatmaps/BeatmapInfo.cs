@@ -95,6 +95,10 @@ namespace osu.Game.Beatmaps
         public bool EpilepsyWarning { get; set; }
 
         public CountdownType Countdown { get; set; } = CountdownType.Normal;
+
+        /// <summary>
+        /// The number of beats to move the countdown backwards (compared to its default location).
+        /// </summary>
         public int CountdownOffset { get; set; }
 
         // Editor
