@@ -328,7 +328,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 var id = PLAYER_1_ID + count;
 
-                end(new[] { id });
+                end(id);
                 AddUntilStep("player area grayed", () => getInstance(id).Colour != Color4.White);
                 AddUntilStep("score quit set", () => getLeaderboardScore(id).HasQuit.Value);
                 sendFrames(getPlayerIds(count), 300);
@@ -367,19 +367,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private void end(int[] userIds)
+        private void end(int userId)
         {
-            AddStep("end play", () =>
+            AddStep($"end play for {userId}", () =>
             {
-                foreach (int id in userIds)
-                {
-                    var user = playingUsers.Single(u => u.UserID == id);
+                var user = playingUsers.Single(u => u.UserID == userId);
 
-                    OnlinePlayDependencies.Client.RemoveUser(user.User.AsNonNull());
-                    SpectatorClient.EndPlay(id);
+                OnlinePlayDependencies.Client.RemoveUser(user.User.AsNonNull());
+                SpectatorClient.EndPlay(userId);
 
-                    playingUsers.Remove(user);
-                }
+                playingUsers.Remove(user);
             });
         }
 
