@@ -106,8 +106,11 @@ namespace osu.Game.Rulesets.Objects
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            // This is done here since ApplyDefaultsToSelf may be used to determine the end time
-            SampleControlPoint = controlPointInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
+            if (controlPointInfo is LegacyControlPointInfo legacyInfo)
+            {
+                // This is done here since ApplyDefaultsToSelf may be used to determine the end time
+                SampleControlPoint = legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
+            }
 
             nestedHitObjects.Clear();
 
