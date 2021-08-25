@@ -616,55 +616,72 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selection was remembered", () => eagerSelectedIDs.Count == 1);
         }
 
-        [Test]
-        public void TestRandomFallbackOnNonMatchingPrevious()
+        [TestCase(10, 1)]
+        [TestCase(10, 10)]
+        public void TestCarouselSelectsNextWhenPreviousIsFiltered(int makeThisManyGroups, int haveThisManySetsInGroup)
         {
-            List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
 
-            AddStep("populate maps", () =>
+            for (int i = 0; i < makeThisManyGroups; i++)
             {
-                for (int i = 0; i < 10; i++)
+                for (int j = 0; j < haveThisManySetsInGroup; j++)
                 {
-                    var set = createTestBeatmapSet(i);
-
-                    foreach (var b in set.Beatmaps)
+                    var testBeatmap = createTestBeatmapSet(i * haveThisManySetsInGroup + j + 1);
+                    var rulesetID = i % 3;
+                    testBeatmap.Beatmaps.ForEach(b =>
                     {
-                        // all taiko except for first
-                        int ruleset = i > 0 ? 1 : 0;
-
-                        b.Ruleset = rulesets.GetRuleset(ruleset);
-                        b.RulesetID = ruleset;
-                    }
-
-                    manySets.Add(set);
+                        b.Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID);
+                        b.RulesetID = rulesetID;
+                    });
+                    sets.Add(testBeatmap);
                 }
-            });
-
-            loadBeatmaps(manySets);
-
-            for (int i = 0; i < 10; i++)
-            {
-                AddStep("Reset filter", () => carousel.Filter(new FilterCriteria(), false));
-
-                AddStep("select first beatmap", () => carousel.SelectBeatmap(manySets.First().Beatmaps.First()));
-
-                AddStep("Toggle non-matching filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria { SearchText = Guid.NewGuid().ToString() }, false);
-                });
-
-                AddAssert("selection lost", () => carousel.SelectedBeatmap == null);
-
-                AddStep("Restore different ruleset filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.GetRuleset(1) }, false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
-                });
-
-                AddAssert("selection changed", () => carousel.SelectedBeatmap != manySets.First().Beatmaps.First());
             }
 
-            AddAssert("Selection was random", () => eagerSelectedIDs.Count > 2);
+            loadBeatmaps(sets);
+            setSelected(1, 1);
+            advanceSelection(false);
+
+            for (int i = 1; i < makeThisManyGroups; i++)
+            {
+                var rulesetID = i % 3;
+                AddStep($"Toggle filter to ruleset {rulesetID}", () =>
+                {
+                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID) }, false);
+                    carousel.Filter(new FilterCriteria(), false);
+                });
+                waitForSelection(i * haveThisManySetsInGroup + 1);
+            }
+        }
+
+        [Test]
+        public void TestCarouselSelectsBackwardsWhenPreviousIsFilteredNearTheEnd()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            for (int i = 1; i <= 40; i++)
+            {
+                var testBeatmap = createTestBeatmapSet(i);
+                var rulesetID = (i - 1) / 10;
+                testBeatmap.Beatmaps.ForEach(b =>
+                {
+                    b.Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID);
+                    b.RulesetID = rulesetID;
+                });
+                sets.Add(testBeatmap);
+            }
+
+            loadBeatmaps(sets);
+
+            for (int i = 1; i < 4; i++)
+            {
+                setSelected(i * 10 + 1, 1);
+                AddStep("Toggle filter to ruleset 0", () =>
+                {
+                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false);
+                    carousel.Filter(new FilterCriteria(), false);
+                });
+                waitForSelection(10);
+            }
         }
 
         [Test]
