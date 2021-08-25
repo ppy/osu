@@ -13,12 +13,15 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class PlaylistsPlayer : RoomSubmittingPlayer
     {
         public Action Exited;
+
+        protected override UserActivity InitialActivity => new UserActivity.InPlaylistGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         public PlaylistsPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration configuration = null)
             : base(room, playlistItem, configuration)
