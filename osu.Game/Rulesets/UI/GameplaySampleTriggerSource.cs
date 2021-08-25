@@ -49,7 +49,29 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Play the most appropriate hit sound for the current point in time.
         /// </summary>
-        public void Play()
+        public virtual void Play()
+        {
+            var nextObject = GetMostValidObject();
+
+            if (nextObject == null)
+                return;
+
+            var samples = nextObject.Samples
+                                    .Select(s => nextObject.SampleControlPoint.ApplyTo(s))
+                                    .Cast<ISampleInfo>()
+                                    .ToArray();
+
+            PlaySamples(samples);
+        }
+
+        protected void PlaySamples(ISampleInfo[] samples)
+        {
+            var hitSound = getNextSample();
+            hitSound.Samples = samples;
+            hitSound.Play();
+        }
+
+        protected HitObject GetMostValidObject()
         {
             // The most optimal lookup case we have is when an object is alive. There are usually very few alive objects so there's no drawbacks in attempting this lookup each time.
             var nextObject = hitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current)?.HitObject;
@@ -58,7 +80,7 @@ namespace osu.Game.Rulesets.UI
             if (nextObject == null)
             {
                 // This lookup can be skipped if the last entry is still valid (in the future and not yet hit).
-                if (fallbackObject == null || fallbackObject.HitObject.StartTime < Time.Current || fallbackObject.Result.IsHit)
+                if (fallbackObject == null || fallbackObject.HitObject.StartTime < Time.Current || fallbackObject.Result?.IsHit == true)
                 {
                     // We need to use lifetime entries to find the next object (we can't just use `hitObjectContainer.Objects` due to pooling - it may even be empty).
                     // If required, we can make this lookup more efficient by adding support to get next-future-entry in LifetimeEntryManager.
@@ -78,16 +100,8 @@ namespace osu.Game.Rulesets.UI
                 nextObject = fallbackObject?.HitObject;
             }
 
-            if (nextObject != null)
-            {
-                var hitSound = getNextSample();
-                hitSound.Samples = GetPlayableSampleInfo(nextObject).Select(s => nextObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
-                hitSound.Play();
-            }
+            return nextObject;
         }
-
-        protected virtual HitSampleInfo[] GetPlayableSampleInfo(HitObject nextObject) =>
-            nextObject.Samples.ToArray();
 
         private SkinnableSound getNextSample()
         {
