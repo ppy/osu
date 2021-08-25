@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// TODO: eventually make this inherit Screen and add a local screen stack inside the Editor.
     /// </summary>
-    public abstract class EditorScreen : Container
+    public abstract class EditorScreen : VisibilityContainer
     {
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
@@ -31,13 +31,16 @@ namespace osu.Game.Screens.Edit
             InternalChild = content = new Container { RelativeSizeAxes = Axes.Both };
         }
 
-        protected override void LoadComplete()
+        protected override void PopIn()
         {
-            base.LoadComplete();
+            this.ScaleTo(1f, 200, Easing.OutQuint)
+                .FadeIn(200, Easing.OutQuint);
+        }
 
-            this.FadeTo(0)
-                .Then()
-                .FadeTo(1f, 250, Easing.OutQuint);
+        protected override void PopOut()
+        {
+            this.ScaleTo(0.98f, 200, Easing.OutQuint)
+                .FadeOut(200, Easing.OutQuint);
         }
     }
 }
