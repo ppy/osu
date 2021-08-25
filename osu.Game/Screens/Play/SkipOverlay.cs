@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Play
         private FadeContainer fadeContainer;
         private double displayTime;
 
+        private bool isClickable;
+
         [Resolved]
         private GameplayClock gameplayClock { get; set; }
 
@@ -124,17 +126,18 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            var progress = fadeOutBeginTime <= displayTime ? 1 : Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
+            double progress = fadeOutBeginTime <= displayTime ? 1 : Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
 
             remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-            button.Enabled.Value = progress > 0;
-            buttonContainer.State.Value = progress > 0 ? Visibility.Visible : Visibility.Hidden;
+            isClickable = progress > 0;
+            button.Enabled.Value = isClickable;
+            buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (!e.HasAnyButtonPressed)
+            if (isClickable && !e.HasAnyButtonPressed)
                 fadeContainer.Show();
 
             return base.OnMouseMove(e);
