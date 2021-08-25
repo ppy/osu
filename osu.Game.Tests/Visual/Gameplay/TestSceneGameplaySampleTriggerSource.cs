@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 },
                 new HitCircle
                 {
-                    StartTime = t += spacing,
+                    StartTime = t + spacing,
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE) },
                     SampleControlPoint = new SampleControlPoint { SampleBank = "soft" },
                 },
