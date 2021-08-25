@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 SelectedMods.Value = Array.Empty<Mod>();
             });
 
-            AddStep("create song select", () => LoadScreen(songSelect = new TestPlaylistsSongSelect()));
+            AddStep("create song select", () => LoadScreen(songSelect = new TestPlaylistsSongSelect(SelectedRoom.Value)));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen());
         }
 
@@ -183,6 +183,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private class TestPlaylistsSongSelect : PlaylistsSongSelect
         {
             public new MatchBeatmapDetailArea BeatmapDetails => (MatchBeatmapDetailArea)base.BeatmapDetails;
+
+            public TestPlaylistsSongSelect(Room room)
+                : base(room)
+            {
+            }
         }
     }
 }

@@ -412,7 +412,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            this.Push(new MultiplayerMatchSongSelect(beatmap, ruleset));
+            this.Push(new MultiplayerMatchSongSelect(Room, beatmap, ruleset));
         }
 
         protected override void Dispose(bool isDisposing)

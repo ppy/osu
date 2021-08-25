@@ -17,6 +17,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
@@ -27,6 +28,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         // Disallow fails in multiplayer for now.
         protected override bool CheckModsAllowFailure() => false;
+
+        protected override UserActivity InitialActivity => new UserActivity.InMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
         private MultiplayerClient client { get; set; }
