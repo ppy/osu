@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.UI
         protected HitObject GetMostValidObject()
         {
             // The most optimal lookup case we have is when an object is alive. There are usually very few alive objects so there's no drawbacks in attempting this lookup each time.
-            var hitObject = hitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.IsHit != true)?.HitObject;
+            var hitObject = hitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject;
 
             // In the case a next object isn't available in drawable form, we need to do a somewhat expensive traversal to get a valid sound to play.
             if (hitObject == null)
