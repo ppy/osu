@@ -66,27 +66,23 @@ namespace osu.Game.Rulesets.UI
         protected HitObject GetMostValidObject()
         {
             // The most optimal lookup case we have is when an object is alive. There are usually very few alive objects so there's no drawbacks in attempting this lookup each time.
-            var hitObject = hitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current)?.HitObject;
+            var hitObject = hitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.IsHit != true)?.HitObject;
 
             // In the case a next object isn't available in drawable form, we need to do a somewhat expensive traversal to get a valid sound to play.
             if (hitObject == null)
             {
                 // This lookup can be skipped if the last entry is still valid (in the future and not yet hit).
-                if (fallbackObject == null || fallbackObject.HitObject.StartTime < Time.Current || fallbackObject.Result?.IsHit == true)
+                if (fallbackObject == null || fallbackObject.Result?.HasResult == true)
                 {
                     // We need to use lifetime entries to find the next object (we can't just use `hitObjectContainer.Objects` due to pooling - it may even be empty).
                     // If required, we can make this lookup more efficient by adding support to get next-future-entry in LifetimeEntryManager.
-                    var lookup = hitObjectContainer.Entries
-                                                   .Where(e => e.Result?.HasResult != true && e.HitObject.StartTime > Time.Current)
-                                                   .OrderBy(e => e.HitObject.StartTime)
-                                                   .FirstOrDefault();
+                    fallbackObject = hitObjectContainer.Entries
+                                                       .Where(e => e.Result?.HasResult != true)
+                                                       .OrderBy(e => e.HitObject.StartTime)
+                                                       .FirstOrDefault();
 
-                    // If the lookup failed, use the previously resolved lookup (we still want to play a sound, and it is still likely the most valid result).
-                    if (lookup != null)
-                        fallbackObject = lookup;
-
-                    // If we still can't find anything, just play whatever we can to get a sound out.
-                    fallbackObject ??= hitObjectContainer.Entries.FirstOrDefault();
+                    // In the case there are no unjudged objects, the last hit object should be used instead.
+                    fallbackObject ??= hitObjectContainer.Entries.LastOrDefault();
                 }
 
                 hitObject = fallbackObject?.HitObject;
