@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestGeneral()
         {
-            int[] userIds = Enumerable.Range(0, 4).Select(i => PLAYER_1_ID + i).ToArray();
+            int[] userIds = getPlayerIds(4);
 
             start(userIds);
             loadSpectateScreen();
@@ -319,19 +319,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestPlayersLeaveWhileSpectating()
         {
-            start(Enumerable.Range(PLAYER_1_ID, 8).ToArray());
-            sendFrames(Enumerable.Range(PLAYER_1_ID, 8).ToArray(), 300);
+            start(getPlayerIds(8));
+            sendFrames(getPlayerIds(8), 300);
 
             loadSpectateScreen();
 
-            for (int i = 7; i >= 0; i--)
+            for (int count = 7; count >= 0; count--)
             {
-                var id = PLAYER_1_ID + i;
+                var id = PLAYER_1_ID + count;
 
                 end(new[] { id });
                 AddUntilStep("player area grayed", () => getInstance(id).Colour != Color4.White);
                 AddUntilStep("score quit set", () => getLeaderboardScore(id).HasQuit.Value);
-                sendFrames(Enumerable.Range(PLAYER_1_ID, i).ToArray(), 300);
+                sendFrames(getPlayerIds(count), 300);
             }
         }
 
@@ -418,5 +418,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private PlayerArea getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerArea>().Single(p => p.UserId == userId);
 
         private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId);
+
+        private int[] getPlayerIds(int count) => Enumerable.Range(PLAYER_1_ID, count).ToArray();
     }
 }
