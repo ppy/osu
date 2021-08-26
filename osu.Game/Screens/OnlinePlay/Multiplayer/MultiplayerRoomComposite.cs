@@ -20,7 +20,36 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             Client.RoomUpdated += OnRoomUpdated;
+
+            Client.UserLeft += UserLeft;
+            Client.UserKicked += UserKicked;
+            Client.UserJoined += UserJoined;
+
             OnRoomUpdated();
+        }
+
+        /// <summary>
+        /// Invoked when a user has joined the room.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        protected virtual void UserJoined(MultiplayerRoomUser user)
+        {
+        }
+
+        /// <summary>
+        /// Invoked when a user has been kicked from the room (including the local user).
+        /// </summary>
+        /// <param name="user">The user.</param>
+        protected virtual void UserKicked(MultiplayerRoomUser user)
+        {
+        }
+
+        /// <summary>
+        /// Invoked when a user has left the room.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        protected virtual void UserLeft(MultiplayerRoomUser user)
+        {
         }
 
         /// <summary>
@@ -33,7 +62,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override void Dispose(bool isDisposing)
         {
             if (Client != null)
+            {
+                Client.UserLeft -= UserLeft;
+                Client.UserKicked -= UserKicked;
+                Client.UserJoined -= UserJoined;
                 Client.RoomUpdated -= OnRoomUpdated;
+            }
 
             base.Dispose(isDisposing);
         }
