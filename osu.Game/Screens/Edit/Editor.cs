@@ -605,19 +605,14 @@ namespace osu.Game.Screens.Edit
         {
             var lastScreen = currentScreen;
 
-            lastScreen?
-                .ScaleTo(0.98f, 200, Easing.OutQuint)
-                .FadeOut(200, Easing.OutQuint);
+            lastScreen?.Hide();
 
             try
             {
                 if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
                 {
                     screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
-
-                    currentScreen
-                        .ScaleTo(1, 200, Easing.OutQuint)
-                        .FadeIn(200, Easing.OutQuint);
+                    currentScreen.Show();
                     return;
                 }
 
@@ -650,7 +645,10 @@ namespace osu.Game.Screens.Edit
                 LoadComponentAsync(currentScreen, newScreen =>
                 {
                     if (newScreen == currentScreen)
+                    {
                         screenContainer.Add(newScreen);
+                        newScreen.Show();
+                    }
                 });
             }
             finally

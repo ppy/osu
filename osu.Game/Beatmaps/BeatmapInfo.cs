@@ -83,7 +83,6 @@ namespace osu.Game.Beatmaps
 
         // General
         public double AudioLeadIn { get; set; }
-        public bool Countdown { get; set; } = true;
         public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
 
@@ -94,6 +93,13 @@ namespace osu.Game.Beatmaps
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
         public bool EpilepsyWarning { get; set; }
+
+        public CountdownType Countdown { get; set; } = CountdownType.Normal;
+
+        /// <summary>
+        /// The number of beats to move the countdown backwards (compared to its default location).
+        /// </summary>
+        public int CountdownOffset { get; set; }
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
