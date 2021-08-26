@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Select.Carousel
             while (true)
             {
                 if (forwardsIndex >= Children.Count)
-                    return Children.Reverse().Skip(Children.Count - backwardsIndex).FirstOrDefault(item => !item.Filtered.Value);
+                    return Children.Reverse().Skip(Children.Count - backwardsIndex - 1).FirstOrDefault(item => !item.Filtered.Value);
 
                 if (backwardsIndex < 0)
                     return Children.Skip(forwardsIndex).FirstOrDefault(item => !item.Filtered.Value);
