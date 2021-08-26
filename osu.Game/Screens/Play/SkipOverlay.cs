@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Play
         public override void Show()
         {
             base.Show();
-            fadeContainer.Show();
+            fadeContainer.TriggerShow();
         }
 
         protected override void LoadComplete()
