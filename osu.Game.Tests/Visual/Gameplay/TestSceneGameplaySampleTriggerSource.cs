@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             HitObjectLifetimeEntry nextObjectEntry = null;
 
-            AddUntilStep("no alive objects", () => getNextAliveObject() == null);
+            AddAssert("no alive objects", () => getNextAliveObject() == null);
 
             AddAssert("check initially correct object", () => sampleTriggerSource.GetMostValidObject() == beatmap.HitObjects[0]);
 
