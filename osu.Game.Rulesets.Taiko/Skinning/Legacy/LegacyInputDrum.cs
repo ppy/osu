@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             public readonly Sprite Centre;
 
             [Resolved]
-            private InputDrum.DrumSampleTriggerSource sampleTriggerSource { get; set; }
+            private DrumSampleTriggerSource sampleTriggerSource { get; set; }
 
             public LegacyHalfDrum(bool flipped)
             {
