@@ -54,11 +54,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
 
-        /// <summary>
-        /// Gets the samples that are played by this object during gameplay.
-        /// </summary>
-        public ISampleInfo[] GetGameplaySamples() => Samples.Samples;
-
         protected PausableSkinnableSound Samples { get; private set; }
 
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
