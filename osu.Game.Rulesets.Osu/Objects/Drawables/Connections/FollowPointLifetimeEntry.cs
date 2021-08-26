@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
         }
 
-        private bool wasBound = false;
+        private bool wasBound;
 
         private void bindEvents()
         {
