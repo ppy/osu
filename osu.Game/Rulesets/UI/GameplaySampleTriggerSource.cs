@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.UI
             InternalChild = hitSounds = new Container<SkinnableSound>
             {
                 Name = "concurrent sample pool",
-                ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound())
+                ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound())
             };
         }
 
