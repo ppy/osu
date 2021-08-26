@@ -199,6 +199,5 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
             }
         }
-
     }
 }
