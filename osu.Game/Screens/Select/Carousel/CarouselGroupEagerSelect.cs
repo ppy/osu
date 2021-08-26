@@ -99,31 +99,32 @@ namespace osu.Game.Screens.Select.Carousel
             PerformSelection();
         }
 
+        /// <summary>
+        /// Finds the item this group would select next if it attempted selection
+        /// </summary>
+        /// <returns>An unfiltered item nearest to the last selected one or null if all items are filtered</returns>
         protected virtual CarouselItem GetNextToSelect()
         {
-            // our return value should be the item (that is not filtered and) that is nearest to the previously selected one
+            int forwardsIndex = lastSelectedIndex;
+            int backwardsIndex = lastSelectedIndex;
 
-            // find nearest such item going forwards in selection
-            int forwardsDistance = 0;
-            var forwards = Children.Skip(lastSelectedIndex).SkipWhile(item =>
+            while (true)
             {
-                forwardsDistance++;
-                return item.Filtered.Value;
-            }).FirstOrDefault();
-            // and backwards
-            int backwardsDistance = 0;
-            var backwards = Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex - 1).SkipWhile(item =>
-            {
-                backwardsDistance++;
-                return item.Filtered.Value;
-            }).FirstOrDefault();
+                if (forwardsIndex >= Children.Count)
+                    return Children.Reverse().Skip(Children.Count - backwardsIndex).FirstOrDefault(item => !item.Filtered.Value);
 
-            // if only one direction had such an item, return that
-            if (forwards == null || backwards == null)
-                return forwards ?? backwards;
+                if (backwardsIndex < 0)
+                    return Children.Skip(forwardsIndex).FirstOrDefault(item => !item.Filtered.Value);
 
-            // else return the closest item
-            return forwardsDistance < backwardsDistance ? forwards : backwards;
+                if (!Children[forwardsIndex].Filtered.Value)
+                    return Children[forwardsIndex];
+
+                if (!Children[backwardsIndex].Filtered.Value)
+                    return Children[backwardsIndex];
+
+                forwardsIndex++;
+                backwardsIndex--;
+            }
         }
 
         protected virtual void PerformSelection()
