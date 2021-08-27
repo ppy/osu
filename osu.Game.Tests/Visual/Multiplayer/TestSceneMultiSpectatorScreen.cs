@@ -333,6 +333,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddUntilStep($"{id} score quit set", () => getLeaderboardScore(id).HasQuit.Value);
                 sendFrames(getPlayerIds(count), 300);
             }
+
+            Player player = null;
+
+            AddStep($"get {PLAYER_1_ID} player instance", () => player = getInstance(PLAYER_1_ID).ChildrenOfType<Player>().Single());
+
+            start(new[] { PLAYER_1_ID });
+            sendFrames(PLAYER_1_ID, 300);
+
+            AddAssert($"{PLAYER_1_ID} player instance still same", () => getInstance(PLAYER_1_ID).ChildrenOfType<Player>().Single() == player);
+            AddAssert($"{PLAYER_1_ID} area still grayed", () => getInstance(PLAYER_1_ID).Colour != Color4.White);
+            AddAssert($"{PLAYER_1_ID} score quit still set", () => getLeaderboardScore(PLAYER_1_ID).HasQuit.Value);
         }
 
         private void loadSpectateScreen(bool waitForPlayerLoad = true)
