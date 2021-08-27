@@ -17,6 +17,7 @@
       "osu.Game.Tournament\\osu.Game.Tournament.csproj",
       "osu.Game\\osu.Game.csproj",
       "M.Resources\\M.Resources.csproj",
+      "M.DBus\\M.DBus.csproj",
       "Mvis.Plugin.StoryboardSupport\\Mvis.Plugin.StoryboardSupport.csproj",
       "Mvis.Plugin.CollectionSupport\\Mvis.Plugin.CollectionSupport.csproj",
       "Mvis.Plugin.Yasp\\Mvis.Plugin.Yasp.csproj",

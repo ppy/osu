@@ -69,6 +69,9 @@ namespace osu.Game.Configuration
 
             //Gamemode集成
             SetDefault(MSetting.Gamemode, GamemodeActivateCondition.InGame);
+
+            //DBus集成
+            SetDefault(MSetting.DBusIntegration, true);
         }
 
         public Color4 GetCustomLoaderColor()
@@ -121,7 +124,8 @@ namespace osu.Game.Configuration
         Gamemode,
         DoNotShowDisclaimer,
         LoaderBackgroundColor,
-        MvisCurrentFunctionBar
+        MvisCurrentFunctionBar,
+        DBusIntegration
     }
 
     public enum GamemodeActivateCondition

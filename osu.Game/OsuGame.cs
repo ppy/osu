@@ -21,6 +21,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
+using M.DBus;
+using M.DBus.Services;
 using osu.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -54,12 +56,14 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using osu.Game.DBus;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Localisation;
 using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
+using Tmds.DBus;
 
 namespace osu.Game
 {
@@ -156,7 +160,9 @@ namespace osu.Game
 
         private OsuLogo osuLogo;
 
+        private DBusManager dBusManager;
         private MvisPluginManager mvisPlManager;
+        private BeatmapInfoDBusService beatmapService;
         private Bindable<GamemodeActivateCondition> gamemodeCondition;
 
         private MainMenu menuScreen;
@@ -288,6 +294,26 @@ namespace osu.Game
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
             dependencies.Cache(mvisPlManager = new MvisPluginManager());
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                dBusManager = new DBusManager(
+                    false,
+                    true,
+                    MConfig.GetBindable<bool>(MSetting.DBusIntegration));
+
+                UserInfoDBusService userInfoService;
+                dBusManager.RegisterNewObjects(new IDBusObject[]
+                {
+                    beatmapService = new BeatmapInfoDBusService(),
+                    new Greet(GetType().Namespace + '.' + GetType().Name),
+                    userInfoService = new UserInfoDBusService()
+                });
+
+                API.LocalUser.BindValueChanged(v => userInfoService.User = v.NewValue, true);
+
+                dependencies.Cache(dBusManager);
+            }
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
@@ -598,6 +624,8 @@ namespace osu.Game
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
+            beatmapService.Beatmap = beatmap.NewValue;
+
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
         }
@@ -768,6 +796,9 @@ namespace osu.Game
                 idleTracker,
                 new ConfineMouseTracker()
             });
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                Add(dBusManager);
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
