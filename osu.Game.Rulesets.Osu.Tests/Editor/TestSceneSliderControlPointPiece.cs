@@ -108,9 +108,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestDragControlPointPathAfterChangingType()
         {
-            AddStep("change type to bezier", () => slider.Path.ControlPoints[2].Type.Value = PathType.Bezier);
+            AddStep("change type to bezier", () => slider.Path.ControlPoints[2].Type = PathType.Bezier);
             AddStep("add point", () => slider.Path.ControlPoints.Add(new PathControlPoint(new Vector2(500, 10))));
-            AddStep("change type to perfect", () => slider.Path.ControlPoints[3].Type.Value = PathType.PerfectCurve);
+            AddStep("change type to perfect", () => slider.Path.ControlPoints[3].Type = PathType.PerfectCurve);
 
             moveMouseToControlPoint(4);
             AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
@@ -137,15 +137,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             AddStep($"move mouse to control point {index}", () =>
             {
-                Vector2 position = slider.Position + slider.Path.ControlPoints[index].Position.Value;
+                Vector2 position = slider.Position + slider.Path.ControlPoints[index].Position;
                 InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
             });
         }
 
-        private void assertControlPointType(int index, PathType type) => AddAssert($"control point {index} is {type}", () => slider.Path.ControlPoints[index].Type.Value == type);
+        private void assertControlPointType(int index, PathType type) => AddAssert($"control point {index} is {type}", () => slider.Path.ControlPoints[index].Type == type);
 
         private void assertControlPointPosition(int index, Vector2 position) =>
-            AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, slider.Path.ControlPoints[index].Position.Value, 1));
+            AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, slider.Path.ControlPoints[index].Position, 1));
 
         private class TestSliderBlueprint : SliderSelectionBlueprint
         {
