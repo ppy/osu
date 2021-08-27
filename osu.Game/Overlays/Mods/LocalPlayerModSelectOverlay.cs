@@ -14,5 +14,17 @@ namespace osu.Game.Overlays.Mods
             foreach (var section in ModSectionsContainer.Children)
                 section.DeselectTypes(mod.IncompatibleMods, true, mod);
         }
+
+        protected override ModSection CreateModSection(ModType type) => new LocalPlayerModSection(type);
+
+        private class LocalPlayerModSection : ModSection
+        {
+            public LocalPlayerModSection(ModType type)
+                : base(type)
+            {
+            }
+
+            protected override ModButton CreateModButton(Mod mod) => new LocalPlayerModButton(mod);
+        }
     }
 }
