@@ -18,7 +18,7 @@ using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyMainCirclePiece : CompositeDrawable
+    public class LegacyMainCirclePiece : CompositeDrawable, IHasOverlayProxy
     {
         public override bool RemoveCompletedTransforms => false;
 
@@ -36,6 +36,42 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private Container circleSprites;
         private Drawable hitCircleSprite;
         private Drawable hitCircleOverlay;
+        private Drawable aboveNumberProxy;
+        private Container overlayProxy;
+
+        public Drawable OverlayProxy
+        {
+            get
+            {
+                if (overlayProxy == null)
+                {
+                    if (overlayAboveNumber)
+                    {
+                        overlayProxy = new Container
+                        {
+                            Children = new[]
+                            {
+                                hitCircleText.CreateProxy(),
+                                aboveNumberProxy.CreateProxy()
+                            }
+                        };
+                    }
+                    else
+                    {
+                        overlayProxy = new Container
+                        {
+                            Children = new[]
+                            {
+                                hitCircleOverlay.CreateProxy(),
+                                hitCircleText.CreateProxy()
+                            }
+                        };
+                    }
+                }
+
+                return overlayProxy;
+            }
+        }
 
         private SkinnableSpriteText hitCircleText;
 
@@ -47,6 +83,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         [Resolved]
         private ISkinSource skin { get; set; }
+
+        private bool overlayAboveNumber => skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -108,10 +146,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 });
             }
 
-            bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
-
             if (overlayAboveNumber)
-                AddInternal(hitCircleOverlay.CreateProxy());
+                AddInternal(aboveNumberProxy = hitCircleOverlay.CreateProxy());
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);

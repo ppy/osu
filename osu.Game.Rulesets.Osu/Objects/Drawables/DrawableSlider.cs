@@ -41,10 +41,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Bindable<int> pathVersion = new Bindable<int>();
 
         private Container<DrawableSliderHead> headContainer;
+        private Container headOverlayContainer;
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
         private Container<DrawableSliderRepeat> repeatContainer;
-        private Container<Drawable> repeatArrowContainer;
+        private Container repeatArrowContainer;
         private PausableSkinnableSound slidingSample;
 
         public DrawableSlider()
@@ -74,7 +75,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
-                repeatArrowContainer = new Container<Drawable> { RelativeSizeAxes = Axes.Both },
+                repeatArrowContainer = new Container { RelativeSizeAxes = Axes.Both },
+                headOverlayContainer = new Container { RelativeSizeAxes = Axes.Both },
                 slidingSample = new PausableSkinnableSound { Looping = true }
             };
 
@@ -157,6 +159,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case DrawableSliderHead head:
                     headContainer.Child = head;
+                    headOverlayContainer.Child = (head.CirclePiece.Drawable as IHasOverlayProxy)?.OverlayProxy ?? Empty();
                     break;
 
                 case DrawableSliderTail tail:
@@ -179,6 +182,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.ClearNestedHitObjects();
 
             headContainer.Clear(false);
+            headOverlayContainer.Clear(false);
             tailContainer.Clear(false);
             repeatContainer.Clear(false);
             repeatArrowContainer.Clear(false);

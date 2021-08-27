@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class MainCirclePiece : CompositeDrawable
+    public class MainCirclePiece : CompositeDrawable, IHasOverlayProxy
     {
         private readonly CirclePiece circle;
         private readonly RingPiece ring;
@@ -45,6 +45,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; }
+
+        public Drawable OverlayProxy => Empty();
 
         [BackgroundDependencyLoader]
         private void load()
