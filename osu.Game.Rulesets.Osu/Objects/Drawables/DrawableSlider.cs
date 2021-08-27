@@ -44,6 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
         private Container<DrawableSliderRepeat> repeatContainer;
+        private Container<Drawable> repeatArrowContainer;
         private PausableSkinnableSound slidingSample;
 
         public DrawableSlider()
@@ -73,6 +74,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
+                repeatArrowContainer = new Container<Drawable> { RelativeSizeAxes = Axes.Both },
                 slidingSample = new PausableSkinnableSound { Looping = true }
             };
 
@@ -167,6 +169,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 case DrawableSliderRepeat repeat:
                     repeatContainer.Add(repeat);
+                    repeatArrowContainer.Add(repeat.ProxyArrow);
                     break;
             }
         }
@@ -178,6 +181,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             headContainer.Clear(false);
             tailContainer.Clear(false);
             repeatContainer.Clear(false);
+            repeatArrowContainer.Clear(false);
             tickContainer.Clear(false);
         }
 
