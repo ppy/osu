@@ -18,14 +18,15 @@ namespace osu.Game.Overlays
         private void load(GameHost host)
         {
             AddSection(new MfMainSection());
-            AddSection(new MfMvisSection());
-            AddSection(new MfMvisPluginSection());
-            AddSection(new DangerousZone());
 
             if (host is LinuxGameHost)
             {
-                AddSection(new LinuxSettings());
+                AddSection(new LinuxSection());
             }
+
+            AddSection(new MfMvisSection());
+            AddSection(new MfMvisPluginSection());
+            AddSection(new DangerousZone());
         }
     }
 }

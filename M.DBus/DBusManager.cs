@@ -36,7 +36,7 @@ namespace M.DBus
 
         protected override void LoadComplete()
         {
-            controlSource.BindValueChanged(onControlSourceChanged, true);
+            controlSource?.BindValueChanged(onControlSourceChanged, true);
             base.LoadComplete();
         }
 
@@ -73,7 +73,7 @@ namespace M.DBus
                 await currentConnection.ResolveServiceOwnerAsync(
                     ObjectPathToName(dBusObject.ObjectPath),
                     onServiceNameChanged,
-                    e => onServiceError(e, ObjectPathToName(dBusObject.ObjectPath))).ConfigureAwait(false);
+                    e => onServiceError(e, dBusObject)).ConfigureAwait(false);
             }
         }
 
@@ -82,11 +82,11 @@ namespace M.DBus
             Logger.Log($"服务 {args.ServiceName} 的归属现在从 {args.OldOwner} 变为 {args.NewOwner}");
         }
 
-        private void onServiceError(Exception e, string path)
+        private void onServiceError(Exception e, IDBusObject dbusObject)
         {
             connectionState = ConnectionState.Faulted;
 
-            Logger.Error(e, $"位于 {path} 的DBus服务出现错误, 请尝试重新连接到DBus");
+            Logger.Error(e, $"位于 {ObjectPathToName(dbusObject.ObjectPath)} 的DBus服务出现错误");
         }
 
         public async Task RegisterNewObject(IDBusObject dbusObject)
@@ -156,16 +156,16 @@ namespace M.DBus
                         currentConnection.UnregisterServiceAsync(ObjectPathToName(dBusObject.ObjectPath)).ConfigureAwait(false);
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                if (connectionState == ConnectionState.NotConnected)
+                else if (connectionState == ConnectionState.Faulted)
                 {
                     currentConnection.Dispose();
                     currentConnection = null;
+                    connectionState = ConnectionState.NotConnected;
                     Logger.Log("DBus服务已经出现过一次错误, 将处理此次连接。");
                 }
-
+            }
+            catch (Exception e)
+            {
                 Logger.Error(e, "停止DBus服务时出现了错误");
 
                 return false;

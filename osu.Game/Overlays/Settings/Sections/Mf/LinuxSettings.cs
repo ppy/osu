@@ -1,25 +1,21 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
-    public class LinuxSettings : SettingsSection
+    public class LinuxSettings : SettingsSubsection
     {
-        public override Drawable CreateIcon() => new SpriteIcon
-        {
-            Icon = FontAwesome.Brands.Linux
-        };
-
-        public override LocalisableString Header => "Linux";
+        protected override LocalisableString Header => "Linux集成";
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config, OsuConfigManager osuConfig, GameHost host)
+        private void load(MConfigManager config)
         {
-            AddRange(new Drawable[]
+            Children = new Drawable[]
             {
                 new SettingsEnumDropdown<GamemodeActivateCondition>
                 {
@@ -29,10 +25,15 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "DBus集成",
+                    LabelText = "D-Bus集成",
                     Current = config.GetBindable<bool>(MSetting.DBusIntegration)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "允许通过D-Bus发送消息到游戏内",
+                    Current = config.GetBindable<bool>(MSetting.DBusAllowPost)
                 }
-            });
+            };
         }
     }
 }

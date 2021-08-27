@@ -305,9 +305,22 @@ namespace osu.Game
                 UserInfoDBusService userInfoService;
                 dBusManager.RegisterNewObjects(new IDBusObject[]
                 {
+                    new Greet(GetType().Namespace + '.' + GetType().Name)
+                    {
+                        AllowPost = MConfig.GetBindable<bool>(MSetting.DBusAllowPost),
+                        OnMessageRecive = s => Schedule(() =>
+                        {
+                            Notifications.Post(new SimpleNotification()
+                            {
+                                Text = "收到一条来自DBus的消息: \n" + s
+                            });
+                        })
+                    },
                     beatmapService = new BeatmapInfoDBusService(),
-                    new Greet(GetType().Namespace + '.' + GetType().Name),
-                    userInfoService = new UserInfoDBusService()
+                    userInfoService = new UserInfoDBusService
+                    {
+                        Ruleset = this.Ruleset
+                    }
                 });
 
                 API.LocalUser.BindValueChanged(v => userInfoService.User = v.NewValue, true);

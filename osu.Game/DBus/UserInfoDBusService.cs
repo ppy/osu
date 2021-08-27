@@ -1,5 +1,8 @@
+using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using osu.Framework.Bindables;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 using Tmds.DBus;
 
@@ -13,6 +16,9 @@ namespace osu.Game.DBus
         Task<string> GetUserRankAsync();
         Task<string> GetUserCountryRegionRankAsync();
         Task<string> GetUserAvatarUrlAsync();
+        Task<string> GetPPAsync();
+        Task<string> GetCurrentRulesetAsync();
+        Task<string> GetLaunchTimeAsync();
     }
 
     public class UserInfoDBusService : IUserInfoDBusService
@@ -22,6 +28,10 @@ namespace osu.Game.DBus
 
         [NotNull]
         public User User { get; set; }
+
+        public IBindable<RulesetInfo> Ruleset { get; set; }
+
+        private readonly TimeSpan loadTick = new TimeSpan(DateTime.Now.Ticks);
 
         public Task<string> GetUserNameAsync()
         {
@@ -45,5 +55,27 @@ namespace osu.Game.DBus
 
         public Task<string> GetUserAvatarUrlAsync()
             => Task.FromResult(User.AvatarUrl ?? "???");
+
+        public Task<string> GetPPAsync()
+            => Task.FromResult(User.Statistics?.PP > 0 ? User.Statistics.PP.ToString() : "-1");
+
+        public Task<string> GetCurrentRulesetAsync()
+            => Task.FromResult(Ruleset.Value?.Name ?? "???");
+
+        public Task<string> GetLaunchTimeAsync()
+            => Task.FromResult(getLaunchTime());
+
+        private string getLaunchTime()
+        {
+            string result = string.Empty;
+            var currentTick = new TimeSpan(DateTime.Now.Ticks);
+            var xE = currentTick.Subtract(loadTick);
+
+            if (xE.Hours > 0)
+                result += $"{(xE.Hours + xE.Days * 24):00}:";
+
+            result += $"{xE.Minutes:00}:{xE.Seconds:00}";
+            return result;
+        }
     }
 }

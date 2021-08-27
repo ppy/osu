@@ -72,6 +72,7 @@ namespace osu.Game.Configuration
 
             //DBus集成
             SetDefault(MSetting.DBusIntegration, true);
+            SetDefault(MSetting.DBusAllowPost, true);
         }
 
         public Color4 GetCustomLoaderColor()
@@ -125,7 +126,8 @@ namespace osu.Game.Configuration
         DoNotShowDisclaimer,
         LoaderBackgroundColor,
         MvisCurrentFunctionBar,
-        DBusIntegration
+        DBusIntegration,
+        DBusAllowPost
     }
 
     public enum GamemodeActivateCondition

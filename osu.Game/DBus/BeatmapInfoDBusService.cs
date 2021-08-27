@@ -8,6 +8,10 @@ namespace osu.Game.DBus
     public interface IBeatmapInfoDBusService : IDBusObject
     {
         Task<string> GetCurrentBeatmapInfoAsync();
+        Task<double> GetTrackLengthAsync();
+        Task<double> GetTrackProgressAsync();
+        Task<string> GetCurrentVersionAsync();
+        Task<double> GetCurrentStarDifficultyAsync();
     }
 
     public class BeatmapInfoDBusService : IBeatmapInfoDBusService
@@ -25,5 +29,17 @@ namespace osu.Game.DBus
 
             return Task.FromResult(info);
         }
+
+        public Task<double> GetTrackLengthAsync()
+            => Task.FromResult(Beatmap.Track.Length);
+
+        public Task<double> GetTrackProgressAsync()
+            => Task.FromResult(Beatmap.Track.CurrentTime);
+
+        public Task<string> GetCurrentVersionAsync()
+            => Task.FromResult(Beatmap.BeatmapInfo.Version);
+
+        public Task<double> GetCurrentStarDifficultyAsync()
+            => Task.FromResult(Beatmap.BeatmapInfo.StarDifficulty);
     }
 }
