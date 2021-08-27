@@ -339,7 +339,7 @@ namespace osu.Game.Rulesets.Scoring
             score.Accuracy = Accuracy.Value;
             score.Rank = Rank.Value;
 
-            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.IsScorable()))
+            foreach (var result in HitResultExtensions.SCORABLE_TYPES)
                 score.Statistics[result] = GetStatistic(result);
 
             score.HitEvents = hitEvents;

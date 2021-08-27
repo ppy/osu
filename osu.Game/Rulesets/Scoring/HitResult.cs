@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Scoring
@@ -170,6 +172,11 @@ namespace osu.Game.Rulesets.Scoring
         /// Whether a <see cref="HitResult"/> is scorable.
         /// </summary>
         public static bool IsScorable(this HitResult result) => result >= HitResult.Miss && result < HitResult.IgnoreMiss;
+
+        /// <summary>
+        /// An array of all scorable <see cref="HitResult"/>s.
+        /// </summary>
+        public static readonly HitResult[] SCORABLE_TYPES = ((HitResult[])Enum.GetValues(typeof(HitResult))).Where(r => r.IsScorable()).ToArray();
 
         /// <summary>
         /// Whether a <see cref="HitResult"/> is valid within a given <see cref="HitResult"/> range.
