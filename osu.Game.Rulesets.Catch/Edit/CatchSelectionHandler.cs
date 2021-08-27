@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                     juiceStream.OriginalX = selectionRange.GetFlippedPosition(juiceStream.OriginalX);
 
                     foreach (var point in juiceStream.Path.ControlPoints)
-                        point.Position.Value *= new Vector2(-1, 1);
+                        point.Position *= new Vector2(-1, 1);
 
                     EditorBeatmap.Update(juiceStream);
                     return true;
