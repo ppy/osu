@@ -184,12 +184,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddRepeatStep("player joins", playerJoin, 5);
 
             // all ready
-            AddRepeatStep("players ready up", () =>
+            AddUntilStep("all players ready", () =>
             {
                 var nextUnready = client.Room?.Users.FirstOrDefault(c => c.State == MultiplayerUserState.Idle);
                 if (nextUnready != null)
                     client.ChangeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
-            }, 40);
+
+                return client.Room?.Users.All(u => u.State == MultiplayerUserState.Ready) == true;
+            });
         }
 
         /// <summary>
