@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -124,6 +125,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     client.ChangeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
 
                 return client.Room?.Users.All(u => u.State == MultiplayerUserState.Ready) == true;
+            });
+
+            AddStep("unready all players at once", () =>
+            {
+                Debug.Assert(client.Room != null);
+
+                foreach (var u in client.Room.Users) client.ChangeUserState(u.UserID, MultiplayerUserState.Idle);
+            });
+
+            AddStep("ready all players at once", () =>
+            {
+                Debug.Assert(client.Room != null);
+
+                foreach (var u in client.Room.Users) client.ChangeUserState(u.UserID, MultiplayerUserState.Ready);
             });
         }
 
