@@ -319,18 +319,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestPlayersLeaveWhileSpectating()
         {
-            start(getPlayerIds(8));
-            sendFrames(getPlayerIds(8), 300);
+            start(getPlayerIds(4));
+            sendFrames(getPlayerIds(4), 300);
 
             loadSpectateScreen();
 
-            for (int count = 7; count >= 0; count--)
+            for (int count = 3; count >= 0; count--)
             {
                 var id = PLAYER_1_ID + count;
 
                 end(id);
-                AddUntilStep("player area grayed", () => getInstance(id).Colour != Color4.White);
-                AddUntilStep("score quit set", () => getLeaderboardScore(id).HasQuit.Value);
+                AddUntilStep($"{id} area grayed", () => getInstance(id).Colour != Color4.White);
+                AddUntilStep($"{id} score quit set", () => getLeaderboardScore(id).HasQuit.Value);
                 sendFrames(getPlayerIds(count), 300);
             }
         }
