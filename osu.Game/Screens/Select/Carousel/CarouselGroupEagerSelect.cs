@@ -110,18 +110,19 @@ namespace osu.Game.Screens.Select.Carousel
 
             while (true)
             {
+                // check if a direction has been exhausted and an item (or null) from the other direction should be returned
                 if (forwardsIndex >= Children.Count)
                     return Children.Reverse().Skip(Children.Count - backwardsIndex - 1).FirstOrDefault(item => !item.Filtered.Value);
-
                 if (backwardsIndex < 0)
                     return Children.Skip(forwardsIndex).FirstOrDefault(item => !item.Filtered.Value);
 
+                // check if an unfiltered item has been reached
                 if (!Children[forwardsIndex].Filtered.Value)
                     return Children[forwardsIndex];
-
                 if (!Children[backwardsIndex].Filtered.Value)
                     return Children[backwardsIndex];
 
+                // increment the indices
                 forwardsIndex++;
                 backwardsIndex--;
             }
