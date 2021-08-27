@@ -8,6 +8,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
@@ -38,11 +39,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private Sample sampleReady;
         private Sample sampleReadyAll;
         private Sample sampleUnready;
-        private double unreadyLastPlaybackTime;
 
         private readonly ButtonWithTrianglesExposed button;
 
         private int countReady;
+
+        private ScheduledDelegate readySampleDelegate;
 
         public MultiplayerReadyButton()
         {
@@ -63,8 +65,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             sampleReady = audio.Samples.Get(@"Multiplayer/player-ready");
             sampleReadyAll = audio.Samples.Get(@"Multiplayer/player-ready-all");
             sampleUnready = audio.Samples.Get(@"Multiplayer/player-unready");
-
-            unreadyLastPlaybackTime = Time.Current;
         }
 
         protected override void OnRoomUpdated()
@@ -117,24 +117,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (newCountReady == countReady)
                 return;
 
-            if (newCountReady > countReady)
+            readySampleDelegate?.Cancel();
+            readySampleDelegate = Schedule(() =>
             {
-                if (newCountReady == newCountTotal)
-                    sampleReadyAll?.Play();
-                else
-                    sampleReady?.Play();
-            }
-            else
-            {
-                // debounce sample playback to prevent the mass-unready of game mode changes from deafening players
-                if (Time.Current - unreadyLastPlaybackTime > 10)
+                if (newCountReady > countReady)
+                {
+                    if (newCountReady == newCountTotal)
+                        sampleReadyAll?.Play();
+                    else
+                        sampleReady?.Play();
+                }
+                else if (newCountReady < countReady)
                 {
                     sampleUnready?.Play();
-                    unreadyLastPlaybackTime = Time.Current;
                 }
-            }
 
-            countReady = newCountReady;
+                countReady = newCountReady;
+            });
         }
 
         private void updateButtonColour(bool green)
