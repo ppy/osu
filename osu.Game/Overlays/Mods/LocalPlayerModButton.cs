@@ -65,5 +65,56 @@ namespace osu.Game.Overlays.Mods
             else
                 incompatibleIcon.Hide();
         }
+
+        public override ITooltip GetCustomTooltip() => new LocalPlayerModButtonTooltip();
+
+        private class LocalPlayerModButtonTooltip : ModButtonTooltip
+        {
+            private readonly OsuSpriteText incompatibleText;
+
+            private readonly Bindable<IReadOnlyList<Mod>> incompatibleMods = new Bindable<IReadOnlyList<Mod>>();
+
+            [Resolved]
+            private Bindable<RulesetInfo> ruleset { get; set; }
+
+            public LocalPlayerModButtonTooltip()
+            {
+                AddRange(new Drawable[]
+                {
+                    incompatibleText = new OsuSpriteText
+                    {
+                        Margin = new MarginPadding { Top = 5 },
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                        Text = "Incompatible with:"
+                    },
+                    new ModDisplay
+                    {
+                        Current = incompatibleMods,
+                        ExpansionMode = ExpansionMode.AlwaysExpanded,
+                        Scale = new Vector2(0.7f)
+                    }
+                });
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                incompatibleText.Colour = colours.BlueLight;
+            }
+
+            protected override Type TargetContentType => typeof(LocalPlayerModButton);
+
+            protected override void UpdateDisplay(Mod mod)
+            {
+                base.UpdateDisplay(mod);
+
+                var incompatibleTypes = mod.IncompatibleMods;
+
+                var allMods = ruleset.Value.CreateInstance().GetAllMods();
+
+                incompatibleMods.Value = allMods.Where(m => m.GetType() != mod.GetType() && incompatibleTypes.Any(t => t.IsInstanceOfType(m))).ToList();
+                incompatibleText.Text = incompatibleMods.Value.Any() ? "Incompatible with:" : "Compatible with all mods";
+            }
+        }
     }
 }
