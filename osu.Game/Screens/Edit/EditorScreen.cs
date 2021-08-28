@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Screens.Edit
 {
@@ -28,7 +29,7 @@ namespace osu.Game.Screens.Edit
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = content = new Container { RelativeSizeAxes = Axes.Both };
+            InternalChild = content = new PopoverContainer { RelativeSizeAxes = Axes.Both };
         }
 
         protected override void PopIn()
