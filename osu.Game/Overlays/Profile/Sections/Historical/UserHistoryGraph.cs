@@ -28,43 +28,11 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         protected override float GetDataPointHeight(long playCount) => playCount;
 
-        protected override UserGraphTooltip GetTooltip() => new HistoryGraphTooltip(tooltipCounterName);
-
-        protected override object GetTooltipContent(DateTime date, long playCount)
+        protected override UserGraphTooltipContent GetTooltipContent(DateTime date, long playCount) => new UserGraphTooltipContent
         {
-            return new TooltipDisplayContent
-            {
-                Name = tooltipCounterName,
-                Count = playCount.ToLocalisableString("N0"),
-                Date = date.ToLocalisableString("MMMM yyyy")
-            };
-        }
-
-        protected class HistoryGraphTooltip : UserGraphTooltip
-        {
-            private readonly LocalisableString tooltipCounterName;
-
-            public HistoryGraphTooltip(LocalisableString tooltipCounterName)
-                : base(tooltipCounterName)
-            {
-                this.tooltipCounterName = tooltipCounterName;
-            }
-
-            public override void SetContent(object content)
-            {
-                if (!(content is TooltipDisplayContent info) || info.Name != tooltipCounterName)
-                    return;
-
-                Counter.Text = info.Count;
-                BottomText.Text = info.Date;
-            }
-        }
-
-        private class TooltipDisplayContent
-        {
-            public LocalisableString Name;
-            public LocalisableString Count;
-            public LocalisableString Date;
-        }
+            Name = tooltipCounterName,
+            Count = playCount.ToLocalisableString("N0"),
+            Time = date.ToLocalisableString("MMMM yyyy")
+        };
     }
 }
