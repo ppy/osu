@@ -54,13 +54,13 @@ namespace osu.Game.DBus
         }
 
         public Task<string> GetUserAvatarUrlAsync()
-            => Task.FromResult(User.AvatarUrl ?? "???");
+            => Task.FromResult(User.AvatarUrl ?? string.Empty);
 
         public Task<string> GetPPAsync()
-            => Task.FromResult(User.Statistics?.PP > 0 ? User.Statistics.PP.ToString() : "-1");
+            => Task.FromResult(User.Statistics?.PP > 0 ? User.Statistics.PP.ToString() : "0");
 
         public Task<string> GetCurrentRulesetAsync()
-            => Task.FromResult(Ruleset.Value?.Name ?? "???");
+            => Task.FromResult(Ruleset.Value?.Name ?? string.Empty);
 
         public Task<string> GetLaunchTimeAsync()
             => Task.FromResult(getLaunchTime());

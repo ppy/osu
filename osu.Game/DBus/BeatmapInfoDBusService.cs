@@ -7,11 +7,11 @@ namespace osu.Game.DBus
     [DBusInterface("io.matrix_feather.mfosu.CurrentBeatmap")]
     public interface IBeatmapInfoDBusService : IDBusObject
     {
-        Task<string> GetCurrentBeatmapInfoAsync();
+        Task<string> GetFullNameAsync();
         Task<double> GetTrackLengthAsync();
         Task<double> GetTrackProgressAsync();
-        Task<string> GetCurrentVersionAsync();
-        Task<double> GetCurrentStarDifficultyAsync();
+        Task<string> GetCurrentDifficultyVersionAsync();
+        Task<double> GetCurrentDifficultyStarAsync();
     }
 
     public class BeatmapInfoDBusService : IBeatmapInfoDBusService
@@ -21,7 +21,7 @@ namespace osu.Game.DBus
 
         public WorkingBeatmap Beatmap { get; set; }
 
-        public Task<string> GetCurrentBeatmapInfoAsync()
+        public Task<string> GetFullNameAsync()
         {
             var info = (Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist)
                        + " - "
@@ -36,10 +36,10 @@ namespace osu.Game.DBus
         public Task<double> GetTrackProgressAsync()
             => Task.FromResult(Beatmap.Track.CurrentTime);
 
-        public Task<string> GetCurrentVersionAsync()
+        public Task<string> GetCurrentDifficultyVersionAsync()
             => Task.FromResult(Beatmap.BeatmapInfo.Version ?? "???");
 
-        public Task<double> GetCurrentStarDifficultyAsync()
+        public Task<double> GetCurrentDifficultyStarAsync()
             => Task.FromResult(Beatmap.BeatmapInfo.StarDifficulty);
     }
 }
