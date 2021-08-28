@@ -1,6 +1,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Types;
 
 namespace Mvis.Plugin.Example.Sidebar
 {
@@ -13,8 +14,7 @@ namespace Mvis.Plugin.Example.Sidebar
         {
         }
 
-        public override PluginBottomBarButton CreateBottomBarButton()
-            => new ExampleBottomBarButton(this);
+        public override IPluginFunctionProvider GetFunctionEntry() => null;
 
         protected override void InitContent(MvisPlugin plugin)
         {
