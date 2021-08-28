@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -12,6 +13,7 @@ using osu.Framework.Input;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
@@ -28,6 +30,8 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK.Input;
@@ -90,6 +94,120 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             // used to test the flow of multiplayer from visual tests.
             AddStep("empty step", () => { });
+        }
+
+        [Test]
+        public void TestLobbyEvents()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddRepeatStep("random stuff happens", performRandomAction, 30);
+
+            // ensure we have a handful of players so the ready-up sounds good :9
+            AddRepeatStep("player joins", addRandomPlayer, 5);
+
+            // all ready
+            AddUntilStep("all players ready", () =>
+            {
+                var nextUnready = client.Room?.Users.FirstOrDefault(c => c.State == MultiplayerUserState.Idle);
+                if (nextUnready != null)
+                    client.ChangeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
+
+                return client.Room?.Users.All(u => u.State == MultiplayerUserState.Ready) == true;
+            });
+
+            AddStep("unready all players at once", () =>
+            {
+                Debug.Assert(client.Room != null);
+
+                foreach (var u in client.Room.Users) client.ChangeUserState(u.UserID, MultiplayerUserState.Idle);
+            });
+
+            AddStep("ready all players at once", () =>
+            {
+                Debug.Assert(client.Room != null);
+
+                foreach (var u in client.Room.Users) client.ChangeUserState(u.UserID, MultiplayerUserState.Ready);
+            });
+        }
+
+        private void addRandomPlayer()
+        {
+            int randomUser = RNG.Next(200000, 500000);
+            client.AddUser(new User { Id = randomUser, Username = $"user {randomUser}" });
+        }
+
+        private void removeLastUser()
+        {
+            User lastUser = client.Room?.Users.Last().User;
+
+            if (lastUser == null || lastUser == client.LocalUser?.User)
+                return;
+
+            client.RemoveUser(lastUser);
+        }
+
+        private void kickLastUser()
+        {
+            User lastUser = client.Room?.Users.Last().User;
+
+            if (lastUser == null || lastUser == client.LocalUser?.User)
+                return;
+
+            client.KickUser(lastUser.Id);
+        }
+
+        private void markNextPlayerReady()
+        {
+            var nextUnready = client.Room?.Users.FirstOrDefault(c => c.State == MultiplayerUserState.Idle);
+            if (nextUnready != null)
+                client.ChangeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
+        }
+
+        private void markNextPlayerIdle()
+        {
+            var nextUnready = client.Room?.Users.FirstOrDefault(c => c.State == MultiplayerUserState.Ready);
+            if (nextUnready != null)
+                client.ChangeUserState(nextUnready.UserID, MultiplayerUserState.Idle);
+        }
+
+        private void performRandomAction()
+        {
+            int eventToPerform = RNG.Next(1, 6);
+
+            switch (eventToPerform)
+            {
+                case 1:
+                    addRandomPlayer();
+                    break;
+
+                case 2:
+                    removeLastUser();
+                    break;
+
+                case 3:
+                    kickLastUser();
+                    break;
+
+                case 4:
+                    markNextPlayerReady();
+                    break;
+
+                case 5:
+                    markNextPlayerIdle();
+                    break;
+            }
         }
 
         [Test]
@@ -428,6 +546,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 AddStep("close dialog overlay", () => InputManager.Key(Key.Escape));
             }
+        }
+
+        [Test]
+        public void TestGameplayFlow()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddRepeatStep("click spectate button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            }, 2);
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+
+            // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
+            for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
+            {
+                var time = i;
+                AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.GameplayClock.CurrentTime > time);
+            }
+
+            AddUntilStep("wait for results", () => Stack.CurrentScreen is ResultsScreen);
         }
 
         private void createRoom(Func<Room> room)

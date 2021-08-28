@@ -23,16 +23,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
-        private readonly IBindableList<Room> rooms = new BindableList<Room>();
-
-        private readonly FillFlowContainer<DrawableLoungeRoom> roomFlow;
+        public readonly Bindable<Room> SelectedRoom = new Bindable<Room>();
+        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
 
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
 
-        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
-
-        [Resolved]
-        private Bindable<Room> selectedRoom { get; set; }
+        private readonly IBindableList<Room> rooms = new BindableList<Room>();
+        private readonly FillFlowContainer<DrawableLoungeRoom> roomFlow;
 
         [Resolved]
         private IRoomManager roomManager { get; set; }
@@ -112,9 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void addRooms(IEnumerable<Room> rooms)
         {
             foreach (var room in rooms)
-            {
-                roomFlow.Add(new DrawableLoungeRoom(room));
-            }
+                roomFlow.Add(new DrawableLoungeRoom(room) { SelectedRoom = { BindTarget = SelectedRoom } });
 
             applyFilterCriteria(Filter?.Value);
         }
@@ -126,8 +121,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomFlow.RemoveAll(d => d.Room == r);
 
                 // selection may have a lease due to being in a sub screen.
-                if (!selectedRoom.Disabled)
-                    selectedRoom.Value = null;
+                if (!SelectedRoom.Disabled)
+                    SelectedRoom.Value = null;
             }
         }
 
@@ -139,8 +134,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!selectedRoom.Disabled)
-                selectedRoom.Value = null;
+            if (!SelectedRoom.Disabled)
+                SelectedRoom.Value = null;
             return base.OnClick(e);
         }
 
@@ -202,26 +197,26 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void selectNext(int direction)
         {
-            if (selectedRoom.Disabled)
+            if (SelectedRoom.Disabled)
                 return;
 
             var visibleRooms = Rooms.AsEnumerable().Where(r => r.IsPresent);
 
             Room room;
 
-            if (selectedRoom.Value == null)
+            if (SelectedRoom.Value == null)
                 room = visibleRooms.FirstOrDefault()?.Room;
             else
             {
                 if (direction < 0)
                     visibleRooms = visibleRooms.Reverse();
 
-                room = visibleRooms.SkipWhile(r => r.Room != selectedRoom.Value).Skip(1).FirstOrDefault()?.Room;
+                room = visibleRooms.SkipWhile(r => r.Room != SelectedRoom.Value).Skip(1).FirstOrDefault()?.Room;
             }
 
             // we already have a valid selection only change selection if we still have a room to switch to.
             if (room != null)
-                selectedRoom.Value = room;
+                SelectedRoom.Value = room;
         }
 
         #endregion

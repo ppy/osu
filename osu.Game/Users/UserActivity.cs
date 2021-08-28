@@ -25,21 +25,55 @@ namespace osu.Game.Users
             public override string Status => "正在选图";
         }
 
-        public class MultiplayerGame : UserActivity
-        {
-            public override string Status => "正在多人联机";
-        }
-
-        public class InMvis : UserActivity
+        public abstract class InGame : UserActivity
         {
             public BeatmapInfo Beatmap { get; }
 
-            public InMvis(BeatmapInfo info)
+            public RulesetInfo Ruleset { get; }
+
+            protected InGame(BeatmapInfo info, RulesetInfo ruleset)
             {
                 Beatmap = info;
+                Ruleset = ruleset;
+            }
+
+            public override string Status => Ruleset.CreateInstance().PlayingVerb;
+        }
+
+        public class InMvis : InGame
+        {
+            public InMvis(BeatmapInfo info)
+                : base(info, info.Ruleset)
+            {
             }
 
             public override string Status => "正在听歌";
+        }
+
+        public class InMultiplayerGame : InGame
+        {
+            public InMultiplayerGame(BeatmapInfo beatmap, RulesetInfo ruleset)
+                : base(beatmap, ruleset)
+            {
+            }
+
+            public override string Status => $@"正和别人一起{base.Status}";
+        }
+
+        public class InPlaylistGame : InGame
+        {
+            public InPlaylistGame(BeatmapInfo beatmap, RulesetInfo ruleset)
+                : base(beatmap, ruleset)
+            {
+            }
+        }
+
+        public class InSoloGame : InGame
+        {
+            public InSoloGame(BeatmapInfo info, RulesetInfo ruleset)
+                : base(info, ruleset)
+            {
+            }
         }
 
         public class Editing : UserActivity
@@ -54,21 +88,6 @@ namespace osu.Game.Users
             public override string Status => @"正在编辑谱面";
         }
 
-        public class SoloGame : UserActivity
-        {
-            public BeatmapInfo Beatmap { get; }
-
-            public RulesetInfo Ruleset { get; }
-
-            public SoloGame(BeatmapInfo info, RulesetInfo ruleset)
-            {
-                Beatmap = info;
-                Ruleset = ruleset;
-            }
-
-            public override string Status => Ruleset.CreateInstance().PlayingVerb;
-        }
-
         public class Spectating : UserActivity
         {
             public override string Status => @"正在旁观别人";
@@ -81,7 +100,7 @@ namespace osu.Game.Users
 
         public class InLobby : UserActivity
         {
-            public override string Status => @"正在多人游戏房间中";
+            public override string Status => @"在多人游戏大厅中";
 
             public readonly Room Room;
 

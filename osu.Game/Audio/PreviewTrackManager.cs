@@ -36,7 +36,7 @@ namespace osu.Game.Audio
         {
             // this is a temporary solution to get around muting ourselves.
             // todo: update this once we have a BackgroundTrackManager or similar.
-            trackStore = new PreviewTrackStore(audioManager.Mixer, new OnlineStore());
+            trackStore = new PreviewTrackStore(audioManager.TrackMixer, new OnlineStore());
 
             audio.AddItem(trackStore);
             trackStore.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
