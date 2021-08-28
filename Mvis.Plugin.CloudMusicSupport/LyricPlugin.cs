@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
+using Mvis.Plugin.CloudMusicSupport.DBus;
 using Mvis.Plugin.CloudMusicSupport.Helper;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using Mvis.Plugin.CloudMusicSupport.Sidebar;
 using Mvis.Plugin.CloudMusicSupport.UI;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
@@ -17,6 +19,7 @@ using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Audio;
+using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
 
@@ -125,6 +128,9 @@ namespace Mvis.Plugin.CloudMusicSupport
         /// </summary>
         protected override bool OnContentLoaded(Drawable content) => true;
 
+        [Resolved]
+        private OsuGame game { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -135,6 +141,24 @@ namespace Mvis.Plugin.CloudMusicSupport
             autoSave = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish);
 
             AddInternal(processor);
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                PluginManager.RegisterDBusObject(new LyricDBusObject
+                {
+                    Plugin = this
+                });
+            }
+
+            if (MvisScreen != null)
+            {
+                MvisScreen.OnScreenExiting += onMvisExiting;
+            }
+        }
+
+        private void onMvisExiting()
+        {
+            PluginManager.UnRegisterDBusObject(new LyricDBusObject());
         }
 
         public void WriteLyricToDisk()

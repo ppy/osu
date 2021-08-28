@@ -5,8 +5,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc
     public class Lyric : IEquatable<Lyric>
     {
         public double Time;
-        public string Content;
-        public string TranslatedString;
+        public string Content = string.Empty;
+        public string TranslatedString = string.Empty;
 
         public override string ToString() => $"{Time}:{Content}({TranslatedString})";
 

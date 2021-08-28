@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
@@ -61,7 +62,7 @@ namespace M.DBus
         //bug: 注册的服务/物件在dbus-send后会直接Name Lost，无法恢复
         private async Task registerObjects()
         {
-            Logger.Log("注册Obj");
+            Logger.Log("注册DBus物件及服务...");
 
             //注册所有DBus Object
             await currentConnection.RegisterObjectsAsync(dBusObjects.ToArray()).ConfigureAwait(false);
@@ -111,16 +112,43 @@ namespace M.DBus
 
             if (connectionState == ConnectionState.Connected)
             {
-                //注册物件
-                await currentConnection.RegisterObjectsAsync(objects).ConfigureAwait(false);
-
-                //注册DBus服务
+                //注册物件和DBus服务
                 foreach (var dBusObject in dBusObjects)
                 {
+                    await currentConnection.RegisterObjectAsync(dBusObject).ConfigureAwait(false);
+
                     await currentConnection.RegisterServiceAsync(ObjectPathToName(dBusObject.ObjectPath)).ConfigureAwait(false);
                 }
             }
         }
+
+        public void UnRegisterObject(IDBusObject dBusObject)
+        {
+            var target = dBusObjects.FirstOrDefault(o => o.ObjectPath.Equals(dBusObject.ObjectPath));
+
+            if (target != null)
+            {
+                Logger.Log($"反注册{dBusObject.ObjectPath}");
+                dBusObjects.Remove(target);
+                currentConnection.UnregisterObject(target);
+                Task.Run(() => unregisterObjectTask(target));
+            }
+            else
+            {
+                throw new InvalidOperationException("尝试反注册一个不存在的DBus物件");
+            }
+        }
+
+        private async Task unregisterObjectTask(IDBusObject target)
+        {
+            await currentConnection.UnregisterServiceAsync(ObjectPathToName(target.ObjectPath)).ConfigureAwait(false);
+        }
+
+        public bool CheckIfAlreadyRegistered(IDBusObject dBusObject)
+            => dBusObjects.Any(o => o.ObjectPath.Equals(dBusObject.ObjectPath));
+
+        public bool CheckIfAlreadyRegistered(ObjectPath objectPath)
+            => dBusObjects.Any(o => o.ObjectPath.Equals(objectPath));
 
         private CancellationTokenSource cancellationTokenSource;
 

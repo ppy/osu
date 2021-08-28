@@ -37,7 +37,7 @@ namespace osu.Game.DBus
             => Task.FromResult(Beatmap.Track.CurrentTime);
 
         public Task<string> GetCurrentVersionAsync()
-            => Task.FromResult(Beatmap.BeatmapInfo.Version);
+            => Task.FromResult(Beatmap.BeatmapInfo.Version ?? "???");
 
         public Task<double> GetCurrentStarDifficultyAsync()
             => Task.FromResult(Beatmap.BeatmapInfo.StarDifficulty);

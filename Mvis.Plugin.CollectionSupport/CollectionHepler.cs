@@ -2,12 +2,15 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using Mvis.Plugin.CollectionSupport.Config;
+using Mvis.Plugin.CollectionSupport.DBus;
 using Mvis.Plugin.CollectionSupport.Sidebar;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Platform;
+using osu.Game;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
@@ -33,7 +36,7 @@ namespace Mvis.Plugin.CollectionSupport
         private MusicController controller { get; set; }
 
         private readonly List<BeatmapSetInfo> beatmapList = new List<BeatmapSetInfo>();
-        private int currentPosition;
+        public int CurrentPosition { get; private set; } = -1;
         private int maxCount;
         public Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
 
@@ -66,6 +69,9 @@ namespace Mvis.Plugin.CollectionSupport
 
         private bool trackChangedAfterDisable;
 
+        [Resolved]
+        private OsuGame game { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -73,8 +79,17 @@ namespace Mvis.Plugin.CollectionSupport
             config.BindWith(CollectionSettings.EnablePlugin, Value);
             b.BindValueChanged(v =>
             {
+                updateCurrentPosition();
                 if (!IsCurrent) trackChangedAfterDisable = true;
             });
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                PluginManager.RegisterDBusObject(new CollectionDBusObject
+                {
+                    Plugin = this
+                });
+            }
         }
 
         protected override void LoadComplete()
@@ -84,7 +99,22 @@ namespace Mvis.Plugin.CollectionSupport
 
             collectionManager.Collections.CollectionChanged += triggerRefresh;
 
-            if (MvisScreen != null) MvisScreen.OnScreenResuming += UpdateBeatmaps;
+            if (MvisScreen != null)
+            {
+                MvisScreen.OnScreenResuming += UpdateBeatmaps;
+                MvisScreen.OnScreenExiting += onMvisExiting;
+            }
+        }
+
+        private void onMvisExiting()
+        {
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                PluginManager.UnRegisterDBusObject(new CollectionDBusObject
+                {
+                    Plugin = this
+                });
+            }
         }
 
         public void Play(WorkingBeatmap b) => changeBeatmap(b);
@@ -155,24 +185,24 @@ namespace Mvis.Plugin.CollectionSupport
 
             //更新当前位置和最大位置
             if (updateCurrentPosition)
-                currentPosition = list.IndexOf(prevSet);
+                CurrentPosition = list.IndexOf(prevSet);
 
             maxCount = list.Count;
 
             //当前位置往指定位置移动
-            currentPosition += displace;
+            CurrentPosition += displace;
 
             //如果当前位置超过了最大位置或者不在范围内，那么回到第一个
-            if (currentPosition >= maxCount || currentPosition < 0)
+            if (CurrentPosition >= maxCount || CurrentPosition < 0)
             {
-                if (displace > 0) currentPosition = 0;
-                else currentPosition = maxCount - 1;
+                if (displace > 0) CurrentPosition = 0;
+                else CurrentPosition = maxCount - 1;
             }
 
             //从list获取当前位置所在的BeatmapSetInfo, 然后选择该BeatmapSetInfo下的第一个WorkingBeatmap
             //最终赋值给NewBeatmap
             var newBeatmap = list.Count > 0
-                ? beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First())
+                ? beatmaps.GetWorkingBeatmap(list.ElementAt(CurrentPosition).Beatmaps.First())
                 : b.Value;
             return newBeatmap;
         }
@@ -196,7 +226,11 @@ namespace Mvis.Plugin.CollectionSupport
                 if (!beatmapList.Contains(currentSet))
                     beatmapList.Add(currentSet);
             }
+
+            updateCurrentPosition();
         }
+
+        private void updateCurrentPosition() => CurrentPosition = beatmapList.IndexOf(b.Value.BeatmapSetInfo);
 
         public void UpdateBeatmaps() => updateBeatmaps(CurrentCollection.Value);
 

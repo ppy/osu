@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using M.DBus;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,6 +16,7 @@ using osu.Game.Screens.Mvis.Misc.PluginResolvers;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Internal;
 using osu.Game.Screens.Mvis.Plugins.Types;
+using Tmds.DBus;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
@@ -32,6 +34,10 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         [Resolved]
         private CustomStore customStore { get; set; }
+
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        private DBusManager dBusManager { get; set; }
 
         internal Action<MvisPlugin> OnPluginAdd;
         internal Action<MvisPlugin> OnPluginUnLoad;
@@ -95,6 +101,12 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public IPluginConfigManager GetConfigManager(MvisPlugin pl) =>
             configManagers.GetOrAdd(pl.GetType(), _ => pl.CreateConfigManager(storage));
+
+        public void RegisterDBusObject(IDBusObject target) =>
+            dBusManager?.RegisterNewObject(target);
+
+        public void UnRegisterDBusObject(IDBusObject target) =>
+            dBusManager?.UnRegisterObject(target);
 
         internal bool AddPlugin(MvisPlugin pl)
         {
