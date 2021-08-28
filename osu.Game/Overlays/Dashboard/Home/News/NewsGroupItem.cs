@@ -67,17 +67,15 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             };
         }
 
-        private class Date : CompositeDrawable, IHasCustomTooltip
+        private class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
         {
-            public ITooltip GetCustomTooltip() => new DateTooltip();
+            public ITooltip<DateTimeOffset> GetCustomTooltip() => new DateTooltip();
 
-            public object TooltipContent => date;
-
-            private readonly DateTimeOffset date;
+            public DateTimeOffset TooltipContent { get; }
 
             public Date(DateTimeOffset date)
             {
-                this.date = date;
+                TooltipContent = date;
             }
 
             [BackgroundDependencyLoader]
@@ -100,12 +98,12 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                     Margin = new MarginPadding { Vertical = 5 }
                 };
 
-                textFlow.AddText($"{date:dd}", t =>
+                textFlow.AddText($"{TooltipContent:dd}", t =>
                 {
                     t.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
                 });
 
-                textFlow.AddText($"{date: MMM}", t =>
+                textFlow.AddText($"{TooltipContent: MMM}", t =>
                 {
                     t.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Regular);
                 });

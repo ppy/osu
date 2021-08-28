@@ -140,17 +140,15 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             }
         }
 
-        private class Date : CompositeDrawable, IHasCustomTooltip
+        private class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
         {
-            public ITooltip GetCustomTooltip() => new DateTooltip();
+            public ITooltip<DateTimeOffset> GetCustomTooltip() => new DateTooltip();
 
-            public object TooltipContent => date;
-
-            private readonly DateTimeOffset date;
+            public DateTimeOffset TooltipContent { get; }
 
             public Date(DateTimeOffset date)
             {
-                this.date = date;
+                TooltipContent = date;
             }
 
             [BackgroundDependencyLoader]
@@ -174,7 +172,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                             Origin = Anchor.TopRight,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold), // using Bold since there is no 800 weight alternative
                             Colour = colourProvider.Light1,
-                            Text = $"{date:dd}"
+                            Text = $"{TooltipContent:dd}"
                         },
                         new TextFlowContainer(f =>
                         {
@@ -185,7 +183,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             AutoSizeAxes = Axes.Both,
-                            Text = $"{date:MMM yyyy}"
+                            Text = $"{TooltipContent:MMM yyyy}"
                         }
                     }
                 };
