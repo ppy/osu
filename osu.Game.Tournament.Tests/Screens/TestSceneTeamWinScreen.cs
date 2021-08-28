@@ -3,7 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Tournament.Screens.TeamWin;
 
