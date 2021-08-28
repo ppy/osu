@@ -26,6 +26,14 @@ namespace osu.Game.Tournament.Tests.Screens
         }
 
         [Test]
+        public void TestStartupStateNoCurrentMatch([Values] TourneyState state)
+        {
+            AddStep("set null current", () => Ladder.CurrentMatch.Value = null);
+            AddStep("set state", () => IPCInfo.State.Value = state);
+            createScreen();
+        }
+
+        [Test]
         public void TestWarmup()
         {
             createScreen();
