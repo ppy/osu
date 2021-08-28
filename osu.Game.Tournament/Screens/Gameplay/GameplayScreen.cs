@@ -124,9 +124,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 }
             });
 
-            State.BindTo(ipc.State);
-            State.BindValueChanged(stateChanged, true);
-
             ladder.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
 
             warmup.BindValueChanged(w =>
@@ -134,6 +131,14 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 warmupButton.Alpha = !w.NewValue ? 0.5f : 1;
                 header.ShowScores = !w.NewValue;
             }, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            State.BindTo(ipc.State);
+            State.BindValueChanged(stateChanged, true);
         }
 
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
@@ -159,7 +164,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             {
                 if (state.NewValue == TourneyState.Ranking)
                 {
-                    if (warmup.Value) return;
+                    if (warmup.Value || CurrentMatch.Value == null) return;
 
                     if (ipc.Score1.Value > ipc.Score2.Value)
                         CurrentMatch.Value.Team1Score.Value++;
