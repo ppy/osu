@@ -5,7 +5,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 
@@ -28,8 +30,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override bool PropagateNonPositionalInputSubTree => true;
 
-        public GameplayChatDisplay()
-            : base(leaveChannelOnDispose: false)
+        public GameplayChatDisplay(Room room)
+            : base(room, leaveChannelOnDispose: false)
         {
             RelativeSizeAxes = Axes.X;
 
@@ -37,6 +39,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             Textbox.FocusLost = () => expandedFromTextboxFocus.Value = false;
         }
+
+        protected override bool OnHover(HoverEvent e) => true; // use UI mouse cursor.
 
         protected override void LoadComplete()
         {

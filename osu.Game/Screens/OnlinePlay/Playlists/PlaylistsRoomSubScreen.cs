@@ -50,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
 
-            AddInternal(selectionPollingComponent = new SelectionPollingComponent());
+            AddInternal(selectionPollingComponent = new SelectionPollingComponent(Room));
         }
 
         protected override void LoadComplete()
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             },
                             new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
                             new Drawable[] { new OverlinedHeader("聊天"), },
-                            new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
+                            new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
                         },
                         RowDimensions = new[]
                         {
@@ -184,12 +184,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             OnStart = StartPlay
         };
 
-        protected override RoomSettingsOverlay CreateRoomSettingsOverlay() => new PlaylistsRoomSettingsOverlay
+        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new PlaylistsRoomSettingsOverlay(room)
         {
             EditPlaylist = () =>
             {
                 if (this.IsCurrentScreen())
-                    this.Push(new PlaylistsSongSelect());
+                    this.Push(new PlaylistsSongSelect(Room));
             },
         };
 
@@ -199,7 +199,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
         }
 
-        protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(SelectedItem.Value)
+        protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(Room, SelectedItem.Value)
         {
             Exited = () => leaderboard.RefreshScores()
         });

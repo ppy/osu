@@ -16,6 +16,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private readonly bool IsMini;
         private readonly bool NoSuffix;
 
-        public LocalisableString TooltipText => button.Enabled.Value ? "下载该谱面" : "请先登录再进行下载";
+        public LocalisableString TooltipText => BeatmapsetsStrings.ShowDetailsDownloadDefault;
 
         private readonly IBindable<User> localUser = new Bindable<User>();
         private BindableBool UseSayobot = new BindableBool();
@@ -119,7 +120,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = "下载中...",
+                                Text = Localisation.CommonStrings.Downloading,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -130,7 +131,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = "导入中...",
+                                Text = Localisation.CommonStrings.Importing,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -145,7 +146,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = "下载",
+                                Text = BeatmapsetsStrings.ShowDetailsDownloadDefault,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
@@ -164,12 +165,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
 
-        private string getVideoSuffixText()
+        private LocalisableString getVideoSuffixText()
         {
             if (!BeatmapSet.Value.OnlineInfo.HasVideo && !BeatmapSet.Value.OnlineInfo.HasStoryboard)
                 return string.Empty;
 
-            return (IsMini == true ? "Mini" : (noVideo ? "不带视频" : "带视频"));
+            return (IsMini == true ? "Mini" : (noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo));
         }
     }
 }

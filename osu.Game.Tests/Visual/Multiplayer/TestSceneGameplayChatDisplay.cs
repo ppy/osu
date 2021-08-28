@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddStep("load chat display", () => Child = chatDisplay = new GameplayChatDisplay
+            AddStep("load chat display", () => Child = chatDisplay = new GameplayChatDisplay(SelectedRoom.Value)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

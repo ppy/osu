@@ -211,7 +211,7 @@ namespace osu.Game.Overlays
 
                 loading.Hide();
 
-                searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue, true);
+                searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchTerm = term.NewValue, true);
                 searchTextBox.TakeFocus();
 
                 loadSidebarButtons();

@@ -47,7 +47,6 @@ namespace osu.Game.Overlays.Settings
 
         protected SettingsSection()
         {
-            Margin = new MarginPadding { Top = margin };
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
@@ -80,7 +79,7 @@ namespace osu.Game.Overlays.Settings
                     Padding = new MarginPadding
                     {
                         Top = margin + border_size,
-                        Bottom = 10,
+                        Bottom = margin + 10,
                     },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,

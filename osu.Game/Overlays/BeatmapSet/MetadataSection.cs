@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         AutoSizeAxes = Axes.Y,
                         Child = new OsuSpriteText
                         {
-                            Text = this.type.GetDescription(),
+                            Text = this.type.GetLocalisableDescription(),
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                         },
                     },

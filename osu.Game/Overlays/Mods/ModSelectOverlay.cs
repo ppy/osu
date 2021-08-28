@@ -74,6 +74,7 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly ModSettingsContainer ModSettingsContainer;
 
+        [Cached]
         public readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods;

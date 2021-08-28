@@ -806,7 +806,7 @@ namespace osu.Game.Database
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
-        /// Whether inport can be skipped after finding an existing import early in the process.
+        /// Whether import can be skipped after finding an existing import early in the process.
         /// Only valid when <see cref="ComputeHash"/> is not overridden.
         /// </summary>
         /// <param name="existing">The existing model.</param>

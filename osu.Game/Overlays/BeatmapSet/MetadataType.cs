@@ -2,23 +2,26 @@
 // See the LICENCE file in the repository root for full licence text.
 using System.ComponentModel;
 
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
+
 namespace osu.Game.Overlays.BeatmapSet
 {
     public enum MetadataType
     {
-        [Description("标签")]
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoTags))]
         Tags,
-        
-        [Description("来源")]
+
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoSource))]
         Source,
 
-        [Description("描述")]
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoDescription))]
         Description,
 
-        [Description("流派")]
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoGenre))]
         Genre,
 
-        [Description("语言")]
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoLanguage))]
         Language
     }
 }

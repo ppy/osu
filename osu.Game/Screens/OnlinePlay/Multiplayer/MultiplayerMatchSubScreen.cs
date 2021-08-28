@@ -48,9 +48,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
-        [Resolved]
-        private Bindable<Room> currentRoom { get; set; } // Todo: This should not exist.
-
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
 
         [CanBeNull]
@@ -80,17 +77,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 if (!connected.NewValue)
                     handleRoomLost();
-            }, true);
-
-            currentRoom.BindValueChanged(room =>
-            {
-                if (room.NewValue == null)
-                {
-                    // the room has gone away.
-                    // this could mean something happened during the join process, or an external connection issue occurred.
-                    // one specific scenario is where the underlying room is created, but the signalr server returns an error during the join process. this triggers a PartRoom operation (see https://github.com/ppy/osu/blob/7654df94f6f37b8382be7dfcb4f674e03bd35427/osu.Game/Screens/OnlinePlay/Multiplayer/MultiplayerRoomManager.cs#L97)
-                    handleRoomLost();
-                }
             }, true);
         }
 
@@ -187,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                 },
                                             },
                                             new Drawable[] { new OverlinedHeader("聊天") { Margin = new MarginPadding { Vertical = 5 }, }, },
-                                            new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
+                                            new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
                                         },
                                         RowDimensions = new[]
                                         {
@@ -212,7 +198,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             OnSpectateClick = onSpectateClick
         };
 
-        protected override RoomSettingsOverlay CreateRoomSettingsOverlay() => new MultiplayerMatchSettingsOverlay();
+        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
 
         protected override void UpdateMods()
         {
@@ -409,7 +395,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     return new MultiSpectatorScreen(users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
 
                 default:
-                    return new PlayerLoader(() => new MultiplayerPlayer(SelectedItem.Value, users));
+                    return new PlayerLoader(() => new MultiplayerPlayer(Room, SelectedItem.Value, users));
             }
         }
 
@@ -426,7 +412,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            this.Push(new MultiplayerMatchSongSelect(beatmap, ruleset));
+            this.Push(new MultiplayerMatchSongSelect(Room, beatmap, ruleset));
         }
 
         protected override void Dispose(bool isDisposing)

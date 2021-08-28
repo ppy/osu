@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("initialise gameplay", () =>
             {
-                Stack.Push(player = new MultiplayerPlayer(Client.CurrentMatchPlayingItem.Value, Client.Room?.Users.ToArray()));
+                Stack.Push(player = new MultiplayerPlayer(Client.APIRoom, Client.CurrentMatchPlayingItem.Value, Client.Room?.Users.ToArray()));
             });
         }
 

@@ -110,15 +110,15 @@ namespace osu.Game.Overlays.Chat
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Roundness = 1,
-                        Offset = new Vector2(0, 3),
-                        Radius = 3,
+                        Radius = 1,
                         Colour = Color4.Black.Opacity(0.3f),
+                        Offset = new Vector2(0, 1),
                         Type = EdgeEffectType.Shadow,
                     },
                     Child = new Container
                     {
                         AutoSizeAxes = Axes.Both,
-                        Y = 3,
+                        Y = 0,
                         Masking = true,
                         CornerRadius = 4,
                         Children = new Drawable[]
