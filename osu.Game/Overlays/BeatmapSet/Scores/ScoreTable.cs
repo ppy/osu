@@ -19,6 +19,7 @@ using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -92,13 +93,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             var columns = new List<TableColumn>
             {
-                new TableColumn("排名", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersRank, Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)), // grade
-                new TableColumn("分数", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("准确率", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, minSize: 60, maxSize: 70)),
+                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersScore, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, minSize: 60, maxSize: 70)),
                 new TableColumn("", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 25)), // flag
-                new TableColumn("玩家", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 125)),
-                new TableColumn("最大连击", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 120))
+                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersPlayer, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 125)),
+                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 120))
             };
 
             // All statistics across all scores, unordered.
@@ -123,9 +124,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
 
             if (showPerformancePoints)
-                columns.Add(new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
+                columns.Add(new TableColumn(BeatmapsetsStrings.ShowScoreboardHeaderspp, Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
 
-            columns.Add(new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)));
+            columns.Add(new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersMods, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)));
 
             return columns.ToArray();
         }
@@ -139,7 +140,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 new OsuSpriteText
                 {
-                    Text = $"#{index + 1}",
+                    Text = (index + 1).ToLocalisableString(@"\##"),
                     Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                 },
                 new UpdateableRank(score.Rank)
@@ -167,7 +168,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 username,
                 new OsuSpriteText
                 {
-                    Text = $@"{score.MaxCombo:N0}x",
+                    Text = score.MaxCombo.ToLocalisableString(@"0\x"),
                     Font = OsuFont.GetFont(size: text_size),
                     Colour = score.MaxCombo == score.Beatmap?.MaxCombo ? highAccuracyColour : Color4.White
                 }
@@ -182,7 +183,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 content.Add(new OsuSpriteText
                 {
-                    Text = stat.MaxCount == null ? $"{stat.Count}" : $"{stat.Count}/{stat.MaxCount}",
+                    Text = stat.MaxCount == null ? stat.Count.ToLocalisableString(@"N0") : (LocalisableString)$"{stat.Count}/{stat.MaxCount}",
                     Font = OsuFont.GetFont(size: text_size),
                     Colour = stat.Count == 0 ? Color4.Gray : Color4.White
                 });
@@ -192,7 +193,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 content.Add(new OsuSpriteText
                 {
-                    Text = $@"{score.PP:N0}",
+                    Text = score.PP.ToLocalisableString(@"N0"),
                     Font = OsuFont.GetFont(size: text_size)
                 });
             }

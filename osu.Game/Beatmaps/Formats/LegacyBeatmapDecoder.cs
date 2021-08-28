@@ -121,10 +121,6 @@ namespace osu.Game.Beatmaps.Formats
                     metadata.PreviewTime = getOffsetTime(Parsing.ParseInt(pair.Value));
                     break;
 
-                case @"Countdown":
-                    beatmap.BeatmapInfo.Countdown = Parsing.ParseInt(pair.Value) == 1;
-                    break;
-
                 case @"SampleSet":
                     defaultSampleBank = (LegacySampleBank)Enum.Parse(typeof(LegacySampleBank), pair.Value);
                     break;
@@ -175,6 +171,14 @@ namespace osu.Game.Beatmaps.Formats
 
                 case @"EpilepsyWarning":
                     beatmap.BeatmapInfo.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
+                    break;
+
+                case @"Countdown":
+                    beatmap.BeatmapInfo.Countdown = (CountdownType)Enum.Parse(typeof(CountdownType), pair.Value);
+                    break;
+
+                case @"CountdownOffset":
+                    beatmap.BeatmapInfo.CountdownOffset = Parsing.ParseInt(pair.Value);
                     break;
             }
         }

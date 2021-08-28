@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -30,15 +31,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             switch (scope)
             {
                 default:
-                    text.Text = @"还没有成绩呢... 考虑当个第一名owo?";
+                    text.Text = BeatmapsetsStrings.ShowScoreboardNoScoresGlobal;
                     break;
 
                 case BeatmapLeaderboardScope.Friend:
-                    text.Text = @"你的好友们还没玩过这张图> <";
+                    text.Text = BeatmapsetsStrings.ShowScoreboardNoScoresFriend;
                     break;
 
                 case BeatmapLeaderboardScope.Country:
-                    text.Text = @"你所在的国家/区域内好像只有你有这张图> <.";
+                    text.Text = BeatmapsetsStrings.ShowScoreboardNoScoresCountry;
                     break;
             }
         }

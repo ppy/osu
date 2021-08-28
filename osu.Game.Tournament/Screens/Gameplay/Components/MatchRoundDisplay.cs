@@ -20,6 +20,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         }
 
         private void matchChanged(ValueChangedEvent<TournamentMatch> match) =>
-            Text.Text = match.NewValue.Round.Value?.Name.Value ?? "未知回合";
+            Text.Text = match.NewValue?.Round.Value?.Name.Value ?? "未知回合";
     }
 }

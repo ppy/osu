@@ -25,10 +25,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneDrawableRoom : OsuTestScene
     {
         [Cached]
-        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
-
-        [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
+
+        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
 
         [Test]
         public void TestMultipleStatuses()
@@ -153,7 +152,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }));
             }
 
-            return new DrawableLoungeRoom(room) { MatchingFilter = true };
+            return new DrawableLoungeRoom(room)
+            {
+                MatchingFilter = true,
+                SelectedRoom = { BindTarget = selectedRoom }
+            };
         }
     }
 }
