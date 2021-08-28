@@ -123,17 +123,15 @@ namespace osu.Game.Overlays.News
             main.AddText(post.Author, t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold));
         }
 
-        private class DateContainer : CircularContainer, IHasCustomTooltip
+        private class DateContainer : CircularContainer, IHasCustomTooltip<DateTimeOffset>
         {
-            public ITooltip GetCustomTooltip() => new DateTooltip();
+            public ITooltip<DateTimeOffset> GetCustomTooltip() => new DateTooltip();
 
-            public object TooltipContent => date;
-
-            private readonly DateTimeOffset date;
+            public DateTimeOffset TooltipContent { get; }
 
             public DateContainer(DateTimeOffset date)
             {
-                this.date = date;
+                TooltipContent = date;
             }
 
             [BackgroundDependencyLoader]
@@ -150,7 +148,7 @@ namespace osu.Game.Overlays.News
                     },
                     new OsuSpriteText
                     {
-                        Text = date.ToString("d MMM yyyy").ToUpper(),
+                        Text = TooltipContent.ToString("d MMM yyyy").ToUpper(),
                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
                         Margin = new MarginPadding
                         {
