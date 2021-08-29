@@ -22,7 +22,7 @@ namespace osu.Game.DBus
         Task<string> GetUserAvatarUrlAsync();
         Task<string> GetPPAsync();
         Task<string> GetCurrentRulesetAsync();
-        Task<string> GetLaunchTimeAsync();
+        Task<long> GetLaunchTickAsync();
     }
 
     public class UserInfoDBusService : IUserInfoDBusService
@@ -36,7 +36,7 @@ namespace osu.Game.DBus
         {
             set
             {
-                SetProperty("name", value.Username ?? string.Empty);
+                SetProperty("name", value.Username);
                 SetProperty("global_rank", value.Statistics?.GlobalRank > 0 ? $"{value.Statistics.GlobalRank:N0}" : "-1");
                 SetProperty("region_rank", value.Statistics?.CountryRank > 0 ? $"{value.Statistics.CountryRank:N0}" : "-1");
                 SetProperty("avatar_url", value.AvatarUrl ?? string.Empty);
@@ -98,20 +98,7 @@ namespace osu.Game.DBus
         public Task<string> GetCurrentRulesetAsync()
             => Task.FromResult(properties["current_ruleset"] as string);
 
-        public Task<string> GetLaunchTimeAsync()
-            => Task.FromResult(getLaunchTime());
-
-        private string getLaunchTime()
-        {
-            string result = string.Empty;
-            var currentTick = new TimeSpan(DateTime.Now.Ticks);
-            var xE = currentTick.Subtract(loadTick);
-
-            if (xE.Hours > 0)
-                result += $"{(xE.Hours + xE.Days * 24):00}:";
-
-            result += $"{xE.Minutes:00}:{xE.Seconds:00}";
-            return result;
-        }
+        public Task<long> GetLaunchTickAsync()
+            => Task.FromResult(new TimeSpan(DateTime.Now.Ticks).Ticks - loadTick.Ticks);
     }
 }
