@@ -21,7 +21,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
-using M.DBus.Services;
 using osu.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -62,7 +61,6 @@ using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Localisation;
 using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
-using Tmds.DBus;
 
 namespace osu.Game
 {
@@ -161,7 +159,7 @@ namespace osu.Game
 
         private DBusManagerContainer dBusManagerContainer;
         private MvisPluginManager mvisPlManager;
-        private BeatmapInfoDBusService beatmapService;
+
         private Bindable<GamemodeActivateCondition> gamemodeCondition;
 
         private MainMenu menuScreen;
@@ -299,29 +297,6 @@ namespace osu.Game
                 dBusManagerContainer = new DBusManagerContainer(
                     true,
                     MConfig.GetBindable<bool>(MSetting.DBusIntegration));
-
-                UserInfoDBusService userInfoService;
-                dBusManagerContainer.DBusManager.RegisterNewObjects(new IDBusObject[]
-                {
-                    new Greet(GetType().Namespace + '.' + GetType().Name)
-                    {
-                        AllowPost = MConfig.GetBindable<bool>(MSetting.DBusAllowPost),
-                        OnMessageRecive = s => Schedule(() =>
-                        {
-                            Notifications.Post(new SimpleNotification()
-                            {
-                                Text = "收到一条来自DBus的消息: \n" + s
-                            });
-                        })
-                    },
-                    beatmapService = new BeatmapInfoDBusService(),
-                    userInfoService = new UserInfoDBusService
-                    {
-                        Ruleset = this.Ruleset
-                    }
-                });
-
-                API.LocalUser.BindValueChanged(v => userInfoService.User = v.NewValue, true);
 
                 dependencies.Cache(dBusManagerContainer.DBusManager);
             }
@@ -635,8 +610,6 @@ namespace osu.Game
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
-            beatmapService.Beatmap = beatmap.NewValue;
-
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
         }

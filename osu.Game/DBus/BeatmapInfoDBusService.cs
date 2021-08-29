@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps;
 using Tmds.DBus;
@@ -7,11 +10,14 @@ namespace osu.Game.DBus
     [DBusInterface("io.matrix_feather.mfosu.CurrentBeatmap")]
     public interface IBeatmapInfoDBusService : IDBusObject
     {
+        Task<IDictionary<string, object>> GetAllAsync();
+        Task<object> GetAsync(string prop);
+        Task SetAsync(string prop, object val);
+        Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler);
         Task<string> GetFullNameAsync();
-        Task<double> GetTrackLengthAsync();
-        Task<double> GetTrackProgressAsync();
         Task<string> GetCurrentDifficultyVersionAsync();
         Task<double> GetCurrentDifficultyStarAsync();
+        Task<int> GetOnlineIdAsync();
     }
 
     public class BeatmapInfoDBusService : IBeatmapInfoDBusService
@@ -19,27 +25,61 @@ namespace osu.Game.DBus
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mfosu/CurrentBeatmap");
 
-        public WorkingBeatmap Beatmap { get; set; }
-
-        public Task<string> GetFullNameAsync()
+        public WorkingBeatmap Beatmap
         {
-            var info = (Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist)
-                       + " - "
-                       + (Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title);
+            set
+            {
+                setProperty("fullname",
+                    (value.Metadata.ArtistUnicode ?? value.Metadata.Artist)
+                    + " - "
+                    + (value.Metadata.TitleUnicode ?? value.Metadata.Title));
 
-            return Task.FromResult(info);
+                setProperty("difficulty", value.BeatmapInfo.Version ?? "???");
+                setProperty("stars", value.BeatmapInfo.StarDifficulty);
+                setProperty("online_id", value.BeatmapInfo.OnlineBeatmapID ?? -1);
+            }
         }
 
-        public Task<double> GetTrackLengthAsync()
-            => Task.FromResult(Beatmap.Track.Length);
+        private void setProperty(string name, object value)
+        {
+            properties[name] = value;
+            OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(name, value));
+        }
 
-        public Task<double> GetTrackProgressAsync()
-            => Task.FromResult(Beatmap.Track.CurrentTime);
+        private readonly IDictionary<string, object> properties = new ConcurrentDictionary<string, object>
+        {
+            ["fullname"] = string.Empty,
+            ["difficulty"] = string.Empty,
+            ["stars"] = 0.0d,
+            ["online_id"] = -1
+        };
+
+        public Task<IDictionary<string, object>> GetAllAsync()
+            => Task.FromResult(properties);
+
+        public Task<object> GetAsync(string prop)
+            => Task.FromResult(properties[prop]);
+
+        public Task SetAsync(string prop, object val)
+        {
+            throw new NotImplementedException();
+        }
+
+        public event Action<PropertyChanges> OnPropertiesChanged;
+
+        public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)
+            => SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
+
+        public Task<string> GetFullNameAsync()
+            => Task.FromResult(properties["fullname"] as string);
 
         public Task<string> GetCurrentDifficultyVersionAsync()
-            => Task.FromResult(Beatmap.BeatmapInfo.Version ?? "???");
+            => Task.FromResult(properties["difficulty"] as string);
 
         public Task<double> GetCurrentDifficultyStarAsync()
-            => Task.FromResult(Beatmap.BeatmapInfo.StarDifficulty);
+            => Task.FromResult(properties["stars"] as double? ?? 0);
+
+        public Task<int> GetOnlineIdAsync()
+            => Task.FromResult(properties["online_id"] as int? ?? -1);
     }
 }
