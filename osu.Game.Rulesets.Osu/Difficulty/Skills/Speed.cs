@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -26,12 +27,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double DifficultyMultiplier => 1.04;
 
         private const double min_speed_bonus = 75; // ~200BPM
-        private const double max_speed_bonus = 45; // ~330BPM
         private const double speed_balancing_factor = 40;
+        private double greatWindow;
 
-        public Speed(Mod[] mods)
+        public Speed(Mod[] mods, IBeatmap beatmap, double clockRate)
             : base(mods)
         {
+            greatWindow = (79 - (beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty * 6) + 0.5) / clockRate;
+            Console.WriteLine(greatWindow);
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -42,11 +45,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuCurrent = (OsuDifficultyHitObject)current;
 
             double distance = Math.Min(single_spacing_threshold, osuCurrent.TravelDistance + osuCurrent.JumpDistance);
-            double deltaTime = Math.Max(max_speed_bonus, current.DeltaTime);
+            double deltaTime = current.DeltaTime;
 
             double speedBonus = 1.0;
             if (deltaTime < min_speed_bonus)
                 speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
+
+            // Doubletap detection
+            if (Previous.Count > 0)
+            {
+                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
+                if ( (osuPrevious.DeltaTime / osuCurrent.DeltaTime) >= 3 && osuCurrent.DeltaTime <= (2 * greatWindow))
+                {
+                    //Console.WriteLine( osuCurrent.StartTime / 1000.0);
+                    return 0; 
+                }
+            }
 
             double angleBonus = 1.0;
 
