@@ -144,6 +144,30 @@ namespace Mvis.Plugin.CollectionSupport
                 drawableTrack.Start();
         }
 
+        public override bool Disable()
+        {
+            this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                dBusObject.Position = -1;
+                dBusObject.CollectionName = "-";
+            }
+
+            return base.Disable();
+        }
+
+        public override bool Enable()
+        {
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                dBusObject.Position = currentPosition;
+                dBusObject.CollectionName = CurrentCollection.Value?.Name.Value ?? "-";
+            }
+
+            return base.Enable();
+        }
+
         public void Seek(double position) => b.Value.Track.Seek(position);
 
         private DrawableTrack drawableTrack;

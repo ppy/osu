@@ -220,6 +220,12 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
 
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                dbusObject.RawLyric = "-";
+                dbusObject.TranslatedLyric = "-";
+            }
+
             return base.Disable();
         }
 
@@ -230,6 +236,12 @@ namespace Mvis.Plugin.CloudMusicSupport
             this.MoveToX(0, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
 
             MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                dbusObject.RawLyric = currentLine?.Content;
+                dbusObject.TranslatedLyric = currentLine?.TranslatedString;
+            }
 
             return result;
         }
