@@ -11,6 +11,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 using Tmds.DBus;
 
 namespace osu.Game.DBus
@@ -46,6 +47,8 @@ namespace osu.Game.DBus
         [Resolved(canBeNull: true)]
         private NotificationOverlay notificationOverlay { get; set; }
 
+        private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
+
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, MConfigManager config)
         {
@@ -53,10 +56,7 @@ namespace osu.Game.DBus
             {
                 beatmapService = new BeatmapInfoDBusService(),
                 audioservice = new AudioInfoDBusService(),
-                userInfoService = new UserInfoDBusService
-                {
-                    Ruleset = ruleset
-                },
+                userInfoService = new UserInfoDBusService(),
                 new Greet(GetType().Namespace + '.' + GetType().Name)
                 {
                     AllowPost = config.GetBindable<bool>(MSetting.DBusAllowPost),
@@ -70,9 +70,17 @@ namespace osu.Game.DBus
                 }
             });
 
-            api.LocalUser.BindValueChanged(v => userInfoService.User = v.NewValue, true);
-
+            api.LocalUser.BindValueChanged(onUserChanged, true);
             beatmap.BindValueChanged(onBeatmapChanged, true);
+            ruleset.BindValueChanged(v => userInfoService.SetProperty("current_ruleset", v.NewValue?.Name ?? "???"), true);
+            bindableActivity.BindValueChanged(v => userInfoService.SetProperty("activity", v.NewValue?.Status ?? "空闲"), true);
+        }
+
+        private void onUserChanged(ValueChangedEvent<User> v)
+        {
+            bindableActivity.UnbindBindings();
+            bindableActivity.BindTo(v.NewValue.Activity);
+            userInfoService.User = v.NewValue;
         }
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
