@@ -64,6 +64,9 @@ namespace osu.Game.Screens.Select
 
         private CarouselBeatmapSet selectedBeatmapSet;
 
+        private readonly List<CarouselBeatmapSet> nowFilteredSets = new List<CarouselBeatmapSet>();
+        private bool justFilteredASet;
+
         /// <summary>
         /// Raised when the <see cref="SelectedBeatmap"/> is changed.
         /// </summary>
@@ -463,6 +466,9 @@ namespace osu.Game.Screens.Select
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
+                CarouselBeatmapSet firstPreviouslyFilteredSet = nowFilteredSets.FirstOrDefault(set => !set.Filtered.Value);
+                if (firstPreviouslyFilteredSet != null)
+                    firstPreviouslyFilteredSet.State.Value = CarouselItemState.Selected;
 
                 if (alwaysResetScrollPosition || !Scroll.UserScrolling)
                     ScrollToSelected(true);
@@ -711,6 +717,26 @@ namespace osu.Game.Screens.Select
             var set = new CarouselBeatmapSet(beatmapSet)
             {
                 GetRecommendedBeatmap = beatmaps => GetRecommendedBeatmap?.Invoke(beatmaps)
+            };
+
+            set.UnselectedBecauseFiltered += () =>
+            {
+                nowFilteredSets.Add(set);
+                justFilteredASet = true;
+            };
+            set.State.ValueChanged += state =>
+            {
+                if (state.NewValue != CarouselItemState.Selected)
+                    return;
+
+                if (justFilteredASet)
+                {
+                    justFilteredASet = false;
+                    return;
+                }
+
+                if (!nowFilteredSets.Contains(set))
+                    nowFilteredSets.Clear();
             };
 
             foreach (var c in set.Beatmaps)
