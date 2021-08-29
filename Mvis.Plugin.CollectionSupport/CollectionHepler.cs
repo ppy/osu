@@ -36,7 +36,22 @@ namespace Mvis.Plugin.CollectionSupport
         private MusicController controller { get; set; }
 
         private readonly List<BeatmapSetInfo> beatmapList = new List<BeatmapSetInfo>();
-        public int CurrentPosition { get; private set; } = -1;
+
+        public int CurrentPosition
+        {
+            get => currentPosition;
+            set
+            {
+                currentPosition = value;
+
+                if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                {
+                    dBusObject.Position = value;
+                }
+            }
+        }
+
+        private int currentPosition = -1;
         private int maxCount;
         public Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
 
@@ -72,6 +87,8 @@ namespace Mvis.Plugin.CollectionSupport
         [Resolved]
         private OsuGame game { get; set; }
 
+        private CollectionDBusObject dBusObject;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -85,10 +102,7 @@ namespace Mvis.Plugin.CollectionSupport
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
-                PluginManager.RegisterDBusObject(new CollectionDBusObject
-                {
-                    Plugin = this
-                });
+                PluginManager.RegisterDBusObject(dBusObject = new CollectionDBusObject());
             }
         }
 
@@ -110,10 +124,7 @@ namespace Mvis.Plugin.CollectionSupport
         {
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
-                PluginManager.UnRegisterDBusObject(new CollectionDBusObject
-                {
-                    Plugin = this
-                });
+                PluginManager.UnRegisterDBusObject(new CollectionDBusObject());
             }
         }
 
@@ -226,6 +237,9 @@ namespace Mvis.Plugin.CollectionSupport
                 if (!beatmapList.Contains(currentSet))
                     beatmapList.Add(currentSet);
             }
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                dBusObject.CollectionName = collection.Name.Value;
 
             updateCurrentPosition();
         }

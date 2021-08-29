@@ -144,10 +144,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
-                PluginManager.RegisterDBusObject(new LyricDBusObject
-                {
-                    Plugin = this
-                });
+                PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
             }
 
             if (MvisScreen != null)
@@ -239,8 +236,25 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         protected override bool PostInit() => true;
 
-        public Lyric CurrentLine;
+        private Lyric currentLine;
+
+        public Lyric CurrentLine
+        {
+            get => currentLine;
+            set
+            {
+                currentLine = value;
+
+                if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                {
+                    dbusObject.RawLyric = value?.Content;
+                    dbusObject.TranslatedLyric = value?.TranslatedString;
+                }
+            }
+        }
+
         private readonly Lyric defaultLrc = new Lyric();
+        private LyricDBusObject dbusObject;
 
         protected override void Update()
         {
