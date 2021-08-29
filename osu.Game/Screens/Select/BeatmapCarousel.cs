@@ -596,6 +596,9 @@ namespace osu.Game.Screens.Select
             if (revalidateItems)
                 updateYPositions();
 
+            if (!visibleItems.Any())
+                justFilteredASet = false;
+
             // if there is a pending scroll action we apply it without animation and transfer the difference in position to the panels.
             // this is intentionally applied before updating the visible range below, to avoid animating new items (sourced from pool) from locations off-screen, as it looks bad.
             if (pendingScrollOperation != PendingScrollOperation.None)
