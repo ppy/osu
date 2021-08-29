@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             setDistances();
 
             // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
-            StrainTime = Math.Max(50, DeltaTime);
+            StrainTime = DeltaTime;
         }
 
         private void setDistances()
