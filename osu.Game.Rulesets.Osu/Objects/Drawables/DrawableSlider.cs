@@ -67,6 +67,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
+                headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
+                repeatArrowContainer = new Container { RelativeSizeAxes = Axes.Both },
+                headOverlayContainer = new Container { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(this)
                 {
                     GetInitialHitAction = () => HeadCircle.HitAction,
@@ -74,9 +77,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
-                repeatArrowContainer = new Container { RelativeSizeAxes = Axes.Both },
-                headOverlayContainer = new Container { RelativeSizeAxes = Axes.Both },
                 slidingSample = new PausableSkinnableSound { Looping = true }
             };
 
