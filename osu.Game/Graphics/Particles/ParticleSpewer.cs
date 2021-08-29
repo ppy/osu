@@ -45,6 +45,10 @@ namespace osu.Game.Graphics.Particles
         {
             base.Update();
 
+            // reset cooldown if the clock was rewound.
+            // this can happen when seeking in replays.
+            if (lastParticleAdded > Time.Current) lastParticleAdded = 0;
+
             if (Active && Time.Current > lastParticleAdded + cooldown)
             {
                 addParticle(SpawnParticle());
@@ -56,7 +60,14 @@ namespace osu.Game.Graphics.Particles
         /// <summary>
         /// Called each time a new particle should be spawned.
         /// </summary>
-        protected abstract FallingParticle SpawnParticle();
+        protected virtual FallingParticle SpawnParticle()
+        {
+            return new FallingParticle
+            {
+                StartTime = (float)Time.Current,
+                StartPosition = ToScreenSpace(OriginPosition),
+            };
+        }
 
         private void addParticle(FallingParticle fallingParticle)
         {
@@ -67,6 +78,8 @@ namespace osu.Game.Graphics.Particles
         }
 
         protected override DrawNode CreateDrawNode() => new ParticleSpewerDrawNode(this);
+
+        # region DrawNode
 
         private class ParticleSpewerDrawNode : SpriteDrawNode
         {
@@ -102,6 +115,10 @@ namespace osu.Game.Graphics.Particles
 
                     var timeSinceStart = currentTime - p.StartTime;
 
+                    // ignore particles from the future.
+                    // these can appear when seeking in replays.
+                    if (timeSinceStart < 0) continue;
+
                     var alpha = p.AlphaAtTime(timeSinceStart);
                     if (alpha <= 0) continue;
 
@@ -109,17 +126,21 @@ namespace osu.Game.Graphics.Particles
                     var pos = p.PositionAtTime(timeSinceStart, gravity);
                     var angle = p.AngleAtTime(timeSinceStart);
 
+                    var matrixScale = DrawInfo.Matrix.ExtractScale();
+                    var width = Texture.DisplayWidth * scale * matrixScale.X;
+                    var height = Texture.DisplayHeight * scale * matrixScale.Y;
+
                     var rect = new RectangleF(
-                        pos.X - Texture.DisplayWidth * scale / 2,
-                        pos.Y - Texture.DisplayHeight * scale / 2,
-                        Texture.DisplayWidth * scale,
-                        Texture.DisplayHeight * scale);
+                        pos.X - width / 2,
+                        pos.Y - height / 2,
+                        width,
+                        height);
 
                     var quad = new Quad(
-                        transformPosition(rect.TopLeft, rect.Centre, angle),
-                        transformPosition(rect.TopRight, rect.Centre, angle),
-                        transformPosition(rect.BottomLeft, rect.Centre, angle),
-                        transformPosition(rect.BottomRight, rect.Centre, angle)
+                        rotatePosition(rect.TopLeft, rect.Centre, angle),
+                        rotatePosition(rect.TopRight, rect.Centre, angle),
+                        rotatePosition(rect.BottomLeft, rect.Centre, angle),
+                        rotatePosition(rect.BottomRight, rect.Centre, angle)
                     );
 
                     DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
@@ -128,24 +149,24 @@ namespace osu.Game.Graphics.Particles
                 }
             }
 
-            private Vector2 transformPosition(Vector2 pos, Vector2 centre, float angle)
+            private Vector2 rotatePosition(Vector2 pos, Vector2 centre, float angle)
             {
-                // rotate point around centre.
                 float cos = MathF.Cos(angle);
                 float sin = MathF.Sin(angle);
 
                 float x = centre.X + (pos.X - centre.X) * cos + (pos.Y - centre.Y) * sin;
                 float y = centre.Y + (pos.Y - centre.Y) * cos - (pos.X - centre.X) * sin;
 
-                // convert to screen space.
-                return Vector2Extensions.Transform(new Vector2(x, y), DrawInfo.Matrix);
+                return new Vector2(x, y);
             }
         }
+
+        #endregion
 
         protected struct FallingParticle
         {
             public float StartTime;
-            public Vector2 Position;
+            public Vector2 StartPosition;
             public Vector2 Velocity;
             public float Duration;
             public float AngularVelocity;
@@ -163,7 +184,7 @@ namespace osu.Game.Graphics.Particles
                 var progress = progressAtTime(timeSinceStart);
                 var grav = new Vector2(0, -gravity) * progress;
 
-                return Position + (Velocity - grav) * timeSinceStart;
+                return StartPosition + (Velocity - grav) * timeSinceStart;
             }
 
             private float progressAtTime(float timeSinceStart) => Math.Clamp(timeSinceStart / Duration, 0, 1);
