@@ -64,7 +64,14 @@ namespace osu.Game.Screens.Select
 
         private CarouselBeatmapSet selectedBeatmapSet;
 
+        /// <summary>
+        /// Beatmapsets that were selected but got filtered. Used to try and re-select if only filter actions have been applied.
+        /// </summary>
         private readonly List<CarouselBeatmapSet> nowFilteredSets = new List<CarouselBeatmapSet>();
+
+        /// <summary>
+        /// True while filter action resulted in last selection getting filtered and next/eager selection hasn't happened yet.
+        /// </summary>
         private bool lastSelectionWasFiltered;
 
         /// <summary>
@@ -464,11 +471,13 @@ namespace osu.Game.Screens.Select
             {
                 PendingFilter = null;
 
+                // selected set can only be null if everything, including our last selection, has been filtered
                 if (selectedBeatmapSet == null)
                     lastSelectionWasFiltered = true;
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
+                // this is to help users who accidentally misused their filter criteria return to their previously selected map
                 CarouselBeatmapSet firstPreviouslyFilteredSet = nowFilteredSets.FirstOrDefault(set => !set.Filtered.Value);
                 if (firstPreviouslyFilteredSet != null)
                     firstPreviouslyFilteredSet.State.Value = CarouselItemState.Selected;
@@ -599,6 +608,7 @@ namespace osu.Game.Screens.Select
             if (revalidateItems)
                 updateYPositions();
 
+            // If an eager selection can't be made because all sets have been filtered, the flag should be reset
             if (!visibleItems.Any())
                 lastSelectionWasFiltered = false;
 
@@ -737,10 +747,13 @@ namespace osu.Game.Screens.Select
 
                 if (lastSelectionWasFiltered)
                 {
+                    // this set is now our last selected one and it isn't filtered
                     lastSelectionWasFiltered = false;
                     return;
                 }
 
+                // if we reached here, either user selected something or carousel selected previously filtered set
+                // if the selection is something the carousel wouldn't have selected, it's the user confirming their filter criteria
                 if (!nowFilteredSets.Contains(set))
                     nowFilteredSets.Clear();
             };
