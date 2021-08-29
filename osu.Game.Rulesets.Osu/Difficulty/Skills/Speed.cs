@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             : base(mods)
         {
             greatWindow = (79 - (beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty * 6) + 0.5) / clockRate;
-            Console.WriteLine(greatWindow);
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -57,7 +56,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 var osuPrevious = (OsuDifficultyHitObject)Previous[0];
                 if ( (osuPrevious.DeltaTime / osuCurrent.DeltaTime) >= 3 && osuCurrent.DeltaTime <= (2 * greatWindow))
                 {
-                    //Console.WriteLine( osuCurrent.StartTime / 1000.0);
                     return 0; 
                 }
             }
