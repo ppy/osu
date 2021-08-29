@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Select
         private CarouselBeatmapSet selectedBeatmapSet;
 
         private readonly List<CarouselBeatmapSet> nowFilteredSets = new List<CarouselBeatmapSet>();
-        private bool justFilteredASet;
+        private bool lastSelectionWasFiltered;
 
         /// <summary>
         /// Raised when the <see cref="SelectedBeatmap"/> is changed.
@@ -464,6 +464,9 @@ namespace osu.Game.Screens.Select
             {
                 PendingFilter = null;
 
+                if (selectedBeatmapSet == null)
+                    lastSelectionWasFiltered = true;
+
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
                 CarouselBeatmapSet firstPreviouslyFilteredSet = nowFilteredSets.FirstOrDefault(set => !set.Filtered.Value);
@@ -597,7 +600,7 @@ namespace osu.Game.Screens.Select
                 updateYPositions();
 
             if (!visibleItems.Any())
-                justFilteredASet = false;
+                lastSelectionWasFiltered = false;
 
             // if there is a pending scroll action we apply it without animation and transfer the difference in position to the panels.
             // this is intentionally applied before updating the visible range below, to avoid animating new items (sourced from pool) from locations off-screen, as it looks bad.
@@ -725,16 +728,16 @@ namespace osu.Game.Screens.Select
             set.UnselectedBecauseFiltered += () =>
             {
                 nowFilteredSets.Add(set);
-                justFilteredASet = true;
+                lastSelectionWasFiltered = true;
             };
             set.State.ValueChanged += state =>
             {
                 if (state.NewValue != CarouselItemState.Selected)
                     return;
 
-                if (justFilteredASet)
+                if (lastSelectionWasFiltered)
                 {
-                    justFilteredASet = false;
+                    lastSelectionWasFiltered = false;
                     return;
                 }
 
