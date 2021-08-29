@@ -29,21 +29,20 @@ namespace osu.Game.Graphics.Particles
 
         protected override FallingParticle SpawnParticle()
         {
+            var p = base.SpawnParticle();
+
             var directionRads = MathUtils.DegreesToRadians(
                 RNG.NextSingle(angle - angle_spread / 2, angle + angle_spread / 2)
             );
             var direction = new Vector2(MathF.Sin(directionRads), MathF.Cos(directionRads));
 
-            return new FallingParticle
-            {
-                StartTime = (float)Time.Current,
-                Position = OriginPosition,
-                Duration = RNG.NextSingle((float)particle_lifetime * 0.8f, (float)particle_lifetime),
-                Velocity = direction * new Vector2(RNG.NextSingle(velocity_min, velocity_max)),
-                AngularVelocity = RNG.NextSingle(-angular_velocity, angular_velocity),
-                StartScale = 1f,
-                EndScale = 2f,
-            };
+            p.Duration = RNG.NextSingle((float)particle_lifetime * 0.8f, (float)particle_lifetime);
+            p.Velocity = direction * new Vector2(RNG.NextSingle(velocity_min, velocity_max));
+            p.AngularVelocity = RNG.NextSingle(-angular_velocity, angular_velocity);
+            p.StartScale = 1f;
+            p.EndScale = 2f;
+
+            return p;
         }
     }
 }
