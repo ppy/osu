@@ -329,8 +329,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (int.TryParse(link.Argument, out int userId))
-                        ShowUser(userId);
+                    ShowUser(link.Argument);
                     break;
 
                 case LinkAction.OpenWiki:
@@ -377,6 +376,12 @@ namespace osu.Game
         /// </summary>
         /// <param name="userId">The user to display.</param>
         public void ShowUser(int userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
+
+        /// <summary>
+        /// Show a user's profile as an overlay.
+        /// </summary>
+        /// <param name="username">The user to display.</param>
+        public void ShowUser(string username) => waitForReady(() => userProfile, _ => userProfile.ShowUser(username));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.
