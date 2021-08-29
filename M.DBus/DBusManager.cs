@@ -53,14 +53,14 @@ namespace M.DBus
 
         private void onServiceNameChanged(ServiceOwnerChangedEventArgs args)
         {
-            Logger.Log($"服务 {args.ServiceName} 的归属现在从 {args.OldOwner} 变为 {args.NewOwner}");
+            Logger.Log($"服务 '{args.ServiceName}' 的归属现在从 '{args.OldOwner}' 变为 '{args.NewOwner}'");
         }
 
         private void onServiceError(Exception e, IDBusObject dbusObject)
         {
             connectionState = ConnectionState.Faulted;
 
-            Logger.Error(e, $"位于 {ObjectPathToName(dbusObject.ObjectPath)} 的DBus服务出现错误");
+            Logger.Error(e, $"位于 '{ObjectPathToName(dbusObject.ObjectPath)}' 的DBus服务出现错误");
         }
 
         public async Task RegisterNewObject(IDBusObject dbusObject)
@@ -125,66 +125,36 @@ namespace M.DBus
 
         private CancellationTokenSource cancellationTokenSource;
 
-        public void Connect()
+        private string currentConnectTarget;
+
+        public void Connect(string target = null)
         {
             if (isDisposed)
                 throw new ObjectDisposedException(ToString(), "已处理的对象不能再次连接。");
 
+            //默认连接到会话
+            target ??= Address.Session;
+            currentConnectTarget = target;
+
             //先停止服务
             Disconnect();
 
-            Logger.Log("正在启动 DBUS 服务!");
+            Logger.Log($"正在连接到 {target} 上的DBus服务!");
 
             //刷新cancellationToken
             cancellationTokenSource = new CancellationTokenSource();
 
             //开始服务
-            Task.Run(connectTask, cancellationTokenSource.Token);
+            Task.Run(() => connectTask(target), cancellationTokenSource.Token);
         }
 
-        public bool Disconnect()
-        {
-            Logger.Log("正在停止 DBUS 服务!");
-
-            try
-            {
-                //如果已经连接到DBus
-                if (connectionState == ConnectionState.Connected)
-                {
-                    //反注册物件
-                    currentConnection.UnregisterObjects(dBusObjects);
-
-                    //反注册服务
-                    foreach (var dBusObject in dBusObjects)
-                    {
-                        currentConnection.UnregisterServiceAsync(ObjectPathToName(dBusObject.ObjectPath)).ConfigureAwait(false);
-                    }
-                }
-                else if (connectionState == ConnectionState.Faulted)
-                {
-                    currentConnection.Dispose();
-                    currentConnection = null;
-                    connectionState = ConnectionState.NotConnected;
-                    Logger.Log("DBus服务已经出现过一次错误, 将处理此次连接。");
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "停止DBus服务时出现了错误");
-
-                return false;
-            }
-
-            return true;
-        }
-
-        private async Task connectTask()
+        private async Task connectTask(string target)
         {
             switch (connectionState)
             {
                 case ConnectionState.NotConnected:
                     //初始化到DBus的连接
-                    currentConnection ??= new Connection(Address.Session);
+                    currentConnection ??= new Connection(target);
 
                     //连接到DBus
                     connectionState = ConnectionState.Connecting;
@@ -195,7 +165,7 @@ namespace M.DBus
                     break;
 
                 case ConnectionState.Connected:
-                    Logger.Log("连接过了，直接注册!");
+                    Logger.Log($"已经连接到{currentConnectTarget}，直接注册!");
 
                     //直接注册
                     await registerObjects().ConfigureAwait(false);
@@ -210,6 +180,52 @@ namespace M.DBus
 
             //设置连接状态
             connectionState = ConnectionState.Connected;
+        }
+
+        public bool Disconnect()
+        {
+            Logger.Log($"正在断开连接!");
+
+            try
+            {
+                switch (connectionState)
+                {
+                    case ConnectionState.Connected:
+                        //反注册物件
+                        currentConnection.UnregisterObjects(dBusObjects);
+
+                        //反注册服务
+                        foreach (var dBusObject in dBusObjects)
+                        {
+                            currentConnection.UnregisterServiceAsync(ObjectPathToName(dBusObject.ObjectPath)).ConfigureAwait(false);
+                        }
+
+                        //清除当前连接目标
+                        currentConnectTarget = string.Empty;
+
+                        break;
+
+                    case ConnectionState.Connecting:
+                        //如果正在连接，中断当前任务
+                        cancellationTokenSource?.Cancel();
+                        break;
+
+                    case ConnectionState.Faulted:
+                        currentConnection.Dispose();
+                        currentConnection = null;
+                        connectionState = ConnectionState.NotConnected;
+                        Logger.Log("DBus服务已经出现过一次错误, 将处理此次连接。");
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "停止DBus服务时出现了错误");
+
+                return false;
+            }
+
+            return true;
         }
 
         private enum ConnectionState
@@ -236,8 +252,6 @@ namespace M.DBus
         public void Dispose()
         {
             Disconnect();
-            currentConnection?.Dispose();
-            cancellationTokenSource?.Dispose();
 
             isDisposed = true;
             GC.SuppressFinalize(this);
