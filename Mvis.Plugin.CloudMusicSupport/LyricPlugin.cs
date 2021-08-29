@@ -155,6 +155,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         private void onMvisExiting()
         {
+            resetDBusMessage();
             PluginManager.UnRegisterDBusObject(new LyricDBusObject());
         }
 
@@ -220,11 +221,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-            {
-                dbusObject.RawLyric = "-";
-                dbusObject.TranslatedLyric = "-";
-            }
+            resetDBusMessage();
 
             return base.Disable();
         }
@@ -244,6 +241,15 @@ namespace Mvis.Plugin.CloudMusicSupport
             }
 
             return result;
+        }
+
+        private void resetDBusMessage()
+        {
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                dbusObject.RawLyric = "-";
+                dbusObject.TranslatedLyric = "-";
+            }
         }
 
         protected override bool PostInit() => true;

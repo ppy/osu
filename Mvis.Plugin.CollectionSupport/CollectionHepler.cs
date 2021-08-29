@@ -124,6 +124,7 @@ namespace Mvis.Plugin.CollectionSupport
         {
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
+                resetDBusMessage();
                 PluginManager.UnRegisterDBusObject(new CollectionDBusObject());
             }
         }
@@ -148,11 +149,7 @@ namespace Mvis.Plugin.CollectionSupport
         {
             this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-            {
-                dBusObject.Position = -1;
-                dBusObject.CollectionName = "-";
-            }
+            resetDBusMessage();
 
             return base.Disable();
         }
@@ -166,6 +163,15 @@ namespace Mvis.Plugin.CollectionSupport
             }
 
             return base.Enable();
+        }
+
+        private void resetDBusMessage()
+        {
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                dBusObject.Position = -1;
+                dBusObject.CollectionName = "-";
+            }
         }
 
         public void Seek(double position) => b.Value.Track.Seek(position);
