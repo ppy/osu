@@ -18,14 +18,15 @@ namespace osu.Game.Screens.Edit.Setup
     {
         private const float fade_duration = 250;
 
-        private LabelledSwitchButton enableCountdown;
-        private FillFlowContainer countdownSettings;
-        private LabelledEnumDropdown<CountdownType> countdownSpeed;
-        private LabelledNumberBox countdownOffset;
+        protected LabelledSwitchButton EnableCountdown;
+        protected LabelledEnumDropdown<CountdownType> CountdownSpeed;
+        protected LabelledNumberBox CountdownOffset;
 
         private LabelledSwitchButton widescreenSupport;
         private LabelledSwitchButton epilepsyWarning;
         private LabelledSwitchButton letterboxDuringBreaks;
+
+        private FillFlowContainer countdownSettings;
 
         public override LocalisableString Title => "Design";
 
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.Edit.Setup
         {
             Children = new[]
             {
-                enableCountdown = new LabelledSwitchButton
+                EnableCountdown = new LabelledSwitchButton
                 {
                     Label = "Enable countdown",
                     Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None },
@@ -48,13 +49,13 @@ namespace osu.Game.Screens.Edit.Setup
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        countdownSpeed = new LabelledEnumDropdown<CountdownType>
+                        CountdownSpeed = new LabelledEnumDropdown<CountdownType>
                         {
                             Label = "Countdown speed",
                             Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None ? Beatmap.BeatmapInfo.Countdown : CountdownType.Normal },
                             Items = Enum.GetValues(typeof(CountdownType)).Cast<CountdownType>().Where(type => type != CountdownType.None)
                         },
-                        countdownOffset = new LabelledNumberBox
+                        CountdownOffset = new LabelledNumberBox
                         {
                             Label = "Countdown offset",
                             Current = { Value = Beatmap.BeatmapInfo.CountdownOffset.ToString() },
@@ -88,12 +89,12 @@ namespace osu.Game.Screens.Edit.Setup
         {
             base.LoadComplete();
 
-            enableCountdown.Current.BindValueChanged(_ => updateCountdownSettingsVisibility(), true);
+            EnableCountdown.Current.BindValueChanged(_ => updateCountdownSettingsVisibility(), true);
             countdownSettings.FinishTransforms(true);
 
-            enableCountdown.Current.BindValueChanged(_ => updateBeatmap());
-            countdownSpeed.Current.BindValueChanged(_ => updateBeatmap());
-            countdownOffset.OnCommit += (_, __) => updateBeatmap();
+            EnableCountdown.Current.BindValueChanged(_ => updateBeatmap());
+            CountdownSpeed.Current.BindValueChanged(_ => updateBeatmap());
+            CountdownOffset.OnCommit += (_, __) => onOffsetCommitted();
 
             widescreenSupport.Current.BindValueChanged(_ => updateBeatmap());
             epilepsyWarning.Current.BindValueChanged(_ => updateBeatmap());
@@ -102,7 +103,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void updateCountdownSettingsVisibility()
         {
-            bool countdownEnabled = enableCountdown.Current.Value;
+            bool countdownEnabled = EnableCountdown.Current.Value;
 
             foreach (var child in countdownSettings)
             {
@@ -111,10 +112,17 @@ namespace osu.Game.Screens.Edit.Setup
             }
         }
 
+        private void onOffsetCommitted()
+        {
+            updateBeatmap();
+            // update displayed text to ensure parsed value matches display (i.e. if empty string was provided).
+            CountdownOffset.Current.Value = Beatmap.BeatmapInfo.CountdownOffset.ToString(CultureInfo.InvariantCulture);
+        }
+
         private void updateBeatmap()
         {
-            Beatmap.BeatmapInfo.Countdown = enableCountdown.Current.Value ? countdownSpeed.Current.Value : CountdownType.None;
-            Beatmap.BeatmapInfo.CountdownOffset = int.TryParse(countdownOffset.Current.Value, NumberStyles.None, CultureInfo.InvariantCulture, out int offset) ? offset : 0;
+            Beatmap.BeatmapInfo.Countdown = EnableCountdown.Current.Value ? CountdownSpeed.Current.Value : CountdownType.None;
+            Beatmap.BeatmapInfo.CountdownOffset = int.TryParse(CountdownOffset.Current.Value, NumberStyles.None, CultureInfo.InvariantCulture, out int offset) ? offset : 0;
 
             Beatmap.BeatmapInfo.WidescreenStoryboard = widescreenSupport.Current.Value;
             Beatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning.Current.Value;
