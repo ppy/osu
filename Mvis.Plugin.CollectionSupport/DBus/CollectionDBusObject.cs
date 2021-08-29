@@ -18,9 +18,9 @@ namespace Mvis.Plugin.CollectionSupport.DBus
         public CollectionHelper Plugin { get; set; }
 
         public Task<string> GetCurrentCollectionNameAsync()
-            => Task.FromResult(Plugin.CurrentCollection.Value?.Name.Value ?? string.Empty);
+            => Task.FromResult(Plugin.Disabled.Value ? "-" : Plugin.CurrentCollection.Value?.Name.Value ?? string.Empty);
 
         public Task<int> GetCurrentIndexAsync()
-            => Task.FromResult(Plugin.CurrentPosition);
+            => Task.FromResult(Plugin.Disabled.Value ? -1 : Plugin.CurrentPosition);
     }
 }

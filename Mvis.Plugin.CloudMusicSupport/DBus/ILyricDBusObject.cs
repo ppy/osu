@@ -21,9 +21,9 @@ namespace Mvis.Plugin.CloudMusicSupport.DBus
         public LyricPlugin Plugin { get; set; }
 
         public Task<string> GetCurrentLineRawAsync()
-            => Task.FromResult(Plugin.CurrentLine.Content);
+            => Task.FromResult(Plugin.Disabled.Value ? "-" : Plugin.CurrentLine.Content);
 
         public Task<string> GetCurrentLineTranslatedAsync()
-            => Task.FromResult(Plugin.CurrentLine.TranslatedString);
+            => Task.FromResult(Plugin.Disabled.Value ? "-" : Plugin.CurrentLine.TranslatedString);
     }
 }
