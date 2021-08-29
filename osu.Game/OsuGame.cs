@@ -104,6 +104,8 @@ namespace osu.Game
 
         protected Container ScreenOffsetContainer { get; private set; }
 
+        private Container overlayOffsetContainer;
+
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
 
@@ -120,7 +122,7 @@ namespace osu.Game
 
         public virtual StableStorage GetStorageForStableInstall() => null;
 
-        public float ToolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
+        private float toolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
         private IdleTracker idleTracker;
 
@@ -692,9 +694,16 @@ namespace osu.Game
                         },
                     }
                 },
-                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                overlayOffsetContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        overlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                    }
+                },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker,
                 new ConfineMouseTracker()
@@ -731,7 +740,6 @@ namespace osu.Game
 
             loadComponentSingleFile(Notifications.With(d =>
             {
-                d.GetToolbarHeight = () => ToolbarOffset;
                 d.Anchor = Anchor.TopRight;
                 d.Origin = Anchor.TopRight;
             }), rightFloatingOverlayContent.Add, true);
@@ -757,7 +765,7 @@ namespace osu.Game
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
-            loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
+            loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
@@ -766,14 +774,12 @@ namespace osu.Game
 
             loadComponentSingleFile(new LoginOverlay
             {
-                GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new NowPlayingOverlay
             {
-                GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
@@ -1013,8 +1019,8 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            ScreenOffsetContainer.Padding = new MarginPadding { Top = ToolbarOffset };
-            overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
+            ScreenOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
+            overlayOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
 
             var horizontalOffset = 0f;
 
