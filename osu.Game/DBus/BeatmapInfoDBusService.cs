@@ -18,6 +18,7 @@ namespace osu.Game.DBus
         Task<string> GetCurrentDifficultyVersionAsync();
         Task<double> GetCurrentDifficultyStarAsync();
         Task<int> GetOnlineIdAsync();
+        Task<double> GetBPMAsync();
     }
 
     public class BeatmapInfoDBusService : IBeatmapInfoDBusService
@@ -37,6 +38,7 @@ namespace osu.Game.DBus
                 setProperty("difficulty", value.BeatmapInfo.Version ?? "???");
                 setProperty("stars", value.BeatmapInfo.StarDifficulty);
                 setProperty("online_id", value.BeatmapInfo.OnlineBeatmapID ?? -1);
+                setProperty("bpm", value.BeatmapInfo.BPM);
             }
         }
 
@@ -51,7 +53,8 @@ namespace osu.Game.DBus
             ["fullname"] = string.Empty,
             ["difficulty"] = string.Empty,
             ["stars"] = 0.0d,
-            ["online_id"] = -1
+            ["online_id"] = 0,
+            ["bpm"] = 0
         };
 
         public Task<IDictionary<string, object>> GetAllAsync()
@@ -80,6 +83,9 @@ namespace osu.Game.DBus
             => Task.FromResult(properties["stars"] as double? ?? 0);
 
         public Task<int> GetOnlineIdAsync()
-            => Task.FromResult(properties["online_id"] as int? ?? -1);
+            => Task.FromResult(properties["online_id"] as int? ?? 0);
+
+        public Task<double> GetBPMAsync()
+            => Task.FromResult(properties["bpm"] as double? ?? 0);
     }
 }
