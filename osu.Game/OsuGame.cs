@@ -21,7 +21,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
-using M.DBus;
 using M.DBus.Services;
 using osu.Framework;
 using osu.Framework.Audio;
@@ -160,7 +159,7 @@ namespace osu.Game
 
         private OsuLogo osuLogo;
 
-        private DBusManager dBusManager;
+        private DBusManagerContainer dBusManagerContainer;
         private MvisPluginManager mvisPlManager;
         private BeatmapInfoDBusService beatmapService;
         private Bindable<GamemodeActivateCondition> gamemodeCondition;
@@ -297,13 +296,12 @@ namespace osu.Game
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
-                dBusManager = new DBusManager(
-                    false,
+                dBusManagerContainer = new DBusManagerContainer(
                     true,
                     MConfig.GetBindable<bool>(MSetting.DBusIntegration));
 
                 UserInfoDBusService userInfoService;
-                dBusManager.RegisterNewObjects(new IDBusObject[]
+                dBusManagerContainer.DBusManager.RegisterNewObjects(new IDBusObject[]
                 {
                     new Greet(GetType().Namespace + '.' + GetType().Name)
                     {
@@ -325,7 +323,7 @@ namespace osu.Game
 
                 API.LocalUser.BindValueChanged(v => userInfoService.User = v.NewValue, true);
 
-                dependencies.Cache(dBusManager);
+                dependencies.Cache(dBusManagerContainer.DBusManager);
             }
 
             // bind config int to database RulesetInfo
@@ -811,7 +809,7 @@ namespace osu.Game
             });
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-                Add(dBusManager);
+                Add(dBusManagerContainer);
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;

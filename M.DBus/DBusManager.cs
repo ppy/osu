@@ -3,50 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using Tmds.DBus;
 
 namespace M.DBus
 {
-    public class DBusManager : Component
+    public class DBusManager : IDisposable
     {
         private Connection currentConnection;
         private readonly List<IDBusObject> dBusObjects = new List<IDBusObject>();
 
         private ConnectionState connectionState = ConnectionState.NotConnected;
 
-        private readonly Bindable<bool> controlSource;
-
-        public DBusManager(bool startOnLoad, bool autoStart = false, Bindable<bool> controlSource = null)
+        public DBusManager(bool startOnLoad)
         {
             //如果在初始化时启动服务
             if (startOnLoad)
                 Connect();
-
-            if (autoStart && controlSource != null)
-            {
-                this.controlSource = controlSource;
-            }
-            else if (controlSource == null && autoStart)
-            {
-                throw new InvalidOperationException("设置了自动启动但是控制源是null?");
-            }
-        }
-
-        protected override void LoadComplete()
-        {
-            controlSource?.BindValueChanged(onControlSourceChanged, true);
-            base.LoadComplete();
-        }
-
-        private void onControlSourceChanged(ValueChangedEvent<bool> v)
-        {
-            if (v.NewValue)
-                Connect();
-            else
-                Disconnect();
         }
 
         public string ObjectPathToName(ObjectPath path)
@@ -154,6 +127,9 @@ namespace M.DBus
 
         public void Connect()
         {
+            if (isDisposed)
+                throw new ObjectDisposedException(ToString(), "已处理的对象不能再次连接。");
+
             //先停止服务
             Disconnect();
 
@@ -236,12 +212,6 @@ namespace M.DBus
             connectionState = ConnectionState.Connected;
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            Disconnect();
-            base.Dispose(isDisposing);
-        }
-
         private enum ConnectionState
         {
             NotConnected,
@@ -259,6 +229,18 @@ namespace M.DBus
             {
                 Logger.Log(service);
             }
+        }
+
+        private bool isDisposed { get; set; }
+
+        public void Dispose()
+        {
+            Disconnect();
+            currentConnection?.Dispose();
+            cancellationTokenSource?.Dispose();
+
+            isDisposed = true;
+            GC.SuppressFinalize(this);
         }
     }
 }

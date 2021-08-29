@@ -44,7 +44,4 @@
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="lazer.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DBus" />
-  </ItemGroup>
 </Project>
