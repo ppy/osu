@@ -1,14 +1,13 @@
 using System;
-using JetBrains.Annotations;
 using M.DBus;
 using M.DBus.Services;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -43,10 +42,6 @@ namespace osu.Game.DBus
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        [CanBeNull]
-        [Resolved(canBeNull: true)]
-        private NotificationOverlay notificationOverlay { get; set; }
-
         private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
 
         [BackgroundDependencyLoader]
@@ -60,13 +55,7 @@ namespace osu.Game.DBus
                 new Greet(GetType().Namespace + '.' + GetType().Name)
                 {
                     AllowPost = config.GetBindable<bool>(MSetting.DBusAllowPost),
-                    OnMessageRecive = s => Schedule(() =>
-                    {
-                        notificationOverlay?.Post(new SimpleNotification
-                        {
-                            Text = "收到一条来自DBus的消息: \n" + s
-                        });
-                    })
+                    OnMessageRecive = onMessageRevicedFromDBus
                 }
             });
 
@@ -74,6 +63,18 @@ namespace osu.Game.DBus
             beatmap.BindValueChanged(onBeatmapChanged, true);
             ruleset.BindValueChanged(v => userInfoService.SetProperty("current_ruleset", v.NewValue?.Name ?? "???"), true);
             bindableActivity.BindValueChanged(v => userInfoService.SetProperty("activity", v.NewValue?.Status ?? "空闲"), true);
+        }
+
+        public Action<Notification> NotificationAction { get; set; }
+
+        private void onMessageRevicedFromDBus(string message)
+        {
+            NotificationAction.Invoke(new SimpleNotification
+            {
+                Text = "收到一条来自DBus的消息: \n" + message
+            });
+
+            Logger.Log($"收到一条来自DBus的消息: {message}");
         }
 
         private void onUserChanged(ValueChangedEvent<User> v)

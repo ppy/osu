@@ -782,7 +782,10 @@ namespace osu.Game
             });
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
                 Add(dBusManagerContainer);
+                dBusManagerContainer.NotificationAction += n => Notifications.Post(n);
+            }
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
