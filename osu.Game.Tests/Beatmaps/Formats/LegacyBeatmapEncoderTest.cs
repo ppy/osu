@@ -14,6 +14,7 @@ using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Catch;
@@ -76,6 +77,32 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.That(decodedSlider.Path.ControlPoints.Count, Is.EqualTo(5));
         }
 
+        [TestCaseSource(nameof(allBeatmaps))]
+        public void TestEncodeDecodeStabilityWithNonLegacyControlPoints(string name)
+        {
+            var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
+
+            sort(decoded.beatmap);
+
+            var originalSerialized = decoded.beatmap.Serialize();
+            var encoded = encodeToLegacy(decoded);
+
+            Assert.AreEqual(typeof(LegacyControlPointInfo), decoded.beatmap.ControlPointInfo.GetType());
+
+            // emulate non-legacy control points by cloning the non-legacy portion.
+            // the assertion is that the encoder can recreate this losslessly from hitobject data.
+            decoded.beatmap.ControlPointInfo = decoded.beatmap.ControlPointInfo.DeepClone();
+
+            Assert.AreNotEqual(typeof(LegacyControlPointInfo), decoded.beatmap.ControlPointInfo.GetType());
+
+            var decodedAfterEncode = decodeFromLegacy(encoded, name);
+
+            sort(decodedAfterEncode.beatmap);
+
+            Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(originalSerialized));
+            Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
+        }
+
         private bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
         {
             // equal to null, no need to SequenceEqual
@@ -116,7 +143,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private Stream encodeToLegacy((IBeatmap beatmap, ISkin beatmapSkin) fullBeatmap)
+        private MemoryStream encodeToLegacy((IBeatmap beatmap, ISkin beatmapSkin) fullBeatmap)
         {
             var (beatmap, beatmapSkin) = fullBeatmap;
             var stream = new MemoryStream();
