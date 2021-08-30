@@ -91,7 +91,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             // emulate non-legacy control points by cloning the non-legacy portion.
             // the assertion is that the encoder can recreate this losslessly from hitobject data.
-            decoded.beatmap.ControlPointInfo = decoded.beatmap.ControlPointInfo.DeepClone();
+            var controlPointInfo = new ControlPointInfo();
+
+            foreach (var point in decoded.beatmap.ControlPointInfo.AllControlPoints)
+                controlPointInfo.Add(point.Time, point.DeepClone());
+
+            decoded.beatmap.ControlPointInfo = controlPointInfo;
 
             Assert.AreNotEqual(typeof(LegacyControlPointInfo), decoded.beatmap.ControlPointInfo.GetType());
 
