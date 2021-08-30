@@ -19,6 +19,8 @@ namespace osu.Game.Tournament.Tests
 {
     public abstract class TournamentTestScene : OsuTestScene
     {
+        private TournamentMatch match;
+
         [Cached]
         protected LadderInfo Ladder { get; private set; } = new LadderInfo();
 
@@ -33,17 +35,21 @@ namespace osu.Game.Tournament.Tests
         {
             Ladder.Ruleset.Value ??= rulesetStore.AvailableRulesets.First();
 
-            TournamentMatch match = CreateSampleMatch();
+            match = CreateSampleMatch();
 
             Ladder.Rounds.Add(match.Round.Value);
             Ladder.Matches.Add(match);
             Ladder.Teams.Add(match.Team1.Value);
             Ladder.Teams.Add(match.Team2.Value);
 
-            Ladder.CurrentMatch.Value = match;
-
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
+        }
+
+        [SetUpSteps]
+        public virtual void SetUpSteps()
+        {
+            AddStep("set current match", () => Ladder.CurrentMatch.Value = match);
         }
 
         public static TournamentMatch CreateSampleMatch() => new TournamentMatch
