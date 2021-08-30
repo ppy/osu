@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 case DrawableSliderRepeat repeat:
                     repeatContainer.Add(repeat);
-                    repeatArrowContainer.Add(repeat.ProxyArrow);
+                    repeatArrowContainer.Add(repeat.ArrowProxy);
                     break;
             }
         }

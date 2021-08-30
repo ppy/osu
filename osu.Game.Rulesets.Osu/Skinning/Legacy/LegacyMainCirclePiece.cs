@@ -43,30 +43,30 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             get
             {
-                if (overlayProxy == null)
+                if (overlayProxy != null)
+                    return overlayProxy;
+
+                if (overlayAboveNumber)
                 {
-                    if (overlayAboveNumber)
+                    overlayProxy = new Container
                     {
-                        overlayProxy = new Container
+                        Children = new[]
                         {
-                            Children = new[]
-                            {
-                                hitCircleText.CreateProxy(),
-                                aboveNumberProxy.CreateProxy()
-                            }
-                        };
-                    }
-                    else
+                            hitCircleText.CreateProxy(),
+                            aboveNumberProxy.CreateProxy()
+                        }
+                    };
+                }
+                else
+                {
+                    overlayProxy = new Container
                     {
-                        overlayProxy = new Container
+                        Children = new[]
                         {
-                            Children = new[]
-                            {
-                                hitCircleOverlay.CreateProxy(),
-                                hitCircleText.CreateProxy()
-                            }
-                        };
-                    }
+                            hitCircleOverlay.CreateProxy(),
+                            hitCircleText.CreateProxy()
+                        }
+                    };
                 }
 
                 return overlayProxy;

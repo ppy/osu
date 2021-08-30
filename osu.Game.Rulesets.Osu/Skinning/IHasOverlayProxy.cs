@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 {
     public interface IHasOverlayProxy
     {
-        public Drawable OverlayProxy { get; }
+        Drawable OverlayProxy { get; }
     }
 }

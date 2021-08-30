@@ -30,15 +30,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public ReverseArrowPiece Arrow { get; private set; }
 
-        private Drawable proxyArrow;
+        private Drawable arrowProxy;
 
-        public Drawable ProxyArrow
+        public Drawable ArrowProxy
         {
             get
             {
                 if (!Arrow.HasProxy)
-                    proxyArrow = Arrow.CreateProxy();
-                return proxyArrow;
+                    arrowProxy = Arrow.CreateProxy();
+                return arrowProxy;
             }
         }
 
