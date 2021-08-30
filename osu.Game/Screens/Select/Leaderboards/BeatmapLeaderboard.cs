@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
                 }
 
-                Scores = scores.OrderByDescending(s => s.TotalScore).ToArray();
+                Scores = scores.OrderByDescending(s => scoreManager.GetTotalScore(s)).ToArray();
                 PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
 
                 return null;
@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             req.Success += r =>
             {
-                scoresCallback?.Invoke(r.Scores.Select(s => s.CreateScoreInfo(rulesets)));
+                scoresCallback?.Invoke(r.Scores.Select(s => s.CreateScoreInfo(rulesets)).OrderByDescending(s => scoreManager.GetTotalScore(s)));
                 TopScore = r.UserScore?.CreateScoreInfo(rulesets);
             };
 
