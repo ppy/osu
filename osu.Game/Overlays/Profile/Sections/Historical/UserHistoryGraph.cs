@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using static osu.Game.Users.User;
 
