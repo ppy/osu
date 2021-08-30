@@ -27,6 +27,6 @@ namespace osu.Game.Online.API.Requests
             Ruleset = ruleset;
         }
 
-        protected override string Target => (userIdentifier != null) ? $@"users/{userIdentifier}/{Ruleset?.ShortName}" : $@"me/{Ruleset?.ShortName}";
+        protected override string Target => userIdentifier != null ? $@"users/{userIdentifier}/{Ruleset?.ShortName}" : $@"me/{Ruleset?.ShortName}";
     }
 }
