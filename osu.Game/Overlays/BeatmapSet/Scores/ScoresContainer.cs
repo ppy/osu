@@ -260,7 +260,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 }
 
                 var scoreInfos = newScores.Scores.Select(s => s.CreateScoreInfo(rulesets))
-                                          .OrderByDescending(s => scoreManager.GetBindableTotalScore(s).Value)
+                                          .OrderByDescending(s => scoreManager.GetTotalScore(s))
                                           .ToList();
 
                 var topScore = scoreInfos.First();
