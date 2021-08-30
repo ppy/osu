@@ -46,7 +46,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         [Resolved]
         private DrawableHitObject drawableObject { get; set; }
 
-        public Drawable OverlayProxy => Empty();
+        private Drawable overlayProxy;
+
+        public Drawable OverlayProxy
+        {
+            get
+            {
+                if (!HasProxy)
+                    overlayProxy = CreateProxy();
+                return overlayProxy;
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load()
