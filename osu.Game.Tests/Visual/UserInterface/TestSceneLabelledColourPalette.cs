@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Cursor;
@@ -55,20 +56,24 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("create component", () =>
             {
-                Child = new OsuContextMenuContainer
+                Child = new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new Container
+                    Child = new OsuContextMenuContainer
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Width = 500,
-                        AutoSizeAxes = Axes.Y,
-                        Child = component = new LabelledColourPalette
+                        RelativeSizeAxes = Axes.Both,
+                        Child = new Container
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            ColourNamePrefix = "My colour #"
+                            Width = 500,
+                            AutoSizeAxes = Axes.Y,
+                            Child = component = new LabelledColourPalette
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                ColourNamePrefix = "My colour #"
+                            }
                         }
                     }
                 };
