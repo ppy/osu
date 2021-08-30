@@ -24,6 +24,19 @@ namespace M.DBus
                 Connect();
         }
 
+        #region 工具
+
+        public async Task GetAllServices()
+        {
+            await currentConnection.ListServicesAsync().ConfigureAwait(false);
+            var services = await currentConnection.ListServicesAsync().ConfigureAwait(false);
+
+            foreach (var service in services)
+            {
+                Logger.Log(service);
+            }
+        }
+
         public string ObjectPathToName(ObjectPath path)
         {
             return path.ToString().Replace('/', '.').Remove(0, 1);
@@ -32,16 +45,6 @@ namespace M.DBus
         public static string ObjectPathToNameStatic(ObjectPath path)
         {
             return path.ToString().Replace('/', '.').Remove(0, 1);
-        }
-
-        //bug: 注册的服务/物件在dbus-send后会直接Name Lost，无法恢复
-        private async Task registerObjects()
-        {
-            Logger.Log("注册DBus物件及服务...");
-
-            //递归注册DBus服务
-            foreach (var dBusObject in dBusObjects)
-                await registerToConection(dBusObject).ConfigureAwait(false);
         }
 
         private void onServiceNameChanged(ServiceOwnerChangedEventArgs args)
@@ -55,6 +58,16 @@ namespace M.DBus
 
             Logger.Error(e, $"位于 '{ObjectPathToName(dbusObject.ObjectPath)}' 的DBus服务出现错误");
         }
+
+        public bool CheckIfAlreadyRegistered(IDBusObject dBusObject)
+            => dBusObjects.Any(o => o.ObjectPath.Equals(dBusObject.ObjectPath));
+
+        public bool CheckIfAlreadyRegistered(ObjectPath objectPath)
+            => dBusObjects.Any(o => o.ObjectPath.Equals(objectPath));
+
+        #endregion
+
+        #region 注册新对象
 
         public async Task RegisterNewObject(IDBusObject dbusObject, string targetName = null)
         {
@@ -84,6 +97,16 @@ namespace M.DBus
             }
         }
 
+        //bug: 注册的服务/物件在dbus-send后会直接Name Lost，无法恢复
+        private async Task registerObjects()
+        {
+            Logger.Log("注册DBus物件及服务...");
+
+            //递归注册DBus服务
+            foreach (var dBusObject in dBusObjects)
+                await registerToConection(dBusObject).ConfigureAwait(false);
+        }
+
         private readonly List<string> registeredServices = new List<string>();
 
         private async Task registerToConection(IDBusObject dBusObject, string targetName = null)
@@ -105,6 +128,10 @@ namespace M.DBus
 
             Logger.Log($"为{dBusObject.ObjectPath}注册{targetName}");
         }
+
+        #endregion
+
+        #region 反注册对象
 
         public void UnRegisterObject(IDBusObject dBusObject)
         {
@@ -128,11 +155,9 @@ namespace M.DBus
             await currentConnection.UnregisterServiceAsync(ObjectPathToName(dBusObject.ObjectPath)).ConfigureAwait(false);
         }
 
-        public bool CheckIfAlreadyRegistered(IDBusObject dBusObject)
-            => dBusObjects.Any(o => o.ObjectPath.Equals(dBusObject.ObjectPath));
+        #endregion
 
-        public bool CheckIfAlreadyRegistered(ObjectPath objectPath)
-            => dBusObjects.Any(o => o.ObjectPath.Equals(objectPath));
+        #region 连接到DBus
 
         private CancellationTokenSource cancellationTokenSource;
 
@@ -170,8 +195,12 @@ namespace M.DBus
                     //连接到DBus
                     connectionState = ConnectionState.Connecting;
 
-                    //启动服务
-                    await connectAsync().ConfigureAwait(false);
+                    //等待连接
+                    await currentConnection.ConnectAsync().ConfigureAwait(false);
+
+                    //设置连接状态
+                    connectionState = ConnectionState.Connected;
+
                     await registerObjects().ConfigureAwait(false);
                     OnConnected?.Invoke();
                     break;
@@ -186,14 +215,9 @@ namespace M.DBus
             }
         }
 
-        private async Task connectAsync()
-        {
-            //等待连接
-            await currentConnection.ConnectAsync().ConfigureAwait(false);
+        #endregion
 
-            //设置连接状态
-            connectionState = ConnectionState.Connected;
-        }
+        #region 断开连接
 
         public bool Disconnect()
         {
@@ -239,23 +263,14 @@ namespace M.DBus
             return true;
         }
 
+        #endregion
+
         private enum ConnectionState
         {
             NotConnected,
             Connecting,
             Connected,
             Faulted
-        }
-
-        public async Task GetAllServices()
-        {
-            await currentConnection.ListServicesAsync().ConfigureAwait(false);
-            var services = await currentConnection.ListServicesAsync().ConfigureAwait(false);
-
-            foreach (var service in services)
-            {
-                Logger.Log(service);
-            }
         }
 
         private bool isDisposed { get; set; }
