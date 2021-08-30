@@ -51,7 +51,7 @@ namespace osu.Game.DBus
         private readonly MprisPlayerService mprisService = new MprisPlayerService();
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, MConfigManager config, Storage storage, OsuGame game)
+        private void load(IAPIProvider api, MConfigManager config, Storage storage, OsuGame game, GameHost host)
         {
             DBusManager.RegisterNewObjects(new IDBusObject[]
             {
@@ -81,22 +81,17 @@ namespace osu.Game.DBus
             bindableActivity.BindValueChanged(v => userInfoService.SetProperty("activity", v.NewValue?.Status ?? "空闲"), true);
 
             mprisService.Storage = storage;
+            mprisService.UseAvatarLogoAsDefault = config.GetBindable<bool>(MSetting.MprisUseAvatarlogoAsCover);
             mprisService.Next += () => musicController.NextTrack();
             mprisService.Previous += () => musicController.PreviousTrack();
             mprisService.Play += () => musicController.Play();
             mprisService.Pause += () => musicController.Stop(true);
-            mprisService.Quit += () => NotificationAction?.Invoke(new SimpleNotification
-            {
-                Text = "尚未实现><"
-            });
+            mprisService.Quit += game.GracefullyExit;
             mprisService.Seek += t => musicController.SeekTo(t);
             mprisService.Stop += () => musicController.Stop(true);
             mprisService.PlayPause += () => musicController.TogglePause();
             mprisService.OpenUri += game.HandleLink;
-            mprisService.WindowRaise += () => NotificationAction?.Invoke(new SimpleNotification
-            {
-                Text = "尚未实现 ><"
-            });
+            mprisService.WindowRaise += () => (host.Window as SDL2DesktopWindow)?.Raise();
         }
 
         protected override void Update()

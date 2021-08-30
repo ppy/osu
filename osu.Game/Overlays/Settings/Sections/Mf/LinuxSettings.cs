@@ -32,6 +32,11 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 {
                     LabelText = "允许通过D-Bus发送消息到游戏内",
                     Current = config.GetBindable<bool>(MSetting.DBusAllowPost)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "总是使用avatarlogo作为mpris封面",
+                    Current = config.GetBindable<bool>(MSetting.MprisUseAvatarlogoAsCover)
                 }
             };
         }

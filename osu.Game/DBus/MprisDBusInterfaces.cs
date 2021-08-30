@@ -26,7 +26,7 @@ namespace osu.Game.DBus
     [Dictionary]
     public class MediaPlayer2Properties
     {
-        private bool _CanQuit => false;
+        private readonly bool _CanQuit = true;
 
         public bool CanQuit => _CanQuit;
 
@@ -61,13 +61,7 @@ namespace osu.Game.DBus
 
         public string[] SupportedUriSchemes => _SupportedUriSchemes;
 
-        private readonly string[] _SupportedMimeTypes =
-        {
-            "application/application/x-wine-extension-osz",
-            "application/application/x-wine-extension-osz2",
-            "application/application/x-wine-extension-osr",
-            "application/application/x-wine-extension-osk",
-        };
+        private readonly string[] _SupportedMimeTypes = Array.Empty<string>();
 
         public string[] SupportedMimeTypes => _SupportedMimeTypes;
 
@@ -82,7 +76,7 @@ namespace osu.Game.DBus
             dictionary[nameof(HasTrackList)] = _HasTrackList;
             dictionary[nameof(Identity)] = _Identity;
             dictionary[nameof(DesktopEntry)] = _DesktopEntry;
-            dictionary[nameof(SupportedUriSchemes)] = _SupportedMimeTypes;
+            dictionary[nameof(SupportedUriSchemes)] = _SupportedUriSchemes;
             dictionary[nameof(SupportedMimeTypes)] = _SupportedMimeTypes;
 
             return dictionary;
@@ -115,7 +109,7 @@ namespace osu.Game.DBus
 
         public string PlaybackStatus => _PlaybackStatus;
 
-        internal string _LoopStatus = "Looping";
+        internal string _LoopStatus = "Playlist";
 
         public string LoopStatus => _LoopStatus;
 
@@ -147,7 +141,7 @@ namespace osu.Game.DBus
 
         public long Position => _Position;
 
-        private readonly double _MinimumRate = 0;
+        private readonly double _MinimumRate = 1;
 
         public double MinimumRate => _MinimumRate;
 
