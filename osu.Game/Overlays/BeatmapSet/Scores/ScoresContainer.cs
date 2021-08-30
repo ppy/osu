@@ -12,8 +12,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Bindables;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
@@ -27,6 +30,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Global);
         private readonly IBindable<User> user = new Bindable<User>();
+        private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
@@ -42,35 +46,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         private GetScoresRequest getScoresRequest;
+
+        private APILegacyScores scores;
 
         protected APILegacyScores Scores
         {
-            set => Schedule(() =>
+            set
             {
-                topScoresContainer.Clear();
-
-                if (value?.Scores.Any() != true)
-                {
-                    scoreTable.ClearScores();
-                    scoreTable.Hide();
-                    return;
-                }
-
-                var scoreInfos = value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToList();
-                var topScore = scoreInfos.First();
-
-                scoreTable.DisplayScores(scoreInfos, topScore.Beatmap?.Status.GrantsPerformancePoints() == true);
-                scoreTable.Show();
-
-                var userScore = value.UserScore;
-                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets);
-
-                topScoresContainer.Add(new DrawableTopScore(topScore));
-
-                if (userScoreInfo != null && userScoreInfo.OnlineScoreID != topScore.OnlineScoreID)
-                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
-            });
+                scores = value;
+                displayScores(value);
+            }
         }
 
         public ScoresContainer()
@@ -166,11 +155,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
         {
             background.Colour = colourProvider.Background5;
 
             user.BindTo(api.LocalUser);
+            config.BindWith(OsuSetting.ScoreDisplayMode, scoringMode);
         }
 
         protected override void LoadComplete()
@@ -183,6 +173,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             Beatmap.BindValueChanged(onBeatmapChanged);
             user.BindValueChanged(onUserChanged, true);
+
+            scoringMode.BindValueChanged(_ => displayScores(scores));
         }
 
         private void onBeatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
@@ -252,6 +244,35 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
 
             api.Queue(getScoresRequest);
+        }
+
+        private void displayScores(APILegacyScores newScores)
+        {
+            Schedule(() =>
+            {
+                topScoresContainer.Clear();
+
+                if (newScores?.Scores.Any() != true)
+                {
+                    scoreTable.ClearScores();
+                    scoreTable.Hide();
+                    return;
+                }
+
+                var scoreInfos = newScores.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToList();
+                var topScore = scoreInfos.First();
+
+                scoreTable.DisplayScores(scoreInfos, topScore.Beatmap?.Status.GrantsPerformancePoints() == true);
+                scoreTable.Show();
+
+                var userScore = newScores.UserScore;
+                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets);
+
+                topScoresContainer.Add(new DrawableTopScore(topScore));
+
+                if (userScoreInfo != null && userScoreInfo.OnlineScoreID != topScore.OnlineScoreID)
+                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
+            });
         }
 
         private bool userIsSupporter => api.IsLoggedIn && api.LocalUser.Value.IsSupporter;
