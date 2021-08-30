@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -80,14 +81,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
             }
 
-            public override bool SetContent(object content)
+            public override void SetContent(object content)
             {
                 if (!(content is TooltipDisplayContent info))
-                    return false;
+                    return;
 
                 Counter.Text = info.Rank;
                 BottomText.Text = info.Time;
-                return true;
             }
         }
 

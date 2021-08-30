@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModButtonTooltip : VisibilityContainer, ITooltip
+    public class ModButtonTooltip : VisibilityContainer, ITooltip<Mod>
     {
         private readonly OsuSpriteText descriptionText;
         private readonly Box background;
@@ -82,12 +82,9 @@ namespace osu.Game.Overlays.Mods
 
         private Mod lastMod;
 
-        public bool SetContent(object content)
+        public void SetContent(Mod mod)
         {
-            if (!(content is Mod mod))
-                return false;
-
-            if (mod.Equals(lastMod)) return true;
+            if (mod.Equals(lastMod)) return;
 
             lastMod = mod;
 
@@ -99,15 +96,7 @@ namespace osu.Game.Overlays.Mods
 
             incompatibleMods.Value = allMods.Where(m => m.GetType() != mod.GetType() && incompatibleTypes.Any(t => t.IsInstanceOfType(m))).ToList();
 
-            if (!incompatibleMods.Value.Any())
-            {
-                incompatibleText.Text = "Compatible with all mods";
-                return true;
-            }
-
-            incompatibleText.Text = "Incompatible with:";
-
-            return true;
+            incompatibleText.Text = !incompatibleMods.Value.Any() ? "Compatible with all mods" : "Incompatible with:";
         }
 
         public void Move(Vector2 pos) => Position = pos;
