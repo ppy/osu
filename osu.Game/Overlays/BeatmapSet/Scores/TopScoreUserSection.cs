@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public int? ScorePosition
         {
-            set => rankText.Text = value == null ? (LocalisableString)"-" : value.ToLocalisableString(@"\##");
+            set => rankText.Text = value?.ToLocalisableString(@"\##") ?? (LocalisableString)"-";
         }
 
         /// <summary>
