@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;

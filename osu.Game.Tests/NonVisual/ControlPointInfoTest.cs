@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Tests.NonVisual
 {
