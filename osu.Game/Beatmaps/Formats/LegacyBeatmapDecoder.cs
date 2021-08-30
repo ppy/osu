@@ -401,15 +401,8 @@ namespace osu.Game.Beatmaps.Formats
         private readonly HashSet<Type> pendingControlPointTypes = new HashSet<Type>();
         private double pendingControlPointsTime;
 
-        private readonly LegacyControlPointInfo controlPointInfo = new LegacyControlPointInfo();
-
         private void addControlPoint(double time, ControlPoint point, bool timingChange)
         {
-            if (point is SampleControlPoint)
-            {
-                controlPointInfo.Add(time, point);
-            }
-
             if (time != pendingControlPointsTime)
                 flushPendingPoints();
 
@@ -447,9 +440,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (obj != null)
             {
-                // assign legacy control points directly to hitobject
-                //obj.SampleControlPoint = controlPointInfo.SamplePointAt(obj.StartTime);
-                obj.ApplyDefaults(controlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
+                obj.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
 
                 beatmap.HitObjects.Add(obj);
             }
