@@ -46,10 +46,7 @@ namespace osu.Game.Beatmaps.Legacy
         protected override void GroupItemAdded(ControlPoint controlPoint)
         {
             if (controlPoint is SampleControlPoint typed)
-            {
                 samplePoints.Add(typed);
-                return;
-            }
 
             base.GroupItemAdded(controlPoint);
         }
@@ -57,10 +54,7 @@ namespace osu.Game.Beatmaps.Legacy
         protected override void GroupItemRemoved(ControlPoint controlPoint)
         {
             if (controlPoint is SampleControlPoint typed)
-            {
                 samplePoints.Remove(typed);
-                return;
-            }
 
             base.GroupItemRemoved(controlPoint);
         }
