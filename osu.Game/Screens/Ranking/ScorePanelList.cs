@@ -5,11 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osuTK;
 using osuTK.Input;
@@ -289,27 +292,42 @@ namespace osu.Game.Screens.Ranking
         {
             public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
 
+            private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
+
+            [Resolved]
+            private ScoreManager scoreManager { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager configManager)
+            {
+                configManager.BindWith(OsuSetting.ScoreDisplayMode, scoringMode);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                scoringMode.BindValueChanged(mode =>
+                {
+                    foreach (var c in Children)
+                        SetLayoutPosition(c, scoreManager.GetTotalScore(c.Panel.Score));
+                }, true);
+            }
+
             public int GetPanelIndex(ScoreInfo score) => applySorting(Children).TakeWhile(s => s.Panel.Score != score).Count();
 
-            private IEnumerable<ScorePanelTrackingContainer> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanelTrackingContainer>()
-                                                                                                                       .OrderByDescending(s => s.Panel.Score.TotalScore)
-                                                                                                                       .ThenBy(s => s.Panel.Score.OnlineScoreID);
-
-            protected override int Compare(Drawable x, Drawable y)
+            public override void Add(ScorePanelTrackingContainer drawable)
             {
-                var tX = (ScorePanelTrackingContainer)x;
-                var tY = (ScorePanelTrackingContainer)y;
+                Debug.Assert(drawable != null);
 
-                int result = tY.Panel.Score.TotalScore.CompareTo(tX.Panel.Score.TotalScore);
+                base.Add(drawable);
 
-                if (result != 0)
-                    return result;
-
-                if (tX.Panel.Score.OnlineScoreID == null || tY.Panel.Score.OnlineScoreID == null)
-                    return base.Compare(x, y);
-
-                return tX.Panel.Score.OnlineScoreID.Value.CompareTo(tY.Panel.Score.OnlineScoreID.Value);
+                SetLayoutPosition(drawable, scoreManager?.GetTotalScore(drawable.Panel.Score) ?? 0);
             }
+
+            private IEnumerable<ScorePanelTrackingContainer> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanelTrackingContainer>()
+                                                                                                                       .OrderByDescending(GetLayoutPosition)
+                                                                                                                       .ThenBy(s => s.Panel.Score.OnlineScoreID);
         }
 
         private class Scroll : OsuScrollContainer
