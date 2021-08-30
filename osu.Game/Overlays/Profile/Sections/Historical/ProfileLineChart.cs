@@ -9,6 +9,7 @@ using System.Linq;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
