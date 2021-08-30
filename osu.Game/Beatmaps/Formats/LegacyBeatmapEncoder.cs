@@ -146,7 +146,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"OverallDifficulty: {beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty}"));
             writer.WriteLine(FormattableString.Invariant($"ApproachRate: {beatmap.BeatmapInfo.BaseDifficulty.ApproachRate}"));
 
-            // Taiko adjusts the slider multiplier (see: TaikoBeatmapConverter.LEGACY_VELOCITY_MULTIPLIER)
+            // Taiko adjusts the slider multiplier (see: LEGACY_TAIKO_VELOCITY_MULTIPLIER)
             writer.WriteLine(beatmap.BeatmapInfo.RulesetID == 1
                 ? FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / LEGACY_TAIKO_VELOCITY_MULTIPLIER}")
                 : FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier}"));
