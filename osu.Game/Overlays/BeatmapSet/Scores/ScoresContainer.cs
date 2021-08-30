@@ -261,6 +261,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 var scoreInfos = newScores.Scores.Select(s => s.CreateScoreInfo(rulesets))
                                           .OrderByDescending(s => scoreManager.GetTotalScore(s))
+                                          .ThenBy(s => s.OnlineScoreID)
                                           .ToList();
 
                 var topScore = scoreInfos.First();
