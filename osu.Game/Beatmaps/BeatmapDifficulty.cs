@@ -32,7 +32,23 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Returns a shallow-clone of this <see cref="BeatmapDifficulty"/>.
         /// </summary>
-        public BeatmapDifficulty Clone() => (BeatmapDifficulty)MemberwiseClone();
+        public BeatmapDifficulty Clone()
+        {
+            var diff = new BeatmapDifficulty();
+            CopyTo(diff);
+            return diff;
+        }
+
+        public void CopyTo(BeatmapDifficulty difficulty)
+        {
+            difficulty.ApproachRate = ApproachRate;
+            difficulty.DrainRate = DrainRate;
+            difficulty.CircleSize = CircleSize;
+            difficulty.OverallDifficulty = OverallDifficulty;
+
+            difficulty.SliderMultiplier = SliderMultiplier;
+            difficulty.SliderTickRate = SliderTickRate;
+        }
 
         /// <summary>
         /// Maps a difficulty value [0, 10] to a two-piece linear range of values.
