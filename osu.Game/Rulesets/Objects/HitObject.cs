@@ -112,6 +112,10 @@ namespace osu.Game.Rulesets.Objects
                 // This is done here since ApplyDefaultsToSelf may be used to determine the end time
                 SampleControlPoint = legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
             }
+            else
+            {
+                SampleControlPoint ??= SampleControlPoint.DEFAULT;
+            }
 
             nestedHitObjects.Clear();
 
