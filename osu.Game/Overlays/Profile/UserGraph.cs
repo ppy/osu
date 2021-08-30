@@ -268,7 +268,7 @@ namespace osu.Game.Overlays.Profile
                 background.Colour = colours.Gray1;
             }
 
-            public abstract bool SetContent(object content);
+            public abstract void SetContent(object content);
 
             private bool instantMove = true;
 
