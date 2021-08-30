@@ -408,7 +408,6 @@ namespace osu.Game.Beatmaps.Formats
             if (point is SampleControlPoint)
             {
                 controlPointInfo.Add(time, point);
-                return;
             }
 
             if (time != pendingControlPointsTime)
