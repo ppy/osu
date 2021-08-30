@@ -13,11 +13,13 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -27,6 +29,7 @@ namespace osu.Game.Online.Leaderboards
     {
         private const double fade_duration = 300;
 
+        private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
         private readonly OsuScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
         private readonly UserTopScoreContainer<TScoreInfo> topScoreContainer;
@@ -246,12 +249,15 @@ namespace osu.Game.Online.Leaderboards
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager configManager)
         {
             if (api != null)
                 apiState.BindTo(api.State);
 
             apiState.BindValueChanged(onlineStateChanged, true);
+
+            configManager.BindWith(OsuSetting.ScoreDisplayMode, scoringMode);
+            scoringMode.BindValueChanged(_ => RefreshScores(), true);
         }
 
         private APIRequest getScoresRequest;
