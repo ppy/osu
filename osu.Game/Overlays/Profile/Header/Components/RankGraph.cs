@@ -81,14 +81,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
             }
 
-            public override bool SetContent(object content)
+            public override void SetContent(object content)
             {
                 if (!(content is TooltipDisplayContent info))
-                    return false;
+                    return;
 
                 Counter.Text = info.Rank;
                 BottomText.Text = info.Time;
-                return true;
             }
         }
 
