@@ -24,6 +24,12 @@ namespace osu.Game.Beatmaps.Formats
     {
         public const int LATEST_VERSION = 128;
 
+        /// <summary>
+        /// osu! is generally slower than taiko, so a factor is added to increase
+        /// speed. This must be used everywhere slider length or beat length is used.
+        /// </summary>
+        public const float LEGACY_TAIKO_VELOCITY_MULTIPLIER = 1.4f;
+
         private readonly IBeatmap beatmap;
 
         [CanBeNull]
@@ -142,7 +148,7 @@ namespace osu.Game.Beatmaps.Formats
 
             // Taiko adjusts the slider multiplier (see: TaikoBeatmapConverter.LEGACY_VELOCITY_MULTIPLIER)
             writer.WriteLine(beatmap.BeatmapInfo.RulesetID == 1
-                ? FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / 1.4f}")
+                ? FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / LEGACY_TAIKO_VELOCITY_MULTIPLIER}")
                 : FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier}"));
 
             writer.WriteLine(FormattableString.Invariant($"SliderTickRate: {beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate}"));

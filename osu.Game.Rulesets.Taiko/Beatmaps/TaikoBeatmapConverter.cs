@@ -19,12 +19,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
     internal class TaikoBeatmapConverter : BeatmapConverter<TaikoHitObject>
     {
         /// <summary>
-        /// osu! is generally slower than taiko, so a factor is added to increase
-        /// speed. This must be used everywhere slider length or beat length is used.
-        /// </summary>
-        public const float LEGACY_VELOCITY_MULTIPLIER = 1.4f;
-
-        /// <summary>
         /// Because swells are easier in taiko than spinners are in osu!,
         /// legacy taiko multiplies a factor when converting the number of required hits.
         /// </summary>
@@ -55,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             // Rewrite the beatmap info to add the slider velocity multiplier
             original.BeatmapInfo = original.BeatmapInfo.Clone();
             original.BeatmapInfo.BaseDifficulty = original.BeatmapInfo.BaseDifficulty.Clone();
-            original.BeatmapInfo.BaseDifficulty.SliderMultiplier *= LEGACY_VELOCITY_MULTIPLIER;
+            original.BeatmapInfo.BaseDifficulty.SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original, cancellationToken);
 
@@ -155,7 +149,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             // The true distance, accounting for any repeats. This ends up being the drum roll distance later
             int spans = (obj as IHasRepeats)?.SpanCount() ?? 1;
-            double distance = distanceData.Distance * spans * LEGACY_VELOCITY_MULTIPLIER;
+            double distance = distanceData.Distance * spans * LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
             DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(obj.StartTime);
