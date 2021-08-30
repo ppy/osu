@@ -259,7 +259,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     return;
                 }
 
-                var scoreInfos = newScores.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToList();
+                var scoreInfos = newScores.Scores.Select(s => s.CreateScoreInfo(rulesets))
+                                          .OrderByDescending(s => scoreManager.GetBindableTotalScore(s).Value)
+                                          .ToList();
+
                 var topScore = scoreInfos.First();
 
                 scoreTable.DisplayScores(scoreInfos, topScore.Beatmap?.Status.GrantsPerformancePoints() == true);
