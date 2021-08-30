@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps.Legacy
             if (newPoint is SampleControlPoint _)
             {
                 var existing = BinarySearch(SamplePoints, time);
-                return newPoint?.IsRedundant(existing) == true;
+                return newPoint.IsRedundant(existing);
             }
 
             return base.CheckAlreadyExisting(time, newPoint);
