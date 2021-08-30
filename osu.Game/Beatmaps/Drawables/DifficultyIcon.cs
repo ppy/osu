@@ -259,10 +259,10 @@ namespace osu.Game.Beatmaps.Drawables
 
             private readonly IBindable<StarDifficulty> starDifficulty = new Bindable<StarDifficulty>();
 
-            public bool SetContent(object content)
+            public void SetContent(object content)
             {
                 if (!(content is DifficultyIconTooltipContent iconContent))
-                    return false;
+                    return;
 
                 difficultyName.Text = iconContent.Beatmap.Version;
 
@@ -273,8 +273,6 @@ namespace osu.Game.Beatmaps.Drawables
                     starRating.Text = $"{difficulty.NewValue.Stars:0.##}";
                     difficultyFlow.Colour = colours.ForStarDifficulty(difficulty.NewValue.Stars);
                 }, true);
-
-                return true;
             }
 
             public void Move(Vector2 pos) => Position = pos;
