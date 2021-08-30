@@ -324,7 +324,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public ControlPointInfo DeepClone()
         {
-            var controlPointInfo = new ControlPointInfo();
+            var controlPointInfo = (ControlPointInfo)Activator.CreateInstance(GetType());
 
             foreach (var point in AllControlPoints)
                 controlPointInfo.Add(point.Time, point.DeepClone());
