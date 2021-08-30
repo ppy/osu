@@ -123,8 +123,8 @@ namespace osu.Game.Screens.Select
         {
             if (Enum.TryParse(value, true, out result)) return true;
 
-            string status = Enum.GetNames(typeof(TEnum)).FirstOrDefault(name => name.StartsWith(value, true, CultureInfo.InvariantCulture));
-            return Enum.TryParse(status, true, out result);
+            value = Enum.GetNames(typeof(TEnum)).FirstOrDefault(name => name.StartsWith(value, true, CultureInfo.InvariantCulture));
+            return Enum.TryParse(value, true, out result);
         }
 
         /// <summary>
