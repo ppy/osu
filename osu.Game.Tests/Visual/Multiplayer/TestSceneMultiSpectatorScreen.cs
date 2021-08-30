@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -19,6 +20,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -78,7 +80,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestGeneral()
         {
-            int[] userIds = Enumerable.Range(0, 4).Select(i => PLAYER_1_ID + i).ToArray();
+            int[] userIds = getPlayerIds(4);
 
             start(userIds);
             loadSpectateScreen();
@@ -314,6 +316,36 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("player 2 playing from correct point in time", () => getPlayer(PLAYER_2_ID).ChildrenOfType<DrawableRuleset>().Single().FrameStableClock.CurrentTime > 30000);
         }
 
+        [Test]
+        public void TestPlayersLeaveWhileSpectating()
+        {
+            start(getPlayerIds(4));
+            sendFrames(getPlayerIds(4), 300);
+
+            loadSpectateScreen();
+
+            for (int count = 3; count >= 0; count--)
+            {
+                var id = PLAYER_1_ID + count;
+
+                end(id);
+                AddUntilStep($"{id} area grayed", () => getInstance(id).Colour != Color4.White);
+                AddUntilStep($"{id} score quit set", () => getLeaderboardScore(id).HasQuit.Value);
+                sendFrames(getPlayerIds(count), 300);
+            }
+
+            Player player = null;
+
+            AddStep($"get {PLAYER_1_ID} player instance", () => player = getInstance(PLAYER_1_ID).ChildrenOfType<Player>().Single());
+
+            start(new[] { PLAYER_1_ID });
+            sendFrames(PLAYER_1_ID, 300);
+
+            AddAssert($"{PLAYER_1_ID} player instance still same", () => getInstance(PLAYER_1_ID).ChildrenOfType<Player>().Single() == player);
+            AddAssert($"{PLAYER_1_ID} area still grayed", () => getInstance(PLAYER_1_ID).Colour != Color4.White);
+            AddAssert($"{PLAYER_1_ID} score quit still set", () => getLeaderboardScore(PLAYER_1_ID).HasQuit.Value);
+        }
+
         private void loadSpectateScreen(bool waitForPlayerLoad = true)
         {
             AddStep("load screen", () =>
@@ -333,11 +365,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 foreach (int id in userIds)
                 {
-                    OnlinePlayDependencies.Client.AddUser(new User { Id = id }, true);
+                    var user = new MultiplayerRoomUser(id)
+                    {
+                        User = new User { Id = id },
+                    };
 
+                    OnlinePlayDependencies.Client.AddUser(user.User, true);
                     SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
-                    playingUsers.Add(new MultiplayerRoomUser(id));
+
+                    playingUsers.Add(user);
                 }
+            });
+        }
+
+        private void end(int userId)
+        {
+            AddStep($"end play for {userId}", () =>
+            {
+                var user = playingUsers.Single(u => u.UserID == userId);
+
+                OnlinePlayDependencies.Client.RemoveUser(user.User.AsNonNull());
+                SpectatorClient.EndPlay(userId);
+
+                playingUsers.Remove(user);
             });
         }
 
@@ -374,5 +424,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 
         private PlayerArea getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerArea>().Single(p => p.UserId == userId);
+
+        private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId);
+
+        private int[] getPlayerIds(int count) => Enumerable.Range(PLAYER_1_ID, count).ToArray();
     }
 }
