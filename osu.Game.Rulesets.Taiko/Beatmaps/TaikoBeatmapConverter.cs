@@ -46,10 +46,12 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override Beatmap<TaikoHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
-            // Rewrite the beatmap info to add the slider velocity multiplier
-            original.BeatmapInfo = original.BeatmapInfo.Clone();
-            original.BeatmapInfo.BaseDifficulty = original.BeatmapInfo.BaseDifficulty.Clone();
-            original.BeatmapInfo.BaseDifficulty.SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            if (!(original.BeatmapInfo.BaseDifficulty is TaikoMutliplierAppliedDifficulty))
+            {
+                // Rewrite the beatmap info to add the slider velocity multiplier
+                original.BeatmapInfo = original.BeatmapInfo.Clone();
+                original.BeatmapInfo.BaseDifficulty = new TaikoMutliplierAppliedDifficulty(original.BeatmapInfo.BaseDifficulty);
+            }
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original, cancellationToken);
 
@@ -188,5 +190,14 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         }
 
         protected override Beatmap<TaikoHitObject> CreateBeatmap() => new TaikoBeatmap();
+
+        private class TaikoMutliplierAppliedDifficulty : BeatmapDifficulty
+        {
+            public TaikoMutliplierAppliedDifficulty(BeatmapDifficulty difficulty)
+            {
+                difficulty.CopyTo(this);
+                SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            }
+        }
     }
 }
