@@ -118,7 +118,7 @@ namespace osu.Game.Overlays
 
             if (fetchOnline)
             {
-                userReq = user.Username != null ? new GetUserRequest(user.Username) : new GetUserRequest(user.Id);
+                userReq = user.Id > 1 ? new GetUserRequest(user.Id) : new GetUserRequest(user.Username);
                 userReq.Success += userLoadComplete;
                 API.Queue(userReq);
             }
