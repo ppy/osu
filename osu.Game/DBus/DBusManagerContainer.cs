@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -47,10 +48,10 @@ namespace osu.Game.DBus
         private MusicController musicController { get; set; }
 
         private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
-        private MprisPlayerService mprisService = new MprisPlayerService();
+        private readonly MprisPlayerService mprisService = new MprisPlayerService();
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, MConfigManager config)
+        private void load(IAPIProvider api, MConfigManager config, Storage storage, OsuGame game)
         {
             DBusManager.RegisterNewObjects(new IDBusObject[]
             {
@@ -64,14 +65,22 @@ namespace osu.Game.DBus
                 }
             });
 
-            DBusManager.OnConnected += () => DBusManager.RegisterNewObject(mprisService,
-                "org.mpris.MediaPlayer2.mfosu");
+            void onDBusConnected()
+            {
+                DBusManager.RegisterNewObject(mprisService,
+                    "org.mpris.MediaPlayer2.mfosu");
+
+                DBusManager.OnConnected -= onDBusConnected;
+            }
+
+            DBusManager.OnConnected += onDBusConnected;
 
             api.LocalUser.BindValueChanged(onUserChanged, true);
             beatmap.BindValueChanged(onBeatmapChanged, true);
             ruleset.BindValueChanged(v => userInfoService.SetProperty("current_ruleset", v.NewValue?.Name ?? "???"), true);
             bindableActivity.BindValueChanged(v => userInfoService.SetProperty("activity", v.NewValue?.Status ?? "空闲"), true);
 
+            mprisService.Storage = storage;
             mprisService.Next += () => musicController.NextTrack();
             mprisService.Previous += () => musicController.PreviousTrack();
             mprisService.Play += () => musicController.Play();
@@ -83,19 +92,18 @@ namespace osu.Game.DBus
             mprisService.Seek += t => musicController.SeekTo(t);
             mprisService.Stop += () => musicController.Stop(true);
             mprisService.PlayPause += () => musicController.TogglePause();
-            mprisService.OpenUri += s => NotificationAction?.Invoke(new SimpleNotification
-            {
-                Text = "尚未实现 ><"
-            });
+            mprisService.OpenUri += game.HandleLink;
             mprisService.WindowRaise += () => NotificationAction?.Invoke(new SimpleNotification
             {
                 Text = "尚未实现 ><"
             });
         }
 
-        #region Mpris控制
-
-        #endregion
+        protected override void Update()
+        {
+            base.Update();
+            mprisService.TrackRunning = musicController.CurrentTrack.IsRunning;
+        }
 
         public Action<Notification> NotificationAction { get; set; }
 
@@ -120,6 +128,7 @@ namespace osu.Game.DBus
         {
             beatmapService.Beatmap = v.NewValue;
             audioservice.Beatmap = v.NewValue;
+            mprisService.Beatmap = v.NewValue;
         }
 
         protected override void LoadComplete()

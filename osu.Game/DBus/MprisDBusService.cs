@@ -1,5 +1,8 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
+using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using Tmds.DBus;
 
 namespace osu.Game.DBus
@@ -11,6 +14,40 @@ namespace osu.Game.DBus
 
         private readonly PlayerProperties playerProperties = new PlayerProperties();
         private readonly MediaPlayer2Properties mp2Properties = new MediaPlayer2Properties();
+
+        internal Storage Storage { get; set; }
+
+        private bool trackRunning;
+
+        internal bool TrackRunning
+        {
+            set
+            {
+                if (trackRunning == value) return;
+
+                trackRunning = value;
+
+                playerProperties._PlaybackStatus = value ? "Playing" : "Paused";
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("PlaybackStatus", playerProperties.PlaybackStatus));
+            }
+        }
+
+        internal WorkingBeatmap Beatmap
+        {
+            set
+            {
+                var info = value.BeatmapInfo;
+                playerProperties.Metadata["xesam:artist"] = new[] { info.Metadata?.ArtistUnicode ?? info.Metadata?.Artist ?? string.Empty };
+                playerProperties.Metadata["xesam:title"] = info.Metadata?.TitleUnicode ?? info.Metadata?.Title ?? string.Empty;
+                playerProperties.Metadata["mpris:artUrl"] = "file://"
+                                                            + Storage?.GetFullPath("files")
+                                                            + Path.DirectorySeparatorChar
+                                                            + (value.BeatmapSetInfo.GetPathForFile(info.Metadata?.BackgroundFile)
+                                                               ?? string.Empty);
+
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("Metadata", playerProperties.Metadata));
+            }
+        }
 
         #region 用于导出到游戏的控制
 
@@ -27,6 +64,9 @@ namespace osu.Game.DBus
         public Action Quit;
 
         #endregion
+
+        private void triggerPauseChange()
+            => OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("PlaybackStatus", playerProperties.PlaybackStatus));
 
         public Task NextAsync()
         {
@@ -61,6 +101,8 @@ namespace osu.Game.DBus
         public Task PlayAsync()
         {
             Play?.Invoke();
+            playerProperties._PlaybackStatus = "Playing";
+            triggerPauseChange();
             return Task.CompletedTask;
         }
 

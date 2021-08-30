@@ -39,18 +39,9 @@ namespace M.DBus
         {
             Logger.Log("注册DBus物件及服务...");
 
-            //注册所有DBus Object
-            await currentConnection.RegisterObjectsAsync(dBusObjects.ToArray()).ConfigureAwait(false);
-
             //递归注册DBus服务
             foreach (var dBusObject in dBusObjects)
-            {
-                await currentConnection.RegisterServiceAsync(ObjectPathToName(dBusObject.ObjectPath)).ConfigureAwait(false);
-                await currentConnection.ResolveServiceOwnerAsync(
-                    ObjectPathToName(dBusObject.ObjectPath),
-                    onServiceNameChanged,
-                    e => onServiceError(e, dBusObject)).ConfigureAwait(false);
-            }
+                await registerToConection(dBusObject).ConfigureAwait(false);
         }
 
         private void onServiceNameChanged(ServiceOwnerChangedEventArgs args)
@@ -77,14 +68,7 @@ namespace M.DBus
             }
 
             if (connectionState == ConnectionState.Connected)
-            {
-                //注册物件
-                await currentConnection.RegisterObjectAsync(dbusObject).ConfigureAwait(false);
-
-                //注册服务
-                await currentConnection.RegisterServiceAsync(targetName).ConfigureAwait(false);
-                Logger.Log($"为{dbusObject.ObjectPath}注册{targetName}");
-            }
+                await registerToConection(dbusObject, targetName).ConfigureAwait(false);
         }
 
         public async Task RegisterNewObjects(IDBusObject[] objects)
@@ -96,12 +80,30 @@ namespace M.DBus
             {
                 //注册物件和DBus服务
                 foreach (var dBusObject in dBusObjects)
-                {
-                    await currentConnection.RegisterObjectAsync(dBusObject).ConfigureAwait(false);
-
-                    await currentConnection.RegisterServiceAsync(ObjectPathToName(dBusObject.ObjectPath)).ConfigureAwait(false);
-                }
+                    await registerToConection(dBusObject).ConfigureAwait(false);
             }
+        }
+
+        private readonly List<string> registeredServices = new List<string>();
+
+        private async Task registerToConection(IDBusObject dBusObject, string targetName = null)
+        {
+            targetName ??= ObjectPathToName(dBusObject.ObjectPath);
+            await currentConnection.RegisterObjectAsync(dBusObject).ConfigureAwait(false);
+
+            await currentConnection.RegisterServiceAsync(targetName).ConfigureAwait(false);
+
+            if (!registeredServices.Contains(targetName))
+            {
+                await currentConnection.ResolveServiceOwnerAsync(
+                    targetName,
+                    onServiceNameChanged,
+                    e => onServiceError(e, dBusObject)).ConfigureAwait(false);
+
+                registeredServices.Add(targetName);
+            }
+
+            Logger.Log($"为{dBusObject.ObjectPath}注册{targetName}");
         }
 
         public void UnRegisterObject(IDBusObject dBusObject)
@@ -112,8 +114,7 @@ namespace M.DBus
             {
                 Logger.Log($"反注册{dBusObject.ObjectPath}");
                 dBusObjects.Remove(target);
-                currentConnection.UnregisterObject(target);
-                Task.Run(() => unregisterObjectTask(target));
+                Task.Run(() => unRegisterFromConnection(target));
             }
             else
             {
@@ -121,9 +122,10 @@ namespace M.DBus
             }
         }
 
-        private async Task unregisterObjectTask(IDBusObject target)
+        private async Task unRegisterFromConnection(IDBusObject dBusObject)
         {
-            await currentConnection.UnregisterServiceAsync(ObjectPathToName(target.ObjectPath)).ConfigureAwait(false);
+            currentConnection.UnregisterObject(dBusObject);
+            await currentConnection.UnregisterServiceAsync(ObjectPathToName(dBusObject.ObjectPath)).ConfigureAwait(false);
         }
 
         public bool CheckIfAlreadyRegistered(IDBusObject dBusObject)
@@ -207,9 +209,7 @@ namespace M.DBus
 
                         //反注册服务
                         foreach (var dBusObject in dBusObjects)
-                        {
-                            currentConnection.UnregisterServiceAsync(ObjectPathToName(dBusObject.ObjectPath)).ConfigureAwait(false);
-                        }
+                            unRegisterFromConnection(dBusObject).ConfigureAwait(false);
 
                         //清除当前连接目标
                         currentConnectTarget = string.Empty;

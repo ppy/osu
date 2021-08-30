@@ -111,11 +111,11 @@ namespace osu.Game.DBus
     [Dictionary]
     public class PlayerProperties
     {
-        private readonly string _PlaybackStatus = "Paused";
+        internal string _PlaybackStatus = "Paused";
 
         public string PlaybackStatus => _PlaybackStatus;
 
-        private readonly string _LoopStatus = "Looping";
+        internal string _LoopStatus = "Looping";
 
         public string LoopStatus => _LoopStatus;
 
@@ -129,8 +129,10 @@ namespace osu.Game.DBus
 
         private readonly IDictionary<string, object> _Metadata = new Dictionary<string, object>
         {
-            ["mpris:artUrl"] = "file://",
-            ["xesam:artist"] = "歌手",
+            ["xesam:artist"] = new[]
+            {
+                "艺术家"
+            },
             ["xesam:title"] = "标题",
             ["xesam:trackNumber"] = 1,
         };
@@ -169,7 +171,7 @@ namespace osu.Game.DBus
 
         public bool CanPause => _CanPause;
 
-        private readonly bool _CanSeek = true;
+        private readonly bool _CanSeek = false;
 
         public bool CanSeek => _CanSeek;
 
