@@ -15,6 +15,8 @@ namespace M.DBus
 
         private ConnectionState connectionState = ConnectionState.NotConnected;
 
+        public Action OnConnected;
+
         public DBusManager(bool startOnLoad)
         {
             //如果在初始化时启动服务
@@ -63,10 +65,16 @@ namespace M.DBus
             Logger.Error(e, $"位于 '{ObjectPathToName(dbusObject.ObjectPath)}' 的DBus服务出现错误");
         }
 
-        public async Task RegisterNewObject(IDBusObject dbusObject)
+        public async Task RegisterNewObject(IDBusObject dbusObject, string targetName = null)
         {
             //添加物件到列表
             dBusObjects.Add(dbusObject);
+
+            if (string.IsNullOrEmpty(targetName))
+            {
+                targetName = ObjectPathToName(dbusObject.ObjectPath);
+                Logger.Log($"为{dbusObject.ObjectPath}指定了空的地址");
+            }
 
             if (connectionState == ConnectionState.Connected)
             {
@@ -74,7 +82,8 @@ namespace M.DBus
                 await currentConnection.RegisterObjectAsync(dbusObject).ConfigureAwait(false);
 
                 //注册服务
-                await currentConnection.RegisterServiceAsync(ObjectPathToName(dbusObject.ObjectPath)).ConfigureAwait(false);
+                await currentConnection.RegisterServiceAsync(targetName).ConfigureAwait(false);
+                Logger.Log($"为{dbusObject.ObjectPath}注册{targetName}");
             }
         }
 
@@ -162,6 +171,7 @@ namespace M.DBus
                     //启动服务
                     await connectAsync().ConfigureAwait(false);
                     await registerObjects().ConfigureAwait(false);
+                    OnConnected?.Invoke();
                     break;
 
                 case ConnectionState.Connected:
@@ -169,6 +179,7 @@ namespace M.DBus
 
                     //直接注册
                     await registerObjects().ConfigureAwait(false);
+                    OnConnected?.Invoke();
                     break;
             }
         }

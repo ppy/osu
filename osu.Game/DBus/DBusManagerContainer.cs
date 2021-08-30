@@ -8,6 +8,7 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -42,7 +43,11 @@ namespace osu.Game.DBus
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
+        private MprisPlayerService mprisService = new MprisPlayerService();
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, MConfigManager config)
@@ -59,11 +64,38 @@ namespace osu.Game.DBus
                 }
             });
 
+            DBusManager.OnConnected += () => DBusManager.RegisterNewObject(mprisService,
+                "org.mpris.MediaPlayer2.mfosu");
+
             api.LocalUser.BindValueChanged(onUserChanged, true);
             beatmap.BindValueChanged(onBeatmapChanged, true);
             ruleset.BindValueChanged(v => userInfoService.SetProperty("current_ruleset", v.NewValue?.Name ?? "???"), true);
             bindableActivity.BindValueChanged(v => userInfoService.SetProperty("activity", v.NewValue?.Status ?? "空闲"), true);
+
+            mprisService.Next += () => musicController.NextTrack();
+            mprisService.Previous += () => musicController.PreviousTrack();
+            mprisService.Play += () => musicController.Play();
+            mprisService.Pause += () => musicController.Stop(true);
+            mprisService.Quit += () => NotificationAction?.Invoke(new SimpleNotification
+            {
+                Text = "尚未实现><"
+            });
+            mprisService.Seek += t => musicController.SeekTo(t);
+            mprisService.Stop += () => musicController.Stop(true);
+            mprisService.PlayPause += () => musicController.TogglePause();
+            mprisService.OpenUri += s => NotificationAction?.Invoke(new SimpleNotification
+            {
+                Text = "尚未实现 ><"
+            });
+            mprisService.WindowRaise += () => NotificationAction?.Invoke(new SimpleNotification
+            {
+                Text = "尚未实现 ><"
+            });
         }
+
+        #region Mpris控制
+
+        #endregion
 
         public Action<Notification> NotificationAction { get; set; }
 
