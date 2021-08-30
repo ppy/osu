@@ -166,6 +166,30 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[TimingPoints]");
 
+            if (!(beatmap.ControlPointInfo is LegacyControlPointInfo)) // todo: always run this? probably no harm.
+            {
+                var legacyControlPoints = new LegacyControlPointInfo();
+
+                foreach (var point in beatmap.ControlPointInfo.AllControlPoints)
+                    legacyControlPoints.Add(point.Time, point.DeepClone());
+
+                beatmap.ControlPointInfo = legacyControlPoints;
+
+                SampleControlPoint lastRelevantSamplePoint = null;
+
+                // iterate over hitobjects and pull out all required sample changes
+                foreach (var h in beatmap.HitObjects)
+                {
+                    var hSamplePoint = h.SampleControlPoint;
+
+                    if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
+                    {
+                        legacyControlPoints.Add(hSamplePoint.Time, hSamplePoint);
+                        lastRelevantSamplePoint = hSamplePoint;
+                    }
+                }
+            }
+
             foreach (var group in beatmap.ControlPointInfo.Groups)
             {
                 var groupTimingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
@@ -175,17 +199,17 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     writer.Write(FormattableString.Invariant($"{groupTimingPoint.Time},"));
                     writer.Write(FormattableString.Invariant($"{groupTimingPoint.BeatLength},"));
-                    outputControlPointEffectsAt(groupTimingPoint.Time, true);
+                    outputControlPointAt(groupTimingPoint.Time, true);
                 }
 
                 // Output any remaining effects as secondary non-timing control point.
                 var difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(group.Time);
                 writer.Write(FormattableString.Invariant($"{group.Time},"));
                 writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SpeedMultiplier},"));
-                outputControlPointEffectsAt(group.Time, false);
+                outputControlPointAt(group.Time, false);
             }
 
-            void outputControlPointEffectsAt(double time, bool isTimingPoint)
+            void outputControlPointAt(double time, bool isTimingPoint)
             {
                 var samplePoint = ((LegacyControlPointInfo)beatmap.ControlPointInfo).SamplePointAt(time);
                 var effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
