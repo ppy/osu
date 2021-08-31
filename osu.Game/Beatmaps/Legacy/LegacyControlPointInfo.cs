@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps.Legacy
 
         protected override bool CheckAlreadyExisting(double time, ControlPoint newPoint)
         {
-            if (newPoint is SampleControlPoint _)
+            if (newPoint is SampleControlPoint)
             {
                 var existing = BinarySearch(SamplePoints, time);
                 return newPoint.IsRedundant(existing);
