@@ -18,7 +18,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class Toolbar : VisibilityContainer, IKeyBindingHandler<GlobalAction>
+    public class Toolbar : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
@@ -40,8 +40,6 @@ namespace osu.Game.Overlays.Toolbar
 
         // Toolbar and its components need keyboard input even when hidden.
         public override bool PropagateNonPositionalInputSubTree => true;
-
-        protected override bool Handle(UIEvent e) => e is MouseEvent;
 
         public Toolbar()
         {
