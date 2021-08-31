@@ -3,9 +3,11 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -118,8 +120,23 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             switch (lookup)
             {
-                case OsuSkinColour colour:
-                    return base.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                case OsuSkinColour colourLookup:
+                    var colour = base.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colourLookup));
+
+                    if (colour == null)
+                        return null;
+
+                    switch (colourLookup)
+                    {
+                        case OsuSkinColour.SliderTrackOverride:
+                            var bindableColour = ((Bindable<Color4>)colour);
+
+                            // legacy skins use a constant value for slider track alpha, regardless of the source colour.
+                            bindableColour.Value = bindableColour.Value.Opacity(0.7f);
+                            break;
+                    }
+
+                    return colour;
 
                 case OsuSkinConfiguration osuLookup:
                     switch (osuLookup)
