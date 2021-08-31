@@ -226,8 +226,9 @@ namespace osu.Game.Rulesets.Scoring
                     return (max_score * (accuracyScore + comboScore) + getBonusScore(statistics)) * scoreMultiplier;
 
                 case ScoringMode.Classic:
-                    // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return getBonusScore(statistics) + (accuracyRatio * Math.Max(1, maxCombo) * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
+                    // This feels very similar to osu!stable scoring (ScoreV1) while maintaining that classic scoring is only a constant multiple of standardised scoring.
+                    // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two systems.
+                    return GetScore(ScoringMode.Standardised, maxCombo, accuracyRatio, comboRatio, statistics) / max_score * Math.Pow(maxCombo, 2) * 25;
             }
         }
 
