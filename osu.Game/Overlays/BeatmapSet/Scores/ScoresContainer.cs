@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
@@ -49,36 +51,41 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private GetScoresRequest getScoresRequest;
 
+        private CancellationTokenSource loadCancellationSource;
+
         protected APILegacyScores Scores
         {
             set => Schedule(() =>
             {
+                loadCancellationSource?.Cancel();
+                loadCancellationSource = new CancellationTokenSource();
+
                 topScoresContainer.Clear();
+                scoreTable.ClearScores();
+                scoreTable.Hide();
 
                 if (value?.Scores.Any() != true)
-                {
-                    scoreTable.ClearScores();
-                    scoreTable.Hide();
                     return;
-                }
 
-                var scoreInfos = value.Scores.Select(s => s.CreateScoreInfo(rulesets))
-                                      .OrderByDescending(s => scoreManager.GetTotalScore(s))
-                                      .ThenBy(s => s.OnlineScoreID)
-                                      .ToList();
+                scoreManager.GetOrderedScoresAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
+                            .ContinueWith(ordered => Schedule(() =>
+                            {
+                                if (loadCancellationSource.IsCancellationRequested)
+                                    return;
 
-                var topScore = scoreInfos.First();
+                                var topScore = ordered.Result.First();
 
-                scoreTable.DisplayScores(scoreInfos, topScore.Beatmap?.Status.GrantsPerformancePoints() == true);
-                scoreTable.Show();
+                                scoreTable.DisplayScores(ordered.Result, topScore.Beatmap?.Status.GrantsPerformancePoints() == true);
+                                scoreTable.Show();
 
-                var userScore = value.UserScore;
-                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets);
+                                var userScore = value.UserScore;
+                                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets);
 
-                topScoresContainer.Add(new DrawableTopScore(topScore));
+                                topScoresContainer.Add(new DrawableTopScore(topScore));
 
-                if (userScoreInfo != null && userScoreInfo.OnlineScoreID != topScore.OnlineScoreID)
-                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
+                                if (userScoreInfo != null && userScoreInfo.OnlineScoreID != topScore.OnlineScoreID)
+                                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
+                            }), TaskContinuationOptions.OnlyOnRanToCompletion);
             });
         }
 
