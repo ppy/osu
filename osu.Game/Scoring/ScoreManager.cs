@@ -23,6 +23,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Users;
 
 namespace osu.Game.Scoring
 {
@@ -43,6 +44,8 @@ namespace osu.Game.Scoring
         [CanBeNull]
         private readonly OsuConfigManager configManager;
 
+        private IAPIProvider api { get; set; }
+
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
                             Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
@@ -51,6 +54,7 @@ namespace osu.Game.Scoring
             this.beatmaps = beatmaps;
             this.difficulties = difficulties;
             this.configManager = configManager;
+            this.api = api;
         }
 
         protected override ScoreInfo CreateModel(ArchiveReader archive)
@@ -72,8 +76,31 @@ namespace osu.Game.Scoring
             }
         }
 
+        private Dictionary<string, User> previouslyLookedUpUsernames = new Dictionary<string, User>();
+
         protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
-            => Task.CompletedTask;
+        {
+            // These scores only provide the user's username but we need the user's ID too.
+            if (model.UserID <= 1 && model.UserString != null)
+            {
+                if (previouslyLookedUpUsernames.TryGetValue(model.UserString, out User user))
+                {
+                    model.UserID = user.Id;
+                    return Task.CompletedTask;
+                }
+
+                var request = new GetUserRequest(model.UserString);
+                request.Success += user =>
+                {
+                    model.UserID = user.Id;
+                    previouslyLookedUpUsernames.TryAdd(model.UserString, user);
+                };
+
+                api.Queue(request);
+            }
+
+            return Task.CompletedTask;
+        }
 
         protected override void ExportModelTo(ScoreInfo model, Stream outputStream)
         {
