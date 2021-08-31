@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Play
                 Beatmap.Value = gameplayState.Beatmap;
                 Ruleset.Value = gameplayState.Ruleset.RulesetInfo;
 
-                this.Push(new SpectatorPlayerLoader(gameplayState.Score));
+                this.Push(new SpectatorPlayerLoader(gameplayState.Score, () => new SoloSpectatorPlayer(gameplayState.Score)));
             }
         }
 

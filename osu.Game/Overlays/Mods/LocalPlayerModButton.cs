@@ -102,8 +102,6 @@ namespace osu.Game.Overlays.Mods
                 incompatibleText.Colour = colours.BlueLight;
             }
 
-            protected override Type TargetContentType => typeof(LocalPlayerModButton);
-
             protected override void UpdateDisplay(Mod mod)
             {
                 base.UpdateDisplay(mod);
