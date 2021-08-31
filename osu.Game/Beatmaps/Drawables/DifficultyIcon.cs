@@ -126,9 +126,9 @@ namespace osu.Game.Beatmaps.Drawables
             difficultyBindable.BindValueChanged(difficulty => background.Colour = colours.ForStarDifficulty(difficulty.NewValue.Stars));
         }
 
-        public ITooltip<DifficultyIconTooltipContent> GetCustomTooltip() => new DifficultyIconTooltip();
+        ITooltip<DifficultyIconTooltipContent> IHasCustomTooltip<DifficultyIconTooltipContent>.GetCustomTooltip() => new DifficultyIconTooltip();
 
-        public DifficultyIconTooltipContent TooltipContent => shouldShowTooltip ? new DifficultyIconTooltipContent(beatmap, difficultyBindable) : null;
+        DifficultyIconTooltipContent IHasCustomTooltip<DifficultyIconTooltipContent>.TooltipContent => shouldShowTooltip ? new DifficultyIconTooltipContent(beatmap, difficultyBindable) : null;
 
         private class DifficultyRetriever : Component
         {
