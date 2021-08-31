@@ -182,11 +182,19 @@ namespace osu.Game.Beatmaps.Formats
                 beatmap.ControlPointInfo = legacyControlPoints;
 
                 SampleControlPoint lastRelevantSamplePoint = null;
+                DifficultyControlPoint lastRelevantDifficultyPoint = null;
 
                 // iterate over hitobjects and pull out all required sample changes
                 foreach (var h in beatmap.HitObjects)
                 {
                     var hSamplePoint = h.SampleControlPoint;
+                    var hDifficultyPoint = h.DifficultyControlPoint;
+
+                    if (!hDifficultyPoint.IsRedundant(lastRelevantDifficultyPoint))
+                    {
+                        legacyControlPoints.Add(hDifficultyPoint.Time, hDifficultyPoint);
+                        lastRelevantDifficultyPoint = hDifficultyPoint;
+                    }
 
                     if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
                     {
@@ -209,7 +217,7 @@ namespace osu.Game.Beatmaps.Formats
                 }
 
                 // Output any remaining effects as secondary non-timing control point.
-                var difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(group.Time);
+                var difficultyPoint = ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(group.Time);
                 writer.Write(FormattableString.Invariant($"{group.Time},"));
                 writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SpeedMultiplier},"));
                 outputControlPointAt(group.Time, false);
