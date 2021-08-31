@@ -153,7 +153,7 @@ namespace osu.Game.Graphics.Backgrounds
                 TriangleParticle newParticle = parts[i];
 
                 // Scale moved distance by the size of the triangle. Smaller triangles should move more slowly.
-                newParticle.Position.Y += parts[i].Scale * movedDistance;
+                newParticle.Position.Y += Math.Max(0.5f, parts[i].Scale) * movedDistance;
                 newParticle.Colour.A = adjustedAlpha;
 
                 parts[i] = newParticle;
