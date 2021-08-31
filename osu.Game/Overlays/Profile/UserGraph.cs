@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Profile
             get
             {
                 if (data == null || hoveredIndex == -1)
-                    return default;
+                    return null;
 
                 var (key, value) = data[hoveredIndex];
                 return GetTooltipContent(key, value);
@@ -295,7 +295,7 @@ namespace osu.Game.Overlays.Profile
         }
     }
 
-    public readonly struct UserGraphTooltipContent
+    public class UserGraphTooltipContent
     {
         // todo: could use init-only properties on C# 9 which read better than a constructor.
         public LocalisableString Name { get; }
