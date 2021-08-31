@@ -16,8 +16,6 @@ namespace osu.Game.Screens.Edit.Setup
 {
     internal class DesignSection : SetupSection
     {
-        private const float fade_duration = 250;
-
         protected LabelledSwitchButton EnableCountdown;
         protected LabelledEnumDropdown<CountdownType> CountdownSpeed;
         protected LabelledNumberBox CountdownOffset;
@@ -90,7 +88,6 @@ namespace osu.Game.Screens.Edit.Setup
             base.LoadComplete();
 
             EnableCountdown.Current.BindValueChanged(_ => updateCountdownSettingsVisibility(), true);
-            countdownSettings.FinishTransforms(true);
 
             EnableCountdown.Current.BindValueChanged(_ => updateBeatmap());
             CountdownSpeed.Current.BindValueChanged(_ => updateBeatmap());
@@ -101,16 +98,7 @@ namespace osu.Game.Screens.Edit.Setup
             letterboxDuringBreaks.Current.BindValueChanged(_ => updateBeatmap());
         }
 
-        private void updateCountdownSettingsVisibility()
-        {
-            bool countdownEnabled = EnableCountdown.Current.Value;
-
-            foreach (var child in countdownSettings)
-            {
-                child.ScaleTo(new Vector2(1, countdownEnabled ? 1 : 0), fade_duration, Easing.OutQuint)
-                     .FadeTo(countdownEnabled ? 1 : 0, fade_duration, Easing.OutQuint);
-            }
-        }
+        private void updateCountdownSettingsVisibility() => countdownSettings.FadeTo(EnableCountdown.Current.Value ? 1 : 0);
 
         private void onOffsetCommitted()
         {
