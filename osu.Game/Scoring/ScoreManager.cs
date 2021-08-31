@@ -195,9 +195,6 @@ namespace osu.Game.Scoring
         {
             public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
 
-            private readonly ScoreInfo score;
-            private readonly ScoreManager scoreManager;
-
             /// <summary>
             /// Creates a new <see cref="TotalScoreBindable"/>.
             /// </summary>
@@ -205,20 +202,7 @@ namespace osu.Game.Scoring
             /// <param name="scoreManager">The <see cref="ScoreManager"/>.</param>
             public TotalScoreBindable(ScoreInfo score, ScoreManager scoreManager)
             {
-                this.score = score;
-                this.scoreManager = scoreManager;
-
-                ScoringMode.BindValueChanged(onScoringModeChanged, true);
-            }
-
-            private CancellationTokenSource difficultyCancellationSource;
-
-            private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
-            {
-                difficultyCancellationSource?.Cancel();
-                difficultyCancellationSource = new CancellationTokenSource();
-
-                scoreManager.GetTotalScoreAsync(score, difficultyCancellationSource.Token).ContinueWith(s => Value = s.Result, TaskContinuationOptions.OnlyOnRanToCompletion);
+                ScoringMode.BindValueChanged(_ => Value = scoreManager.GetTotalScore(score), true);
             }
         }
 
