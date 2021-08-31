@@ -295,11 +295,18 @@ namespace osu.Game.Overlays.Profile
         }
     }
 
-    public class UserGraphTooltipContent
+    public readonly struct UserGraphTooltipContent
     {
-        // todo: change to init-only on C# 9
-        public LocalisableString Name { get; set; }
-        public LocalisableString Count { get; set; }
-        public LocalisableString Time { get; set; }
+        // todo: could use init-only properties on C# 9 which read better than a constructor.
+        public LocalisableString Name { get; }
+        public LocalisableString Count { get; }
+        public LocalisableString Time { get; }
+
+        public UserGraphTooltipContent(LocalisableString name, LocalisableString count, LocalisableString time)
+        {
+            Name = name;
+            Count = count;
+            Time = time;
+        }
     }
 }
