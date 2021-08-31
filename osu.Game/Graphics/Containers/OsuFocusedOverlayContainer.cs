@@ -75,14 +75,14 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            closeOnMouseUp = !base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition) && (game?.Toolbar.IsHovered == false);
+            closeOnMouseUp = !base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition);
 
             return base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (closeOnMouseUp && !base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition) && (game?.Toolbar.IsHovered == false))
+            if (closeOnMouseUp && !base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
                 Hide();
 
             base.OnMouseUp(e);

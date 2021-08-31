@@ -345,7 +345,9 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
             AddStep("move cursor to toolbar", () => InputManager.MoveMouseTo(Game.Toolbar.ScreenSpaceDrawQuad.Centre));
             AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
-            AddAssert("now playing is still visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
+            AddAssert("now playing is hidden", () => nowPlayingOverlay.State.Value == Visibility.Hidden);
+
+            AddStep("press now playing hotkey", () => InputManager.Key(Key.F6));
 
             // toolbar -> background
             AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));

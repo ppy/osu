@@ -41,8 +41,7 @@ namespace osu.Game.Overlays.Toolbar
         // Toolbar and its components need keyboard input even when hidden.
         public override bool PropagateNonPositionalInputSubTree => true;
 
-        // IsHovered is used
-        public override bool HandlePositionalInput => true;
+        protected override bool Handle(UIEvent e) => e is MouseEvent;
 
         public Toolbar()
         {
@@ -143,13 +142,12 @@ namespace osu.Game.Overlays.Toolbar
             protected override bool OnHover(HoverEvent e)
             {
                 gradientBackground.FadeIn(transition_time, Easing.OutQuint);
-                return base.OnHover(e);
+                return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 gradientBackground.FadeOut(transition_time, Easing.OutQuint);
-                base.OnHoverLost(e);
             }
         }
 
