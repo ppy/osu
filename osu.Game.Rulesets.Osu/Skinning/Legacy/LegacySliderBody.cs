@@ -22,8 +22,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 // Roughly matches osu!stable's slider border portions.
                 => base.CalculatedBorderPortion * 0.77f;
 
-            public new Color4 AccentColour => new Color4(base.AccentColour.R, base.AccentColour.G, base.AccentColour.B, 0.7f);
-
             protected override Color4 ColourAt(float position)
             {
                 float realBorderPortion = shadow_portion + CalculatedBorderPortion;
