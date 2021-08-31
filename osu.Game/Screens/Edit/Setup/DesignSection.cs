@@ -17,14 +17,14 @@ namespace osu.Game.Screens.Edit.Setup
     internal class DesignSection : SetupSection
     {
         protected LabelledSwitchButton EnableCountdown;
+
+        protected FillFlowContainer CountdownSettings;
         protected LabelledEnumDropdown<CountdownType> CountdownSpeed;
         protected LabelledNumberBox CountdownOffset;
 
         private LabelledSwitchButton widescreenSupport;
         private LabelledSwitchButton epilepsyWarning;
         private LabelledSwitchButton letterboxDuringBreaks;
-
-        private FillFlowContainer countdownSettings;
 
         public override LocalisableString Title => "Design";
 
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Setup
                     Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None },
                     Description = "If enabled, an \"Are you ready? 3, 2, 1, GO!\" countdown will be inserted at the beginning of the beatmap, assuming there is enough time to do so."
                 },
-                countdownSettings = new FillFlowContainer
+                CountdownSettings = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Edit.Setup
             letterboxDuringBreaks.Current.BindValueChanged(_ => updateBeatmap());
         }
 
-        private void updateCountdownSettingsVisibility() => countdownSettings.FadeTo(EnableCountdown.Current.Value ? 1 : 0);
+        private void updateCountdownSettingsVisibility() => CountdownSettings.FadeTo(EnableCountdown.Current.Value ? 1 : 0);
 
         private void onOffsetCommitted()
         {

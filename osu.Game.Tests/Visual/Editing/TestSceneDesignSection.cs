@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -42,7 +43,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("turn countdown off", () => designSection.EnableCountdown.Current.Value = false);
 
             AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.None);
-            AddUntilStep("other controls hidden", () => !designSection.CountdownSpeed.IsPresent && !designSection.CountdownOffset.IsPresent);
+            AddUntilStep("other controls hidden", () => !designSection.CountdownSettings.IsPresent);
         }
 
         [Test]
@@ -51,12 +52,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("turn countdown on", () => designSection.EnableCountdown.Current.Value = true);
 
             AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.Normal);
-            AddUntilStep("other controls shown", () => designSection.CountdownSpeed.IsPresent && designSection.CountdownOffset.IsPresent);
+            AddUntilStep("other controls shown", () => designSection.CountdownSettings.IsPresent);
 
             AddStep("change countdown speed", () => designSection.CountdownSpeed.Current.Value = CountdownType.DoubleSpeed);
 
             AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.DoubleSpeed);
-            AddUntilStep("other controls still shown", () => designSection.CountdownSpeed.IsPresent && designSection.CountdownOffset.IsPresent);
+            AddUntilStep("other controls still shown", () => designSection.CountdownSettings.IsPresent);
         }
 
         [Test]
@@ -90,6 +91,8 @@ namespace osu.Game.Tests.Visual.Editing
         private class TestDesignSection : DesignSection
         {
             public new LabelledSwitchButton EnableCountdown => base.EnableCountdown;
+
+            public new FillFlowContainer CountdownSettings => base.CountdownSettings;
             public new LabelledEnumDropdown<CountdownType> CountdownSpeed => base.CountdownSpeed;
             public new LabelledNumberBox CountdownOffset => base.CountdownOffset;
         }
