@@ -66,7 +66,6 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
-        [JsonIgnore]
         public SampleControlPoint SampleControlPoint;
 
         /// <summary>
