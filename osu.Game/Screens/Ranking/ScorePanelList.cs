@@ -10,9 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osuTK;
 using osuTK.Input;
@@ -292,26 +290,15 @@ namespace osu.Game.Screens.Ranking
         {
             public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
 
-            private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
-
             [Resolved]
             private ScoreManager scoreManager { get; set; }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuConfigManager configManager)
-            {
-                configManager.BindWith(OsuSetting.ScoreDisplayMode, scoringMode);
-            }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                scoringMode.BindValueChanged(mode =>
-                {
-                    foreach (var c in Children)
-                        SetLayoutPosition(c, scoreManager.GetTotalScore(c.Panel.Score));
-                }, true);
+                foreach (var c in Children)
+                    SetLayoutPosition(c, scoreManager.GetTotalScore(c.Panel.Score));
             }
 
             public int GetPanelIndex(ScoreInfo score) => applySorting(Children).TakeWhile(s => s.Panel.Score != score).Count();

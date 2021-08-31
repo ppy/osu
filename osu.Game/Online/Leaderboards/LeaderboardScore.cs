@@ -199,7 +199,7 @@ namespace osu.Game.Online.Leaderboards
                                             TextColour = Color4.White,
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                                             Font = OsuFont.Numeric.With(size: 23),
-                                            Text = scoreManager.GetTotalScore(score).ToLocalisableString(@"N0"),
+                                            Current = scoreManager.GetBindableTotalScoreString(score)
                                         },
                                         RankContainer = new Container
                                         {
