@@ -160,7 +160,7 @@ namespace osu.Game
 
         private readonly string[] args;
 
-        private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
+        private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
@@ -195,7 +195,7 @@ namespace osu.Game
         /// <param name="hideToolbar">Whether the toolbar should also be hidden.</param>
         public void CloseAllOverlays(bool hideToolbar = true)
         {
-            foreach (var overlay in overlays)
+            foreach (var overlay in focusedOverlays)
                 overlay.Hide();
 
             if (hideToolbar) Toolbar.Hide();
@@ -910,8 +910,8 @@ namespace osu.Game
             if (cache)
                 dependencies.CacheAs(component);
 
-            if (component is OverlayContainer overlay)
-                overlays.Add(overlay);
+            if (component is OsuFocusedOverlayContainer overlay)
+                focusedOverlays.Add(overlay);
 
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
