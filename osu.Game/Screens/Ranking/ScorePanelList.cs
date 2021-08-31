@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -61,6 +62,10 @@ namespace osu.Game.Screens.Ranking
 
         public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
+        private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
         private readonly Flow flow;
         private readonly Scroll scroll;
         private ScorePanel expandedPanel;
@@ -115,32 +120,33 @@ namespace osu.Game.Screens.Ranking
                 };
             });
 
-            flow.Add(panel.CreateTrackingContainer().With(d =>
-            {
-                d.Anchor = Anchor.Centre;
-                d.Origin = Anchor.Centre;
-            }));
+            scoreManager.GetOrderedScoresAsync(new[] { score })
+                        .ContinueWith(_ => Schedule(() =>
+                        {
+                            flow.Add(panel.CreateTrackingContainer().With(d =>
+                            {
+                                d.Anchor = Anchor.Centre;
+                                d.Origin = Anchor.Centre;
+                            }));
 
-            if (IsLoaded)
-            {
-                if (SelectedScore.Value == score)
-                {
-                    SelectedScore.TriggerChange();
-                }
-                else
-                {
-                    // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
-                    // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
-                    if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
-                    {
-                        // A somewhat hacky property is used here because we need to:
-                        // 1) Scroll after the scroll container's visible range is updated.
-                        // 2) Scroll before the scroll container's scroll position is updated.
-                        // Without this, we would have a 1-frame positioning error which looks very jarring.
-                        scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
-                    }
-                }
-            }
+                            if (SelectedScore.Value == score)
+                            {
+                                SelectedScore.TriggerChange();
+                            }
+                            else
+                            {
+                                // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
+                                // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
+                                if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
+                                {
+                                    // A somewhat hacky property is used here because we need to:
+                                    // 1) Scroll after the scroll container's visible range is updated.
+                                    // 2) Scroll before the scroll container's scroll position is updated.
+                                    // Without this, we would have a 1-frame positioning error which looks very jarring.
+                                    scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
+                                }
+                            }
+                        }));
 
             return panel;
         }
@@ -284,6 +290,12 @@ namespace osu.Game.Screens.Ranking
             }
 
             return base.OnKeyDown(e);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            loadCancellationSource?.Cancel();
         }
 
         private class Flow : FillFlowContainer<ScorePanelTrackingContainer>

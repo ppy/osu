@@ -106,6 +106,25 @@ namespace osu.Game.Scoring
             => base.CheckLocalAvailability(model, items)
                || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
 
+        public async Task<ScoreInfo[]> GetOrderedScoresAsync(ScoreInfo[] scores, CancellationToken cancellationToken = default)
+        {
+            var difficultyCache = difficulties?.Invoke();
+
+            if (difficultyCache == null)
+                return orderByTotalScore(scores);
+
+            // Compute difficulties asynchronously first to prevent blocks on the main thread.
+            foreach (var s in scores)
+            {
+                await difficultyCache.GetDifficultyAsync(s.Beatmap, s.Ruleset, s.Mods, cancellationToken).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            return orderByTotalScore(scores);
+
+            ScoreInfo[] orderByTotalScore(IEnumerable<ScoreInfo> incoming) => incoming.OrderByDescending(GetTotalScore).ThenBy(s => s.OnlineScoreID).ToArray();
+        }
+
         /// <summary>
         /// Retrieves a bindable that represents the total score of a <see cref="ScoreInfo"/>.
         /// </summary>
