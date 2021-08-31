@@ -4,12 +4,11 @@
 using System.Collections.Generic;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
-    public interface IBeatmap : IJsonSerializable
+    public interface IBeatmap
     {
         /// <summary>
         /// This beatmap's info.
