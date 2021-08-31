@@ -1,14 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -130,26 +128,6 @@ namespace osu.Game.Tournament.Screens.Setup
             base.Update();
 
             resolution.Value = $"{ScreenSpaceDrawQuad.Width:N0}x{ScreenSpaceDrawQuad.Height:N0}";
-        }
-
-        public class LabelledDropdown<T> : LabelledComponent<OsuDropdown<T>, T>
-        {
-            public LabelledDropdown()
-                : base(true)
-            {
-            }
-
-            public IEnumerable<T> Items
-            {
-                get => Component.Items;
-                set => Component.Items = value;
-            }
-
-            protected override OsuDropdown<T> CreateComponent() => new OsuDropdown<T>
-            {
-                RelativeSizeAxes = Axes.X,
-                Width = 0.5f,
-            };
         }
     }
 }
