@@ -278,10 +278,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("timingpoint-speedmultiplier-reset.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var controlPoints = decoder.Decode(stream).ControlPointInfo;
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
 
-                Assert.That(controlPoints.DifficultyPointAt(0).SpeedMultiplier, Is.EqualTo(0.5).Within(0.1));
-                Assert.That(controlPoints.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1).Within(0.1));
+                Assert.That(controlPoints?.DifficultyPointAt(0).SpeedMultiplier, Is.EqualTo(0.5).Within(0.1));
+                Assert.That(controlPoints?.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1).Within(0.1));
             }
         }
 
@@ -393,7 +393,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("controlpoint-difficulty-multiplier.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var controlPointInfo = decoder.Decode(stream).ControlPointInfo;
+                var controlPointInfo = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
 
                 Assert.That(controlPointInfo.DifficultyPointAt(5).SpeedMultiplier, Is.EqualTo(1));
                 Assert.That(controlPointInfo.DifficultyPointAt(1000).SpeedMultiplier, Is.EqualTo(10));

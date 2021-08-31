@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             Debug.Assert(distanceData != null);
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
-            DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(hitObject.StartTime);
+            DifficultyControlPoint difficultyPoint = hitObject.DifficultyControlPoint;
 
             double beatLength;
 #pragma warning disable 618

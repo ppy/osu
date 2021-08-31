@@ -42,14 +42,6 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        protected override DifficultyControlPoint CreatePoint()
-        {
-            var reference = Beatmap.ControlPointInfo.DifficultyPointAt(SelectedGroup.Value.Time);
-
-            return new DifficultyControlPoint
-            {
-                SpeedMultiplier = reference.SpeedMultiplier,
-            };
-        }
+        protected override DifficultyControlPoint CreatePoint() => new DifficultyControlPoint(); // TODO: remove
     }
 }
