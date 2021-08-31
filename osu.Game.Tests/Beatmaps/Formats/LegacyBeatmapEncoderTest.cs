@@ -50,6 +50,22 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
         }
 
+        [TestCaseSource(nameof(allBeatmaps))]
+        public void TestEncodeDecodeStabilityDoubleConvert(string name)
+        {
+            var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded), name);
+
+            // run an extra convert. this is expected to be stable.
+            decodedAfterEncode.beatmap = convert(decodedAfterEncode.beatmap);
+
+            sort(decoded.beatmap);
+            sort(decodedAfterEncode.beatmap);
+
+            Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
+            Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
+        }
+
         [Test]
         public void TestEncodeMultiSegmentSliderWithFloatingPointError()
         {
