@@ -125,13 +125,11 @@ namespace osu.Game.Overlays.News
 
         private class DateContainer : CircularContainer, IHasCustomTooltip<DateTimeOffset>
         {
-            public ITooltip<DateTimeOffset> GetCustomTooltip() => new DateTooltip();
-
-            public DateTimeOffset TooltipContent { get; }
+            private readonly DateTimeOffset date;
 
             public DateContainer(DateTimeOffset date)
             {
-                TooltipContent = date;
+                this.date = date;
             }
 
             [BackgroundDependencyLoader]
@@ -148,7 +146,7 @@ namespace osu.Game.Overlays.News
                     },
                     new OsuSpriteText
                     {
-                        Text = TooltipContent.ToString("d MMM yyyy").ToUpper(),
+                        Text = date.ToString("d MMM yyyy").ToUpper(),
                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
                         Margin = new MarginPadding
                         {
@@ -160,6 +158,10 @@ namespace osu.Game.Overlays.News
             }
 
             protected override bool OnClick(ClickEvent e) => true; // Protects the NewsCard from clicks while hovering DateContainer
+
+            ITooltip<DateTimeOffset> IHasCustomTooltip<DateTimeOffset>.GetCustomTooltip() => new DateTooltip();
+
+            DateTimeOffset IHasCustomTooltip<DateTimeOffset>.TooltipContent => date;
         }
     }
 }
