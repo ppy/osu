@@ -76,7 +76,7 @@ namespace osu.Game.Scoring
             }
         }
 
-        private Dictionary<string, User> previouslyLookedUpUsernames = new Dictionary<string, User>();
+        private readonly Dictionary<string, User> previouslyLookedUpUsernames = new Dictionary<string, User>();
 
         protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
@@ -90,10 +90,10 @@ namespace osu.Game.Scoring
                 }
 
                 var request = new GetUserRequest(model.UserString);
-                request.Success += user =>
+                request.Success += u =>
                 {
-                    model.UserID = user.Id;
-                    previouslyLookedUpUsernames.TryAdd(model.UserString, user);
+                    model.UserID = u.Id;
+                    previouslyLookedUpUsernames.TryAdd(model.UserString, u);
                 };
 
                 api.Queue(request);
