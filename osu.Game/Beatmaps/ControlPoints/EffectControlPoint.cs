@@ -12,13 +12,34 @@ namespace osu.Game.Beatmaps.ControlPoints
         public static readonly EffectControlPoint DEFAULT = new EffectControlPoint
         {
             KiaiModeBindable = { Disabled = true },
-            OmitFirstBarLineBindable = { Disabled = true }
+            OmitFirstBarLineBindable = { Disabled = true },
+            ApproachRateBindable = { Disabled = true }
         };
 
         /// <summary>
         /// Whether the first bar line of this control point is ignored.
         /// </summary>
         public readonly BindableBool OmitFirstBarLineBindable = new BindableBool();
+
+        /// <summary>
+        /// The relative approach rate at this control point.
+        /// </summary>
+        public readonly BindableDouble ApproachRateBindable = new BindableDouble(1)
+        {
+            Precision = 0.01,
+            Default = 1,
+            MinValue = 0.01,
+            MaxValue = 10
+        };
+
+        /// <summary>
+        /// The relative approach rate.
+        /// </summary>
+        public double ApproachRate
+        {
+            get => ApproachRateBindable.Value;
+            set => ApproachRateBindable.Value = value;
+        }
 
         public override Color4 GetRepresentingColour(OsuColour colours) => colours.Purple;
 
@@ -49,12 +70,14 @@ namespace osu.Game.Beatmaps.ControlPoints
             => !OmitFirstBarLine
                && existing is EffectControlPoint existingEffect
                && KiaiMode == existingEffect.KiaiMode
-               && OmitFirstBarLine == existingEffect.OmitFirstBarLine;
+               && OmitFirstBarLine == existingEffect.OmitFirstBarLine
+               && ApproachRate == existingEffect.ApproachRate;
 
         public override void CopyFrom(ControlPoint other)
         {
             KiaiMode = ((EffectControlPoint)other).KiaiMode;
             OmitFirstBarLine = ((EffectControlPoint)other).OmitFirstBarLine;
+            ApproachRate = ((EffectControlPoint)other).ApproachRate;
 
             base.CopyFrom(other);
         }

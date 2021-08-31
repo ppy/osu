@@ -392,7 +392,7 @@ namespace osu.Game.Rulesets.Edit
         public override float GetBeatSnapDistanceAt(double referenceTime)
         {
             DifficultyControlPoint difficultyPoint = EditorBeatmap.ControlPointInfo.DifficultyPointAt(referenceTime);
-            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / BeatSnapProvider.BeatDivisor);
+            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SliderVelocity / BeatSnapProvider.BeatDivisor);
         }
 
         public override float DurationToDistance(double referenceTime, double duration)

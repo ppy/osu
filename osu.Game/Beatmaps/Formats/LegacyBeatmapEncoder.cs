@@ -219,7 +219,7 @@ namespace osu.Game.Beatmaps.Formats
                 // Output any remaining effects as secondary non-timing control point.
                 var difficultyPoint = ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(group.Time);
                 writer.Write(FormattableString.Invariant($"{group.Time},"));
-                writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SpeedMultiplier},"));
+                writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SliderVelocity},"));
                 outputControlPointAt(group.Time, false);
             }
 

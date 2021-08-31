@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 #pragma warning restore 618
                 beatLength = timingPoint.BeatLength * legacyDifficultyPoint.BpmMultiplier;
             else
-                beatLength = timingPoint.BeatLength / difficultyPoint.SpeedMultiplier;
+                beatLength = timingPoint.BeatLength / difficultyPoint.SliderVelocity;
 
             SpanCount = repeatsData?.SpanCount() ?? 1;
             StartTime = (int)Math.Round(hitObject.StartTime);

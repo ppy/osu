@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Editing
             composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 1;
             composer.EditorBeatmap.ControlPointInfo.Clear();
 
-            composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 1 });
+            composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SliderVelocity = 1 });
             composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
         });
 
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Editing
             AddStep($"set multiplier = {multiplier}", () =>
             {
                 composer.EditorBeatmap.ControlPointInfo.Clear();
-                composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = multiplier });
+                composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SliderVelocity = multiplier });
             });
 
             assertSnapDistance(100 * multiplier);
