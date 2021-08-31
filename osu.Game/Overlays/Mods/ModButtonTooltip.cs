@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModButtonTooltip : VisibilityContainer, ITooltip<ModButton>
+    public class ModButtonTooltip : VisibilityContainer, ITooltip<Mod>
     {
         private readonly OsuSpriteText descriptionText;
         private readonly Box background;
@@ -61,11 +60,10 @@ namespace osu.Game.Overlays.Mods
 
         private Mod lastMod;
 
-        public virtual void SetContent(ModButton button)
+        public void SetContent(Mod mod)
         {
-            var mod = button.SelectedMod ?? button.Mods.First();
-
-            if (mod.Equals(lastMod)) return;
+            if (mod.Equals(lastMod))
+                return;
 
             lastMod = mod;
 
