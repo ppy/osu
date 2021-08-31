@@ -96,7 +96,7 @@ namespace osu.Game.Scoring
                     previouslyLookedUpUsernames.TryAdd(model.UserString, u);
                 };
 
-                api.Queue(request);
+                api?.Queue(request);
             }
 
             return Task.CompletedTask;
