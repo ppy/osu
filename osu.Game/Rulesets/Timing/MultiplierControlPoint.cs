@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// The aggregate multiplier which this <see cref="MultiplierControlPoint"/> provides.
         /// </summary>
-        public double Multiplier => Velocity * DifficultyPoint.SpeedMultiplier * BaseBeatLength / TimingPoint.BeatLength;
+        public double Multiplier => Velocity * DifficultyPoint.SliderVelocity * BaseBeatLength / TimingPoint.BeatLength;
 
         /// <summary>
         /// The base beat length to scale the <see cref="TimingPoint"/> provided multiplier relative to.

@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         protected double MultiplierAt(HitObject obj)
         {
             double beatLength = controlPointInfo.TimingPointAt(obj.StartTime).BeatLength;
-            double speedMultiplier = obj.DifficultyControlPoint.SpeedMultiplier;
+            double speedMultiplier = obj.DifficultyControlPoint.SliderVelocity;
 
             return speedMultiplier * TimingControlPoint.DEFAULT_BEAT_LENGTH / beatLength;
         }

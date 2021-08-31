@@ -380,7 +380,7 @@ namespace osu.Game.Beatmaps.Formats
             addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
 #pragma warning restore 618
             {
-                SpeedMultiplier = speedMultiplier,
+                SliderVelocity = speedMultiplier,
             }, timingChange);
 
             addControlPoint(time, new EffectControlPoint

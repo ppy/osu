@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SpeedMultiplier;
+            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate;

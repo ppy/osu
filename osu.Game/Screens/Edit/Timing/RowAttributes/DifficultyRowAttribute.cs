@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
         public DifficultyRowAttribute(DifficultyControlPoint difficulty)
             : base(difficulty, "difficulty")
         {
-            speedMultiplier = difficulty.SpeedMultiplierBindable.GetBoundCopy();
+            speedMultiplier = difficulty.SliderVelocityBindable.GetBoundCopy();
         }
 
         [BackgroundDependencyLoader]

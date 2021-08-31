@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 #pragma warning restore 618
                 beatLength = timingPoint.BeatLength * legacyDifficultyPoint.BpmMultiplier;
             else
-                beatLength = timingPoint.BeatLength / difficultyPoint.SpeedMultiplier;
+                beatLength = timingPoint.BeatLength / difficultyPoint.SliderVelocity;
 
             double sliderScoringPointDistance = osu_base_scoring_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate;
 

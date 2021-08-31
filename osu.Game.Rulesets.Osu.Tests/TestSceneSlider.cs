@@ -329,7 +329,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private Drawable createDrawable(Slider slider, float circleSize, double speedMultiplier)
         {
             var cpi = new ControlPointInfo();
-            cpi.Add(0, new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
+            cpi.Add(0, new DifficultyControlPoint { SliderVelocity = speedMultiplier });
 
             slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
 
