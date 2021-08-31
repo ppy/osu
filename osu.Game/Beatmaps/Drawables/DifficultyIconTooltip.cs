@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    internal class DifficultyIconTooltip : VisibilityContainer, ITooltip<DifficultyIconTooltipContent>
+    public class DifficultyIconTooltip : VisibilityContainer, ITooltip<DifficultyIconTooltipContent>
     {
         private readonly OsuSpriteText difficultyName, starRating;
         private readonly Box background;
@@ -107,7 +107,7 @@ namespace osu.Game.Beatmaps.Drawables
         protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
     }
 
-    internal class DifficultyIconTooltipContent
+    public class DifficultyIconTooltipContent
     {
         public readonly BeatmapInfo Beatmap;
         public readonly IBindable<StarDifficulty> Difficulty;
