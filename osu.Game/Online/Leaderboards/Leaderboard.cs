@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Threading;
-using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
@@ -247,7 +246,7 @@ namespace osu.Game.Online.Leaderboards
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager configManager)
+        private void load()
         {
             if (api != null)
                 apiState.BindTo(api.State);
