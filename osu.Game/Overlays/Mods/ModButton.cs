@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Mods
     /// <summary>
     /// Represents a clickable button which can cycle through one of more mods.
     /// </summary>
-    public class ModButton : ModButtonEmpty, IHasCustomTooltip
+    public class ModButton : ModButtonEmpty, IHasCustomTooltip<Mod>
     {
         private ModIcon foregroundIcon;
         private ModIcon backgroundIcon;
@@ -312,8 +312,8 @@ namespace osu.Game.Overlays.Mods
             Mod = mod;
         }
 
-        public virtual ITooltip GetCustomTooltip() => new ModButtonTooltip();
+        public virtual ITooltip<Mod> GetCustomTooltip() => new ModButtonTooltip();
 
-        public object TooltipContent => this;
+        public Mod TooltipContent => SelectedMod ?? Mods.FirstOrDefault();
     }
 }
