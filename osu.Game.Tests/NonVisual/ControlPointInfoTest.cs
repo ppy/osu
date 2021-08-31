@@ -46,7 +46,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestAddRedundantDifficulty()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             cpi.Add(0, new DifficultyControlPoint()); // is redundant
             cpi.Add(1000, new DifficultyControlPoint()); // is redundant
@@ -159,7 +159,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestAddControlPointToGroup()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             var group = cpi.GroupAt(1000, true);
             Assert.That(cpi.Groups.Count, Is.EqualTo(1));
@@ -174,7 +174,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestAddDuplicateControlPointToGroup()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             var group = cpi.GroupAt(1000, true);
             Assert.That(cpi.Groups.Count, Is.EqualTo(1));
@@ -190,7 +190,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestRemoveControlPointFromGroup()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             var group = cpi.GroupAt(1000, true);
             Assert.That(cpi.Groups.Count, Is.EqualTo(1));
@@ -230,7 +230,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestClear()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             cpi.Add(0, new TimingControlPoint());
             cpi.Add(1000, new TimingControlPoint { BeatLength = 500 });

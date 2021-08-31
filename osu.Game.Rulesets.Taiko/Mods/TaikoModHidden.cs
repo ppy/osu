@@ -24,21 +24,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
             ApplyNormalVisibilityState(hitObject, state);
         }
 
-        protected double MultiplierAt(double position)
-        {
-            double beatLength = controlPointInfo.TimingPointAt(position).BeatLength;
-            double speedMultiplier = controlPointInfo.DifficultyPointAt(position).SpeedMultiplier;
-
-            return speedMultiplier * TimingControlPoint.DEFAULT_BEAT_LENGTH / beatLength;
-        }
-
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
             switch (hitObject)
             {
                 case DrawableDrumRollTick _:
                 case DrawableHit _:
-                    double preempt = 10000 / MultiplierAt(hitObject.HitObject.StartTime);
+                    double preempt = 10000 / MultiplierAt(hitObject.HitObject);
                     double start = hitObject.HitObject.StartTime - preempt * 0.6;
                     double duration = preempt * 0.3;
 
@@ -55,6 +47,14 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                     break;
             }
+        }
+
+        protected double MultiplierAt(HitObject obj)
+        {
+            double beatLength = controlPointInfo.TimingPointAt(obj.StartTime).BeatLength;
+            double speedMultiplier = obj.DifficultyControlPoint.SpeedMultiplier;
+
+            return speedMultiplier * TimingControlPoint.DEFAULT_BEAT_LENGTH / beatLength;
         }
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
