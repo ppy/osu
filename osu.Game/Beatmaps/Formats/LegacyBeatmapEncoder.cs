@@ -172,7 +172,7 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[TimingPoints]");
 
-            if (!(beatmap.ControlPointInfo is LegacyControlPointInfo)) // todo: always run this? probably no harm.
+            if (!(beatmap.ControlPointInfo is LegacyControlPointInfo))
             {
                 var legacyControlPoints = new LegacyControlPointInfo();
 
