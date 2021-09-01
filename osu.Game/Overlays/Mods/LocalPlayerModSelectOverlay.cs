@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Mods
             {
             }
 
-            protected override ModButton CreateModButton(Mod mod) => new LocalPlayerModButton(mod);
+            protected override ModButton CreateModButton(Mod mod) => new IncompatibilityDisplayingModButton(mod);
         }
     }
 }
