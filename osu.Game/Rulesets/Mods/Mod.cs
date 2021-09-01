@@ -11,7 +11,6 @@ using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
-using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.UI;
 using osu.Game.Utils;
 
@@ -21,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
     /// The base class for gameplay modifiers.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public abstract class Mod : IMod, IEquatable<Mod>, IJsonSerializable, IDeepCloneable<Mod>
+    public abstract class Mod : IMod, IEquatable<Mod>, IDeepCloneable<Mod>
     {
         /// <summary>
         /// The name of this mod.

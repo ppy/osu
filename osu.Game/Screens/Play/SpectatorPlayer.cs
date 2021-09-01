@@ -14,16 +14,16 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
-    public class SpectatorPlayer : Player
+    public abstract class SpectatorPlayer : Player
     {
         [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
+        protected SpectatorClient SpectatorClient { get; private set; }
 
         private readonly Score score;
 
         protected override bool CheckModsAllowFailure() => false; // todo: better support starting mid-way through beatmap
 
-        public SpectatorPlayer(Score score, PlayerConfiguration configuration = null)
+        protected SpectatorPlayer(Score score, PlayerConfiguration configuration = null)
             : base(configuration)
         {
             this.score = score;
@@ -32,8 +32,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            spectatorClient.OnUserBeganPlaying += userBeganPlaying;
-
             AddInternal(new OsuSpriteText
             {
                 Text = $"Watching {score.ScoreInfo.User.Username} playing live!",
@@ -50,7 +48,7 @@ namespace osu.Game.Screens.Play
 
             // Start gameplay along with the very first arrival frame (the latest one).
             score.Replay.Frames.Clear();
-            spectatorClient.OnNewFrames += userSentFrames;
+            SpectatorClient.OnNewFrames += userSentFrames;
         }
 
         private void userSentFrames(int userId, FrameDataBundle bundle)
@@ -93,31 +91,17 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
-            spectatorClient.OnNewFrames -= userSentFrames;
+            SpectatorClient.OnNewFrames -= userSentFrames;
 
             return base.OnExiting(next);
-        }
-
-        private void userBeganPlaying(int userId, SpectatorState state)
-        {
-            if (userId != score.ScoreInfo.UserID) return;
-
-            Schedule(() =>
-            {
-                if (this.IsCurrentScreen()) this.Exit();
-            });
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (spectatorClient != null)
-            {
-                spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
-                spectatorClient.OnNewFrames -= userSentFrames;
-            }
+            if (SpectatorClient != null)
+                SpectatorClient.OnNewFrames -= userSentFrames;
         }
     }
 }

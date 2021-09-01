@@ -3,6 +3,7 @@
 
 using System;
 using Humanizer;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Utils
