@@ -159,7 +159,7 @@ namespace osu.Game.Scoring
         /// <param name="score">The <see cref="ScoreInfo"/> to calculate the total score of.</param>
         /// <param name="mode">The <see cref="ScoringMode"/> to return the total score as.</param>
         /// <returns>The total score.</returns>
-        public long GetTotalScore(ScoreInfo score, ScoringMode mode = ScoringMode.Standardised) => GetTotalScoreAsync(score).Result;
+        public long GetTotalScore(ScoreInfo score, ScoringMode mode = ScoringMode.Standardised) => GetTotalScoreAsync(score, mode).Result;
 
         /// <summary>
         /// Retrieves the total score of a <see cref="ScoreInfo"/> in the given <see cref="ScoringMode"/>.
