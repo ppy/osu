@@ -184,7 +184,7 @@ namespace osu.Game.Beatmaps.Formats
                 SampleControlPoint lastRelevantSamplePoint = null;
                 DifficultyControlPoint lastRelevantDifficultyPoint = null;
 
-                // iterate over hitobjects and pull out all required sample changes
+                // iterate over hitobjects and pull out all required sample and difficulty changes
                 foreach (var h in beatmap.HitObjects)
                 {
                     var hSamplePoint = h.SampleControlPoint;
@@ -202,6 +202,8 @@ namespace osu.Game.Beatmaps.Formats
                         lastRelevantSamplePoint = hSamplePoint;
                     }
                 }
+
+                // TODO: we need to pull out approach rate from EffectControlPoint and shove it in with difficulty points where necessary...
             }
 
             foreach (var group in beatmap.ControlPointInfo.Groups)
