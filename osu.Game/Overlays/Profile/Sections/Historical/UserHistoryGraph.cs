@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using static osu.Game.Users.User;
 
@@ -49,14 +50,13 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 this.tooltipCounterName = tooltipCounterName;
             }
 
-            public override bool SetContent(object content)
+            public override void SetContent(object content)
             {
                 if (!(content is TooltipDisplayContent info) || info.Name != tooltipCounterName)
-                    return false;
+                    return;
 
                 Counter.Text = info.Count;
                 BottomText.Text = info.Date;
-                return true;
             }
         }
 
