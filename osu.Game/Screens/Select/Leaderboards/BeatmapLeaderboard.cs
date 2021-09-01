@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
                 }
 
-                scoreManager.GetOrderedScoresAsync(scores.ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(scores.ToArray(), loadCancellationSource.Token)
                             .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
 
                 return null;
@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             req.Success += r =>
             {
-                scoreManager.GetOrderedScoresAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
                             .ContinueWith(ordered => Schedule(() =>
                             {
                                 if (loadCancellationSource.IsCancellationRequested)

@@ -14,7 +14,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Bindables;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -67,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (value?.Scores.Any() != true)
                     return;
 
-                scoreManager.GetOrderedScoresAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
                             .ContinueWith(ordered => Schedule(() =>
                             {
                                 if (loadCancellationSource.IsCancellationRequested)
