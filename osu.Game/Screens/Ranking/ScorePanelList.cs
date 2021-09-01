@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Scoring;
 using osuTK;
@@ -64,6 +65,9 @@ namespace osu.Game.Screens.Ranking
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; }
 
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
         private readonly Flow flow;
@@ -120,33 +124,33 @@ namespace osu.Game.Screens.Ranking
                 };
             });
 
-            scoreManager.GetOrderedScoresAsync(new[] { score })
-                        .ContinueWith(_ => Schedule(() =>
-                        {
-                            flow.Add(panel.CreateTrackingContainer().With(d =>
-                            {
-                                d.Anchor = Anchor.Centre;
-                                d.Origin = Anchor.Centre;
-                            }));
+            difficultyCache.GetDifficultyAsync(score.Beatmap, score.Ruleset, score.Mods)
+                           .ContinueWith(_ => Schedule(() =>
+                           {
+                               flow.Add(panel.CreateTrackingContainer().With(d =>
+                               {
+                                   d.Anchor = Anchor.Centre;
+                                   d.Origin = Anchor.Centre;
+                               }));
 
-                            if (SelectedScore.Value == score)
-                            {
-                                SelectedScore.TriggerChange();
-                            }
-                            else
-                            {
-                                // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
-                                // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
-                                if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
-                                {
-                                    // A somewhat hacky property is used here because we need to:
-                                    // 1) Scroll after the scroll container's visible range is updated.
-                                    // 2) Scroll before the scroll container's scroll position is updated.
-                                    // Without this, we would have a 1-frame positioning error which looks very jarring.
-                                    scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
-                                }
-                            }
-                        }));
+                               if (SelectedScore.Value == score)
+                               {
+                                   SelectedScore.TriggerChange();
+                               }
+                               else
+                               {
+                                   // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
+                                   // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
+                                   if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
+                                   {
+                                       // A somewhat hacky property is used here because we need to:
+                                       // 1) Scroll after the scroll container's visible range is updated.
+                                       // 2) Scroll before the scroll container's scroll position is updated.
+                                       // Without this, we would have a 1-frame positioning error which looks very jarring.
+                                       scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
+                                   }
+                               }
+                           }));
 
             return panel;
         }
