@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -100,6 +101,9 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
+            foreach (var d in flow)
+                displayScore(d);
+
             SelectedScore.BindValueChanged(selectedScoreChanged, true);
         }
 
@@ -124,35 +128,54 @@ namespace osu.Game.Screens.Ranking
                 };
             });
 
-            difficultyCache.GetDifficultyAsync(score.Beatmap, score.Ruleset, score.Mods)
-                           .ContinueWith(_ => Schedule(() =>
-                           {
-                               flow.Add(panel.CreateTrackingContainer().With(d =>
-                               {
-                                   d.Anchor = Anchor.Centre;
-                                   d.Origin = Anchor.Centre;
-                               }));
+            var trackingContainer = panel.CreateTrackingContainer().With(d =>
+            {
+                d.Anchor = Anchor.Centre;
+                d.Origin = Anchor.Centre;
+                d.Hide();
+            });
 
-                               if (SelectedScore.Value == score)
-                               {
-                                   SelectedScore.TriggerChange();
-                               }
-                               else
-                               {
-                                   // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
-                                   // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
-                                   if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
-                                   {
-                                       // A somewhat hacky property is used here because we need to:
-                                       // 1) Scroll after the scroll container's visible range is updated.
-                                       // 2) Scroll before the scroll container's scroll position is updated.
-                                       // Without this, we would have a 1-frame positioning error which looks very jarring.
-                                       scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
-                                   }
-                               }
-                           }));
+            flow.Add(trackingContainer);
+
+            if (IsLoaded)
+                displayScore(trackingContainer);
 
             return panel;
+        }
+
+        private void displayScore(ScorePanelTrackingContainer trackingContainer)
+        {
+            if (!IsLoaded)
+                return;
+
+            var score = trackingContainer.Panel.Score;
+
+            // Calculating score can take a while in extreme scenarios, so only display scores after the process completes.
+            scoreManager.GetTotalScoreAsync(score)
+                        .ContinueWith(totalScore => Schedule(() =>
+                        {
+                            flow.SetLayoutPosition(trackingContainer, totalScore.Result);
+
+                            trackingContainer.Show();
+
+                            if (SelectedScore.Value == score)
+                            {
+                                SelectedScore.TriggerChange();
+                            }
+                            else
+                            {
+                                // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
+                                // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
+                                if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
+                                {
+                                    // A somewhat hacky property is used here because we need to:
+                                    // 1) Scroll after the scroll container's visible range is updated.
+                                    // 2) Scroll before the scroll container's scroll position is updated.
+                                    // Without this, we would have a 1-frame positioning error which looks very jarring.
+                                    scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
+                                }
+                            }
+                        }), TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         /// <summary>
@@ -306,27 +329,7 @@ namespace osu.Game.Screens.Ranking
         {
             public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
 
-            [Resolved]
-            private ScoreManager scoreManager { get; set; }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                foreach (var c in Children)
-                    SetLayoutPosition(c, scoreManager.GetTotalScore(c.Panel.Score));
-            }
-
             public int GetPanelIndex(ScoreInfo score) => applySorting(Children).TakeWhile(s => s.Panel.Score != score).Count();
-
-            public override void Add(ScorePanelTrackingContainer drawable)
-            {
-                Debug.Assert(drawable != null);
-
-                base.Add(drawable);
-
-                SetLayoutPosition(drawable, scoreManager?.GetTotalScore(drawable.Panel.Score) ?? 0);
-            }
 
             private IEnumerable<ScorePanelTrackingContainer> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanelTrackingContainer>()
                                                                                                                        .OrderByDescending(GetLayoutPosition)

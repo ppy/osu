@@ -182,6 +182,22 @@ namespace osu.Game.Tests.Visual.Ranking
             assertExpandedPanelCentred();
         }
 
+        [Test]
+        public void TestAddScoreImmediately()
+        {
+            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo);
+
+            createListStep(() =>
+            {
+                var newList = new ScorePanelList { SelectedScore = { Value = score } };
+                newList.AddScore(score);
+                return newList;
+            });
+
+            assertScoreState(score, true);
+            assertExpandedPanelCentred();
+        }
+
         private void createListStep(Func<ScorePanelList> creationFunc)
         {
             AddStep("create list", () => Child = list = creationFunc().With(d =>
