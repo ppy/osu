@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class LocalPlayerModSelectOverlay : ModSelectOverlay
+    public class UserModSelectOverlay : ModSelectOverlay
     {
         protected override void OnModSelected(Mod mod)
         {
@@ -15,11 +15,11 @@ namespace osu.Game.Overlays.Mods
                 section.DeselectTypes(mod.IncompatibleMods, true, mod);
         }
 
-        protected override ModSection CreateModSection(ModType type) => new LocalPlayerModSection(type);
+        protected override ModSection CreateModSection(ModType type) => new UserModSection(type);
 
-        private class LocalPlayerModSection : ModSection
+        private class UserModSection : ModSection
         {
-            public LocalPlayerModSection(ModType type)
+            public UserModSection(ModType type)
                 : base(type)
             {
             }
