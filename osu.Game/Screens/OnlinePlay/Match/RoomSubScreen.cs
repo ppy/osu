@@ -429,10 +429,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// <param name="room">The room to change the settings of.</param>
         protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay(Room room);
 
-        private class UserModSelectOverlay : LocalPlayerModSelectOverlay
-        {
-        }
-
         public class UserModSelectButton : PurpleTriangleButton
         {
         }

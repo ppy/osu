@@ -65,9 +65,9 @@ namespace osu.Game.Overlays.Mods
                 incompatibleIcon.Hide();
         }
 
-        public override ITooltip<Mod> GetCustomTooltip() => new LocalPlayerModButtonTooltip();
+        public override ITooltip<Mod> GetCustomTooltip() => new IncompatibilityDisplayingTooltip();
 
-        private class LocalPlayerModButtonTooltip : ModButtonTooltip
+        private class IncompatibilityDisplayingTooltip : ModButtonTooltip
         {
             private readonly OsuSpriteText incompatibleText;
 
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Mods
             [Resolved]
             private Bindable<RulesetInfo> ruleset { get; set; }
 
-            public LocalPlayerModButtonTooltip()
+            public IncompatibilityDisplayingTooltip()
             {
                 AddRange(new Drawable[]
                 {
