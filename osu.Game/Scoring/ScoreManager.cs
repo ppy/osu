@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -36,6 +37,7 @@ namespace osu.Game.Scoring
 
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
+        private readonly Scheduler scheduler;
 
         [CanBeNull]
         private readonly Func<BeatmapDifficultyCache> difficulties;
@@ -43,12 +45,13 @@ namespace osu.Game.Scoring
         [CanBeNull]
         private readonly OsuConfigManager configManager;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
-                            Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, Scheduler scheduler,
+                            IIpcHost importHost = null, Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
+            this.scheduler = scheduler;
             this.difficulties = difficulties;
             this.configManager = configManager;
         }
@@ -125,7 +128,13 @@ namespace osu.Game.Scoring
 
             return orderByTotalScore(scores);
 
-            ScoreInfo[] orderByTotalScore(IEnumerable<ScoreInfo> incoming) => incoming.OrderByDescending(s => GetTotalScore(s)).ThenBy(s => s.OnlineScoreID).ToArray();
+            ScoreInfo[] orderByTotalScore(IEnumerable<ScoreInfo> incoming)
+            {
+                // We're calling .Result, but this should not be a blocking call due to the above GetDifficultyAsync() calls.
+                return incoming.OrderByDescending(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken).Result)
+                               .ThenBy(s => s.OnlineScoreID)
+                               .ToArray();
+            }
         }
 
         /// <summary>
@@ -136,7 +145,7 @@ namespace osu.Game.Scoring
         /// </remarks>
         /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
         /// <returns>The bindable containing the total score.</returns>
-        public Bindable<long> GetBindableTotalScore(ScoreInfo score)
+        public Bindable<long> GetBindableTotalScore([NotNull] ScoreInfo score)
         {
             var bindable = new TotalScoreBindable(score, this);
             configManager?.BindWith(OsuSetting.ScoreDisplayMode, bindable.ScoringMode);
@@ -151,15 +160,21 @@ namespace osu.Game.Scoring
         /// </remarks>
         /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
         /// <returns>The bindable containing the formatted total score string.</returns>
-        public Bindable<string> GetBindableTotalScoreString(ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
+        public Bindable<string> GetBindableTotalScoreString([NotNull] ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
 
         /// <summary>
         /// Retrieves the total score of a <see cref="ScoreInfo"/> in the given <see cref="ScoringMode"/>.
+        /// The score is returned in a callback that is run on the update thread.
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to calculate the total score of.</param>
+        /// <param name="callback">The callback to be invoked with the total score.</param>
         /// <param name="mode">The <see cref="ScoringMode"/> to return the total score as.</param>
-        /// <returns>The total score.</returns>
-        public long GetTotalScore(ScoreInfo score, ScoringMode mode = ScoringMode.Standardised) => GetTotalScoreAsync(score, mode).Result;
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to cancel the process.</param>
+        public void GetTotalScore([NotNull] ScoreInfo score, [NotNull] Action<long> callback, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
+        {
+            GetTotalScoreAsync(score, mode, cancellationToken)
+                .ContinueWith(s => scheduler.Add(() => callback(s.Result)), TaskContinuationOptions.OnlyOnRanToCompletion);
+        }
 
         /// <summary>
         /// Retrieves the total score of a <see cref="ScoreInfo"/> in the given <see cref="ScoringMode"/>.
@@ -168,7 +183,7 @@ namespace osu.Game.Scoring
         /// <param name="mode">The <see cref="ScoringMode"/> to return the total score as.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to cancel the process.</param>
         /// <returns>The total score.</returns>
-        public async Task<long> GetTotalScoreAsync(ScoreInfo score, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
+        public async Task<long> GetTotalScoreAsync([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
             if (score.Beatmap == null)
                 return score.TotalScore;
@@ -230,6 +245,11 @@ namespace osu.Game.Scoring
         {
             public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
 
+            private readonly ScoreInfo score;
+            private readonly ScoreManager scoreManager;
+
+            private CancellationTokenSource difficultyCalculationCancellationSource;
+
             /// <summary>
             /// Creates a new <see cref="TotalScoreBindable"/>.
             /// </summary>
@@ -237,7 +257,18 @@ namespace osu.Game.Scoring
             /// <param name="scoreManager">The <see cref="ScoreManager"/>.</param>
             public TotalScoreBindable(ScoreInfo score, ScoreManager scoreManager)
             {
-                ScoringMode.BindValueChanged(mode => Value = scoreManager.GetTotalScore(score, mode.NewValue), true);
+                this.score = score;
+                this.scoreManager = scoreManager;
+
+                ScoringMode.BindValueChanged(onScoringModeChanged, true);
+            }
+
+            private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
+            {
+                difficultyCalculationCancellationSource?.Cancel();
+                difficultyCalculationCancellationSource = new CancellationTokenSource();
+
+                scoreManager.GetTotalScore(score, s => Value = s, mode.NewValue, difficultyCalculationCancellationSource.Token);
             }
         }
 
