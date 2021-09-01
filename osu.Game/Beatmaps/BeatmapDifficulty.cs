@@ -26,7 +26,7 @@ namespace osu.Game.Beatmaps
             set => approachRate = value;
         }
 
-        public double SliderMultiplier { get; set; } = 1;
+        public double SliderMultiplier { get; set; } = 1; // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA this needs to be renamed or removed or something.
         public double SliderTickRate { get; set; } = 1;
 
         /// <summary>

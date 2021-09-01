@@ -387,6 +387,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 KiaiMode = kiaiMode,
                 OmitFirstBarLine = omitFirstBarSignature,
+                ApproachRate = speedMultiplier,
             }, timingChange);
 
             addControlPoint(time, new LegacySampleControlPoint

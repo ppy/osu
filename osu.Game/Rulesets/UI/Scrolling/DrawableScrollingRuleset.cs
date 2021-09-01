@@ -139,27 +139,26 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             // Merge sequences of timing and difficulty control points to create the aggregate "multiplier" control point
             var lastTimingPoint = new TimingControlPoint();
-            var lastDifficultyPoint = new DifficultyControlPoint();
+            var lastEffectPoint = new EffectControlPoint();
             var allPoints = new SortedList<ControlPoint>(Comparer<ControlPoint>.Default);
-            allPoints.AddRange(Beatmap.ControlPointInfo.TimingPoints);
 
-            // TODO: fix
-            //allPoints.AddRange(Beatmap.ControlPointInfo.DifficultyPoints);
+            allPoints.AddRange(Beatmap.ControlPointInfo.TimingPoints);
+            allPoints.AddRange(Beatmap.ControlPointInfo.EffectPoints);
 
             // Generate the timing points, making non-timing changes use the previous timing change and vice-versa
             var timingChanges = allPoints.Select(c =>
             {
                 if (c is TimingControlPoint timingPoint)
                     lastTimingPoint = timingPoint;
-                else if (c is DifficultyControlPoint difficultyPoint)
-                    lastDifficultyPoint = difficultyPoint;
+                else if (c is EffectControlPoint difficultyPoint)
+                    lastEffectPoint = difficultyPoint;
 
                 return new MultiplierControlPoint(c.Time)
                 {
                     Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier,
                     BaseBeatLength = baseBeatLength,
                     TimingPoint = lastTimingPoint,
-                    DifficultyPoint = lastDifficultyPoint
+                    EffectPoint = lastEffectPoint
                 };
             });
 
