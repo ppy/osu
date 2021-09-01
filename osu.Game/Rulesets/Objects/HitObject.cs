@@ -106,8 +106,6 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty, CancellationToken cancellationToken = default)
         {
-            ApplyDefaultsToSelf(controlPointInfo, difficulty);
-
             if (controlPointInfo is LegacyControlPointInfo legacyInfo)
             {
                 // This is done here since ApplyDefaultsToSelf may be used to determine the end time
@@ -119,6 +117,8 @@ namespace osu.Game.Rulesets.Objects
                 SampleControlPoint ??= SampleControlPoint.DEFAULT;
                 DifficultyControlPoint ??= DifficultyControlPoint.DEFAULT;
             }
+
+            ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             nestedHitObjects.Clear();
 
