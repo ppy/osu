@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
@@ -179,15 +180,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
 
-            public float GetBeatSnapDistanceAt(double referenceTime) => (float)beat_length;
+            public float GetBeatSnapDistanceAt(HitObject referenceObject) => (float)beat_length;
 
-            public float DurationToDistance(double referenceTime, double duration) => (float)duration;
+            public float DurationToDistance(HitObject referenceObject, double duration) => (float)duration;
 
-            public double DistanceToDuration(double referenceTime, float distance) => distance;
+            public double DistanceToDuration(HitObject referenceObject, float distance) => distance;
 
-            public double GetSnappedDurationFromDistance(double referenceTime, float distance) => 0;
+            public double GetSnappedDurationFromDistance(HitObject referenceObject, float distance) => 0;
 
-            public float GetSnappedDistanceFromDistance(double referenceTime, float distance) => 0;
+            public float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance) => 0;
         }
     }
 }

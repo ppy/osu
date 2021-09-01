@@ -142,7 +142,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             var lastDifficultyPoint = new DifficultyControlPoint();
             var allPoints = new SortedList<ControlPoint>(Comparer<ControlPoint>.Default);
             allPoints.AddRange(Beatmap.ControlPointInfo.TimingPoints);
-            allPoints.AddRange(Beatmap.ControlPointInfo.DifficultyPoints);
+
+            // TODO: fix
+            //allPoints.AddRange(Beatmap.ControlPointInfo.DifficultyPoints);
 
             // Generate the timing points, making non-timing changes use the previous timing change and vice-versa
             var timingChanges = allPoints.Select(c =>
