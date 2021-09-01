@@ -18,14 +18,14 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class LocalPlayerModButton : ModButton
+    public class IncompatibilityDisplayingModButton : ModButton
     {
         private readonly CompositeDrawable incompatibleIcon;
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
 
-        public LocalPlayerModButton(Mod mod)
+        public IncompatibilityDisplayingModButton(Mod mod)
             : base(mod)
         {
             ButtonContent.Add(incompatibleIcon = new IncompatibleIcon
