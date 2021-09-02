@@ -54,11 +54,6 @@ namespace osu.Game.Overlays
 
         protected override string PopInSampleName => "UI/settings-pop-in";
 
-        /// <summary>
-        /// Provide a source for the toolbar height.
-        /// </summary>
-        public Func<float> GetToolbarHeight;
-
         private readonly bool showSidebar;
 
         private LoadingLayer loading;
@@ -193,7 +188,6 @@ namespace osu.Game.Overlays
             base.UpdateAfterChildren();
 
             ContentContainer.Margin = new MarginPadding { Left = Sidebar?.DrawWidth ?? 0 };
-            Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
         private const double fade_in_duration = 1000;
