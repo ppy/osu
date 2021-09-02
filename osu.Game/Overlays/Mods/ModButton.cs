@@ -11,29 +11,24 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Utils;
 
 namespace osu.Game.Overlays.Mods
 {
     /// <summary>
     /// Represents a clickable button which can cycle through one of more mods.
     /// </summary>
-    public class ModButton : ModButtonEmpty, IHasCustomTooltip
+    public class ModButton : ModButtonEmpty, IHasCustomTooltip<Mod>
     {
         private ModIcon foregroundIcon;
         private ModIcon backgroundIcon;
         private readonly SpriteText text;
         private readonly Container<ModIcon> iconsContainer;
-        private readonly CompositeDrawable incompatibleIcon;
 
         /// <summary>
         /// Fired when the selection changes.
@@ -47,9 +42,6 @@ namespace osu.Game.Overlays.Mods
 
         // A selected index of -1 means not selected.
         private int selectedIndex = -1;
-
-        [Resolved]
-        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
 
         /// <summary>
         /// Change the selected mod index of this button.
@@ -109,7 +101,7 @@ namespace osu.Game.Overlays.Mods
                             .RotateTo(rotate_angle * direction)
                             .RotateTo(0f, mod_switch_duration, mod_switch_easing);
 
-                        Schedule(() => displayMod(newSelection));
+                        Schedule(() => DisplayMod(newSelection));
                     }
                 }
 
@@ -138,7 +130,8 @@ namespace osu.Game.Overlays.Mods
         }
 
         private Mod mod;
-        private readonly Container scaleContainer;
+
+        protected readonly Container ButtonContent;
 
         public Mod Mod
         {
@@ -162,7 +155,7 @@ namespace osu.Game.Overlays.Mods
 
                 if (Mods.Length > 0)
                 {
-                    displayMod(Mods[0]);
+                    DisplayMod(Mods[0]);
                 }
             }
         }
@@ -173,13 +166,13 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            scaleContainer.ScaleTo(0.9f, 800, Easing.Out);
+            ButtonContent.ScaleTo(0.9f, 800, Easing.Out);
             return base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            scaleContainer.ScaleTo(1, 500, Easing.OutElastic);
+            ButtonContent.ScaleTo(1, 500, Easing.OutElastic);
 
             // only trigger the event if we are inside the area of the button
             if (Contains(e.ScreenSpaceMousePosition))
@@ -238,30 +231,13 @@ namespace osu.Game.Overlays.Mods
 
         public void Deselect() => changeSelectedIndex(-1);
 
-        private void displayMod(Mod mod)
+        protected virtual void DisplayMod(Mod mod)
         {
             if (backgroundIcon != null)
                 backgroundIcon.Mod = foregroundIcon.Mod;
             foregroundIcon.Mod = mod;
             text.Text = mod.Name;
             Colour = mod.HasImplementation ? Color4.White : Color4.Gray;
-
-            Scheduler.AddOnce(updateCompatibility);
-        }
-
-        private void updateCompatibility()
-        {
-            var m = SelectedMod ?? Mods.First();
-
-            bool isIncompatible = false;
-
-            if (selectedMods.Value.Count > 0 && !selectedMods.Value.Contains(m))
-                isIncompatible = !ModUtils.CheckCompatibleSet(selectedMods.Value.Append(m));
-
-            if (isIncompatible)
-                incompatibleIcon.Show();
-            else
-                incompatibleIcon.Hide();
         }
 
         private void createIcons()
@@ -307,7 +283,7 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
-                        scaleContainer = new Container
+                        ButtonContent = new Container
                         {
                             Children = new Drawable[]
                             {
@@ -317,12 +293,6 @@ namespace osu.Game.Overlays.Mods
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.Centre,
                                 },
-                                incompatibleIcon = new IncompatibleIcon
-                                {
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.BottomRight,
-                                    Position = new Vector2(-13),
-                                }
                             },
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
@@ -342,15 +312,8 @@ namespace osu.Game.Overlays.Mods
             Mod = mod;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
+        public virtual ITooltip<Mod> GetCustomTooltip() => new ModButtonTooltip();
 
-            selectedMods.BindValueChanged(_ => Scheduler.AddOnce(updateCompatibility), true);
-        }
-
-        public ITooltip GetCustomTooltip() => new ModButtonTooltip();
-
-        public object TooltipContent => SelectedMod ?? Mods.FirstOrDefault();
+        public Mod TooltipContent => SelectedMod ?? Mods.FirstOrDefault();
     }
 }

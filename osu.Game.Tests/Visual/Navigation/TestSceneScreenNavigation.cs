@@ -323,6 +323,71 @@ namespace osu.Game.Tests.Visual.Navigation
             AddWaitStep("wait two frames", 2);
         }
 
+        [Test]
+        public void TestOverlayClosing()
+        {
+            // use now playing overlay for "overlay -> background" drag case
+            // since most overlays use a scroll container that absorbs on mouse down
+            NowPlayingOverlay nowPlayingOverlay = null;
+
+            AddStep("enter menu", () => InputManager.Key(Key.Enter));
+
+            AddStep("get and press now playing hotkey", () =>
+            {
+                nowPlayingOverlay = Game.ChildrenOfType<NowPlayingOverlay>().Single();
+                InputManager.Key(Key.F6);
+            });
+
+            // drag tests
+
+            // background -> toolbar
+            AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move cursor to toolbar", () => InputManager.MoveMouseTo(Game.Toolbar.ScreenSpaceDrawQuad.Centre));
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("now playing is hidden", () => nowPlayingOverlay.State.Value == Visibility.Hidden);
+
+            AddStep("press now playing hotkey", () => InputManager.Key(Key.F6));
+
+            // toolbar -> background
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("now playing is still visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
+
+            // background -> overlay
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move cursor to now playing overlay", () => InputManager.MoveMouseTo(nowPlayingOverlay.ScreenSpaceDrawQuad.Centre));
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("now playing is still visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
+
+            // overlay -> background
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("now playing is still visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
+
+            // background -> background
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move cursor to left", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomLeft));
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("now playing is hidden", () => nowPlayingOverlay.State.Value == Visibility.Hidden);
+
+            AddStep("press now playing hotkey", () => InputManager.Key(Key.F6));
+
+            // click tests
+
+            // toolbar
+            AddStep("move cursor to toolbar", () => InputManager.MoveMouseTo(Game.Toolbar.ScreenSpaceDrawQuad.Centre));
+            AddStep("click left mouse button", () => InputManager.Click(MouseButton.Left));
+            AddAssert("now playing is still visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
+
+            // background
+            AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
+            AddStep("click left mouse button", () => InputManager.Click(MouseButton.Left));
+            AddAssert("now playing is hidden", () => nowPlayingOverlay.State.Value == Visibility.Hidden);
+        }
+
         private void pushEscape() =>
             AddStep("Press escape", () => InputManager.Key(Key.Escape));
 
