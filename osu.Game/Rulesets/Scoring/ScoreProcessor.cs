@@ -227,7 +227,8 @@ namespace osu.Game.Rulesets.Scoring
                 case ScoringMode.Classic:
                     // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
                     // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
-                    return GetScore(ScoringMode.Standardised, maxCombo, accuracyRatio, comboRatio, statistics) / max_score * Math.Pow(maxCombo, 2) * 25;
+                    var scaledStandardised = GetScore(ScoringMode.Standardised, maxCombo, accuracyRatio, comboRatio, statistics) / max_score;
+                    return Math.Pow(scaledStandardised * maxCombo, 2) * 18;
             }
         }
 
