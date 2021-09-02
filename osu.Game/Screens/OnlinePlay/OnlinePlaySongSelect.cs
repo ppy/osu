@@ -152,7 +152,7 @@ namespace osu.Game.Screens.OnlinePlay
             return base.OnExiting(next);
         }
 
-        protected override ModSelectOverlay CreateModSelectOverlay() => new LocalPlayerModSelectOverlay
+        protected override ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
         {
             IsValidMod = IsValidMod
         };
