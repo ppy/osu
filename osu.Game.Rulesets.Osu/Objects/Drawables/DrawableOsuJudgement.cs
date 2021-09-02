@@ -74,10 +74,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             public override void PlayAnimation()
             {
-                base.PlayAnimation();
-
                 if (Result != HitResult.Miss)
-                    JudgementText.ScaleTo(new Vector2(0.8f, 1)).Then().ScaleTo(new Vector2(1.2f, 1), 1800, Easing.OutQuint);
+                {
+                    JudgementText
+                        .ScaleTo(new Vector2(0.8f, 1))
+                        .ScaleTo(new Vector2(1.2f, 1), 1800, Easing.OutQuint);
+                }
+
+                base.PlayAnimation();
             }
         }
     }
