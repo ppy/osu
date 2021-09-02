@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public Speed(Mod[] mods, IBeatmap beatmap, double clockRate)
             : base(mods)
         {
-            greatWindow = (79 - (beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty * 6) + 0.5) / clockRate;
+            //greatWindow = (79 - (beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty * 6) + 0.5) / clockRate;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -46,19 +46,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double distance = Math.Min(single_spacing_threshold, osuCurrent.TravelDistance + osuCurrent.JumpDistance);
             double deltaTime = current.DeltaTime;
 
+            // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
+            if (Previous.Count > 0)
+            {
+                deltaTime = Math.Max(Previous[0].DeltaTime, deltaTime);
+            }
+
             double speedBonus = 1.0;
             if (deltaTime < min_speed_bonus)
                 speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
-
-            // Doubletap detection
-            if (Previous.Count > 0)
-            {
-                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
-                if ( (osuPrevious.DeltaTime / osuCurrent.DeltaTime) >= 3 && osuCurrent.DeltaTime <= (2 * greatWindow))
-                {
-                    return 0; 
-                }
-            }
 
             double angleBonus = 1.0;
 
@@ -76,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
-            return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / osuCurrent.StrainTime;
+            return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / deltaTime;
         }
     }
 }
