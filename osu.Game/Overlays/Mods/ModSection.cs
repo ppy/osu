@@ -51,14 +51,14 @@ namespace osu.Game.Overlays.Mods
                     if (m == null)
                         return new ModButtonEmpty();
 
-                    return new ModButton(m)
+                    return CreateModButton(m).With(b =>
                     {
-                        SelectionChanged = mod =>
+                        b.SelectionChanged = mod =>
                         {
                             ModButtonStateChanged(mod);
                             Action?.Invoke(mod);
-                        },
-                    };
+                        };
+                    });
                 }).ToArray();
 
                 modsLoadCts?.Cancel();
@@ -246,6 +246,8 @@ namespace osu.Game.Overlays.Mods
             Font = OsuFont.GetFont(weight: FontWeight.Bold),
             Text = text
         };
+
+        protected virtual ModButton CreateModButton(Mod mod) => new ModButton(mod);
 
         /// <summary>
         /// Play out all remaining animations immediately to leave mods in a good (final) state.
