@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(4, controlPoints.TimingPoints.Count);
                 Assert.AreEqual(5, controlPoints.DifficultyPoints.Count);
                 Assert.AreEqual(34, controlPoints.SamplePoints.Count);
-                Assert.AreEqual(8, controlPoints.EffectPoints.Count);
+                Assert.AreEqual(13, controlPoints.EffectPoints.Count);
 
                 var timingPoint = controlPoints.TimingPointAt(0);
                 Assert.AreEqual(956, timingPoint.Time);
@@ -226,7 +226,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsTrue(effectPoint.KiaiMode);
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
 
-                effectPoint = controlPoints.EffectPointAt(119637);
+                effectPoint = controlPoints.EffectPointAt(116637);
                 Assert.AreEqual(95901, effectPoint.Time);
                 Assert.IsFalse(effectPoint.KiaiMode);
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
