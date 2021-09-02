@@ -66,9 +66,9 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
-        public SampleControlPoint SampleControlPoint;
+        public SampleControlPoint SampleControlPoint = SampleControlPoint.DEFAULT;
 
-        public DifficultyControlPoint DifficultyControlPoint;
+        public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;
 
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
@@ -111,11 +111,6 @@ namespace osu.Game.Rulesets.Objects
                 // This is done here since ApplyDefaultsToSelf may be used to determine the end time
                 SampleControlPoint = legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
                 DifficultyControlPoint = legacyInfo.DifficultyPointAt(StartTime);
-            }
-            else
-            {
-                SampleControlPoint ??= SampleControlPoint.DEFAULT;
-                DifficultyControlPoint ??= DifficultyControlPoint.DEFAULT;
             }
 
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
