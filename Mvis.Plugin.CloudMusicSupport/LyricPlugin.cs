@@ -142,10 +142,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             AddInternal(processor);
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-            {
-                PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
-            }
+            PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
 
             if (MvisScreen != null)
             {

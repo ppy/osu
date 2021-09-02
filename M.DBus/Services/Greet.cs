@@ -15,7 +15,7 @@ namespace M.DBus.Services
     public class Greet : IGreet
     {
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/dbus/greet");
-        private string host;
+        private readonly string host;
 
         public Action<string> OnMessageRecive;
         public Bindable<bool> AllowPost;

@@ -8,7 +8,7 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using Tmds.DBus;
 
-namespace osu.Game.DBus
+namespace osu.Desktop.DBus
 {
     public class MprisPlayerService : IPlayer, IMediaPlayer2
     {
@@ -197,8 +197,8 @@ namespace osu.Game.DBus
 
             if (playerDict.ContainsKey(prop))
                 return Task.FromResult(playerDict[prop]);
-            else
-                return Task.FromResult(mp2Dict[prop]);
+
+            return Task.FromResult(mp2Dict[prop]);
         }
 
         Task<MediaPlayer2Properties> IMediaPlayer2.GetAllAsync()

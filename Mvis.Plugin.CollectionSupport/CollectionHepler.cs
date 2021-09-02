@@ -100,10 +100,7 @@ namespace Mvis.Plugin.CollectionSupport
                 if (!IsCurrent) trackChangedAfterDisable = true;
             });
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-            {
-                PluginManager.RegisterDBusObject(dBusObject = new CollectionDBusObject());
-            }
+            PluginManager.RegisterDBusObject(dBusObject = new CollectionDBusObject());
         }
 
         protected override void LoadComplete()
@@ -122,11 +119,8 @@ namespace Mvis.Plugin.CollectionSupport
 
         private void onMvisExiting()
         {
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-            {
-                resetDBusMessage();
-                PluginManager.UnRegisterDBusObject(new CollectionDBusObject());
-            }
+            PluginManager.UnRegisterDBusObject(new CollectionDBusObject());
+            resetDBusMessage();
         }
 
         public void Play(WorkingBeatmap b) => changeBeatmap(b);

@@ -6,6 +6,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using M.DBus;
 using Newtonsoft.Json;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -102,11 +103,17 @@ namespace osu.Game.Screens.Mvis.Plugins
         public IPluginConfigManager GetConfigManager(MvisPlugin pl) =>
             configManagers.GetOrAdd(pl.GetType(), _ => pl.CreateConfigManager(storage));
 
-        public void RegisterDBusObject(IDBusObject target) =>
-            dBusManager?.RegisterNewObject(target);
+        public void RegisterDBusObject(IDBusObject target)
+        {
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                dBusManager?.RegisterNewObject(target);
+        }
 
-        public void UnRegisterDBusObject(IDBusObject target) =>
-            dBusManager?.UnRegisterObject(target);
+        public void UnRegisterDBusObject(IDBusObject target)
+        {
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                dBusManager?.UnRegisterObject(target);
+        }
 
         internal bool AddPlugin(MvisPlugin pl)
         {

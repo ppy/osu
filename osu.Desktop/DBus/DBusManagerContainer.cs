@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -15,7 +16,7 @@ using osu.Game.Rulesets;
 using osu.Game.Users;
 using Tmds.DBus;
 
-namespace osu.Game.DBus
+namespace osu.Desktop.DBus
 {
     public class DBusManagerContainer : Component
     {

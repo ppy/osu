@@ -10,7 +10,7 @@ using Tmds.DBus;
 // ReSharper disable InconsistentNaming
 // ReSharper disable ConvertToAutoProperty
 
-namespace osu.Game.DBus
+namespace osu.Desktop.DBus
 {
     [DBusInterface("org.mpris.MediaPlayer2")]
     public interface IMediaPlayer2 : IDBusObject

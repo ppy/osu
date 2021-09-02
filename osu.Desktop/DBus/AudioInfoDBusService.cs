@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using osu.Game.Beatmaps;
 using Tmds.DBus;
 
-namespace osu.Game.DBus
+namespace osu.Desktop.DBus
 {
     [DBusInterface("io.matrix_feather.mfosu.Audio")]
     public interface IAudioInfoDBusService : IDBusObject

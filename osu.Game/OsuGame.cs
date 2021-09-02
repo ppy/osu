@@ -54,7 +54,6 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
-using osu.Game.DBus;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Mvis.Plugins;
@@ -157,7 +156,6 @@ namespace osu.Game
 
         private OsuLogo osuLogo;
 
-        private DBusManagerContainer dBusManagerContainer;
         private MvisPluginManager mvisPlManager;
 
         private Bindable<GamemodeActivateCondition> gamemodeCondition;
@@ -291,15 +289,6 @@ namespace osu.Game
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
             dependencies.Cache(mvisPlManager = new MvisPluginManager());
-
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-            {
-                dBusManagerContainer = new DBusManagerContainer(
-                    true,
-                    MConfig.GetBindable<bool>(MSetting.DBusIntegration));
-
-                dependencies.Cache(dBusManagerContainer.DBusManager);
-            }
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
@@ -780,12 +769,6 @@ namespace osu.Game
                 idleTracker,
                 new ConfineMouseTracker()
             });
-
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-            {
-                Add(dBusManagerContainer);
-                dBusManagerContainer.NotificationAction += n => Notifications.Post(n);
-            }
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
