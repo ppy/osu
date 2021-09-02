@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public Speed(Mod[] mods, IBeatmap beatmap, double clockRate)
             : base(mods)
         {
-            //greatWindow = (79 - (beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty * 6) + 0.5) / clockRate;
+            greatWindow = (79 - (beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty * 6) + 0.5) / clockRate;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -51,6 +51,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 deltaTime = Math.Max(Previous[0].DeltaTime, deltaTime);
             }
+
+            // Cap deltatime to the OD 300 hitwindow.
+            // 0.77 is derived from making sure 260bpm OD8 streams aren't nerfed 
+            var hitWindowNerfRaw = deltaTime / (greatWindow * 2 * 0.77);
+            var hitWindowNerf = Math.Clamp(hitWindowNerfRaw, 0.85, 1);
 
             double speedBonus = 1.0;
             if (deltaTime < min_speed_bonus)
@@ -72,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
-            return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / deltaTime;
+            return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / (deltaTime / hitWindowNerf);
         }
     }
 }
