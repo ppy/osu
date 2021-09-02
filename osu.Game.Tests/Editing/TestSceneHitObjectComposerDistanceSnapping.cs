@@ -74,13 +74,13 @@ namespace osu.Game.Tests.Editing
         [TestCase(2)]
         public void TestSpeedMultiplier(float multiplier)
         {
-            AddStep($"set multiplier = {multiplier}", () =>
+            assertSnapDistance(100 * multiplier, new HitObject
             {
-                composer.EditorBeatmap.ControlPointInfo.Clear();
-                composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SliderVelocity = multiplier });
+                DifficultyControlPoint = new DifficultyControlPoint
+                {
+                    SliderVelocity = multiplier
+                }
             });
-
-            assertSnapDistance(100 * multiplier);
         }
 
         [TestCase(1)]
@@ -198,8 +198,8 @@ namespace osu.Game.Tests.Editing
             assertSnappedDistance(400, 400);
         }
 
-        private void assertSnapDistance(float expectedDistance)
-            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(new HitObject()) == expectedDistance);
+        private void assertSnapDistance(float expectedDistance, HitObject hitObject = null)
+            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(hitObject ?? new HitObject()) == expectedDistance);
 
         private void assertDurationToDistance(double duration, float expectedDistance)
             => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DurationToDistance(new HitObject(), duration) == expectedDistance);
