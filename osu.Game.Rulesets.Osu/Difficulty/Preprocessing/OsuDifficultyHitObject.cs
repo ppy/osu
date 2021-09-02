@@ -32,11 +32,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double? Angle { get; private set; }
 
-        /// <summary>
-        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 50ms.
-        /// </summary>
-        public readonly double StrainTime;
-
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
 
@@ -47,9 +42,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastObject = (OsuHitObject)lastObject;
 
             setDistances();
-
-            // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
-            StrainTime = DeltaTime;
         }
 
         private void setDistances()
