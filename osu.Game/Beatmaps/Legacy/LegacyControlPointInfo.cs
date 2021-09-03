@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Bindables;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps.ControlPoints;
 
@@ -16,9 +15,9 @@ namespace osu.Game.Beatmaps.Legacy
         /// All sound points.
         /// </summary>
         [JsonProperty]
-        public IBindableList<SampleControlPoint> SamplePoints => samplePoints;
+        public IReadOnlyList<SampleControlPoint> SamplePoints => samplePoints;
 
-        private readonly BindableList<SampleControlPoint> samplePoints = new BindableList<SampleControlPoint>();
+        private readonly SortedList<SampleControlPoint> samplePoints = new SortedList<SampleControlPoint>(Comparer<SampleControlPoint>.Default);
 
         /// <summary>
         /// Finds the sound control point that is active at <paramref name="time"/>.
