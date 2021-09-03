@@ -1,3 +1,9 @@
+# Listens for new PR comments containing !pp check [id], and runs a diffcalc comparison against master.
+# Usage:
+#   !pp check 0        | Runs only the osu! ruleset.
+#   !pp check 0 2      | Runs only the osu! and catch rulesets.
+#
+
 name: Diffcalc Consistency Checks
 on:
   issue_comment:
