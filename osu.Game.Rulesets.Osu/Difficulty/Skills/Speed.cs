@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Previous.Count > 0 && deltaTime < deltaTimeThreshold && Previous[0].DeltaTime > deltaTime)
             {
-                double closenessToZero = Math.Min(1, deltaTime / deltaTimeThreshold);
-                deltaTime = Interpolation.Lerp(Previous[0].DeltaTime, deltaTime, closenessToZero);
+                double speedWindowRatio = deltaTime / deltaTimeThreshold;
+                deltaTime = Interpolation.Lerp(Previous[0].DeltaTime, deltaTime, speedWindowRatio);
             }
 
             // Cap deltatime to the OD 300 hitwindow.
