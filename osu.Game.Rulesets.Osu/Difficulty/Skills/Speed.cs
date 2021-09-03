@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double deltaTime = current.DeltaTime;
 
             // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
-            if (Previous.Count > 0 && deltaTime <= greatWindow * 2)
+            if (Previous.Count > 0 && deltaTime <= greatWindow)
             {
                 deltaTime = Math.Max(Previous[0].DeltaTime, deltaTime);
             }
