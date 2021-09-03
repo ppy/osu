@@ -93,8 +93,8 @@ jobs:
       # Initial data imports
       - name: Download + import data
         run: |
-          PERFORMANCE_DATA_NAME=$(date +'%Y_%m_01_performance_${{ matrix.ruleset.name }}_random')
-          BEATMAPS_DATA_NAME=$(date +'%Y_%m_01_osu_files')
+          PERFORMANCE_DATA_NAME=$(curl https://data.ppy.sh/ | grep performance_${{ matrix.ruleset.name }}_random | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
+          BEATMAPS_DATA_NAME=$(curl https://data.ppy.sh/ | grep osu_files | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
 
           # Set env variable for further steps.
           echo "BEATMAPS_PATH=$GITHUB_WORKSPACE/$BEATMAPS_DATA_NAME" >> $GITHUB_ENV
