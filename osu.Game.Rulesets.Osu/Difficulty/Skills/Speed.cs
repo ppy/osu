@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -47,9 +47,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double deltaTime = current.DeltaTime;
 
             // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
-            if (Previous.Count > 0 && deltaTime <= greatWindow)
+            double deltaTimeThreshold = greatWindow * 2;
+
+            if (Previous.Count > 0 && deltaTime < deltaTimeThreshold && Previous[0].DeltaTime > deltaTime)
             {
-                deltaTime = Math.Max(Previous[0].DeltaTime, deltaTime);
+                double closenessToZero = Math.Min(1, deltaTime / deltaTimeThreshold);
+                deltaTime = Interpolation.Lerp(Previous[0].DeltaTime, deltaTime, closenessToZero);
             }
 
             // Cap deltatime to the OD 300 hitwindow.
