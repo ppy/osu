@@ -203,7 +203,8 @@ namespace osu.Game.Beatmaps.Formats
                     }
                 }
 
-                // TODO: we need to pull out approach rate from EffectControlPoint and shove it in with difficulty points where necessary...
+                // In the future we may want to pull out approach rate changes from EffectPoints (and create DifficultyControlPoints to handle them).
+                // This requires special consideration due to precision mismatches (see implementation of LegacyDifficultyControlPoint).
             }
 
             foreach (var group in beatmap.ControlPointInfo.Groups)
