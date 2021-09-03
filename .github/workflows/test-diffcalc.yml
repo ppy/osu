@@ -104,7 +104,7 @@ jobs:
       # Initial data imports
       - name: Download + import data
         run: |
-          PERFORMANCE_DATA_NAME=$(curl https://data.ppy.sh/ | grep performance_${{ matrix.ruleset.name }}_random | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
+          PERFORMANCE_DATA_NAME=$(curl https://data.ppy.sh/ | grep performance_${{ matrix.ruleset.name }}_top | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
           BEATMAPS_DATA_NAME=$(curl https://data.ppy.sh/ | grep osu_files | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
 
           # Set env variable for further steps.
