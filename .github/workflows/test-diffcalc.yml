@@ -135,9 +135,9 @@ jobs:
             SELECT
               m.beatmap_id,
               m.mods,
-              m.diff_unified as `sr_master`,
-              p.diff_unified as `sr_pr`,
-              (p.diff_unified - m.diff_unified) as `diff`
+              m.diff_unified as 'sr_master',
+              p.diff_unified as 'sr_pr',
+              (p.diff_unified - m.diff_unified) as 'diff'
             FROM osu_master.osu_beatmap_difficulty m
             JOIN osu_pr.osu_beatmap_difficulty p
               ON m.beatmap_id = p.beatmap_id
