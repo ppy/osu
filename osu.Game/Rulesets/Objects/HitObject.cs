@@ -67,7 +67,6 @@ namespace osu.Game.Rulesets.Objects
         }
 
         public SampleControlPoint SampleControlPoint = SampleControlPoint.DEFAULT;
-
         public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;
 
         /// <summary>
@@ -106,14 +105,16 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty, CancellationToken cancellationToken = default)
         {
-            if (controlPointInfo is LegacyControlPointInfo legacyInfo)
-            {
-                // This is done here since ApplyDefaultsToSelf may be used to determine the end time
-                SampleControlPoint = legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
+            var legacyInfo = controlPointInfo as LegacyControlPointInfo;
+
+            if (legacyInfo != null)
                 DifficultyControlPoint = legacyInfo.DifficultyPointAt(StartTime);
-            }
 
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
+
+            // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
+            if (legacyInfo != null)
+                SampleControlPoint = legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
 
             nestedHitObjects.Clear();
 
