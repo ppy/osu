@@ -20,7 +20,6 @@ jobs:
       contains(github.event.comment.body, '!pp check') &&
       ${{ github.event.comment.author_association == 'MEMBER' }}
 
-
     strategy:
       fail-fast: false
       matrix:
@@ -40,6 +39,12 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
+      - name: Verify ruleset
+        if: contains(github.event.comment.body, matrix.ruleset.id) == false
+        run: |
+          echo "${{ github.event.comment.body }} doesn't contain ${{ matrix.ruleset.id }}"
+          exit 1
+
       - name: Verify MySQL connection from host
         run: |
           sudo apt-get install -y mysql-client
