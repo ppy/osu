@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -42,6 +43,14 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        protected override DifficultyControlPoint CreatePoint() => new DifficultyControlPoint(); // TODO: remove
+        protected override DifficultyControlPoint CreatePoint()
+        {
+            var reference = (Beatmap.ControlPointInfo as LegacyControlPointInfo)?.DifficultyPointAt(SelectedGroup.Value.Time) ?? DifficultyControlPoint.DEFAULT;
+
+            return new DifficultyControlPoint
+            {
+                SliderVelocity = reference.SliderVelocity,
+            };
+        }
     }
 }
