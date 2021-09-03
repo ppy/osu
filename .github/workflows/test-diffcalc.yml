@@ -23,7 +23,8 @@ jobs:
     if: |
       contains(github.event.comment.html_url, '/pull/') &&
       contains(github.event.comment.body, '!pp check') &&
-      ${{ github.event.comment.author_association == 'MEMBER' }}
+      ${{ github.event.comment.author_association == 'MEMBER' }} &&
+      contains(github.event.comment.body, ${{ matrix.ruleset.id }})
 
     strategy:
       fail-fast: false
@@ -33,10 +34,6 @@ jobs:
           - { name: taiko, id: 1 }
           - { name: catch, id: 2 }
           - { name: mania, id: 3 }
-        isValidRuleset:
-          - contains(github.event.comment.body, ${{ matrix.ruleset.id }})
-        exclude:
-          - isValidRuleset: false
 
     services:
       mysql:
