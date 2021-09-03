@@ -1,8 +1,3 @@
-# Listens to new PR comments containing "!pp check", and runs diffcalc across the PR and master to produce a table of differences.
-# Usage:
-# !pp check 0     : Runs only the osu! ruleset
-# !pp check 0 1   : Runs the osu! and taiko rulesets.
-
 name: Diffcalc Consistency Checks
 on:
   issue_comment:
@@ -23,8 +18,8 @@ jobs:
     if: |
       contains(github.event.comment.html_url, '/pull/') &&
       contains(github.event.comment.body, '!pp check') &&
-      ${{ github.event.comment.author_association == 'MEMBER' }} &&
-      contains(github.event.comment.body, ${{ matrix.ruleset.id }})
+      ${{ github.event.comment.author_association == 'MEMBER' }}
+
 
     strategy:
       fail-fast: false
