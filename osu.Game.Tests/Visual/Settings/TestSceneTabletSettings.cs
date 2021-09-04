@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
-        public void TestValidAfterRotation()
+        public void TestRotationValidity()
         {
             AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
 
@@ -75,12 +75,34 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("rotate 0", () => tabletHandler.Rotation.Value = 0);
             ensureValid();
+
+            AddStep("rotate 0", () => tabletHandler.Rotation.Value = 45);
+            ensureInvalid();
+
+            AddStep("rotate 0", () => tabletHandler.Rotation.Value = 0);
+            ensureValid();
+        }
+
+        [Test]
+        public void TestOffsetValidity()
+        {
+            ensureValid();
+            AddStep("move right", () => tabletHandler.AreaOffset.Value = Vector2.Zero);
+            ensureInvalid();
+            AddStep("move back", () => tabletHandler.AreaOffset.Value = tabletHandler.AreaSize.Value / 2);
+            ensureValid();
         }
 
         private void ensureValid()
         {
             AddUntilStep("wait for transforms", () => settings.AreaSelection.ChildrenOfType<Container>().All(c => !c.Transforms.Any()));
             AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
+        }
+
+        private void ensureInvalid()
+        {
+            AddUntilStep("wait for transforms", () => settings.AreaSelection.ChildrenOfType<Container>().All(c => !c.Transforms.Any()));
+            AddAssert("area invalid", () => !settings.AreaSelection.IsWithinBounds);
         }
 
         public class TestTabletHandler : ITabletHandler
