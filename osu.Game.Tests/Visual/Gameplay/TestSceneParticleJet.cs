@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Child = jet = createJet();
             });
 
-            AddToggleStep("toggle spawning", value => jet.Active = value);
+            AddToggleStep("toggle spawning", value => jet.Active.Value = value);
         }
 
         [SetUpSteps]
@@ -37,11 +37,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestPresence()
         {
-            AddStep("start jet", () => jet.Active = true);
+            AddStep("start jet", () => jet.Active.Value = true);
             AddAssert("is present", () => jet.IsPresent);
 
             AddWaitStep("wait for some particles", 3);
-            AddStep("stop jet", () => jet.Active = false);
+            AddStep("stop jet", () => jet.Active.Value = false);
 
             AddWaitStep("wait for clean screen", 5);
             AddAssert("is not present", () => !jet.IsPresent);

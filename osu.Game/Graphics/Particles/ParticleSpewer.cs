@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
@@ -23,9 +24,9 @@ namespace osu.Game.Graphics.Particles
         /// <summary>
         /// Determines whether particles are being spawned.
         /// </summary>
-        public bool Active { get; set; }
+        public readonly BindableBool Active = new BindableBool();
 
-        public bool HasActiveParticles => Active || (lastParticleAdded + maxLifetime) > Time.Current;
+        public bool HasActiveParticles => Active.Value || (lastParticleAdded + maxLifetime) > Time.Current;
         public override bool IsPresent => base.IsPresent && HasActiveParticles;
 
         protected virtual float ParticleGravity => 0;
@@ -49,7 +50,7 @@ namespace osu.Game.Graphics.Particles
             // this can happen when seeking in replays.
             if (lastParticleAdded > Time.Current) lastParticleAdded = 0;
 
-            if (Active && Time.Current > lastParticleAdded + cooldown)
+            if (Active.Value && Time.Current > lastParticleAdded + cooldown)
             {
                 addParticle(SpawnParticle());
             }
