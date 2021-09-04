@@ -256,8 +256,21 @@ namespace osu.Game.Online.Chat
                     JoinChannel(channel);
                     break;
 
+                case "chat":
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        target.AddNewMessages(new ErrorMessage("Usage: /chat [user]"));
+                        break;
+                    }
+
+                    var request = new GetUserRequest(content);
+                    request.Success += u => OpenPrivateChannel(u);
+                    request.Failure += _ => target.AddNewMessages(new ErrorMessage("User not found."));
+                    api.Queue(request);
+                    break;
+
                 case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /np"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np"));
                     break;
 
                 default:
