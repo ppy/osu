@@ -131,6 +131,44 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             public StarParticleSpewer(Texture texture, int perSecond)
                 : base(texture, perSecond, particle_lifetime_max)
             {
+                Active.BindValueChanged(_ => resetVelocityCalculation());
+            }
+
+            private Vector2 screenPosition => ToScreenSpace(OriginPosition);
+
+            private Vector2 screenVelocity;
+
+            private const double velocity_calculation_delay = 15;
+            private double lastVelocityCalculation;
+            private Vector2 positionDifference;
+            private Vector2? lastPosition;
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (lastPosition != null)
+                {
+                    positionDifference += (screenPosition - lastPosition.Value);
+                    lastVelocityCalculation += Clock.ElapsedFrameTime;
+                }
+
+                lastPosition = screenPosition;
+
+                if (lastVelocityCalculation > velocity_calculation_delay)
+                {
+                    screenVelocity = positionDifference / (float)lastVelocityCalculation;
+
+                    positionDifference = Vector2.Zero;
+                    lastVelocityCalculation = 0;
+                }
+            }
+
+            private void resetVelocityCalculation()
+            {
+                positionDifference = Vector2.Zero;
+                lastVelocityCalculation = 0;
+                lastPosition = null;
             }
 
             protected override FallingParticle SpawnParticle()
@@ -169,6 +207,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         );
                         break;
                 }
+
+                p.Velocity += screenVelocity * 50;
 
                 return p;
             }
