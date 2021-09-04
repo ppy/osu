@@ -2,11 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Handlers.Tablet;
-using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Input;
@@ -17,27 +16,57 @@ namespace osu.Game.Tests.Visual.Settings
     [TestFixture]
     public class TestSceneTabletSettings : OsuTestScene
     {
-        [BackgroundDependencyLoader]
-        private void load(GameHost host)
-        {
-            var tabletHandler = new TestTabletHandler();
+        private TestTabletHandler tabletHandler;
+        private TabletSettings settings;
 
-            AddRange(new Drawable[]
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("create settings", () =>
             {
-                new TabletSettings(tabletHandler)
+                tabletHandler = new TestTabletHandler();
+
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.None,
-                    Width = SettingsPanel.PANEL_WIDTH,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                }
+                    settings = new TabletSettings(tabletHandler)
+                    {
+                        RelativeSizeAxes = Axes.None,
+                        Width = SettingsPanel.PANEL_WIDTH,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                    }
+                };
             });
 
+            AddStep("set square size", () => tabletHandler.SetTabletSize(new Vector2(100, 100)));
+        }
+
+        [Test]
+        public void TestVariousTabletSizes()
+        {
             AddStep("Test with wide tablet", () => tabletHandler.SetTabletSize(new Vector2(160, 100)));
             AddStep("Test with square tablet", () => tabletHandler.SetTabletSize(new Vector2(300, 300)));
             AddStep("Test with tall tablet", () => tabletHandler.SetTabletSize(new Vector2(100, 300)));
             AddStep("Test with very tall tablet", () => tabletHandler.SetTabletSize(new Vector2(100, 700)));
             AddStep("Test no tablet present", () => tabletHandler.SetTabletSize(Vector2.Zero));
+        }
+
+        [Test]
+        public void TestValidAfterRotation()
+        {
+            AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
+
+            AddStep("rotate 90", () => tabletHandler.Rotation.Value = 90);
+            AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
+
+            AddStep("rotate 180", () => tabletHandler.Rotation.Value = 180);
+            AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
+
+            AddStep("rotate 360", () => tabletHandler.Rotation.Value = 360);
+            AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
+
+            AddStep("rotate 0", () => tabletHandler.Rotation.Value = 0);
+            AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
         }
 
         public class TestTabletHandler : ITabletHandler
