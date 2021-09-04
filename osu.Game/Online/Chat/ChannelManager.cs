@@ -264,7 +264,7 @@ namespace osu.Game.Online.Chat
                     }
 
                     var request = new GetUserRequest(content);
-                    request.Success += u => OpenPrivateChannel(u);
+                    request.Success += OpenPrivateChannel;
                     request.Failure += _ => target.AddNewMessages(new ErrorMessage("User not found."));
                     api.Queue(request);
                     break;
