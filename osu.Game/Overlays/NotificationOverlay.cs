@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
@@ -29,11 +28,6 @@ namespace osu.Game.Overlays
         public const float TRANSITION_LENGTH = 600;
 
         private FlowContainer<NotificationSection> sections;
-
-        /// <summary>
-        /// Provide a source for the toolbar height.
-        /// </summary>
-        public Func<float> GetToolbarHeight;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -167,13 +161,6 @@ namespace osu.Game.Overlays
             sections.Children.ForEach(s => s.MarkAllRead());
 
             updateCounts();
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
     }
 }

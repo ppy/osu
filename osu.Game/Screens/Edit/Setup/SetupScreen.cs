@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Setup
         {
             AddRange(new Drawable[]
             {
-                sections = new SectionsContainer<SetupSection>
+                sections = new SetupScreenSectionsContainer
                 {
                     FixedHeader = header,
                     RelativeSizeAxes = Axes.Both,
@@ -39,6 +39,20 @@ namespace osu.Game.Screens.Edit.Setup
                     }
                 },
             });
+        }
+
+        private class SetupScreenSectionsContainer : SectionsContainer<SetupSection>
+        {
+            protected override UserTrackingScrollContainer CreateScrollContainer()
+            {
+                var scrollContainer = base.CreateScrollContainer();
+
+                // Workaround for masking issues (see https://github.com/ppy/osu-framework/issues/1675#issuecomment-910023157)
+                // Note that this actually causes the full scroll range to be reduced by 2px at the bottom, but it's not really noticeable.
+                scrollContainer.Margin = new MarginPadding { Top = 2 };
+
+                return scrollContainer;
+            }
         }
     }
 }

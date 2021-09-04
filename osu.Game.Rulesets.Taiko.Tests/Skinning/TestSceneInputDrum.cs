@@ -5,7 +5,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.UI;
 using osuTK;
 
@@ -17,6 +16,13 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
+            var playfield = new TaikoPlayfield();
+
+            var beatmap = CreateWorkingBeatmap(new TaikoRuleset().RulesetInfo).GetPlayableBeatmap(new TaikoRuleset().RulesetInfo);
+
+            foreach (var h in beatmap.HitObjects)
+                playfield.Add(h);
+
             SetContents(_ => new TaikoInputManager(new TaikoRuleset().RulesetInfo)
             {
                 RelativeSizeAxes = Axes.Both,
@@ -25,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(200),
-                    Child = new InputDrum(new ControlPointInfo())
+                    Child = new InputDrum(playfield.HitObjectContainer)
                 }
             });
         }

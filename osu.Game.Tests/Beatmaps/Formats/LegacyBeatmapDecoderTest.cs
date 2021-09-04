@@ -3,15 +3,12 @@
 
 using System;
 using System.IO;
-using NUnit.Framework;
-using osuTK;
-using osuTK.Graphics;
-using osu.Game.Tests.Resources;
 using System.Linq;
+using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
 using osu.Game.Rulesets.Catch;
@@ -19,9 +16,13 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Skinning;
+using osu.Game.Tests.Resources;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -166,7 +167,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = new LineBufferedReader(resStream))
             {
                 var beatmap = decoder.Decode(stream);
-                var controlPoints = beatmap.ControlPointInfo;
+                var controlPoints = (LegacyControlPointInfo)beatmap.ControlPointInfo;
 
                 Assert.AreEqual(4, controlPoints.TimingPoints.Count);
                 Assert.AreEqual(5, controlPoints.DifficultyPoints.Count);
@@ -240,7 +241,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("overlapping-control-points.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var controlPoints = decoder.Decode(stream).ControlPointInfo;
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
 
                 Assert.That(controlPoints.TimingPoints.Count, Is.EqualTo(4));
                 Assert.That(controlPoints.DifficultyPoints.Count, Is.EqualTo(3));
