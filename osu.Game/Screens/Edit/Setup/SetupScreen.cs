@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Edit.Setup
     public class SetupScreen : EditorRoundedScreen
     {
         [Cached]
-        private SectionsContainer<SetupSection> sections = new SectionsContainer<SetupSection>();
+        private SectionsContainer<SetupSection> sections { get; } = new SetupScreenSectionsContainer();
 
         [Cached]
         private SetupScreenHeader header = new SetupScreenHeader();
@@ -37,15 +37,12 @@ namespace osu.Game.Screens.Edit.Setup
             if (rulesetSpecificSection != null)
                 sectionsEnumerable.Add(rulesetSpecificSection);
 
-            AddRange(new Drawable[]
+            Add(sections.With(s =>
             {
-                sections = new SetupScreenSectionsContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ChildrenEnumerable = sectionsEnumerable,
-                    FixedHeader = header
-                },
-            });
+                s.RelativeSizeAxes = Axes.Both;
+                s.ChildrenEnumerable = sectionsEnumerable;
+                s.FixedHeader = header;
+            }));
         }
 
         private class SetupScreenSectionsContainer : SectionsContainer<SetupSection>
