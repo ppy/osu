@@ -296,6 +296,41 @@ namespace osu.Game.Tests.Visual.SongSelect
             waitForSelection(3, 2);
         }
 
+        [Test]
+        public void TestReturnPreviousSelection()
+        {
+            var sets = new List<BeatmapSetInfo>();
+            int selectedId = 0;
+
+            AddStep("Create ABC beatmaps", () =>
+            {
+                sets.Clear();
+
+                var a = createTestBeatmapSet(1);
+                a.Metadata.Title = "a";
+                sets.Add(a);
+
+                var b = createTestBeatmapSet(2);
+                b.Metadata.Title = "ab";
+                sets.Add(b);
+
+                var c = createTestBeatmapSet(3);
+                c.Metadata.Title = "abc";
+                sets.Add(c);
+            });
+
+            loadBeatmaps(sets);
+            setSelected(1, 1);
+            AddStep("Filter ab", () => carousel.Filter(new FilterCriteria { SearchText = "ab" }, false));
+            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            waitForSelection(1);
+            AddStep("Filter ab", () => carousel.Filter(new FilterCriteria { SearchText = "ab" }, false));
+            advanceSelection(false);
+            AddStep("Save current selection", () => selectedId = carousel.SelectedBeatmapSet.ID);
+            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            AddUntilStep("Selection didn't change", () => carousel.SelectedBeatmapSet.ID == selectedId);
+        }
+
         /// <summary>
         /// Test random non-repeating algorithm
         /// </summary>
