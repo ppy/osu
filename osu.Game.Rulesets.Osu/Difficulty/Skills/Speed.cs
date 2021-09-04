@@ -7,6 +7,8 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Osu.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -33,7 +35,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public Speed(Mod[] mods, float od, double clockRate)
             : base(mods)
         {
-            greatWindow = (79 - (od * 6) + 0.5) / clockRate;
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(od);
+            greatWindow = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -56,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             // Cap deltatime to the OD 300 hitwindow.
-            // 0.77 is derived from making sure 260bpm OD8 streams aren't nerfed 
+            // 0.77 is derived from making sure 260bpm OD8 streams aren't nerfed harshly
             var hitWindowNerf = deltaTime / (greatWindow * 2 * 0.77);
             deltaTime /= Math.Clamp(hitWindowNerf, 0.92, 1);
 
