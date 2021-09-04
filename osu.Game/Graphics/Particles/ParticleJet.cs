@@ -14,12 +14,12 @@ namespace osu.Game.Graphics.Particles
         private const double particle_lifetime = 500;
         private const float angular_velocity = 3f;
         private const int angle_spread = 10;
-        private const float velocity_min = 1.3f;
-        private const float velocity_max = 1.5f;
+        private const float velocity_min = 1300f;
+        private const float velocity_max = 1500f;
 
         private readonly int angle;
 
-        protected override float ParticleGravity => 0.25f;
+        protected override float ParticleGravity => 750f;
 
         public ParticleJet(Texture texture, int angle)
             : base(texture, particles_per_second, particle_lifetime)

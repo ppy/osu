@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.Particles
         public bool HasActiveParticles => Active || (lastParticleAdded + maxLifetime) > Time.Current;
         public override bool IsPresent => base.IsPresent && HasActiveParticles;
 
-        protected virtual float ParticleGravity => 0.5f;
+        protected virtual float ParticleGravity => 0;
 
         protected ParticleSpewer(Texture texture, int perSecond, double maxLifetime)
         {
@@ -182,9 +182,9 @@ namespace osu.Game.Graphics.Particles
             public Vector2 PositionAtTime(float timeSinceStart, float gravity)
             {
                 var progress = progressAtTime(timeSinceStart);
-                var grav = new Vector2(0, -gravity) * progress;
+                var currentGravity = new Vector2(0, gravity * Duration / 1000 * progress);
 
-                return StartPosition + (Velocity - grav) * timeSinceStart;
+                return StartPosition + (Velocity + currentGravity) * timeSinceStart / 1000;
             }
 
             private float progressAtTime(float timeSinceStart) => Math.Clamp(timeSinceStart / Duration, 0, 1);
