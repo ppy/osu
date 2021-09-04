@@ -131,9 +131,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             rotation.BindTo(handler.Rotation);
             rotation.BindValueChanged(val =>
             {
-                tabletContainer.RotateTo(-val.NewValue, 800, Easing.OutQuint);
-                usableAreaContainer.RotateTo(val.NewValue, 100, Easing.OutQuint)
-                                   .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
+                usableAreaContainer.RotateTo(val.NewValue, 100, Easing.OutQuint);
+                tabletContainer.RotateTo(-val.NewValue, 800, Easing.OutQuint)
+                               .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
             }, true);
 
             tablet.BindTo(handler.Tablet);
