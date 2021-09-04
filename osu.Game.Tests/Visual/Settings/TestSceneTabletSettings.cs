@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -57,15 +59,27 @@ namespace osu.Game.Tests.Visual.Settings
             AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
 
             AddStep("rotate 90", () => tabletHandler.Rotation.Value = 90);
-            AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
+            ensureValid();
 
             AddStep("rotate 180", () => tabletHandler.Rotation.Value = 180);
-            AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
+
+            ensureValid();
+
+            AddStep("rotate 270", () => tabletHandler.Rotation.Value = 270);
+
+            ensureValid();
 
             AddStep("rotate 360", () => tabletHandler.Rotation.Value = 360);
-            AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
+
+            ensureValid();
 
             AddStep("rotate 0", () => tabletHandler.Rotation.Value = 0);
+            ensureValid();
+        }
+
+        private void ensureValid()
+        {
+            AddUntilStep("wait for transforms", () => settings.AreaSelection.ChildrenOfType<Container>().All(c => !c.Transforms.Any()));
             AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
         }
 
