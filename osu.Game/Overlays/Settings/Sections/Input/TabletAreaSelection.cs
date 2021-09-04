@@ -17,6 +17,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class TabletAreaSelection : CompositeDrawable
     {
+        public bool IsWithinBounds { get; private set; }
+
         private readonly ITabletHandler handler;
 
         private Container tabletContainer;
@@ -171,10 +173,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             var usableSsdq = usableAreaContainer.ScreenSpaceDrawQuad;
 
-            bool isWithinBounds = tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.TopLeft + new Vector2(1)) &&
-                                  tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.BottomRight - new Vector2(1));
+            IsWithinBounds = tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.TopLeft + new Vector2(1)) &&
+                             tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.BottomRight - new Vector2(1));
 
-            usableFill.FadeColour(isWithinBounds ? colour.Blue : colour.RedLight, 100);
+            usableFill.FadeColour(IsWithinBounds ? colour.Blue : colour.RedLight, 100);
         }
 
         protected override void Update()
