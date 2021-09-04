@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Select
         private CarouselBeatmapSet selectedBeatmapSet;
 
         /// <summary>
-        /// Beatmapsets that were selected but got filtered. Used to try and re-select if only filter actions have been applied.
+        /// Beatmapsets that were selected but got filtered. Used to try and re-select them if user hasn't explicitly selected anything.
         /// </summary>
         private readonly List<CarouselBeatmapSet> nowFilteredSets = new List<CarouselBeatmapSet>();
 
@@ -733,6 +733,7 @@ namespace osu.Game.Screens.Select
 
                 // if we reached here, either user selected something or carousel selected previously filtered set
                 // if the selection is something the carousel wouldn't have selected, it's the user confirming their filter criteria
+                // and we can clear the list so re-selection stops happening for those beatmapsets
                 if (!nowFilteredSets.Contains(set))
                     nowFilteredSets.Clear();
             };

@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Select.Carousel
         /// </summary>
         public bool Visible => State.Value != CarouselItemState.Collapsed && !Filtered.Value;
 
-        public Action UnselectedBecauseFiltered;
+        public event Action UnselectedBecauseFiltered;
 
         protected CarouselItem()
         {
