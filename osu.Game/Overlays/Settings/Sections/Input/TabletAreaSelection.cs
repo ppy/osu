@@ -4,10 +4,13 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.MatrixExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -131,9 +134,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             rotation.BindTo(handler.Rotation);
             rotation.BindValueChanged(val =>
             {
-                usableAreaContainer.RotateTo(val.NewValue, 100, Easing.OutQuint);
-                tabletContainer.RotateTo(-val.NewValue, 800, Easing.OutQuint)
-                               .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
+                usableAreaContainer.RotateTo(val.NewValue, 100, Easing.OutQuint)
+                                   .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
+                tabletContainer.RotateTo(-val.NewValue, 800, Easing.OutQuint);
             }, true);
 
             tablet.BindTo(handler.Tablet);
@@ -171,10 +174,22 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (tablet.Value == null)
                 return;
 
-            var usableSsdq = usableAreaContainer.ScreenSpaceDrawQuad;
+            // All of this manual logic is just to get around floating point issues when doing a contains check on the screen quads.
+            // This is best effort, as it's only used for display purposes. If we need for anything more, manual math on the raw values should be preferred.
+            var containerQuad = tabletContainer.ScreenSpaceDrawQuad.AABBFloat.Inflate(1);
+            var usableAreaQuad = Quad.FromRectangle(usableAreaContainer.ScreenSpaceDrawQuad.AABBFloat);
 
-            IsWithinBounds = tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.TopLeft + new Vector2(1)) &&
-                             tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.BottomRight - new Vector2(1));
+            var matrix = Matrix3.Identity;
+            MatrixExtensions.TranslateFromLeft(ref matrix, usableAreaQuad.Centre);
+            MatrixExtensions.RotateFromLeft(ref matrix, MathUtils.DegreesToRadians(rotation.Value));
+            MatrixExtensions.TranslateFromLeft(ref matrix, -usableAreaQuad.Centre);
+            usableAreaQuad *= matrix;
+
+            IsWithinBounds =
+                containerQuad.Contains(usableAreaQuad.TopLeft) &&
+                containerQuad.Contains(usableAreaQuad.TopRight) &&
+                containerQuad.Contains(usableAreaQuad.BottomLeft) &&
+                containerQuad.Contains(usableAreaQuad.BottomRight);
 
             usableFill.FadeColour(IsWithinBounds ? colour.Blue : colour.RedLight, 100);
         }
