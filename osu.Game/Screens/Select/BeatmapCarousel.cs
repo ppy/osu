@@ -70,11 +70,6 @@ namespace osu.Game.Screens.Select
         private readonly List<CarouselBeatmapSet> nowFilteredSets = new List<CarouselBeatmapSet>();
 
         /// <summary>
-        /// True while filter action resulted in last selection getting filtered and next/eager selection hasn't happened yet.
-        /// </summary>
-        private bool lastSelectionWasFiltered;
-
-        /// <summary>
         /// Raised when the <see cref="SelectedBeatmap"/> is changed.
         /// </summary>
         public Action<BeatmapInfo> SelectionChanged;
@@ -471,10 +466,6 @@ namespace osu.Game.Screens.Select
             {
                 PendingFilter = null;
 
-                // selected set can only be null if everything, including our last selection, has been filtered
-                if (selectedBeatmapSet == null)
-                    lastSelectionWasFiltered = true;
-
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
                 // this is to help users who accidentally misused their filter criteria return to their previously selected map
@@ -608,10 +599,6 @@ namespace osu.Game.Screens.Select
             if (revalidateItems)
                 updateYPositions();
 
-            // If an eager selection can't be made because all sets have been filtered, the flag should be reset
-            if (!visibleItems.Any())
-                lastSelectionWasFiltered = false;
-
             // if there is a pending scroll action we apply it without animation and transfer the difference in position to the panels.
             // this is intentionally applied before updating the visible range below, to avoid animating new items (sourced from pool) from locations off-screen, as it looks bad.
             if (pendingScrollOperation != PendingScrollOperation.None)
@@ -735,22 +722,14 @@ namespace osu.Game.Screens.Select
                 GetRecommendedBeatmap = beatmaps => GetRecommendedBeatmap?.Invoke(beatmaps)
             };
 
-            set.UnselectedBecauseFiltered += () =>
-            {
-                nowFilteredSets.Add(set);
-                lastSelectionWasFiltered = true;
-            };
+            set.UnselectedBecauseFiltered += () => nowFilteredSets.Add(set);
             set.State.ValueChanged += state =>
             {
                 if (state.NewValue != CarouselItemState.Selected)
                     return;
 
-                if (lastSelectionWasFiltered)
-                {
-                    // this set is now our last selected one and it isn't filtered
-                    lastSelectionWasFiltered = false;
+                if (root.EagerlySelecting)
                     return;
-                }
 
                 // if we reached here, either user selected something or carousel selected previously filtered set
                 // if the selection is something the carousel wouldn't have selected, it's the user confirming their filter criteria
@@ -944,6 +923,7 @@ namespace osu.Game.Screens.Select
         private class CarouselRoot : CarouselGroupEagerSelect
         {
             private readonly BeatmapCarousel carousel;
+            public bool EagerlySelecting;
 
             public CarouselRoot(BeatmapCarousel carousel)
             {
@@ -956,10 +936,12 @@ namespace osu.Game.Screens.Select
 
             protected override void PerformSelection()
             {
+                EagerlySelecting = true;
                 if (LastSelected == null || LastSelected.Filtered.Value)
                     carousel?.SelectNextRandom();
                 else
                     base.PerformSelection();
+                EagerlySelecting = false;
             }
         }
 
