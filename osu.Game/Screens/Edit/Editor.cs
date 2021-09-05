@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -35,9 +36,7 @@ using osu.Game.Screens.Edit.Design;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
-using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select;
 using osu.Game.Users;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -77,6 +76,9 @@ namespace osu.Game.Screens.Edit
 
         private Container<EditorScreen> screenContainer;
 
+        [CanBeNull]
+        private readonly EditorLoader loader;
+
         private EditorScreen currentScreen;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
@@ -105,6 +107,11 @@ namespace osu.Game.Screens.Edit
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
+
+        public Editor(EditorLoader loader = null)
+        {
+            this.loader = loader;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OsuConfigManager config)
@@ -730,12 +737,14 @@ namespace osu.Game.Screens.Edit
             {
                 menuItem.Action.Value = () =>
                 {
+                    if (loader != null)
+                        loader.ValidForResume = true;
+
                     game?.PerformFromScreen(screen =>
                     {
-                        var osuScreen = (OsuScreen)screen;
-                        osuScreen.Beatmap.Value = beatmapManager.GetWorkingBeatmap(b);
-                        screen.Push(new Editor());
-                    }, new[] { typeof(MainMenu), typeof(SongSelect) });
+                        if (screen != null && screen == loader)
+                            loader.PushEditor();
+                    }, new[] { typeof(EditorLoader) });
                 };
             }
 
