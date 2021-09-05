@@ -9,6 +9,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
@@ -28,6 +29,9 @@ namespace osu.Game.Overlays
         public const float TRANSITION_LENGTH = 600;
 
         private FlowContainer<NotificationSection> sections;
+
+        [Resolved]
+        private AudioManager audio { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -104,6 +108,8 @@ namespace osu.Game.Overlays
 
         private bool processingPosts = true;
 
+        private double? lastSamplePlayback;
+
         /// <summary>
         /// Post a new notification for display.
         /// </summary>
@@ -126,6 +132,7 @@ namespace osu.Game.Overlays
                 Show();
 
             updateCounts();
+            playDebouncedSample(notification.PopInSampleName);
         });
 
         protected override void Update()
@@ -154,7 +161,23 @@ namespace osu.Game.Overlays
             this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
         }
 
-        private void notificationClosed() => updateCounts();
+        private void notificationClosed()
+        {
+            updateCounts();
+
+            // this debounce is currently shared between popin/popout sounds, which means one could potentially not play when the user is expecting it.
+            // popout is constant across all notification types, and should therefore be handled using playback concurrency instead, but seems broken at the moment.
+            playDebouncedSample("UI/overlay-pop-out");
+        }
+
+        private void playDebouncedSample(string sampleName)
+        {
+            if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > 50)
+            {
+                audio.Samples.Get(sampleName)?.Play();
+                lastSamplePlayback = Time.Current;
+            }
+        }
 
         private void updateCounts()
         {

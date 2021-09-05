@@ -3,20 +3,18 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Game.Graphics;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -42,10 +40,7 @@ namespace osu.Game.Overlays.Notifications
         /// </summary>
         public virtual bool DisplayOnTop => true;
 
-        private Sample samplePopIn;
-        private Sample samplePopOut;
-        protected virtual string PopInSampleName => "UI/notification-pop-in";
-        protected virtual string PopOutSampleName => "UI/overlay-pop-out"; // TODO: replace with a unique sample?
+        public virtual string PopInSampleName => "UI/notification-pop-in";
 
         protected NotificationLight Light;
         private readonly CloseButton closeButton;
@@ -114,7 +109,7 @@ namespace osu.Game.Overlays.Notifications
                         closeButton = new CloseButton
                         {
                             Alpha = 0,
-                            Action = () => Close(),
+                            Action = Close,
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Margin = new MarginPadding
@@ -125,13 +120,6 @@ namespace osu.Game.Overlays.Notifications
                     }
                 }
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            samplePopIn = audio.Samples.Get(PopInSampleName);
-            samplePopOut = audio.Samples.Get(PopOutSampleName);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -158,8 +146,6 @@ namespace osu.Game.Overlays.Notifications
         {
             base.LoadComplete();
 
-            samplePopIn?.Play();
-
             this.FadeInFromZero(200);
             NotificationContent.MoveToX(DrawSize.X);
             NotificationContent.MoveToX(0, 500, Easing.OutQuint);
@@ -167,14 +153,11 @@ namespace osu.Game.Overlays.Notifications
 
         public bool WasClosed;
 
-        public virtual void Close(bool playSound = true)
+        public virtual void Close()
         {
             if (WasClosed) return;
 
             WasClosed = true;
-
-            if (playSound)
-                samplePopOut?.Play();
 
             Closed?.Invoke();
             this.FadeOut(100);
