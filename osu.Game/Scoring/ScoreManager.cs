@@ -26,7 +26,7 @@ using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
 {
-    public partial class ScoreManager : DownloadableArchiveModelManager<ScoreInfo, ScoreFileInfo>
+    public class ScoreManager : DownloadableArchiveModelManager<ScoreInfo, ScoreFileInfo>
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
 
@@ -43,23 +43,14 @@ namespace osu.Game.Scoring
         [CanBeNull]
         private readonly OsuConfigManager configManager;
 
-        [CanBeNull]
-        private readonly UserIdLookupCache userIdLookupCache;
-
-        private readonly IAPIProvider api;  
-
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
-                            Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null, bool performOnlineLookups = false)
+                            Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
             this.difficulties = difficulties;
             this.configManager = configManager;
-            this.api = api;
-
-            if (performOnlineLookups)
-                userIdLookupCache = new UserIdLookupCache(api);
         }
 
         protected override ScoreInfo CreateModel(ArchiveReader archive)
@@ -81,21 +72,8 @@ namespace osu.Game.Scoring
             }
         }
 
-        protected override async Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
-        {
-            // These scores only provide the user's username but we need the user's ID too.
-            if (model.UserID <= 1 && model.UserString != null && userIdLookupCache != null)
-            {
-                try
-                {
-                    model.UserID = await userIdLookupCache.GetUserIdAsync(model.UserString, cancellationToken).ConfigureAwait(false);
-                }
-                catch (Exception e)
-                {
-                    LogForModel(model, $"Online retrieval failed for {model.User} ({e.Message})", e);
-                }
-            }
-        }
+        protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
 
         protected override void ExportModelTo(ScoreInfo model, Stream outputStream)
         {
