@@ -98,14 +98,16 @@ namespace osu.Game.Overlays
 
         private int runningDepth;
 
-        private void notificationClosed() => updateCounts();
-
         private readonly Scheduler postScheduler = new Scheduler();
 
         public override bool IsPresent => base.IsPresent || postScheduler.HasPendingTasks;
 
         private bool processingPosts = true;
 
+        /// <summary>
+        /// Post a new notification for display.
+        /// </summary>
+        /// <param name="notification">The notification to display.</param>
         public void Post(Notification notification) => postScheduler.Add(() =>
         {
             ++runningDepth;
@@ -129,6 +131,7 @@ namespace osu.Game.Overlays
         protected override void Update()
         {
             base.Update();
+
             if (processingPosts)
                 postScheduler.Update();
         }
@@ -150,6 +153,8 @@ namespace osu.Game.Overlays
             this.MoveToX(WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
         }
+
+        private void notificationClosed() => updateCounts();
 
         private void updateCounts()
         {
