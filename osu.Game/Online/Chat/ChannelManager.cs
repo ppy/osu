@@ -256,10 +256,6 @@ namespace osu.Game.Online.Chat
                     JoinChannel(channel);
                     break;
 
-                case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /np, /msg [user] [message]"));
-                    break;
-
                 case "msg":
                     if (string.IsNullOrWhiteSpace(content))
                     {
@@ -288,6 +284,10 @@ namespace osu.Game.Online.Chat
                     };
                     request.Failure += _ => target.AddNewMessages(new ErrorMessage($"User {args[0]} not found."));
                     api.Queue(request);
+                    break;
+
+                case "help":
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /np, /msg [user] [message]"));
                     break;
 
                 default:
