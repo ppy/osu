@@ -57,6 +57,11 @@ namespace osu.Game
         public const int SAMPLE_CONCURRENCY = 6;
 
         /// <summary>
+        /// Length of debounce (in milliseconds) for commonly occuring sample playbacks that could stack.
+        /// </summary>
+        public const int SAMPLE_DEBOUNCE_TIME = 20;
+
+        /// <summary>
         /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
         /// </summary>
         internal const double GLOBAL_TRACK_VOLUME_ADJUST = 0.8;
