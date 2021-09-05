@@ -260,6 +260,36 @@ namespace osu.Game.Online.Chat
                     target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /np"));
                     break;
 
+                case "msg":
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        target.AddNewMessages(new ErrorMessage("Usage: /msg [user] [msg]"));
+                        break;
+                    }
+
+                    var args = content.Split(" ");
+
+                    var request = new GetUserRequest(args[0]);
+                    request.Success += user =>
+                    {
+                        OpenPrivateChannel(user);
+                        var message = new Message
+                        {
+                            Content = string.Join(" ", args[1..]),
+                            Sender = user,
+                            IsAction = false,
+                            ChannelId = CurrentChannel.Value.Id,
+                            Timestamp = DateTimeOffset.Now,
+                            DisplayContent = string.Join(" ", args[1..])
+                        };
+                        var messageRequest = new PostMessageRequest(message);
+                        messageRequest.Failure += e => Logger.Error(e, $"Message to user {user} failed to send.", LoggingTarget.Network);
+                        api.Queue(messageRequest);
+                    };
+                    request.Failure += _ => target.AddNewMessages(new ErrorMessage($"User {args[0]} not found."));
+                    api.Queue(request);
+                    break;
+
                 default:
                     target.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
                     break;
