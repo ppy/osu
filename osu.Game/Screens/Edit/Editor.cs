@@ -715,7 +715,17 @@ namespace osu.Game.Screens.Edit
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
             var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
-            var difficultyItems = beatmapSet.Beatmaps.Select(createDifficultyMenuItem).ToList();
+
+            var difficultyItems = new List<MenuItem>();
+
+            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.RulesetID).OrderBy(group => group.Key))
+            {
+                if (difficultyItems.Count > 0)
+                    difficultyItems.Add(new EditorMenuItemSpacer());
+
+                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarDifficulty))
+                    difficultyItems.Add(createDifficultyMenuItem(beatmap));
+            }
 
             fileMenuItems.Add(new EditorMenuItem("Change difficulty") { Items = difficultyItems });
 
