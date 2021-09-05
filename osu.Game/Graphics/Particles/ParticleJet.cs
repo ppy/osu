@@ -12,7 +12,6 @@ namespace osu.Game.Graphics.Particles
     {
         private const int particles_per_second = 80;
         private const double particle_lifetime = 500;
-        private const float angular_velocity = 3f;
         private const int angle_spread = 10;
         private const float velocity_min = 1300f;
         private const float velocity_max = 1500f;
@@ -39,7 +38,8 @@ namespace osu.Game.Graphics.Particles
             p.StartPosition = OriginPosition;
             p.Duration = RNG.NextSingle((float)particle_lifetime * 0.8f, (float)particle_lifetime);
             p.Velocity = direction * new Vector2(RNG.NextSingle(velocity_min, velocity_max));
-            p.AngularVelocity = RNG.NextSingle(-angular_velocity, angular_velocity);
+            p.StartAngle = RNG.NextSingle(-2f, 2f);
+            p.EndAngle = RNG.NextSingle(-2f, 2f);
             p.EndScale = 2f;
 
             return p;
