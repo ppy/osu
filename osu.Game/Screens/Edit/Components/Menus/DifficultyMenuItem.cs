@@ -10,9 +10,12 @@ namespace osu.Game.Screens.Edit.Components.Menus
 {
     public class DifficultyMenuItem : StatefulMenuItem<bool>
     {
+        public BeatmapInfo Beatmap { get; }
+
         public DifficultyMenuItem(BeatmapInfo beatmapInfo, bool selected, Action<BeatmapInfo> difficultyChangeFunc)
             : base(beatmapInfo.Version ?? "(unnamed)", null)
         {
+            Beatmap = beatmapInfo;
             State.Value = selected;
 
             if (!selected)
