@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Direction = SpewDirection.None,
                     Active =
                     {
-                        Value = true,
+                        Value = false,
                     }
                 },
                 kiaiSpewer = new StarParticleSpewer(texture, 60)
@@ -63,6 +63,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (player != null)
             {
                 breakSpewer.Active.BindTarget = player.IsBreakTime;
+            }
+
+            if (osuPlayfield != null)
+            {
+                breakSpewer.ParticleParent = osuPlayfield;
+                kiaiSpewer.ParticleParent = osuPlayfield;
             }
         }
 
@@ -126,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             public SpewDirection Direction { get; set; }
 
-            protected override float ParticleGravity => 460;
+            protected override float ParticleGravity => 240;
 
             public StarParticleSpewer(Texture texture, int perSecond)
                 : base(texture, perSecond, particle_lifetime_max)
@@ -134,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 Active.BindValueChanged(_ => resetVelocityCalculation());
             }
 
-            private Vector2 screenPosition => ToScreenSpace(OriginPosition);
+            private Vector2 positionInParent => ToSpaceOfOtherDrawable(OriginPosition, ParticleParent);
 
             private Vector2 screenVelocity;
 
@@ -149,11 +155,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                 if (lastPosition != null)
                 {
-                    positionDifference += (screenPosition - lastPosition.Value);
+                    positionDifference += (positionInParent - lastPosition.Value);
                     lastVelocityCalculation += Clock.ElapsedFrameTime;
                 }
 
-                lastPosition = screenPosition;
+                lastPosition = positionInParent;
 
                 if (lastVelocityCalculation > velocity_calculation_delay)
                 {
@@ -175,6 +181,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 var p = base.SpawnParticle();
 
+                p.StartPosition = positionInParent;
                 p.Duration = RNG.NextSingle(particle_lifetime_min, particle_lifetime_max);
                 p.AngularVelocity = RNG.NextSingle(-3f, 3f);
                 p.StartScale = RNG.NextSingle(0.5f, 1f);
@@ -188,27 +195,27 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     case SpewDirection.Left:
                         p.Velocity = new Vector2(
-                            RNG.NextSingle(-460f, 0) * 2,
-                            RNG.NextSingle(-40f, 40f) * 2
+                            RNG.NextSingle(-460f, 0),
+                            RNG.NextSingle(-40f, 40f)
                         );
                         break;
 
                     case SpewDirection.Right:
                         p.Velocity = new Vector2(
-                            RNG.NextSingle(0, 460f) * 2,
-                            RNG.NextSingle(-40f, 40f) * 2
+                            RNG.NextSingle(0, 460f),
+                            RNG.NextSingle(-40f, 40f)
                         );
                         break;
 
                     case SpewDirection.Both:
                         p.Velocity = new Vector2(
-                            RNG.NextSingle(-460f, 460f) * 2,
-                            RNG.NextSingle(-160f, 160f) * 2
+                            RNG.NextSingle(-460f, 460f),
+                            RNG.NextSingle(-160f, 160f)
                         );
                         break;
                 }
 
-                p.Velocity += screenVelocity * 50;
+                p.Velocity += screenVelocity * 40;
 
                 return p;
             }

@@ -26,6 +26,12 @@ namespace osu.Game.Graphics.Particles
         /// </summary>
         public readonly BindableBool Active = new BindableBool();
 
+        /// <summary>
+        /// <see cref="Drawable"/> whose DrawInfo will be used to draw each particle.
+        /// Defaults to the <see cref="ParticleSpewer"/> itself.
+        /// </summary>
+        public IDrawable ParticleParent;
+
         public bool HasActiveParticles => Active.Value || (lastParticleAdded + maxLifetime) > Time.Current;
         public override bool IsPresent => base.IsPresent && HasActiveParticles;
 
@@ -35,6 +41,7 @@ namespace osu.Game.Graphics.Particles
         {
             Texture = texture;
             Blending = BlendingParameters.Additive;
+            ParticleParent = this;
 
             particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxLifetime / 1000)];
 
@@ -66,7 +73,6 @@ namespace osu.Game.Graphics.Particles
             return new FallingParticle
             {
                 StartTime = (float)Time.Current,
-                StartPosition = ToScreenSpace(OriginPosition),
             };
         }
 
@@ -90,6 +96,7 @@ namespace osu.Game.Graphics.Particles
 
             private float currentTime;
             private float gravity;
+            private Matrix3 particleDrawMatrix;
 
             public ParticleSpewerDrawNode(Sprite source)
                 : base(source)
@@ -105,6 +112,7 @@ namespace osu.Game.Graphics.Particles
 
                 currentTime = (float)Source.Time.Current;
                 gravity = Source.ParticleGravity;
+                particleDrawMatrix = Source.ParticleParent.DrawInfo.Matrix;
             }
 
             protected override void Blit(Action<TexturedVertex2D> vertexAction)
@@ -127,9 +135,8 @@ namespace osu.Game.Graphics.Particles
                     var pos = p.PositionAtTime(timeSinceStart, gravity);
                     var angle = p.AngleAtTime(timeSinceStart);
 
-                    var matrixScale = DrawInfo.Matrix.ExtractScale();
-                    var width = Texture.DisplayWidth * scale * matrixScale.X;
-                    var height = Texture.DisplayHeight * scale * matrixScale.Y;
+                    var width = Texture.DisplayWidth * scale;
+                    var height = Texture.DisplayHeight * scale;
 
                     var rect = new RectangleF(
                         pos.X - width / 2,
@@ -158,7 +165,7 @@ namespace osu.Game.Graphics.Particles
                 float x = centre.X + (pos.X - centre.X) * cos + (pos.Y - centre.Y) * sin;
                 float y = centre.Y + (pos.Y - centre.Y) * cos - (pos.X - centre.X) * sin;
 
-                return new Vector2(x, y);
+                return Vector2Extensions.Transform(new Vector2(x, y), particleDrawMatrix);
             }
         }
 
