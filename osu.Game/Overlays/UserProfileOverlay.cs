@@ -40,6 +40,8 @@ namespace osu.Game.Overlays
 
         public void ShowUser(int userId) => ShowUser(new User { Id = userId });
 
+        public void ShowUser(string username) => ShowUser(new User { Username = username });
+
         public void ShowUser(User user, bool fetchOnline = true)
         {
             if (user == User.SYSTEM_USER)
@@ -116,7 +118,7 @@ namespace osu.Game.Overlays
 
             if (fetchOnline)
             {
-                userReq = new GetUserRequest(user.Id);
+                userReq = user.Id > 1 ? new GetUserRequest(user.Id) : new GetUserRequest(user.Username);
                 userReq.Success += userLoadComplete;
                 API.Queue(userReq);
             }
