@@ -4,6 +4,7 @@
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Play;
 
@@ -18,19 +19,31 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
+        [CanBeNull]
+        private ScheduledDelegate scheduledDifficultySwitch;
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            PushEditor();
+            pushEditor();
         }
 
-        public void PushEditor([CanBeNull] BeatmapInfo beatmapInfo = null) => Schedule(() =>
+        private void pushEditor()
         {
-            if (beatmapInfo != null)
-                Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
-
             this.Push(new Editor(this));
             ValidForResume = false;
-        });
+        }
+
+        public void ScheduleDifficultySwitch(BeatmapInfo beatmapInfo)
+        {
+            CancelDifficultySwitch();
+            scheduledDifficultySwitch = Schedule(() =>
+            {
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+                pushEditor();
+            });
+        }
+
+        public void CancelDifficultySwitch() => scheduledDifficultySwitch?.Cancel();
     }
 }
