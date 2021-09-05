@@ -40,7 +40,6 @@ namespace osu.Game.Graphics.Particles
             p.Duration = RNG.NextSingle((float)particle_lifetime * 0.8f, (float)particle_lifetime);
             p.Velocity = direction * new Vector2(RNG.NextSingle(velocity_min, velocity_max));
             p.AngularVelocity = RNG.NextSingle(-angular_velocity, angular_velocity);
-            p.StartScale = 1f;
             p.EndScale = 2f;
 
             return p;

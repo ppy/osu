@@ -178,12 +178,11 @@ namespace osu.Game.Graphics.Particles
             public Vector2 Velocity;
             public float Duration;
             public float AngularVelocity;
-            public float StartScale;
             public float EndScale;
 
             public float AlphaAtTime(float timeSinceStart) => 1 - progressAtTime(timeSinceStart);
 
-            public float ScaleAtTime(float timeSinceStart) => StartScale + (EndScale - StartScale) * progressAtTime(timeSinceStart);
+            public float ScaleAtTime(float timeSinceStart) => 1 + (EndScale - 1) * progressAtTime(timeSinceStart);
 
             public float AngleAtTime(float timeSinceStart) => AngularVelocity / 1000 * timeSinceStart;
 

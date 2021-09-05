@@ -184,7 +184,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 p.StartPosition = positionInParent;
                 p.Duration = RNG.NextSingle(particle_lifetime_min, particle_lifetime_max);
                 p.AngularVelocity = RNG.NextSingle(-3f, 3f);
-                p.StartScale = RNG.NextSingle(0.5f, 1f);
                 p.EndScale = RNG.NextSingle(2f);
 
                 switch (Direction)
