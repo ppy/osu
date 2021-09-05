@@ -257,7 +257,7 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /np"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /np, /msg [user] [message]"));
                     break;
 
                 case "msg":
