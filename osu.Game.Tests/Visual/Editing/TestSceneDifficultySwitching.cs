@@ -11,6 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Menu;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Input;
 
@@ -19,14 +20,24 @@ namespace osu.Game.Tests.Visual.Editing
     public class TestSceneDifficultySwitching : ScreenTestScene
     {
         private BeatmapSetInfo importedBeatmapSet;
+        private Editor editor;
+
+        // required for screen transitions to work properly
+        // (see comment in EditorLoader.LogoArriving).
+        [Cached]
+        private OsuLogo logo = new OsuLogo
+        {
+            Alpha = 0
+        };
 
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        private Editor editor;
-
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load() => Add(logo);
 
         [SetUpSteps]
         public void SetUp()
