@@ -260,7 +260,7 @@ namespace osu.Game.Online.Chat
                 case "query":
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        target.AddNewMessages(new ErrorMessage("Usage: /chat [user]"));
+                        target.AddNewMessages(new ErrorMessage($"Usage: /{command} [user]"));
                         break;
                     }
 
