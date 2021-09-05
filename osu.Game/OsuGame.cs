@@ -329,7 +329,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (int.TryParse(link.Argument, out var userId))
+                    if (int.TryParse(link.Argument, out int userId))
                         ShowUser(userId);
                     else
                         ShowUser(link.Argument);
