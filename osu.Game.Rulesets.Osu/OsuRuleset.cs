@@ -308,6 +308,6 @@ namespace osu.Game.Rulesets.Osu
             };
         }
 
-        public override RulesetSetupSection CreateEditorSetupSectionForRuleset() => new OsuSetupSection();
+        public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
     }
 }

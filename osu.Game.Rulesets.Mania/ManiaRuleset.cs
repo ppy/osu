@@ -393,7 +393,7 @@ namespace osu.Game.Rulesets.Mania
             return new ManiaFilterCriteria();
         }
 
-        public override RulesetSetupSection CreateEditorSetupSectionForRuleset() => new ManiaSetupSection();
+        public override RulesetSetupSection CreateEditorSetupSection() => new ManiaSetupSection();
     }
 
     public enum PlayfieldType

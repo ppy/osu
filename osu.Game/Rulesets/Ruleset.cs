@@ -321,6 +321,6 @@ namespace osu.Game.Rulesets
         /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
         /// </summary>
         [CanBeNull]
-        public virtual RulesetSetupSection CreateEditorSetupSectionForRuleset() => null;
+        public virtual RulesetSetupSection CreateEditorSetupSection() => null;
     }
 }
