@@ -704,6 +704,13 @@ namespace osu.Game.Screens.Edit
                 fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
+
+            var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
+            var difficultyItems = beatmapSet.Beatmaps.Select(b => new EditorMenuItem(b.Version ?? "(unnamed)")).ToList();
+
+            fileMenuItems.Add(new EditorMenuItem("Change difficulty") { Items = difficultyItems });
+
+            fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
             return fileMenuItems;
         }
