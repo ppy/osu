@@ -11,7 +11,6 @@ namespace osu.Game.Online.API.Requests
         private readonly string userIdentifier;
         public readonly RulesetInfo Ruleset;
 
-
         /// <summary>
         /// Gets the currently logged-in user.
         /// </summary>
