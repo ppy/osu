@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -27,7 +28,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : DownloadableArchiveModelManager<ScoreInfo, ScoreFileInfo>
+    public partial class ScoreManager : DownloadableArchiveModelManager<ScoreInfo, ScoreFileInfo>
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
 
@@ -44,10 +45,13 @@ namespace osu.Game.Scoring
         [CanBeNull]
         private readonly OsuConfigManager configManager;
 
+        [CanBeNull]
+        private readonly UserIdLookupCache userIdLookupCache;
+
         private IAPIProvider api { get; set; }
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
-                            Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
+                            Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null, bool performOnlineLookups = false)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
@@ -55,6 +59,9 @@ namespace osu.Game.Scoring
             this.difficulties = difficulties;
             this.configManager = configManager;
             this.api = api;
+
+            if (performOnlineLookups)
+                userIdLookupCache = new UserIdLookupCache(api);
         }
 
         protected override ScoreInfo CreateModel(ArchiveReader archive)
@@ -76,30 +83,20 @@ namespace osu.Game.Scoring
             }
         }
 
-        private readonly Dictionary<string, User> previouslyLookedUpUsernames = new Dictionary<string, User>();
-
-        protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
+        protected override async Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             // These scores only provide the user's username but we need the user's ID too.
-            if (model.UserID <= 1 && model.UserString != null)
+            if (model.UserID <= 1 && model.UserString != null && userIdLookupCache != null)
             {
-                if (previouslyLookedUpUsernames.TryGetValue(model.UserString, out User user))
+                try
                 {
-                    model.UserID = user.Id;
-                    return Task.CompletedTask;
+                    model.UserID = await userIdLookupCache.GetUserIdAsync(model.UserString, cancellationToken).ConfigureAwait(false);
                 }
-
-                var request = new GetUserRequest(model.UserString);
-                request.Success += u =>
+                catch (Exception e)
                 {
-                    model.UserID = u.Id;
-                    previouslyLookedUpUsernames.TryAdd(model.UserString, u);
-                };
-
-                api?.Queue(request);
+                    LogForModel(model, $"Online retrieval failed for {model.User} ({e.Message})", e);
+                }
             }
-
-            return Task.CompletedTask;
         }
 
         protected override void ExportModelTo(ScoreInfo model, Stream outputStream)
