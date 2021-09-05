@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Tests.Beatmaps.IO;
@@ -35,8 +36,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("set current beatmap", () => Beatmap.Value = beatmaps.GetWorkingBeatmap(importedBeatmapSet.Beatmaps.First()));
             AddStep("push loader", () => Stack.Push(new EditorLoader()));
 
-            AddUntilStep("wait for editor to load", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("wait for editor push", () => Stack.CurrentScreen is Editor);
             AddStep("store editor", () => editor = (Editor)Stack.CurrentScreen);
+            AddUntilStep("wait for editor to load", () => editor.IsLoaded);
         }
 
         [Test]
@@ -49,6 +51,39 @@ namespace osu.Game.Tests.Visual.Editing
             confirmEditingBeatmap(() => targetDifficulty);
 
             AddStep("exit editor", () => Stack.Exit());
+            // ensure editor loader didn't resume.
+            AddAssert("stack empty", () => Stack.CurrentScreen == null);
+        }
+
+        [Test]
+        public void TestPreventSwitchDueToUnsavedChanges()
+        {
+            BeatmapInfo targetDifficulty = null;
+            PromptForSaveDialog saveDialog = null;
+
+            AddStep("remove first hitobject", () =>
+            {
+                var editorBeatmap = editor.ChildrenOfType<EditorBeatmap>().Single();
+                editorBeatmap.RemoveAt(0);
+            });
+
+            AddStep("set target difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo)));
+            switchToDifficulty(() => targetDifficulty);
+
+            AddUntilStep("prompt for save dialog shown", () =>
+            {
+                saveDialog = this.ChildrenOfType<PromptForSaveDialog>().Single();
+                return saveDialog != null;
+            });
+            AddStep("continue editing", () =>
+            {
+                var continueButton = saveDialog.ChildrenOfType<PopupDialogCancelButton>().Last();
+                continueButton.TriggerClick();
+            });
+
+            confirmEditingBeatmap(() => importedBeatmapSet.Beatmaps.First());
+
+            AddRepeatStep("exit editor forcefully", () => Stack.Exit(), 2);
             // ensure editor loader didn't resume.
             AddAssert("stack empty", () => Stack.CurrentScreen == null);
         }
