@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -24,7 +23,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Users;
 
 namespace osu.Game.Scoring
 {
@@ -48,7 +46,7 @@ namespace osu.Game.Scoring
         [CanBeNull]
         private readonly UserIdLookupCache userIdLookupCache;
 
-        private IAPIProvider api { get; set; }
+        private readonly IAPIProvider api;  
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
                             Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null, bool performOnlineLookups = false)
