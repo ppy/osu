@@ -27,11 +27,13 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mania.Edit;
+using osu.Game.Rulesets.Mania.Edit.Setup;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mania.Skinning.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Scoring;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Mania
@@ -390,6 +392,8 @@ namespace osu.Game.Rulesets.Mania
         {
             return new ManiaFilterCriteria();
         }
+
+        public override RulesetSetupSection CreateEditorSetupSection() => new ManiaSetupSection();
     }
 
     public enum PlayfieldType
