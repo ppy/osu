@@ -727,28 +727,24 @@ namespace osu.Game.Screens.Edit
             return fileMenuItems;
         }
 
-        private ToggleMenuItem createDifficultyMenuItem(BeatmapInfo b)
+        private DifficultyMenuItem createDifficultyMenuItem(BeatmapInfo beatmapInfo)
         {
-            bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(b);
+            bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmapInfo);
+            return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, switchToDifficulty);
+        }
 
-            var menuItem = new ToggleMenuItem(b.Version ?? "(unnamed)") { State = { Value = isCurrentDifficulty }, };
+        private void switchToDifficulty(BeatmapInfo beatmapInfo)
+        {
+            if (loader != null)
+                loader.ValidForResume = true;
 
-            if (!isCurrentDifficulty)
+            game?.PerformFromScreen(screen =>
             {
-                menuItem.Action.Value = () =>
-                {
-                    if (loader != null)
-                        loader.ValidForResume = true;
+                if (screen == null || screen != loader)
+                    return;
 
-                    game?.PerformFromScreen(screen =>
-                    {
-                        if (screen != null && screen == loader)
-                            loader.PushEditor();
-                    }, new[] { typeof(EditorLoader) });
-                };
-            }
-
-            return menuItem;
+                loader.PushEditor(beatmapInfo);
+            }, new[] { typeof(EditorLoader) });
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
