@@ -88,6 +88,39 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("stack empty", () => Stack.CurrentScreen == null);
         }
 
+        [Test]
+        public void TestAllowSwitchAfterDiscardingUnsavedChanges()
+        {
+            BeatmapInfo targetDifficulty = null;
+            PromptForSaveDialog saveDialog = null;
+
+            AddStep("remove first hitobject", () =>
+            {
+                var editorBeatmap = editor.ChildrenOfType<EditorBeatmap>().Single();
+                editorBeatmap.RemoveAt(0);
+            });
+
+            AddStep("set target difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo)));
+            switchToDifficulty(() => targetDifficulty);
+
+            AddUntilStep("prompt for save dialog shown", () =>
+            {
+                saveDialog = this.ChildrenOfType<PromptForSaveDialog>().Single();
+                return saveDialog != null;
+            });
+            AddStep("discard changes", () =>
+            {
+                var continueButton = saveDialog.ChildrenOfType<PopupDialogOkButton>().Single();
+                continueButton.TriggerClick();
+            });
+
+            confirmEditingBeatmap(() => targetDifficulty);
+
+            AddStep("exit editor forcefully", () => Stack.Exit());
+            // ensure editor loader didn't resume.
+            AddAssert("stack empty", () => Stack.CurrentScreen == null);
+        }
+
         private void switchToDifficulty(Func<BeatmapInfo> difficulty)
         {
             AddUntilStep("wait for menubar to load", () => editor.ChildrenOfType<EditorMenuBar>().Any());
