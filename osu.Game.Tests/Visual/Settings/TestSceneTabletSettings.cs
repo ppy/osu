@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("rotate 0", () => tabletHandler.Rotation.Value = 0);
             ensureValid();
 
-            AddStep("rotate 0", () => tabletHandler.Rotation.Value = 45);
+            AddStep("rotate 45", () => tabletHandler.Rotation.Value = 45);
             ensureInvalid();
 
             AddStep("rotate 0", () => tabletHandler.Rotation.Value = 0);
