@@ -24,13 +24,13 @@ namespace osu.Game.Screens.Edit
             PushEditor();
         }
 
-        public void PushEditor([CanBeNull] BeatmapInfo beatmapInfo = null)
+        public void PushEditor([CanBeNull] BeatmapInfo beatmapInfo = null) => Schedule(() =>
         {
             if (beatmapInfo != null)
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
 
             this.Push(new Editor(this));
             ValidForResume = false;
-        }
+        });
     }
 }
