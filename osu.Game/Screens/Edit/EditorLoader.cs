@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit
@@ -12,14 +15,20 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorLoader : ScreenWithBeatmapBackground
     {
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             PushEditor();
         }
 
-        public void PushEditor()
+        public void PushEditor([CanBeNull] BeatmapInfo beatmapInfo = null)
         {
+            if (beatmapInfo != null)
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+
             this.Push(new Editor(this));
             ValidForResume = false;
         }
