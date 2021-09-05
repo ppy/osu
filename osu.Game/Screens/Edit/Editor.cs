@@ -35,7 +35,9 @@ using osu.Game.Screens.Edit.Design;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
 using osu.Game.Users;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -100,6 +102,9 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private MusicController music { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OsuConfigManager config)
@@ -706,16 +711,35 @@ namespace osu.Game.Screens.Edit
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
             var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
-            var difficultyItems = beatmapSet.Beatmaps.Select(b => new ToggleMenuItem(b.Version ?? "(unnamed)")
-            {
-                State = { Value = playableBeatmap.BeatmapInfo.Equals(b) }
-            }).ToList();
+            var difficultyItems = beatmapSet.Beatmaps.Select(createDifficultyMenuItem).ToList();
 
             fileMenuItems.Add(new EditorMenuItem("Change difficulty") { Items = difficultyItems });
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
             return fileMenuItems;
+        }
+
+        private ToggleMenuItem createDifficultyMenuItem(BeatmapInfo b)
+        {
+            bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(b);
+
+            var menuItem = new ToggleMenuItem(b.Version ?? "(unnamed)") { State = { Value = isCurrentDifficulty }, };
+
+            if (!isCurrentDifficulty)
+            {
+                menuItem.Action.Value = () =>
+                {
+                    game?.PerformFromScreen(screen =>
+                    {
+                        var osuScreen = (OsuScreen)screen;
+                        osuScreen.Beatmap.Value = beatmapManager.GetWorkingBeatmap(b);
+                        screen.Push(new Editor());
+                    }, new[] { typeof(MainMenu), typeof(SongSelect) });
+                };
+            }
+
+            return menuItem;
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
