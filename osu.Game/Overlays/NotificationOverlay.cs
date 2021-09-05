@@ -172,7 +172,7 @@ namespace osu.Game.Overlays
 
         private void playDebouncedSample(string sampleName)
         {
-            if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > 50)
+            if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > OsuGameBase.SAMPLE_DEBOUNCE_TIME)
             {
                 audio.Samples.Get(sampleName)?.Play();
                 lastSamplePlayback = Time.Current;
