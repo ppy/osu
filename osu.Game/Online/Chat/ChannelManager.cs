@@ -263,7 +263,7 @@ namespace osu.Game.Online.Chat
                         break;
                     }
 
-                    var args = content.Split(" ");
+                    var args = content.Split(' ', 2);
 
                     var request = new GetUserRequest(args[0]);
                     request.Success += user =>
@@ -271,12 +271,12 @@ namespace osu.Game.Online.Chat
                         OpenPrivateChannel(user);
                         var message = new Message
                         {
-                            Content = string.Join(" ", args[1..]),
+                            Content = args[1],
                             Sender = user,
                             IsAction = false,
                             ChannelId = CurrentChannel.Value.Id,
                             Timestamp = DateTimeOffset.Now,
-                            DisplayContent = string.Join(" ", args[1..])
+                            DisplayContent = args[1],
                         };
                         var messageRequest = new PostMessageRequest(message);
                         messageRequest.Failure += e => Logger.Error(e, $"Message to user {user} failed to send.", LoggingTarget.Network);
