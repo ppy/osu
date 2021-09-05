@@ -105,9 +105,6 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private MusicController music { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private OsuGame game { get; set; }
-
         public Editor(EditorLoader loader = null)
         {
             this.loader = loader;
@@ -735,16 +732,12 @@ namespace osu.Game.Screens.Edit
 
         private void switchToDifficulty(BeatmapInfo beatmapInfo)
         {
-            if (loader != null)
-                loader.ValidForResume = true;
+            if (loader == null)
+                return;
 
-            game?.PerformFromScreen(screen =>
-            {
-                if (screen == null || screen != loader)
-                    return;
-
-                loader.PushEditor(beatmapInfo);
-            }, new[] { typeof(EditorLoader) });
+            loader.ValidForResume = true;
+            this.Exit();
+            loader.PushEditor(beatmapInfo);
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
