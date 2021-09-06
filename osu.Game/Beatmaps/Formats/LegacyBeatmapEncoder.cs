@@ -170,24 +170,22 @@ namespace osu.Game.Beatmaps.Formats
             if (beatmap.ControlPointInfo.Groups.Count == 0)
                 return;
 
+            var legacyControlPoints = new LegacyControlPointInfo();
+            foreach (var point in beatmap.ControlPointInfo.AllControlPoints)
+                legacyControlPoints.Add(point.Time, point.DeepClone());
+
             writer.WriteLine("[TimingPoints]");
 
-            if (!(beatmap.ControlPointInfo is LegacyControlPointInfo))
+            SampleControlPoint lastRelevantSamplePoint = null;
+            DifficultyControlPoint lastRelevantDifficultyPoint = null;
+
+            bool isOsuRuleset = beatmap.BeatmapInfo.RulesetID == 0;
+
+            // iterate over hitobjects and pull out all required sample and difficulty changes
+            foreach (var h in beatmap.HitObjects)
             {
-                var legacyControlPoints = new LegacyControlPointInfo();
-
-                foreach (var point in beatmap.ControlPointInfo.AllControlPoints)
-                    legacyControlPoints.Add(point.Time, point.DeepClone());
-
-                beatmap.ControlPointInfo = legacyControlPoints;
-
-                SampleControlPoint lastRelevantSamplePoint = null;
-                DifficultyControlPoint lastRelevantDifficultyPoint = null;
-
-                // iterate over hitobjects and pull out all required sample and difficulty changes
-                foreach (var h in beatmap.HitObjects)
+                if (isOsuRuleset)
                 {
-                    var hSamplePoint = h.SampleControlPoint;
                     var hDifficultyPoint = h.DifficultyControlPoint;
 
                     if (!hDifficultyPoint.IsRedundant(lastRelevantDifficultyPoint))
@@ -195,19 +193,26 @@ namespace osu.Game.Beatmaps.Formats
                         legacyControlPoints.Add(hDifficultyPoint.Time, hDifficultyPoint);
                         lastRelevantDifficultyPoint = hDifficultyPoint;
                     }
-
-                    if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
-                    {
-                        legacyControlPoints.Add(hSamplePoint.Time, hSamplePoint);
-                        lastRelevantSamplePoint = hSamplePoint;
-                    }
                 }
 
-                // In the future we may want to pull out approach rate changes from EffectPoints (and create DifficultyControlPoints to handle them).
-                // This requires special consideration due to precision mismatches (see implementation of LegacyDifficultyControlPoint).
+                var hSamplePoint = h.SampleControlPoint;
+
+                if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
+                {
+                    legacyControlPoints.Add(hSamplePoint.Time, hSamplePoint);
+                    lastRelevantSamplePoint = hSamplePoint;
+                }
             }
 
-            foreach (var group in beatmap.ControlPointInfo.Groups)
+            // handle scroll speed, which is stored as "slider velocity" in legacy formats.
+            // note that this is only relevant for mania beatmaps.
+            if (!isOsuRuleset)
+            {
+                foreach (var point in legacyControlPoints.EffectPoints)
+                    legacyControlPoints.Add(point.Time, new DifficultyControlPoint { SliderVelocity = point.ScrollSpeed });
+            }
+
+            foreach (var group in legacyControlPoints.Groups)
             {
                 var groupTimingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
@@ -220,7 +225,7 @@ namespace osu.Game.Beatmaps.Formats
                 }
 
                 // Output any remaining effects as secondary non-timing control point.
-                var difficultyPoint = ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(group.Time);
+                var difficultyPoint = legacyControlPoints.DifficultyPointAt(group.Time);
                 writer.Write(FormattableString.Invariant($"{group.Time},"));
                 writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SliderVelocity},"));
                 outputControlPointAt(group.Time, false);
@@ -228,8 +233,8 @@ namespace osu.Game.Beatmaps.Formats
 
             void outputControlPointAt(double time, bool isTimingPoint)
             {
-                var samplePoint = ((LegacyControlPointInfo)beatmap.ControlPointInfo).SamplePointAt(time);
-                var effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
+                var samplePoint = legacyControlPoints.SamplePointAt(time);
+                var effectPoint = legacyControlPoints.EffectPointAt(time);
 
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
                 HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
@@ -241,7 +246,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (effectPoint.OmitFirstBarLine)
                     effectFlags |= LegacyEffectFlags.OmitFirstBarLine;
 
-                writer.Write(FormattableString.Invariant($"{(int)beatmap.ControlPointInfo.TimingPointAt(time).TimeSignature},"));
+                writer.Write(FormattableString.Invariant($"{(int)legacyControlPoints.TimingPointAt(time).TimeSignature},"));
                 writer.Write(FormattableString.Invariant($"{(int)toLegacySampleBank(tempHitSample.Bank)},"));
                 writer.Write(FormattableString.Invariant($"{toLegacyCustomSampleBank(tempHitSample)},"));
                 writer.Write(FormattableString.Invariant($"{tempHitSample.Volume},"));

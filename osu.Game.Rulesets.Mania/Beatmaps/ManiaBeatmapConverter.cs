@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
@@ -47,6 +49,26 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             if (IsForCurrentRuleset)
             {
+                if (beatmap.ControlPointInfo is LegacyControlPointInfo legacyControlPoints)
+                {
+                    // convert all slider velocity adjustments to scroll speed adjustments.
+                    foreach (var controlPoint in legacyControlPoints.DifficultyPoints.ToArray())
+                    {
+                        double time = controlPoint.Time;
+
+                        var reference = legacyControlPoints.EffectPointAt(time);
+
+                        var scrollControlPoint = new EffectControlPoint();
+                        scrollControlPoint.CopyFrom(reference);
+                        scrollControlPoint.ScrollSpeed = controlPoint.SliderVelocity;
+
+                        legacyControlPoints.Add(time, scrollControlPoint);
+
+                        // remove the DifficultyControlPoint as we don't need them any more.
+                        legacyControlPoints.GroupAt(time).Remove(controlPoint);
+                    }
+                }
+
                 TargetColumns = GetColumnCountForNonConvert(beatmap.BeatmapInfo);
 
                 if (TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
