@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             KiaiModeBindable = { Disabled = true },
             OmitFirstBarLineBindable = { Disabled = true },
-            ApproachRateBindable = { Disabled = true }
+            ScrollSpeedBindable = { Disabled = true }
         };
 
         /// <summary>
@@ -22,9 +22,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         public readonly BindableBool OmitFirstBarLineBindable = new BindableBool();
 
         /// <summary>
-        /// The relative approach rate at this control point.
+        /// The relative scroll speed at this control point.
         /// </summary>
-        public readonly BindableDouble ApproachRateBindable = new BindableDouble(1)
+        public readonly BindableDouble ScrollSpeedBindable = new BindableDouble(1)
         {
             Precision = 0.01,
             Default = 1,
@@ -33,12 +33,12 @@ namespace osu.Game.Beatmaps.ControlPoints
         };
 
         /// <summary>
-        /// The relative approach rate.
+        /// The relative scroll speed.
         /// </summary>
-        public double ApproachRate
+        public double ScrollSpeed
         {
-            get => ApproachRateBindable.Value;
-            set => ApproachRateBindable.Value = value;
+            get => ScrollSpeedBindable.Value;
+            set => ScrollSpeedBindable.Value = value;
         }
 
         public override Color4 GetRepresentingColour(OsuColour colours) => colours.Purple;
@@ -71,13 +71,13 @@ namespace osu.Game.Beatmaps.ControlPoints
                && existing is EffectControlPoint existingEffect
                && KiaiMode == existingEffect.KiaiMode
                && OmitFirstBarLine == existingEffect.OmitFirstBarLine
-               && ApproachRate == existingEffect.ApproachRate;
+               && ScrollSpeed == existingEffect.ScrollSpeed;
 
         public override void CopyFrom(ControlPoint other)
         {
             KiaiMode = ((EffectControlPoint)other).KiaiMode;
             OmitFirstBarLine = ((EffectControlPoint)other).OmitFirstBarLine;
-            ApproachRate = ((EffectControlPoint)other).ApproachRate;
+            ScrollSpeed = ((EffectControlPoint)other).ScrollSpeed;
 
             base.CopyFrom(other);
         }
