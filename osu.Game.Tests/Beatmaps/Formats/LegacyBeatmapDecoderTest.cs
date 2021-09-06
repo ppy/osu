@@ -280,8 +280,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
 
-                Assert.That(controlPoints?.DifficultyPointAt(0).SliderVelocity, Is.EqualTo(0.5).Within(0.1));
-                Assert.That(controlPoints?.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(0).SliderVelocity, Is.EqualTo(0.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1).Within(0.1));
             }
         }
 
