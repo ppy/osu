@@ -12,6 +12,8 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
     {
         private readonly Bindable<bool> kiaiMode;
         private readonly Bindable<bool> omitBarLine;
+        private readonly BindableNumber<double> scrollSpeed;
+
         private AttributeText kiaiModeBubble;
         private AttributeText omitBarLineBubble;
 
@@ -20,6 +22,7 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
         {
             kiaiMode = effect.KiaiModeBindable.GetBoundCopy();
             omitBarLine = effect.OmitFirstBarLineBindable.GetBoundCopy();
+            scrollSpeed = effect.ScrollSpeedBindable.GetBoundCopy();
         }
 
         [BackgroundDependencyLoader]
@@ -27,6 +30,10 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
         {
             Content.AddRange(new Drawable[]
             {
+                new AttributeProgressBar(Point)
+                {
+                    Current = scrollSpeed,
+                },
                 kiaiModeBubble = new AttributeText(Point) { Text = "kiai" },
                 omitBarLineBubble = new AttributeText(Point) { Text = "no barline" },
             });

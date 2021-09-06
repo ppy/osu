@@ -148,10 +148,16 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // Generate the timing points, making non-timing changes use the previous timing change and vice-versa
             var timingChanges = allPoints.Select(c =>
             {
-                if (c is TimingControlPoint timingPoint)
-                    lastTimingPoint = timingPoint;
-                else if (c is EffectControlPoint difficultyPoint)
-                    lastEffectPoint = difficultyPoint;
+                switch (c)
+                {
+                    case TimingControlPoint timingPoint:
+                        lastTimingPoint = timingPoint;
+                        break;
+
+                    case EffectControlPoint difficultyPoint:
+                        lastEffectPoint = difficultyPoint;
+                        break;
+                }
 
                 return new MultiplierControlPoint(c.Time)
                 {
