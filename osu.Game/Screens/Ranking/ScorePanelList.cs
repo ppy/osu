@@ -47,6 +47,8 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         public bool IsScrolledToEnd => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.IsScrolledToEnd(scroll_endpoint_distance);
 
+        public bool AllPanelsVisible => flow.All(p => p.IsPresent);
+
         /// <summary>
         /// The current scroll position.
         /// </summary>

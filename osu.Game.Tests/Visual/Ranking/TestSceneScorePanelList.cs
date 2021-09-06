@@ -159,6 +159,9 @@ namespace osu.Game.Tests.Visual.Ranking
             var firstScore = new TestScoreInfo(new OsuRuleset().RulesetInfo);
             var secondScore = new TestScoreInfo(new OsuRuleset().RulesetInfo);
 
+            firstScore.User.Username = "A";
+            secondScore.User.Username = "B";
+
             createListStep(() => new ScorePanelList());
 
             AddStep("add scores and select first", () =>
@@ -167,6 +170,8 @@ namespace osu.Game.Tests.Visual.Ranking
                 list.AddScore(secondScore);
                 list.SelectedScore.Value = firstScore;
             });
+
+            AddUntilStep("wait for load", () => list.AllPanelsVisible);
 
             assertScoreState(firstScore, true);
             assertScoreState(secondScore, false);

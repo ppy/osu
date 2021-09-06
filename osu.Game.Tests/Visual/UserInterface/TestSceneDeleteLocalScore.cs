@@ -158,14 +158,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scores[0].OnlineScoreID));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s != scores[0]));
         }
 
         [Test]
         public void TestDeleteViaDatabase()
         {
             AddStep("delete top score", () => scoreManager.Delete(scores[0]));
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scores[0].OnlineScoreID));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s != scores[0]));
         }
     }
 }

@@ -160,6 +160,8 @@ namespace osu.Game.Tests.Visual.Playlists
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 }));
             });
+
+            AddUntilStep("wait for load", () => resultsScreen.ChildrenOfType<ScorePanelList>().FirstOrDefault()?.AllPanelsVisible == true);
         }
 
         private void waitForDisplay()
