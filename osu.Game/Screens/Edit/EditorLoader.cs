@@ -3,7 +3,6 @@
 
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -34,10 +33,11 @@ namespace osu.Game.Screens.Edit
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
+
             // the push cannot happen in OnEntering() or similar (even if scheduled), because the transition from main menu will look bad.
             // that is because this screen pushing the editor makes it no longer current, and OsuScreen checks if the screen is current
             // before enqueueing this screen's LogoArriving onto the logo animation sequence.
-            logo.Delay(300).Schedule(pushEditor);
+            pushEditor();
         }
 
         private void pushEditor()
