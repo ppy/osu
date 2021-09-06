@@ -16,6 +16,7 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
 
         private AttributeText kiaiModeBubble;
         private AttributeText omitBarLineBubble;
+        private AttributeText text;
 
         public EffectRowAttribute(EffectControlPoint effect)
             : base(effect, "effect")
@@ -34,12 +35,16 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
                 {
                     Current = scrollSpeed,
                 },
+                text = new AttributeText(Point) { Width = 45 },
                 kiaiModeBubble = new AttributeText(Point) { Text = "kiai" },
                 omitBarLineBubble = new AttributeText(Point) { Text = "no barline" },
             });
 
             kiaiMode.BindValueChanged(enabled => kiaiModeBubble.FadeTo(enabled.NewValue ? 1 : 0), true);
             omitBarLine.BindValueChanged(enabled => omitBarLineBubble.FadeTo(enabled.NewValue ? 1 : 0), true);
+            scrollSpeed.BindValueChanged(_ => updateText(), true);
         }
+
+        private void updateText() => text.Text = $"{scrollSpeed.Value:n2}x";
     }
 }

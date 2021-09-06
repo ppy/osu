@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
                 },
                 text = new AttributeText(Point)
                 {
-                    Width = 40,
+                    Width = 45,
                 },
             });
 
