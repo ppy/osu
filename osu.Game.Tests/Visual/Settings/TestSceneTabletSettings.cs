@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -93,17 +91,9 @@ namespace osu.Game.Tests.Visual.Settings
             ensureValid();
         }
 
-        private void ensureValid()
-        {
-            AddUntilStep("wait for transforms", () => settings.AreaSelection.ChildrenOfType<Container>().All(c => !c.Transforms.Any()));
-            AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
-        }
+        private void ensureValid() => AddAssert("area valid", () => settings.AreaSelection.IsWithinBounds);
 
-        private void ensureInvalid()
-        {
-            AddUntilStep("wait for transforms", () => settings.AreaSelection.ChildrenOfType<Container>().All(c => !c.Transforms.Any()));
-            AddAssert("area invalid", () => !settings.AreaSelection.IsWithinBounds);
-        }
+        private void ensureInvalid() => AddAssert("area invalid", () => !settings.AreaSelection.IsWithinBounds);
 
         public class TestTabletHandler : ITabletHandler
         {
