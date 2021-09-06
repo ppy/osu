@@ -10,14 +10,14 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal class DifficultySection : Section<DifficultyControlPoint>
     {
-        private SliderWithTextBoxInput<double> multiplierSlider;
+        private SliderWithTextBoxInput<double> sliderVelocitySlider;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Flow.AddRange(new[]
             {
-                multiplierSlider = new SliderWithTextBoxInput<double>("Speed Multiplier")
+                sliderVelocitySlider = new SliderWithTextBoxInput<double>("Slider Velocity")
                 {
                     Current = new DifficultyControlPoint().SliderVelocityBindable,
                     KeyboardStep = 0.1f
@@ -38,8 +38,8 @@ namespace osu.Game.Screens.Edit.Timing
                 if (selectedPointBindable.Precision < expectedPrecision)
                     selectedPointBindable.Precision = expectedPrecision;
 
-                multiplierSlider.Current = selectedPointBindable;
-                multiplierSlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+                sliderVelocitySlider.Current = selectedPointBindable;
+                sliderVelocitySlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
         }
 
