@@ -114,29 +114,30 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             areaOffset.BindTo(handler.AreaOffset);
             areaOffset.BindValueChanged(val =>
             {
-                usableAreaContainer.MoveTo(val.NewValue, 100, Easing.OutQuint)
-                                   .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
+                usableAreaContainer.MoveTo(val.NewValue, 100, Easing.OutQuint);
+                checkBounds();
             }, true);
 
             areaSize.BindTo(handler.AreaSize);
             areaSize.BindValueChanged(val =>
             {
-                usableAreaContainer.ResizeTo(val.NewValue, 100, Easing.OutQuint)
-                                   .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
+                usableAreaContainer.ResizeTo(val.NewValue, 100, Easing.OutQuint);
 
                 int x = (int)val.NewValue.X;
                 int y = (int)val.NewValue.Y;
                 int commonDivider = greatestCommonDivider(x, y);
 
                 usableAreaText.Text = $"{(float)x / commonDivider}:{(float)y / commonDivider}";
+                checkBounds();
             }, true);
 
             rotation.BindTo(handler.Rotation);
             rotation.BindValueChanged(val =>
             {
-                usableAreaContainer.RotateTo(val.NewValue, 100, Easing.OutQuint)
-                                   .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
+                usableAreaContainer.RotateTo(val.NewValue, 100, Easing.OutQuint);
                 tabletContainer.RotateTo(-val.NewValue, 800, Easing.OutQuint);
+
+                checkBounds();
             }, true);
 
             tablet.BindTo(handler.Tablet);
@@ -174,22 +175,33 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (tablet.Value == null)
                 return;
 
-            // All of this manual logic is just to get around floating point issues when doing a contains check on the screen quads.
-            // This is best effort, as it's only used for display purposes. If we need for anything more, manual math on the raw values should be preferred.
-            var containerQuad = tabletContainer.ScreenSpaceDrawQuad.AABBFloat.Inflate(1);
-            var usableAreaQuad = Quad.FromRectangle(usableAreaContainer.ScreenSpaceDrawQuad.AABBFloat);
+            // allow for some degree of floating point error, as we don't care about being perfect here.
+            const float lenience = 0.5f;
+
+            var tabletArea = new Quad(-lenience, -lenience, tablet.Value.Size.X + lenience * 2, tablet.Value.Size.Y + lenience * 2);
+
+            var halfUsableArea = areaSize.Value / 2;
+            var offset = areaOffset.Value;
+
+            var usableAreaQuad = new Quad(
+                new Vector2(-halfUsableArea.X, -halfUsableArea.Y),
+                new Vector2(halfUsableArea.X, -halfUsableArea.Y),
+                new Vector2(-halfUsableArea.X, halfUsableArea.Y),
+                new Vector2(halfUsableArea.X, halfUsableArea.Y)
+            );
 
             var matrix = Matrix3.Identity;
-            MatrixExtensions.TranslateFromLeft(ref matrix, usableAreaQuad.Centre);
+
+            MatrixExtensions.TranslateFromLeft(ref matrix, offset);
             MatrixExtensions.RotateFromLeft(ref matrix, MathUtils.DegreesToRadians(rotation.Value));
-            MatrixExtensions.TranslateFromLeft(ref matrix, -usableAreaQuad.Centre);
+
             usableAreaQuad *= matrix;
 
             IsWithinBounds =
-                containerQuad.Contains(usableAreaQuad.TopLeft) &&
-                containerQuad.Contains(usableAreaQuad.TopRight) &&
-                containerQuad.Contains(usableAreaQuad.BottomLeft) &&
-                containerQuad.Contains(usableAreaQuad.BottomRight);
+                tabletArea.Contains(usableAreaQuad.TopLeft) &&
+                tabletArea.Contains(usableAreaQuad.TopRight) &&
+                tabletArea.Contains(usableAreaQuad.BottomLeft) &&
+                tabletArea.Contains(usableAreaQuad.BottomRight);
 
             usableFill.FadeColour(IsWithinBounds ? colour.Blue : colour.RedLight, 100);
         }
