@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,6 +9,7 @@ using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osuTK;
 
@@ -49,6 +51,27 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("Test with tall tablet", () => tabletHandler.SetTabletSize(new Vector2(100, 300)));
             AddStep("Test with very tall tablet", () => tabletHandler.SetTabletSize(new Vector2(100, 700)));
             AddStep("Test no tablet present", () => tabletHandler.SetTabletSize(Vector2.Zero));
+        }
+
+        [Test]
+        public void TestWideAspectRatioValidity()
+        {
+            AddStep("Test with wide tablet", () => tabletHandler.SetTabletSize(new Vector2(160, 100)));
+
+            AddStep("Reset to full area", () => settings.ChildrenOfType<DangerousSettingsButton>().First().TriggerClick());
+            ensureValid();
+
+            AddStep("rotate 10", () => tabletHandler.Rotation.Value = 10);
+            ensureInvalid();
+
+            AddStep("scale down", () => tabletHandler.AreaSize.Value *= 0.9f);
+            ensureInvalid();
+
+            AddStep("scale down", () => tabletHandler.AreaSize.Value *= 0.9f);
+            ensureInvalid();
+
+            AddStep("scale down", () => tabletHandler.AreaSize.Value *= 0.9f);
+            ensureValid();
         }
 
         [Test]
