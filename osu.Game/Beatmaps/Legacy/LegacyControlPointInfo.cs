@@ -73,14 +73,16 @@ namespace osu.Game.Beatmaps.Legacy
             {
                 case SampleControlPoint typed:
                     samplePoints.Add(typed);
-                    break;
+                    return;
 
                 case DifficultyControlPoint typed:
                     difficultyPoints.Add(typed);
+                    return;
+
+                default:
+                    base.GroupItemAdded(controlPoint);
                     break;
             }
-
-            base.GroupItemAdded(controlPoint);
         }
 
         protected override void GroupItemRemoved(ControlPoint controlPoint)
