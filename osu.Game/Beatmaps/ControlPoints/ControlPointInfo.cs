@@ -276,6 +276,9 @@ namespace osu.Game.Beatmaps.ControlPoints
                 case EffectControlPoint typed:
                     effectPoints.Add(typed);
                     break;
+
+                default:
+                    throw new ArgumentException($"A control point of unexpected type {controlPoint.GetType()} was added to this {nameof(ControlPointInfo)}");
             }
         }
 
