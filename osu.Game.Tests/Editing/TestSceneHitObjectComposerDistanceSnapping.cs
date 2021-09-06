@@ -56,8 +56,6 @@ namespace osu.Game.Tests.Editing
 
             composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 1;
             composer.EditorBeatmap.ControlPointInfo.Clear();
-
-            composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SliderVelocity = 1 });
             composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
         });
 

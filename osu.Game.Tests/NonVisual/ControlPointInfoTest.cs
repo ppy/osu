@@ -208,7 +208,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestOrdering()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             cpi.Add(0, new TimingControlPoint());
             cpi.Add(1000, new TimingControlPoint { BeatLength = 500 });

@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     // completely ignore "legacy" types, which have been moved to HitObjects.
                     // even though these would mostly be ignored by the Add call, they will still be available in groups,
                     // which isn't what we want to be testing here.
-                    if (point is SampleControlPoint)
+                    if (point is SampleControlPoint || point is DifficultyControlPoint)
                         continue;
 
                     newControlPoints.Add(point.Time, point.DeepClone());
