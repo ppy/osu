@@ -498,7 +498,7 @@ namespace osu.Game.Screens.Edit
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
-                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave, cancelPendingDifficultySwitch));
+                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave, cancelExit));
                     return true;
                 }
             }
@@ -750,7 +750,7 @@ namespace osu.Game.Screens.Edit
             loader.ScheduleDifficultySwitch(beatmapInfo);
         }
 
-        private void cancelPendingDifficultySwitch()
+        private void cancelExit()
         {
             if (loader == null)
                 return;
