@@ -301,6 +301,9 @@ namespace osu.Game.Screens.Ranking
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (expandedPanel == null)
+                return base.OnKeyDown(e);
+
             var expandedPanelIndex = flow.GetPanelIndex(expandedPanel.Score);
 
             switch (e.Key)
