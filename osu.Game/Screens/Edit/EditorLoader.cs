@@ -48,7 +48,10 @@ namespace osu.Game.Screens.Edit
 
         public void ScheduleDifficultySwitch(BeatmapInfo beatmapInfo)
         {
-            CancelDifficultySwitch();
+            scheduledDifficultySwitch?.Cancel();
+            ValidForResume = true;
+
+            this.MakeCurrent();
             scheduledDifficultySwitch = Schedule(() =>
             {
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
@@ -56,6 +59,10 @@ namespace osu.Game.Screens.Edit
             });
         }
 
-        public void CancelDifficultySwitch() => scheduledDifficultySwitch?.Cancel();
+        public void CancelPendingDifficultySwitch()
+        {
+            scheduledDifficultySwitch?.Cancel();
+            ValidForResume = false;
+        }
     }
 }

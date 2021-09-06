@@ -740,24 +740,9 @@ namespace osu.Game.Screens.Edit
             return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, switchToDifficulty);
         }
 
-        private void switchToDifficulty(BeatmapInfo beatmapInfo)
-        {
-            if (loader == null)
-                return;
+        private void switchToDifficulty(BeatmapInfo beatmapInfo) => loader?.ScheduleDifficultySwitch(beatmapInfo);
 
-            loader.ValidForResume = true;
-            this.Exit();
-            loader.ScheduleDifficultySwitch(beatmapInfo);
-        }
-
-        private void cancelExit()
-        {
-            if (loader == null)
-                return;
-
-            loader.ValidForResume = false;
-            loader.CancelDifficultySwitch();
-        }
+        private void cancelExit() => loader?.CancelPendingDifficultySwitch();
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 
