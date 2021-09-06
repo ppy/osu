@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public override Color4 GetRepresentingColour(OsuColour colours) => colours.Lime1;
 
         /// <summary>
-        /// The speed multiplier at this control point.
+        /// The slider velocity at this control point.
         /// </summary>
         public double SliderVelocity
         {
