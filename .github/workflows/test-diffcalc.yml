@@ -156,6 +156,7 @@ jobs:
               AND m.mods = p.mods
             WHERE abs(m.diff_unified - p.diff_unified) > 0.1
             ORDER BY abs(m.diff_unified - p.diff_unified)
-              DESC;"
+              DESC
+            LIMIT 10000;"
 
       # Todo: Run ppcalc
