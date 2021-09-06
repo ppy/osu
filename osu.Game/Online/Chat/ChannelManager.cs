@@ -269,6 +269,10 @@ namespace osu.Game.Online.Chat
                     request.Success += user =>
                     {
                         OpenPrivateChannel(user);
+
+                        if (args.Length < 2)
+                            return; // Only open the channel if no message was provided
+
                         var message = new Message
                         {
                             Content = args[1],
