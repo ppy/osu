@@ -68,7 +68,8 @@ namespace osu.Game.Online.Leaderboards
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
         {
-            this.Score = score;
+            Score = score;
+
             this.rank = rank;
             this.allowHighlight = allowHighlight;
 
