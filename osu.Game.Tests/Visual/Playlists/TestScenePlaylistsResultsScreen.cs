@@ -167,6 +167,7 @@ namespace osu.Game.Tests.Visual.Playlists
         private void waitForDisplay()
         {
             AddUntilStep("wait for request to complete", () => requestComplete);
+            AddUntilStep("wait for panels to be visible", () => resultsScreen.ChildrenOfType<ScorePanelList>().FirstOrDefault()?.AllPanelsVisible == true);
             AddWaitStep("wait for display", 5);
         }
 
