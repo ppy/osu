@@ -20,6 +20,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class TabletSettings : SettingsSubsection
     {
+        public TabletAreaSelection AreaSelection { get; private set; }
+
         private readonly ITabletHandler tabletHandler;
 
         private readonly Bindable<bool> enabled = new BindableBool(true);
@@ -121,7 +123,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new TabletAreaSelection(tabletHandler)
+                        AreaSelection = new TabletAreaSelection(tabletHandler)
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 300,

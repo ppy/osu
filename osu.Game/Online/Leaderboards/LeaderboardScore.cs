@@ -37,6 +37,8 @@ namespace osu.Game.Online.Leaderboards
     {
         public const float HEIGHT = 60;
 
+        public readonly ScoreInfo Score;
+
         private const float corner_radius = 5;
         private const float edge_margin = 5;
         private const float background_alpha = 0.25f;
@@ -44,7 +46,6 @@ namespace osu.Game.Online.Leaderboards
 
         protected Container RankContainer { get; private set; }
 
-        private readonly ScoreInfo score;
         private readonly int? rank;
         private readonly bool allowHighlight;
 
@@ -73,7 +74,8 @@ namespace osu.Game.Online.Leaderboards
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true, bool isSongSelect = false)
         {
-            this.score = score;
+            Score = score;
+
             this.rank = rank;
             this.allowHighlight = allowHighlight;
             this.isSongSelect = isSongSelect;
@@ -85,14 +87,13 @@ namespace osu.Game.Online.Leaderboards
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager, MConfigManager config)
         {
-            var user = score.User;
+            var user = Score.User;
 
             config.BindWith(MSetting.OptUI, optui);
 
-            optui.ValueChanged += _ => updateTooltip();
-            updateTooltip();
+            optui.BindValueChanged(_ => updateTooltip(), true);
 
-            statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
+            statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
 
             ClickableAvatar innerAvatar;
 
@@ -211,7 +212,7 @@ namespace osu.Game.Online.Leaderboards
                                         {
                                             TextColour = Color4.White,
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
-                                            Current = scoreManager.GetBindableTotalScoreString(score),
+                                            Current = scoreManager.GetBindableTotalScoreString(Score),
                                             Font = OsuFont.Numeric.With(size: 23),
                                         },
                                         RankContainer = new Container
@@ -219,7 +220,7 @@ namespace osu.Game.Online.Leaderboards
                                             Size = new Vector2(40f, 20f),
                                             Children = new[]
                                             {
-                                                scoreRank = new UpdateableRank(score.Rank)
+                                                scoreRank = new UpdateableRank(Score.Rank)
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
@@ -236,7 +237,7 @@ namespace osu.Game.Online.Leaderboards
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(1),
-                                    ChildrenEnumerable = score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
+                                    ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
                         },
@@ -251,7 +252,7 @@ namespace osu.Game.Online.Leaderboards
         {
             if (optui.Value && isSongSelect)
             {
-                TooltipText = $"于 {score.Date.ToLocalTime():g} 游玩";
+                TooltipText = $"于 {Score.Date.ToLocalTime():g} 游玩";
                 return;
             }
 
@@ -413,14 +414,14 @@ namespace osu.Game.Online.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
-                    items.Add(new OsuMenuItem("使用这些mod游玩", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
+                if (Score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                    items.Add(new OsuMenuItem("使用这些mod游玩", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
 
-                if (score.Files?.Count > 0)
-                    items.Add(new OsuMenuItem("导出", MenuItemType.Standard, () => scoreManager.Export(score)));
+                if (Score.Files?.Count > 0)
+                    items.Add(new OsuMenuItem("导出", MenuItemType.Standard, () => scoreManager.Export(Score)));
 
-                if (score.ID != 0)
-                    items.Add(new OsuMenuItem("删除", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
+                if (Score.ID != 0)
+                    items.Add(new OsuMenuItem("删除", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
 
                 return items.ToArray();
             }

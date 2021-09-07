@@ -11,7 +11,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Allocation;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Cursor;
-using System.ComponentModel;
 using osu.Framework.Extensions;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;

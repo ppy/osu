@@ -24,6 +24,12 @@ namespace osu.Game.Beatmaps.Formats
     {
         public const int LATEST_VERSION = 128;
 
+        /// <summary>
+        /// osu! is generally slower than taiko, so a factor is added to increase
+        /// speed. This must be used everywhere slider length or beat length is used.
+        /// </summary>
+        public const float LEGACY_TAIKO_VELOCITY_MULTIPLIER = 1.4f;
+
         private readonly IBeatmap beatmap;
 
         [CanBeNull]
@@ -80,7 +86,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.BeatmapInfo.AudioLeadIn}"));
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.BeatmapInfo.Countdown}"));
-            writer.WriteLine(FormattableString.Invariant($"SampleSet: {toLegacySampleBank(beatmap.ControlPointInfo.SamplePointAt(double.MinValue).SampleBank)}"));
+            writer.WriteLine(FormattableString.Invariant($"SampleSet: {toLegacySampleBank((beatmap.HitObjects.FirstOrDefault()?.SampleControlPoint ?? SampleControlPoint.DEFAULT).SampleBank)}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
             writer.WriteLine(FormattableString.Invariant($"Mode: {beatmap.BeatmapInfo.RulesetID}"));
             writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? '1' : '0')}"));
@@ -140,9 +146,9 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"OverallDifficulty: {beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty}"));
             writer.WriteLine(FormattableString.Invariant($"ApproachRate: {beatmap.BeatmapInfo.BaseDifficulty.ApproachRate}"));
 
-            // Taiko adjusts the slider multiplier (see: TaikoBeatmapConverter.LEGACY_VELOCITY_MULTIPLIER)
+            // Taiko adjusts the slider multiplier (see: LEGACY_TAIKO_VELOCITY_MULTIPLIER)
             writer.WriteLine(beatmap.BeatmapInfo.RulesetID == 1
-                ? FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / 1.4f}")
+                ? FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / LEGACY_TAIKO_VELOCITY_MULTIPLIER}")
                 : FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier}"));
 
             writer.WriteLine(FormattableString.Invariant($"SliderTickRate: {beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate}"));
@@ -166,6 +172,30 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[TimingPoints]");
 
+            if (!(beatmap.ControlPointInfo is LegacyControlPointInfo))
+            {
+                var legacyControlPoints = new LegacyControlPointInfo();
+
+                foreach (var point in beatmap.ControlPointInfo.AllControlPoints)
+                    legacyControlPoints.Add(point.Time, point.DeepClone());
+
+                beatmap.ControlPointInfo = legacyControlPoints;
+
+                SampleControlPoint lastRelevantSamplePoint = null;
+
+                // iterate over hitobjects and pull out all required sample changes
+                foreach (var h in beatmap.HitObjects)
+                {
+                    var hSamplePoint = h.SampleControlPoint;
+
+                    if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
+                    {
+                        legacyControlPoints.Add(hSamplePoint.Time, hSamplePoint);
+                        lastRelevantSamplePoint = hSamplePoint;
+                    }
+                }
+            }
+
             foreach (var group in beatmap.ControlPointInfo.Groups)
             {
                 var groupTimingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
@@ -175,19 +205,19 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     writer.Write(FormattableString.Invariant($"{groupTimingPoint.Time},"));
                     writer.Write(FormattableString.Invariant($"{groupTimingPoint.BeatLength},"));
-                    outputControlPointEffectsAt(groupTimingPoint.Time, true);
+                    outputControlPointAt(groupTimingPoint.Time, true);
                 }
 
                 // Output any remaining effects as secondary non-timing control point.
                 var difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(group.Time);
                 writer.Write(FormattableString.Invariant($"{group.Time},"));
                 writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SpeedMultiplier},"));
-                outputControlPointEffectsAt(group.Time, false);
+                outputControlPointAt(group.Time, false);
             }
 
-            void outputControlPointEffectsAt(double time, bool isTimingPoint)
+            void outputControlPointAt(double time, bool isTimingPoint)
             {
-                var samplePoint = beatmap.ControlPointInfo.SamplePointAt(time);
+                var samplePoint = ((LegacyControlPointInfo)beatmap.ControlPointInfo).SamplePointAt(time);
                 var effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
 
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)

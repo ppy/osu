@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
-        protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo);
+        protected override Playfield CreatePlayfield() => new TaikoPlayfield();
 
         public override DrawableHitObject<TaikoHitObject> CreateDrawableRepresentation(TaikoHitObject h) => null;
 

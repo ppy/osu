@@ -20,12 +20,12 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="DiffPlex" Version="1.7.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.36" />
     <PackageReference Include="Humanizer" Version="2.11.10" />
     <PackageReference Include="MessagePack" Version="2.3.75" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="5.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
@@ -36,8 +36,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Realm" Version="10.3.0" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.827.0" />
-    <PackageReference Include="Sentry" Version="3.8.3" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.907.0" />
+    <PackageReference Include="Sentry" Version="3.9.0" />
     <PackageReference Include="SharpCompress" Version="0.28.3" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />

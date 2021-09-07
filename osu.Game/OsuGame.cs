@@ -112,6 +112,8 @@ namespace osu.Game
 
         protected Container ScreenOffsetContainer { get; private set; }
 
+        private Container overlayOffsetContainer;
+
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
 
@@ -128,6 +130,10 @@ namespace osu.Game
 
         public virtual StableStorage GetStorageForStableInstall() => null;
 
+        /// <summary>
+        /// Modified
+        /// private -> pubic
+        /// </summary>
         public float ToolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
         private IdleTracker idleTracker;
@@ -171,7 +177,7 @@ namespace osu.Game
 
         private readonly string[] args;
 
-        private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
+        private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
@@ -255,7 +261,7 @@ namespace osu.Game
         /// <param name="hideToolbar">Whether the toolbar should also be hidden.</param>
         public void CloseAllOverlays(bool hideToolbar = true)
         {
-            foreach (var overlay in overlays)
+            foreach (var overlay in focusedOverlays)
                 overlay.Hide();
 
             if (hideToolbar) Toolbar.Hide();
@@ -401,6 +407,9 @@ namespace osu.Game
                 case LinkAction.OpenUserProfile:
                     if (int.TryParse(link.Argument, out int userId))
                         ShowUser(userId);
+                    else
+                        ShowUser(link.Argument);
+
                     break;
 
                 case LinkAction.OpenWiki:
@@ -447,6 +456,12 @@ namespace osu.Game
         /// </summary>
         /// <param name="userId">The user to display.</param>
         public void ShowUser(int userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
+
+        /// <summary>
+        /// Show a user's profile as an overlay.
+        /// </summary>
+        /// <param name="username">The user to display.</param>
+        public void ShowUser(string username) => waitForReady(() => userProfile, _ => userProfile.ShowUser(username));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.
@@ -762,9 +777,16 @@ namespace osu.Game
                         },
                     }
                 },
-                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                overlayOffsetContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        overlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                    }
+                },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker,
                 new ConfineMouseTracker()
@@ -817,7 +839,6 @@ namespace osu.Game
 
             loadComponentSingleFile(Notifications.With(d =>
             {
-                d.GetToolbarHeight = () => ToolbarOffset;
                 d.Anchor = Anchor.TopRight;
                 d.Origin = Anchor.TopRight;
             }), rightFloatingOverlayContent.Add, true);
@@ -845,7 +866,7 @@ namespace osu.Game
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(Picture = new OnlinePictureOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
-            loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
+            loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
@@ -854,14 +875,12 @@ namespace osu.Game
 
             loadComponentSingleFile(new LoginOverlay
             {
-                GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new NowPlayingOverlay
             {
-                GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
@@ -992,8 +1011,8 @@ namespace osu.Game
             if (cache)
                 dependencies.CacheAs(component);
 
-            if (component is OverlayContainer overlay)
-                overlays.Add(overlay);
+            if (component is OsuFocusedOverlayContainer overlay)
+                focusedOverlays.Add(overlay);
 
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
@@ -1102,7 +1121,7 @@ namespace osu.Game
             base.UpdateAfterChildren();
 
             ScreenOffsetContainer.Padding = new MarginPadding { Top = ToolbarOffset };
-            overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
+            overlayOffsetContainer.Padding = new MarginPadding { Top = ToolbarOffset };
 
             var horizontalOffset = 0f;
 

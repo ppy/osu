@@ -12,9 +12,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal abstract class SetupSection : Container
+    public abstract class SetupSection : Container
     {
-        private readonly FillFlowContainer flow;
+        private FillFlowContainer flow;
 
         /// <summary>
         /// Used to align some of the child <see cref="LabelledDrawable{T}"/>s together to achieve a grid-like look.
@@ -31,7 +31,8 @@ namespace osu.Game.Screens.Edit.Setup
 
         public abstract LocalisableString Title { get; }
 
-        protected SetupSection()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
@@ -18,7 +17,7 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey
     {
         public int ID { get; set; }
 

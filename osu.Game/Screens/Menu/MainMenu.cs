@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate
                             {
                                 Beatmap.SetDefault();
-                                this.Push(new Editor());
+                                this.Push(new EditorLoader());
                             },
                             OnMvisButton = onMvis,
                             OnImportButton = onImport,

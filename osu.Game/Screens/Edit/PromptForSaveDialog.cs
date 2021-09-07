@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Edit
 {
     public class PromptForSaveDialog : PopupDialog
     {
-        public PromptForSaveDialog(Action exit, Action saveAndExit)
+        public PromptForSaveDialog(Action exit, Action saveAndExit, Action cancel)
         {
             HeaderText = "你要保存你的更改吗?";
 
@@ -30,6 +30,7 @@ namespace osu.Game.Screens.Edit
                 new PopupDialogCancelButton
                 {
                     Text = @"我点错了，继续编辑。",
+                    Action = cancel
                 },
             };
         }

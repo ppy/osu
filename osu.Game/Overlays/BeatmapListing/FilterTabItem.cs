@@ -71,10 +71,10 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private void updateState()
         {
-            text.FadeColour(IsHovered ? colourProvider.Light1 : getStateColour(), 200, Easing.OutQuint);
+            text.FadeColour(IsHovered ? colourProvider.Light1 : GetStateColour(), 200, Easing.OutQuint);
             text.Font = text.Font.With(weight: Active.Value ? FontWeight.SemiBold : FontWeight.Regular);
         }
 
-        private Color4 getStateColour() => Active.Value ? colourProvider.Content1 : colourProvider.Light2;
+        protected virtual Color4 GetStateColour() => Active.Value ? colourProvider.Content1 : colourProvider.Light2;
     }
 }
