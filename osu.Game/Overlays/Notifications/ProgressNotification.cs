@@ -150,12 +150,12 @@ namespace osu.Game.Overlays.Notifications
             colourCancelled = colours.Red;
         }
 
-        public override void Close(bool playSound = true)
+        public override void Close()
         {
             switch (State)
             {
                 case ProgressNotificationState.Cancelled:
-                    base.Close(playSound);
+                    base.Close();
                     break;
 
                 case ProgressNotificationState.Active:
