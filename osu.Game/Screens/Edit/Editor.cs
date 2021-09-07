@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -75,6 +76,9 @@ namespace osu.Game.Screens.Edit
 
         private Container<EditorScreen> screenContainer;
 
+        [CanBeNull]
+        private readonly EditorLoader loader;
+
         private EditorScreen currentScreen;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
@@ -100,6 +104,11 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private MusicController music { get; set; }
+
+        public Editor(EditorLoader loader = null)
+        {
+            this.loader = loader;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OsuConfigManager config)
@@ -489,7 +498,7 @@ namespace osu.Game.Screens.Edit
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
-                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
+                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave, cancelExit));
                     return true;
                 }
             }
@@ -704,9 +713,36 @@ namespace osu.Game.Screens.Edit
                 fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
+
+            var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
+
+            var difficultyItems = new List<MenuItem>();
+
+            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.RulesetID).OrderBy(group => group.Key))
+            {
+                if (difficultyItems.Count > 0)
+                    difficultyItems.Add(new EditorMenuItemSpacer());
+
+                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarDifficulty))
+                    difficultyItems.Add(createDifficultyMenuItem(beatmap));
+            }
+
+            fileMenuItems.Add(new EditorMenuItem("Change difficulty") { Items = difficultyItems });
+
+            fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
             return fileMenuItems;
         }
+
+        private DifficultyMenuItem createDifficultyMenuItem(BeatmapInfo beatmapInfo)
+        {
+            bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmapInfo);
+            return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, switchToDifficulty);
+        }
+
+        private void switchToDifficulty(BeatmapInfo beatmapInfo) => loader?.ScheduleDifficultySwitch(beatmapInfo);
+
+        private void cancelExit() => loader?.CancelPendingDifficultySwitch();
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 
