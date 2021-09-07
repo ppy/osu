@@ -201,7 +201,6 @@ namespace osu.Game.Tests.Visual.Ranking
 
         [Test]
         public void TestFetchScoresAfterShowingStatistics()
-
         {
             DelayedFetchResultsScreen screen = null;
 
