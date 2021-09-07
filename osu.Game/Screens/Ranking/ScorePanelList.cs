@@ -40,12 +40,12 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Whether this <see cref="ScorePanelList"/> can be scrolled and is currently scrolled to the start.
         /// </summary>
-        public bool IsScrolledToStart => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.Current <= scroll_endpoint_distance;
+        public bool IsScrolledToStart => flow.Count > 0 && AllPanelsVisible && scroll.ScrollableExtent > 0 && scroll.Current <= scroll_endpoint_distance;
 
         /// <summary>
         /// Whether this <see cref="ScorePanelList"/> can be scrolled and is currently scrolled to the end.
         /// </summary>
-        public bool IsScrolledToEnd => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.IsScrolledToEnd(scroll_endpoint_distance);
+        public bool IsScrolledToEnd => flow.Count > 0 && AllPanelsVisible && scroll.ScrollableExtent > 0 && scroll.IsScrolledToEnd(scroll_endpoint_distance);
 
         public bool AllPanelsVisible => flow.All(p => p.IsPresent);
 
