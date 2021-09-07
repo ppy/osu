@@ -20,6 +20,7 @@ jobs:
   diffcalc:
     name: Diffcalc
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     if: |
       ${{ github.event.issue.pull_request }} &&
@@ -28,7 +29,6 @@ jobs:
 
     strategy:
       fail-fast: false
-      continue-on-error: true
       matrix:
         ruleset:
           - { name: osu, id: 0 }
