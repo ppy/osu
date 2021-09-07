@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
 
 namespace osu.Game.Screens.Edit
@@ -43,10 +44,16 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        private void pushEditor()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            this.Push(new Editor(this));
-            ValidForResume = false;
+            AddRangeInternal(new Drawable[]
+            {
+                new LoadingSpinner(true)
+                {
+                    State = { Value = Visibility.Visible },
+                }
+            });
         }
 
         public void ScheduleDifficultySwitch(BeatmapInfo beatmapInfo)
@@ -60,6 +67,12 @@ namespace osu.Game.Screens.Edit
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
                 pushEditor();
             });
+        }
+
+        private void pushEditor()
+        {
+            this.Push(new Editor(this));
+            ValidForResume = false;
         }
 
         public void CancelPendingDifficultySwitch()
