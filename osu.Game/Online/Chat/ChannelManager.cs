@@ -257,6 +257,7 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case "chat":
+                case "msg":
                 case "query":
                     if (string.IsNullOrWhiteSpace(content))
                     {
