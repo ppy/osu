@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Padding = new MarginPadding { Horizontal = 10 },
                                 Children = new Drawable[]
                                 {
-                                    generalFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>(BeatmapsStrings.ListingSearchFiltersGeneral),
+                                    generalFilter = new BeatmapSearchGeneralFilterRow(),
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
                                     categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(BeatmapsStrings.ListingSearchFiltersStatus),
                                     genreFilter = new BeatmapSearchFilterRow<SearchGenre>(BeatmapsStrings.ListingSearchFiltersGenre),
