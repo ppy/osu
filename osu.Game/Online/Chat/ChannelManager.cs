@@ -264,6 +264,11 @@ namespace osu.Game.Online.Chat
                         break;
                     }
 
+                    // Check if the user has joined requested channel already.
+                    var alreadyJoinedChannel = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Name == content);
+                    if (alreadyJoinedChannel != null)
+                        CurrentChannel.Value = alreadyJoinedChannel;
+
                     var request = new GetUserRequest(content);
                     request.Success += OpenPrivateChannel;
                     request.Failure += _ => target.AddNewMessages(new ErrorMessage("User not found."));
