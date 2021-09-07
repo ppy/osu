@@ -3,11 +3,14 @@
 
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit
 {
@@ -15,7 +18,7 @@ namespace osu.Game.Screens.Edit
     /// Transition screen for the editor.
     /// Used to avoid backing out to main menu/song select when switching difficulties from within the editor.
     /// </summary>
-    public class EditorLoader : OsuScreen
+    public class EditorLoader : ScreenWithBeatmapBackground
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -62,9 +65,16 @@ namespace osu.Game.Screens.Edit
             ValidForResume = true;
 
             this.MakeCurrent();
+
             scheduledDifficultySwitch = Schedule(() =>
             {
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+
+                // This screen is a weird exception to the rule that nothing after song select changes the global beatmap.
+                // Because of this, we need to update the background stack's beatmap to match.
+                // If we don't do this, the editor will see a discrepancy and create a new background, along with an unnecessary transition.
+                ApplyToBackground(b => b.Beatmap = Beatmap.Value);
+
                 pushEditor();
             });
         }
