@@ -116,25 +116,20 @@ namespace osu.Game.Scoring
         {
             var difficultyCache = difficulties?.Invoke();
 
-            if (difficultyCache == null)
-                return orderByTotalScore(scores);
-
-            // Compute difficulties asynchronously first to prevent blocking via the GetTotalScore() call below.
-            foreach (var s in scores)
+            if (difficultyCache != null)
             {
-                await difficultyCache.GetDifficultyAsync(s.Beatmap, s.Ruleset, s.Mods, cancellationToken).ConfigureAwait(false);
-                cancellationToken.ThrowIfCancellationRequested();
+                // Compute difficulties asynchronously first to prevent blocking via the GetTotalScore() call below.
+                foreach (var s in scores)
+                {
+                    await difficultyCache.GetDifficultyAsync(s.Beatmap, s.Ruleset, s.Mods, cancellationToken).ConfigureAwait(false);
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
             }
 
-            return orderByTotalScore(scores);
-
-            ScoreInfo[] orderByTotalScore(IEnumerable<ScoreInfo> incoming)
-            {
-                // We're calling .Result, but this should not be a blocking call due to the above GetDifficultyAsync() calls.
-                return incoming.OrderByDescending(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken).Result)
-                               .ThenBy(s => s.OnlineScoreID)
-                               .ToArray();
-            }
+            // We're calling .Result, but this should not be a blocking call due to the above GetDifficultyAsync() calls.
+            return scores.OrderByDescending(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken).Result)
+                         .ThenBy(s => s.OnlineScoreID)
+                         .ToArray();
         }
 
         /// <summary>
