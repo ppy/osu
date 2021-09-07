@@ -30,9 +30,11 @@ using osu.Game.Skinning;
 using System;
 using System.Linq;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Game.Rulesets.Osu.Edit.Setup;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Osu
@@ -305,5 +307,7 @@ namespace osu.Game.Rulesets.Osu
                 }
             };
         }
+
+        public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
     }
 }
