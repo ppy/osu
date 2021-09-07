@@ -178,7 +178,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             private readonly Room room;
 
-            public Action<Room, string> JoinRequested;
+            public Action<Room, string, Action<Room>, Action<string>> JoinRequested;
 
             public PasswordEntryPopover(Room room)
             {
@@ -186,6 +186,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             }
 
             private OsuPasswordTextBox passwordTextbox;
+            private TriangleButton joinButton;
 
             [BackgroundDependencyLoader]
             private void load()
@@ -201,15 +202,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         passwordTextbox = new OsuPasswordTextBox
                         {
                             Width = 200,
+                            PlaceholderText = "password",
                         },
-                        new TriangleButton
+                        joinButton = new TriangleButton
                         {
                             Width = 80,
                             Text = "Join Room",
-                            Action = () => JoinRequested?.Invoke(room, passwordTextbox.Text)
                         }
                     }
                 };
+
+                joinButton.Action = () => JoinRequested?.Invoke(room, passwordTextbox.Text, null, _ => this.HidePopover());
             }
 
             protected override void LoadComplete()
@@ -217,7 +220,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 base.LoadComplete();
 
                 Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
-                passwordTextbox.OnCommit += (_, __) => JoinRequested?.Invoke(room, passwordTextbox.Text);
+                passwordTextbox.OnCommit += (_, __) => JoinRequested?.Invoke(room, passwordTextbox.Text, null, _ => this.HidePopover());
             }
         }
     }
