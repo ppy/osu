@@ -8,8 +8,9 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetUserRequest : APIRequest<User>
     {
-        private readonly string userIdentifier;
+        private readonly string lookup;
         public readonly RulesetInfo Ruleset;
+        private readonly LookupType lookupType;
 
         /// <summary>
         /// Gets the currently logged-in user.
@@ -25,7 +26,8 @@ namespace osu.Game.Online.API.Requests
         /// <param name="ruleset">The ruleset to get the user's info for.</param>
         public GetUserRequest(long? userId = null, RulesetInfo ruleset = null)
         {
-            this.userIdentifier = userId.ToString();
+            lookup = userId.ToString();
+            lookupType = LookupType.Id;
             Ruleset = ruleset;
         }
 
@@ -36,10 +38,17 @@ namespace osu.Game.Online.API.Requests
         /// <param name="ruleset">The ruleset to get the user's info for.</param>
         public GetUserRequest(string username = null, RulesetInfo ruleset = null)
         {
-            this.userIdentifier = username;
+            lookup = username;
+            lookupType = LookupType.Username;
             Ruleset = ruleset;
         }
 
-        protected override string Target => userIdentifier != null ? $@"users/{userIdentifier}/{Ruleset?.ShortName}" : $@"me/{Ruleset?.ShortName}";
+        protected override string Target => lookup != null ? $@"users/{lookup}/{Ruleset?.ShortName}?k={lookupType.ToString().ToLower()}" : $@"me/{Ruleset?.ShortName}";
+
+        private enum LookupType
+        {
+            Id,
+            Username
+        }
     }
 }
