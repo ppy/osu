@@ -351,10 +351,7 @@ namespace osu.Game
             base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
 
             KeyBindingStore = new RealmKeyBindingStore(realmFactory);
-            KeyBindingStore.Register(globalBindings);
-
-            foreach (var r in RulesetStore.AvailableRulesets)
-                KeyBindingStore.Register(r);
+            KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
 
             dependencies.Cache(globalBindings);
 
