@@ -22,12 +22,13 @@ jobs:
     runs-on: ubuntu-latest
 
     if: |
-      contains(github.event.comment.html_url, '/pull/') &&
+      ${{ github.event.issue.pull_request }} &&
       contains(github.event.comment.body, '!pp check') &&
       ${{ github.event.comment.author_association == 'MEMBER' }}
 
     strategy:
       fail-fast: false
+      continue-on-error: true
       matrix:
         ruleset:
           - { name: osu, id: 0 }
