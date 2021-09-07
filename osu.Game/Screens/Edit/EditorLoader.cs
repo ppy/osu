@@ -34,10 +34,13 @@ namespace osu.Game.Screens.Edit
         {
             base.LogoArriving(logo, resuming);
 
-            // the push cannot happen in OnEntering() or similar (even if scheduled), because the transition from main menu will look bad.
-            // that is because this screen pushing the editor makes it no longer current, and OsuScreen checks if the screen is current
-            // before enqueueing this screen's LogoArriving onto the logo animation sequence.
-            pushEditor();
+            if (!resuming)
+            {
+                // the push cannot happen in OnEntering() or similar (even if scheduled), because the transition from main menu will look bad.
+                // that is because this screen pushing the editor makes it no longer current, and OsuScreen checks if the screen is current
+                // before enqueueing this screen's LogoArriving onto the logo animation sequence.
+                pushEditor();
+            }
         }
 
         private void pushEditor()
