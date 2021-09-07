@@ -4,6 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit
 {
@@ -14,6 +16,9 @@ namespace osu.Game.Screens.Edit
     {
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
+
+        [Cached]
+        protected readonly OverlayColourProvider ColourProvider;
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -28,7 +33,9 @@ namespace osu.Game.Screens.Edit
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = content = new Container { RelativeSizeAxes = Axes.Both };
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+            InternalChild = content = new PopoverContainer { RelativeSizeAxes = Axes.Both };
         }
 
         protected override void PopIn()

@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 maxComboColumn.Text = value.MaxCombo.ToLocalisableString(@"0\x");
 
                 ppColumn.Alpha = value.Beatmap?.Status.GrantsPerformancePoints() == true ? 1 : 0;
-                ppColumn.Text = value.PP.ToLocalisableString(@"N0");
+                ppColumn.Text = value.PP?.ToLocalisableString(@"N0");
 
                 statisticsColumns.ChildrenEnumerable = value.GetStatisticsForDisplay().Select(createStatisticsColumn);
                 modsColumn.Mods = value.Mods;

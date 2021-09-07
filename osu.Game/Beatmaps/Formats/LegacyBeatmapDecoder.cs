@@ -44,6 +44,13 @@ namespace osu.Game.Beatmaps.Formats
             offset = FormatVersion < 5 ? 24 : 0;
         }
 
+        protected override Beatmap CreateTemplateObject()
+        {
+            var templateBeatmap = base.CreateTemplateObject();
+            templateBeatmap.ControlPointInfo = new LegacyControlPointInfo();
+            return templateBeatmap;
+        }
+
         protected override void ParseStreamInto(LineBufferedReader stream, Beatmap beatmap)
         {
             this.beatmap = beatmap;
@@ -430,8 +437,13 @@ namespace osu.Game.Beatmaps.Formats
             parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
             var obj = parser.Parse(line);
+
             if (obj != null)
+            {
+                obj.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
+
                 beatmap.HitObjects.Add(obj);
+            }
         }
 
         private int getOffsetTime(int time) => time + (ApplyOffsets ? offset : 0);
