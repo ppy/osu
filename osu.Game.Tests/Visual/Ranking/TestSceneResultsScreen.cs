@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual.Ranking
             TestResultsScreen screen = null;
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
-            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddStep("click expanded panel", () =>
             {
@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Visual.Ranking
             TestResultsScreen screen = null;
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
-            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddStep("click expanded panel", () =>
             {
@@ -177,7 +177,7 @@ namespace osu.Game.Tests.Visual.Ranking
             TestResultsScreen screen = null;
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
-            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             ScorePanel expandedPanel = null;
             ScorePanel contractedPanel = null;
@@ -223,6 +223,7 @@ namespace osu.Game.Tests.Visual.Ranking
             TestResultsScreen screen = null;
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
 
             AddAssert("download button is disabled", () => !screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
 

@@ -243,7 +243,7 @@ namespace osu.Game
             dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, true));
 
             // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
