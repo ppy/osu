@@ -265,7 +265,8 @@ namespace osu.Game.Online.Chat
                     }
 
                     // Check if the user has joined requested channel already.
-                    var alreadyJoinedChannel = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Name == content);
+                    var alreadyJoinedChannel = JoinedChannels.FirstOrDefault(
+                        c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Name.Equals(content, StringComparison.OrdinalIgnoreCase));
                     if (alreadyJoinedChannel != null)
                         CurrentChannel.Value = alreadyJoinedChannel;
 
