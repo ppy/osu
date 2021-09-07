@@ -186,17 +186,14 @@ namespace osu.Game.Screens
         {
             applyArrivingDefaults(false);
 
-            backgroundStack?.Push(ownedBackground = CreateBackground());
-
-            background = backgroundStack?.CurrentScreen as BackgroundScreen;
-
-            if (background != ownedBackground)
+            if (backgroundStack?.Push(ownedBackground = CreateBackground()) != true)
             {
-                // background may have not been replaced, at which point we don't want to track the background lifetime.
+                // If the constructed instance was not actually pushed to the background stack, we don't want to track it unnecessarily.
                 ownedBackground?.Dispose();
                 ownedBackground = null;
             }
 
+            background = backgroundStack?.CurrentScreen as BackgroundScreen;
             base.OnEntering(last);
         }
 
