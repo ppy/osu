@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Settings
             {
                 new OsuSpriteText
                 {
-                    Text = Header.ToString().ToUpper(), // TODO: Add localisation support after https://github.com/ppy/osu-framework/pull/4603 is merged.
+                    Text = Header, // TODO: Add localisation support after https://github.com/ppy/osu-framework/pull/4603 is merged.
                     Margin = new MarginPadding { Vertical = 30, Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS },
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
                 },

@@ -8,7 +8,7 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public abstract class RulesetSetupSection : SetupSection
     {
-        public sealed override LocalisableString Title => $"Ruleset ({rulesetInfo.Name})";
+        public sealed override LocalisableString Title => $"游戏模式 ({rulesetInfo.Name})";
 
         private readonly RulesetInfo rulesetInfo;
 

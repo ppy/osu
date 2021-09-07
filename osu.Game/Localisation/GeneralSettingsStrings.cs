@@ -27,12 +27,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Prefer metadata in original language"
         /// </summary>
-        public static LocalisableString PreferOriginalMetadataLanguage => new TranslatableString(getKey(@"prefer_original"), @"Prefer metadata in original language");
+        public static LocalisableString PreferOriginalMetadataLanguage => new TranslatableString(getKey(@"prefer_original"), @"偏好以原语言显示谱面信息");
 
         /// <summary>
         /// "Updates"
         /// </summary>
-        public static LocalisableString UpdateHeader => new TranslatableString(getKey(@"update_header"), @"Updates");
+        public static LocalisableString UpdateHeader => new TranslatableString(getKey(@"update_header"), @"Update");
 
         /// <summary>
         /// "Release stream"

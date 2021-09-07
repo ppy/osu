@@ -22,7 +22,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "High precision mouse"
         /// </summary>
-        public static LocalisableString HighPrecisionMouse => new TranslatableString(getKey(@"high_precision_mouse"), @"High precision mouse");
+        public static LocalisableString HighPrecisionMouse => new TranslatableString(getKey(@"high_precision_mouse"), @"高精度鼠标");
 
         /// <summary>
         /// "Attempts to bypass any operation system mouse acceleration. On windows, this is equivalent to what used to be known as &quot;Raw Input&quot;."
@@ -37,12 +37,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Disable mouse wheel during gameplay"
         /// </summary>
-        public static LocalisableString DisableMouseWheel => new TranslatableString(getKey(@"disable_mouse_wheel"), @"Disable mouse wheel during gameplay");
+        public static LocalisableString DisableMouseWheel => new TranslatableString(getKey(@"disable_mouse_wheel"), @"在游戏中禁用鼠标滚轮");
 
         /// <summary>
         /// "Disable mouse buttons during gameplay"
         /// </summary>
-        public static LocalisableString DisableMouseButtons => new TranslatableString(getKey(@"disable_mouse_buttons"), @"Disable mouse buttons during gameplay");
+        public static LocalisableString DisableMouseButtons => new TranslatableString(getKey(@"disable_mouse_buttons"), @"在游戏中禁用鼠标按钮");
 
         /// <summary>
         /// "Enable high precision mouse to adjust sensitivity"
@@ -57,7 +57,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now."
         /// </summary>
-        public static LocalisableString HighPrecisionPlatformWarning => new TranslatableString(getKey(@"high_precision_platform_warning"), @"This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now.");
+        public static LocalisableString HighPrecisionPlatformWarning => new TranslatableString(getKey(@"high_precision_platform_warning"), @"此设置在您的平台上有已知问题。如果您遇到问题，建议您在游戏外调整灵敏度，并暂时禁用此项。");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

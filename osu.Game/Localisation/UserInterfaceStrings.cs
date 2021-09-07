@@ -22,7 +22,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Rotate cursor when dragging"
         /// </summary>
-        public static LocalisableString CursorRotation => new TranslatableString(getKey(@"cursor_rotation"), @"Rotate cursor when dragging");
+        public static LocalisableString CursorRotation => new TranslatableString(getKey(@"cursor_rotation"), @"拖动时旋转光标");
 
         /// <summary>
         /// "Menu cursor size"
@@ -32,7 +32,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Parallax"
         /// </summary>
-        public static LocalisableString Parallax => new TranslatableString(getKey(@"parallax"), @"Parallax");
+        public static LocalisableString Parallax => new TranslatableString(getKey(@"parallax"), @"视差");
 
         /// <summary>
         /// "Hold-to-confirm activation time"
@@ -47,12 +47,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Interface voices"
         /// </summary>
-        public static LocalisableString InterfaceVoices => new TranslatableString(getKey(@"interface_voices"), @"Interface voices");
+        public static LocalisableString InterfaceVoices => new TranslatableString(getKey(@"interface_voices"), @"界面声音");
 
         /// <summary>
         /// "osu! music theme"
         /// </summary>
-        public static LocalisableString OsuMusicTheme => new TranslatableString(getKey(@"osu_music_theme"), @"osu! music theme");
+        public static LocalisableString OsuMusicTheme => new TranslatableString(getKey(@"osu_music_theme"), @"osu! 主题音乐");
 
         /// <summary>
         /// "Intro sequence"
@@ -72,7 +72,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Changes to this setting will only apply with an active osu!supporter tag."
         /// </summary>
-        public static LocalisableString NotSupporterNote => new TranslatableString(getKey(@"not_supporter_note"), @"Changes to this setting will only apply with an active osu!supporter tag.");
+        public static LocalisableString NotSupporterNote => new TranslatableString(getKey(@"not_supporter_note"), @"该设置仅对 osu! supporter 有效");
 
         /// <summary>
         /// "Song Select"
@@ -82,12 +82,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Right mouse drag to absolute scroll"
         /// </summary>
-        public static LocalisableString RightMouseScroll => new TranslatableString(getKey(@"right_mouse_scroll"), @"Right mouse drag to absolute scroll");
+        public static LocalisableString RightMouseScroll => new TranslatableString(getKey(@"right_mouse_scroll"), @"按住鼠标右键快速滚动");
 
         /// <summary>
         /// "Show converted beatmaps"
         /// </summary>
-        public static LocalisableString ShowConvertedBeatmaps => new TranslatableString(getKey(@"show_converted_beatmaps"), @"Show converted beatmaps");
+        public static LocalisableString ShowConvertedBeatmaps => new TranslatableString(getKey(@"show_converted_beatmaps"), @"显示转谱");
 
         /// <summary>
         /// "Display beatmaps from"

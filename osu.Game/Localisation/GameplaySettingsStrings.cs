@@ -32,7 +32,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Lighten playfield during breaks"
         /// </summary>
-        public static LocalisableString LightenDuringBreaks => new TranslatableString(getKey(@"lighten_during_breaks"), @"Lighten playfield during breaks");
+        public static LocalisableString LightenDuringBreaks => new TranslatableString(getKey(@"lighten_during_breaks"), @"休息段解除背景暗化");
 
         /// <summary>
         /// "HUD overlay visibility mode"
@@ -42,32 +42,32 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Show difficulty graph on progress bar"
         /// </summary>
-        public static LocalisableString ShowDifficultyGraph => new TranslatableString(getKey(@"show_difficulty_graph"), @"Show difficulty graph on progress bar");
+        public static LocalisableString ShowDifficultyGraph => new TranslatableString(getKey(@"show_difficulty_graph"), @"在进度条上显示难度分布图");
 
         /// <summary>
         /// "Show health display even when you can't fail"
         /// </summary>
-        public static LocalisableString ShowHealthDisplayWhenCantFail => new TranslatableString(getKey(@"show_health_display_when_cant_fail"), @"Show health display even when you can't fail");
+        public static LocalisableString ShowHealthDisplayWhenCantFail => new TranslatableString(getKey(@"show_health_display_when_cant_fail"), @"不会失败时仍然显示血量");
 
         /// <summary>
         /// "Fade playfield to red when health is low"
         /// </summary>
-        public static LocalisableString FadePlayfieldWhenHealthLow => new TranslatableString(getKey(@"fade_playfield_when_health_low"), @"Fade playfield to red when health is low");
+        public static LocalisableString FadePlayfieldWhenHealthLow => new TranslatableString(getKey(@"fade_playfield_when_health_low"), @"当血量低时屏幕变红");
 
         /// <summary>
         /// "Always show key overlay"
         /// </summary>
-        public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
+        public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"总是显示按键框");
 
         /// <summary>
         /// "Positional hitsounds"
         /// </summary>
-        public static LocalisableString PositionalHitsounds => new TranslatableString(getKey(@"positional_hitsounds"), @"Positional hitsounds");
+        public static LocalisableString PositionalHitsounds => new TranslatableString(getKey(@"positional_hitsounds"), @"立体打击音效");
 
         /// <summary>
         /// "Always play first combo break sound"
         /// </summary>
-        public static LocalisableString AlwaysPlayFirstComboBreak => new TranslatableString(getKey(@"always_play_first_combo_break"), @"Always play first combo break sound");
+        public static LocalisableString AlwaysPlayFirstComboBreak => new TranslatableString(getKey(@"always_play_first_combo_break"), @"总是播放第一次断连的提示音");
 
         /// <summary>
         /// "Score display mode"
@@ -77,7 +77,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Disable Windows key during gameplay"
         /// </summary>
-        public static LocalisableString DisableWinKey => new TranslatableString(getKey(@"disable_win_key"), @"Disable Windows key during gameplay");
+        public static LocalisableString DisableWinKey => new TranslatableString(getKey(@"disable_win_key"), @"在游戏中禁用 Windows 键");
 
         /// <summary>
         /// "Mods"
@@ -87,7 +87,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Increase visibility of first object when visual impairment mods are enabled"
         /// </summary>
-        public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"Increase visibility of first object when visual impairment mods are enabled");
+        public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"在隐藏 Mod 下显示第一个物件的缩圈");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

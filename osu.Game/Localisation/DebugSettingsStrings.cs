@@ -17,22 +17,22 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "General"
         /// </summary>
-        public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"General");
+        public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"常规");
 
         /// <summary>
         /// "Show log overlay"
         /// </summary>
-        public static LocalisableString ShowLogOverlay => new TranslatableString(getKey(@"show_log_overlay"), @"Show log overlay");
+        public static LocalisableString ShowLogOverlay => new TranslatableString(getKey(@"show_log_overlay"), @"显示日志叠加层");
 
         /// <summary>
         /// "Bypass front-to-back render pass"
         /// </summary>
-        public static LocalisableString BypassFrontToBackPass => new TranslatableString(getKey(@"bypass_front_to_back_pass"), @"Bypass front-to-back render pass");
+        public static LocalisableString BypassFrontToBackPass => new TranslatableString(getKey(@"bypass_front_to_back_pass"), @"总是渲染被遮挡的窗口");
 
         /// <summary>
         /// "Import files"
         /// </summary>
-        public static LocalisableString ImportFiles => new TranslatableString(getKey(@"import_files"), @"Import files");
+        public static LocalisableString ImportFiles => new TranslatableString(getKey(@"import_files"), @"导入文件");
 
         /// <summary>
         /// "Memory"

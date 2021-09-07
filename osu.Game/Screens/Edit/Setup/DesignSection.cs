@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledSwitchButton epilepsyWarning;
         private LabelledSwitchButton letterboxDuringBreaks;
 
-        public override LocalisableString Title => "Design";
+        public override LocalisableString Title => "设计";
 
         [BackgroundDependencyLoader]
         private void load()
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 EnableCountdown = new LabelledSwitchButton
                 {
-                    Label = "Enable countdown",
+                    Label = "启用倒计时",
                     Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None },
                     Description = "If enabled, an \"Are you ready? 3, 2, 1, GO!\" countdown will be inserted at the beginning of the beatmap, assuming there is enough time to do so."
                 },
@@ -49,13 +49,13 @@ namespace osu.Game.Screens.Edit.Setup
                     {
                         CountdownSpeed = new LabelledEnumDropdown<CountdownType>
                         {
-                            Label = "Countdown speed",
+                            Label = "倒计时速度",
                             Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None ? Beatmap.BeatmapInfo.Countdown : CountdownType.Normal },
                             Items = Enum.GetValues(typeof(CountdownType)).Cast<CountdownType>().Where(type => type != CountdownType.None)
                         },
                         CountdownOffset = new LabelledNumberBox
                         {
-                            Label = "Countdown offset",
+                            Label = "倒计时偏移",
                             Current = { Value = Beatmap.BeatmapInfo.CountdownOffset.ToString() },
                             Description = "If the countdown sounds off-time, use this to make it appear one or more beats early.",
                         }
@@ -64,13 +64,13 @@ namespace osu.Game.Screens.Edit.Setup
                 Empty(),
                 widescreenSupport = new LabelledSwitchButton
                 {
-                    Label = "Widescreen support",
+                    Label = "宽屏支持",
                     Description = "Allows storyboards to use the full screen space, rather than be confined to a 4:3 area.",
                     Current = { Value = Beatmap.BeatmapInfo.WidescreenStoryboard }
                 },
                 epilepsyWarning = new LabelledSwitchButton
                 {
-                    Label = "Epilepsy warning",
+                    Label = "光敏性癫痫警告",
                     Description = "Recommended if the storyboard or video contain scenes with rapidly flashing colours.",
                     Current = { Value = Beatmap.BeatmapInfo.EpilepsyWarning }
                 },
