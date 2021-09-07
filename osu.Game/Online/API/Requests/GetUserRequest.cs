@@ -43,7 +43,7 @@ namespace osu.Game.Online.API.Requests
             Ruleset = ruleset;
         }
 
-        protected override string Target => lookup != null ? $@"users/{lookup}/{Ruleset?.ShortName}?k={lookupType.ToString().ToLower()}" : $@"me/{Ruleset?.ShortName}";
+        protected override string Target => lookup != null ? $@"users/{lookup}/{Ruleset?.ShortName}?key={lookupType.ToString().ToLower()}" : $@"me/{Ruleset?.ShortName}";
 
         private enum LookupType
         {
