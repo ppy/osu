@@ -227,6 +227,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             },
                         },
                     }, 0)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
             };
         }
 
@@ -236,6 +239,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             wrapper.DelayedLoadComplete += _ =>
             {
+                wrapper.FadeInFromZero(200);
+
                 roomCategory.BindTo(Room.Category);
                 roomCategory.BindValueChanged(c =>
                 {
