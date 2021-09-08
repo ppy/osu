@@ -64,9 +64,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override void LoadComplete()
         {
-            rooms.CollectionChanged += roomsChanged;
             roomManager.RoomsUpdated += updateSorting;
 
+            rooms.CollectionChanged += roomsChanged;
             rooms.BindTo(roomManager.Rooms);
 
             Filter?.BindValueChanged(criteria => applyFilterCriteria(criteria.NewValue), true);
@@ -108,10 +108,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void addRooms(IEnumerable<Room> rooms)
         {
-            foreach (var room in rooms)
-                roomFlow.Add(new DrawableLoungeRoom(room) { SelectedRoom = { BindTarget = SelectedRoom } });
+            LoadComponentsAsync(rooms.Select(room =>
+                new DrawableLoungeRoom(room) { SelectedRoom = { BindTarget = SelectedRoom } }), rooms =>
+            {
+                // check against rooms collection to ensure the room wasn't removed since this async load started.
+                roomFlow.AddRange(rooms.Where(r => this.rooms.Contains(r.Room)));
 
-            applyFilterCriteria(Filter?.Value);
+                applyFilterCriteria(Filter?.Value);
+            });
         }
 
         private void removeRooms(IEnumerable<Room> rooms)
