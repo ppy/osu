@@ -1,3 +1,7 @@
+PS: 你可以使用[d-feet](https://github.com/GNOME/d-feet)来查看所有可用的DBus接口
+
+![d-feet截图](assets/dfeet-screenshot.png)
+
 # 本体DBus API
 
 ## io.matrix_feather.dbus.greet
@@ -14,7 +18,7 @@
         - `string s1`: 发送方的名字
 
     - 返回:
-        - `string`: 可能是`Greetings from xxx: xxxx , {s1}!`
+        - `string`: 接收方的名字，默认是"null"
 
 * `SendMessage`
     - 向游戏内发送信息
@@ -113,6 +117,38 @@
     - 注:
         - 前往 "`https://osu.ppy.sh/beatmaps/{n1}`" 可以直接查询到该图号对应的谱面信息
 
+### 属性
+
+* `BPM`
+    - 谱面BPM
+
+    - 类型:
+        - double
+
+* `Stars`:
+    - 谱面难度星级
+
+    - 类型:
+        - double
+
+* `OnlineID`:
+    - 谱面在线图号
+
+    - 类型:
+        - int32
+
+* `FullName`:
+    - 谱面全名
+
+    - 类型:
+        - string
+
+* `Version`:
+    - 谱面难度名
+
+    - 类型:
+        - string
+
 ## io.matrix_feather.dbus.CurrentUser
 
 ### 描述
@@ -136,7 +172,7 @@
         - 无
 
     - 返回:
-        - `long`: 游戏运行时间(`DateTime.Now.Ticks - loadTick.Ticks`)
+        - `int64(long)`: 游戏运行时间(`DateTime.Now.Ticks - loadTick.Ticks`)
 
 * `GetPP`
     - 显而易见
@@ -145,9 +181,9 @@
         - 无
 
     - 返回:
-        - `string`: pp数
+        - `int32`: pp数
 
-* `GetUserActivity`
+* `GetActivity`
     - 获取用户当前状态
 
     - 参数:
@@ -156,7 +192,7 @@
     - 返回:
         - `string`: 当前状态(如: "正在选图"、"正在戳泡泡"、"闲置")
 
-* `GetUserAvatarUrl`
+* `GetAvatarUrl`
     - 获取用户头像URL
 
     - 参数:
@@ -168,31 +204,31 @@
     - 注:
         - 若用户没有登录，则返回空字符串(string.Empty)
 
-* `GetUserCountryRegionRank`
+* `GetRegionRank`
     - 获取用户在当前国家/地区的排名
 
     - 参数:
         - 无
 
     - 返回:
-        - `string`: 排名结果
+        - `int32`: 排名结果
 
     - 注:
         - 若用户没有登录，则返回-1
 
-* `GetUserRank`
+* `GetRank`
     - 获取用户的全球排名
 
     - 参数:
         - 无
 
     - 返回:
-        - `string`: 排名结果
+        - `int32`: 排名结果
 
     - 注:
         - 若用户没有登录，则返回-1
 
-* `GetUserName`
+* `GetName`
     - 获取用户名
 
     - 参数:
@@ -200,6 +236,50 @@
 
     - 返回:
         - `string`: 用户名
+
+### 属性
+
+* `GlobalRank`
+    - 全球排名
+
+    - 类型
+        - int32
+
+* `RegionRank`
+    - 国家/地区排行
+
+    - 类型
+        - int32
+
+* `PP`
+    - PP值
+
+    - 类型
+        - int32
+
+* `Activity`
+    - 当前活动
+
+    - 类型
+        - string
+
+* `AvatarUrl`
+    - 头像URL
+
+    - 类型
+        - string
+
+* `CurrentRuleset`
+    - 当前游戏模式
+
+    - 类型
+        - string
+
+* `Name`
+    - 当前名称
+
+    - 类型
+        - string
 
 # 播放器插件DBus API
 
@@ -234,6 +314,20 @@
     - 注:
         - 若未选择收藏夹、插件被禁用，或当前歌曲不在收藏夹中，则返回-1
 
+### 属性
+
+* `Position`:
+    - 当前歌曲在收藏夹中的位置
+
+    - 类型
+        - int32
+
+* `Name`:
+    - 当前收藏夹名称
+
+    - 类型
+        - string
+
 ## io.matrix_feather.mvis.lyric
 
 ### 描述
@@ -265,6 +359,20 @@
     - 注:
         - 若插件被禁用，则返回"`-`"
         - 用户可能也会将翻译歌词设置为"`-`"
+
+### 属性
+
+* `RawString`:
+    - 原始歌词
+
+    - 类型
+        - string
+
+* `TranslatedString`:
+    - 翻译歌词
+
+    - 类型
+        - string
 
 # 在Mvis插件中添加自己的DBus服务
 
