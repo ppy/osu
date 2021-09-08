@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
-        protected void StartTrack()
+        protected virtual void StartTrack()
         {
             // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
             if (UsingThemedIntro)
