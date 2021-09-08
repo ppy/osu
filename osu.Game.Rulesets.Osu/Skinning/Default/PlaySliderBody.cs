@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             pathVersion.BindValueChanged(_ => Refresh());
 
             accentColour = drawableObject.AccentColour.GetBoundCopy();
-            accentColour.BindValueChanged(accent => updateAccentColour(skin, accent.NewValue), true);
+            accentColour.BindValueChanged(accent => AccentColour = GetBodyAccentColour(skin, accent.NewValue), true);
 
             config?.BindWith(OsuRulesetSetting.SnakingInSliders, SnakingIn);
             config?.BindWith(OsuRulesetSetting.SnakingOutSliders, configSnakingOut);
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             }
         }
 
-        private void updateAccentColour(ISkinSource skin, Color4 defaultAccentColour)
-            => AccentColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? defaultAccentColour;
+        protected virtual Color4 GetBodyAccentColour(ISkinSource skin, Color4 hitObjectAccentColour) =>
+            skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? hitObjectAccentColour;
     }
 }

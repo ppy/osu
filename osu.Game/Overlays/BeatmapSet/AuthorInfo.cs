@@ -88,8 +88,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             fields.Children = new Drawable[]
             {
-                new Field("mapped by", BeatmapSet.Metadata.Author, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
-                new Field("submitted", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
+                new Field("谱师：", BeatmapSet.Metadata.Author, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
+                new Field("提交于", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
                 {
                     Margin = new MarginPadding { Top = 5 },
                 },
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
             else if (online.LastUpdated.HasValue)
             {
-                fields.Add(new Field("last updated", online.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field("上次更新", online.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
         }
 
@@ -155,12 +155,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     new LinkFlowContainer(s =>
                     {
-                        s.Font = OsuFont.GetFont(size: 11);
+                        s.Font = OsuFont.GetFont(size: 17);
                     }).With(d =>
                     {
                         d.AutoSizeAxes = Axes.Both;
                         d.AddText($"{first} ");
-                        d.AddUserLink(second, s => s.Font = secondFont.With(size: 11));
+                        d.AddUserLink(second, s => s.Font = secondFont.With(size: 17));
                     }),
                 };
             }

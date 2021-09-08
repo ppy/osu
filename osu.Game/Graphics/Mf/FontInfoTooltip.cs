@@ -196,9 +196,9 @@ namespace osu.Game.Graphics.Mf
             this.FadeOut(200);
         }
 
-        public bool SetContent(object content)
+        public void SetContent(object content)
         {
-            if (!(content is Font font)) return false;
+            if (!(content is Font font)) return;
 
             name.Value = font.Name;
             desc.Value = font.Description;
@@ -214,8 +214,6 @@ namespace osu.Game.Graphics.Mf
             semiBold.Value = font.SemiBoldAvaliable;
             bold.Value = font.BoldAvaliable;
             black.Value = font.BlackAvaliable;
-
-            return true;
         }
 
         public void Move(Vector2 pos)

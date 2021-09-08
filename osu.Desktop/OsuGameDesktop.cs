@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Win32;
+using osu.Desktop.DBus;
 using osu.Desktop.Security;
 using osu.Desktop.Overlays;
 using osu.Framework.Platform;
@@ -19,8 +20,10 @@ using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.IO;
 
@@ -31,6 +34,7 @@ namespace osu.Desktop
         private readonly bool noVersionOverlay;
         private VersionManager versionManager;
         private TextEditIndicator textEditIndicator;
+        private DBusManagerContainer dBusManagerContainer;
 
         public OsuGameDesktop(string[] args = null)
             : base(args)
@@ -102,6 +106,11 @@ namespace osu.Desktop
             }
         }
 
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -115,6 +124,17 @@ namespace osu.Desktop
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                dBusManagerContainer = new DBusManagerContainer(
+                    true,
+                    MConfig.GetBindable<bool>(MSetting.DBusIntegration));
+
+                dependencies.Cache(dBusManagerContainer.DBusManager);
+                Add(dBusManagerContainer);
+                dBusManagerContainer.NotificationAction += n => Notifications.Post(n);
+            }
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
         }

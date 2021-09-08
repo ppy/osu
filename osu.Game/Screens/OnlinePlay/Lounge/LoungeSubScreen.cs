@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
@@ -72,6 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private readonly Bindable<FilterCriteria> filter = new Bindable<FilterCriteria>(new FilterCriteria());
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly IBindable<bool> isIdle = new BindableBool();
+        private PopoverContainer popoverContainer;
         private LoadingLayer loadingLayer;
         private RoomsContainer roomsContainer;
         private SearchTextBox searchTextBox;
@@ -90,7 +92,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             InternalChildren = new Drawable[]
             {
                 ListingPollingComponent = CreatePollingComponent().With(c => c.Filter.BindTarget = filter),
-                new Container
+                popoverContainer = new PopoverContainer
                 {
                     Name = @"Rooms area",
                     RelativeSizeAxes = Axes.Both,
@@ -285,7 +287,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             searchTextBox.HoldFocus = false;
 
             // ensure any password prompt is dismissed.
-            this.HidePopover();
+            popoverContainer.HidePopover();
         }
 
         public void Join(Room room, string password) => Schedule(() =>

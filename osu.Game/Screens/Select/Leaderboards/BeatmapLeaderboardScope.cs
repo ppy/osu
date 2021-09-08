@@ -13,12 +13,15 @@ namespace osu.Game.Screens.Select.Leaderboards
         Local,
 
         [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardCountry))]
+        [Description("地区排行")]
         Country,
 
         [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardGlobal))]
+        [Description("全球排行")]
         Global,
 
         [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardFriend))]
+        [Description("好友排行")]
         Friend,
     }
 }

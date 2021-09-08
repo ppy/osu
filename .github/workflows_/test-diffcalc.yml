@@ -1,0 +1,163 @@
+# Listens for new PR comments containing !pp check [id], and runs a diffcalc comparison against master.
+# Usage:
+#   !pp check 0        | Runs only the osu! ruleset.
+#   !pp check 0 2      | Runs only the osu! and catch rulesets.
+#
+
+name: Diffcalc Consistency Checks
+on:
+  issue_comment:
+    types: [ created ]
+
+env:
+  DB_USER: root
+  DB_HOST: 127.0.0.1
+  CONCURRENCY: 4
+  ALLOW_DOWNLOAD: 1
+  SAVE_DOWNLOADED: 1
+
+jobs:
+  diffcalc:
+    name: Diffcalc
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '!pp check') &&
+      (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ruleset:
+          - { name: osu, id: 0 }
+          - { name: taiko, id: 1 }
+          - { name: catch, id: 2 }
+          - { name: mania, id: 3 }
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Verify ruleset
+        if: contains(github.event.comment.body, matrix.ruleset.id) == false
+        run: |
+          echo "${{ github.event.comment.body }} doesn't contain ${{ matrix.ruleset.id }}"
+          exit 1
+
+      - name: Verify MySQL connection from host
+        run: |
+          sudo apt-get install -y mysql-client
+          mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} -e "SHOW DATABASES"
+
+      - name: Create directory structure
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/master/
+          mkdir -p $GITHUB_WORKSPACE/pr/
+
+      # Checkout osu
+      - name: Checkout osu (master)
+        uses: actions/checkout@v2
+        with:
+          repository: ppy/osu
+          path: 'master/osu'
+      - name: Checkout osu (pr)
+        uses: actions/checkout@v2
+        with:
+          path: 'pr/osu'
+
+      # Checkout osu-difficulty-calculator
+      - name: Checkout osu-difficulty-calculator (master)
+        uses: actions/checkout@v2
+        with:
+          repository: ppy/osu-difficulty-calculator
+          path: 'master/osu-difficulty-calculator'
+      - name: Checkout osu-difficulty-calculator (pr)
+        uses: actions/checkout@v2
+        with:
+          repository: ppy/osu-difficulty-calculator
+          path: 'pr/osu-difficulty-calculator'
+
+      - name: Install .NET 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+
+      # Sanity checks to make sure diffcalc is not run when incompatible.
+      - name: Build diffcalc (master)
+        run: |
+          cd $GITHUB_WORKSPACE/master/osu-difficulty-calculator
+          ./UseLocalOsu.sh
+          dotnet build
+      - name: Build diffcalc (pr)
+        run: |
+          cd $GITHUB_WORKSPACE/pr/osu-difficulty-calculator
+          ./UseLocalOsu.sh
+          dotnet build
+
+      # Initial data imports
+      - name: Download + import data
+        run: |
+          PERFORMANCE_DATA_NAME=$(curl https://data.ppy.sh/ | grep performance_${{ matrix.ruleset.name }}_top | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
+          BEATMAPS_DATA_NAME=$(curl https://data.ppy.sh/ | grep osu_files | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
+
+          # Set env variable for further steps.
+          echo "BEATMAPS_PATH=$GITHUB_WORKSPACE/$BEATMAPS_DATA_NAME" >> $GITHUB_ENV
+
+          cd $GITHUB_WORKSPACE
+
+          wget https://data.ppy.sh/$PERFORMANCE_DATA_NAME.tar.bz2
+          wget https://data.ppy.sh/$BEATMAPS_DATA_NAME.tar.bz2
+          tar -xf $PERFORMANCE_DATA_NAME.tar.bz2
+          tar -xf $BEATMAPS_DATA_NAME.tar.bz2
+
+          cd $GITHUB_WORKSPACE/$PERFORMANCE_DATA_NAME
+
+          mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} -e "CREATE DATABASE osu_master"
+          mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} -e "CREATE DATABASE osu_pr"
+
+          cat *.sql | mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} --database=osu_master
+          cat *.sql | mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} --database=osu_pr
+
+      # Run diffcalc
+      - name: Run diffcalc (master)
+        env:
+          DB_NAME: osu_master
+        run: |
+          cd $GITHUB_WORKSPACE/master/osu-difficulty-calculator/osu.Server.DifficultyCalculator
+          dotnet run -c:Release -- all -m ${{ matrix.ruleset.id }} -ac -c ${{ env.CONCURRENCY }}
+      - name: Run diffcalc (pr)
+        env:
+          DB_NAME: osu_pr
+        run: |
+          cd $GITHUB_WORKSPACE/pr/osu-difficulty-calculator/osu.Server.DifficultyCalculator
+          dotnet run -c:Release -- all -m ${{ matrix.ruleset.id }} -ac -c ${{ env.CONCURRENCY }}
+
+      # Print diffs
+      - name: Print diffs
+        run: |
+          mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} -e "
+            SELECT
+              m.beatmap_id,
+              m.mods,
+              m.diff_unified as 'sr_master',
+              p.diff_unified as 'sr_pr',
+              (p.diff_unified - m.diff_unified) as 'diff'
+            FROM osu_master.osu_beatmap_difficulty m
+            JOIN osu_pr.osu_beatmap_difficulty p
+              ON m.beatmap_id = p.beatmap_id
+              AND m.mode = p.mode
+              AND m.mods = p.mods
+            WHERE abs(m.diff_unified - p.diff_unified) > 0.1
+            ORDER BY abs(m.diff_unified - p.diff_unified)
+              DESC
+            LIMIT 10000;"
+
+      # Todo: Run ppcalc

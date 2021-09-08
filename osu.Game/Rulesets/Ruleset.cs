@@ -28,6 +28,7 @@ using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.Filter;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets
@@ -315,5 +316,11 @@ namespace osu.Game.Rulesets
         /// </summary>
         [CanBeNull]
         public virtual IRulesetFilterCriteria CreateRulesetFilterCriteria() => null;
+
+        /// <summary>
+        /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
+        /// </summary>
+        [CanBeNull]
+        public virtual RulesetSetupSection CreateEditorSetupSection() => null;
     }
 }

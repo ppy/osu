@@ -99,13 +99,18 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected DependencyContainer DependenciesContainer;
 
+        protected MvisPluginManager PluginManager;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             DependenciesContainer = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var config = DependenciesContainer.Get<MvisPluginManager>().GetConfigManager(this);
+            var pluginManager = DependenciesContainer.Get<MvisPluginManager>();
+            this.PluginManager = pluginManager;
+
+            var config = pluginManager.GetConfigManager(this);
 
             if (config != null)
                 DependenciesContainer.Cache(config);

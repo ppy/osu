@@ -1,6 +1,7 @@
 using osu.Game.Overlays.Settings;
 using osu.Framework.Graphics;
 using System;
+
 namespace osu.Game.Screens.Select
 {
     public class MvisBeatmapDetailArea : BeatmapDetailArea
@@ -15,7 +16,7 @@ namespace osu.Game.Screens.Select
         public MvisBeatmapDetailArea()
         {
             Add(
-                new SettingsButton()
+                new SettingsButton
                 {
                     Text = "选择该谱面",
                     Anchor = Anchor.Centre,

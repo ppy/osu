@@ -59,6 +59,6 @@ namespace osu.Game.Overlays.Mods
             this.ScaleTo(0.8f, 200, Easing.In);
         }
 
-        public LocalisableString TooltipText => "Incompatible with current selected mods";
+        public LocalisableString TooltipText => "与当前选择的Mod不兼容";
     }
 }

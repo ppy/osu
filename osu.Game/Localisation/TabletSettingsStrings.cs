@@ -52,7 +52,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Lock aspect ratio"
         /// </summary>
-        public static LocalisableString LockAspectRatio => new TranslatableString(getKey(@"lock_aspect_ratio"), @"Lock aspect ratio");
+        public static LocalisableString LockAspectRatio => new TranslatableString(getKey(@"lock_aspect_ratio"), @"锁定宽高比");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

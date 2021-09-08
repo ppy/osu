@@ -22,12 +22,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Show a notification when someone mentions your name"
         /// </summary>
-        public static LocalisableString NotifyOnMentioned => new TranslatableString(getKey(@"notify_on_mentioned"), @"Show a notification when someone mentions your name");
+        public static LocalisableString NotifyOnMentioned => new TranslatableString(getKey(@"notify_on_mentioned"), @"当有人提及您的名字时显示通知");
 
         /// <summary>
         /// "Show a notification when you receive a private message"
         /// </summary>
-        public static LocalisableString NotifyOnPrivateMessage => new TranslatableString(getKey(@"notify_on_private_message"), @"Show a notification when you receive a private message");
+        public static LocalisableString NotifyOnPrivateMessage => new TranslatableString(getKey(@"notify_on_private_message"), @"当收到私信时显示通知");
 
         /// <summary>
         /// "Integrations"
@@ -47,22 +47,22 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Warn about opening external links"
         /// </summary>
-        public static LocalisableString ExternalLinkWarning => new TranslatableString(getKey(@"external_link_warning"), @"Warn about opening external links");
+        public static LocalisableString ExternalLinkWarning => new TranslatableString(getKey(@"external_link_warning"), @"打开外部链接时弹出警告");
 
         /// <summary>
         /// "Prefer downloads without video"
         /// </summary>
-        public static LocalisableString PreferNoVideo => new TranslatableString(getKey(@"prefer_no_video"), @"Prefer downloads without video");
+        public static LocalisableString PreferNoVideo => new TranslatableString(getKey(@"prefer_no_video"), @"下载谱面时不带视频");
 
         /// <summary>
         /// "Automatically download beatmaps when spectating"
         /// </summary>
-        public static LocalisableString AutomaticallyDownloadWhenSpectating => new TranslatableString(getKey(@"automatically_download_when_spectating"), @"Automatically download beatmaps when spectating");
+        public static LocalisableString AutomaticallyDownloadWhenSpectating => new TranslatableString(getKey(@"automatically_download_when_spectating"), @"在观看时自动下载谱面");
 
         /// <summary>
         /// "Show explicit content in search results"
         /// </summary>
-        public static LocalisableString ShowExplicitContent => new TranslatableString(getKey(@"show_explicit_content"), @"Show explicit content in search results");
+        public static LocalisableString ShowExplicitContent => new TranslatableString(getKey(@"show_explicit_content"), @"在搜索结果中显示敏感内容");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

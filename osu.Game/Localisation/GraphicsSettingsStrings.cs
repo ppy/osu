@@ -32,12 +32,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Show FPS"
         /// </summary>
-        public static LocalisableString ShowFPS => new TranslatableString(getKey(@"show_fps"), @"Show FPS");
+        public static LocalisableString ShowFPS => new TranslatableString(getKey(@"show_fps"), @"显示帧率");
 
         /// <summary>
         /// "Using unlimited frame limiter can lead to stutters, bad performance and overheating. It will not improve perceived latency. "2x refresh rate" is recommended."
         /// </summary>
-        public static LocalisableString UnlimitedFramesNote => new TranslatableString(getKey(@"unlimited_frames_note"), @"Using unlimited frame limiter can lead to stutters, bad performance and overheating. It will not improve perceived latency. ""2x refresh rate"" is recommended.");
+        public static LocalisableString UnlimitedFramesNote => new TranslatableString(getKey(@"unlimited_frames_note"), @"启用无限制帧数选项可能导致游戏卡顿、性能下降和电脑过热。这并不会降低体感延迟。推荐使用“2倍刷新率”选项。");
 
         /// <summary>
         /// "Layout"
@@ -87,7 +87,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Running without fullscreen mode will increase your input latency!"
         /// </summary>
-        public static LocalisableString NotFullscreenNote => new TranslatableString(getKey(@"not_fullscreen_note"), @"Running without fullscreen mode will increase your input latency!");
+        public static LocalisableString NotFullscreenNote => new TranslatableString(getKey(@"not_fullscreen_note"), @"不启用全屏模式会增加你的输入延迟！");
 
         /// <summary>
         /// "Detail Settings"
@@ -97,12 +97,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Storyboard / video"
         /// </summary>
-        public static LocalisableString StoryboardVideo => new TranslatableString(getKey(@"storyboard_video"), @"Storyboard / video");
+        public static LocalisableString StoryboardVideo => new TranslatableString(getKey(@"storyboard_video"), @"故事板 / 视频");
 
         /// <summary>
         /// "Hit lighting"
         /// </summary>
-        public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit lighting");
+        public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"击打闪光");
 
         /// <summary>
         /// "Screenshot format"
@@ -112,7 +112,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Show menu cursor in screenshots"
         /// </summary>
-        public static LocalisableString ShowCursorInScreenshots => new TranslatableString(getKey(@"show_cursor_in_screenshots"), @"Show menu cursor in screenshots");
+        public static LocalisableString ShowCursorInScreenshots => new TranslatableString(getKey(@"show_cursor_in_screenshots"), @"在截图中显示光标");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

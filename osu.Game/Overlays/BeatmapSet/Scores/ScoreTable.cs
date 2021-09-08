@@ -4,10 +4,12 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -191,6 +193,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             if (showPerformancePoints)
             {
+                Debug.Assert(score.PP != null);
+
                 content.Add(new OsuSpriteText
                 {
                     Text = score.PP.ToLocalisableString(@"N0"),

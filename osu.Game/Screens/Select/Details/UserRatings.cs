@@ -8,8 +8,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Beatmaps;
-using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Select.Details

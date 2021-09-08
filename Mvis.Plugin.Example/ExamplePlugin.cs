@@ -1,6 +1,8 @@
 using Mvis.Plugin.Example.Config;
+using Mvis.Plugin.Example.DBus;
 using Mvis.Plugin.Example.Sidebar;
 using Mvis.Plugin.Example.UI;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -61,6 +63,14 @@ namespace Mvis.Plugin.Example
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            //注册DBus物件
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                PluginManager.RegisterDBusObject(new ExampleDBusObject());
         }
 
         /// <summary>

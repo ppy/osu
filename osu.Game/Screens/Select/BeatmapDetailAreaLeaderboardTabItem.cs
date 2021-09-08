@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Select
     public class BeatmapDetailAreaLeaderboardTabItem<TScope> : BeatmapDetailAreaTabItem
         where TScope : Enum
     {
-        public override string Name => Scope.GetDescription()??ToString();
+        public override string Name => Scope.GetDescription() ?? ToString();
 
         public override bool FilterableByMods => true;
 
