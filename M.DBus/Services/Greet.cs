@@ -27,7 +27,7 @@ namespace M.DBus.Services
 
         public Task<string> GreetAsync(string name)
         {
-            return Task.FromResult($"Greetings from {GetType().Assembly} : {host} , {name}!");
+            return Task.FromResult($"{host}");
         }
 
         public Task<bool> SendMessageAsync(string message)
