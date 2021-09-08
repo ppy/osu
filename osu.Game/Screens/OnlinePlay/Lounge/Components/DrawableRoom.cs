@@ -65,6 +65,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
+            ButtonsContainer = new Container
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                RelativeSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.X
+            };
+
             InternalChildren = new[]
             {
                 // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
@@ -208,13 +216,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     },
                                     Children = new Drawable[]
                                     {
-                                        ButtonsContainer = new Container
-                                        {
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight,
-                                            RelativeSizeAxes = Axes.Y,
-                                            AutoSizeAxes = Axes.X
-                                        },
+                                        ButtonsContainer,
                                         recentParticipantsList = new RecentParticipantsList
                                         {
                                             Anchor = Anchor.CentreRight,
