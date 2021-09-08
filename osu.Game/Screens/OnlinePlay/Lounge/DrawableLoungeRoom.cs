@@ -83,12 +83,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             base.LoadComplete();
 
-            if (matchingFilter)
-                this.FadeInFromZero(transition_duration);
-            else
-                Alpha = 0;
+            Alpha = matchingFilter ? 1 : 0;
+            selectionBox.Alpha = SelectedRoom.Value == Room ? 1 : 0;
 
-            SelectedRoom.BindValueChanged(updateSelectedRoom, true);
+            SelectedRoom.BindValueChanged(updateSelectedRoom);
         }
 
         private void updateSelectedRoom(ValueChangedEvent<Room> selected)
