@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -27,6 +28,11 @@ namespace osu.Game.Graphics.Containers
         public float ShakeMagnitude = 8;
 
         /// <summary>
+        /// Fired when <see cref="Shake"/> finishes
+        /// </summary>
+        public event Action OnShakeFinish;
+
+        /// <summary>
         /// Shake the contents of this container.
         /// </summary>
         /// <param name="maximumLength">The maximum length the shake should last.</param>
@@ -50,6 +56,7 @@ namespace osu.Game.Graphics.Containers
             }
 
             sequence.MoveToX(0, ShakeDuration / 2, Easing.InSine);
+            sequence.Finally(_ => OnShakeFinish?.Invoke());
         }
     }
 }

@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
@@ -187,32 +188,50 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             private OsuPasswordTextBox passwordTextbox;
             private TriangleButton joinButton;
+            private ShakeContainer shakeContainer;
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Child = new FillFlowContainer
+                shakeContainer = new ShakeContainer
                 {
                     Margin = new MarginPadding(10),
-                    Spacing = new Vector2(5),
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Children = new Drawable[]
+                    Child = new FillFlowContainer
                     {
-                        passwordTextbox = new OsuPasswordTextBox
+                        Margin = new MarginPadding(10),
+                        Spacing = new Vector2(5),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Children = new Drawable[]
                         {
-                            Width = 200,
-                            PlaceholderText = "password",
-                        },
-                        joinButton = new TriangleButton
-                        {
-                            Width = 80,
-                            Text = "Join Room",
+                            passwordTextbox = new OsuPasswordTextBox
+                            {
+                                Width = 200,
+                                PlaceholderText = "password",
+                            },
+                            joinButton = new TriangleButton
+                            {
+                                Width = 80,
+                                Text = "Join Room",
+                            }
                         }
                     }
                 };
+                Child = shakeContainer;
 
-                joinButton.Action = () => JoinRequested?.Invoke(room, passwordTextbox.Text, null, _ => this.HidePopover());
+                joinButton.Action = () => JoinRequested?.Invoke(room, passwordTextbox.Text, null, joinFailed);
+            }
+
+            private void joinFailed(string error)
+            {
+                passwordTextbox.Text = string.Empty;
+                passwordTextbox.PlaceholderText = "incorrect password";
+                passwordTextbox.Colour = Color4.Red;
+
+                shakeContainer.OnShakeFinish += () => passwordTextbox.Colour = Color4.White;
+
+                shakeContainer.Shake();
             }
 
             protected override void LoadComplete()
@@ -220,7 +239,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 base.LoadComplete();
 
                 Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
-                passwordTextbox.OnCommit += (_, __) => JoinRequested?.Invoke(room, passwordTextbox.Text, null, _ => this.HidePopover());
+                passwordTextbox.OnCommit += (_, __) => JoinRequested?.Invoke(room, passwordTextbox.Text, null, joinFailed);
             }
         }
     }
