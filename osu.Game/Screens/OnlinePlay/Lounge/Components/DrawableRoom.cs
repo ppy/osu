@@ -43,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private PasswordProtectedIcon passwordIcon;
         private EndDateInfo endDateInfo;
 
+        private DelayedLoadWrapper wrapper;
+
         public DrawableRoom(Room room)
         {
             Room = room;
@@ -75,155 +77,156 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     d.RelativeSizeAxes = Axes.Both;
                 }),
-                new Container
-                {
-                    Name = @"Room content",
-                    RelativeSizeAxes = Axes.Both,
-                    // This negative padding resolves 1px gaps between this background and the background above.
-                    Padding = new MarginPadding { Left = 20, Vertical = -0.5f },
-                    Child = new Container
+                wrapper = new DelayedLoadWrapper(() =>
+                    new Container
                     {
+                        Name = @"Room content",
                         RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        CornerRadius = CORNER_RADIUS,
-                        Children = new Drawable[]
+                        // This negative padding resolves 1px gaps between this background and the background above.
+                        Padding = new MarginPadding { Left = 20, Vertical = -0.5f },
+                        Child = new Container
                         {
-                            new GridContainer
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            CornerRadius = CORNER_RADIUS,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[]
+                                new GridContainer
                                 {
-                                    new Dimension(GridSizeMode.Relative, 0.2f)
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColumnDimensions = new[]
                                     {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = colours.Background5,
-                                        },
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f))
-                                        },
-                                    }
-                                }
-                            },
-                            new Container
-                            {
-                                Name = @"Left details",
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding
-                                {
-                                    Left = 20,
-                                    Vertical = 5
-                                },
-                                Children = new Drawable[]
-                                {
-                                    new FillFlowContainer
-                                    {
-                                        AutoSizeAxes = Axes.Both,
-                                        Direction = FillDirection.Vertical,
-                                        Children = new Drawable[]
-                                        {
-                                            new FillFlowContainer
-                                            {
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Spacing = new Vector2(5),
-                                                Children = new Drawable[]
-                                                {
-                                                    new RoomStatusPill
-                                                    {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft
-                                                    },
-                                                    specialCategoryPill = new RoomSpecialCategoryPill
-                                                    {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft
-                                                    },
-                                                    endDateInfo = new EndDateInfo
-                                                    {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft,
-                                                    },
-                                                }
-                                            },
-                                            new FillFlowContainer
-                                            {
-                                                AutoSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Top = 3 },
-                                                Direction = FillDirection.Vertical,
-                                                Children = new Drawable[]
-                                                {
-                                                    new RoomNameText(),
-                                                    new RoomHostText(),
-                                                }
-                                            }
-                                        },
+                                        new Dimension(GridSizeMode.Relative, 0.2f)
                                     },
-                                    new FillFlowContainer
+                                    Content = new[]
                                     {
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft,
-                                        AutoSizeAxes = Axes.Both,
-                                        Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(5),
-                                        Children = new Drawable[]
+                                        new Drawable[]
                                         {
-                                            new PlaylistCountPill
+                                            new Box
                                             {
-                                                Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.CentreLeft,
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = colours.Background5,
                                             },
-                                            new StarRatingRangeDisplay
+                                            new Box
                                             {
-                                                Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.CentreLeft,
-                                                Scale = new Vector2(0.8f)
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f))
+                                            },
+                                        }
+                                    }
+                                },
+                                new Container
+                                {
+                                    Name = @"Left details",
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding
+                                    {
+                                        Left = 20,
+                                        Vertical = 5
+                                    },
+                                    Children = new Drawable[]
+                                    {
+                                        new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Vertical,
+                                            Children = new Drawable[]
+                                            {
+                                                new FillFlowContainer
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(5),
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new RoomStatusPill
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft
+                                                        },
+                                                        specialCategoryPill = new RoomSpecialCategoryPill
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft
+                                                        },
+                                                        endDateInfo = new EndDateInfo
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                        },
+                                                    }
+                                                },
+                                                new FillFlowContainer
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Padding = new MarginPadding { Top = 3 },
+                                                    Direction = FillDirection.Vertical,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new RoomNameText(),
+                                                        new RoomHostText(),
+                                                    }
+                                                }
+                                            },
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(5),
+                                            Children = new Drawable[]
+                                            {
+                                                new PlaylistCountPill
+                                                {
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                },
+                                                new StarRatingRangeDisplay
+                                                {
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                    Scale = new Vector2(0.8f)
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            },
-                            new FillFlowContainer
-                            {
-                                Name = "Right content",
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                AutoSizeAxes = Axes.X,
-                                RelativeSizeAxes = Axes.Y,
-                                Spacing = new Vector2(5),
-                                Padding = new MarginPadding
-                                {
-                                    Right = 10,
-                                    Vertical = 20,
                                 },
-                                Children = new Drawable[]
+                                new FillFlowContainer
                                 {
-                                    ButtonsContainer = new Container
+                                    Name = "Right content",
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    AutoSizeAxes = Axes.X,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Spacing = new Vector2(5),
+                                    Padding = new MarginPadding
                                     {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        RelativeSizeAxes = Axes.Y,
-                                        AutoSizeAxes = Axes.X
+                                        Right = 10,
+                                        Vertical = 20,
                                     },
-                                    recentParticipantsList = new RecentParticipantsList
+                                    Children = new Drawable[]
                                     {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        NumberOfCircles = NumberOfAvatars
+                                        ButtonsContainer = new Container
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            RelativeSizeAxes = Axes.Y,
+                                            AutoSizeAxes = Axes.X
+                                        },
+                                        recentParticipantsList = new RecentParticipantsList
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            NumberOfCircles = NumberOfAvatars
+                                        }
                                     }
-                                }
+                                },
+                                passwordIcon = new PasswordProtectedIcon { Alpha = 0 }
                             },
-                            passwordIcon = new PasswordProtectedIcon { Alpha = 0 }
                         },
-                    },
-                },
+                    }, 0)
             };
         }
 
@@ -231,23 +234,26 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            roomCategory.BindTo(Room.Category);
-            roomCategory.BindValueChanged(c =>
+            wrapper.DelayedLoadComplete += _ =>
             {
-                if (c.NewValue == RoomCategory.Spotlight)
-                    specialCategoryPill.Show();
-                else
-                    specialCategoryPill.Hide();
-            }, true);
+                roomCategory.BindTo(Room.Category);
+                roomCategory.BindValueChanged(c =>
+                {
+                    if (c.NewValue == RoomCategory.Spotlight)
+                        specialCategoryPill.Show();
+                    else
+                        specialCategoryPill.Hide();
+                }, true);
 
-            roomType.BindTo(Room.Type);
-            roomType.BindValueChanged(t =>
-            {
-                endDateInfo.Alpha = t.NewValue == MatchType.Playlists ? 1 : 0;
-            }, true);
+                roomType.BindTo(Room.Type);
+                roomType.BindValueChanged(t =>
+                {
+                    endDateInfo.Alpha = t.NewValue == MatchType.Playlists ? 1 : 0;
+                }, true);
 
-            hasPassword.BindTo(Room.HasPassword);
-            hasPassword.BindValueChanged(v => passwordIcon.Alpha = v.NewValue ? 1 : 0, true);
+                hasPassword.BindTo(Room.HasPassword);
+                hasPassword.BindValueChanged(v => passwordIcon.Alpha = v.NewValue ? 1 : 0, true);
+            };
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
