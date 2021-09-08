@@ -90,6 +90,12 @@ namespace osu.Game.Beatmaps
         /// The song language of this beatmap set.
         /// </summary>
         public BeatmapSetOnlineLanguage Language { get; set; }
+
+        /// <summary>
+        /// The song ID of this beatmap set.
+        /// Non-null only if the song is from a featured artist.
+        /// </summary>
+        public int? TrackId { get; set; }
     }
 
     public class BeatmapSetOnlineGenre
