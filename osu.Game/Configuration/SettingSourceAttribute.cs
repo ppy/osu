@@ -167,18 +167,7 @@ namespace osu.Game.Configuration
             }
         }
 
-        public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetSettingsSourceProperties(this object obj)
-        {
-            foreach (var property in obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
-            {
-                var attr = property.GetCustomAttribute<SettingSourceAttribute>(true);
-
-                if (attr == null)
-                    continue;
-
-                yield return (attr, property);
-            }
-        }
+        public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetSettingsSourceProperties<T>(this T obj) => SettingSourceCache<T>.SettingSourceProperties;
 
         public static ICollection<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
             => obj.GetSettingsSourceProperties()
@@ -195,6 +184,15 @@ namespace osu.Game.Configuration
                 // Set menu's max height low enough to workaround nested scroll issues (see https://github.com/ppy/osu-framework/issues/4536).
                 protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 100);
             }
+        }
+
+        private static class SettingSourceCache<T>
+        {
+            public static (SettingSourceAttribute, PropertyInfo)[] SettingSourceProperties { get; } =
+                typeof(T).GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance)
+                         .Select(property => (property.GetCustomAttribute<SettingSourceAttribute>(), property))
+                         .Where(pair => pair.Item1 != null)
+                         .ToArray();
         }
     }
 }
