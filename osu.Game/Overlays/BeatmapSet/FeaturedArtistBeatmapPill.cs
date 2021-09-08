@@ -10,7 +10,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class ExplicitContentBeatmapPill : BeatmapSetBadgePill
+    public class FeaturedArtistBeatmapPill : BeatmapSetBadgePill
     {
         [BackgroundDependencyLoader]
         private void load()
@@ -18,9 +18,9 @@ namespace osu.Game.Overlays.BeatmapSet
             Add(new OsuSpriteText
             {
                 Margin = new MarginPadding { Horizontal = 10f, Vertical = 2f },
-                Text = BeatmapsetsStrings.NsfwBadgeLabel.ToUpper(),
+                Text = BeatmapsetsStrings.FeaturedArtistBadgeLabel.ToUpper(),
                 Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
-                Colour = OverlayColourProvider.Orange.Colour2,
+                Colour = OverlayColourProvider.Blue.Colour1
             });
         }
     }
