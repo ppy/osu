@@ -78,8 +78,8 @@ namespace osu.Desktop.DBus
 
             api.LocalUser.BindValueChanged(onUserChanged, true);
             beatmap.BindValueChanged(onBeatmapChanged, true);
-            ruleset.BindValueChanged(v => userInfoService.SetProperty("current_ruleset", v.NewValue?.Name ?? "???"), true);
-            bindableActivity.BindValueChanged(v => userInfoService.SetProperty("activity", v.NewValue?.Status ?? "空闲"), true);
+            ruleset.BindValueChanged(v => userInfoService.SetProperty(nameof(UserMetadataProperties.CurrentRuleset), v.NewValue?.Name ?? "???"), true);
+            bindableActivity.BindValueChanged(v => userInfoService.SetProperty(nameof(UserMetadataProperties.Activity), v.NewValue?.Status ?? "空闲"), true);
 
             mprisService.Storage = storage;
             mprisService.UseAvatarLogoAsDefault = config.GetBindable<bool>(MSetting.MprisUseAvatarlogoAsCover);

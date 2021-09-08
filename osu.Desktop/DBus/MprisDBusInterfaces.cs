@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Tmds.DBus;
-
-// ReSharper disable ConvertToAutoPropertyWhenPossible
-// ReSharper disable ConvertToConstant.Local
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable ConvertToAutoProperty
 
 namespace osu.Desktop.DBus
 {
@@ -24,6 +19,10 @@ namespace osu.Desktop.DBus
     }
 
     [Dictionary]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
+    [SuppressMessage("ReSharper", "ConvertToConstant.Local")]
+    [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
     public class MediaPlayer2Properties
     {
         private readonly bool _CanQuit = true;
@@ -103,6 +102,10 @@ namespace osu.Desktop.DBus
     }
 
     [Dictionary]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
+    [SuppressMessage("ReSharper", "ConvertToConstant.Local")]
+    [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
     public class PlayerProperties
     {
         internal string _PlaybackStatus = "Paused";

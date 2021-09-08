@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Tmds.DBus;
 
@@ -9,12 +10,52 @@ namespace Mvis.Plugin.CloudMusicSupport.DBus
     [DBusInterface("io.matrix_feather.mvis.lyric")]
     public interface ILyricDBusObject : IDBusObject
     {
-        Task<IDictionary<string, object>> GetAllAsync();
+        Task<LyricProperties> GetAllAsync();
         Task<object> GetAsync(string prop);
         Task SetAsync(string prop, object val);
         Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler);
         Task<string> GetCurrentLineRawAsync();
         Task<string> GetCurrentLineTranslatedAsync();
+    }
+
+    [Dictionary]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
+    [SuppressMessage("ReSharper", "ConvertToConstant.Local")]
+    [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
+    public class LyricProperties
+    {
+        private string _RawString = string.Empty;
+
+        public string RawString
+        {
+            get => _RawString;
+            set
+            {
+                _RawString = value;
+                dictionary[nameof(RawString)] = value;
+            }
+        }
+
+        private string _TranslatedString;
+
+        public string TranslatedString
+        {
+            get => _TranslatedString;
+            set
+            {
+                _TranslatedString = value;
+                dictionary[nameof(TranslatedString)] = value;
+            }
+        }
+
+        private readonly IDictionary<string, object> dictionary = new ConcurrentDictionary<string, object>
+        {
+            [nameof(RawString)] = string.Empty,
+            [nameof(TranslatedString)] = string.Empty
+        };
+
+        internal IDictionary<string, object> ToDictionary() => dictionary;
     }
 
     public class LyricDBusObject : ILyricDBusObject
@@ -27,7 +68,7 @@ namespace Mvis.Plugin.CloudMusicSupport.DBus
             set
             {
                 value ??= string.Empty;
-                properties["raw"] = value;
+                properties.RawString = value;
                 OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("raw", value));
             }
         }
@@ -37,26 +78,22 @@ namespace Mvis.Plugin.CloudMusicSupport.DBus
             set
             {
                 value ??= string.Empty;
-                properties["translate"] = value;
+                properties.TranslatedString = value;
                 OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("translate", value));
             }
         }
 
-        private readonly IDictionary<string, object> properties = new ConcurrentDictionary<string, object>
-        {
-            ["raw"] = "",
-            ["translate"] = ""
-        };
+        private readonly LyricProperties properties = new LyricProperties();
 
-        public Task<IDictionary<string, object>> GetAllAsync()
+        public Task<LyricProperties> GetAllAsync()
             => Task.FromResult(properties);
 
         public Task<object> GetAsync(string prop)
-            => Task.FromResult(properties[prop]);
+            => Task.FromResult(properties.ToDictionary()[prop]);
 
         public Task SetAsync(string prop, object val)
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException("只读属性");
         }
 
         public event Action<PropertyChanges> OnPropertiesChanged;
@@ -65,9 +102,9 @@ namespace Mvis.Plugin.CloudMusicSupport.DBus
             => SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
 
         public Task<string> GetCurrentLineRawAsync()
-            => Task.FromResult(properties["raw"] as string);
+            => Task.FromResult(properties.RawString);
 
         public Task<string> GetCurrentLineTranslatedAsync()
-            => Task.FromResult(properties["translate"] as string);
+            => Task.FromResult(properties.TranslatedString);
     }
 }
