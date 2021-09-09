@@ -10,7 +10,9 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -18,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
-    public class BarHitErrorMeter : HitErrorMeter
+    public class BarHitErrorMeter : HitErrorMeter, IKeyBindingHandler<GlobalAction>
     {
         private const int arrow_move_duration = 400;
 
@@ -278,6 +280,23 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 this.ResizeWidthTo(1, 200, Easing.OutElasticHalf);
                 this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration).Expire();
             }
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.SeekReplayBackward:
+                case GlobalAction.SeekReplayForward:
+                    judgementsContainer.Clear(true);
+                    return false;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 }
