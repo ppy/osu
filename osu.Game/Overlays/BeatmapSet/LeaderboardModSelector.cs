@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 return;
 
             modsContainer.Add(new ModButton(new ModNoMod()));
-            modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllMods().Where(m => m.UserPlayable).Select(m => new ModButton(m)));
+            modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllModsForReference().Where(m => m.UserPlayable).Select(m => new ModButton(m)));
 
             modsContainer.ForEach(button =>
             {
