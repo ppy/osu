@@ -24,7 +24,6 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using JetBrains.Annotations;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
@@ -82,6 +81,20 @@ namespace osu.Game.Rulesets
 
             if (type != null)
                 return (Mod)Activator.CreateInstance(type);
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns a fresh instance of the mod matching the specified type.
+        /// </summary>
+        public T GetMod<T>()
+            where T : Mod
+        {
+            var type = GetAllModsForReference().FirstOrDefault(m => m is T)?.GetType();
+
+            if (type != null)
+                return (T)Activator.CreateInstance(type);
 
             return null;
         }
@@ -166,7 +179,7 @@ namespace osu.Game.Rulesets
         }
 
         [CanBeNull]
-        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().FirstOrDefault();
+        public ModAutoplay GetAutoplayMod() => GetMod<ModAutoplay>();
 
         public virtual ISkin CreateLegacySkinProvider([NotNull] ISkin skin, IBeatmap beatmap) => null;
 
