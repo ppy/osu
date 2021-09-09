@@ -20,10 +20,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyCursorStarParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
+    public class LegacyCursorParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
     {
-        private StarParticleSpewer breakSpewer;
-        private StarParticleSpewer kiaiSpewer;
+        private LegacyCursorParticleSpewer breakSpewer;
+        private LegacyCursorParticleSpewer kiaiSpewer;
 
         [Resolved(canBeNull: true)]
         private Player player { get; set; }
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             InternalChildren = new[]
             {
-                breakSpewer = new StarParticleSpewer(texture, 20)
+                breakSpewer = new LegacyCursorParticleSpewer(texture, 20)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Value = false,
                     }
                 },
-                kiaiSpewer = new StarParticleSpewer(texture, 60)
+                kiaiSpewer = new LegacyCursorParticleSpewer(texture, 60)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 breakSpewer.Direction = SpewDirection.None;
         }
 
-        private class StarParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
+        private class LegacyCursorParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
         {
             private const int particle_lifetime_min = 300;
             private const int particle_lifetime_max = 1000;
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             protected override bool CanSpawnParticles => base.CanSpawnParticles && cursorScreenPosition.HasValue;
             protected override float ParticleGravity => 240;
 
-            public StarParticleSpewer(Texture texture, int perSecond)
+            public LegacyCursorParticleSpewer(Texture texture, int perSecond)
                 : base(texture, perSecond, particle_lifetime_max)
             {
                 Active.BindValueChanged(_ => resetVelocityCalculation());
