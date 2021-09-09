@@ -22,10 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
 
-    if: |
-      github.event.issue.pull_request &&
-      contains(github.event.comment.body, '!pp check') &&
-      (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '!pp check') && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')
 
     strategy:
       fail-fast: false
