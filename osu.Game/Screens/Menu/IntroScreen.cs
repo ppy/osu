@@ -115,7 +115,9 @@ namespace osu.Game.Screens.Menu
                 if (setInfo == null)
                     return false;
 
-                return (initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0])) != null;
+                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+
+                return UsingThemedIntro = initialBeatmap != null;
             }
         }
 
@@ -184,7 +186,6 @@ namespace osu.Game.Screens.Menu
             {
                 beatmap.Value = initialBeatmap;
                 Track = initialBeatmap.Track;
-                UsingThemedIntro = !initialBeatmap.Track.IsDummyDevice;
 
                 // ensure the track starts at maximum volume
                 musicController.CurrentTrack.FinishTransforms();
