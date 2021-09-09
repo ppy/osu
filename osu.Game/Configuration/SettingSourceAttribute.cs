@@ -168,14 +168,14 @@ namespace osu.Game.Configuration
             }
         }
 
-        private static readonly ConcurrentDictionary<Type, IEnumerable<(SettingSourceAttribute, PropertyInfo)>> property_info_cache = new ConcurrentDictionary<Type, IEnumerable<(SettingSourceAttribute, PropertyInfo)>>();
+        private static readonly ConcurrentDictionary<Type, (SettingSourceAttribute, PropertyInfo)[]> property_info_cache = new ConcurrentDictionary<Type, (SettingSourceAttribute, PropertyInfo)[]>();
 
         public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetSettingsSourceProperties(this object obj)
         {
             var type = obj.GetType();
 
             if (!property_info_cache.TryGetValue(type, out var properties))
-                property_info_cache[type] = properties = getSettingsSourceProperties(type);
+                property_info_cache[type] = properties = getSettingsSourceProperties(type).ToArray();
 
             return properties;
         }
