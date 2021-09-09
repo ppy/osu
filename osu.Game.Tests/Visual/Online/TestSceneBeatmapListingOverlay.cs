@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet, 100).ToArray()));
 
-            AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+            AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
 
             AddStep("scroll to bottom", () => overlay.ChildrenOfType<OverlayScrollContainer>().First().ScrollToEnd());
 
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
 
             AddStep("fetch for 1 beatmap", () => fetchFor(CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet));
-            AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+            AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
 
             AddStep("fetch for 0 beatmaps", () => fetchFor());
             AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
@@ -283,8 +283,8 @@ namespace osu.Game.Tests.Visual.Online
         private void noPlaceholderShown()
         {
             AddUntilStep("no placeholder shown", () =>
-                !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any()
-                && !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+                !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any(d => d.IsPresent)
+                && !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
         }
 
         private class TestAPIBeatmapSet : APIBeatmapSet
