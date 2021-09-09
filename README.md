@@ -36,7 +36,6 @@ If you are looking to install or test osu! without setting up a development envi
 
 - The iOS testflight link may fill up (Apple has a hard limit of 10,000 users). We reset it occasionally when this happens. Please do not ask about this. Check back regularly for link resets or follow [peppy](https://twitter.com/ppy) on twitter for announcements of link resets.
 
-- When running on Windows 8.1, *[additional prerequisites](https://docs.microsoft.com/en-us/dotnet/core/install/windows?tabs=net50&pivots=os-windows#dependencies)** may be required to correctly run .NET 5 applications if your operating system is not up-to-date with the latest service packs.
 If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
 
 ## Developing a custom ruleset
