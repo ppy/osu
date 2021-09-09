@@ -33,7 +33,7 @@ jobs:
         ruleset:
           - { name: osu, id: 0 }
           - { name: taiko, id: 1 }
-          - { name: catch, id: 2 }
+          - { name: fruits, id: 2 }
           - { name: mania, id: 3 }
 
     services:
