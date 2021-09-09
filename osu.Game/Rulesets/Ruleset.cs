@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -23,6 +24,7 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using JetBrains.Annotations;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
@@ -38,6 +40,13 @@ namespace osu.Game.Rulesets
     {
         public RulesetInfo RulesetInfo { get; internal set; }
 
+        /// <summary>
+        /// Returns fresh instances of all mods.
+        /// </summary>
+        /// <remarks>
+        /// This comes with considerable allocation overhead. If only accessing for reference purposes (ie. not changing bindables / settings)
+        /// use <see cref="GetAllModsForReference"/> instead.
+        /// </remarks>
         public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
                                                     // Confine all mods of each mod type into a single IEnumerable<Mod>
                                                     .SelectMany(GetModsFor)
@@ -45,6 +54,37 @@ namespace osu.Game.Rulesets
                                                     .Where(mod => mod != null)
                                                     // Resolve MultiMods as their .Mods property
                                                     .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
+
+        private static readonly ConcurrentDictionary<int, Mod[]> mod_reference_cache = new ConcurrentDictionary<int, Mod[]>();
+
+        /// <summary>
+        /// Returns all mods for a query-only purpose.
+        /// Bindables should not be considered usable when retrieving via this method (use <see cref="GetAllMods"/> instead).
+        /// </summary>
+        public IEnumerable<Mod> GetAllModsForReference()
+        {
+            if (!(RulesetInfo.ID is int id))
+                return GetAllMods();
+
+            if (!mod_reference_cache.TryGetValue(id, out var mods))
+                mod_reference_cache[id] = mods = GetAllMods().ToArray();
+
+            return mods;
+        }
+
+        /// <summary>
+        /// Returns a fresh instance of the mod matching the specified acronym.
+        /// </summary>
+        /// <param name="acronym">The acronym to query for .</param>
+        public Mod GetModForAcronym(string acronym)
+        {
+            var type = GetAllModsForReference().FirstOrDefault(m => m.Acronym == acronym)?.GetType();
+
+            if (type != null)
+                return (Mod)Activator.CreateInstance(type);
+
+            return null;
+        }
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 

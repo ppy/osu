@@ -39,5 +39,11 @@ namespace osu.Game.Benchmarks
         {
             ruleset.GetAllMods().Consume(new Consumer());
         }
+
+        [Benchmark]
+        public void BenchmarkGetAllModsForReference()
+        {
+            ruleset.GetAllModsForReference().Consume(new Consumer());
+        }
     }
 }
