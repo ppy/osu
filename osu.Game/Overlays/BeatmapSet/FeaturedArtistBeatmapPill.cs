@@ -1,27 +1,29 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class FeaturedArtistBeatmapPill : BeatmapSetBadgePill
+    public class FeaturedArtistBeatmapPill : CompositeDrawable
     {
-        [BackgroundDependencyLoader]
-        private void load()
+        public FeaturedArtistBeatmapPill()
         {
-            Add(new OsuSpriteText
+            AutoSizeAxes = Axes.Both;
+            InternalChild = new BeatmapSetBadgePillContainer
             {
-                Margin = new MarginPadding { Horizontal = 10f, Vertical = 2f },
-                Text = BeatmapsetsStrings.FeaturedArtistBadgeLabel.ToUpper(),
-                Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
-                Colour = OverlayColourProvider.Blue.Colour1
-            });
+                Child = new OsuSpriteText
+                {
+                    Text = BeatmapsetsStrings.FeaturedArtistBadgeLabel.ToUpper(),
+                    Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
+                    Colour = OverlayColourProvider.Blue.Colour1
+                }
+            };
         }
     }
 }
