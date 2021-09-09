@@ -90,8 +90,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void StartTrack()
         {
-            if (UsingThemedIntro)
-                decoupledClock.Start();
+            decoupledClock.Start();
         }
 
         private class TrianglesIntroSequence : CompositeDrawable
