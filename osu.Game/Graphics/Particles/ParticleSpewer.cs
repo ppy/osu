@@ -26,22 +26,16 @@ namespace osu.Game.Graphics.Particles
         /// </summary>
         public readonly BindableBool Active = new BindableBool();
 
-        /// <summary>
-        /// <see cref="Drawable"/> whose DrawInfo will be used to draw each particle.
-        /// Defaults to the <see cref="ParticleSpewer"/> itself.
-        /// </summary>
-        public IDrawable ParticleParent;
-
         public bool HasActiveParticles => Active.Value || (lastParticleAdded + maxLifetime) > Time.Current;
         public override bool IsPresent => base.IsPresent && HasActiveParticles;
 
+        protected virtual bool CanSpawnParticles => true;
         protected virtual float ParticleGravity => 0;
 
         protected ParticleSpewer(Texture texture, int perSecond, double maxLifetime)
         {
             Texture = texture;
             Blending = BlendingParameters.Additive;
-            ParticleParent = this;
 
             particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxLifetime / 1000)];
 
@@ -57,9 +51,12 @@ namespace osu.Game.Graphics.Particles
             // this can happen when seeking in replays.
             if (lastParticleAdded > Time.Current) lastParticleAdded = 0;
 
-            if (Active.Value && Time.Current > lastParticleAdded + cooldown)
+            if (Active.Value && CanSpawnParticles && Time.Current > lastParticleAdded + cooldown)
             {
-                addParticle(SpawnParticle());
+                particles[currentIndex] = SpawnParticle();
+
+                currentIndex = (currentIndex + 1) % particles.Length;
+                lastParticleAdded = Time.Current;
             }
 
             Invalidate(Invalidation.DrawNode);
@@ -76,14 +73,6 @@ namespace osu.Game.Graphics.Particles
             };
         }
 
-        private void addParticle(FallingParticle fallingParticle)
-        {
-            particles[currentIndex] = fallingParticle;
-
-            currentIndex = (currentIndex + 1) % particles.Length;
-            lastParticleAdded = Time.Current;
-        }
-
         protected override DrawNode CreateDrawNode() => new ParticleSpewerDrawNode(this);
 
         # region DrawNode
@@ -96,7 +85,6 @@ namespace osu.Game.Graphics.Particles
 
             private float currentTime;
             private float gravity;
-            private Matrix3 particleDrawMatrix;
 
             public ParticleSpewerDrawNode(Sprite source)
                 : base(source)
@@ -112,7 +100,6 @@ namespace osu.Game.Graphics.Particles
 
                 currentTime = (float)Source.Time.Current;
                 gravity = Source.ParticleGravity;
-                particleDrawMatrix = Source.ParticleParent.DrawInfo.Matrix;
             }
 
             protected override void Blit(Action<TexturedVertex2D> vertexAction)
@@ -165,7 +152,7 @@ namespace osu.Game.Graphics.Particles
                 float x = centre.X + (pos.X - centre.X) * cos + (pos.Y - centre.Y) * sin;
                 float y = centre.Y + (pos.Y - centre.Y) * cos - (pos.X - centre.X) * sin;
 
-                return Vector2Extensions.Transform(new Vector2(x, y), particleDrawMatrix);
+                return Vector2Extensions.Transform(new Vector2(x, y), DrawInfo.Matrix);
             }
         }
 
