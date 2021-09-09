@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Osu;
 
@@ -36,7 +37,7 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkGetAllMods()
         {
-            ruleset.GetAllMods();
+            ruleset.GetAllMods().Consume(new Consumer());
         }
     }
 }
