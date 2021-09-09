@@ -166,7 +166,7 @@ namespace osu.Game
 
         public OsuGameBase()
         {
-            UseDevelopmentServer = false;
+            UseDevelopmentServer = DebugUtils.IsDebugBuild;
             Name = @"osu!";
         }
 
