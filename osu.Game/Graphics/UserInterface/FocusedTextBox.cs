@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnKeyDown(e);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(GlobalAction action)
         {
             if (!HasFocus) return false;
 
