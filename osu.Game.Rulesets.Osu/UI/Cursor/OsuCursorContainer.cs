@@ -11,7 +11,6 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Configuration;
-using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
@@ -46,11 +45,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Children = new[]
                 {
                     cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
-                    new LegacyCursorStarParticles()
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
+                    new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
                 }
             };
         }
