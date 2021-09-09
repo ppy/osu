@@ -69,7 +69,7 @@ namespace Mvis.Plugin.CollectionSupport.DBus
             {
                 value ??= string.Empty;
                 properties.Name = value;
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("name", value));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(CollectionProperties.Name), value));
             }
         }
 
@@ -78,7 +78,7 @@ namespace Mvis.Plugin.CollectionSupport.DBus
             set
             {
                 properties.Position = value;
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("position", value));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(CollectionProperties.Position), value));
             }
         }
 

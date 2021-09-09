@@ -1,6 +1,5 @@
 using System;
 using M.DBus;
-using M.DBus.Services;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -58,13 +57,11 @@ namespace osu.Desktop.DBus
             {
                 beatmapService = new BeatmapInfoDBusService(),
                 audioservice = new AudioInfoDBusService(),
-                userInfoService = new UserInfoDBusService(),
-                new Greet(GetType().Namespace + '.' + GetType().Name)
-                {
-                    AllowPost = config.GetBindable<bool>(MSetting.DBusAllowPost),
-                    OnMessageRecive = onMessageRevicedFromDBus
-                }
+                userInfoService = new UserInfoDBusService()
             });
+
+            DBusManager.GreetService.AllowPost = config.GetBindable<bool>(MSetting.DBusAllowPost);
+            DBusManager.GreetService.OnMessageRecive = onMessageRevicedFromDBus;
 
             void onDBusConnected()
             {
@@ -82,6 +79,8 @@ namespace osu.Desktop.DBus
             bindableActivity.BindValueChanged(v => userInfoService.SetProperty(nameof(UserMetadataProperties.Activity), v.NewValue?.Status ?? "空闲"), true);
 
             mprisService.Storage = storage;
+            beatmapService.Storage = storage;
+
             mprisService.UseAvatarLogoAsDefault = config.GetBindable<bool>(MSetting.MprisUseAvatarlogoAsCover);
             mprisService.Next += () => musicController.NextTrack();
             mprisService.Previous += () => musicController.PreviousTrack();
@@ -95,10 +94,23 @@ namespace osu.Desktop.DBus
             mprisService.WindowRaise += () => (host.Window as SDL2DesktopWindow)?.Raise();
         }
 
+        protected override void LoadComplete()
+        {
+            controlSource?.BindValueChanged(onControlSourceChanged, true);
+            Scheduler.AddDelayed(updateAudioProperties, 50, true);
+            base.LoadComplete();
+        }
+
         protected override void Update()
         {
             base.Update();
             mprisService.TrackRunning = musicController.CurrentTrack.IsRunning;
+        }
+
+        private void updateAudioProperties()
+        {
+            audioservice.Length = musicController.CurrentTrack.Length;
+            audioservice.Current = musicController.CurrentTrack.CurrentTime;
         }
 
         public Action<Notification> NotificationAction { get; set; }
@@ -123,14 +135,7 @@ namespace osu.Desktop.DBus
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {
             beatmapService.Beatmap = v.NewValue;
-            audioservice.Beatmap = v.NewValue;
             mprisService.Beatmap = v.NewValue;
-        }
-
-        protected override void LoadComplete()
-        {
-            controlSource?.BindValueChanged(onControlSourceChanged, true);
-            base.LoadComplete();
         }
 
         private void onControlSourceChanged(ValueChangedEvent<bool> v)

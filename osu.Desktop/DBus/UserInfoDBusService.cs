@@ -189,7 +189,7 @@ namespace osu.Desktop.DBus
         internal void SetProperty(string target, object value)
         {
             if (properties.SetValue(target, value))
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(target), value));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, value));
         }
 
         private readonly UserMetadataProperties properties = new UserMetadataProperties();

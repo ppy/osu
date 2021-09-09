@@ -2,7 +2,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using Tmds.DBus;
 
@@ -89,13 +92,26 @@ namespace osu.Desktop.DBus
             }
         }
 
+        private string _CoverPath;
+
+        public string CoverPath
+        {
+            get => _CoverPath;
+            set
+            {
+                _CoverPath = value;
+                dictionary[nameof(CoverPath)] = value;
+            }
+        }
+
         private readonly IDictionary<string, object> dictionary = new ConcurrentDictionary<string, object>
         {
             [nameof(FullName)] = string.Empty,
             [nameof(Version)] = string.Empty,
             [nameof(Stars)] = default,
             [nameof(OnlineID)] = default,
-            [nameof(BPM)] = default
+            [nameof(BPM)] = default,
+            [nameof(CoverPath)] = string.Empty,
         };
 
         internal IDictionary<string, object> ToDictionary() => dictionary;
@@ -123,6 +139,10 @@ namespace osu.Desktop.DBus
                 case nameof(BPM):
                     BPM = (double)value;
                     return true;
+
+                case nameof(CoverPath):
+                    CoverPath = (string)value;
+                    return true;
             }
 
             return false;
@@ -148,13 +168,40 @@ namespace osu.Desktop.DBus
                 setProperty(nameof(properties.Stars), value.BeatmapInfo.StarDifficulty);
                 setProperty(nameof(properties.OnlineID), value.BeatmapInfo.OnlineBeatmapID ?? -1);
                 setProperty(nameof(properties.BPM), value.BeatmapInfo.BPM);
+                setProperty(nameof(properties.CoverPath), resolveBeatmapCoverUrl(value));
             }
+        }
+
+        internal Storage Storage { get; set; }
+
+        private string resolveBeatmapCoverUrl(WorkingBeatmap beatmap)
+        {
+            string body;
+            var backgroundFilename = beatmap?.BeatmapInfo.Metadata?.BackgroundFile;
+
+            if (!string.IsNullOrEmpty(backgroundFilename))
+            {
+                body = Storage?.GetFullPath("files")
+                       + Path.DirectorySeparatorChar
+                       + (beatmap.BeatmapSetInfo.GetPathForFile(beatmap.BeatmapInfo.Metadata?.BackgroundFile)
+                          ?? string.Empty);
+            }
+            else
+            {
+                var target = Storage?.GetFiles("custom", "avatarlogo*").FirstOrDefault(s => s.Contains("avatarlogo"));
+                if (!string.IsNullOrEmpty(target))
+                    body = Storage.GetFullPath(target);
+                else
+                    return string.Empty;
+            }
+
+            return body;
         }
 
         private void setProperty(string target, object value)
         {
             if (properties.SetValue(target, value))
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(target), value));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, value));
         }
 
         public Task<BeatmapMetadataProperties> GetAllAsync()

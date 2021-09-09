@@ -69,7 +69,7 @@ namespace Mvis.Plugin.CloudMusicSupport.DBus
             {
                 value ??= string.Empty;
                 properties.RawString = value;
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("raw", value));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(properties.RawString), value));
             }
         }
 
@@ -79,7 +79,7 @@ namespace Mvis.Plugin.CloudMusicSupport.DBus
             {
                 value ??= string.Empty;
                 properties.TranslatedString = value;
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("translate", value));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(properties.TranslatedString), value));
             }
         }
 

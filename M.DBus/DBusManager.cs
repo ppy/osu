@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using M.DBus.Services;
 using osu.Framework.Logging;
 using Tmds.DBus;
 
@@ -16,11 +17,15 @@ namespace M.DBus
 
         public Action OnConnected;
 
+        public Greet GreetService = new Greet();
+
         public DBusManager(bool startOnLoad)
         {
             //如果在初始化时启动服务
             if (startOnLoad)
                 Connect();
+
+            Task.Run(() => RegisterNewObject(GreetService));
         }
 
         #region 工具
@@ -205,6 +210,7 @@ namespace M.DBus
 
                     await registerObjects().ConfigureAwait(false);
                     OnConnected?.Invoke();
+                    GreetService.SwitchState(true, "");
                     break;
 
                 case ConnectionState.Connected:
@@ -213,6 +219,7 @@ namespace M.DBus
                     //直接注册
                     await registerObjects().ConfigureAwait(false);
                     OnConnected?.Invoke();
+                    GreetService.SwitchState(true, "");
                     break;
             }
         }
@@ -230,6 +237,8 @@ namespace M.DBus
                 switch (connectionState)
                 {
                     case ConnectionState.Connected:
+                        GreetService.SwitchState(false, "Diconnecting");
+
                         //反注册物件
                         currentConnection.UnregisterObjects(registerDictionary.Keys);
 
