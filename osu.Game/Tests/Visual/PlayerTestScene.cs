@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual
 
             if (!AllowFail)
             {
-                var noFailMod = ruleset.GetAllMods().FirstOrDefault(m => m is ModNoFail);
+                var noFailMod = ruleset.GetMod<ModNoFail>();
                 if (noFailMod != null)
                     SelectedMods.Value = new[] { noFailMod };
             }
