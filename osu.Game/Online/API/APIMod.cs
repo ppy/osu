@@ -53,12 +53,15 @@ namespace osu.Game.Online.API
             if (resultMod == null)
                 throw new InvalidOperationException($"There is no mod in the ruleset ({ruleset.ShortName}) matching the acronym {Acronym}.");
 
-            foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
+            if (Settings.Count > 0)
             {
-                if (!Settings.TryGetValue(property.Name.Underscore(), out object settingValue))
-                    continue;
+                foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
+                {
+                    if (!Settings.TryGetValue(property.Name.Underscore(), out object settingValue))
+                        continue;
 
-                resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                    resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                }
             }
 
             return resultMod;
