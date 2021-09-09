@@ -4,11 +4,13 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Particles;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
@@ -18,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyCursorStarParticles : BeatSyncedContainer, IKeyBindingHandler<OsuAction>
+    public class LegacyCursorStarParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
     {
         private StarParticleSpewer breakSpewer;
         private StarParticleSpewer kiaiSpewer;
@@ -63,12 +65,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (player != null)
             {
                 breakSpewer.Active.BindTarget = player.IsBreakTime;
-            }
-
-            if (osuPlayfield != null)
-            {
-                breakSpewer.ParticleParent = osuPlayfield;
-                kiaiSpewer.ParticleParent = osuPlayfield;
             }
         }
 
@@ -116,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             }
 
             if (leftPressed && rightPressed)
-                breakSpewer.Direction = SpewDirection.Both;
+                breakSpewer.Direction = SpewDirection.Omni;
             else if (leftPressed)
                 breakSpewer.Direction = SpewDirection.Left;
             else if (rightPressed)
@@ -125,13 +121,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 breakSpewer.Direction = SpewDirection.None;
         }
 
-        private class StarParticleSpewer : ParticleSpewer
+        private class StarParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
         {
             private const int particle_lifetime_min = 300;
             private const int particle_lifetime_max = 1000;
 
             public SpewDirection Direction { get; set; }
 
+            protected override bool CanSpawnParticles => base.CanSpawnParticles && cursorScreenPosition.HasValue;
             protected override float ParticleGravity => 240;
 
             public StarParticleSpewer(Texture texture, int perSecond)
@@ -140,48 +137,52 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 Active.BindValueChanged(_ => resetVelocityCalculation());
             }
 
-            private Vector2 positionInParent => ToSpaceOfOtherDrawable(OriginPosition, ParticleParent);
+            private Vector2? cursorScreenPosition;
+            private Vector2 cursorVelocity;
 
-            private Vector2 screenVelocity;
+            private const double max_velocity_frame_length = 15;
+            private double velocityFrameLength;
+            private Vector2 totalPosDifference;
 
-            private const double velocity_calculation_delay = 15;
-            private double lastVelocityCalculation;
-            private Vector2 positionDifference;
-            private Vector2? lastPosition;
-
-            protected override void Update()
+            protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                base.Update();
-
-                if (lastPosition != null)
+                if (cursorScreenPosition == null)
                 {
-                    positionDifference += (positionInParent - lastPosition.Value);
-                    lastVelocityCalculation += Clock.ElapsedFrameTime;
+                    cursorScreenPosition = e.ScreenSpaceMousePosition;
+                    return base.OnMouseMove(e);
                 }
 
-                lastPosition = positionInParent;
+                // calculate cursor velocity.
+                totalPosDifference += e.ScreenSpaceMousePosition - cursorScreenPosition.Value;
+                cursorScreenPosition = e.ScreenSpaceMousePosition;
 
-                if (lastVelocityCalculation > velocity_calculation_delay)
+                velocityFrameLength += Clock.ElapsedFrameTime;
+
+                if (velocityFrameLength > max_velocity_frame_length)
                 {
-                    screenVelocity = positionDifference / (float)lastVelocityCalculation;
+                    cursorVelocity = totalPosDifference / (float)velocityFrameLength;
 
-                    positionDifference = Vector2.Zero;
-                    lastVelocityCalculation = 0;
+                    totalPosDifference = Vector2.Zero;
+                    velocityFrameLength = 0;
                 }
+
+                return base.OnMouseMove(e);
             }
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             private void resetVelocityCalculation()
             {
-                positionDifference = Vector2.Zero;
-                lastVelocityCalculation = 0;
-                lastPosition = null;
+                cursorScreenPosition = null;
+                totalPosDifference = Vector2.Zero;
+                velocityFrameLength = 0;
             }
 
             protected override FallingParticle SpawnParticle()
             {
                 var p = base.SpawnParticle();
 
-                p.StartPosition = positionInParent;
+                p.StartPosition = ToLocalSpace(cursorScreenPosition ?? Vector2.Zero);
                 p.Duration = RNG.NextSingle(particle_lifetime_min, particle_lifetime_max);
                 p.StartAngle = (float)(RNG.NextDouble() * 4 - 2);
                 p.EndAngle = RNG.NextSingle(-2f, 2f);
@@ -207,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         );
                         break;
 
-                    case SpewDirection.Both:
+                    case SpewDirection.Omni:
                         p.Velocity = new Vector2(
                             RNG.NextSingle(-460f, 460f),
                             RNG.NextSingle(-160f, 160f)
@@ -215,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         break;
                 }
 
-                p.Velocity += screenVelocity * 40;
+                p.Velocity += cursorVelocity * 40;
 
                 return p;
             }
@@ -226,7 +227,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             None,
             Left,
             Right,
-            Both,
+            Omni,
         }
     }
 }

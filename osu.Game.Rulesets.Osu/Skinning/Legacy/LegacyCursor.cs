@@ -31,11 +31,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             InternalChildren = new[]
             {
-                new LegacyCursorStarParticles
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
                 ExpandTarget = new NonPlayfieldSprite
                 {
                     Texture = skin.GetTexture("cursor"),
