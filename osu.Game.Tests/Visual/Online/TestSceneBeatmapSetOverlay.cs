@@ -11,7 +11,6 @@ using osu.Game.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Utils;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -21,6 +20,8 @@ namespace osu.Game.Tests.Visual.Online
         private readonly TestBeatmapSetOverlay overlay;
 
         protected override bool UseOnlineAPI => true;
+
+        private int nextBeatmapSetId = 1;
 
         public TestSceneBeatmapSetOverlay()
         {
@@ -323,8 +324,8 @@ namespace osu.Game.Tests.Visual.Online
         private BeatmapSetInfo getBeatmapSet()
         {
             var beatmapSet = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
-            // Overlay doesn't reload if the same beatmap set is set.
-            beatmapSet.OnlineBeatmapSetID = RNG.Next();
+            // Make sure the overlay is reloaded (see `BeatmapSetInfo.Equals`).
+            beatmapSet.OnlineBeatmapSetID = nextBeatmapSetId++;
             return beatmapSet;
         }
 
