@@ -203,6 +203,71 @@ namespace osu.Game.Tests.Visual.Ranking
             assertExpandedPanelCentred();
         }
 
+        [Test]
+        public void TestKeyboardNavigation()
+        {
+            var lowestScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { MaxCombo = 100 };
+            var middleScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { MaxCombo = 200 };
+            var highestScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { MaxCombo = 300 };
+
+            createListStep(() => new ScorePanelList());
+
+            AddStep("add scores and select middle", () =>
+            {
+                // order of addition purposefully scrambled.
+                list.AddScore(middleScore);
+                list.AddScore(lowestScore);
+                list.AddScore(highestScore);
+                list.SelectedScore.Value = middleScore;
+            });
+
+            assertScoreState(highestScore, false);
+            assertScoreState(middleScore, true);
+            assertScoreState(lowestScore, false);
+
+            AddStep("press left", () => InputManager.Key(Key.Left));
+
+            assertScoreState(highestScore, true);
+            assertScoreState(middleScore, false);
+            assertScoreState(lowestScore, false);
+            assertExpandedPanelCentred();
+
+            AddStep("press left at start of list", () => InputManager.Key(Key.Left));
+
+            assertScoreState(highestScore, true);
+            assertScoreState(middleScore, false);
+            assertScoreState(lowestScore, false);
+            assertExpandedPanelCentred();
+
+            AddStep("press right", () => InputManager.Key(Key.Right));
+
+            assertScoreState(highestScore, false);
+            assertScoreState(middleScore, true);
+            assertScoreState(lowestScore, false);
+            assertExpandedPanelCentred();
+
+            AddStep("press right again", () => InputManager.Key(Key.Right));
+
+            assertScoreState(highestScore, false);
+            assertScoreState(middleScore, false);
+            assertScoreState(lowestScore, true);
+            assertExpandedPanelCentred();
+
+            AddStep("press right at end of list", () => InputManager.Key(Key.Right));
+
+            assertScoreState(highestScore, false);
+            assertScoreState(middleScore, false);
+            assertScoreState(lowestScore, true);
+            assertExpandedPanelCentred();
+
+            AddStep("press left", () => InputManager.Key(Key.Left));
+
+            assertScoreState(highestScore, false);
+            assertScoreState(middleScore, true);
+            assertScoreState(lowestScore, false);
+            assertExpandedPanelCentred();
+        }
+
         private void createListStep(Func<ScorePanelList> creationFunc)
         {
             AddStep("create list", () => Child = list = creationFunc().With(d =>
