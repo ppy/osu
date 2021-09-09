@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Changelog
             };
 
             supportLinkText.AddText("Support further development of osu! and ");
-            supportLinkText.AddLink("become an osu!supporter", "https://osu.ppy.sh/home/support", t => t.Font = t.Font.With(weight: FontWeight.Bold));
+            supportLinkText.AddLink("become an osu!supporter", @"https://osu.ppy.sh/home/support", t => t.Font = t.Font.With(weight: FontWeight.Bold));
             supportLinkText.AddText(" today!");
 
             imageContainer.Children = new Drawable[]
@@ -170,27 +170,18 @@ namespace osu.Game.Overlays.Changelog
             {
             }
 
-            public new void AddLink(string text, string url, Action<SpriteText> creationParameters) =>
-                AddInternal(new SupporterPromoLinkCompiler(AddText(text, creationParameters)) { Url = url });
+            protected override DrawableLinkCompiler CreateLinkCompiler(IEnumerable<SpriteText> parts) => new SupporterPromoLinkCompiler(parts);
 
             private class SupporterPromoLinkCompiler : DrawableLinkCompiler
             {
-                [Resolved(CanBeNull = true)]
-                private OsuGame game { get; set; }
-
-                public string Url;
-
                 public SupporterPromoLinkCompiler(IEnumerable<Drawable> parts)
                     : base(parts)
                 {
-                    RelativeSizeAxes = Axes.Both;
                 }
 
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colour)
                 {
-                    TooltipText = Url;
-                    Action = () => game?.HandleLink(Url);
                     IdleColour = colour.PinkDark;
                     HoverColour = Color4.White;
                 }
