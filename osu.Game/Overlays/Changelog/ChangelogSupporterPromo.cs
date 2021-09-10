@@ -53,6 +53,7 @@ namespace osu.Game.Overlays.Changelog
                         Colour = Color4.Black.Opacity(0.25f),
                         Offset = new Vector2(0, 1),
                         Radius = 3,
+                        Hollow = true,
                     },
                     Children = new Drawable[]
                     {
