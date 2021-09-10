@@ -16,7 +16,7 @@ using osu.Game.Utils;
 namespace osu.Game.Online.API
 {
     [MessagePackObject]
-    public class APIMod
+    public class APIMod : IEquatable<APIMod>
     {
         [JsonProperty("acronym")]
         [Key(0)]
@@ -72,8 +72,7 @@ namespace osu.Game.Online.API
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return Acronym == other.Acronym &&
-                   Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
+            return Acronym == other.Acronym && Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
         }
 
         public override string ToString()
