@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Edit;
@@ -179,6 +180,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             colouredComponents.Colour = OsuColour.ForegroundTextColourFor(col);
         }
 
+        private SamplePointPiece sampleOverrideDisplay;
+        private DifficultyPointPiece difficultyOverrideDisplay;
+
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; }
+
+        private DifficultyControlPoint difficultyControlPoint;
+        private SampleControlPoint sampleControlPoint;
+
         protected override void Update()
         {
             base.Update();
@@ -193,6 +203,36 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // kind of haphazard but yeah, no bindables.
                 if (Item is IHasRepeats repeats)
                     updateRepeats(repeats);
+            }
+
+            if (difficultyControlPoint != Item.DifficultyControlPoint)
+            {
+                difficultyControlPoint = Item.DifficultyControlPoint;
+                difficultyOverrideDisplay?.Expire();
+
+                if (Item.DifficultyControlPoint != null && Item is IHasDistance)
+                {
+                    AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(Item.DifficultyControlPoint)
+                    {
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.BottomCentre
+                    });
+                }
+            }
+
+            if (sampleControlPoint != Item.SampleControlPoint)
+            {
+                sampleControlPoint = Item.SampleControlPoint;
+                sampleOverrideDisplay?.Expire();
+
+                if (Item.SampleControlPoint != null)
+                {
+                    AddInternal(sampleOverrideDisplay = new SamplePointPiece(Item.SampleControlPoint)
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.TopCentre
+                    });
+                }
             }
         }
 
