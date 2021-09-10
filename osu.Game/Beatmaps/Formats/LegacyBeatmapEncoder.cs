@@ -184,24 +184,8 @@ namespace osu.Game.Beatmaps.Formats
             // iterate over hitobjects and pull out all required sample and difficulty changes
             foreach (var h in beatmap.HitObjects)
             {
-                if (isOsuRuleset)
-                {
-                    var hDifficultyPoint = h.DifficultyControlPoint;
-
-                    if (!hDifficultyPoint.IsRedundant(lastRelevantDifficultyPoint))
-                    {
-                        legacyControlPoints.Add(hDifficultyPoint.Time, hDifficultyPoint);
-                        lastRelevantDifficultyPoint = hDifficultyPoint;
-                    }
-                }
-
-                var hSamplePoint = h.SampleControlPoint;
-
-                if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
-                {
-                    legacyControlPoints.Add(hSamplePoint.Time, hSamplePoint);
-                    lastRelevantSamplePoint = hSamplePoint;
-                }
+                extractDifficultyControlPoints(h);
+                extractSampleControlPoints(h);
             }
 
             // handle scroll speed, which is stored as "slider velocity" in legacy formats.
@@ -253,6 +237,39 @@ namespace osu.Game.Beatmaps.Formats
                 writer.Write(FormattableString.Invariant($"{(isTimingPoint ? '1' : '0')},"));
                 writer.Write(FormattableString.Invariant($"{(int)effectFlags}"));
                 writer.WriteLine();
+            }
+
+            void extractDifficultyControlPoints(HitObject hitObject)
+            {
+                if (!isOsuRuleset)
+                    return;
+
+                var hDifficultyPoint = hitObject.DifficultyControlPoint;
+
+                if (!hDifficultyPoint.IsRedundant(lastRelevantDifficultyPoint))
+                {
+                    legacyControlPoints.Add(hDifficultyPoint.Time, hDifficultyPoint);
+                    lastRelevantDifficultyPoint = hDifficultyPoint;
+                }
+
+                foreach (var nested in hitObject.NestedHitObjects)
+                    extractDifficultyControlPoints(nested);
+            }
+
+            void extractSampleControlPoints(HitObject hitObject)
+            {
+                // process nested objects first as these use EndTime for legacy storage.
+
+                foreach (var nested in hitObject.NestedHitObjects)
+                    extractSampleControlPoints(nested);
+
+                var hSamplePoint = hitObject.SampleControlPoint;
+
+                if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
+                {
+                    legacyControlPoints.Add(hSamplePoint.Time, hSamplePoint);
+                    lastRelevantSamplePoint = hSamplePoint;
+                }
             }
         }
 
