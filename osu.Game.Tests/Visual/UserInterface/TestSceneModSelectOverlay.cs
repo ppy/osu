@@ -158,8 +158,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             var mania = new ManiaRuleset();
 
             testModsWithSameBaseType(
-                mania.CreateAllMods().Single(m => m.GetType() == typeof(ManiaModFadeIn)),
-                mania.CreateAllMods().Single(m => m.GetType() == typeof(ManiaModHidden)));
+                mania.CreateMod<ManiaModFadeIn>(),
+                mania.CreateMod<ManiaModHidden>());
         }
 
         [Test]
