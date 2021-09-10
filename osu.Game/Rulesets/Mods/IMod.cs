@@ -14,6 +14,21 @@ namespace osu.Game.Rulesets.Mods
         string Acronym { get; }
 
         /// <summary>
+        /// The name of this mod.
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        /// The user readable description of this mod.
+        /// </summary>
+        string Description { get; }
+
+        /// <summary>
+        /// The type of this mod.
+        /// </summary>
+        ModType Type { get; }
+
+        /// <summary>
         /// The icon of this mod.
         /// </summary>
         IconUsage? Icon { get; }
