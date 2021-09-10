@@ -69,20 +69,22 @@ namespace osu.Game.Users.Drawables
             if (user == null && !showGuestOnNull)
                 return null;
 
-            if (!openOnClick)
+            if (openOnClick)
+            {
+                return new ClickableAvatar(user)
+                {
+                    OpenOnClick = true,
+                    ShowUsernameTooltip = showUsernameTooltip,
+                    RelativeSizeAxes = Axes.Both,
+                };
+            }
+            else
             {
                 return new DrawableAvatar(user)
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
             }
-
-            return new ClickableAvatar(user)
-            {
-                OpenOnClick = openOnClick,
-                ShowUsernameTooltip = showUsernameTooltip,
-                RelativeSizeAxes = Axes.Both,
-            };
         }
     }
 }
