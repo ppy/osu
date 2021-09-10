@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPlayActivity()
         {
-            AddStep("Set activity", () => api.Activity.Value = new UserActivity.SoloGame(new BeatmapInfo(), new RulesetInfo()));
+            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InSoloGame(new BeatmapInfo(), new RulesetInfo()));
 
             AddStep("Run command", () => Add(new NowPlayingCommand()));
 

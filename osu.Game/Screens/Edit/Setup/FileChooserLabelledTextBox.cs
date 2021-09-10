@@ -8,28 +8,28 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
     /// <summary>
     /// A labelled textbox which reveals an inline file chooser when clicked.
     /// </summary>
-    internal class FileChooserLabelledTextBox : LabelledTextBox, ICanAcceptFiles
+    internal class FileChooserLabelledTextBox : LabelledTextBox, ICanAcceptFiles, IHasPopover
     {
         private readonly string[] handledExtensions;
-        public IEnumerable<string> HandledExtensions => handledExtensions;
 
-        /// <summary>
-        /// The target container to display the file chooser in.
-        /// </summary>
-        public Container Target;
+        public IEnumerable<string> HandledExtensions => handledExtensions;
 
         private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
 
@@ -51,22 +51,8 @@ namespace osu.Game.Screens.Edit.Setup
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 CornerRadius = CORNER_RADIUS,
-                OnFocused = DisplayFileChooser
+                OnFocused = this.ShowPopover
             };
-
-        public void DisplayFileChooser()
-        {
-            OsuFileSelector fileSelector;
-
-            Target.Child = fileSelector = new OsuFileSelector(currentFile.Value?.DirectoryName, handledExtensions)
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = 400,
-                CurrentFile = { BindTarget = currentFile }
-            };
-
-            sectionsContainer.ScrollTo(fileSelector);
-        }
 
         protected override void LoadComplete()
         {
@@ -81,7 +67,7 @@ namespace osu.Game.Screens.Edit.Setup
             if (file.NewValue == null)
                 return;
 
-            Target.Clear();
+            this.HidePopover();
             Current.Value = file.NewValue.FullName;
         }
 
@@ -109,6 +95,24 @@ namespace osu.Game.Screens.Edit.Setup
                 base.OnFocus(e);
 
                 GetContainingInputManager().TriggerFocusContention(this);
+            }
+        }
+
+        public Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile);
+
+        private class FileChooserPopover : OsuPopover
+        {
+            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo> currentFile)
+            {
+                Child = new Container
+                {
+                    Size = new Vector2(600, 400),
+                    Child = new OsuFileSelector(currentFile.Value?.DirectoryName, handledExtensions)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        CurrentFile = { BindTarget = currentFile }
+                    },
+                };
             }
         }
     }

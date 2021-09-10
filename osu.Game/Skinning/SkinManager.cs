@@ -105,12 +105,18 @@ namespace osu.Game.Skinning
         /// Returns a list of all usable <see cref="SkinInfo"/>s that have been loaded by the user.
         /// </summary>
         /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
-        public List<SkinInfo> GetAllUserSkins() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+        public List<SkinInfo> GetAllUserSkins(bool includeFiles = false)
+        {
+            if (includeFiles)
+                return ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+
+            return ModelStore.Items.Where(s => !s.DeletePending).ToList();
+        }
 
         public void SelectRandomSkin()
         {
             // choose from only user skins, removing the current selection to ensure a new one is chosen.
-            var randomChoices = GetAllUsableSkins().Where(s => s.ID != CurrentSkinInfo.Value.ID).ToArray();
+            var randomChoices = ModelStore.Items.Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
 
             if (randomChoices.Length == 0)
             {
@@ -118,7 +124,8 @@ namespace osu.Game.Skinning
                 return;
             }
 
-            CurrentSkinInfo.Value = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
+            var chosen = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
+            CurrentSkinInfo.Value = ModelStore.ConsumableItems.Single(i => i.ID == chosen.ID);
         }
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
@@ -129,18 +136,19 @@ namespace osu.Game.Skinning
 
         protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
         {
-            // we need to populate early to create a hash based off skin.ini contents
-            if (item.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
-                populateMetadata(item, GetSkin(item));
+            var instance = GetSkin(item);
 
-            if (item.Creator != null && item.Creator != unknown_creator_string)
+            // in the case the skin has a skin.ini file, we are going to create a hash based on that.
+            // we don't want to do this in the case we don't have a skin.ini, as it would match only on the filename portion,
+            // causing potentially unique skin imports to be considered as a duplicate.
+            if (!string.IsNullOrEmpty(instance.Configuration.SkinInfo.Name))
             {
-                // this is the optimal way to hash legacy skins, but will need to be reconsidered when we move forward with skin implementation.
-                // likely, the skin should expose a real version (ie. the version of the skin, not the skin.ini version it's targeting).
+                // we need to populate early to create a hash based off skin.ini contents
+                populateMetadata(item, instance, reader?.Name);
+
                 return item.ToString().ComputeSHA2Hash();
             }
 
-            // if there was no creator, the ToString above would give the filename, which alone isn't really enough to base any decisions on.
             return base.ComputeHash(item, reader);
         }
 
@@ -150,13 +158,12 @@ namespace osu.Game.Skinning
 
             model.InstantiationInfo ??= instance.GetType().GetInvariantInstantiationInfo();
 
-            if (model.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
-                populateMetadata(model, instance);
+            populateMetadata(model, instance, archive?.Name);
 
             return Task.CompletedTask;
         }
 
-        private void populateMetadata(SkinInfo item, Skin instance)
+        private void populateMetadata(SkinInfo item, Skin instance, string archiveName)
         {
             if (!string.IsNullOrEmpty(instance.Configuration.SkinInfo.Name))
             {
@@ -168,6 +175,13 @@ namespace osu.Game.Skinning
                 item.Name = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
                 item.Creator ??= unknown_creator_string;
             }
+
+            // generally when importing from a folder, the ".osk" extension will not be present.
+            // if we ever need a more reliable method of determining this, the type of `ArchiveReader` can be checked.
+            bool isArchiveImport = archiveName?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (archiveName != null && !isArchiveImport && archiveName != item.Name)
+                item.Name = $"{item.Name} [{archiveName}]";
         }
 
         /// <summary>

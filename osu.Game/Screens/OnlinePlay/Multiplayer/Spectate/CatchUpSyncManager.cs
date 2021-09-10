@@ -61,7 +61,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             playerClocks.Add(clock);
         }
 
-        public void RemovePlayerClock(ISpectatorPlayerClock clock) => playerClocks.Remove(clock);
+        public void RemovePlayerClock(ISpectatorPlayerClock clock)
+        {
+            playerClocks.Remove(clock);
+            clock.Stop();
+        }
 
         protected override void Update()
         {

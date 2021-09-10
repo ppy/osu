@@ -42,9 +42,24 @@ namespace osu.Game.Input.Handlers
                 if (!(state is RulesetInputManagerInputState<T> inputState))
                     throw new InvalidOperationException($"{nameof(ReplayState<T>)} should only be applied to a {nameof(RulesetInputManagerInputState<T>)}");
 
-                var lastPressed = inputState.LastReplayState?.PressedActions ?? new List<T>();
-                var released = lastPressed.Except(PressedActions).ToArray();
-                var pressed = PressedActions.Except(lastPressed).ToArray();
+                T[] released = Array.Empty<T>();
+                T[] pressed = Array.Empty<T>();
+
+                var lastPressed = inputState.LastReplayState?.PressedActions;
+
+                if (lastPressed == null || lastPressed.Count == 0)
+                {
+                    pressed = PressedActions.ToArray();
+                }
+                else if (PressedActions.Count == 0)
+                {
+                    released = lastPressed.ToArray();
+                }
+                else if (!lastPressed.SequenceEqual(PressedActions))
+                {
+                    released = lastPressed.Except(PressedActions).ToArray();
+                    pressed = PressedActions.Except(lastPressed).ToArray();
+                }
 
                 inputState.LastReplayState = this;
 

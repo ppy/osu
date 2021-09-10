@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private BeatmapManager beatmapManager;
         private ScoreManager scoreManager;
 
-        private readonly List<ScoreInfo> scores = new List<ScoreInfo>();
+        private readonly List<ScoreInfo> importedScores = new List<ScoreInfo>();
         private BeatmapInfo beatmap;
 
         [Cached]
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, null, ContextFactory));
+            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, null, ContextFactory, Scheduler));
 
             beatmap = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).Result.Beatmaps[0];
 
@@ -100,10 +100,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     User = new User { Username = "TestUser" },
                 };
 
-                scores.Add(scoreManager.Import(score).Result);
+                importedScores.Add(scoreManager.Import(score).Result);
             }
-
-            scores.Sort(Comparer<ScoreInfo>.Create((s1, s2) => s2.TotalScore.CompareTo(s1.TotalScore)));
 
             return dependencies;
         }
@@ -134,9 +132,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestDeleteViaRightClick()
         {
+            ScoreInfo scoreBeingDeleted = null;
             AddStep("open menu for top score", () =>
             {
-                InputManager.MoveMouseTo(leaderboard.ChildrenOfType<LeaderboardScore>().First());
+                var leaderboardScore = leaderboard.ChildrenOfType<LeaderboardScore>().First();
+
+                scoreBeingDeleted = leaderboardScore.Score;
+
+                InputManager.MoveMouseTo(leaderboardScore);
                 InputManager.Click(MouseButton.Right);
             });
 
@@ -158,14 +161,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scores[0].OnlineScoreID));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scoreBeingDeleted.OnlineScoreID));
         }
 
         [Test]
         public void TestDeleteViaDatabase()
         {
-            AddStep("delete top score", () => scoreManager.Delete(scores[0]));
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scores[0].OnlineScoreID));
+            AddStep("delete top score", () => scoreManager.Delete(importedScores[0]));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != importedScores[0].OnlineScoreID));
         }
     }
 }

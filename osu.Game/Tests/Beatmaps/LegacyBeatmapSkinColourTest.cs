@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Beatmaps
                 HasColours = hasColours;
             }
 
-            protected override ISkin GetSkin() => new TestBeatmapSkin(BeatmapInfo, HasColours);
+            protected internal override ISkin GetSkin() => new TestBeatmapSkin(BeatmapInfo, HasColours);
         }
 
         protected class TestBeatmapSkin : LegacyBeatmapSkin
@@ -116,7 +116,7 @@ namespace osu.Game.Tests.Beatmaps
             {
                 if (hasColours)
                 {
-                    Configuration.AddComboColours(Colours);
+                    Configuration.CustomComboColours = Colours.ToList();
                     Configuration.CustomColours.Add("HyperDash", HYPER_DASH_COLOUR);
                     Configuration.CustomColours.Add("HyperDashAfterImage", HYPER_DASH_AFTER_IMAGE_COLOUR);
                     Configuration.CustomColours.Add("HyperDashFruit", HYPER_DASH_FRUIT_COLOUR);
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Beatmaps
             {
                 if (hasCustomColours)
                 {
-                    Configuration.AddComboColours(Colours);
+                    Configuration.CustomComboColours = Colours.ToList();
                     Configuration.CustomColours.Add("HyperDash", HYPER_DASH_COLOUR);
                     Configuration.CustomColours.Add("HyperDashAfterImage", HYPER_DASH_AFTER_IMAGE_COLOUR);
                     Configuration.CustomColours.Add("HyperDashFruit", HYPER_DASH_FRUIT_COLOUR);

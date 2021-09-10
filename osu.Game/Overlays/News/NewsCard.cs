@@ -123,12 +123,8 @@ namespace osu.Game.Overlays.News
             main.AddText(post.Author, t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold));
         }
 
-        private class DateContainer : CircularContainer, IHasCustomTooltip
+        private class DateContainer : CircularContainer, IHasCustomTooltip<DateTimeOffset>
         {
-            public ITooltip GetCustomTooltip() => new DateTooltip();
-
-            public object TooltipContent => date;
-
             private readonly DateTimeOffset date;
 
             public DateContainer(DateTimeOffset date)
@@ -162,6 +158,10 @@ namespace osu.Game.Overlays.News
             }
 
             protected override bool OnClick(ClickEvent e) => true; // Protects the NewsCard from clicks while hovering DateContainer
+
+            ITooltip<DateTimeOffset> IHasCustomTooltip<DateTimeOffset>.GetCustomTooltip() => new DateTooltip();
+
+            DateTimeOffset IHasCustomTooltip<DateTimeOffset>.TooltipContent => date;
         }
     }
 }

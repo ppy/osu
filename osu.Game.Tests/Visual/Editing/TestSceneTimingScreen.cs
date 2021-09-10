@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
@@ -30,7 +31,10 @@ namespace osu.Game.Tests.Visual.Editing
             Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
             Beatmap.Disabled = true;
 
-            Child = new TimingScreen();
+            Child = new TimingScreen
+            {
+                State = { Value = Visibility.Visible },
+            };
         }
 
         protected override void Dispose(bool isDisposing)

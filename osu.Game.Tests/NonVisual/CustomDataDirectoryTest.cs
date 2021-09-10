@@ -6,10 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using NUnit.Framework;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.IO;
 
@@ -278,7 +278,7 @@ namespace osu.Game.Tests.NonVisual
 
         private static string getDefaultLocationFor(string testTypeName)
         {
-            string path = Path.Combine(RuntimeInfo.StartupDirectory, "headless", testTypeName);
+            string path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, testTypeName);
 
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
@@ -288,7 +288,7 @@ namespace osu.Game.Tests.NonVisual
 
         private string prepareCustomPath(string suffix = "")
         {
-            string path = Path.Combine(RuntimeInfo.StartupDirectory, $"custom-path{suffix}");
+            string path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, $"custom-path{suffix}");
 
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
@@ -307,6 +307,19 @@ namespace osu.Game.Tests.NonVisual
 
                 InitialStorage = new DesktopStorage(defaultStorageLocation, this);
                 InitialStorage.DeleteDirectory(string.Empty);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                try
+                {
+                    // the storage may have changed from the initial location.
+                    // this handles cleanup of the initial location.
+                    InitialStorage.DeleteDirectory(string.Empty);
+                }
+                catch { }
             }
         }
     }

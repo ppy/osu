@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     } while (rng.Next(2) != 0);
 
                     int length = sliderPath.ControlPoints.Count - start + 1;
-                    sliderPath.ControlPoints[start].Type.Value = length <= 2 ? PathType.Linear : length == 3 ? PathType.PerfectCurve : PathType.Bezier;
+                    sliderPath.ControlPoints[start].Type = length <= 2 ? PathType.Linear : length == 3 ? PathType.PerfectCurve : PathType.Bezier;
                 } while (rng.Next(3) != 0);
 
                 if (rng.Next(5) == 0)
@@ -210,13 +210,13 @@ namespace osu.Game.Rulesets.Catch.Tests
 
                 path.ConvertToSliderPath(sliderPath, sliderStartY);
                 Assert.That(sliderPath.Distance, Is.EqualTo(path.Distance).Within(1e-3));
-                Assert.That(sliderPath.ControlPoints[0].Position.Value.X, Is.EqualTo(path.Vertices[0].X));
+                Assert.That(sliderPath.ControlPoints[0].Position.X, Is.EqualTo(path.Vertices[0].X));
                 assertInvariants(path.Vertices, true);
 
                 foreach (var point in sliderPath.ControlPoints)
                 {
-                    Assert.That(point.Type.Value, Is.EqualTo(PathType.Linear).Or.Null);
-                    Assert.That(sliderStartY + point.Position.Value.Y, Is.InRange(0, JuiceStreamPath.OSU_PLAYFIELD_HEIGHT));
+                    Assert.That(point.Type, Is.EqualTo(PathType.Linear).Or.Null);
+                    Assert.That(sliderStartY + point.Position.Y, Is.InRange(0, JuiceStreamPath.OSU_PLAYFIELD_HEIGHT));
                 }
 
                 for (int i = 0; i < 10; i++)

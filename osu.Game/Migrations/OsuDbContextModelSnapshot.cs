@@ -53,7 +53,9 @@ namespace osu.Game.Migrations
 
                     b.Property<int>("BeatmapSetInfoID");
 
-                    b.Property<bool>("Countdown");
+                    b.Property<int>("Countdown");
+
+                    b.Property<int>("CountdownOffset");
 
                     b.Property<double>("DistanceSpacing");
 

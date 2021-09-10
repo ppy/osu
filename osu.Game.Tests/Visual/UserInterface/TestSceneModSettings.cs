@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait for ready", () => modSelect.State.Value == Visibility.Visible && modSelect.ButtonsLoaded);
         }
 
-        private class TestModSelectOverlay : LocalPlayerModSelectOverlay
+        private class TestModSelectOverlay : UserModSelectOverlay
         {
             public new VisibilityContainer ModSettingsContainer => base.ModSettingsContainer;
             public new TriangleButton CustomiseButton => base.CustomiseButton;
