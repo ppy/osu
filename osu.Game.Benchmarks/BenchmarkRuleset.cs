@@ -4,6 +4,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using osu.Game.Online.API;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Benchmarks
@@ -37,7 +38,25 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkGetAllMods()
         {
-            ruleset.GetAllMods().Consume(new Consumer());
+            ruleset.CreateAllMods().Consume(new Consumer());
+        }
+
+        [Benchmark]
+        public void BenchmarkGetAllModsForReference()
+        {
+            ruleset.AllMods.Consume(new Consumer());
+        }
+
+        [Benchmark]
+        public void BenchmarkGetForAcronym()
+        {
+            ruleset.CreateModFromAcronym("DT");
+        }
+
+        [Benchmark]
+        public void BenchmarkGetForType()
+        {
+            ruleset.CreateMod<ModDoubleTime>();
         }
     }
 }
