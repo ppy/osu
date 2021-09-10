@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
@@ -143,6 +144,10 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             arrow.Alpha = 0;
             arrow.Delay(200).FadeInFromZero(600);
+
+            var progressBar = Parent.ChildrenOfType<SongProgress>().FirstOrDefault();
+            if (progressBar != null)
+                progressBar.Bar.OnSeek += _ => handleSeek();
         }
 
         private void createColourBars(OsuColour colours)
@@ -282,13 +287,18 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
+        private void handleSeek()
+        {
+            judgementsContainer.Clear(true);
+        }
+
         public bool OnPressed(GlobalAction action)
         {
             switch (action)
             {
                 case GlobalAction.SeekReplayBackward:
                 case GlobalAction.SeekReplayForward:
-                    judgementsContainer.Clear(true);
+                    handleSeek();
                     return false;
             }
 
