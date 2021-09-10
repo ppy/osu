@@ -27,6 +27,6 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Create a fresh <see cref="Mod"/> instance based on this mod.
         /// </summary>
-        Mod CreateInstance() => ((Mod)this).DeepClone();
+        Mod CreateInstance() => (Mod)Activator.CreateInstance(GetType());
     }
 }
