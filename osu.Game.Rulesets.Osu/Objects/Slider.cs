@@ -174,7 +174,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             StartTime = e.Time,
                             Position = Position,
                             StackHeight = StackHeight,
-                            SampleControlPoint = SampleControlPoint,
                         });
                         break;
 

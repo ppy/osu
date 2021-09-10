@@ -108,13 +108,13 @@ namespace osu.Game.Rulesets.Objects
             var legacyInfo = controlPointInfo as LegacyControlPointInfo;
 
             if (legacyInfo != null)
-                DifficultyControlPoint = legacyInfo.DifficultyPointAt(StartTime);
+                DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
 
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
             if (legacyInfo != null)
-                SampleControlPoint = legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
+                SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
 
             nestedHitObjects.Clear();
 
