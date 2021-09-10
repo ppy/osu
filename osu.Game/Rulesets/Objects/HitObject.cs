@@ -94,6 +94,12 @@ namespace osu.Game.Rulesets.Objects
 
                 foreach (var nested in NestedHitObjects)
                     nested.StartTime += offset;
+
+                if (DifficultyControlPoint != DifficultyControlPoint.DEFAULT)
+                    DifficultyControlPoint.Time = time.NewValue;
+                // traditionally this used EndTime, but at the point changes are being made in the editor this should no longer be considered relevant.
+                if (SampleControlPoint != SampleControlPoint.DEFAULT)
+                    SampleControlPoint.Time = time.NewValue;
             };
         }
 
@@ -108,13 +114,19 @@ namespace osu.Game.Rulesets.Objects
             var legacyInfo = controlPointInfo as LegacyControlPointInfo;
 
             if (legacyInfo != null)
+            {
                 DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
+                DifficultyControlPoint.Time = StartTime;
+            }
 
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
             if (legacyInfo != null)
+            {
                 SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
+                SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
+            }
 
             nestedHitObjects.Clear();
 
