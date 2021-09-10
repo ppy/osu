@@ -207,7 +207,7 @@ namespace osu.Game
 
             InitialiseFonts();
 
-            Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
+            Audio.SampleMixer.Concurrency = SAMPLE_CONCURRENCY;
 
             runMigrations();
 

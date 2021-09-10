@@ -56,7 +56,6 @@ namespace osu.Game.Rulesets.UI
                 CacheAs(TextureStore = new FallbackTextureStore(TextureStore, parent.Get<TextureStore>()));
 
                 SampleStore = parent.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
-                SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
                 CacheAs(SampleStore = new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
 
                 ShaderManager = new ShaderManager(new NamespacedResourceStore<byte[]>(resources, @"Shaders"));
