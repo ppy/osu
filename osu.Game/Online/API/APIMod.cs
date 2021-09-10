@@ -16,7 +16,7 @@ using osu.Game.Utils;
 namespace osu.Game.Online.API
 {
     [MessagePackObject]
-    public class APIMod : IMod, IEquatable<APIMod>
+    public class APIMod
     {
         [JsonProperty("acronym")]
         [Key(0)]
@@ -66,8 +66,6 @@ namespace osu.Game.Online.API
 
             return resultMod;
         }
-
-        public bool Equals(IMod other) => other is APIMod them && Equals(them);
 
         public bool Equals(APIMod other)
         {
