@@ -22,29 +22,17 @@ namespace osu.Game.Rulesets.Mods
     [ExcludeFromDynamicCompile]
     public abstract class Mod : IMod, IEquatable<Mod>, IDeepCloneable<Mod>
     {
-        /// <summary>
-        /// The name of this mod.
-        /// </summary>
         [JsonIgnore]
         public abstract string Name { get; }
 
-        /// <summary>
-        /// The shortened name of this mod.
-        /// </summary>
         public abstract string Acronym { get; }
 
         [JsonIgnore]
         public virtual IconUsage? Icon => null;
 
-        /// <summary>
-        /// The type of this mod.
-        /// </summary>
         [JsonIgnore]
         public virtual ModType Type => ModType.Fun;
 
-        /// <summary>
-        /// The user readable description of this mod.
-        /// </summary>
         [JsonIgnore]
         public abstract string Description { get; }
 
