@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Changelog
 
         private readonly FillFlowContainer textContainer;
         private readonly Container imageContainer;
+        private readonly Box background;
 
         public ChangelogSupporterPromo()
         {
@@ -56,10 +57,9 @@ namespace osu.Game.Overlays.Changelog
                     },
                     Children = new Drawable[]
                     {
-                        new Box
+                        background = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#222027"),
                         },
                         new Container
                         {
@@ -92,8 +92,10 @@ namespace osu.Game.Overlays.Changelog
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, TextureStore textures)
+        private void load(OsuColour colour, TextureStore textures, OverlayColourProvider colourProvider)
         {
+            background.Colour = colourProvider.Background5;
+
             SupporterPromoLinkFlowContainer supportLinkText;
             textContainer.Children = new Drawable[]
             {
