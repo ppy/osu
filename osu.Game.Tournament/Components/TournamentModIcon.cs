@@ -48,7 +48,7 @@ namespace osu.Game.Tournament.Components
             }
 
             var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.ID ?? 0);
-            var modIcon = ruleset?.CreateInstance().GetModForAcronym(modAcronym);
+            var modIcon = ruleset?.CreateInstance().CreateModFromAcronym(modAcronym);
 
             if (modIcon == null)
                 return;

@@ -39,45 +39,48 @@ namespace osu.Game.Rulesets
     {
         public RulesetInfo RulesetInfo { get; internal set; }
 
+        private static readonly ConcurrentDictionary<int, IMod[]> mod_reference_cache = new ConcurrentDictionary<int, IMod[]>();
+
+        /// <summary>
+        /// A queryable source containing all available mods.
+        /// Call <see cref="IMod.CreateInstance"/> for consumption purposes.
+        /// </summary>
+        public IEnumerable<IMod> AllMods
+        {
+            get
+            {
+                if (!(RulesetInfo.ID is int id))
+                    return CreateAllMods();
+
+                if (!mod_reference_cache.TryGetValue(id, out var mods))
+                    mod_reference_cache[id] = mods = CreateAllMods().Cast<IMod>().ToArray();
+
+                return mods;
+            }
+        }
+
         /// <summary>
         /// Returns fresh instances of all mods.
         /// </summary>
         /// <remarks>
         /// This comes with considerable allocation overhead. If only accessing for reference purposes (ie. not changing bindables / settings)
-        /// use <see cref="GetAllModsForReference"/> instead.
+        /// use <see cref="AllMods"/> instead.
         /// </remarks>
-        public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
-                                                    // Confine all mods of each mod type into a single IEnumerable<Mod>
-                                                    .SelectMany(GetModsFor)
-                                                    // Filter out all null mods
-                                                    .Where(mod => mod != null)
-                                                    // Resolve MultiMods as their .Mods property
-                                                    .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
-
-        private static readonly ConcurrentDictionary<int, Mod[]> mod_reference_cache = new ConcurrentDictionary<int, Mod[]>();
-
-        /// <summary>
-        /// Returns all mods for a query-only purpose.
-        /// Bindables should not be considered usable when retrieving via this method (use <see cref="GetAllMods"/> instead).
-        /// </summary>
-        public IEnumerable<Mod> GetAllModsForReference()
-        {
-            if (!(RulesetInfo.ID is int id))
-                return GetAllMods();
-
-            if (!mod_reference_cache.TryGetValue(id, out var mods))
-                mod_reference_cache[id] = mods = GetAllMods().ToArray();
-
-            return mods;
-        }
+        public IEnumerable<Mod> CreateAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
+                                                       // Confine all mods of each mod type into a single IEnumerable<Mod>
+                                                       .SelectMany(GetModsFor)
+                                                       // Filter out all null mods
+                                                       .Where(mod => mod != null)
+                                                       // Resolve MultiMods as their .Mods property
+                                                       .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
 
         /// <summary>
         /// Returns a fresh instance of the mod matching the specified acronym.
         /// </summary>
         /// <param name="acronym">The acronym to query for .</param>
-        public Mod GetModForAcronym(string acronym)
+        public Mod CreateModFromAcronym(string acronym)
         {
-            var type = GetAllModsForReference().FirstOrDefault(m => m.Acronym == acronym)?.GetType();
+            var type = AllMods.FirstOrDefault(m => m.Acronym == acronym)?.GetType();
 
             if (type != null)
                 return (Mod)Activator.CreateInstance(type);
@@ -88,10 +91,10 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Returns a fresh instance of the mod matching the specified type.
         /// </summary>
-        public T GetMod<T>()
+        public T CreateMod<T>()
             where T : Mod
         {
-            var type = GetAllModsForReference().FirstOrDefault(m => m is T)?.GetType();
+            var type = AllMods.FirstOrDefault(m => m is T)?.GetType();
 
             if (type != null)
                 return (T)Activator.CreateInstance(type);
@@ -179,7 +182,7 @@ namespace osu.Game.Rulesets
         }
 
         [CanBeNull]
-        public ModAutoplay GetAutoplayMod() => GetMod<ModAutoplay>();
+        public ModAutoplay GetAutoplayMod() => CreateMod<ModAutoplay>();
 
         public virtual ISkin CreateLegacySkinProvider([NotNull] ISkin skin, IBeatmap beatmap) => null;
 

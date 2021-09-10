@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var working = CreateWorkingBeatmap(rulesetInfo);
 
             Beatmap.Value = working;
-            SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
+            SelectedMods.Value = new[] { ruleset.CreateAllMods().First(m => m is ModNoFail) };
 
             Player = CreatePlayer(ruleset);
 

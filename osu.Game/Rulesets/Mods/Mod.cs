@@ -33,9 +33,6 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         public abstract string Acronym { get; }
 
-        /// <summary>
-        /// The icon of this mod.
-        /// </summary>
         [JsonIgnore]
         public virtual IconUsage? Icon => null;
 
@@ -106,10 +103,6 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool HasImplementation => this is IApplicableMod;
 
-        /// <summary>
-        /// Whether this mod is playable by an end user.
-        /// Should be <c>false</c> for cases where the user is not interacting with the game (so it can be excluded from mutliplayer selection, for example).
-        /// </summary>
         [JsonIgnore]
         public virtual bool UserPlayable => true;
 

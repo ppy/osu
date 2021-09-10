@@ -38,25 +38,25 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkGetAllMods()
         {
-            ruleset.GetAllMods().Consume(new Consumer());
+            ruleset.CreateAllMods().Consume(new Consumer());
         }
 
         [Benchmark]
         public void BenchmarkGetAllModsForReference()
         {
-            ruleset.GetAllModsForReference().Consume(new Consumer());
+            ruleset.AllMods.Consume(new Consumer());
         }
 
         [Benchmark]
         public void BenchmarkGetForAcronym()
         {
-            ruleset.GetModForAcronym("DT");
+            ruleset.CreateModFromAcronym("DT");
         }
 
         [Benchmark]
         public void BenchmarkGetForType()
         {
-            ruleset.GetMod<ModDoubleTime>();
+            ruleset.CreateMod<ModDoubleTime>();
         }
     }
 }
