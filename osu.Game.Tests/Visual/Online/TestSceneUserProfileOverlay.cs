@@ -104,6 +104,9 @@ namespace osu.Game.Tests.Visual.Online
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg"
             }, api.IsLoggedIn));
 
+            AddStep("Show ppy from username", () => profile.ShowUser(@"peppy"));
+            AddStep("Show flyte from username", () => profile.ShowUser(@"flyte"));
+
             AddStep("Hide", profile.Hide);
             AddStep("Show without reload", profile.Show);
         }

@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
@@ -30,7 +31,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             check = new CheckMutedObjects();
 
-            cpi = new ControlPointInfo();
+            cpi = new LegacyControlPointInfo();
             cpi.Add(0, new SampleControlPoint { SampleVolume = volume_regular });
             cpi.Add(1000, new SampleControlPoint { SampleVolume = volume_low });
             cpi.Add(2000, new SampleControlPoint { SampleVolume = volume_muted });

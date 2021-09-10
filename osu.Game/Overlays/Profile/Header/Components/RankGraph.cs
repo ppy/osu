@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
@@ -60,41 +60,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
             placeholder.FadeIn(FADE_DURATION, Easing.Out);
         }
 
-        protected override object GetTooltipContent(int index, int rank)
+        protected override UserGraphTooltipContent GetTooltipContent(int index, int rank)
         {
             var days = ranked_days - index + 1;
 
-            return new TooltipDisplayContent
-            {
-                Rank = rank.ToLocalisableString("\\##,##0"),
-                Time = days == 0 ? "now" : $"{"day".ToQuantity(days)} ago"
-            };
-        }
-
-        protected override UserGraphTooltip GetTooltip() => new RankGraphTooltip();
-
-        private class RankGraphTooltip : UserGraphTooltip
-        {
-            public RankGraphTooltip()
-                : base(UsersStrings.ShowRankGlobalSimple)
-            {
-            }
-
-            public override bool SetContent(object content)
-            {
-                if (!(content is TooltipDisplayContent info))
-                    return false;
-
-                Counter.Text = info.Rank;
-                BottomText.Text = info.Time;
-                return true;
-            }
-        }
-
-        private class TooltipDisplayContent
-        {
-            public LocalisableString Rank;
-            public string Time;
+            return new UserGraphTooltipContent(
+                UsersStrings.ShowRankGlobalSimple,
+                rank.ToLocalisableString("\\##,##0"),
+                days == 0 ? "now" : $"{"day".ToQuantity(days)} ago");
         }
     }
 }

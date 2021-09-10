@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -46,7 +47,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         AutoSizeAxes = Axes.Y,
                         Child = new OsuSpriteText
                         {
-                            Text = this.type.ToString(),
+                            Text = this.type.GetLocalisableDescription(),
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                         },
                     },

@@ -11,12 +11,7 @@ namespace osu.Game.Screens.Play
     {
         public readonly ScoreInfo Score;
 
-        public SpectatorPlayerLoader(Score score)
-            : this(score, () => new SpectatorPlayer(score))
-        {
-        }
-
-        public SpectatorPlayerLoader(Score score, Func<Player> createPlayer)
+        public SpectatorPlayerLoader(Score score, Func<SpectatorPlayer> createPlayer)
             : base(createPlayer)
         {
             if (score.Replay == null)

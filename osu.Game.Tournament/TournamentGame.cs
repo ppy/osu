@@ -26,8 +26,8 @@ namespace osu.Game.Tournament
     {
         public static ColourInfo GetTeamColour(TeamColour teamColour) => teamColour == TeamColour.Red ? COLOUR_RED : COLOUR_BLUE;
 
-        public static readonly Color4 COLOUR_RED = Color4Extensions.FromHex("#AA1414");
-        public static readonly Color4 COLOUR_BLUE = Color4Extensions.FromHex("#1462AA");
+        public static readonly Color4 COLOUR_RED = new OsuColour().TeamColourRed;
+        public static readonly Color4 COLOUR_BLUE = new OsuColour().TeamColourBlue;
 
         public static readonly Color4 ELEMENT_BACKGROUND_COLOUR = Color4Extensions.FromHex("#fff");
         public static readonly Color4 ELEMENT_FOREGROUND_COLOUR = Color4Extensions.FromHex("#000");

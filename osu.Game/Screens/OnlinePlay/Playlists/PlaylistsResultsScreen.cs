@@ -32,6 +32,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         public PlaylistsResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
             : base(score, allowRetry, allowWatchingReplay)
         {
@@ -166,23 +169,28 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
         private void performSuccessCallback([NotNull] Action<IEnumerable<ScoreInfo>> callback, [NotNull] List<MultiplayerScore> scores, [CanBeNull] MultiplayerScores pivot = null)
         {
-            var scoreInfos = new List<ScoreInfo>(scores.Select(s => s.CreateScoreInfo(playlistItem)));
+            var scoreInfos = scores.Select(s => s.CreateScoreInfo(playlistItem)).ToArray();
 
-            // Select a score if we don't already have one selected.
-            // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
-            if (SelectedScore.Value == null)
+            // Score panels calculate total score before displaying, which can take some time. In order to count that calculation as part of the loading spinner display duration,
+            // calculate the total scores locally before invoking the success callback.
+            scoreManager.OrderByTotalScoreAsync(scoreInfos).ContinueWith(_ => Schedule(() =>
             {
-                Schedule(() =>
+                // Select a score if we don't already have one selected.
+                // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
+                if (SelectedScore.Value == null)
                 {
-                    // Prefer selecting the local user's score, or otherwise default to the first visible score.
-                    SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.Id == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
-                });
-            }
+                    Schedule(() =>
+                    {
+                        // Prefer selecting the local user's score, or otherwise default to the first visible score.
+                        SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.Id == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
+                    });
+                }
 
-            // Invoke callback to add the scores. Exclude the user's current score which was added previously.
-            callback.Invoke(scoreInfos.Where(s => s.OnlineScoreID != Score?.OnlineScoreID));
+                // Invoke callback to add the scores. Exclude the user's current score which was added previously.
+                callback.Invoke(scoreInfos.Where(s => s.OnlineScoreID != Score?.OnlineScoreID));
 
-            hideLoadingSpinners(pivot);
+                hideLoadingSpinners(pivot);
+            }));
         }
 
         private void hideLoadingSpinners([CanBeNull] MultiplayerScores pivot = null)
