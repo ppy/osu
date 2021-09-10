@@ -80,12 +80,7 @@ namespace osu.Game.Rulesets
         /// <param name="acronym">The acronym to query for .</param>
         public Mod CreateModFromAcronym(string acronym)
         {
-            var type = AllMods.FirstOrDefault(m => m.Acronym == acronym)?.GetType();
-
-            if (type != null)
-                return (Mod)Activator.CreateInstance(type);
-
-            return null;
+            return AllMods.FirstOrDefault(m => m.Acronym == acronym)?.CreateInstance();
         }
 
         /// <summary>
@@ -94,12 +89,7 @@ namespace osu.Game.Rulesets
         public T CreateMod<T>()
             where T : Mod
         {
-            var type = AllMods.FirstOrDefault(m => m is T)?.GetType();
-
-            if (type != null)
-                return (T)Activator.CreateInstance(type);
-
-            return null;
+            return AllMods.FirstOrDefault(m => m is T)?.CreateInstance() as T;
         }
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
