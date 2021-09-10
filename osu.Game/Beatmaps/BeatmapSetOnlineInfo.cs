@@ -92,8 +92,8 @@ namespace osu.Game.Beatmaps
         public BeatmapSetOnlineLanguage Language { get; set; }
 
         /// <summary>
-        /// The song ID of this beatmap set.
-        /// Non-null only if the song is from a featured artist.
+        /// The track ID of this beatmap set.
+        /// Non-null only if the track is linked to a featured artist track entry.
         /// </summary>
         public int? TrackId { get; set; }
     }
