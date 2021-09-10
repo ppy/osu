@@ -35,6 +35,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private void load(ISkinSource skin, OsuColour colour)
         {
             var texture = skin.GetTexture("star2");
+            if (texture == null)
+                return;
+
+            texture.ScaleAdjust = 3.2f;
 
             InternalChildren = new[]
             {
