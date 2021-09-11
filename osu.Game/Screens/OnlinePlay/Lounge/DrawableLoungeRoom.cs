@@ -225,8 +225,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             private void joinFailed(string error)
             {
                 passwordTextbox.Text = string.Empty;
-                passwordTextbox.PlaceholderText = "incorrect password";
-                passwordTextbox.Colour = Color4.Red;
 
                 shakeContainer.OnShakeFinish += () => passwordTextbox.Colour = Color4.White;
 
