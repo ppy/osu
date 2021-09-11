@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
                         case GetUserRequest getUser:
                             if (getUser.Lookup.Equals("some body", StringComparison.OrdinalIgnoreCase))
                             {
-                                getUser.TriggerSuccess(new User()
+                                getUser.TriggerSuccess(new User
                                 {
                                     Username = "some body",
                                     Id = 1,
@@ -100,6 +100,7 @@ namespace osu.Game.Tests.Visual.Online
                             {
                                 getUser.TriggerFailure(new Exception());
                             }
+
                             return true;
                     }
 
