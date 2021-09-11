@@ -118,6 +118,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     NormalText = new OsuSpriteText
                     {
+                        AlwaysPresent = true,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: text_size),
