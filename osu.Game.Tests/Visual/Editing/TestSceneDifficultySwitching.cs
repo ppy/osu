@@ -56,6 +56,22 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestClockPositionPreservedBetweenSwitches()
+        {
+            BeatmapInfo targetDifficulty = null;
+            AddStep("seek editor to 00:05:00", () => EditorClock.Seek(5000));
+
+            AddStep("set target difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo)));
+            switchToDifficulty(() => targetDifficulty);
+            confirmEditingBeatmap(() => targetDifficulty);
+            AddAssert("editor clock at 00:05:00", () => EditorClock.CurrentTime == 5000);
+
+            AddStep("exit editor", () => Stack.Exit());
+            // ensure editor loader didn't resume.
+            AddAssert("stack empty", () => Stack.CurrentScreen == null);
+        }
+
+        [Test]
         public void TestPreventSwitchDueToUnsavedChanges()
         {
             BeatmapInfo targetDifficulty = null;
@@ -118,7 +134,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void confirmEditingBeatmap(Func<BeatmapInfo> targetDifficulty)
         {
             AddUntilStep("current beatmap is correct", () => Beatmap.Value.BeatmapInfo.Equals(targetDifficulty.Invoke()));
-            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen == Editor && Editor?.IsLoaded == true);
         }
     }
 }
