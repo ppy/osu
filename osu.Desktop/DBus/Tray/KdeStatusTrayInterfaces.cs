@@ -219,5 +219,11 @@ namespace osu.Desktop.DBus.Tray
             ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
             return ServiceUtils.SetValueFor(this, name, newValue, members);
         }
+
+        internal bool Contains(string prop)
+        {
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.CheckifContained(this, prop, members);
+        }
     }
 }

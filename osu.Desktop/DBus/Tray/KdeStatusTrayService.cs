@@ -5,7 +5,7 @@ using Tmds.DBus;
 namespace osu.Desktop.DBus.Tray
 {
     /// <summary>
-    /// WIP
+    ///     WIP
     /// </summary>
     public class KdeStatusTrayService : IKdeStatusNotifierItem
     {
@@ -14,15 +14,9 @@ namespace osu.Desktop.DBus.Tray
 
         public Action WindowRaise { get; set; }
 
-        private Task<string> returnEmptyString => Task.FromResult(string.Empty);
+        private readonly StatusNotifierItemProperties kdeProperties = new StatusNotifierItemProperties();
 
-        private readonly StatusNotifierItemProperties properties = new StatusNotifierItemProperties();
-
-        public Task<object> GetAsync(string prop)
-            => Task.FromResult(properties.Get(prop));
-
-        public Task<StatusNotifierItemProperties> GetAllAsync()
-            => Task.FromResult(properties);
+        public Task<object> GetAsync(string prop) => Task.FromResult(kdeProperties.Get(prop));
 
         public Task SetAsync(string prop, object val)
         {
@@ -32,27 +26,30 @@ namespace osu.Desktop.DBus.Tray
         public event Action<PropertyChanges> OnPropertiesChanged;
 
         public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)
-            => SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
-
-        //Extensions
-        public Task ContextMenuAsync(int X, int Y)
         {
-            return Task.CompletedTask;
+            return SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
         }
 
-        public Task ActivateAsync(int X, int Y)
-        {
-            WindowRaise?.Invoke();
-            return Task.CompletedTask;
-        }
+        #region KDE DBus
 
-        public Task SecondaryActivateAsync(int X, int Y)
+        Task<StatusNotifierItemProperties> IKdeStatusNotifierItem.GetAllAsync()
+            => Task.FromResult(kdeProperties);
+
+        public Task ContextMenuAsync(int x, int y) => Task.CompletedTask;
+
+        public Task ActivateAsync(int x, int y)
         {
             WindowRaise?.Invoke();
             return Task.CompletedTask;
         }
 
-        public Task ScrollAsync(int Delta, string Orientation)
+        public Task SecondaryActivateAsync(int x, int y)
+        {
+            WindowRaise?.Invoke();
+            return Task.CompletedTask;
+        }
+
+        public Task ScrollAsync(int delta, string orientation)
         {
             return Task.CompletedTask;
         }
@@ -60,84 +57,100 @@ namespace osu.Desktop.DBus.Tray
         public event Action OnTitleChanged;
 
         public Task<IDisposable> WatchNewTitleAsync(Action handler, Action<Exception> onError = null)
-            => SignalWatcher.AddAsync(this, nameof(OnTitleChanged), handler);
+        {
+            return SignalWatcher.AddAsync(this, nameof(OnTitleChanged), handler);
+        }
 
         public event Action OnIconChanged;
 
         public Task<IDisposable> WatchNewIconAsync(Action handler, Action<Exception> onError = null)
-            => SignalWatcher.AddAsync(this, nameof(OnIconChanged), handler);
+        {
+            return SignalWatcher.AddAsync(this, nameof(OnIconChanged), handler);
+        }
 
         public event Action OnNewAttentionIcon;
 
         public Task<IDisposable> WatchNewAttentionIconAsync(Action handler, Action<Exception> onError = null)
-            => SignalWatcher.AddAsync(this, nameof(OnNewAttentionIcon), handler);
+        {
+            return SignalWatcher.AddAsync(this, nameof(OnNewAttentionIcon), handler);
+        }
 
         public event Action OnOverlayIconChanged;
 
         public Task<IDisposable> WatchNewOverlayIconAsync(Action handler, Action<Exception> onError = null)
-            => SignalWatcher.AddAsync(this, nameof(OnOverlayIconChanged), handler);
+        {
+            return SignalWatcher.AddAsync(this, nameof(OnOverlayIconChanged), handler);
+        }
 
         public event Action OnMenuCreated;
 
         public Task<IDisposable> WatchNewMenuAsync(Action handler, Action<Exception> onError = null)
-            => SignalWatcher.AddAsync(this, nameof(OnMenuCreated), handler);
+        {
+            return SignalWatcher.AddAsync(this, nameof(OnMenuCreated), handler);
+        }
 
         public event Action OnTooltipChanged;
 
         public Task<IDisposable> WatchNewToolTipAsync(Action handler, Action<Exception> onError = null)
-            => SignalWatcher.AddAsync(this, nameof(OnTooltipChanged), handler);
+        {
+            return SignalWatcher.AddAsync(this, nameof(OnTooltipChanged), handler);
+        }
 
         public event Action<string> OnStatusChanged;
 
         public Task<IDisposable> WatchNewStatusAsync(Action<string> handler, Action<Exception> onError = null)
-            => SignalWatcher.AddAsync(this, nameof(OnStatusChanged), handler);
+        {
+            return SignalWatcher.AddAsync(this, nameof(OnStatusChanged), handler);
+        }
 
         public Task<string> GetCategoryAsync()
-            => Task.FromResult(properties.Category);
+            => Task.FromResult(kdeProperties.Category);
 
         public Task<string> GetIdAsync()
-            => Task.FromResult(properties.Id);
+            => Task.FromResult(kdeProperties.Id);
 
         public Task<string> GetTitleAsync()
-            => Task.FromResult(properties.Title);
+            => Task.FromResult(kdeProperties.Title);
 
         public Task<string> GetStatusAsync()
-            => Task.FromResult(properties.Status);
+            => Task.FromResult(kdeProperties.Status);
 
         public Task<int> GetWindowIdAsync()
-            => Task.FromResult(properties.WindowId);
+            => Task.FromResult(kdeProperties.WindowId);
 
         public Task<string> GetIconThemePathAsync()
-            => Task.FromResult(properties.IconThemePath);
+            => Task.FromResult(kdeProperties.IconThemePath);
 
         public Task<ObjectPath> GetMenuAsync()
-            => Task.FromResult(this.ObjectPath);
+            => Task.FromResult(CanonicalTrayService.PATH);
 
         public Task<bool> GetItemIsMenuAsync()
-            => Task.FromResult(properties.ItemIsMenu);
+            => Task.FromResult(kdeProperties.ItemIsMenu);
 
         public Task<string> GetIconNameAsync()
-            => Task.FromResult(properties.IconName);
+            => Task.FromResult(kdeProperties.IconName);
 
         public Task<(int, int, byte[])[]> GetIconPixmapAsync()
-            => Task.FromResult(properties.IconPixmap);
+            => Task.FromResult(kdeProperties.IconPixmap);
 
         public Task<string> GetOverlayIconNameAsync()
-            => Task.FromResult(properties.OverlayIconName);
+            => Task.FromResult(kdeProperties.OverlayIconName);
 
         public Task<(int, int, byte[])[]> GetOverlayIconPixmapAsync()
-            => Task.FromResult(properties.OverlayIconPixmap);
+            => Task.FromResult(kdeProperties.OverlayIconPixmap);
 
         public Task<string> GetAttentionIconNameAsync()
-            => Task.FromResult(properties.AttentionIconName);
+            => Task.FromResult(kdeProperties.AttentionIconName);
 
         public Task<(int, int, byte[])[]> GetAttentionIconPixmapAsync()
-            => Task.FromResult(properties.AttentionIconPixmap);
+            => Task.FromResult(kdeProperties.AttentionIconPixmap);
 
         public Task<string> GetAttentionMovieNameAsync()
-            => Task.FromResult(properties.AttentionMovieName);
+            => Task.FromResult(kdeProperties.AttentionMovieName);
 
         public Task<(string, (int, int, byte[])[], string, string)> GetToolTipAsync()
-            => Task.FromResult(properties.ToolTip);
+            => Task.FromResult(kdeProperties.ToolTip);
+
+        #endregion
     }
 }

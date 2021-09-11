@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using M.DBus;
 using osu.Desktop.DBus.Tray;
 using osu.Framework.Allocation;
@@ -74,6 +75,7 @@ namespace osu.Desktop.DBus
         }
 
         private readonly KdeStatusTrayService kdeTrayService = new KdeStatusTrayService();
+        private readonly CanonicalTrayService canonicalTrayService = new CanonicalTrayService();
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, MConfigManager config, Storage storage, OsuGame game)
@@ -93,8 +95,31 @@ namespace osu.Desktop.DBus
                 DBusManager.RegisterNewObject(mprisService,
                     "org.mpris.MediaPlayer2.mfosu");
 
+                DBusManager.RegisterNewObject(canonicalTrayService,
+                    "io.matrix_feather.dbus.menu");
+
+                canonicalTrayService.AddEntryToMenu(new Dictionary<string, object>
+                {
+                    ["enabled"] = true,
+                    ["label"] = "测试0",
+                    ["toggle-state"] = 0,
+                    ["toggle-type"] = "checkmark",
+                    ["visible"] = true
+                });
+
+                canonicalTrayService.AddEntryToMenu(new Dictionary<string, object>
+                {
+                    ["enabled"] = true,
+                    ["label"] = "测试1",
+                    ["toggle-state"] = 0,
+                    ["toggle-type"] = "checkmark",
+                    ["visible"] = true
+                });
+
                 DBusManager.RegisterNewObject(kdeTrayService,
                     "org.kde.StatusNotifierItem.mfosu");
+
+                canonicalTrayService.TriggerLayoutUpdate();
 
                 registerTrayToDBus();
 
