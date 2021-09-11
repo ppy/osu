@@ -47,11 +47,16 @@ namespace osu.Desktop.DBus
         [Resolved]
         private MusicController musicController { get; set; }
 
+        [Resolved]
+        private GameHost host { get; set; }
+
         private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
         private readonly MprisPlayerService mprisService = new MprisPlayerService();
 
+        //private readonly KdeStatusTrayService kdeTrayService = new KdeStatusTrayService();
+
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, MConfigManager config, Storage storage, OsuGame game, GameHost host)
+        private void load(IAPIProvider api, MConfigManager config, Storage storage, OsuGame game)
         {
             DBusManager.RegisterNewObjects(new IDBusObject[]
             {
@@ -67,6 +72,9 @@ namespace osu.Desktop.DBus
             {
                 DBusManager.RegisterNewObject(mprisService,
                     "org.mpris.MediaPlayer2.mfosu");
+
+                //DBusManager.RegisterNewObject(kdeTrayService,
+                //    "org.kde.StatusNotifierItem.mfosu");
 
                 DBusManager.OnConnected -= onDBusConnected;
             }
@@ -91,13 +99,19 @@ namespace osu.Desktop.DBus
             mprisService.Stop += () => musicController.Stop(true);
             mprisService.PlayPause += () => musicController.TogglePause();
             mprisService.OpenUri += game.HandleLink;
-            mprisService.WindowRaise += () => (host.Window as SDL2DesktopWindow)?.Raise();
+            mprisService.WindowRaise += raiseWindow;
+
+            //kdeTrayService.WindowRaise += raiseWindow;
+        }
+
+        private void raiseWindow()
+        {
+            (host.Window as SDL2DesktopWindow)?.Raise();
         }
 
         protected override void LoadComplete()
         {
             controlSource?.BindValueChanged(onControlSourceChanged, true);
-            Scheduler.AddDelayed(updateAudioProperties, 50, true);
             base.LoadComplete();
         }
 
@@ -105,12 +119,6 @@ namespace osu.Desktop.DBus
         {
             base.Update();
             mprisService.TrackRunning = musicController.CurrentTrack.IsRunning;
-        }
-
-        private void updateAudioProperties()
-        {
-            audioservice.Length = musicController.CurrentTrack.Length;
-            audioservice.Current = musicController.CurrentTrack.CurrentTime;
         }
 
         public Action<Notification> NotificationAction { get; set; }
@@ -136,6 +144,7 @@ namespace osu.Desktop.DBus
         {
             beatmapService.Beatmap = v.NewValue;
             mprisService.Beatmap = v.NewValue;
+            audioservice.Beatmap = v.NewValue;
         }
 
         private void onControlSourceChanged(ValueChangedEvent<bool> v)

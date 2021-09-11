@@ -191,14 +191,18 @@ namespace osu.Desktop.DBus
         }
 
         public Task<object> GetAsync(string prop)
+            => Task.FromResult(mp2Properties.Contains(prop)
+                ? mp2Properties.Get(prop)
+                : playerProperties.Get(prop));
+
+        public Task SetAsync(string prop, object val)
         {
-            var playerDict = playerProperties.ToDictionary();
-            var mp2Dict = mp2Properties.ToDictionary();
+            if (prop == nameof(PlayerProperties.Volume))
+            {
+                playerProperties.Set(nameof(PlayerProperties.Volume), val);
+            }
 
-            if (playerDict.ContainsKey(prop))
-                return Task.FromResult(playerDict[prop]);
-
-            return Task.FromResult(mp2Dict[prop]);
+            return Task.CompletedTask;
         }
 
         Task<MediaPlayer2Properties> IMediaPlayer2.GetAllAsync()
@@ -206,9 +210,6 @@ namespace osu.Desktop.DBus
 
         public Task<PlayerProperties> GetAllAsync()
             => Task.FromResult(playerProperties);
-
-        public Task SetAsync(string prop, object val)
-            => Task.CompletedTask;
 
         public event Action<PropertyChanges> OnPropertiesChanged;
 

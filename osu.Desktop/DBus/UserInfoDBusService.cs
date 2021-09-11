@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using M.DBus;
 using osu.Game.Users;
 using Tmds.DBus;
 
@@ -33,137 +33,74 @@ namespace osu.Desktop.DBus
     [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
     public class UserMetadataProperties
     {
-        private string _Name = string.Empty;
-
         public string Name
         {
             get => _Name;
-            set
-            {
-                _Name = value;
-                dictionary[nameof(Name)] = value;
-            }
+            set => _Name = value;
         }
-
-        private int _GlobalRank;
 
         public int GlobalRank
         {
             get => _GlobalRank;
-            set
-            {
-                _GlobalRank = value;
-                dictionary[nameof(GlobalRank)] = value;
-            }
+            set => _GlobalRank = value;
         }
-
-        private int _RegionRank;
 
         public int RegionRank
         {
             get => _RegionRank;
-            set
-            {
-                _RegionRank = value;
-                dictionary[nameof(RegionRank)] = value;
-            }
+            set => _RegionRank = value;
         }
-
-        private string _AvatarUrl;
 
         public string AvatarUrl
         {
             get => _AvatarUrl;
-            set
-            {
-                _AvatarUrl = value;
-                dictionary[nameof(AvatarUrl)] = value;
-            }
+            set => _AvatarUrl = value;
         }
-
-        private int _PP;
 
         public int PP
         {
             get => _PP;
-            set
-            {
-                _PP = value;
-                dictionary[nameof(PP)] = value;
-            }
+            set => _PP = value;
         }
-
-        private string _CurrentRuleset;
 
         public string CurrentRuleset
         {
             get => _CurrentRuleset;
-            set
-            {
-                _CurrentRuleset = value;
-                dictionary[nameof(CurrentRuleset)] = value;
-            }
+            set => _CurrentRuleset = value;
         }
-
-        private string _Activity;
 
         public string Activity
         {
             get => _Activity;
-            set
-            {
-                _Activity = value;
-                dictionary[nameof(Activity)] = value;
-            }
+            set => _Activity = value;
         }
 
-        private readonly IDictionary<string, object> dictionary = new ConcurrentDictionary<string, object>
+        private IDictionary<string, object> members;
+
+        private string _Name = string.Empty;
+
+        private int _GlobalRank;
+
+        private int _RegionRank;
+
+        private string _AvatarUrl;
+
+        private int _PP;
+
+        private string _CurrentRuleset;
+
+        private string _Activity;
+
+        public object Get(string prop)
         {
-            [nameof(Name)] = string.Empty,
-            [nameof(GlobalRank)] = 0,
-            [nameof(RegionRank)] = 0,
-            [nameof(AvatarUrl)] = string.Empty,
-            [nameof(PP)] = (decimal)0,
-            [nameof(CurrentRuleset)] = string.Empty,
-            [nameof(Activity)] = string.Empty
-        };
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.GetValueFor(this, prop, members);
+        }
 
-        internal IDictionary<string, object> ToDictionary() => dictionary;
-
-        internal bool SetValue(string name, object value)
+        internal bool Set(string name, object newValue)
         {
-            switch (name)
-            {
-                case nameof(Name):
-                    Name = (string)value;
-                    return true;
-
-                case nameof(GlobalRank):
-                    GlobalRank = (int)value;
-                    return true;
-
-                case nameof(RegionRank):
-                    RegionRank = (int)value;
-                    return true;
-
-                case nameof(AvatarUrl):
-                    AvatarUrl = (string)value;
-                    return true;
-
-                case nameof(PP):
-                    PP = (int)value;
-                    return true;
-
-                case nameof(CurrentRuleset):
-                    CurrentRuleset = (string)value;
-                    return true;
-
-                case nameof(Activity):
-                    Activity = (string)value;
-                    return true;
-            }
-
-            return false;
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.SetValueFor(this, name, newValue, members);
         }
     }
 
@@ -171,8 +108,6 @@ namespace osu.Desktop.DBus
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mfosu/CurrentUser");
-
-        private readonly TimeSpan loadTick = new TimeSpan(DateTime.Now.Ticks);
 
         public User User
         {
@@ -186,52 +121,76 @@ namespace osu.Desktop.DBus
             }
         }
 
-        internal void SetProperty(string target, object value)
-        {
-            if (properties.SetValue(target, value))
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, value));
-        }
+        private readonly TimeSpan loadTick = new TimeSpan(DateTime.Now.Ticks);
 
         private readonly UserMetadataProperties properties = new UserMetadataProperties();
 
         public Task<UserMetadataProperties> GetAllAsync()
-            => Task.FromResult(properties);
+        {
+            return Task.FromResult(properties);
+        }
 
         public Task<object> GetAsync(string prop)
-            => Task.FromResult(properties.ToDictionary()[prop]);
+        {
+            return Task.FromResult(properties.Get(prop));
+        }
 
         public Task SetAsync(string prop, object val)
         {
             throw new InvalidOperationException("只读属性");
         }
 
-        public event Action<PropertyChanges> OnPropertiesChanged;
-
         public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)
-            => SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
+        {
+            return SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
+        }
 
         public Task<string> GetNameAsync()
-            => Task.FromResult(properties.Name);
+        {
+            return Task.FromResult(properties.Name);
+        }
 
         public Task<string> GetActivityAsync()
-            => Task.FromResult(properties.Activity);
+        {
+            return Task.FromResult(properties.Activity);
+        }
 
         public Task<int> GetGlobalRankAsync()
-            => Task.FromResult(properties.GlobalRank);
+        {
+            return Task.FromResult(properties.GlobalRank);
+        }
 
         public Task<int> GetRegionRankAsync()
-            => Task.FromResult(properties.RegionRank);
+        {
+            return Task.FromResult(properties.RegionRank);
+        }
 
         public Task<string> GetAvatarUrlAsync()
-            => Task.FromResult(properties.AvatarUrl);
+        {
+            return Task.FromResult(properties.AvatarUrl);
+        }
 
         public Task<int> GetPPAsync()
-            => Task.FromResult(properties.PP);
+        {
+            return Task.FromResult(properties.PP);
+        }
 
         public Task<string> GetCurrentRulesetAsync()
-            => Task.FromResult(properties.CurrentRuleset);
+        {
+            return Task.FromResult(properties.CurrentRuleset);
+        }
 
         public Task<long> GetLaunchTickAsync()
-            => Task.FromResult(new TimeSpan(DateTime.Now.Ticks).Ticks - loadTick.Ticks);
+        {
+            return Task.FromResult(new TimeSpan(DateTime.Now.Ticks).Ticks - loadTick.Ticks);
+        }
+
+        internal void SetProperty(string target, object value)
+        {
+            if (properties.Set(target, value))
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, value));
+        }
+
+        public event Action<PropertyChanges> OnPropertiesChanged;
     }
 }

@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using M.DBus;
 using Tmds.DBus;
 
 namespace osu.Desktop.DBus
@@ -64,21 +64,24 @@ namespace osu.Desktop.DBus
 
         public string[] SupportedMimeTypes => _SupportedMimeTypes;
 
-        private readonly IDictionary<string, object> dictionary = new ConcurrentDictionary<string, object>();
+        private IDictionary<string, object> members;
 
-        internal IDictionary<string, object> ToDictionary()
+        public object Get(string prop)
         {
-            dictionary[nameof(CanQuit)] = _CanQuit;
-            dictionary[nameof(Fullscreen)] = _Fullscreen;
-            dictionary[nameof(CanSetFullscreen)] = _CanSetFullscreen;
-            dictionary[nameof(CanRaise)] = _CanRaise;
-            dictionary[nameof(HasTrackList)] = _HasTrackList;
-            dictionary[nameof(Identity)] = _Identity;
-            dictionary[nameof(DesktopEntry)] = _DesktopEntry;
-            dictionary[nameof(SupportedUriSchemes)] = _SupportedUriSchemes;
-            dictionary[nameof(SupportedMimeTypes)] = _SupportedMimeTypes;
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.GetValueFor(this, prop, members);
+        }
 
-            return dictionary;
+        internal bool Set(string name, object newValue)
+        {
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.SetValueFor(this, name, newValue, members);
+        }
+
+        internal bool Contains(string prop)
+        {
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.CheckifContained(this, prop, members);
         }
     }
 
@@ -108,11 +111,31 @@ namespace osu.Desktop.DBus
     [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
     public class PlayerProperties
     {
+        private IDictionary<string, object> members;
+
+        public object Get(string prop)
+        {
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.GetValueFor(this, prop, members);
+        }
+
+        internal bool Set(string name, object newValue)
+        {
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.SetValueFor(this, name, newValue, members);
+        }
+
+        internal bool Contains(string prop)
+        {
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.CheckifContained(this, prop, members);
+        }
+
         internal string _PlaybackStatus = "Paused";
 
         public string PlaybackStatus => _PlaybackStatus;
 
-        internal string _LoopStatus = "Playlist";
+        internal string _LoopStatus = "Single";
 
         public string LoopStatus => _LoopStatus;
 
@@ -136,9 +159,13 @@ namespace osu.Desktop.DBus
 
         public IDictionary<string, object> Metadata => _Metadata;
 
-        private readonly double _Volume = 1.0;
+        private double _Volume = 0.0;
 
-        public double Volume => _Volume;
+        public double Volume
+        {
+            get => _Volume;
+            set => _Volume = value;
+        }
 
         private readonly long _Position = 0;
 
@@ -175,28 +202,5 @@ namespace osu.Desktop.DBus
         private readonly bool _CanControl = true;
 
         public bool CanControl => _CanControl;
-
-        private readonly IDictionary<string, object> dictionary = new ConcurrentDictionary<string, object>();
-
-        internal IDictionary<string, object> ToDictionary()
-        {
-            dictionary[nameof(PlaybackStatus)] = _PlaybackStatus;
-            dictionary[nameof(LoopStatus)] = _LoopStatus;
-            dictionary[nameof(Position)] = _Position;
-            dictionary[nameof(Volume)] = _Volume;
-            dictionary[nameof(Rate)] = _Rate;
-            dictionary[nameof(MinimumRate)] = _MinimumRate;
-            dictionary[nameof(MaximumRate)] = _MaximumRate;
-            dictionary[nameof(Metadata)] = _Metadata;
-            dictionary[nameof(Shuffle)] = _Shuffle;
-            dictionary[nameof(CanSeek)] = _CanSeek;
-            dictionary[nameof(CanPlay)] = _CanPlay;
-            dictionary[nameof(CanPause)] = _CanPause;
-            dictionary[nameof(CanGoPrevious)] = _CanGoPrevious;
-            dictionary[nameof(CanGoNext)] = _CanGoNext;
-            dictionary[nameof(CanControl)] = _CanControl;
-
-            return dictionary;
-        }
     }
 }

@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using M.DBus;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using Tmds.DBus;
@@ -32,120 +32,72 @@ namespace osu.Desktop.DBus
     [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
     public class BeatmapMetadataProperties
     {
-        private string _FullName = "Not Set?";
-
         public string FullName
         {
             get => _FullName;
-            set
-            {
-                _FullName = value;
-                dictionary[nameof(FullName)] = value;
-            }
+            set => _FullName = value;
         }
-
-        private string _Version = string.Empty;
 
         public string Version
         {
             get => _Version;
-            set
-            {
-                _Version = value;
-                dictionary[nameof(Version)] = value;
-            }
+            set => _Version = value;
         }
-
-        private double _Stars;
 
         public double Stars
         {
             get => _Stars;
-            set
-            {
-                _Stars = value;
-                dictionary[nameof(Stars)] = value;
-            }
+            set => _Stars = value;
         }
-
-        private int _OnlineID;
 
         public int OnlineID
         {
             get => _OnlineID;
-            set
-            {
-                _OnlineID = value;
-                dictionary[nameof(OnlineID)] = value;
-            }
+            set => _OnlineID = value;
         }
-
-        private double _BPM;
 
         public double BPM
         {
             get => _BPM;
-            set
-            {
-                _BPM = value;
-                dictionary[nameof(BPM)] = value;
-            }
+            set => _BPM = value;
         }
-
-        private string _CoverPath;
 
         public string CoverPath
         {
             get => _CoverPath;
-            set
-            {
-                _CoverPath = value;
-                dictionary[nameof(CoverPath)] = value;
-            }
+            set => _CoverPath = value;
         }
 
-        private readonly IDictionary<string, object> dictionary = new ConcurrentDictionary<string, object>
+        private string _FullName = "Not Set?";
+
+        private string _Version = string.Empty;
+
+        private double _Stars;
+
+        private int _OnlineID;
+
+        private double _BPM;
+
+        private string _CoverPath;
+
+        private IDictionary<string, object> members;
+
+        public object Get(string prop)
         {
-            [nameof(FullName)] = string.Empty,
-            [nameof(Version)] = string.Empty,
-            [nameof(Stars)] = default,
-            [nameof(OnlineID)] = default,
-            [nameof(BPM)] = default,
-            [nameof(CoverPath)] = string.Empty,
-        };
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.GetValueFor(this, prop, members);
+        }
 
-        internal IDictionary<string, object> ToDictionary() => dictionary;
-
-        internal bool SetValue(string name, object value)
+        internal bool Set(string name, object newValue)
         {
-            switch (name)
-            {
-                case nameof(FullName):
-                    FullName = (string)value;
-                    return true;
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.SetValueFor(this, name, newValue, members);
+        }
 
-                case nameof(Version):
-                    Version = (string)value;
-                    return true;
-
-                case nameof(Stars):
-                    Stars = (double)value;
-                    return true;
-
-                case nameof(OnlineID):
-                    OnlineID = (int)value;
-                    return true;
-
-                case nameof(BPM):
-                    BPM = (double)value;
-                    return true;
-
-                case nameof(CoverPath):
-                    CoverPath = (string)value;
-                    return true;
-            }
-
-            return false;
+        internal bool Contains(string prop)
+        {
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.CheckifContained(this, prop, members);
         }
     }
 
@@ -153,8 +105,6 @@ namespace osu.Desktop.DBus
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mfosu/CurrentBeatmap");
-
-        private readonly BeatmapMetadataProperties properties = new BeatmapMetadataProperties();
 
         public WorkingBeatmap Beatmap
         {
@@ -173,6 +123,53 @@ namespace osu.Desktop.DBus
         }
 
         internal Storage Storage { get; set; }
+
+        private readonly BeatmapMetadataProperties properties = new BeatmapMetadataProperties();
+
+        public Task<BeatmapMetadataProperties> GetAllAsync()
+        {
+            return Task.FromResult(properties);
+        }
+
+        public Task<object> GetAsync(string prop)
+        {
+            return Task.FromResult(properties.Get(prop));
+        }
+
+        public Task SetAsync(string prop, object val)
+        {
+            throw new InvalidOperationException("只读属性");
+        }
+
+        public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)
+        {
+            return SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
+        }
+
+        public Task<string> GetFullNameAsync()
+        {
+            return Task.FromResult(properties.FullName);
+        }
+
+        public Task<string> GetCurrentDifficultyVersionAsync()
+        {
+            return Task.FromResult(properties.Version);
+        }
+
+        public Task<double> GetCurrentDifficultyStarAsync()
+        {
+            return Task.FromResult(properties.Stars);
+        }
+
+        public Task<int> GetOnlineIdAsync()
+        {
+            return Task.FromResult(properties.OnlineID);
+        }
+
+        public Task<double> GetBPMAsync()
+        {
+            return Task.FromResult(properties.BPM);
+        }
 
         private string resolveBeatmapCoverUrl(WorkingBeatmap beatmap)
         {
@@ -200,39 +197,10 @@ namespace osu.Desktop.DBus
 
         private void setProperty(string target, object value)
         {
-            if (properties.SetValue(target, value))
+            if (properties.Set(target, value))
                 OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, value));
         }
 
-        public Task<BeatmapMetadataProperties> GetAllAsync()
-            => Task.FromResult(properties);
-
-        public Task<object> GetAsync(string prop)
-            => Task.FromResult(properties.ToDictionary()[prop]);
-
-        public Task SetAsync(string prop, object val)
-        {
-            throw new InvalidOperationException("只读属性");
-        }
-
         public event Action<PropertyChanges> OnPropertiesChanged;
-
-        public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)
-            => SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
-
-        public Task<string> GetFullNameAsync()
-            => Task.FromResult(properties.FullName);
-
-        public Task<string> GetCurrentDifficultyVersionAsync()
-            => Task.FromResult(properties.Version);
-
-        public Task<double> GetCurrentDifficultyStarAsync()
-            => Task.FromResult(properties.Stars);
-
-        public Task<int> GetOnlineIdAsync()
-            => Task.FromResult(properties.OnlineID);
-
-        public Task<double> GetBPMAsync()
-            => Task.FromResult(properties.BPM);
     }
 }
