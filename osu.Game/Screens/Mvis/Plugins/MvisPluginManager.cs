@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using M.DBus;
+using M.DBus.Tray;
 using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -105,15 +106,29 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public void RegisterDBusObject(IDBusObject target)
         {
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            if (platformSupportsDBus)
                 dBusManager?.RegisterNewObject(target);
         }
 
         public void UnRegisterDBusObject(IDBusObject target)
         {
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            if (platformSupportsDBus)
                 dBusManager?.UnRegisterObject(target);
         }
+
+        public void AddDBusMenuEntry(SingleEntry entry)
+        {
+            if (platformSupportsDBus)
+                dBusManager?.AddEntry(entry);
+        }
+
+        public void RemoveDBusMenuEntry(SingleEntry entry)
+        {
+            if (platformSupportsDBus)
+                dBusManager?.RemoveEntry(entry);
+        }
+
+        private bool platformSupportsDBus => RuntimeInfo.OS == RuntimeInfo.Platform.Linux;
 
         internal bool AddPlugin(MvisPlugin pl)
         {

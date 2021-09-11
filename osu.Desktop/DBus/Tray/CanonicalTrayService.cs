@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using M.DBus.Tray;
 using Tmds.DBus;
 using Logger = osu.Framework.Logging.Logger;
 
@@ -24,14 +26,34 @@ namespace osu.Desktop.DBus.Tray
 
         #region 列表物件存储
 
-        private readonly Dictionary<int, IDictionary<string, object>> entries = new Dictionary<int, IDictionary<string, object>>();
+        private readonly Dictionary<int, SingleEntry> entries = new Dictionary<int, SingleEntry>();
+        private readonly List<object> cachedMenuEntries = new List<object>();
 
         private int lastEntryId = 1;
 
-        public void AddEntryToMenu(IDictionary<string, object> entry)
+        public void AddEntryToMenu(SingleEntry entry)
         {
             entries[lastEntryId] = entry;
             lastEntryId++;
+            triggerLayoutUpdate();
+        }
+
+        public void RemoveEntryFromMenu(SingleEntry entry)
+        {
+            var key = entries.FirstOrDefault(p => p.Value == entry);
+
+            if (key.Value != null)
+                entries.Remove(key.Key);
+            else
+                throw new InvalidOperationException($"给定的 {entry} 不在列表中");
+
+            triggerLayoutUpdate();
+        }
+
+        private void triggerLayoutUpdate()
+        {
+            menuRevision++;
+            OnLayoutUpdated?.Invoke((menuRevision, 0));
         }
 
         #endregion
@@ -47,21 +69,33 @@ namespace osu.Desktop.DBus.Tray
         /// <param name="propertyNames"></param>
         /// <returns></returns>
         /// 你知道查不到文档被迫连蒙带猜有多痛苦么
-        /// 我他妈在这小东西上面花了整整2小时
+        /// 我在这小东西上面花了整整2小时
         public Task<(uint revision, (int, IDictionary<string, object>, object[]) layout)> GetLayoutAsync(int parentId, int recursionDepth, string[] propertyNames)
         {
-            var list = new List<object>();
-
-            foreach (var entry in entries)
+            if (cachedMenuEntries.Count != entries.Count)
             {
-                list.Add((entry.Key, entry.Value, Array.Empty<object>()));
+                Logger.Log("重新构建列表...");
+                cachedMenuEntries.Clear();
+
+                foreach (var entry in entries)
+                {
+                    //id, dict, subItems
+                    Logger.Log($"id: {entry.Key}, value: {entry.Value.ToDictionary()}");
+                    cachedMenuEntries.Add((entry.Key, entry.Value.ToDictionary(), Array.Empty<object>()));
+                }
             }
 
-            var abab = (menuRevision, (0, layout, list.ToArray()));
+            var abab = (menuRevision, (0, layout, cachedMenuEntries.ToArray()));
 
-            Logger.Log($"{abab}");
-
-            return Task.FromResult(abab);
+            try
+            {
+                return Task.FromResult(abab);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public Task<(int, IDictionary<string, object>)[]> GetGroupPropertiesAsync(int[] ids, string[] propertyNames)
@@ -78,9 +112,26 @@ namespace osu.Desktop.DBus.Tray
 
         public Task EventAsync(int id, string eventId, object data, uint timestamp)
         {
-            Logger.Log($"方法被调用：EventAsync: id: {id} | eventId: {eventId} | data: {data} | timestamp: {timestamp}");
+            var eventType = TrayUtils.GetEntryEventType(eventId);
 
-            throw new NotImplementedException();
+            switch (eventType)
+            {
+                case TrayUtils.EntryEvent.Clicked:
+                    entries.FirstOrDefault(p => p.Key == id).Value?.OnActive?.Invoke();
+                    break;
+
+                case TrayUtils.EntryEvent.Closed:
+                    break;
+
+                case TrayUtils.EntryEvent.Opened:
+                    break;
+
+                default:
+                    Logger.Log($"未实现的方法被调用：EventAsync: id: {id} | eventId: {eventId} | data: {data} | timestamp: {timestamp}");
+                    break;
+            }
+
+            return Task.CompletedTask;
         }
 
         public Task<int[]> EventGroupAsync((int, string, object, uint)[] events)
@@ -89,11 +140,7 @@ namespace osu.Desktop.DBus.Tray
             throw new NotImplementedException();
         }
 
-        public Task<bool> AboutToShowAsync(int id)
-        {
-            Logger.Log($"未实现的方法被调用：AboutToShowAsync: {id}");
-            return Task.FromResult(false);
-        }
+        public Task<bool> AboutToShowAsync(int id) => Task.FromResult(false);
 
         public Task<(int[] updatesNeeded, int[] idErrors)> AboutToShowGroupAsync(int[] ids)
         {
@@ -109,12 +156,6 @@ namespace osu.Desktop.DBus.Tray
         }
 
         public event Action<(uint revision, int parent)> OnLayoutUpdated;
-
-        internal void TriggerLayoutUpdate()
-        {
-            menuRevision++;
-            OnLayoutUpdated?.Invoke((menuRevision, 0));
-        }
 
         public Task<IDisposable> WatchLayoutUpdatedAsync(Action<(uint revision, int parent)> handler, Action<Exception> onError = null)
         {

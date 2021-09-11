@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using M.DBus.Services;
+using M.DBus.Tray;
 using osu.Framework.Logging;
 using Tmds.DBus;
 
@@ -19,12 +20,15 @@ namespace M.DBus
         private ConnectionState connectionState = ConnectionState.NotConnected;
 
         private bool isDisposed { get; set; }
+        private readonly IHandleTrayManagement trayManagement;
 
-        public DBusManager(bool startOnLoad)
+        public DBusManager(bool startOnLoad, IHandleTrayManagement trayManagement)
         {
             //如果在初始化时启动服务
             if (startOnLoad)
                 Connect();
+
+            this.trayManagement = trayManagement;
 
             Task.Run(() => RegisterNewObject(GreetService));
         }
@@ -144,6 +148,13 @@ namespace M.DBus
 
             return currentConnection.CreateProxy<T>(name, path);
         }
+
+        #endregion
+
+        #region 托盘
+
+        public void AddEntry(SingleEntry entry) => trayManagement.AddEntry(entry);
+        public void RemoveEntry(SingleEntry entry) => trayManagement.RemoveEntry(entry);
 
         #endregion
 

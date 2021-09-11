@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using M.DBus;
+using M.DBus.Tray;
 using osu.Desktop.DBus.Tray;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,15 +19,19 @@ using Tmds.DBus;
 
 namespace osu.Desktop.DBus
 {
-    public class DBusManagerContainer : Component
+    public class DBusManagerContainer : Component, IHandleTrayManagement
     {
-        public readonly DBusManager DBusManager = new DBusManager(false);
+        public DBusManager DBusManager;
 
         public Action<Notification> NotificationAction { get; set; }
         private readonly Bindable<bool> controlSource;
 
         private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
         private readonly MprisPlayerService mprisService = new MprisPlayerService();
+
+        private readonly KdeStatusTrayService kdeTrayService = new KdeStatusTrayService();
+        private readonly CanonicalTrayService canonicalTrayService = new CanonicalTrayService();
+        private SDL2DesktopWindow sdl2DesktopWindow => (SDL2DesktopWindow)host.Window;
 
         private BeatmapInfoDBusService beatmapService;
         private AudioInfoDBusService audioservice;
@@ -45,11 +49,16 @@ namespace osu.Desktop.DBus
         [Resolved]
         private GameHost host { get; set; }
 
+        [Resolved]
+        private OsuGame game { get; set; }
+
         public DBusManagerContainer(bool autoStart = false, Bindable<bool> controlSource = null)
         {
             if (autoStart && controlSource != null)
                 this.controlSource = controlSource;
             else if (controlSource == null && autoStart) throw new InvalidOperationException("设置了自动启动但是控制源是null?");
+
+            DBusManager = new DBusManager(false, this);
         }
 
         #region Disposal
@@ -74,11 +83,8 @@ namespace osu.Desktop.DBus
             mprisService.TrackRunning = musicController.CurrentTrack.IsRunning;
         }
 
-        private readonly KdeStatusTrayService kdeTrayService = new KdeStatusTrayService();
-        private readonly CanonicalTrayService canonicalTrayService = new CanonicalTrayService();
-
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, MConfigManager config, Storage storage, OsuGame game)
+        private void load(IAPIProvider api, MConfigManager config, Storage storage)
         {
             DBusManager.RegisterNewObjects(new IDBusObject[]
             {
@@ -98,28 +104,23 @@ namespace osu.Desktop.DBus
                 DBusManager.RegisterNewObject(canonicalTrayService,
                     "io.matrix_feather.dbus.menu");
 
-                canonicalTrayService.AddEntryToMenu(new Dictionary<string, object>
+                canonicalTrayService.AddEntryToMenu(new SingleEntry
                 {
-                    ["enabled"] = true,
-                    ["label"] = "测试0",
-                    ["toggle-state"] = 0,
-                    ["toggle-type"] = "checkmark",
-                    ["visible"] = true
+                    Name = "隐藏/显示窗口",
+                    OnActive = () =>
+                    {
+                        sdl2DesktopWindow.Visible = !sdl2DesktopWindow.Visible;
+                    }
                 });
 
-                canonicalTrayService.AddEntryToMenu(new Dictionary<string, object>
+                canonicalTrayService.AddEntryToMenu(new SingleEntry
                 {
-                    ["enabled"] = true,
-                    ["label"] = "测试1",
-                    ["toggle-state"] = 0,
-                    ["toggle-type"] = "checkmark",
-                    ["visible"] = true
+                    Name = "退出",
+                    OnActive = exitGame
                 });
 
                 DBusManager.RegisterNewObject(kdeTrayService,
                     "org.kde.StatusNotifierItem.mfosu");
-
-                canonicalTrayService.TriggerLayoutUpdate();
 
                 registerTrayToDBus();
 
@@ -141,7 +142,7 @@ namespace osu.Desktop.DBus
             mprisService.Previous += () => musicController.PreviousTrack();
             mprisService.Play += () => musicController.Play();
             mprisService.Pause += () => musicController.Stop(true);
-            mprisService.Quit += game.GracefullyExit;
+            mprisService.Quit += exitGame;
             mprisService.Seek += t => musicController.SeekTo(t);
             mprisService.Stop += () => musicController.Stop(true);
             mprisService.PlayPause += () => musicController.TogglePause();
@@ -151,18 +152,16 @@ namespace osu.Desktop.DBus
             kdeTrayService.WindowRaise += raiseWindow;
         }
 
-        #region 托盘
-
-        private void registerTrayToDBus()
+        private void raiseWindow()
         {
-            var trayWatcher = DBusManager.GetDBusObject<IStatusNotifierWatcher>(new ObjectPath("/StatusNotifierWatcher"), "org.kde.StatusNotifierWatcher");
-
-            trayWatcher.RegisterStatusNotifierItemAsync("org.kde.StatusNotifierItem.mfosu").ConfigureAwait(false);
+            (host.Window as SDL2DesktopWindow)?.Raise();
         }
 
-        #endregion
-
-        private void raiseWindow() => (host.Window as SDL2DesktopWindow)?.Raise();
+        private void exitGame()
+        {
+            Schedule(game.GracefullyExit);
+            Schedule(game.GracefullyExit);
+        }
 
         private void onMessageRevicedFromDBus(string message)
         {
@@ -195,5 +194,26 @@ namespace osu.Desktop.DBus
             else
                 DBusManager.Disconnect();
         }
+
+        #region 托盘
+
+        private void registerTrayToDBus()
+        {
+            var trayWatcher = DBusManager.GetDBusObject<IStatusNotifierWatcher>(new ObjectPath("/StatusNotifierWatcher"), "org.kde.StatusNotifierWatcher");
+
+            trayWatcher.RegisterStatusNotifierItemAsync("org.kde.StatusNotifierItem.mfosu").ConfigureAwait(false);
+        }
+
+        public void AddEntry(SingleEntry entry)
+        {
+            canonicalTrayService.AddEntryToMenu(entry);
+        }
+
+        public void RemoveEntry(SingleEntry entry)
+        {
+            canonicalTrayService.RemoveEntryFromMenu(entry);
+        }
+
+        #endregion
     }
 }
