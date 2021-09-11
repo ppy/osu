@@ -104,7 +104,7 @@ namespace osu.Desktop.DBus
                 DBusManager.RegisterNewObject(canonicalTrayService,
                     "io.matrix_feather.dbus.menu");
 
-                canonicalTrayService.AddEntryToMenu(new SingleEntry
+                canonicalTrayService.AddEntryToMenu(new SimpleEntry
                 {
                     Name = "隐藏/显示窗口",
                     OnActive = () =>
@@ -113,11 +113,13 @@ namespace osu.Desktop.DBus
                     }
                 });
 
-                canonicalTrayService.AddEntryToMenu(new SingleEntry
+                canonicalTrayService.AddEntryToMenu(new SimpleEntry
                 {
                     Name = "退出",
                     OnActive = exitGame
                 });
+
+                canonicalTrayService.AddEntryToMenu(new SeparatorEntry());
 
                 DBusManager.RegisterNewObject(kdeTrayService,
                     "org.kde.StatusNotifierItem.mfosu");
@@ -204,12 +206,12 @@ namespace osu.Desktop.DBus
             trayWatcher.RegisterStatusNotifierItemAsync("org.kde.StatusNotifierItem.mfosu").ConfigureAwait(false);
         }
 
-        public void AddEntry(SingleEntry entry)
+        public void AddEntry(SimpleEntry entry)
         {
             canonicalTrayService.AddEntryToMenu(entry);
         }
 
-        public void RemoveEntry(SingleEntry entry)
+        public void RemoveEntry(SimpleEntry entry)
         {
             canonicalTrayService.RemoveEntryFromMenu(entry);
         }

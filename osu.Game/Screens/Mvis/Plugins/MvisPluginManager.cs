@@ -116,13 +116,13 @@ namespace osu.Game.Screens.Mvis.Plugins
                 dBusManager?.UnRegisterObject(target);
         }
 
-        public void AddDBusMenuEntry(SingleEntry entry)
+        public void AddDBusMenuEntry(SimpleEntry entry)
         {
             if (platformSupportsDBus)
                 dBusManager?.AddEntry(entry);
         }
 
-        public void RemoveDBusMenuEntry(SingleEntry entry)
+        public void RemoveDBusMenuEntry(SimpleEntry entry)
         {
             if (platformSupportsDBus)
                 dBusManager?.RemoveEntry(entry);

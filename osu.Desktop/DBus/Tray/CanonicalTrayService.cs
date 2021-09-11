@@ -26,19 +26,19 @@ namespace osu.Desktop.DBus.Tray
 
         #region 列表物件存储
 
-        private readonly Dictionary<int, SingleEntry> entries = new Dictionary<int, SingleEntry>();
+        private readonly Dictionary<int, SimpleEntry> entries = new Dictionary<int, SimpleEntry>();
         private readonly List<object> cachedMenuEntries = new List<object>();
 
         private int lastEntryId = 1;
 
-        public void AddEntryToMenu(SingleEntry entry)
+        public void AddEntryToMenu(SimpleEntry entry)
         {
             entries[lastEntryId] = entry;
             lastEntryId++;
             triggerLayoutUpdate();
         }
 
-        public void RemoveEntryFromMenu(SingleEntry entry)
+        public void RemoveEntryFromMenu(SimpleEntry entry)
         {
             var key = entries.FirstOrDefault(p => p.Value == entry);
 
@@ -80,8 +80,8 @@ namespace osu.Desktop.DBus.Tray
                 foreach (var entry in entries)
                 {
                     //id, dict, subItems
-                    Logger.Log($"id: {entry.Key}, value: {entry.Value.ToDictionary()}");
-                    cachedMenuEntries.Add((entry.Key, entry.Value.ToDictionary(), Array.Empty<object>()));
+                    Logger.Log($"id: {entry.Key}, value: {entry.Value}");
+                    cachedMenuEntries.Add((entry.Key, TrayUtils.ToDictionary(entry.Value), Array.Empty<object>()));
                 }
             }
 

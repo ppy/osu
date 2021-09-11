@@ -153,8 +153,8 @@ namespace M.DBus
 
         #region 托盘
 
-        public void AddEntry(SingleEntry entry) => trayManagement.AddEntry(entry);
-        public void RemoveEntry(SingleEntry entry) => trayManagement.RemoveEntry(entry);
+        public void AddEntry(SimpleEntry entry) => trayManagement.AddEntry(entry);
+        public void RemoveEntry(SimpleEntry entry) => trayManagement.RemoveEntry(entry);
 
         #endregion
 

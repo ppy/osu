@@ -2,7 +2,7 @@ namespace M.DBus.Tray
 {
     public interface IHandleTrayManagement
     {
-        void AddEntry(SingleEntry entry);
-        void RemoveEntry(SingleEntry entry);
+        void AddEntry(SimpleEntry entry);
+        void RemoveEntry(SimpleEntry entry);
     }
 }
