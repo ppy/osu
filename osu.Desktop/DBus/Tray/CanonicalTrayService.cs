@@ -8,6 +8,9 @@ using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Desktop.DBus.Tray
 {
+    /// <summary>
+    /// todo: 找到文档并实现所有目前未实现的功能
+    /// </summary>
     public class CanonicalTrayService : ICanonicalDBusMenu
     {
         public ObjectPath ObjectPath => PATH;
@@ -100,17 +103,9 @@ namespace osu.Desktop.DBus.Tray
                 }
             }
 
-            var abab = (menuRevision, (0, layout, cachedMenuEntries.ToArray()));
+            var result = (menuRevision, (0, layout, cachedMenuEntries.ToArray()));
 
-            try
-            {
-                return Task.FromResult(abab);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            return Task.FromResult(result);
         }
 
         public Task<(int, IDictionary<string, object>)[]> GetGroupPropertiesAsync(int[] ids, string[] propertyNames)
@@ -155,7 +150,7 @@ namespace osu.Desktop.DBus.Tray
             throw new NotImplementedException();
         }
 
-        public Task<bool> AboutToShowAsync(int id) => Task.FromResult(false);
+        public Task<bool> AboutToShowAsync(int id) => Task.FromResult(true);
 
         public Task<(int[] updatesNeeded, int[] idErrors)> AboutToShowGroupAsync(int[] ids)
         {

@@ -108,6 +108,11 @@ namespace osu.Desktop.DBus
                 {
                     new SimpleEntry
                     {
+                        Name = "mfosu",
+                        Enabled = false
+                    },
+                    new SimpleEntry
+                    {
                         Name = "隐藏/显示窗口",
                         OnActive = () =>
                         {
