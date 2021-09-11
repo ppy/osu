@@ -71,7 +71,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public void OnReleased(GlobalAction action)
         {
-            throw new System.NotImplementedException();
         }
     }
 }
