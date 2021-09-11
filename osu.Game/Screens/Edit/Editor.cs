@@ -742,9 +742,30 @@ namespace osu.Game.Screens.Edit
             var rulesetItems = new List<MenuItem>();
 
             foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(ruleset => ruleset.ID))
-                rulesetItems.Add(new EditorMenuItem(ruleset.Name));
+            {
+                rulesetItems.Add(new EditorMenuItem(ruleset.Name, MenuItemType.Standard, () => createNewDifficulty(ruleset)));
+            }
 
             return new EditorMenuItem("Create new difficulty") { Items = rulesetItems };
+        }
+
+        private void createNewDifficulty(RulesetInfo rulesetInfo)
+        {
+            var newDifficulty = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    BaseDifficulty = new BeatmapDifficulty(),
+                    BeatmapSet = editorBeatmap.BeatmapInfo.BeatmapSet,
+                    Metadata = editorBeatmap.BeatmapInfo.Metadata.DeepClone(),
+                    Ruleset = rulesetInfo,
+                }
+            };
+
+            foreach (var timingPoint in editorBeatmap.ControlPointInfo.TimingPoints)
+                newDifficulty.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
+
+            loader?.ScheduleSwitchToNewDifficulty(newDifficulty, storeEditorState(newDifficulty.BeatmapInfo));
         }
 
         private EditorMenuItem createDifficultySwitchMenu()
@@ -771,11 +792,16 @@ namespace osu.Game.Screens.Edit
             return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, storeEditorState(nextBeatmap));
+
+        private EditorState storeEditorState(BeatmapInfo nextBeatmap)
         {
-            Time = clock.CurrentTimeAccurate,
-            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? clipboard.Value : string.Empty
-        });
+            return new EditorState
+            {
+                Time = clock.CurrentTimeAccurate,
+                ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? clipboard.Value : string.Empty
+            };
+        }
 
         private void cancelExit() => loader?.CancelPendingDifficultySwitch();
 

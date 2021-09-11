@@ -10,12 +10,13 @@ using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Users;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey
+    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey, IDeepCloneable<BeatmapMetadata>
     {
         public int ID { get; set; }
 
@@ -128,5 +129,7 @@ namespace osu.Game.Beatmaps
                    && AudioFile == other.AudioFile
                    && BackgroundFile == other.BackgroundFile;
         }
+
+        public BeatmapMetadata DeepClone() => (BeatmapMetadata)MemberwiseClone();
     }
 }

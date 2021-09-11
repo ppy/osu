@@ -138,6 +138,34 @@ namespace osu.Game.Beatmaps
             return GetWorkingBeatmap(working.Beatmaps.First());
         }
 
+        /// <summary>
+        /// Adds a beatmap to an existing set.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap set to add the <paramref name="beatmap"/> to.</param>
+        /// <param name="beatmap">The beatmap to be added.</param>
+        /// <param name="beatmapSkin">The skin specific to the beatmap being added.</param>
+        /// <returns>The usable <see cref="WorkingBeatmap"/> corresponding to <paramref name="beatmap"/> and associated with the supplied <paramref name="beatmapSet"/>.</returns>
+        /// <exception cref="InvalidOperationException">If <paramref name="beatmapSet"/> does not exist in the database.</exception>
+        public WorkingBeatmap AddToExistingSet(BeatmapSetInfo beatmapSet, IBeatmap beatmap, ISkin beatmapSkin = null)
+        {
+            var beatmapInfo = beatmap.BeatmapInfo;
+
+            using (ContextFactory.GetForWrite())
+            {
+                int setId = beatmapSet.ID;
+
+                var refetchedSet = QueryBeatmapSet(set => set.ID == setId);
+                if (refetchedSet == null)
+                    throw new InvalidOperationException($"Beatmap set with ID {setId} was not found");
+
+                refetchedSet.Beatmaps.Add(beatmapInfo);
+                Update(refetchedSet);
+                Save(beatmapInfo, beatmap, beatmapSkin);
+            }
+
+            return GetWorkingBeatmap(beatmapInfo);
+        }
+
         protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             if (archive != null)

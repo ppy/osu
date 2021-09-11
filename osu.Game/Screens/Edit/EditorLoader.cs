@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -68,7 +69,13 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        public void ScheduleDifficultySwitch(BeatmapInfo nextBeatmap, EditorState editorState)
+        public void ScheduleSwitchToNewDifficulty(IBeatmap newBeatmap, EditorState editorState)
+            => switchToDifficulty(() => beatmapManager.AddToExistingSet(newBeatmap.BeatmapInfo.BeatmapSet, newBeatmap), editorState);
+
+        public void ScheduleSwitchToExistingDifficulty(BeatmapInfo beatmapInfo, EditorState editorState)
+            => switchToDifficulty(() => beatmapManager.GetWorkingBeatmap(beatmapInfo), editorState);
+
+        private void switchToDifficulty(Func<WorkingBeatmap> beatmapAccessor, EditorState editorState)
         {
             scheduledDifficultySwitch?.Cancel();
             ValidForResume = true;
@@ -77,7 +84,7 @@ namespace osu.Game.Screens.Edit
 
             scheduledDifficultySwitch = Schedule(() =>
             {
-                Beatmap.Value = beatmapManager.GetWorkingBeatmap(nextBeatmap);
+                Beatmap.Value = beatmapAccessor.Invoke();
                 state = editorState;
 
                 // This screen is a weird exception to the rule that nothing after song select changes the global beatmap.
