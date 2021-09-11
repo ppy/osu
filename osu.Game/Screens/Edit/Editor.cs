@@ -476,6 +476,8 @@ namespace osu.Game.Screens.Edit
             });
 
             resetTrack(true);
+            if (loader?.State != null)
+                restoreState(loader.State);
         }
 
         public override bool OnExiting(IScreen next)
@@ -740,7 +742,16 @@ namespace osu.Game.Screens.Edit
             return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo beatmapInfo) => loader?.ScheduleDifficultySwitch(beatmapInfo);
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
+        {
+            Time = clock.CurrentTimeAccurate
+        });
+
+        private void restoreState([NotNull] EditorState state)
+        {
+            if (state.Time != null)
+                clock.Seek(state.Time.Value);
+        }
 
         private void cancelExit() => loader?.CancelPendingDifficultySwitch();
 
