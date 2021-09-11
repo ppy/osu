@@ -12,10 +12,10 @@ namespace osu.Desktop.DBus.Tray
     [DBusInterface("org.kde.StatusNotifierItem")]
     public interface IKdeStatusNotifierItem : IDBusObject
     {
-        Task ContextMenuAsync(int X, int Y);
-        Task ActivateAsync(int X, int Y);
-        Task SecondaryActivateAsync(int X, int Y);
-        Task ScrollAsync(int Delta, string Orientation);
+        Task ContextMenuAsync(int x, int y);
+        Task ActivateAsync(int x, int y);
+        Task SecondaryActivateAsync(int x, int y);
+        Task ScrollAsync(int delta, string orientation);
         Task<IDisposable> WatchNewTitleAsync(Action handler, Action<Exception> onError = null);
         Task<IDisposable> WatchNewIconAsync(Action handler, Action<Exception> onError = null);
         Task<IDisposable> WatchNewAttentionIconAsync(Action handler, Action<Exception> onError = null);
@@ -166,47 +166,58 @@ namespace osu.Desktop.DBus.Tray
             set => _ToolTip = value;
         }
 
-        private string _Category;
+        private string _Category = "ApplicationStatus";
 
         private string _Id = "mfosu";
 
-        private string _Title;
+        private string _Title = "mfosu";
 
-        private string _Status;
+        private string _Status = "osu";
 
         private int _WindowId;
 
-        private string _IconThemePath;
+        private string _IconThemePath = string.Empty;
 
         private ObjectPath _Menu;
 
         private bool _ItemIsMenu;
 
-        private string _IconName;
+        private string _IconName = "xorg";
 
-        private (int, int, byte[])[] _IconPixmap;
-
-        private string _OverlayIconName;
-
-        private (int, int, byte[])[] _OverlayIconPixmap;
-
-        private string _AttentionIconName;
-
-        private (int, int, byte[])[] _AttentionIconPixmap;
-
-        private string _AttentionMovieName;
-
-        private (string, (int, int, byte[])[], string, string) _ToolTip;
-
-        private readonly IDictionary<string, object> members;
-
-        public StatusNotifierItemProperties()
+        private (int, int, byte[])[] _IconPixmap =
         {
-            members = ServiceUtils.GetMembers(this);
+            (2, 2, new byte[]
+            {
+                00, 00,
+                00, 00
+            })
+        };
+
+        private string _OverlayIconName = string.Empty;
+
+        private (int, int, byte[])[] _OverlayIconPixmap = Array.Empty<(int, int, byte[])>();
+
+        private string _AttentionIconName = string.Empty;
+
+        private (int, int, byte[])[] _AttentionIconPixmap = Array.Empty<(int, int, byte[])>();
+
+        private string _AttentionMovieName = string.Empty;
+
+        private (string, (int, int, byte[])[], string, string) _ToolTip
+            = (string.Empty, Array.Empty<(int, int, byte[])>(), "mfosu", string.Empty);
+
+        private IDictionary<string, object> members;
+
+        public object Get(string prop)
+        {
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.GetValueFor(this, prop, members);
         }
 
-        public object Get(string prop) => ServiceUtils.GetValueFor(this, prop, members);
-
-        internal bool Set(string name, object newValue) => ServiceUtils.SetValueFor(this, name, newValue, members);
+        internal bool Set(string name, object newValue)
+        {
+            ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
+            return ServiceUtils.SetValueFor(this, name, newValue, members);
+        }
     }
 }

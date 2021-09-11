@@ -11,13 +11,14 @@ namespace M.DBus
 {
     public class DBusManager : IDisposable
     {
+        public Action OnConnected;
+
+        public Greet GreetService = new Greet();
         private Connection currentConnection;
 
         private ConnectionState connectionState = ConnectionState.NotConnected;
 
-        public Action OnConnected;
-
-        public Greet GreetService = new Greet();
+        private bool isDisposed { get; set; }
 
         public DBusManager(bool startOnLoad)
         {
@@ -28,6 +29,68 @@ namespace M.DBus
             Task.Run(() => RegisterNewObject(GreetService));
         }
 
+        #region Disposal
+
+        public void Dispose()
+        {
+            Disconnect();
+
+            isDisposed = true;
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
+
+        #region 断开连接
+
+        public bool Disconnect()
+        {
+            Logger.Log("正在断开连接!");
+
+            try
+            {
+                switch (connectionState)
+                {
+                    case ConnectionState.Connected:
+                        GreetService.SwitchState(false, "Diconnecting");
+
+                        //反注册物件
+                        currentConnection.UnregisterObjects(registerDictionary.Keys);
+
+                        //反注册服务
+                        foreach (var dBusObject in registerDictionary.Keys)
+                            unRegisterFromConnection(dBusObject).ConfigureAwait(false);
+
+                        //清除当前连接目标
+                        currentConnectTarget = string.Empty;
+
+                        break;
+
+                    case ConnectionState.Connecting:
+                        //如果正在连接，中断当前任务
+                        cancellationTokenSource?.Cancel();
+                        break;
+
+                    case ConnectionState.Faulted:
+                        currentConnection.Dispose();
+                        currentConnection = null;
+                        connectionState = ConnectionState.NotConnected;
+                        Logger.Log("DBus服务已经出现过一次错误, 将处理此次连接。");
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "停止DBus服务时出现了错误");
+
+                return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
         #region 工具
 
         public async Task GetAllServices()
@@ -35,10 +98,7 @@ namespace M.DBus
             await currentConnection.ListServicesAsync().ConfigureAwait(false);
             var services = await currentConnection.ListServicesAsync().ConfigureAwait(false);
 
-            foreach (var service in services)
-            {
-                Logger.Log(service);
-            }
+            foreach (var service in services) Logger.Log(service);
         }
 
         public string ObjectPathToName(ObjectPath path)
@@ -64,10 +124,26 @@ namespace M.DBus
         }
 
         public bool CheckIfAlreadyRegistered(IDBusObject dBusObject)
-            => registerDictionary.Any(o => o.Key.ObjectPath.Equals(dBusObject.ObjectPath));
+        {
+            return registerDictionary.Any(o => o.Key.ObjectPath.Equals(dBusObject.ObjectPath));
+        }
 
         public bool CheckIfAlreadyRegistered(ObjectPath objectPath)
-            => registerDictionary.Any(o => o.Key.ObjectPath.Equals(objectPath));
+        {
+            return registerDictionary.Any(o => o.Key.ObjectPath.Equals(objectPath));
+        }
+
+        public T GetDBusObject<T>(ObjectPath path, string name = null)
+            where T : IDBusObject
+        {
+            if (connectionState != ConnectionState.Connected || currentConnection == null)
+                throw new NotSupportedException("未连接");
+
+            if (string.IsNullOrEmpty(name))
+                name = ObjectPathToName(path);
+
+            return currentConnection.CreateProxy<T>(name, path);
+        }
 
         #endregion
 
@@ -151,9 +227,7 @@ namespace M.DBus
                 });
             }
             else
-            {
                 throw new InvalidOperationException("尝试反注册一个不存在的DBus物件");
-            }
         }
 
         private async Task unRegisterFromConnection(IDBusObject dBusObject)
@@ -226,72 +300,12 @@ namespace M.DBus
 
         #endregion
 
-        #region 断开连接
-
-        public bool Disconnect()
-        {
-            Logger.Log($"正在断开连接!");
-
-            try
-            {
-                switch (connectionState)
-                {
-                    case ConnectionState.Connected:
-                        GreetService.SwitchState(false, "Diconnecting");
-
-                        //反注册物件
-                        currentConnection.UnregisterObjects(registerDictionary.Keys);
-
-                        //反注册服务
-                        foreach (var dBusObject in registerDictionary.Keys)
-                            unRegisterFromConnection(dBusObject).ConfigureAwait(false);
-
-                        //清除当前连接目标
-                        currentConnectTarget = string.Empty;
-
-                        break;
-
-                    case ConnectionState.Connecting:
-                        //如果正在连接，中断当前任务
-                        cancellationTokenSource?.Cancel();
-                        break;
-
-                    case ConnectionState.Faulted:
-                        currentConnection.Dispose();
-                        currentConnection = null;
-                        connectionState = ConnectionState.NotConnected;
-                        Logger.Log("DBus服务已经出现过一次错误, 将处理此次连接。");
-                        break;
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "停止DBus服务时出现了错误");
-
-                return false;
-            }
-
-            return true;
-        }
-
-        #endregion
-
         private enum ConnectionState
         {
             NotConnected,
             Connecting,
             Connected,
             Faulted
-        }
-
-        private bool isDisposed { get; set; }
-
-        public void Dispose()
-        {
-            Disconnect();
-
-            isDisposed = true;
-            GC.SuppressFinalize(this);
         }
     }
 }

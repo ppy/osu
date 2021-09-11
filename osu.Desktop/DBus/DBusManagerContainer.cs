@@ -1,5 +1,6 @@
 using System;
 using M.DBus;
+using osu.Desktop.DBus.Tray;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,19 +21,12 @@ namespace osu.Desktop.DBus
     public class DBusManagerContainer : Component
     {
         public readonly DBusManager DBusManager = new DBusManager(false);
+
+        public Action<Notification> NotificationAction { get; set; }
         private readonly Bindable<bool> controlSource;
 
-        public DBusManagerContainer(bool autoStart = false, Bindable<bool> controlSource = null)
-        {
-            if (autoStart && controlSource != null)
-            {
-                this.controlSource = controlSource;
-            }
-            else if (controlSource == null && autoStart)
-            {
-                throw new InvalidOperationException("设置了自动启动但是控制源是null?");
-            }
-        }
+        private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
+        private readonly MprisPlayerService mprisService = new MprisPlayerService();
 
         private BeatmapInfoDBusService beatmapService;
         private AudioInfoDBusService audioservice;
@@ -50,10 +44,36 @@ namespace osu.Desktop.DBus
         [Resolved]
         private GameHost host { get; set; }
 
-        private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
-        private readonly MprisPlayerService mprisService = new MprisPlayerService();
+        public DBusManagerContainer(bool autoStart = false, Bindable<bool> controlSource = null)
+        {
+            if (autoStart && controlSource != null)
+                this.controlSource = controlSource;
+            else if (controlSource == null && autoStart) throw new InvalidOperationException("设置了自动启动但是控制源是null?");
+        }
 
-        //private readonly KdeStatusTrayService kdeTrayService = new KdeStatusTrayService();
+        #region Disposal
+
+        protected override void Dispose(bool isDisposing)
+        {
+            DBusManager.Dispose();
+            base.Dispose(isDisposing);
+        }
+
+        #endregion
+
+        protected override void LoadComplete()
+        {
+            controlSource?.BindValueChanged(onControlSourceChanged, true);
+            base.LoadComplete();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            mprisService.TrackRunning = musicController.CurrentTrack.IsRunning;
+        }
+
+        private readonly KdeStatusTrayService kdeTrayService = new KdeStatusTrayService();
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, MConfigManager config, Storage storage, OsuGame game)
@@ -73,8 +93,10 @@ namespace osu.Desktop.DBus
                 DBusManager.RegisterNewObject(mprisService,
                     "org.mpris.MediaPlayer2.mfosu");
 
-                //DBusManager.RegisterNewObject(kdeTrayService,
-                //    "org.kde.StatusNotifierItem.mfosu");
+                DBusManager.RegisterNewObject(kdeTrayService,
+                    "org.kde.StatusNotifierItem.mfosu");
+
+                registerTrayToDBus();
 
                 DBusManager.OnConnected -= onDBusConnected;
             }
@@ -101,27 +123,21 @@ namespace osu.Desktop.DBus
             mprisService.OpenUri += game.HandleLink;
             mprisService.WindowRaise += raiseWindow;
 
-            //kdeTrayService.WindowRaise += raiseWindow;
+            kdeTrayService.WindowRaise += raiseWindow;
         }
 
-        private void raiseWindow()
+        #region 托盘
+
+        private void registerTrayToDBus()
         {
-            (host.Window as SDL2DesktopWindow)?.Raise();
+            var trayWatcher = DBusManager.GetDBusObject<IStatusNotifierWatcher>(new ObjectPath("/StatusNotifierWatcher"), "org.kde.StatusNotifierWatcher");
+
+            trayWatcher.RegisterStatusNotifierItemAsync("org.kde.StatusNotifierItem.mfosu").ConfigureAwait(false);
         }
 
-        protected override void LoadComplete()
-        {
-            controlSource?.BindValueChanged(onControlSourceChanged, true);
-            base.LoadComplete();
-        }
+        #endregion
 
-        protected override void Update()
-        {
-            base.Update();
-            mprisService.TrackRunning = musicController.CurrentTrack.IsRunning;
-        }
-
-        public Action<Notification> NotificationAction { get; set; }
+        private void raiseWindow() => (host.Window as SDL2DesktopWindow)?.Raise();
 
         private void onMessageRevicedFromDBus(string message)
         {
@@ -153,12 +169,6 @@ namespace osu.Desktop.DBus
                 DBusManager.Connect();
             else
                 DBusManager.Disconnect();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            DBusManager.Dispose();
-            base.Dispose(isDisposing);
         }
     }
 }

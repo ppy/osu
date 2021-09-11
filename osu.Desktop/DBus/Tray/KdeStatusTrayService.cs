@@ -93,56 +93,51 @@ namespace osu.Desktop.DBus.Tray
             => SignalWatcher.AddAsync(this, nameof(OnStatusChanged), handler);
 
         public Task<string> GetCategoryAsync()
-            => Task.FromResult("ApplicationStatus");
+            => Task.FromResult(properties.Category);
 
         public Task<string> GetIdAsync()
-            => Task.FromResult("mfosu");
+            => Task.FromResult(properties.Id);
 
         public Task<string> GetTitleAsync()
-            => Task.FromResult("mfosu");
+            => Task.FromResult(properties.Title);
 
         public Task<string> GetStatusAsync()
-            => Task.FromResult("Active");
+            => Task.FromResult(properties.Status);
 
         public Task<int> GetWindowIdAsync()
-        {
-            throw new NotImplementedException();
-        }
+            => Task.FromResult(properties.WindowId);
 
         public Task<string> GetIconThemePathAsync()
-            => returnEmptyString;
+            => Task.FromResult(properties.IconThemePath);
 
         public Task<ObjectPath> GetMenuAsync()
             => Task.FromResult(this.ObjectPath);
 
         public Task<bool> GetItemIsMenuAsync()
-            => Task.FromResult(false);
+            => Task.FromResult(properties.ItemIsMenu);
 
         public Task<string> GetIconNameAsync()
-            => Task.FromResult("osu");
+            => Task.FromResult(properties.IconName);
 
         public Task<(int, int, byte[])[]> GetIconPixmapAsync()
-            => Task.FromResult(Array.Empty<(int, int, byte[])>());
+            => Task.FromResult(properties.IconPixmap);
 
         public Task<string> GetOverlayIconNameAsync()
-            => Task.FromResult("osu");
+            => Task.FromResult(properties.OverlayIconName);
 
         public Task<(int, int, byte[])[]> GetOverlayIconPixmapAsync()
-            => Task.FromResult(Array.Empty<(int, int, byte[])>());
+            => Task.FromResult(properties.OverlayIconPixmap);
 
         public Task<string> GetAttentionIconNameAsync()
-            => returnEmptyString;
+            => Task.FromResult(properties.AttentionIconName);
 
         public Task<(int, int, byte[])[]> GetAttentionIconPixmapAsync()
-            => Task.FromResult(Array.Empty<(int, int, byte[])>());
+            => Task.FromResult(properties.AttentionIconPixmap);
 
         public Task<string> GetAttentionMovieNameAsync()
-            => returnEmptyString;
+            => Task.FromResult(properties.AttentionMovieName);
 
         public Task<(string, (int, int, byte[])[], string, string)> GetToolTipAsync()
-        {
-            var abab = (string.Empty, Array.Empty<(int, int, byte[])>(), string.Empty, string.Empty);
-            return Task.FromResult(abab);
-        }
+            => Task.FromResult(properties.ToolTip);
     }
 }
