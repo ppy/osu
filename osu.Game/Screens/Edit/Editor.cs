@@ -27,6 +27,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO.Serialization;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
@@ -62,6 +63,9 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
@@ -724,12 +728,23 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
+            fileMenuItems.Add(createDifficultyCreationMenu());
             fileMenuItems.Add(createDifficultySwitchMenu());
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
             return fileMenuItems;
+        }
+
+        private EditorMenuItem createDifficultyCreationMenu()
+        {
+            var rulesetItems = new List<MenuItem>();
+
+            foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(ruleset => ruleset.ID))
+                rulesetItems.Add(new EditorMenuItem(ruleset.Name));
+
+            return new EditorMenuItem("Create new difficulty") { Items = rulesetItems };
         }
 
         private EditorMenuItem createDifficultySwitchMenu()
