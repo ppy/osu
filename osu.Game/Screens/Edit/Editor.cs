@@ -724,6 +724,16 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
+            fileMenuItems.Add(createDifficultySwitchMenu());
+
+            fileMenuItems.Add(new EditorMenuItemSpacer());
+
+            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
+            return fileMenuItems;
+        }
+
+        private EditorMenuItem createDifficultySwitchMenu()
+        {
             var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
 
             var difficultyItems = new List<MenuItem>();
@@ -734,17 +744,13 @@ namespace osu.Game.Screens.Edit
                     difficultyItems.Add(new EditorMenuItemSpacer());
 
                 foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarDifficulty))
-                    difficultyItems.Add(createDifficultyMenuItem(beatmap));
+                    difficultyItems.Add(createDifficultySubMenuItem(beatmap));
             }
 
-            fileMenuItems.Add(new EditorMenuItem("Change difficulty") { Items = difficultyItems });
-
-            fileMenuItems.Add(new EditorMenuItemSpacer());
-            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
-            return fileMenuItems;
+            return new EditorMenuItem("Change difficulty") { Items = difficultyItems };
         }
 
-        private DifficultyMenuItem createDifficultyMenuItem(BeatmapInfo beatmapInfo)
+        private DifficultyMenuItem createDifficultySubMenuItem(BeatmapInfo beatmapInfo)
         {
             bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmapInfo);
             return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
