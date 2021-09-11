@@ -351,7 +351,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Open chat with non-existant user", () => channelManager.PostCommand("chat nobody"));
             AddAssert("Last message is error", () => channelManager.CurrentChannel.Value.Messages.Last().GetType() == typeof(ErrorMessage));
 
-            // Make sure no unnecessary requests are made when the PM chanenl is already open.
+            // Make sure no unnecessary requests are made when the PM channel is already open.
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
             AddStep("Unregister request handling", () => ((DummyAPIAccess)API).HandleRequest = null);
             AddStep("Open chat with user.", () => channelManager.PostCommand("chat some body"));
