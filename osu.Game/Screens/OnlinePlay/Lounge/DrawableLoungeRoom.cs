@@ -226,8 +226,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             {
                 passwordTextbox.Text = string.Empty;
 
-                shakeContainer.OnShakeFinish += () => passwordTextbox.Colour = Color4.White;
-
                 shakeContainer.Shake();
             }
 
