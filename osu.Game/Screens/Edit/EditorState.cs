@@ -15,5 +15,10 @@ namespace osu.Game.Screens.Edit
         /// The current clock time when a difficulty switch was requested.
         /// </summary>
         public double? Time { get; set; }
+
+        /// <summary>
+        /// The current editor clipboard content at the time when a difficulty switch was requested.
+        /// </summary>
+        public string? ClipboardContent { get; set; }
     }
 }

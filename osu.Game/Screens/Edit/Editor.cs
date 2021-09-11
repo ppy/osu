@@ -744,13 +744,16 @@ namespace osu.Game.Screens.Edit
 
         protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
         {
-            Time = clock.CurrentTimeAccurate
+            Time = clock.CurrentTimeAccurate,
+            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? clipboard.Value : null
         });
 
         private void restoreState([NotNull] EditorState state)
         {
             if (state.Time != null)
                 clock.Seek(state.Time.Value);
+
+            clipboard.Value = state.ClipboardContent ?? clipboard.Value;
         }
 
         private void cancelExit() => loader?.CancelPendingDifficultySwitch();
