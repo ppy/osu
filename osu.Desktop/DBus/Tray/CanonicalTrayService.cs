@@ -31,10 +31,25 @@ namespace osu.Desktop.DBus.Tray
 
         private int lastEntryId = 1;
 
-        public void AddEntryToMenu(SimpleEntry entry)
+        private void addEntry(SimpleEntry entry)
         {
             entries[lastEntryId] = entry;
             lastEntryId++;
+        }
+
+        public void AddEntryRange(SimpleEntry[] entries)
+        {
+            foreach (var entry in entries)
+            {
+                addEntry(entry);
+            }
+
+            triggerLayoutUpdate();
+        }
+
+        public void AddEntryToMenu(SimpleEntry entry)
+        {
+            addEntry(entry);
             triggerLayoutUpdate();
         }
 

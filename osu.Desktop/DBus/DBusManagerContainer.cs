@@ -104,22 +104,23 @@ namespace osu.Desktop.DBus
                 DBusManager.RegisterNewObject(canonicalTrayService,
                     "io.matrix_feather.dbus.menu");
 
-                canonicalTrayService.AddEntryToMenu(new SimpleEntry
+                canonicalTrayService.AddEntryRange(new SimpleEntry[]
                 {
-                    Name = "隐藏/显示窗口",
-                    OnActive = () =>
+                    new SimpleEntry
                     {
-                        sdl2DesktopWindow.Visible = !sdl2DesktopWindow.Visible;
-                    }
+                        Name = "隐藏/显示窗口",
+                        OnActive = () =>
+                        {
+                            sdl2DesktopWindow.Visible = !sdl2DesktopWindow.Visible;
+                        }
+                    },
+                    new SimpleEntry
+                    {
+                        Name = "退出",
+                        OnActive = exitGame
+                    },
+                    new SeparatorEntry()
                 });
-
-                canonicalTrayService.AddEntryToMenu(new SimpleEntry
-                {
-                    Name = "退出",
-                    OnActive = exitGame
-                });
-
-                canonicalTrayService.AddEntryToMenu(new SeparatorEntry());
 
                 DBusManager.RegisterNewObject(kdeTrayService,
                     "org.kde.StatusNotifierItem.mfosu");
