@@ -16,6 +16,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
+using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual
@@ -24,7 +25,9 @@ namespace osu.Game.Tests.Visual
     {
         protected EditorBeatmap EditorBeatmap;
 
-        protected TestEditor Editor { get; private set; }
+        private TestEditorLoader editorLoader;
+
+        protected TestEditor Editor => editorLoader.Editor;
 
         protected EditorClock EditorClock { get; private set; }
 
@@ -33,9 +36,19 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected virtual bool IsolateSavingFromDatabase => true;
 
+        // required for screen transitions to work properly
+        // (see comment in EditorLoader.LogoArriving).
+        [Cached]
+        private OsuLogo logo = new OsuLogo
+        {
+            Alpha = 0
+        };
+
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio, RulesetStore rulesets)
         {
+            Add(logo);
+
             var working = CreateWorkingBeatmap(Ruleset.Value);
 
             Beatmap.Value = working;
@@ -59,7 +72,7 @@ namespace osu.Game.Tests.Visual
 
         protected virtual void LoadEditor()
         {
-            LoadScreen(Editor = CreateEditor());
+            LoadScreen(editorLoader = new TestEditorLoader());
         }
 
         /// <summary>
@@ -70,7 +83,14 @@ namespace osu.Game.Tests.Visual
 
         protected sealed override Ruleset CreateRuleset() => CreateEditorRuleset();
 
-        protected virtual TestEditor CreateEditor() => new TestEditor();
+        protected class TestEditorLoader : EditorLoader
+        {
+            public TestEditor Editor { get; private set; }
+
+            protected sealed override Editor CreateEditor() => Editor = CreateTestEditor(this);
+
+            protected virtual TestEditor CreateTestEditor(EditorLoader loader) => new TestEditor(loader);
+        }
 
         protected class TestEditor : Editor
         {
@@ -87,6 +107,11 @@ namespace osu.Game.Tests.Visual
             public new void Paste() => base.Paste();
 
             public new bool HasUnsavedChanges => base.HasUnsavedChanges;
+
+            public TestEditor(EditorLoader loader = null)
+                : base(loader)
+            {
+            }
         }
 
         private class TestBeatmapManager : BeatmapManager
