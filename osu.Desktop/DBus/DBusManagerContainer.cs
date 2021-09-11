@@ -1,10 +1,13 @@
 using System;
 using M.DBus;
+using M.DBus.Services.Kde;
 using M.DBus.Tray;
+using M.DBus.Utils;
 using osu.Desktop.DBus.Tray;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game;
@@ -51,6 +54,9 @@ namespace osu.Desktop.DBus
 
         [Resolved]
         private OsuGame game { get; set; }
+
+        [Resolved]
+        private LargeTextureStore textureStore { get; set; }
 
         public DBusManagerContainer(bool autoStart = false, Bindable<bool> controlSource = null)
         {
@@ -108,21 +114,25 @@ namespace osu.Desktop.DBus
                 {
                     new SimpleEntry
                     {
-                        Name = "mfosu",
-                        Enabled = false
+                        Label = "mfosu",
+                        Enabled = false,
+                        IconData = textureStore.GetStream("avatarlogo")?.ToByteArray()
+                                   ?? SimpleEntry.EmptyPngBytes
                     },
                     new SimpleEntry
                     {
-                        Name = "隐藏/显示窗口",
+                        Label = "隐藏/显示窗口",
                         OnActive = () =>
                         {
                             sdl2DesktopWindow.Visible = !sdl2DesktopWindow.Visible;
-                        }
+                        },
+                        IconName = "window-pop-out"
                     },
                     new SimpleEntry
                     {
-                        Name = "退出",
-                        OnActive = exitGame
+                        Label = "退出",
+                        OnActive = exitGame,
+                        IconName = "application-exit"
                     },
                     new SeparatorEntry()
                 });
@@ -168,10 +178,7 @@ namespace osu.Desktop.DBus
         }
 
         private void exitGame()
-        {
-            Schedule(game.GracefullyExit);
-            Schedule(game.GracefullyExit);
-        }
+            => Schedule(game.GracefullyExit);
 
         private void onMessageRevicedFromDBus(string message)
         {

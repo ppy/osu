@@ -70,7 +70,6 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures, CustomStore customStore, MConfigManager mConfig)
         {
-            textures.AddStore(new TextureLoaderStore(customStore));
             var enableAvatarSprite = mConfig.Get<bool>(MSetting.UseCustomGreetingPicture);
 
             showDisclaimer = !mConfig.Get<bool>(MSetting.DoNotShowDisclaimer) && showDisclaimer;

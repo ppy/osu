@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using M.DBus.Services.Kde;
 using Tmds.DBus;
 
 namespace osu.Desktop.DBus.Tray
@@ -7,14 +8,14 @@ namespace osu.Desktop.DBus.Tray
     /// <summary>
     ///     WIP
     /// </summary>
-    public class KdeStatusTrayService : IKdeStatusNotifierItem
+    public class KdeStatusTrayService : IStatusNotifierItem
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/StatusNotifierItem");
 
         public Action WindowRaise { get; set; }
 
-        private readonly StatusNotifierItemProperties kdeProperties = new StatusNotifierItemProperties();
+        private readonly StatusNotifierProperties kdeProperties = new StatusNotifierProperties();
 
         public Task<object> GetAsync(string prop) => Task.FromResult(kdeProperties.Get(prop));
 
@@ -32,7 +33,7 @@ namespace osu.Desktop.DBus.Tray
 
         #region KDE DBus
 
-        Task<StatusNotifierItemProperties> IKdeStatusNotifierItem.GetAllAsync()
+        Task<StatusNotifierProperties> IStatusNotifierItem.GetAllAsync()
             => Task.FromResult(kdeProperties);
 
         public Task ContextMenuAsync(int x, int y) => Task.CompletedTask;

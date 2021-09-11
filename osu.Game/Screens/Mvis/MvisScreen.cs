@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using JetBrains.Annotations;
+using M.DBus.Tray;
 using M.Resources.Localisation.Mvis;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -805,10 +806,17 @@ namespace osu.Game.Screens.Mvis
             trackRunning.Value = CurrentTrack.IsRunning;
         }
 
+        private readonly SimpleEntry mvisEntry = new SimpleEntry
+        {
+            Label = "Mvis播放器",
+            Enabled = false
+        };
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
+            pluginManager.AddDBusMenuEntry(mvisEntry);
             originalMods = Mods.Value;
 
             //覆盖mod列表
@@ -829,6 +837,8 @@ namespace osu.Game.Screens.Mvis
 
         public override bool OnExiting(IScreen next)
         {
+            pluginManager.RemoveDBusMenuEntry(mvisEntry);
+
             //重置Track
             CurrentTrack.ResetSpeedAdjustments();
             CurrentTrack.Looping = false;

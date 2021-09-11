@@ -1,13 +1,12 @@
-using System.Collections.Generic;
+using M.DBus.Utils.Canonical.DBusMenuFlags;
 
 namespace M.DBus.Tray
 {
     public class SeparatorEntry : SimpleEntry
     {
-        public override void AfterCast(IDictionary<string, object> dictionary)
+        public SeparatorEntry()
         {
-            dictionary["type"] = "separator";
-            base.AfterCast(dictionary);
+            Type = EntryType.SSeparator;
         }
     }
 }

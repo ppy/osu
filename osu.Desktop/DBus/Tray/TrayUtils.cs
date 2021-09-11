@@ -24,19 +24,19 @@ namespace osu.Desktop.DBus.Tray
         }
 
         public static IDictionary<string, object> ToDictionary(SimpleEntry entry)
-        {
-            var dict = new Dictionary<string, object>
+            => new Dictionary<string, object>
             {
-                ["label"] = entry.Name,
+                ["type"] = entry.Type,
+                ["label"] = entry.Label,
                 ["enabled"] = entry.Enabled,
                 ["visible"] = entry.Visible,
+                ["icon-name"] = entry.IconName,
+                ["icon-data"] = entry.IconData,
+                ["shortcuts"] = entry.Shortcuts,
+                ["toggle-type"] = entry.ToggleType,
                 ["toggle-state"] = entry.ToggleState,
-                ["visible"] = entry.Visible
+                ["children-display"] = entry.ChildrenDisplay,
             };
-
-            entry.AfterCast(dict);
-            return dict;
-        }
 
         public enum EntryEvent
         {

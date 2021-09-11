@@ -203,7 +203,9 @@ namespace osu.Game
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
+
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
+
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(this);
@@ -213,7 +215,10 @@ namespace osu.Game
             //fallback机制: 先加载的字体会覆盖后加载的字体，即从上到下覆盖(如果在OsuFont.Typeface中)
             InitialiseFonts();
 
-            dependencies.Cache(new CustomStore(Storage, this));
+            //CustomStore在字体后初始化，避免覆盖原有字体
+            var customStore = new CustomStore(Storage, this);
+            largeStore.AddStore(new TextureLoaderStore(customStore));
+            dependencies.Cache(customStore);
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 

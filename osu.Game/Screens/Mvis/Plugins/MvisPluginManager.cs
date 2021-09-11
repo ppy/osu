@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         internal Action<MvisPlugin> OnPluginAdd;
         internal Action<MvisPlugin> OnPluginUnLoad;
 
-        public int PluginVersion => 6;
+        public int PluginVersion => 7;
         public int MinimumPluginVersion => 6;
         private const bool experimental = true;
 

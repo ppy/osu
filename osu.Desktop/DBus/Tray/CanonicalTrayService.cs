@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using M.DBus.Services.Canonical;
 using M.DBus.Tray;
+using M.DBus.Utils.Canonical.DBusMenuFlags;
 using Tmds.DBus;
 using Logger = osu.Framework.Logging.Logger;
 
@@ -10,21 +12,22 @@ namespace osu.Desktop.DBus.Tray
 {
     /// <summary>
     /// todo: 找到文档并实现所有目前未实现的功能
+    /// https://github.com/gnustep/libs-dbuskit/blob/master/Bundles/DBusMenu/com.canonical.dbusmenu.xml
     /// </summary>
-    public class CanonicalTrayService : ICanonicalDBusMenu
+    public class CanonicalTrayService : IDBusMenu
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/MenuBar");
 
         #region Canonical DBus
 
-        private readonly CanonicalDBusMenuProperties canonicalProperties = new CanonicalDBusMenuProperties();
+        private readonly DBusMenuProperties canonicalProperties = new DBusMenuProperties();
 
         private uint menuRevision;
 
         private readonly IDictionary<string, object> layout = new Dictionary<string, object>
         {
-            ["children-display"] = "submenu"
+            ["children-display"] = ChildrenDisplayType.SSubmenu
         };
 
         #region 列表物件存储
@@ -76,18 +79,6 @@ namespace osu.Desktop.DBus.Tray
 
         #endregion
 
-        /// <summary>
-        /// revision: 作用未知
-        /// layout(int): 作用未知
-        /// layout(IDictionary string, object ): layout类型
-        /// object[]: 目录列表
-        /// </summary>
-        /// <param name="parentId"></param>
-        /// <param name="recursionDepth"></param>
-        /// <param name="propertyNames"></param>
-        /// <returns></returns>
-        /// 你知道查不到文档被迫连蒙带猜有多痛苦么
-        /// 我在这小东西上面花了整整2小时
         public Task<(uint revision, (int, IDictionary<string, object>, object[]) layout)> GetLayoutAsync(int parentId, int recursionDepth, string[] propertyNames)
         {
             if (cachedMenuEntries.Count != entries.Count)
@@ -184,7 +175,7 @@ namespace osu.Desktop.DBus.Tray
             return Task.FromResult(canonicalProperties.Get(prop));
         }
 
-        public Task<CanonicalDBusMenuProperties> GetAllAsync()
+        public Task<DBusMenuProperties> GetAllAsync()
         {
             return Task.FromResult(canonicalProperties);
         }
@@ -193,6 +184,9 @@ namespace osu.Desktop.DBus.Tray
         {
             throw new NotImplementedException();
         }
+
+        internal bool SetProperty(string prop, object value)
+            => canonicalProperties.Set(prop, value);
 
         public event Action<PropertyChanges> OnPropertiesChanged;
 
@@ -214,7 +208,7 @@ namespace osu.Desktop.DBus.Tray
         public Task<string> GetStatusAsync()
             => Task.FromResult(canonicalProperties.Status);
 
-        Task<string[]> ICanonicalDBusMenu.GetIconThemePathAsync()
+        Task<string[]> IDBusMenu.GetIconThemePathAsync()
             => Task.FromResult(canonicalProperties.IconThemePath);
 
         #endregion

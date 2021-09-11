@@ -1,58 +1,17 @@
-//为什么就没有一个统一点的托盘标准呢...
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
-using M.DBus;
+using M.DBus.Tray;
 using Tmds.DBus;
 
-namespace osu.Desktop.DBus.Tray
+namespace M.DBus.Services.Kde
 {
-    [DBusInterface("org.kde.StatusNotifierItem")]
-    public interface IKdeStatusNotifierItem : IDBusObject
-    {
-        Task ContextMenuAsync(int x, int y);
-        Task ActivateAsync(int x, int y);
-        Task SecondaryActivateAsync(int x, int y);
-        Task ScrollAsync(int delta, string orientation);
-        Task<IDisposable> WatchNewTitleAsync(Action handler, Action<Exception> onError = null);
-        Task<IDisposable> WatchNewIconAsync(Action handler, Action<Exception> onError = null);
-        Task<IDisposable> WatchNewAttentionIconAsync(Action handler, Action<Exception> onError = null);
-        Task<IDisposable> WatchNewOverlayIconAsync(Action handler, Action<Exception> onError = null);
-        Task<IDisposable> WatchNewMenuAsync(Action handler, Action<Exception> onError = null);
-        Task<IDisposable> WatchNewToolTipAsync(Action handler, Action<Exception> onError = null);
-        Task<IDisposable> WatchNewStatusAsync(Action<string> handler, Action<Exception> onError = null);
-        Task<object> GetAsync(string prop);
-        Task<StatusNotifierItemProperties> GetAllAsync();
-        Task SetAsync(string prop, object val);
-        Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler);
-
-        //Extensions
-        Task<string> GetCategoryAsync();
-        Task<string> GetIdAsync();
-        Task<string> GetTitleAsync();
-        Task<string> GetStatusAsync();
-        Task<int> GetWindowIdAsync();
-        Task<string> GetIconThemePathAsync();
-        Task<ObjectPath> GetMenuAsync();
-        Task<bool> GetItemIsMenuAsync();
-        Task<string> GetIconNameAsync();
-        Task<(int, int, byte[])[]> GetIconPixmapAsync();
-        Task<string> GetOverlayIconNameAsync();
-        Task<(int, int, byte[])[]> GetOverlayIconPixmapAsync();
-        Task<string> GetAttentionIconNameAsync();
-        Task<(int, int, byte[])[]> GetAttentionIconPixmapAsync();
-        Task<string> GetAttentionMovieNameAsync();
-        Task<(string, (int, int, byte[])[], string, string)> GetToolTipAsync();
-    }
-
     [Dictionary]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
     [SuppressMessage("ReSharper", "ConvertToConstant.Local")]
     [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
-    public class StatusNotifierItemProperties
+    public class StatusNotifierProperties
     {
         public string Category
         {
@@ -186,11 +145,7 @@ namespace osu.Desktop.DBus.Tray
 
         private (int, int, byte[])[] _IconPixmap =
         {
-            (2, 2, new byte[]
-            {
-                00, 00,
-                00, 00
-            })
+            (1, 1, SimpleEntry.EmptyPngBytes)
         };
 
         private string _OverlayIconName = string.Empty;
@@ -214,13 +169,13 @@ namespace osu.Desktop.DBus.Tray
             return ServiceUtils.GetValueFor(this, prop, members);
         }
 
-        internal bool Set(string name, object newValue)
+        public bool Set(string name, object newValue)
         {
             ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
             return ServiceUtils.SetValueFor(this, name, newValue, members);
         }
 
-        internal bool Contains(string prop)
+        public bool Contains(string prop)
         {
             ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
             return ServiceUtils.CheckifContained(this, prop, members);
