@@ -28,7 +28,7 @@ namespace osu.Game.Tests
             RulesetID = ruleset.ID ?? 0;
 
             Mods = excessMods
-                ? ruleset.CreateInstance().GetAllMods().ToArray()
+                ? ruleset.CreateInstance().CreateAllMods().ToArray()
                 : new Mod[] { new TestModHardRock(), new TestModDoubleTime() };
 
             TotalScore = 2845370;

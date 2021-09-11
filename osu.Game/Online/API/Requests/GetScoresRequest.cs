@@ -18,9 +18,9 @@ namespace osu.Game.Online.API.Requests
         private readonly BeatmapInfo beatmap;
         private readonly BeatmapLeaderboardScope scope;
         private readonly RulesetInfo ruleset;
-        private readonly IEnumerable<Mod> mods;
+        private readonly IEnumerable<IMod> mods;
 
-        public GetScoresRequest(BeatmapInfo beatmap, RulesetInfo ruleset, BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<Mod> mods = null)
+        public GetScoresRequest(BeatmapInfo beatmap, RulesetInfo ruleset, BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<IMod> mods = null)
         {
             if (!beatmap.OnlineBeatmapID.HasValue)
                 throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
@@ -31,7 +31,7 @@ namespace osu.Game.Online.API.Requests
             this.beatmap = beatmap;
             this.scope = scope;
             this.ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
-            this.mods = mods ?? Array.Empty<Mod>();
+            this.mods = mods ?? Array.Empty<IMod>();
 
             Success += onSuccess;
         }

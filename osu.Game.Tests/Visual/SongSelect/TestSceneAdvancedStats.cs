@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select EZ mod", () =>
             {
                 var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
-                SelectedMods.Value = new[] { ruleset.GetAllMods().OfType<ModEasy>().Single() };
+                SelectedMods.Value = new[] { ruleset.CreateMod<ModEasy>() };
             });
 
             AddAssert("circle size bar is blue", () => barIsBlue(advancedStats.FirstValue));
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select HR mod", () =>
             {
                 var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
-                SelectedMods.Value = new[] { ruleset.GetAllMods().OfType<ModHardRock>().Single() };
+                SelectedMods.Value = new[] { ruleset.CreateMod<ModHardRock>() };
             });
 
             AddAssert("circle size bar is red", () => barIsRed(advancedStats.FirstValue));
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select unchanged Difficulty Adjust mod", () =>
             {
                 var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
-                var difficultyAdjustMod = ruleset.GetAllMods().OfType<ModDifficultyAdjust>().Single();
+                var difficultyAdjustMod = ruleset.CreateMod<ModDifficultyAdjust>();
                 difficultyAdjustMod.ReadFromDifficulty(advancedStats.Beatmap.BaseDifficulty);
                 SelectedMods.Value = new[] { difficultyAdjustMod };
             });
@@ -142,7 +142,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select changed Difficulty Adjust mod", () =>
             {
                 var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
-                var difficultyAdjustMod = ruleset.GetAllMods().OfType<OsuModDifficultyAdjust>().Single();
+                var difficultyAdjustMod = ruleset.CreateMod<OsuModDifficultyAdjust>();
                 var originalDifficulty = advancedStats.Beatmap.BaseDifficulty;
 
                 difficultyAdjustMod.ReadFromDifficulty(originalDifficulty);
