@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -123,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             }
         }
 
-        public Popover GetPopover() => new PasswordEntryPopover(Room) { JoinRequested = lounge.Join };
+        public Popover GetPopover() => new PasswordEntryPopover(Room) { Lounge = lounge };
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
@@ -179,7 +178,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             private readonly Room room;
 
-            public Action<Room, string, Action<Room>, Action<string>> JoinRequested;
+            public LoungeSubScreen Lounge;
 
             public PasswordEntryPopover(Room room)
             {
@@ -220,7 +219,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 };
                 Child = shakeContainer;
 
-                joinButton.Action = () => JoinRequested?.Invoke(room, passwordTextbox.Text, null, joinFailed);
+                joinButton.Action = () => Lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
             }
 
             private void joinFailed(string error)
@@ -239,7 +238,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 base.LoadComplete();
 
                 Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
-                passwordTextbox.OnCommit += (_, __) => JoinRequested?.Invoke(room, passwordTextbox.Text, null, joinFailed);
+                passwordTextbox.OnCommit += (_, __) => Lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
             }
         }
     }
