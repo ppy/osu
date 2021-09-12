@@ -122,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             }
         }
 
-        public Popover GetPopover() => new PasswordEntryPopover(Room) { Lounge = lounge };
+        public Popover GetPopover() => new PasswordEntryPopover(Room);
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
@@ -178,7 +178,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             private readonly Room room;
 
-            public LoungeSubScreen Lounge;
+            [Resolved(canBeNull: true)]
+            private LoungeSubScreen lounge { get; set; }
 
             public PasswordEntryPopover(Room room)
             {
@@ -219,7 +220,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 };
                 Child = shakeContainer;
 
-                joinButton.Action = () => Lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
+                joinButton.Action = () => lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
             }
 
             private void joinFailed(string error)
@@ -234,7 +235,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 base.LoadComplete();
 
                 Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
-                passwordTextbox.OnCommit += (_, __) => Lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
+                passwordTextbox.OnCommit += (_, __) => lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
             }
         }
     }
