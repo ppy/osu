@@ -95,6 +95,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Whether or not sound samples should change rate when playing with speed-changing mods.
+        /// TODO: only read/write supported for now, requires implementation in gameplay.
         /// </summary>
         public bool SamplesMatchPlaybackRate { get; set; }
 
