@@ -62,6 +62,9 @@ namespace osu.Game.Rulesets.Osu.Configuration
             //Bezier mover settings
             SetDefault(OsuRulesetSetting.BezierAggressiveness, 60f, 1f, 180f);
             SetDefault(OsuRulesetSetting.BezierSliderAggressiveness, 3f, 1f, 20f);
+
+            //Cursor
+            SetDefault(OsuRulesetSetting.CursorTrailForceLong, false);
         }
     }
 
@@ -117,5 +120,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
         //Bezier mover settings
         BezierAggressiveness,
         BezierSliderAggressiveness,
+
+        CursorTrailForceLong,
     }
 }

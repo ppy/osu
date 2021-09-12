@@ -45,6 +45,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "光标轨迹",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "强制光标使用长拖尾",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.CursorTrailForceLong)
+                },
                 new SettingsSlider<float, FramerateSlider>
                 {
                     LabelText = "回放帧率",
