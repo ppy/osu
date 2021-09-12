@@ -90,7 +90,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return null;
 
                     case OsuSkinComponents.CursorParticles:
-                        return new LegacyCursorParticles();
+                        if (GetTexture("star2") != null)
+                            return new LegacyCursorParticles();
+
+                        return null;
 
                     case OsuSkinComponents.HitCircleText:
                         if (!this.HasFont(LegacyFont.HitCircle))
