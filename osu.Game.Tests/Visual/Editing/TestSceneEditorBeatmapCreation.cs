@@ -54,6 +54,29 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestCreateNewBeatmapWithMultipleDifficulties()
+        {
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.Version = Guid.NewGuid().ToString());
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
+            AddAssert("new beatmap set in database", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+                return set != null && !set.DeletePending && set.Beatmaps.Count == 1;
+            });
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.Version = Guid.NewGuid().ToString());
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
+            AddAssert("beatmap set updated", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+                return set != null && !set.DeletePending && set.Beatmaps.Count == 2;
+            });
+        }
+
+        [Test]
         public void TestExitWithoutSave()
         {
             EditorBeatmap editorBeatmap = null;

@@ -743,13 +743,13 @@ namespace osu.Game.Screens.Edit
 
             foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(ruleset => ruleset.ID))
             {
-                rulesetItems.Add(new EditorMenuItem(ruleset.Name, MenuItemType.Standard, () => createNewDifficulty(ruleset)));
+                rulesetItems.Add(new EditorMenuItem(ruleset.Name, MenuItemType.Standard, () => CreateNewDifficulty(ruleset)));
             }
 
             return new EditorMenuItem("Create new difficulty") { Items = rulesetItems };
         }
 
-        private void createNewDifficulty(RulesetInfo rulesetInfo)
+        protected void CreateNewDifficulty(RulesetInfo rulesetInfo)
         {
             var newDifficulty = new Beatmap
             {
