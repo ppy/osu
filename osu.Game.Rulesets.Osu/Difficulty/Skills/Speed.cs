@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -44,11 +45,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        private bool isRatioEqual(double ratio, double a, double b)
-        {
-            return a + 15 > ratio * b && a - 15 < ratio * b;
-        }
-
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
@@ -65,15 +61,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int i = Previous.Count - 2; i > 0; i--)
             {
-                double currHistoricalDecay = Math.Max(0, (history_time_max - (current.StartTime - Previous[i - 1].StartTime))) / history_time_max; // scales note 0 to 1 from history to now
+                DifficultyHitObject currObj = Previous[i - 1];
+                DifficultyHitObject prevObj = Previous[i];
+                DifficultyHitObject prevPrevObj = Previous[i + 1];
+
+                double currHistoricalDecay = Math.Max(0, (history_time_max - (current.StartTime - currObj.StartTime))) / history_time_max; // scales note 0 to 1 from history to now
 
                 if (currHistoricalDecay != 0)
                 {
                     currHistoricalDecay = Math.Min(currHistoricalDecay, (double)(Previous.Count - i) / Previous.Count); // either we're limited by time or limited by object count.
 
-                    double currDelta = ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime;
-                    double prevDelta = ((OsuDifficultyHitObject)Previous[i]).StrainTime;
-                    double prevPrevDelta = ((OsuDifficultyHitObject)Previous[i + 1]).StrainTime;
+                    double currDelta = ((OsuDifficultyHitObject)currObj).StrainTime;
+                    double prevDelta = ((OsuDifficultyHitObject)prevObj).StrainTime;
+                    double prevPrevDelta = ((OsuDifficultyHitObject)prevPrevObj).StrainTime;
                     double effectiveRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
 
                     if (effectiveRatio > 0.5)
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                     if (firstDeltaSwitch)
                     {
-                        if (isRatioEqual(1.0, prevDelta, currDelta))
+                        if (Precision.AlmostEquals(prevDelta, currDelta, 15))
                         {
                             islandSize++; // island is still progressing, count size.
                         }
@@ -174,10 +174,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             currentRhythm = calculateRhythmBonus(current);
 
-            currentTapStrain *= strainDecay(current.DeltaTime);
+            double decay = strainDecay(current.DeltaTime);
+
+            currentTapStrain *= decay;
             currentTapStrain += tapStrainOf(current, speedBonus) * skillMultiplier;
 
-            currentMovementStrain *= strainDecay(current.DeltaTime);
+            currentMovementStrain *= decay;
             currentMovementStrain += movementStrainOf(current, speedBonus) * skillMultiplier;
 
             return currentMovementStrain + currentTapStrain * currentRhythm;
