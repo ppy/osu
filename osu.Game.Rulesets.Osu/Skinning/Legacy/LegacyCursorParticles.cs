@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyCursorParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
     {
+        public bool Active => breakSpewer?.Active.Value == true || kiaiSpewer?.Active.Value == true;
+
         private LegacyCursorParticleSpewer breakSpewer;
         private LegacyCursorParticleSpewer kiaiSpewer;
 
@@ -32,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private OsuPlayfield osuPlayfield { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, OsuColour colour)
+        private void load(ISkinSource skin, OsuColour colours)
         {
             var texture = skin.GetTexture("star2");
             if (texture == null)
@@ -46,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = colour.PinkLighter,
+                    Colour = colours.PinkLighter,
                     Direction = SpewDirection.None,
                     Active =
                     {
@@ -57,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = colour.PinkLighter,
+                    Colour = colours.PinkLighter,
                     Direction = SpewDirection.None,
                     Active =
                     {
