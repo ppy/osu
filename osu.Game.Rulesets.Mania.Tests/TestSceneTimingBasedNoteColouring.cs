@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
@@ -14,6 +15,9 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
@@ -26,6 +30,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         private Bindable<bool> configTimingBasedNoteColouring;
 
         private ManualClock clock;
+        private DrawableManiaRuleset drawableRuleset;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -38,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
                 Children = new[]
                 {
-                    Ruleset.Value.CreateInstance().CreateDrawableRulesetWith(createTestBeatmap())
+                    drawableRuleset = (DrawableManiaRuleset)Ruleset.Value.CreateInstance().CreateDrawableRulesetWith(createTestBeatmap())
                 }
             });
             AddStep("retrieve config bindable", () =>
@@ -53,6 +58,28 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             AddStep("enable", () => configTimingBasedNoteColouring.Value = true);
             AddStep("disable", () => configTimingBasedNoteColouring.Value = false);
+        }
+
+        [Test]
+        public void TestToggleOffScreen()
+        {
+            AddStep("enable", () => configTimingBasedNoteColouring.Value = true);
+
+            seekTo(10000);
+            AddStep("disable", () => configTimingBasedNoteColouring.Value = false);
+            seekTo(0);
+            AddAssert("all notes not coloured", () => this.ChildrenOfType<DrawableNote>().All(note => note.Colour == Colour4.White));
+
+            seekTo(10000);
+            AddStep("enable again", () => configTimingBasedNoteColouring.Value = true);
+            seekTo(0);
+            AddAssert("some notes coloured", () => this.ChildrenOfType<DrawableNote>().Any(note => note.Colour != Colour4.White));
+        }
+
+        private void seekTo(double time)
+        {
+            AddStep($"seek to {time}", () => clock.CurrentTime = time);
+            AddUntilStep("wait for seek", () => Precision.AlmostEquals(drawableRuleset.FrameStableClock.CurrentTime, time, 1));
         }
 
         private ManiaBeatmap createTestBeatmap()
