@@ -98,8 +98,11 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("exit editor", () => Stack.Exit());
 
-            AddUntilStep("prompt for save dialog shown", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
-            AddStep("discard changes", () => ((PromptForSaveDialog)DialogOverlay.CurrentDialog).PerformOkAction());
+            if (sameRuleset)
+            {
+                AddUntilStep("prompt for save dialog shown", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
+                AddStep("discard changes", () => ((PromptForSaveDialog)DialogOverlay.CurrentDialog).PerformOkAction());
+            }
 
             // ensure editor loader didn't resume.
             AddAssert("stack empty", () => Stack.CurrentScreen == null);
