@@ -35,17 +35,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("create jet", () => Child = spewer = createSpewer());
+            AddStep("create spewer", () => Child = spewer = createSpewer());
         }
 
         [Test]
         public void TestPresence()
         {
-            AddStep("start jet", () => spewer.Active.Value = true);
+            AddStep("start spewer", () => spewer.Active.Value = true);
             AddAssert("is present", () => spewer.IsPresent);
 
             AddWaitStep("wait for some particles", 3);
-            AddStep("stop jet", () => spewer.Active.Value = false);
+            AddStep("stop spewer", () => spewer.Active.Value = false);
 
             AddWaitStep("wait for clean screen", 8);
             AddAssert("is not present", () => !spewer.IsPresent);
