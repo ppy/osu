@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "插入角度",
+                    LabelText = "角度插值",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.InterpolateAngles)
                 },
                 new SettingsCheckbox
