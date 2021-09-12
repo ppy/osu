@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osuTK;
 
-namespace osu.Game.Graphics.Particles
+namespace osu.Game.Graphics
 {
     public abstract class ParticleSpewer : Sprite
     {
