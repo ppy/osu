@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             private const int lifetime = 1500;
             private const int rate = 250;
 
-            public float Gravity = 0;
+            public float Gravity;
             public float MaxVelocity = 250;
 
             protected override float ParticleGravity => Gravity;
