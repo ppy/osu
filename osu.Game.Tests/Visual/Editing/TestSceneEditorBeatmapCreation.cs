@@ -77,6 +77,48 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestCreateNewBeatmapFailsWithBlankNamedDifficulties()
+        {
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
+            AddAssert("new beatmap set in database", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+                return set != null && !set.DeletePending && set.Beatmaps.Count == 1 && set.Files.Count == 1;
+            });
+
+            AddStep("try to create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddAssert("beatmap set unchanged", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+                return set != null && !set.DeletePending && set.Beatmaps.Count == 1 && set.Files.Count == 1;
+            });
+        }
+
+        [Test]
+        public void TestCreateNewBeatmapFailsWithSameNamedDifficulties()
+        {
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.Version = "duplicate");
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
+            AddAssert("new beatmap set in database", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+                return set != null && !set.DeletePending && set.Beatmaps.Count == 1 && set.Files.Count == 1;
+            });
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.Version = "duplicate");
+            AddStep("try to save beatmap", () => Editor.Save());
+            AddAssert("beatmap set not corrupted", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+                // the difficulty was already created at the point of the switch - what we want to check is that the two difficulties don't point at the same file.
+                return set != null && !set.DeletePending && set.Beatmaps.Count == 2 && set.Files.Select(f => f.Filename).Distinct().Count() == 2;
+            });
+        }
+
+        [Test]
         public void TestExitWithoutSave()
         {
             EditorBeatmap editorBeatmap = null;

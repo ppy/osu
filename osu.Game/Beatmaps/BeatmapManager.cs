@@ -292,17 +292,22 @@ namespace osu.Game.Beatmaps
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 
                     // grab the original file (or create a new one if not found).
-                    var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
+                    var originalFileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase));
+                    var targetFileInfo = originalFileInfo ?? new BeatmapSetFileInfo();
 
                     // metadata may have changed; update the path with the standard format.
                     beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu";
+                    // ensure that two difficulties from the set don't point at the same beatmap file.
+                    if (setInfo.Beatmaps.Any(b => string.Equals(b.Path, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)))
+                        throw new InvalidOperationException($"{setInfo} already has a difficulty with the name of '{beatmapInfo.Version}'.");
+
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 
                     // update existing or populate new file's filename.
-                    fileInfo.Filename = beatmapInfo.Path;
+                    targetFileInfo.Filename = beatmapInfo.Path;
 
                     stream.Seek(0, SeekOrigin.Begin);
-                    ReplaceFile(setInfo, fileInfo, stream);
+                    ReplaceFile(setInfo, targetFileInfo, stream);
                 }
             }
 
