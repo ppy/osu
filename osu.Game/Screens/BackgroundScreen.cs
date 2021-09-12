@@ -11,6 +11,9 @@ namespace osu.Game.Screens
 {
     public abstract class BackgroundScreen : Screen, IEquatable<BackgroundScreen>
     {
+        protected const float TRANSITION_LENGTH = 500;
+        private const float x_movement_amount = 50;
+
         private readonly bool animateOnEnter;
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
@@ -26,9 +29,6 @@ namespace osu.Game.Screens
         {
             return other?.GetType() == GetType();
         }
-
-        private const float transition_length = 500;
-        private const float x_movement_amount = 50;
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -55,8 +55,8 @@ namespace osu.Game.Screens
                 this.FadeOut();
                 this.MoveToX(x_movement_amount);
 
-                this.FadeIn(transition_length, Easing.InOutQuart);
-                this.MoveToX(0, transition_length, Easing.InOutQuart);
+                this.FadeIn(TRANSITION_LENGTH, Easing.InOutQuart);
+                this.MoveToX(0, TRANSITION_LENGTH, Easing.InOutQuart);
             }
 
             base.OnEntering(last);
@@ -64,7 +64,7 @@ namespace osu.Game.Screens
 
         public override void OnSuspending(IScreen next)
         {
-            this.MoveToX(-x_movement_amount, transition_length, Easing.InOutQuart);
+            this.MoveToX(-x_movement_amount, TRANSITION_LENGTH, Easing.InOutQuart);
             base.OnSuspending(next);
         }
 
@@ -72,8 +72,8 @@ namespace osu.Game.Screens
         {
             if (IsLoaded)
             {
-                this.FadeOut(transition_length, Easing.OutExpo);
-                this.MoveToX(x_movement_amount, transition_length, Easing.OutExpo);
+                this.FadeOut(TRANSITION_LENGTH, Easing.OutExpo);
+                this.MoveToX(x_movement_amount, TRANSITION_LENGTH, Easing.OutExpo);
             }
 
             return base.OnExiting(next);
@@ -82,7 +82,7 @@ namespace osu.Game.Screens
         public override void OnResuming(IScreen last)
         {
             if (IsLoaded)
-                this.MoveToX(0, transition_length, Easing.OutExpo);
+                this.MoveToX(0, TRANSITION_LENGTH, Easing.OutExpo);
             base.OnResuming(last);
         }
     }

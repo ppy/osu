@@ -39,7 +39,7 @@ namespace osu.Game.Online.Multiplayer
         {
             // Importantly, we are intentionally not using MessagePack here to correctly support derived class serialization.
             // More information on the limitations / reasoning can be found in osu-server-spectator's initialisation code.
-            connector = api.GetHubConnector(nameof(OnlineMultiplayerClient), endpoint, false);
+            connector = api.GetHubConnector(nameof(OnlineMultiplayerClient), endpoint);
 
             if (connector != null)
             {

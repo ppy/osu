@@ -5,7 +5,6 @@ using System;
 using System.Collections.Specialized;
 using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsMatchSettingsOverlay : MatchSettingsOverlay
+    public class PlaylistsRoomSettingsOverlay : RoomSettingsOverlay
     {
         public Action EditPlaylist;
 
@@ -32,15 +31,19 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override bool IsLoading => settings.IsLoading; // should probably be replaced with an OngoingOperationTracker.
 
+        public PlaylistsRoomSettingsOverlay(Room room)
+            : base(room)
+        {
+        }
+
         protected override void SelectBeatmap() => settings.SelectBeatmap();
 
-        protected override OnlinePlayComposite CreateSettings()
-            => settings = new MatchSettings
-            {
-                RelativeSizeAxes = Axes.Both,
-                RelativePositionAxes = Axes.Y,
-                EditPlaylist = () => EditPlaylist?.Invoke()
-            };
+        protected override OnlinePlayComposite CreateSettings(Room room) => settings = new MatchSettings(room)
+        {
+            RelativeSizeAxes = Axes.Both,
+            RelativePositionAxes = Axes.Y,
+            EditPlaylist = () => EditPlaylist?.Invoke()
+        };
 
         protected class MatchSettings : OnlinePlayComposite
         {
@@ -66,8 +69,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             [Resolved(CanBeNull = true)]
             private IRoomManager manager { get; set; }
 
-            [Resolved]
-            private Bindable<Room> currentRoom { get; set; }
+            private readonly Room room;
+
+            public MatchSettings(Room room)
+            {
+                this.room = room;
+            }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -193,7 +200,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Child = new GridContainer
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                Height = 500,
+                                                                Height = 448,
                                                                 Content = new[]
                                                                 {
                                                                     new Drawable[]
@@ -333,7 +340,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 Duration.Value = DurationField.Current.Value;
 
-                manager?.CreateRoom(currentRoom.Value, onSuccess, onError);
+                manager?.CreateRoom(room, onSuccess, onError);
 
                 loadingLayer.Show();
             }

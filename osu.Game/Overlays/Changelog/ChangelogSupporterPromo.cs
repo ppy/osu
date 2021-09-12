@@ -26,9 +26,6 @@ namespace osu.Game.Overlays.Changelog
         private const float image_container_width = 164;
         private const float heart_size = 75;
 
-        private readonly FillFlowContainer textContainer;
-        private readonly Container imageContainer;
-
         public ChangelogSupporterPromo()
         {
             RelativeSizeAxes = Axes.X;
@@ -38,6 +35,12 @@ namespace osu.Game.Overlays.Changelog
                 Vertical = 20,
                 Horizontal = 50,
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colour, TextureStore textures, OverlayColourProvider colourProvider)
+        {
+            SupporterPromoLinkFlowContainer supportLinkText;
 
             InternalChildren = new Drawable[]
             {
@@ -59,7 +62,7 @@ namespace osu.Game.Overlays.Changelog
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.3f),
+                            Colour = colourProvider.Background5,
                         },
                         new Container
                         {
@@ -68,7 +71,7 @@ namespace osu.Game.Overlays.Changelog
                             Padding = new MarginPadding { Horizontal = 75 },
                             Children = new Drawable[]
                             {
-                                textContainer = new FillFlowContainer
+                                new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -76,91 +79,84 @@ namespace osu.Game.Overlays.Changelog
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Padding = new MarginPadding { Right = 50 + image_container_width },
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Text = ChangelogStrings.SupportHeading,
+                                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
+                                            Margin = new MarginPadding { Bottom = 20 },
+                                        },
+                                        supportLinkText = new SupporterPromoLinkFlowContainer(t =>
+                                        {
+                                            t.Font = t.Font.With(size: 14);
+                                            t.Colour = colour.PinkLighter;
+                                        })
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                        },
+                                        new OsuTextFlowContainer(t =>
+                                        {
+                                            t.Font = t.Font.With(size: 12);
+                                            t.Colour = colour.PinkLighter;
+                                        })
+                                        {
+                                            Text = ChangelogStrings.SupportText2.ToString(),
+                                            Margin = new MarginPadding { Top = 10 },
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                        }
+                                    },
                                 },
-                                imageContainer = new Container
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Y,
                                     Width = image_container_width,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
+                                    Children = new Drawable[]
+                                    {
+                                        new Sprite
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Margin = new MarginPadding { Bottom = 28 },
+                                            RelativeSizeAxes = Axes.Both,
+                                            FillMode = FillMode.Fill,
+                                            Texture = textures.Get(@"Online/supporter-pippi"),
+                                        },
+                                        new Container
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Size = new Vector2(heart_size),
+                                            Margin = new MarginPadding { Top = 70 },
+                                            Masking = true,
+                                            EdgeEffect = new EdgeEffectParameters
+                                            {
+                                                Type = EdgeEffectType.Shadow,
+                                                Colour = colour.Pink,
+                                                Radius = 10,
+                                                Roundness = heart_size / 2,
+                                            },
+                                            Child = new Sprite
+                                            {
+                                                Size = new Vector2(heart_size),
+                                                Texture = textures.Get(@"Online/supporter-heart"),
+                                            },
+                                        },
+                                    }
                                 }
                             }
                         },
                     }
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colour, TextureStore textures)
-        {
-            SupporterPromoLinkFlowContainer supportLinkText;
-            textContainer.Children = new Drawable[]
-            {
-                new OsuSpriteText
-                {
-                    Text = ChangelogStrings.SupportHeading,
-                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
-                    Margin = new MarginPadding { Bottom = 20 },
-                },
-                supportLinkText = new SupporterPromoLinkFlowContainer(t =>
-                {
-                    t.Font = t.Font.With(size: 14);
-                    t.Colour = colour.PinkLighter;
-                })
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                },
-                new OsuTextFlowContainer(t =>
-                {
-                    t.Font = t.Font.With(size: 12);
-                    t.Colour = colour.PinkLighter;
-                })
-                {
-                    Text = ChangelogStrings.SupportText2.ToString(),
-                    Margin = new MarginPadding { Top = 10 },
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                }
-            };
 
             supportLinkText.AddText("Support further development of osu! and ");
-            supportLinkText.AddLink("become and osu!supporter", "https://osu.ppy.sh/home/support", t => t.Font = t.Font.With(weight: FontWeight.Bold));
+            supportLinkText.AddLink("become an osu!supporter", @"https://osu.ppy.sh/home/support", t => t.Font = t.Font.With(weight: FontWeight.Bold));
             supportLinkText.AddText(" today!");
-
-            imageContainer.Children = new Drawable[]
-            {
-                new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Margin = new MarginPadding { Bottom = 28 },
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fill,
-                    Texture = textures.Get(@"Online/supporter-pippi"),
-                },
-                new Container
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Size = new Vector2(heart_size),
-                    Margin = new MarginPadding { Top = 70 },
-                    Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = colour.Pink,
-                        Radius = 10,
-                        Roundness = heart_size / 2,
-                    },
-                    Child = new Sprite
-                    {
-                        Size = new Vector2(heart_size),
-                        Texture = textures.Get(@"Online/supporter-heart"),
-                    },
-                },
-            };
         }
 
         private class SupporterPromoLinkFlowContainer : LinkFlowContainer
@@ -170,27 +166,18 @@ namespace osu.Game.Overlays.Changelog
             {
             }
 
-            public new void AddLink(string text, string url, Action<SpriteText> creationParameters) =>
-                AddInternal(new SupporterPromoLinkCompiler(AddText(text, creationParameters)) { Url = url });
+            protected override DrawableLinkCompiler CreateLinkCompiler(IEnumerable<SpriteText> parts) => new SupporterPromoLinkCompiler(parts);
 
             private class SupporterPromoLinkCompiler : DrawableLinkCompiler
             {
-                [Resolved(CanBeNull = true)]
-                private OsuGame game { get; set; }
-
-                public string Url;
-
                 public SupporterPromoLinkCompiler(IEnumerable<Drawable> parts)
                     : base(parts)
                 {
-                    RelativeSizeAxes = Axes.Both;
                 }
 
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colour)
                 {
-                    TooltipText = Url;
-                    Action = () => game?.HandleLink(Url);
                     IdleColour = colour.PinkDark;
                     HoverColour = Color4.White;
                 }

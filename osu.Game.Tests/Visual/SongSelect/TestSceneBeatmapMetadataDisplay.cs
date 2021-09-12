@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("setup display", () =>
             {
-                var randomMods = Ruleset.Value.CreateInstance().GetAllMods().OrderBy(_ => RNG.Next()).Take(5).ToList();
+                var randomMods = Ruleset.Value.CreateInstance().CreateAllMods().OrderBy(_ => RNG.Next()).Take(5).ToList();
 
                 OsuLogo logo = new OsuLogo { Scale = new Vector2(0.15f) };
 

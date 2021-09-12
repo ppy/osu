@@ -148,7 +148,12 @@ namespace osu.Game.Online
                 });
 
             if (RuntimeInfo.SupportsJIT && preferMessagePack)
-                builder.AddMessagePackProtocol();
+            {
+                builder.AddMessagePackProtocol(options =>
+                {
+                    options.SerializerOptions = SignalRUnionWorkaroundResolver.OPTIONS;
+                });
+            }
             else
             {
                 // eventually we will precompile resolvers for messagepack, but this isn't working currently

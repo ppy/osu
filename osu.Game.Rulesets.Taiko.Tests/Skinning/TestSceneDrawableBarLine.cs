@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        new TaikoPlayfield(new ControlPointInfo()),
+                        new TaikoPlayfield(),
                         hoc = new ScrollingHitObjectContainer()
                     }
                 };
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        new TaikoPlayfield(new ControlPointInfo()),
+                        new TaikoPlayfield(),
                         hoc = new ScrollingHitObjectContainer()
                     }
                 };

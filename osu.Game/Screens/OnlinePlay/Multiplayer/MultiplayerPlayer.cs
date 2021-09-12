@@ -17,6 +17,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
@@ -27,6 +28,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         // Disallow fails in multiplayer for now.
         protected override bool CheckModsAllowFailure() => false;
+
+        protected override UserActivity InitialActivity => new UserActivity.InMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
         private MultiplayerClient client { get; set; }
@@ -45,10 +48,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// <summary>
         /// Construct a multiplayer player.
         /// </summary>
+        /// <param name="room">The room.</param>
         /// <param name="playlistItem">The playlist item to be played.</param>
         /// <param name="users">The users which are participating in this game.</param>
-        public MultiplayerPlayer(PlaylistItem playlistItem, MultiplayerRoomUser[] users)
-            : base(playlistItem, new PlayerConfiguration
+        public MultiplayerPlayer(Room room, PlaylistItem playlistItem, MultiplayerRoomUser[] users)
+            : base(room, playlistItem, new PlayerConfiguration
             {
                 AllowPause = false,
                 AllowRestart = false,
@@ -68,6 +72,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
+                Spacing = new Vector2(5)
             });
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
@@ -78,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 ((IBindable<bool>)leaderboard.Expanded).BindTo(HUDOverlay.ShowHud);
 
-                leaderboardFlow.Add(l);
+                leaderboardFlow.Insert(0, l);
 
                 if (leaderboard.TeamScores.Count >= 2)
                 {
@@ -87,9 +92,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         Team1Score = { BindTarget = leaderboard.TeamScores.First().Value },
                         Team2Score = { BindTarget = leaderboard.TeamScores.Last().Value },
                         Expanded = { BindTarget = HUDOverlay.ShowHud },
-                    }, leaderboardFlow.Add);
+                    }, scoreDisplay => leaderboardFlow.Insert(1, scoreDisplay));
                 }
             });
+
+            LoadComponentAsync(new GameplayChatDisplay(Room)
+            {
+                Expanded = { BindTarget = HUDOverlay.ShowHud },
+            }, chat => leaderboardFlow.Insert(2, chat));
 
             HUDOverlay.Add(loadingDisplay = new LoadingLayer(true) { Depth = float.MaxValue });
         }
@@ -180,10 +190,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
-            Debug.Assert(RoomId.Value != null);
+            Debug.Assert(Room.RoomID.Value != null);
+
             return leaderboard.TeamScores.Count == 2
-                ? new MultiplayerTeamResultsScreen(score, RoomId.Value.Value, PlaylistItem, leaderboard.TeamScores)
-                : new MultiplayerResultsScreen(score, RoomId.Value.Value, PlaylistItem);
+                ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, leaderboard.TeamScores)
+                : new MultiplayerResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem);
         }
 
         protected override void Dispose(bool isDisposing)
