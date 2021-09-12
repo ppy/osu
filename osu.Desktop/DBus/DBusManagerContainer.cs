@@ -158,7 +158,7 @@ namespace osu.Desktop.DBus
             mprisService.UseAvatarLogoAsDefault = config.GetBindable<bool>(MSetting.MprisUseAvatarlogoAsCover);
             mprisService.Next += () => musicController.NextTrack();
             mprisService.Previous += () => musicController.PreviousTrack();
-            mprisService.Play += () => musicController.Play();
+            mprisService.Play += () => musicController.Play(requestedByUser: true);
             mprisService.Pause += () => musicController.Stop(true);
             mprisService.Quit += exitGame;
             mprisService.Seek += t => musicController.SeekTo(t);
