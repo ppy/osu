@@ -23,13 +23,12 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class EditorTestScene : ScreenTestScene
     {
-        protected EditorBeatmap EditorBeatmap;
-
         private TestEditorLoader editorLoader;
 
         protected TestEditor Editor => editorLoader.Editor;
 
-        protected EditorClock EditorClock { get; private set; }
+        protected EditorBeatmap EditorBeatmap => Editor.ChildrenOfType<EditorBeatmap>().Single();
+        protected EditorClock EditorClock => Editor.ChildrenOfType<EditorClock>().Single();
 
         /// <summary>
         /// Whether any saves performed by the editor should be isolate (and not persist) to the underlying <see cref="BeatmapManager"/>.
@@ -66,8 +65,6 @@ namespace osu.Game.Tests.Visual
 
             AddStep("load editor", LoadEditor);
             AddUntilStep("wait for editor to load", () => EditorComponentsReady);
-            AddStep("get beatmap", () => EditorBeatmap = Editor.ChildrenOfType<EditorBeatmap>().Single());
-            AddStep("get clock", () => EditorClock = Editor.ChildrenOfType<EditorClock>().Single());
         }
 
         protected virtual void LoadEditor()
