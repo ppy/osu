@@ -286,7 +286,7 @@ namespace osu.Game.Beatmaps
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                using (ContextFactory.GetForWrite())
+                using (var usage = ContextFactory.GetForWrite())
                 {
                     var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
@@ -297,9 +297,14 @@ namespace osu.Game.Beatmaps
 
                     // metadata may have changed; update the path with the standard format.
                     beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu";
+
                     // ensure that two difficulties from the set don't point at the same beatmap file.
-                    if (setInfo.Beatmaps.Any(b => string.Equals(b.Path, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)))
-                        throw new InvalidOperationException($"{setInfo} already has a difficulty with the name of '{beatmapInfo.Version}'.");
+                    if (setInfo.Beatmaps.Any(b => !b.Equals(beatmapInfo) && string.Equals(b.Path, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var ex = new InvalidOperationException($"{setInfo} already has a difficulty with the name of '{beatmapInfo.Version}'.");
+                        usage.Errors.Add(ex);
+                        throw ex;
+                    }
 
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 
