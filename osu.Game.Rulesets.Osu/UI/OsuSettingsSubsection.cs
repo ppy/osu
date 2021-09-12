@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 {
                     LabelText = "回放帧率",
                     Current = config.GetBindable<float>(OsuRulesetSetting.ReplayFramerate),
-                    KeyboardStep = 30f
+                    KeyboardStep = 10f
                 },
                 new SettingsEnumDropdown<OsuDanceMover>
                 {
@@ -143,8 +143,6 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "打串限制",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.StreamRestrict)
                 },
-                //某人做功能不留翻译
-                //一些拉满都看不出来啥明显差异的功能我都不知道我翻译的准不准确
                 new OsuSpriteText
                 {
                     Text = "Momentum 移动设置",
@@ -162,6 +160,54 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "限制角度",
                     Current = config.GetBindable<float>(OsuRulesetSetting.RestrictAngle),
                     KeyboardStep = 1
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "Restrict angle add",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.RestrictAngleAdd),
+                    KeyboardStep = 100f
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "Restrict angle sub",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.RestrictAngleSub),
+                    KeyboardStep = 100f
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "打串区域",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.StreamArea),
+                    KeyboardStep = 100f
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "最小串距离",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.StreamMinimum)
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "最大串距离",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.StreamMaximum)
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "Bounce on equal pos",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.EqualPosBounce)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "滑条预测",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.SliderPredict)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "插入角度",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.InterpolateAngles)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "翻转角度插值",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.InvertAngleInterpolation)
                 },
                 new OsuSpriteText
                 {

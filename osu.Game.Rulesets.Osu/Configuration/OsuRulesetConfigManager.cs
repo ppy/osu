@@ -26,15 +26,15 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.ShowCursorTrail, true);
             SetDefault(OsuRulesetSetting.PlayfieldBorderStyle, PlayfieldBorderStyle.None);
 
-            SetDefault(OsuRulesetSetting.ReplayFramerate, 120f, 24f, 990f, 2f);
+            SetDefault(OsuRulesetSetting.ReplayFramerate, 120f, 15f, 1000f, 1f);
+            SetDefault(OsuRulesetSetting.SpinnerRadiusStart, 50, 5f, 350f, 1f);
+            SetDefault(OsuRulesetSetting.SpinnerRadiusEnd, 50, 5f, 350f, 1f);
             SetDefault(OsuRulesetSetting.DanceMover, OsuDanceMover.Momentum);
             SetDefault(OsuRulesetSetting.BorderBounce, true);
             SetDefault(OsuRulesetSetting.PippiSpinner, false);
             SetDefault(OsuRulesetSetting.PippiStream, false);
             SetDefault(OsuRulesetSetting.SpinnerDance, true);
             SetDefault(OsuRulesetSetting.SliderDance, true);
-            SetDefault(OsuRulesetSetting.SpinnerRadiusStart, 235f, 10f, 350f, 1f);
-            SetDefault(OsuRulesetSetting.SpinnerRadiusEnd, 15f, 10f, 250f, 1f);
 
             SetDefault(OsuRulesetSetting.AngleOffset, 0.45f, 0f, 2f, 0.01f);
             SetDefault(OsuRulesetSetting.JumpMult, 0.6f, 0f, 2f, 0.01f);
@@ -47,6 +47,17 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.StreamRestrict, false);
             SetDefault(OsuRulesetSetting.RestrictInvert, true);
             SetDefault(OsuRulesetSetting.SkipStackAngles, false);
+
+            //Momentum extra
+            SetDefault(OsuRulesetSetting.EqualPosBounce, 0f, 0, 100f, 0.1f);
+            SetDefault(OsuRulesetSetting.RestrictAngleAdd, 90f, 0, 100f);
+            SetDefault(OsuRulesetSetting.RestrictAngleSub, 90f, 0, 100f);
+            SetDefault(OsuRulesetSetting.StreamArea, 40f, 0, 100);
+            SetDefault(OsuRulesetSetting.StreamMaximum, 10000f, 0, 50000f);
+            SetDefault(OsuRulesetSetting.StreamMinimum, 50f, 0, 1000f);
+            SetDefault(OsuRulesetSetting.InterpolateAngles, true);
+            SetDefault(OsuRulesetSetting.InvertAngleInterpolation, false);
+            SetDefault(OsuRulesetSetting.SliderPredict, false);
 
             //Bezier mover settings
             SetDefault(OsuRulesetSetting.BezierAggressiveness, 60f, 1f, 180f);
@@ -91,6 +102,19 @@ namespace osu.Game.Rulesets.Osu.Configuration
         StreamRestrict,
         DurationTrigger,
         DurationMult,
+
+        //Momentum extra
+        EqualPosBounce,
+        SliderPredict,
+        InterpolateAngles,
+        InvertAngleInterpolation,
+        RestrictAngleAdd,
+        RestrictAngleSub,
+        StreamArea,
+        StreamMinimum,
+        StreamMaximum,
+
+        //Bezier mover settings
         BezierAggressiveness,
         BezierSliderAggressiveness,
     }

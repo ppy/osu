@@ -196,7 +196,6 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             for (int i = 0; i < Beatmap.HitObjects.Count - 1; i++)
             {
-                OsuReplayFrame lastFrame = (OsuReplayFrame)Frames[^1];
                 hitObject = Beatmap.HitObjects[i];
                 addHitObjectClickFrames(hitObject, i);
 
