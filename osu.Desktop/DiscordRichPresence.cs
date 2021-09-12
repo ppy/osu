@@ -139,8 +139,8 @@ namespace osu.Desktop
         {
             switch (activity)
             {
-                case UserActivity.SoloGame solo:
-                    return solo.Beatmap.ToString();
+                case UserActivity.InGame game:
+                    return game.Beatmap.ToString();
 
                 case UserActivity.Editing edit:
                     return edit.Beatmap.ToString();

@@ -68,9 +68,9 @@ namespace osu.Game.Rulesets.Catch.Mods
         /// </summary>
         private static void mirrorJuiceStreamPath(JuiceStream juiceStream)
         {
-            var controlPoints = juiceStream.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
+            var controlPoints = juiceStream.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
             foreach (var point in controlPoints)
-                point.Position.Value = new Vector2(-point.Position.Value.X, point.Position.Value.Y);
+                point.Position = new Vector2(-point.Position.X, point.Position.Y);
 
             juiceStream.Path = new SliderPath(controlPoints, juiceStream.Path.ExpectedDistance.Value);
         }

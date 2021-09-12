@@ -60,23 +60,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestSettingValidity()
-        {
-            AddAssert("create button not enabled", () => !this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
-
-            AddStep("set playlist", () =>
-            {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem
-                {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                });
-            });
-
-            AddAssert("create button enabled", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
-        }
-
-        [Test]
         public void TestCreatedRoom()
         {
             AddStep("set playlist", () =>
@@ -95,6 +78,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for join", () => Client.Room != null);
+        }
+
+        [Test]
+        public void TestSettingValidity()
+        {
+            AddAssert("create button not enabled", () => !this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
+
+            AddStep("set playlist", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                });
+            });
+
+            AddAssert("create button enabled", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
         }
 
         [Test]

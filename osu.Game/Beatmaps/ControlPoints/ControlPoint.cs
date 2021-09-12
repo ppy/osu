@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Newtonsoft.Json;
 using osu.Game.Graphics;
 using osu.Game.Utils;
 using osuTK.Graphics;
@@ -13,6 +14,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The time at which the control point takes effect.
         /// </summary>
+        [JsonIgnore]
         public double Time => controlPointGroup?.Time ?? 0;
 
         private ControlPointGroup controlPointGroup;

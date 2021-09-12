@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Extensions;
-using osu.Game.IO.Serialization;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -18,7 +17,7 @@ namespace osu.Game.Screens.Play.HUD
     /// Serialised information governing custom changes to an <see cref="ISkinnableDrawable"/>.
     /// </summary>
     [Serializable]
-    public class SkinnableInfo : IJsonSerializable
+    public class SkinnableInfo
     {
         public Type Type { get; set; }
 

@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             SelectedRoom.Value = new Room();
 
-            Child = settings = new TestRoomSettings
+            Child = settings = new TestRoomSettings(SelectedRoom.Value)
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible }
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
         }
 
-        private class TestRoomSettings : PlaylistsMatchSettingsOverlay
+        private class TestRoomSettings : PlaylistsRoomSettingsOverlay
         {
             public TriangleButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
 
@@ -118,6 +118,11 @@ namespace osu.Game.Tests.Visual.Playlists
             public OsuDropdown<TimeSpan> DurationField => ((MatchSettings)Settings).DurationField;
 
             public OsuSpriteText ErrorText => ((MatchSettings)Settings).ErrorText;
+
+            public TestRoomSettings(Room room)
+                : base(room)
+            {
+            }
         }
 
         private class TestDependencies : OnlinePlayTestSceneDependencies

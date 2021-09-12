@@ -173,12 +173,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     int thirdPointIndex = indexInSegment + 2;
 
                     if (piece.PointsInSegment.Count > thirdPointIndex + 1)
-                        piece.PointsInSegment[thirdPointIndex].Type.Value = piece.PointsInSegment[0].Type.Value;
+                        piece.PointsInSegment[thirdPointIndex].Type = piece.PointsInSegment[0].Type;
 
                     break;
             }
 
-            piece.ControlPoint.Type.Value = type;
+            piece.ControlPoint.Type = type;
         }
 
         [Resolved(CanBeNull = true)]
@@ -241,7 +241,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private MenuItem createMenuItemForPathType(PathType? type)
         {
             int totalCount = Pieces.Count(p => p.IsSelected.Value);
-            int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type.Value == type);
+            int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type == type);
 
             var item = new TernaryStateRadioMenuItem(type == null ? "Inherit" : type.ToString().Humanize(), MenuItemType.Standard, _ =>
             {

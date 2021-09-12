@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             for (int i = 1; i < vertices.Count; i++)
             {
-                sliderPath.ControlPoints[^1].Type.Value = PathType.Linear;
+                sliderPath.ControlPoints[^1].Type = PathType.Linear;
 
                 float deltaX = vertices[i].X - lastPosition.X;
                 double length = vertices[i].Distance - currentDistance;

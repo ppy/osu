@@ -33,6 +33,12 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public event Action? RoomUpdated;
 
+        public event Action<MultiplayerRoomUser>? UserJoined;
+
+        public event Action<MultiplayerRoomUser>? UserLeft;
+
+        public event Action<MultiplayerRoomUser>? UserKicked;
+
         /// <summary>
         /// Invoked when the multiplayer server requests the current beatmap to be loaded into play.
         /// </summary>
@@ -366,11 +372,26 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Add(user);
 
+                UserJoined?.Invoke(user);
                 RoomUpdated?.Invoke();
             }, false);
         }
 
-        Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user)
+        Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user) =>
+            handleUserLeft(user, UserLeft);
+
+        Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user)
+        {
+            if (LocalUser == null)
+                return Task.CompletedTask;
+
+            if (user.Equals(LocalUser))
+                LeaveRoom();
+
+            return handleUserLeft(user, UserKicked);
+        }
+
+        private Task handleUserLeft(MultiplayerRoomUser user, Action<MultiplayerRoomUser>? callback)
         {
             if (Room == null)
                 return Task.CompletedTask;
@@ -383,22 +404,11 @@ namespace osu.Game.Online.Multiplayer
                 Room.Users.Remove(user);
                 PlayingUserIds.Remove(user.UserID);
 
+                callback?.Invoke(user);
                 RoomUpdated?.Invoke();
             }, false);
 
             return Task.CompletedTask;
-        }
-
-        Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user)
-        {
-            if (LocalUser == null)
-                return Task.CompletedTask;
-
-            if (user.Equals(LocalUser))
-                LeaveRoom();
-
-            // TODO: also inform users of the kick operation.
-            return ((IMultiplayerClient)this).UserLeft(user);
         }
 
         Task IMultiplayerClient.HostChanged(int userId)

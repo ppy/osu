@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Objects
 
             foreach (PathControlPoint point in ControlPoints)
             {
-                if (point.Type.Value != null)
+                if (point.Type != null)
                 {
                     if (!found)
                         pointsInCurrentSegment.Clear();
@@ -215,18 +215,18 @@ namespace osu.Game.Rulesets.Objects
 
             Vector2[] vertices = new Vector2[ControlPoints.Count];
             for (int i = 0; i < ControlPoints.Count; i++)
-                vertices[i] = ControlPoints[i].Position.Value;
+                vertices[i] = ControlPoints[i].Position;
 
             int start = 0;
 
             for (int i = 0; i < ControlPoints.Count; i++)
             {
-                if (ControlPoints[i].Type.Value == null && i < ControlPoints.Count - 1)
+                if (ControlPoints[i].Type == null && i < ControlPoints.Count - 1)
                     continue;
 
                 // The current vertex ends the segment
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
-                var segmentType = ControlPoints[start].Type.Value ?? PathType.Linear;
+                var segmentType = ControlPoints[start].Type ?? PathType.Linear;
 
                 foreach (Vector2 t in calculateSubPath(segmentVertices, segmentType))
                 {

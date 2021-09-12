@@ -150,8 +150,6 @@ namespace osu.Game.Screens.Edit
             if (seekTime < timingPoint.Time && timingPoint != ControlPointInfo.TimingPoints.First())
                 seekTime = timingPoint.Time;
 
-            // Ensure the sought point is within the boundaries
-            seekTime = Math.Clamp(seekTime, 0, TrackLength);
             SeekSmoothlyTo(seekTime);
         }
 
@@ -190,6 +188,9 @@ namespace osu.Game.Screens.Edit
             seekingOrStopped.Value = IsSeeking = true;
 
             ClearTransforms();
+
+            // Ensure the sought point is within the boundaries
+            position = Math.Clamp(position, 0, TrackLength);
             return underlyingClock.Seek(position);
         }
 
@@ -288,7 +289,7 @@ namespace osu.Game.Screens.Edit
         }
 
         private void transformSeekTo(double seek, double duration = 0, Easing easing = Easing.None)
-            => this.TransformTo(this.PopulateTransform(new TransformSeek(), seek, duration, easing));
+            => this.TransformTo(this.PopulateTransform(new TransformSeek(), Math.Clamp(seek, 0, TrackLength), duration, easing));
 
         private double currentTime
         {
