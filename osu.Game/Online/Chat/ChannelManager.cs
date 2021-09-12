@@ -265,7 +265,8 @@ namespace osu.Game.Online.Chat
                         break;
                     }
 
-                    // Check if the user has joined requested channel already.
+                    // Check if the user has joined the requested channel already.
+                    // This uses the channel name for comparison as the PM user's username is unavailable after a restart.
                     var privateChannel = JoinedChannels.FirstOrDefault(
                         c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Name.Equals(content, StringComparison.OrdinalIgnoreCase));
 
