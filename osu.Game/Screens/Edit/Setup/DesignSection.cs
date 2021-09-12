@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledSwitchButton widescreenSupport;
         private LabelledSwitchButton epilepsyWarning;
         private LabelledSwitchButton letterboxDuringBreaks;
+        private LabelledSwitchButton samplesMatchPlaybackRate;
 
         public override LocalisableString Title => "Design";
 
@@ -79,6 +80,12 @@ namespace osu.Game.Screens.Edit.Setup
                     Label = "Letterbox during breaks",
                     Description = "Adds horizontal letterboxing to give a cinematic look during breaks.",
                     Current = { Value = Beatmap.BeatmapInfo.LetterboxInBreaks }
+                },
+                samplesMatchPlaybackRate = new LabelledSwitchButton
+                {
+                    Label = "Samples match playback rate",
+                    Description = "When enabled, all samples will speed up or slow down when rate-changing mods are enabled.",
+                    Current = { Value = Beatmap.BeatmapInfo.SamplesMatchPlaybackRate }
                 }
             };
         }
@@ -96,6 +103,7 @@ namespace osu.Game.Screens.Edit.Setup
             widescreenSupport.Current.BindValueChanged(_ => updateBeatmap());
             epilepsyWarning.Current.BindValueChanged(_ => updateBeatmap());
             letterboxDuringBreaks.Current.BindValueChanged(_ => updateBeatmap());
+            samplesMatchPlaybackRate.Current.BindValueChanged(_ => updateBeatmap());
         }
 
         private void updateCountdownSettingsVisibility() => CountdownSettings.FadeTo(EnableCountdown.Current.Value ? 1 : 0);
@@ -115,6 +123,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.WidescreenStoryboard = widescreenSupport.Current.Value;
             Beatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning.Current.Value;
             Beatmap.BeatmapInfo.LetterboxInBreaks = letterboxDuringBreaks.Current.Value;
+            Beatmap.BeatmapInfo.SamplesMatchPlaybackRate = samplesMatchPlaybackRate.Current.Value;
         }
     }
 }
