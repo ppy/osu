@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Framework.Bindables;
+using osu.Framework.Testing;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
@@ -22,13 +23,41 @@ namespace osu.Game.Rulesets.Mania.Tests
         [Resolved]
         private RulesetConfigCache configCache { get; set; }
 
-        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
+        private Bindable<bool> configTimingBasedNoteColouring;
 
-        protected override void LoadComplete()
+        private ManualClock clock;
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("setup hierarchy", () => Child = new Container
+            {
+                Clock = new FramedClock(clock = new ManualClock()),
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Children = new[]
+                {
+                    Ruleset.Value.CreateInstance().CreateDrawableRulesetWith(createTestBeatmap())
+                }
+            });
+            AddStep("retrieve config bindable", () =>
+            {
+                var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
+                configTimingBasedNoteColouring = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring);
+            });
+        }
+
+        [Test]
+        public void TestSimple()
+        {
+            AddStep("enable", () => configTimingBasedNoteColouring.Value = true);
+            AddStep("disable", () => configTimingBasedNoteColouring.Value = false);
+        }
+
+        private ManiaBeatmap createTestBeatmap()
         {
             const double beat_length = 500;
-
-            var ruleset = new ManiaRuleset();
 
             var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 1 })
             {
@@ -45,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     new Note { StartTime = beat_length }
                 },
                 ControlPointInfo = new ControlPointInfo(),
-                BeatmapInfo = { Ruleset = ruleset.RulesetInfo },
+                BeatmapInfo = { Ruleset = Ruleset.Value },
             };
 
             foreach (var note in beatmap.HitObjects)
@@ -57,24 +86,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 BeatLength = beat_length
             });
-
-            Child = new Container
-            {
-                Clock = new FramedClock(new ManualClock()),
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new[]
-                {
-                    ruleset.CreateDrawableRulesetWith(beatmap)
-                }
-            };
-
-            var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
-            config.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
-
-            AddStep("Enable", () => configTimingBasedNoteColouring.Value = true);
-            AddStep("Disable", () => configTimingBasedNoteColouring.Value = false);
+            return beatmap;
         }
     }
 }
