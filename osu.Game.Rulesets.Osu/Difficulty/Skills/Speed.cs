@@ -71,8 +71,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 {
                     currHistoricalDecay = Math.Min(currHistoricalDecay, (double)(Previous.Count - i) / Previous.Count); // either we're limited by time or limited by object count.
 
-                    double currDelta = ((OsuDifficultyHitObject)currObj).StrainTime;
-                    double prevDelta = ((OsuDifficultyHitObject)prevObj).StrainTime;
+                    double currDelta = Math.Max(25, currObj.DeltaTime);
+                    double prevDelta = Math.Max(25, prevObj.DeltaTime);
                     double prevPrevDelta = ((OsuDifficultyHitObject)prevPrevObj).StrainTime;
                     double effectiveRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
 
