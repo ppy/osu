@@ -7,14 +7,11 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Tests.Beatmaps.IO;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -116,34 +113,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("stack empty", () => Stack.CurrentScreen == null);
         }
 
-        private void switchToDifficulty(Func<BeatmapInfo> difficulty)
-        {
-            AddUntilStep("wait for menubar to load", () => Editor.ChildrenOfType<EditorMenuBar>().Any());
-            AddStep("open file menu", () =>
-            {
-                var menuBar = Editor.ChildrenOfType<EditorMenuBar>().Single();
-                var fileMenu = menuBar.ChildrenOfType<DrawableOsuMenuItem>().First();
-                InputManager.MoveMouseTo(fileMenu);
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddStep("open difficulty menu", () =>
-            {
-                var difficultySelector =
-                    Editor.ChildrenOfType<DrawableOsuMenuItem>().Single(item => item.Item.Text.Value.ToString().Contains("Change difficulty"));
-                InputManager.MoveMouseTo(difficultySelector);
-            });
-            AddWaitStep("wait for open", 3);
-
-            AddStep("switch to target difficulty", () =>
-            {
-                var difficultyMenuItem =
-                    Editor.ChildrenOfType<DrawableOsuMenuItem>()
-                          .Last(item => item.Item is DifficultyMenuItem difficultyItem && difficultyItem.Beatmap.Equals(difficulty.Invoke()));
-                InputManager.MoveMouseTo(difficultyMenuItem);
-                InputManager.Click(MouseButton.Left);
-            });
-        }
+        private void switchToDifficulty(Func<BeatmapInfo> difficulty) => AddStep("switch to difficulty", () => Editor.SwitchToDifficulty(difficulty.Invoke()));
 
         private void confirmEditingBeatmap(Func<BeatmapInfo> targetDifficulty)
         {
