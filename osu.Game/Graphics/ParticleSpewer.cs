@@ -132,10 +132,10 @@ namespace osu.Game.Graphics
                         height);
 
                     var quad = new Quad(
-                        rotatePosition(rect.TopLeft, rect.Centre, angle),
-                        rotatePosition(rect.TopRight, rect.Centre, angle),
-                        rotatePosition(rect.BottomLeft, rect.Centre, angle),
-                        rotatePosition(rect.BottomRight, rect.Centre, angle)
+                        transformPosition(rect.TopLeft, rect.Centre, angle),
+                        transformPosition(rect.TopRight, rect.Centre, angle),
+                        transformPosition(rect.BottomLeft, rect.Centre, angle),
+                        transformPosition(rect.BottomRight, rect.Centre, angle)
                     );
 
                     DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
@@ -144,7 +144,7 @@ namespace osu.Game.Graphics
                 }
             }
 
-            private Vector2 rotatePosition(Vector2 pos, Vector2 centre, float angle)
+            private Vector2 transformPosition(Vector2 pos, Vector2 centre, float angle)
             {
                 float cos = MathF.Cos(angle);
                 float sin = MathF.Sin(angle);

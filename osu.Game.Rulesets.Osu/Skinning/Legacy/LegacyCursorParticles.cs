@@ -149,6 +149,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             private double velocityFrameLength;
             private Vector2 totalPosDifference;
 
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
                 if (cursorScreenPosition == null)
@@ -173,8 +175,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                 return base.OnMouseMove(e);
             }
-
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             private void resetVelocityCalculation()
             {
