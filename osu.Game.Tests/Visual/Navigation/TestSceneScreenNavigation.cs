@@ -15,6 +15,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.Play;
@@ -386,6 +387,19 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
             AddStep("click left mouse button", () => InputManager.Click(MouseButton.Left));
             AddAssert("now playing is hidden", () => nowPlayingOverlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestExitGameFromSongSelect()
+        {
+            PushAndConfirm(() => new TestPlaySongSelect());
+            exitViaEscapeAndConfirm();
+
+            pushEscape(); // returns to osu! logo
+
+            AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
+            AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroTriangles);
+            AddUntilStep("Wait for game exit", () => Game.ScreenStack.CurrentScreen == null);
         }
 
         private void pushEscape() =>

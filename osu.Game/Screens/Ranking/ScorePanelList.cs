@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -306,18 +307,18 @@ namespace osu.Game.Screens.Ranking
             if (expandedPanel == null)
                 return base.OnKeyDown(e);
 
-            var expandedPanelIndex = flow.GetPanelIndex(expandedPanel.Score);
-
             switch (e.Key)
             {
                 case Key.Left:
-                    if (expandedPanelIndex > 0)
-                        SelectedScore.Value = flow.Children[expandedPanelIndex - 1].Panel.Score;
+                    var previousScore = flow.GetPreviousScore(expandedPanel.Score);
+                    if (previousScore != null)
+                        SelectedScore.Value = previousScore;
                     return true;
 
                 case Key.Right:
-                    if (expandedPanelIndex < flow.Count - 1)
-                        SelectedScore.Value = flow.Children[expandedPanelIndex + 1].Panel.Score;
+                    var nextScore = flow.GetNextScore(expandedPanel.Score);
+                    if (nextScore != null)
+                        SelectedScore.Value = nextScore;
                     return true;
             }
 
@@ -335,6 +336,12 @@ namespace osu.Game.Screens.Ranking
             public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
 
             public int GetPanelIndex(ScoreInfo score) => applySorting(Children).TakeWhile(s => s.Panel.Score != score).Count();
+
+            [CanBeNull]
+            public ScoreInfo GetPreviousScore(ScoreInfo score) => applySorting(Children).TakeWhile(s => s.Panel.Score != score).LastOrDefault()?.Panel.Score;
+
+            [CanBeNull]
+            public ScoreInfo GetNextScore(ScoreInfo score) => applySorting(Children).SkipWhile(s => s.Panel.Score != score).ElementAtOrDefault(1)?.Panel.Score;
 
             private IEnumerable<ScorePanelTrackingContainer> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanelTrackingContainer>()
                                                                                                                        .OrderByDescending(GetLayoutPosition)
