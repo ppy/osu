@@ -3,10 +3,10 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <Authors> </Authors>
         <Copyright> </Copyright>
-        <PackageProjectUrl>https://github.com/matrix-feather/osu</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/matrix-feather/osu</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/MATRIX-feather/osu</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/MATRIX-feather/osu</RepositoryUrl>
         <PackageTags />
-        <Company> </Company>
+        <Company></Company>
     </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Fonts\**\*" />

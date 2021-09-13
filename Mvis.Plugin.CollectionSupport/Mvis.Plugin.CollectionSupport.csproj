@@ -4,6 +4,11 @@
     <OutputType>Library</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>CollectionSupport</Description>
+    <Authors>MATRIX-夜翎</Authors>
+    <Copyright />
+    <PackageProjectUrl>https://github.com/MATRIX-feather/osu</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MATRIX-feather/osu</RepositoryUrl>
+    <Company />
   </PropertyGroup>
 
   <ItemGroup Label="Project References">

@@ -24,6 +24,8 @@ namespace osu.Desktop.DBus.Tray
             throw new InvalidOperationException("暂时不能修改");
         }
 
+        internal bool Set(string prop, object value) => kdeProperties.Set(prop, value);
+
         public event Action<PropertyChanges> OnPropertiesChanged;
 
         public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)

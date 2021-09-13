@@ -10,6 +10,8 @@ namespace M.DBus.Tray
     /// </summary>
     public class SimpleEntry
     {
+        public int ChildId { get; internal set; } = -2;
+
         /// <summary>
         /// 该项目的类型<br/>
         /// <![CDATA[供应商特定类型可以通过添加前缀“x-<vendor>-”来添加。]]>
@@ -101,6 +103,8 @@ namespace M.DBus.Tray
         /// 该项目被激活时要执行的动作
         /// </summary>
         public Action OnActive { get; set; }
+
+        public IList<SimpleEntry> Children = new List<SimpleEntry>();
 
         public override string ToString() => $"DBusMenuEntry '{Label}'";
     }

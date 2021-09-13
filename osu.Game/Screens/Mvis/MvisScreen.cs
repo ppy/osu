@@ -309,6 +309,12 @@ namespace osu.Game.Screens.Mvis
 
         public float BottombarHeight => currentFunctionBarProvider.GetSafeAreaPadding();
 
+        private readonly SimpleEntry mvisEntry = new SimpleEntry
+        {
+            Label = "Mvis播放器",
+            Enabled = false
+        };
+
         #endregion
 
         public MvisScreen()
@@ -552,6 +558,9 @@ namespace osu.Game.Screens.Mvis
 
             //设置键位
             setupKeyBindings();
+
+            //添加DBusEntry
+            pluginManager.AddDBusMenuEntry(mvisEntry);
 
             //当插件卸载时调用onPluginUnload
             pluginManager.OnPluginUnLoad += onPluginUnLoad;
@@ -806,17 +815,10 @@ namespace osu.Game.Screens.Mvis
             trackRunning.Value = CurrentTrack.IsRunning;
         }
 
-        private readonly SimpleEntry mvisEntry = new SimpleEntry
-        {
-            Label = "Mvis播放器",
-            Enabled = false
-        };
-
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            pluginManager.AddDBusMenuEntry(mvisEntry);
             originalMods = Mods.Value;
 
             //覆盖mod列表

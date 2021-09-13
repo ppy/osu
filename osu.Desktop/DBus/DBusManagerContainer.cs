@@ -134,7 +134,10 @@ namespace osu.Desktop.DBus
                         OnActive = exitGame,
                         IconName = "application-exit"
                     },
-                    new SeparatorEntry()
+                    new SeparatorEntry
+                    {
+                        Label = "分割符"
+                    }
                 });
 
                 DBusManager.RegisterNewObject(kdeTrayService,
