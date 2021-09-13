@@ -30,8 +30,6 @@ namespace osu.Game.Tests.Visual
     /// </summary>
     public abstract class OsuGameTestScene : OsuManualInputManagerTestScene
     {
-        private GameHost host;
-
         protected TestOsuGame Game;
 
         protected override bool UseFreshStoragePerRun => true;
@@ -39,10 +37,8 @@ namespace osu.Game.Tests.Visual
         protected override bool CreateNestedActionContainer => false;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load()
         {
-            this.host = host;
-
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,
@@ -55,7 +51,7 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("Create new game instance", () =>
             {
-                if (Game != null)
+                if (Game?.Parent != null)
                 {
                     Remove(Game);
                     Game.Dispose();
