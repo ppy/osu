@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -36,6 +37,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private void load(ISkinSource skin, OsuColour colours)
         {
             var texture = skin.GetTexture("star2");
+            var starBreakAdditive = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.StarBreakAdditive)?.Value ?? new Color4(255, 182, 193, 255);
+
             if (texture == null)
                 return;
 
@@ -47,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = colours.PinkLighter,
+                    Colour = starBreakAdditive,
                     Direction = SpewDirection.None,
                     Active =
                     {
@@ -58,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = colours.PinkLighter,
+                    Colour = starBreakAdditive,
                     Direction = SpewDirection.None,
                     Active =
                     {
