@@ -9,5 +9,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         SliderBorder,
         SliderBall,
         SpinnerBackground,
+        StarBreakAdditive,
     }
 }
