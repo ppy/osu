@@ -60,8 +60,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             // Cap deltatime to the OD 300 hitwindow.
-            // 0.77 is derived from making sure 260bpm OD8 streams aren't nerfed harshly
-            var hitWindowNerf = deltaTime / (greatWindow * 2 * 0.77);
+            // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly
+            var hitWindowNerf = deltaTime / (greatWindow * 2 * 0.93);
             deltaTime /= Math.Clamp(hitWindowNerf, 0.92, 1);
 
             double speedBonus = 1.0;
