@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
             Current.ValueChanged += filled =>
             {
                 fill.FadeTo(filled.NewValue ? 1 : 0, 200, Easing.OutQuint);
-                this.TransformTo(nameof(BorderThickness), filled.NewValue ? 7 : border_width, 200, Easing.OutQuint);
+                this.TransformTo(nameof(BorderThickness), filled.NewValue ? 8.5f : border_width, 200, Easing.OutQuint);
             };
         }
 
