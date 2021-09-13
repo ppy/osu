@@ -105,6 +105,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             if (newTeam == displayedTeam)
                 return;
 
+            // only play the sample if an already valid team changes to another valid team.
+            // this avoids playing a sound for each user if the match type is changed to/from a team mode.
             if (newTeam != null && displayedTeam != null)
                 sampleTeamSwap?.Play();
 
