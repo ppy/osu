@@ -146,6 +146,7 @@ namespace osu.Desktop.DBus.Tray
             catch (Exception e)
             {
                 Logger.Error(e, "执行GetLayout时出现错误");
+                return null;
             }
         }
 
@@ -171,6 +172,7 @@ namespace osu.Desktop.DBus.Tray
             catch (Exception e)
             {
                 Logger.Error(e, "执行GetGroupPropertiesAsync时出现错误");
+                return null;
             }
         }
 
