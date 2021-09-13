@@ -4,8 +4,13 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
 
@@ -23,15 +28,31 @@ namespace osu.Game.Tests.Visual.Editing
             editorBeatmap = new EditorBeatmap(new OsuBeatmap());
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
+        [Test]
+        public void TestOsu() => runForRuleset(new OsuRuleset().RulesetInfo);
 
-            Child = new SetupScreen
+        [Test]
+        public void TestTaiko() => runForRuleset(new TaikoRuleset().RulesetInfo);
+
+        [Test]
+        public void TestCatch() => runForRuleset(new CatchRuleset().RulesetInfo);
+
+        [Test]
+        public void TestMania() => runForRuleset(new ManiaRuleset().RulesetInfo);
+
+        private void runForRuleset(RulesetInfo rulesetInfo)
+        {
+            AddStep("create screen", () =>
             {
-                State = { Value = Visibility.Visible },
-            };
+                editorBeatmap.BeatmapInfo.Ruleset = rulesetInfo;
+
+                Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
+
+                Child = new SetupScreen
+                {
+                    State = { Value = Visibility.Visible },
+                };
+            });
         }
     }
 }
