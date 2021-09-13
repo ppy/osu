@@ -128,7 +128,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             };
 
             createColourBars(colours);
-            OrientIcons();
         }
 
         protected override void LoadComplete()
@@ -142,11 +141,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             arrow.Delay(200).FadeInFromZero(600);
         }
 
-        /// <summary>
-        /// Method to undo any layout rotation to display icons in the correct orientation.
-        /// </summary>
-        public void OrientIcons()
+        protected override void Update()
         {
+            base.Update();
+
+            // undo any layout rotation to display icons in the correct orientation
             iconEarly.Rotation = -Rotation;
             iconLate.Rotation = -Rotation;
         }

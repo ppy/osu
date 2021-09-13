@@ -376,7 +376,6 @@ namespace osu.Game.Skinning
                                     hitError.Anchor = Anchor.BottomCentre;
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
-                                    if (hitError is BarHitErrorMeter barHitError) barHitError.OrientIcons();
                                 }
 
                                 if (songProgress != null)
