@@ -47,6 +47,7 @@ namespace osu.Game.Graphics.UserInterface
             };
 
             Current.ValueChanged += filled => fill.FadeTo(filled.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            Current.ValueChanged += filled => this.TransformTo(nameof(BorderThickness), filled.NewValue ? 7 : border_width, 200, Easing.OutQuint);
         }
 
         [BackgroundDependencyLoader]
