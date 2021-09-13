@@ -34,6 +34,20 @@ namespace osu.Game.Screens.Edit
         [CanBeNull]
         private ScheduledDelegate scheduledDifficultySwitch;
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddRangeInternal(new Drawable[]
+            {
+                new LoadingSpinner(true)
+                {
+                    State = { Value = Visibility.Visible },
+                }
+            });
+        }
+
+        protected virtual Editor CreateEditor() => new Editor(this);
+
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
@@ -45,18 +59,6 @@ namespace osu.Game.Screens.Edit
                 // before enqueueing this screen's LogoArriving onto the logo animation sequence.
                 pushEditor();
             }
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            AddRangeInternal(new Drawable[]
-            {
-                new LoadingSpinner(true)
-                {
-                    State = { Value = Visibility.Visible },
-                }
-            });
         }
 
         public void ScheduleDifficultySwitch(BeatmapInfo beatmapInfo)
@@ -81,7 +83,7 @@ namespace osu.Game.Screens.Edit
 
         private void pushEditor()
         {
-            this.Push(new Editor(this));
+            this.Push(CreateEditor());
             ValidForResume = false;
         }
 
