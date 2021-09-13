@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using M.DBus.Tray;
 using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.DBus;
@@ -131,6 +132,8 @@ namespace Mvis.Plugin.CloudMusicSupport
         [Resolved]
         private OsuGame game { get; set; }
 
+        private SimpleEntry lyricEntry;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -143,6 +146,10 @@ namespace Mvis.Plugin.CloudMusicSupport
             AddInternal(processor);
 
             PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
+            PluginManager.AddDBusMenuEntry(lyricEntry = new SimpleEntry
+            {
+                Enabled = false
+            });
 
             if (MvisScreen != null)
             {
@@ -154,6 +161,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             resetDBusMessage();
             PluginManager.UnRegisterDBusObject(new LyricDBusObject());
+            PluginManager.RemoveDBusMenuEntry(lyricEntry);
         }
 
         public void WriteLyricToDisk()
@@ -244,26 +252,31 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
-                dbusObject.RawLyric = "-";
-                dbusObject.TranslatedLyric = "-";
+                dbusObject.RawLyric = string.Empty;
+                dbusObject.TranslatedLyric = string.Empty;
             }
         }
 
         protected override bool PostInit() => true;
 
         private Lyric currentLine;
+        private readonly Lyric emptyLine = new Lyric();
 
         public Lyric CurrentLine
         {
             get => currentLine;
             set
             {
+                value ??= emptyLine;
+
                 currentLine = value;
 
                 if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                 {
-                    dbusObject.RawLyric = value?.Content;
-                    dbusObject.TranslatedLyric = value?.TranslatedString;
+                    dbusObject.RawLyric = value.Content;
+                    dbusObject.TranslatedLyric = value.TranslatedString;
+
+                    lyricEntry.Label = value.Content + "\n" + value.TranslatedString;
                 }
             }
         }

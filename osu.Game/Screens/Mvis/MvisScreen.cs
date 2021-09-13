@@ -311,7 +311,7 @@ namespace osu.Game.Screens.Mvis
 
         private readonly SimpleEntry mvisEntry = new SimpleEntry
         {
-            Label = "Mvis播放器",
+            Label = "Mvis播放器 - 插件",
             Enabled = false
         };
 

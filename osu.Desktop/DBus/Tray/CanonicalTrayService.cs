@@ -7,13 +7,12 @@ using M.DBus.Tray;
 using M.DBus.Utils.Canonical.DBusMenuFlags;
 using osu.Framework.Logging;
 using Tmds.DBus;
-using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Desktop.DBus.Tray
 {
     /// <summary>
-    /// todo: 找到文档并实现所有目前未实现的功能
-    /// https://github.com/gnustep/libs-dbuskit/blob/master/Bundles/DBusMenu/com.canonical.dbusmenu.xml
+    ///     todo: 找到文档并实现所有目前未实现的功能
+    ///     https://github.com/gnustep/libs-dbuskit/blob/master/Bundles/DBusMenu/com.canonical.dbusmenu.xml
     /// </summary>
     public class CanonicalTrayService : IDBusMenu
     {
@@ -44,15 +43,14 @@ namespace osu.Desktop.DBus.Tray
 
             rootEntry.Children.Add(entry);
             entries[lastEntryId] = entry;
+            entry.OnPropertyChanged = () => triggerLayoutUpdate(entry);
+
             lastEntryId++;
         }
 
         public void AddEntryRange(SimpleEntry[] entries)
         {
-            foreach (var entry in entries)
-            {
-                addEntry(entry);
-            }
+            foreach (var entry in entries) addEntry(entry);
 
             triggerLayoutUpdate();
         }
@@ -78,61 +76,108 @@ namespace osu.Desktop.DBus.Tray
             triggerLayoutUpdate();
         }
 
-        private void triggerLayoutUpdate()
+        private void triggerLayoutUpdate(SimpleEntry entry = null)
         {
             menuRevision++;
-            menuChanged = true;
-            OnLayoutUpdated?.Invoke((menuRevision, 0));
+
+            entry ??= rootEntry;
+            //Logger.Log($"{entry.ToString().Replace("\n", "\\n")}发生了变化");
+
+            updatedEntries[entry.ChildId] = entry;
+
+            if (entry.ChildrenDisplay == ChildrenDisplayType.SSubmenu)
+                OnLayoutUpdated?.Invoke((menuRevision, entry.ChildId));
+            else
+            {
+                OnEntriesUpdated?.Invoke((new[]
+                {
+                    entry.ToDbusObject()
+                }, Array.Empty<(int, string[])>()));
+            }
         }
 
         #endregion
 
         private int dbusItemMaxOrder;
-        private bool menuChanged;
+        private readonly Dictionary<int, SimpleEntry> updatedEntries = new Dictionary<int, SimpleEntry>();
+        private (uint menuRevision, (int, IDictionary<string, object>, object[])) cachedLayoutObject;
 
         public Task<(uint revision, (int, IDictionary<string, object>, object[]) layout)> GetLayoutAsync(int parentId, int recursionDepth, string[] propertyNames)
         {
-            Logger.Log($"方法被调用：GetLayoutAsync: parentId: {parentId} | recursionDepth: {recursionDepth}", level: LogLevel.Verbose);
+            //Logger.Log($"方法被调用：GetLayoutAsync: parentId: {parentId} | recursionDepth: {recursionDepth}", level: LogLevel.Verbose);
 
-            int addit;
+            try
+            {
+                if (updatedEntries.Count != 0)
+                {
+                    Logger.Log("刷新DBus目录缓存", level: LogLevel.Verbose);
+                    IDictionary<int, SimpleEntry> additDict;
+                    int addit;
 
-            var result =
-                (menuRevision, rootEntry.ToDbusObject(
-                    rootEntry.ChildId,
-                    dbusItemMaxOrder,
-                    out addit));
+                    var result =
+                        (menuRevision, rootEntry.ToDbusObject(
+                            rootEntry.ChildId,
+                            dbusItemMaxOrder,
+                            out addit,
+                            out additDict));
 
-            dbusItemMaxOrder += addit;
+                    cachedLayoutObject = result;
 
-            return Task.FromResult(result);
+                    dbusItemMaxOrder += addit;
+
+                    foreach (var kvp in additDict)
+                    {
+                        if (entries.TryAdd(kvp.Key, kvp.Value))
+                        {
+                            kvp.Value.OnPropertyChanged = () =>
+                            {
+                                triggerLayoutUpdate(kvp.Value);
+                            };
+                        }
+                    }
+
+                    updatedEntries.Clear();
+
+                    return Task.FromResult(result);
+                }
+
+                return Task.FromResult(cachedLayoutObject);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "执行GetLayout时出现错误");
+            }
         }
 
         public Task<(int, IDictionary<string, object>)[]> GetGroupPropertiesAsync(int[] ids, string[] propertyNames)
         {
-            Logger.Log("方法被调用：GetGroupPropertiesAsync: ids:", level: LogLevel.Verbose);
+            //Logger.Log("方法被调用：GetGroupPropertiesAsync: ids:", level: LogLevel.Verbose);
+            foreach (var id in ids) Logger.Log(id.ToString());
 
-            foreach (var id in ids)
+            try
             {
-                Logger.Log(id.ToString());
+                var result = new List<(int, IDictionary<string, object>)>();
+
+                foreach (var id in ids)
+                {
+                    var target = entries.FirstOrDefault(k => k.Key == id);
+                    if (target.Value == null) continue;
+
+                    result.Add(target.Value.ToDbusObject());
+                }
+
+                return Task.FromResult(result.ToArray());
             }
-
-            var result = new List<(int, IDictionary<string, object>)>();
-
-            foreach (var id in ids)
+            catch (Exception e)
             {
-                var target = entries.FirstOrDefault(k => k.Key == id);
-                if (target.Value == null) continue;
-
-                result.Add(target.Value.ToDbusObject());
+                Logger.Error(e, "执行GetGroupPropertiesAsync时出现错误");
             }
-
-            return Task.FromResult(result.ToArray());
         }
 
         public Task<object> GetPropertyAsync(int id, string name)
         {
             Logger.Log($"未实现的方法被调用：GetPropertyAsync: id: {id} | name: {name}");
-            throw new NotImplementedException();
+            throw new NotImplementedException("未实现的接口");
         }
 
         public Task EventAsync(int id, string eventId, object data, uint timestamp)
@@ -142,7 +187,18 @@ namespace osu.Desktop.DBus.Tray
             switch (eventType)
             {
                 case EventType.Clicked:
-                    entries.FirstOrDefault(p => p.Key == id).Value?.OnActive?.Invoke();
+                    SimpleEntry target = null;
+
+                    try
+                    {
+                        target = entries.FirstOrDefault(p => p.Key == id).Value;
+                        target.OnActive?.Invoke();
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $"激活 {target?.ToString() ?? "未知菜单"} 的动作时出现问题, 请尝试联系其内容提供方");
+                    }
+
                     break;
 
                 case EventType.Closed:
@@ -162,20 +218,14 @@ namespace osu.Desktop.DBus.Tray
         public Task<int[]> EventGroupAsync((int, string, object, uint)[] events)
         {
             Logger.Log($"未实现的方法被调用：EventGroupAsync: {events}");
-            throw new NotImplementedException();
+            throw new NotImplementedException("未实现的接口");
         }
 
         public Task<bool> AboutToShowAsync(int id)
         {
-            Logger.Log("方法被调用: AboutToShowAsync", level: LogLevel.Verbose);
+            //Logger.Log($"方法被调用: AboutToShowAsync id: {id}", level: LogLevel.Verbose);
 
-            bool returnValue = false;
-
-            if (id == rootEntry.ChildId)
-            {
-                returnValue = menuChanged;
-                menuChanged = false;
-            }
+            var returnValue = updatedEntries.ContainsKey(id);
 
             return Task.FromResult(returnValue);
         }
@@ -183,7 +233,7 @@ namespace osu.Desktop.DBus.Tray
         public Task<(int[] updatesNeeded, int[] idErrors)> AboutToShowGroupAsync(int[] ids)
         {
             Logger.Log($"未实现的方法被调用：AboutToShowGroupAsync: {ids}");
-            throw new NotImplementedException();
+            throw new NotImplementedException("未实现的接口");
         }
 
         public event Action<((int, IDictionary<string, object>)[] updatedProps, (int, string[])[] removedProps)> OnEntriesUpdated;
@@ -219,11 +269,17 @@ namespace osu.Desktop.DBus.Tray
 
         public Task SetAsync(string prop, object val)
         {
-            throw new NotImplementedException();
+            if (canonicalProperties.Set(prop, val))
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(prop, val));
+
+            return Task.CompletedTask;
         }
 
-        internal bool SetProperty(string prop, object value)
-            => canonicalProperties.Set(prop, value);
+        internal void SetProperty(string prop, object value)
+        {
+            if (canonicalProperties.Set(prop, value))
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(prop, value));
+        }
 
         public event Action<PropertyChanges> OnPropertiesChanged;
 
@@ -243,10 +299,14 @@ namespace osu.Desktop.DBus.Tray
         }
 
         public Task<string> GetStatusAsync()
-            => Task.FromResult(canonicalProperties.Status);
+        {
+            return Task.FromResult(canonicalProperties.Status);
+        }
 
         Task<string[]> IDBusMenu.GetIconThemePathAsync()
-            => Task.FromResult(canonicalProperties.IconThemePath);
+        {
+            return Task.FromResult(canonicalProperties.IconThemePath);
+        }
 
         #endregion
     }
