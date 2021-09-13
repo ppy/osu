@@ -737,10 +737,10 @@ namespace osu.Game.Screens.Edit
         private DifficultyMenuItem createDifficultyMenuItem(BeatmapInfo beatmapInfo)
         {
             bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmapInfo);
-            return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, switchToDifficulty);
+            return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
         }
 
-        private void switchToDifficulty(BeatmapInfo beatmapInfo) => loader?.ScheduleDifficultySwitch(beatmapInfo);
+        protected void SwitchToDifficulty(BeatmapInfo beatmapInfo) => loader?.ScheduleDifficultySwitch(beatmapInfo);
 
         private void cancelExit() => loader?.CancelPendingDifficultySwitch();
 
