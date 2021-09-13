@@ -190,38 +190,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeFlashlightValue()
         {
-            double flashlightValue = 0.0;
+            if (!mods.Any(h => h is OsuModFlashlight))
+                return 0.0;
 
-            if (mods.Any(h => h is OsuModFlashlight))
-            {
-                double rawFlashlight = Attributes.FlashlightStrain;
+            double rawFlashlight = Attributes.FlashlightStrain;
 
-                if (mods.Any(m => m is OsuModTouchDevice))
-                    rawFlashlight = Math.Pow(rawFlashlight, 0.8);
+            if (mods.Any(m => m is OsuModTouchDevice))
+                rawFlashlight = Math.Pow(rawFlashlight, 0.8);
 
-                flashlightValue = Math.Pow(rawFlashlight, 2.0) * 25.0;
+            double flashlightValue = Math.Pow(rawFlashlight, 2.0) * 25.0;
 
-                // Add an additional bonus for HDFL.
-                if (mods.Any(h => h is OsuModHidden))
-                    flashlightValue *= 1.3;
+            // Add an additional bonus for HDFL.
+            if (mods.Any(h => h is OsuModHidden))
+                flashlightValue *= 1.3;
 
-                // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-                if (countMiss > 0)
-                    flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), Math.Pow(countMiss, .875));
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            if (countMiss > 0)
+                flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), Math.Pow(countMiss, .875));
 
-                // Combo scaling.
-                if (Attributes.MaxCombo > 0)
-                    flashlightValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
+            // Combo scaling.
+            if (Attributes.MaxCombo > 0)
+                flashlightValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
-                // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
-                flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
-                                   (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
+            // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
+            flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
+                               (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
 
-                // Scale the flashlight value with accuracy _slightly_.
-                flashlightValue *= 0.5 + accuracy / 2.0;
-                // It is important to also consider accuracy difficulty when doing that.
-                flashlightValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
-            }
+            // Scale the flashlight value with accuracy _slightly_.
+            flashlightValue *= 0.5 + accuracy / 2.0;
+            // It is important to also consider accuracy difficulty when doing that.
+            flashlightValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
             return flashlightValue;
         }
