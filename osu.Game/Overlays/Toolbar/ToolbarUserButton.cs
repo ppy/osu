@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Toolbar
 
             Add(new OpaqueBackground { Depth = 1 });
 
-            Flow.Add(avatar = new UpdateableAvatar(openOnClick: false)
+            Flow.Add(avatar = new UpdateableAvatar(isInteractive: false)
             {
                 Masking = true,
                 Size = new Vector2(32),
