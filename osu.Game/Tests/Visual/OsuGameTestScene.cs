@@ -81,10 +81,7 @@ namespace osu.Game.Tests.Visual
 
         protected void CreateGame()
         {
-            Game = new TestOsuGame(LocalStorage, API);
-            Game.SetHost(host);
-
-            Add(Game);
+            AddGame(Game = new TestOsuGame(LocalStorage, API));
         }
 
         protected void PushAndConfirm(Func<Screen> newScreen)
