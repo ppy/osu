@@ -15,9 +15,6 @@ namespace osu.Game.Rulesets.EmptyScrolling.Tests
         [BackgroundDependencyLoader]
         private void load(GameHost host, OsuGameBase gameBase)
         {
-            OsuGame game = new OsuGame();
-            game.SetHost(host);
-
             Children = new Drawable[]
             {
                 new Box
@@ -25,8 +22,9 @@ namespace osu.Game.Rulesets.EmptyScrolling.Tests
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                game
             };
+
+            AddGame(new OsuGame());
         }
     }
 }
