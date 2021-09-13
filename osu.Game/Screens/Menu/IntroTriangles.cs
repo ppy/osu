@@ -42,6 +42,7 @@ namespace osu.Game.Screens.Menu
         private Sample welcome;
 
         private DecoupleableInterpolatingFramedClock decoupledClock;
+        private TrianglesIntroSequence intro;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -66,7 +67,7 @@ namespace osu.Game.Screens.Menu
                 if (UsingThemedIntro)
                     decoupledClock.ChangeSource(Track);
 
-                LoadComponentAsync(new TrianglesIntroSequence(logo, background)
+                LoadComponentAsync(intro = new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Clock = decoupledClock,
@@ -80,6 +81,14 @@ namespace osu.Game.Screens.Menu
                     StartTrack();
                 });
             }
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            base.OnSuspending(next);
+
+            // important as there is a clock attached to a track which will likely be disposed before returning to this screen.
+            intro.Expire();
         }
 
         public override void OnResuming(IScreen last)
