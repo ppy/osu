@@ -14,6 +14,7 @@ using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Catch;
@@ -47,6 +48,63 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
             Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
+        }
+
+        [TestCaseSource(nameof(allBeatmaps))]
+        public void TestEncodeDecodeStabilityDoubleConvert(string name)
+        {
+            var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded), name);
+
+            // run an extra convert. this is expected to be stable.
+            decodedAfterEncode.beatmap = convert(decodedAfterEncode.beatmap);
+
+            sort(decoded.beatmap);
+            sort(decodedAfterEncode.beatmap);
+
+            Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
+            Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
+        }
+
+        [TestCaseSource(nameof(allBeatmaps))]
+        public void TestEncodeDecodeStabilityWithNonLegacyControlPoints(string name)
+        {
+            var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
+
+            // we are testing that the transfer of relevant data to hitobjects (from legacy control points) sticks through encode/decode.
+            // before the encode step, the legacy information is removed here.
+            decoded.beatmap.ControlPointInfo = removeLegacyControlPointTypes(decoded.beatmap.ControlPointInfo);
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded), name);
+
+            // in this process, we may lose some detail in the control points section.
+            // let's focus on only the hitobjects.
+            var originalHitObjects = decoded.beatmap.HitObjects.Serialize();
+            var newHitObjects = decodedAfterEncode.beatmap.HitObjects.Serialize();
+
+            Assert.That(newHitObjects, Is.EqualTo(originalHitObjects));
+
+            ControlPointInfo removeLegacyControlPointTypes(ControlPointInfo controlPointInfo)
+            {
+                // emulate non-legacy control points by cloning the non-legacy portion.
+                // the assertion is that the encoder can recreate this losslessly from hitobject data.
+                Assert.IsInstanceOf<LegacyControlPointInfo>(controlPointInfo);
+
+                var newControlPoints = new ControlPointInfo();
+
+                foreach (var point in controlPointInfo.AllControlPoints)
+                {
+                    // completely ignore "legacy" types, which have been moved to HitObjects.
+                    // even though these would mostly be ignored by the Add call, they will still be available in groups,
+                    // which isn't what we want to be testing here.
+                    if (point is SampleControlPoint)
+                        continue;
+
+                    newControlPoints.Add(point.Time, point.DeepClone());
+                }
+
+                return newControlPoints;
+            }
         }
 
         [Test]
@@ -116,7 +174,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private Stream encodeToLegacy((IBeatmap beatmap, ISkin beatmapSkin) fullBeatmap)
+        private MemoryStream encodeToLegacy((IBeatmap beatmap, ISkin beatmapSkin) fullBeatmap)
         {
             var (beatmap, beatmapSkin) = fullBeatmap;
             var stream = new MemoryStream();

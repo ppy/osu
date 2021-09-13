@@ -17,15 +17,21 @@ namespace osu.Game.Screens
             Origin = Anchor.Centre;
         }
 
-        public void Push(BackgroundScreen screen)
+        /// <summary>
+        /// Attempt to push a new background screen to this stack.
+        /// </summary>
+        /// <param name="screen">The screen to attempt to push.</param>
+        /// <returns>Whether the push succeeded. For example, if the existing screen was already of the correct type this will return <c>false</c>.</returns>
+        public bool Push(BackgroundScreen screen)
         {
             if (screen == null)
-                return;
+                return false;
 
             if (EqualityComparer<BackgroundScreen>.Default.Equals((BackgroundScreen)CurrentScreen, screen))
-                return;
+                return false;
 
             base.Push(screen);
+            return true;
         }
     }
 }
