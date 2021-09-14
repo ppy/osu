@@ -15,7 +15,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -190,47 +189,44 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             private OsuPasswordTextBox passwordTextbox;
             private TriangleButton joinButton;
-            private ShakeContainer shakeContainer;
             private OsuSpriteText errorText;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Child = shakeContainer = new ShakeContainer
+                Padding = new MarginPadding(10);
+
+                Child = new FillFlowContainer
                 {
                     Margin = new MarginPadding(10),
+                    Spacing = new Vector2(5),
                     AutoSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
                     {
-                        Spacing = new Vector2(5),
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        new FillFlowContainer
                         {
-                            new FillFlowContainer
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(5),
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(5),
-                                AutoSizeAxes = Axes.Both,
-                                Children = new Drawable[]
+                                passwordTextbox = new OsuPasswordTextBox
                                 {
-                                    passwordTextbox = new OsuPasswordTextBox
-                                    {
-                                        Width = 200,
-                                        PlaceholderText = "password",
-                                    },
-                                    joinButton = new TriangleButton
-                                    {
-                                        Width = 80,
-                                        Text = "Join Room",
-                                    }
+                                    Width = 200,
+                                    PlaceholderText = "password",
+                                },
+                                joinButton = new TriangleButton
+                                {
+                                    Width = 80,
+                                    Text = "Join Room",
                                 }
-                            },
-                            errorText = new OsuSpriteText
-                            {
-                                Colour = colours.Red,
-                            },
-                        }
+                            }
+                        },
+                        errorText = new OsuSpriteText
+                        {
+                            Colour = colours.Red,
+                        },
                     }
                 };
 
@@ -243,8 +239,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
                 errorText.Text = error;
                 errorText.FadeOutFromOne(1000, Easing.In);
-
-                shakeContainer.Shake();
             }
 
             protected override void LoadComplete()
