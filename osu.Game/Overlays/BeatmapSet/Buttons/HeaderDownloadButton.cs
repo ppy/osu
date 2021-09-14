@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -27,7 +28,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly bool noVideo;
 
-        public LocalisableString TooltipText => button.Enabled.Value ? "download this beatmap" : "login to download";
+        public LocalisableString TooltipText => BeatmapsetsStrings.ShowDetailsDownloadDefault;
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
@@ -113,7 +114,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = "Downloading...",
+                                Text = Localisation.CommonStrings.Downloading,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -124,7 +125,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = "Importing...",
+                                Text = Localisation.CommonStrings.Importing,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -139,7 +140,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = "Download",
+                                Text = BeatmapsetsStrings.ShowDetailsDownloadDefault,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
@@ -158,12 +159,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
 
-        private string getVideoSuffixText()
+        private LocalisableString getVideoSuffixText()
         {
             if (!BeatmapSet.Value.OnlineInfo.HasVideo)
                 return string.Empty;
 
-            return noVideo ? "without Video" : "with Video";
+            return noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo;
         }
     }
 }

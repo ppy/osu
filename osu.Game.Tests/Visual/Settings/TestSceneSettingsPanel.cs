@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -11,27 +12,39 @@ namespace osu.Game.Tests.Visual.Settings
     [TestFixture]
     public class TestSceneSettingsPanel : OsuTestScene
     {
-        private readonly SettingsPanel settings;
-        private readonly DialogOverlay dialogOverlay;
+        private SettingsPanel settings;
+        private DialogOverlay dialogOverlay;
 
-        public TestSceneSettingsPanel()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            settings = new SettingsOverlay
+            AddStep("create settings", () =>
             {
-                State = { Value = Visibility.Visible }
-            };
-            Add(dialogOverlay = new DialogOverlay
-            {
-                Depth = -1
+                settings?.Expire();
+
+                Add(settings = new SettingsOverlay
+                {
+                    State = { Value = Visibility.Visible }
+                });
             });
+        }
+
+        [Test]
+        public void ToggleVisibility()
+        {
+            AddWaitStep("wait some", 5);
+            AddToggleStep("toggle editor visibility", visible => settings.ToggleVisibility());
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Dependencies.Cache(dialogOverlay);
+            Add(dialogOverlay = new DialogOverlay
+            {
+                Depth = -1
+            });
 
-            Add(settings);
+            Dependencies.Cache(dialogOverlay);
         }
     }
 }

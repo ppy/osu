@@ -42,6 +42,12 @@ namespace osu.Game.Graphics.Containers
             base.OnUserScroll(value, animated, distanceDecay);
         }
 
+        public new void ScrollIntoView(Drawable target, bool animated = true)
+        {
+            UserScrolling = false;
+            base.ScrollIntoView(target, animated);
+        }
+
         public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
         {
             UserScrolling = false;

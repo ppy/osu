@@ -36,9 +36,9 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.Meh, 750_000)]
         [TestCase(ScoringMode.Standardised, HitResult.Ok, 800_000)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, 1_000_000)]
-        [TestCase(ScoringMode.Classic, HitResult.Meh, 50)]
-        [TestCase(ScoringMode.Classic, HitResult.Ok, 100)]
-        [TestCase(ScoringMode.Classic, HitResult.Great, 300)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, 41)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, 46)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, 72)]
         public void TestSingleOsuHit(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
         {
             scoreProcessor.Mode.Value = scoringMode;
@@ -85,19 +85,18 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickHit, HitResult.LargeTickHit, 575_000)] // (3 * 30) / (4 * 30) * 300_000 + (0 / 4) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 1_000_030)] // 1 * 300_000 + 700_000 (max combo 0) + 3 * 10 (bonus points)
         [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 1_000_150)] // 1 * 300_000 + 700_000 (max combo 0) + 3 * 50 (bonus points)
-        [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)] // (0 * 4 * 300) * (1 + 0 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 156)] // (((3 * 50) / (4 * 300)) * 4 * 300) * (1 + 1 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 312)] // (((3 * 100) / (4 * 300)) * 4 * 300) * (1 + 1 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 594)] // (((3 * 200) / (4 * 350)) * 4 * 300) * (1 + 1 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 936)] // (((3 * 300) / (4 * 300)) * 4 * 300) * (1 + 1 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 936)] // (((3 * 350) / (4 * 350)) * 4 * 300) * (1 + 1 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 0)] // (0 * 1 * 300) * (1 + 0 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 225)] // (((3 * 10) / (4 * 10)) * 1 * 300) * (1 + 0 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)] // (0 * 4 * 300) * (1 + 0 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 936)] // (((3 * 50) / (4 * 50)) * 4 * 300) * (1 + 1 / 25)
-        // TODO: The following two cases don't match expectations currently (a single hit is registered in acc portion when it shouldn't be). See https://github.com/ppy/osu/issues/12604.
-        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 330)] // (1 * 1 * 300) * (1 + 0 / 25) + 3 * 10 (bonus points)
-        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 450)] // (1 * 1 * 300) * (1 + 0 / 25) + 3 * 50 (bonus points)
+        [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 68)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 81)]
+        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 109)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 149)]
+        [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 149)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 9)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 15)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 149)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 18)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 18)]
         public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
         {
             var minResult = new TestJudgement(hitResult).MinResult;
@@ -129,8 +128,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
         /// </remarks>
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, 978_571)] // (3 * 10 + 100) / (4 * 10 + 100) * 300_000 + (1 / 1) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, 914_286)] // (3 * 0 + 100) / (4 * 10 + 100) * 300_000 + (1 / 1) * 700_000
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, 279)] // (((3 * 10 + 100) / (4 * 10 + 100)) * 1 * 300) * (1 + 0 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, 214)] // (((3 * 0 + 100) / (4 * 10 + 100)) * 1 * 300) * (1 + 0 / 25)
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, 69)] // (((3 * 10 + 100) / (4 * 10 + 100)) * 1 * 300) * (1 + 0 / 25)
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, 60)] // (((3 * 0 + 100) / (4 * 10 + 100)) * 1 * 300) * (1 + 0 / 25)
         public void TestSmallTicksAccuracy(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
         {
             IEnumerable<HitObject> hitObjects = Enumerable

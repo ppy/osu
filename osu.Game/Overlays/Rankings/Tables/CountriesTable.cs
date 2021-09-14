@@ -9,8 +9,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Resources.Localisation.Web;
-using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {

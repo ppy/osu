@@ -23,7 +23,10 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> parentRuleset { get; set; }
+
+        [Cached]
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public RankingsOverlay()
             : base(OverlayColourScheme.Green)
@@ -52,6 +55,19 @@ namespace osu.Game.Overlays
 
                 Scheduler.AddOnce(triggerTabChanged);
             });
+        }
+
+        private bool requiresRulesetUpdate = true;
+
+        protected override void PopIn()
+        {
+            if (requiresRulesetUpdate)
+            {
+                ruleset.Value = parentRuleset.Value;
+                requiresRulesetUpdate = false;
+            }
+
+            base.PopIn();
         }
 
         protected override void OnTabChanged(RankingsScope tab)

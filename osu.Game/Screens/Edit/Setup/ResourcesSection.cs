@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -39,61 +38,29 @@ namespace osu.Game.Screens.Edit.Setup
         [BackgroundDependencyLoader]
         private void load()
         {
-            Container audioTrackFileChooserContainer = createFileChooserContainer();
-            Container backgroundFileChooserContainer = createFileChooserContainer();
-
             Children = new Drawable[]
             {
-                new FillFlowContainer
+                backgroundTextBox = new FileChooserLabelledTextBox(".jpg", ".jpeg", ".png")
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
-                    {
-                        backgroundTextBox = new FileChooserLabelledTextBox(".jpg", ".jpeg", ".png")
-                        {
-                            Label = "Background",
-                            FixedLabelWidth = LABEL_WIDTH,
-                            PlaceholderText = "Click to select a background image",
-                            Current = { Value = working.Value.Metadata.BackgroundFile },
-                            Target = backgroundFileChooserContainer,
-                            TabbableContentContainer = this
-                        },
-                        backgroundFileChooserContainer,
-                    }
+                    Label = "Background",
+                    FixedLabelWidth = LABEL_WIDTH,
+                    PlaceholderText = "Click to select a background image",
+                    Current = { Value = working.Value.Metadata.BackgroundFile },
+                    TabbableContentContainer = this
                 },
-                new FillFlowContainer
+                audioTrackTextBox = new FileChooserLabelledTextBox(".mp3", ".ogg")
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
-                    {
-                        audioTrackTextBox = new FileChooserLabelledTextBox(".mp3", ".ogg")
-                        {
-                            Label = "Audio Track",
-                            FixedLabelWidth = LABEL_WIDTH,
-                            PlaceholderText = "Click to select a track",
-                            Current = { Value = working.Value.Metadata.AudioFile },
-                            Target = audioTrackFileChooserContainer,
-                            TabbableContentContainer = this
-                        },
-                        audioTrackFileChooserContainer,
-                    }
-                }
+                    Label = "Audio Track",
+                    FixedLabelWidth = LABEL_WIDTH,
+                    PlaceholderText = "Click to select a track",
+                    Current = { Value = working.Value.Metadata.AudioFile },
+                    TabbableContentContainer = this
+                },
             };
 
             backgroundTextBox.Current.BindValueChanged(backgroundChanged);
             audioTrackTextBox.Current.BindValueChanged(audioTrackChanged);
         }
-
-        private static Container createFileChooserContainer() =>
-            new Container
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-            };
 
         public bool ChangeBackgroundImage(string path)
         {

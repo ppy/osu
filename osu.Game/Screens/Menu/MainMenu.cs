@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate
                             {
                                 Beatmap.SetDefault();
-                                this.Push(new Editor());
+                                this.Push(new EditorLoader());
                             },
                             OnSolo = loadSoloSongSelect,
                             OnMultiplayer = () => this.Push(new Multiplayer()),

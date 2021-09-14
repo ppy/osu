@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Origin = Anchor.TopCentre;
         }
 
-        public void UpdateResult() => base.UpdateResult(true);
+        public bool UpdateResult() => base.UpdateResult(true);
 
         protected override void UpdateInitialTransforms()
         {

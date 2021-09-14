@@ -12,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Resources.Localisation.Web;
 using osu.Framework.Localisation;
 

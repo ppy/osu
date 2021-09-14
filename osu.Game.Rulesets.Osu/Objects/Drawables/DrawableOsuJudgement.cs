@@ -74,10 +74,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             public override void PlayAnimation()
             {
-                base.PlayAnimation();
-
                 if (Result != HitResult.Miss)
-                    JudgementText.TransformSpacingTo(Vector2.Zero).Then().TransformSpacingTo(new Vector2(14, 0), 1800, Easing.OutQuint);
+                {
+                    JudgementText
+                        .ScaleTo(new Vector2(0.8f, 1))
+                        .ScaleTo(new Vector2(1.2f, 1), 1800, Easing.OutQuint);
+                }
+
+                base.PlayAnimation();
             }
         }
     }
