@@ -382,15 +382,29 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     switch (hitObject)
                     {
                         case IHasRepeats repeatHitObject:
-                            // find the number of repeats which can fit in the requested time.
-                            var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
-                            var proposedCount = Math.Max(0, (int)Math.Round((time - hitObject.StartTime) / lengthOfOneRepeat) - 1);
+                            double proposedDuration = time - hitObject.StartTime;
 
-                            if (proposedCount == repeatHitObject.RepeatCount)
-                                return;
+                            if (e.CurrentState.Keyboard.ShiftPressed)
+                            {
+                                if (hitObject.DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                                    hitObject.DifficultyControlPoint = new DifficultyControlPoint();
 
-                            repeatHitObject.RepeatCount = proposedCount;
-                            beatmap.Update(hitObject);
+                                hitObject.DifficultyControlPoint.SliderVelocity *= (repeatHitObject.Duration / proposedDuration);
+                                beatmap.Update(hitObject);
+                            }
+                            else
+                            {
+                                // find the number of repeats which can fit in the requested time.
+                                var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
+                                var proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
+
+                                if (proposedCount == repeatHitObject.RepeatCount)
+                                    return;
+
+                                repeatHitObject.RepeatCount = proposedCount;
+                                beatmap.Update(hitObject);
+                            }
+
                             break;
 
                         case IHasDuration endTimeHitObject:
