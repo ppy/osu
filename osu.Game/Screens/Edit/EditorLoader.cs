@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit
         /// This will be read by the next editor instance to be opened to restore any relevant previous state.
         /// </summary>
         [CanBeNull]
-        public EditorState State;
+        private EditorState state;
 
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Edit
             scheduledDifficultySwitch = Schedule(() =>
             {
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(nextBeatmap);
-                State = editorState;
+                state = editorState;
 
                 // This screen is a weird exception to the rule that nothing after song select changes the global beatmap.
                 // Because of this, we need to update the background stack's beatmap to match.
