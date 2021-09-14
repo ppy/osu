@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -67,6 +69,9 @@ namespace osu.Game.Screens.Select.Leaderboards
         private ScoreManager scoreManager { get; set; }
 
         [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; }
+
+        [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
@@ -120,8 +125,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
+        private CancellationTokenSource loadCancellationSource;
+
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
+            loadCancellationSource?.Cancel();
+            loadCancellationSource = new CancellationTokenSource();
+
             if (Beatmap == null)
             {
                 PlaceholderState = PlaceholderState.NoneSelected;
@@ -146,8 +156,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
                 }
 
-                Scores = scores.OrderByDescending(s => s.TotalScore).ToArray();
-                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
+                scoreManager.OrderByTotalScoreAsync(scores.ToArray(), loadCancellationSource.Token)
+                            .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
 
                 return null;
             }
@@ -182,8 +192,15 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             req.Success += r =>
             {
-                scoresCallback?.Invoke(r.Scores.Select(s => s.CreateScoreInfo(rulesets)));
-                TopScore = r.UserScore?.CreateScoreInfo(rulesets);
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
+                            .ContinueWith(ordered => Schedule(() =>
+                            {
+                                if (loadCancellationSource.IsCancellationRequested)
+                                    return;
+
+                                scoresCallback?.Invoke(ordered.Result);
+                                TopScore = r.UserScore?.CreateScoreInfo(rulesets);
+                            }), TaskContinuationOptions.OnlyOnRanToCompletion);
             };
 
             return req;

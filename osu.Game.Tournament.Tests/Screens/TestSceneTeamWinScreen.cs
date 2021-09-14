@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Allocation;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Tournament.Screens.TeamWin;
 
@@ -10,19 +10,22 @@ namespace osu.Game.Tournament.Tests.Screens
 {
     public class TestSceneTeamWinScreen : TournamentTestScene
     {
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestBasic()
         {
-            var match = Ladder.CurrentMatch.Value;
+            AddStep("set up match", () =>
+            {
+                var match = Ladder.CurrentMatch.Value;
 
-            match.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
-            match.Completed.Value = true;
+                match.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
+                match.Completed.Value = true;
+            });
 
-            Add(new TeamWinScreen
+            AddStep("create screen", () => Add(new TeamWinScreen
             {
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 16 / 9f
-            });
+            }));
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -68,13 +70,40 @@ namespace osu.Game.Tests.Visual.UserInterface
             );
         }
 
-        private class MyContextMenuContainer : Container, IHasContextMenu
+        private static MenuItem[] makeMenu()
         {
-            public MenuItem[] ContextMenuItems => new MenuItem[]
+            return new MenuItem[]
             {
                 new OsuMenuItem(@"Some option"),
                 new OsuMenuItem(@"Highlighted option", MenuItemType.Highlighted),
                 new OsuMenuItem(@"Another option"),
+                new OsuMenuItem(@"Nested option >")
+                {
+                    Items = new MenuItem[]
+                    {
+                        new OsuMenuItem(@"Sub-One"),
+                        new OsuMenuItem(@"Sub-Two"),
+                        new OsuMenuItem(@"Sub-Three"),
+                        new OsuMenuItem(@"Sub-Nested option >")
+                        {
+                            Items = new MenuItem[]
+                            {
+                                new OsuMenuItem(@"Double Sub-One"),
+                                new OsuMenuItem(@"Double Sub-Two"),
+                                new OsuMenuItem(@"Double Sub-Three"),
+                                new OsuMenuItem(@"Sub-Sub-Nested option >")
+                                {
+                                    Items = new MenuItem[]
+                                    {
+                                        new OsuMenuItem(@"Too Deep One"),
+                                        new OsuMenuItem(@"Too Deep Two"),
+                                        new OsuMenuItem(@"Too Deep Three"),
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 new OsuMenuItem(@"Choose me please"),
                 new OsuMenuItem(@"And me too"),
                 new OsuMenuItem(@"Trying to fill"),
@@ -82,17 +111,29 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
+        private class MyContextMenuContainer : Container, IHasContextMenu
+        {
+            public MenuItem[] ContextMenuItems => makeMenu();
+        }
+
         private class AnotherContextMenuContainer : Container, IHasContextMenu
         {
-            public MenuItem[] ContextMenuItems => new MenuItem[]
+            public MenuItem[] ContextMenuItems
             {
-                new OsuMenuItem(@"Simple option"),
-                new OsuMenuItem(@"Simple very very long option"),
-                new OsuMenuItem(@"Change width", MenuItemType.Highlighted, () => this.ResizeWidthTo(Width * 2, 100, Easing.OutQuint)),
-                new OsuMenuItem(@"Change height", MenuItemType.Highlighted, () => this.ResizeHeightTo(Height * 2, 100, Easing.OutQuint)),
-                new OsuMenuItem(@"Change width back", MenuItemType.Destructive, () => this.ResizeWidthTo(Width / 2, 100, Easing.OutQuint)),
-                new OsuMenuItem(@"Change height back", MenuItemType.Destructive, () => this.ResizeHeightTo(Height / 2, 100, Easing.OutQuint)),
-            };
+                get
+                {
+                    List<MenuItem> items = makeMenu().ToList();
+                    items.AddRange(new MenuItem[]
+                    {
+                        new OsuMenuItem(@"Change width", MenuItemType.Highlighted, () => this.ResizeWidthTo(Width * 2, 100, Easing.OutQuint)),
+                        new OsuMenuItem(@"Change height", MenuItemType.Highlighted, () => this.ResizeHeightTo(Height * 2, 100, Easing.OutQuint)),
+                        new OsuMenuItem(@"Change width back", MenuItemType.Destructive, () => this.ResizeWidthTo(Width / 2, 100, Easing.OutQuint)),
+                        new OsuMenuItem(@"Change height back", MenuItemType.Destructive, () => this.ResizeHeightTo(Height / 2, 100, Easing.OutQuint)),
+                    });
+
+                    return items.ToArray();
+                }
+            }
         }
     }
 }

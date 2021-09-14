@@ -16,6 +16,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        public PlaylistsSongSelect(Room room)
+            : base(room)
+        {
+        }
+
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new MatchBeatmapDetailArea
         {
             CreateNewItem = createNewItem

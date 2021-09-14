@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Width = 200,
                 Current =
                 {
-                    Value = new OsuRuleset().GetAllMods().ToArray(),
+                    Value = new OsuRuleset().CreateAllMods().ToArray(),
                 }
             };
         });

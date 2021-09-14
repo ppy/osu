@@ -8,6 +8,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
@@ -35,11 +36,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private IBindable<bool> operationInProgress;
 
-        private Sample sampleReadyCount;
+        private Sample sampleReady;
+        private Sample sampleReadyAll;
+        private Sample sampleUnready;
 
         private readonly ButtonWithTrianglesExposed button;
 
         private int countReady;
+
+        private ScheduledDelegate readySampleDelegate;
 
         public MultiplayerReadyButton()
         {
@@ -54,10 +59,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleReadyCount = audio.Samples.Get(@"SongSelect/select-difficulty");
-
             operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
             operationInProgress.BindValueChanged(_ => updateState());
+
+            sampleReady = audio.Samples.Get(@"Multiplayer/player-ready");
+            sampleReadyAll = audio.Samples.Get(@"Multiplayer/player-ready-all");
+            sampleUnready = audio.Samples.Get(@"Multiplayer/player-unready");
         }
 
         protected override void OnRoomUpdated()
@@ -107,21 +114,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             button.Enabled.Value = enableButton;
 
-            if (newCountReady != countReady)
-            {
-                countReady = newCountReady;
-                Scheduler.AddOnce(playSound);
-            }
-        }
-
-        private void playSound()
-        {
-            if (sampleReadyCount == null)
+            if (newCountReady == countReady)
                 return;
 
-            var channel = sampleReadyCount.GetChannel();
-            channel.Frequency.Value = 0.77f + countReady * 0.06f;
-            channel.Play();
+            readySampleDelegate?.Cancel();
+            readySampleDelegate = Schedule(() =>
+            {
+                if (newCountReady > countReady)
+                {
+                    if (newCountReady == newCountTotal)
+                        sampleReadyAll?.Play();
+                    else
+                        sampleReady?.Play();
+                }
+                else if (newCountReady < countReady)
+                {
+                    sampleUnready?.Play();
+                }
+
+                countReady = newCountReady;
+            });
         }
 
         private void updateButtonColour(bool green)

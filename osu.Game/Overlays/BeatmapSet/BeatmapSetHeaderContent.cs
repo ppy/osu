@@ -37,6 +37,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
         private readonly ExplicitContentBeatmapPill explicitContentPill;
+        private readonly FeaturedArtistBeatmapPill featuredArtistPill;
         private readonly FillFlowContainer downloadButtonsContainer;
         private readonly BeatmapAvailability beatmapAvailability;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
@@ -129,10 +130,25 @@ namespace osu.Game.Overlays.BeatmapSet
                                             }
                                         }
                                     },
-                                    artist = new OsuSpriteText
+                                    new FillFlowContainer
                                     {
-                                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true),
-                                        Margin = new MarginPadding { Bottom = 20 }
+                                        Direction = FillDirection.Horizontal,
+                                        AutoSizeAxes = Axes.Both,
+                                        Margin = new MarginPadding { Bottom = 20 },
+                                        Children = new Drawable[]
+                                        {
+                                            artist = new OsuSpriteText
+                                            {
+                                                Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true),
+                                            },
+                                            featuredArtistPill = new FeaturedArtistBeatmapPill
+                                            {
+                                                Alpha = 0f,
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Margin = new MarginPadding { Left = 10 }
+                                            }
+                                        }
                                     },
                                     new Container
                                     {
@@ -233,6 +249,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     artist.Text = new RomanisableString(setInfo.NewValue.Metadata.ArtistUnicode, setInfo.NewValue.Metadata.Artist);
 
                     explicitContentPill.Alpha = setInfo.NewValue.OnlineInfo.HasExplicitContent ? 1 : 0;
+                    featuredArtistPill.Alpha = setInfo.NewValue.OnlineInfo.TrackId != null ? 1 : 0;
 
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
                     onlineStatusPill.Status = setInfo.NewValue.OnlineInfo.Status;

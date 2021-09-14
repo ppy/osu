@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 // Intercept and extract the internal number bindable from DifficultyBindable.
                 // This will provide bounds and precision specifications for the slider bar.
-                difficultyBindable = ((DifficultyBindable)value).GetBoundCopy();
+                difficultyBindable = (DifficultyBindable)value.GetBoundCopy();
                 sliderDisplayCurrent.BindTo(difficultyBindable.CurrentNumber);
 
                 base.Current = difficultyBindable;
@@ -91,7 +92,13 @@ namespace osu.Game.Rulesets.Mods
         {
             // This is required as SettingsItem relies heavily on this bindable for internal use.
             // The actual update flow is done via the bindable provided in the constructor.
-            public Bindable<float?> Current { get; set; } = new Bindable<float?>();
+            private readonly DifficultyBindableWithCurrent current = new DifficultyBindableWithCurrent();
+
+            public Bindable<float?> Current
+            {
+                get => current.Current;
+                set => current.Current = value;
+            }
 
             public SliderControl(BindableNumber<float> currentNumber)
             {
@@ -107,6 +114,31 @@ namespace osu.Game.Rulesets.Mods
                 AutoSizeAxes = Axes.Y;
                 RelativeSizeAxes = Axes.X;
             }
+        }
+
+        private class DifficultyBindableWithCurrent : DifficultyBindable, IHasCurrentValue<float?>
+        {
+            private Bindable<float?> currentBound;
+
+            public Bindable<float?> Current
+            {
+                get => this;
+                set
+                {
+                    if (value == null)
+                        throw new ArgumentNullException(nameof(value));
+
+                    if (currentBound != null) UnbindFrom(currentBound);
+                    BindTo(currentBound = value);
+                }
+            }
+
+            public DifficultyBindableWithCurrent(float? defaultValue = default)
+                : base(defaultValue)
+            {
+            }
+
+            protected override Bindable<float?> CreateInstance() => new DifficultyBindableWithCurrent();
         }
     }
 }

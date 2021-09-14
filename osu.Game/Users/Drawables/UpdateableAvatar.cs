@@ -44,7 +44,7 @@ namespace osu.Game.Users.Drawables
 
         protected override double LoadDelay => 200;
 
-        private readonly bool openOnClick;
+        private readonly bool isInteractive;
         private readonly bool showUsernameTooltip;
         private readonly bool showGuestOnNull;
 
@@ -52,12 +52,12 @@ namespace osu.Game.Users.Drawables
         /// Construct a new UpdateableAvatar.
         /// </summary>
         /// <param name="user">The initial user to display.</param>
-        /// <param name="openOnClick">Whether to open the user's profile when clicked.</param>
-        /// <param name="showUsernameTooltip">Whether to show the username rather than "view profile" on the tooltip.</param>
+        /// <param name="isInteractive">If set to true, hover/click sounds will play and clicking the avatar will open the user's profile.</param>
+        /// <param name="showUsernameTooltip">Whether to show the username rather than "view profile" on the tooltip. (note: this only applies if <paramref name="isInteractive"/> is also true)</param>
         /// <param name="showGuestOnNull">Whether to show a default guest representation on null user (as opposed to nothing).</param>
-        public UpdateableAvatar(User user = null, bool openOnClick = true, bool showUsernameTooltip = false, bool showGuestOnNull = true)
+        public UpdateableAvatar(User user = null, bool isInteractive = true, bool showUsernameTooltip = false, bool showGuestOnNull = true)
         {
-            this.openOnClick = openOnClick;
+            this.isInteractive = isInteractive;
             this.showUsernameTooltip = showUsernameTooltip;
             this.showGuestOnNull = showGuestOnNull;
 
@@ -69,14 +69,22 @@ namespace osu.Game.Users.Drawables
             if (user == null && !showGuestOnNull)
                 return null;
 
-            var avatar = new ClickableAvatar(user)
+            if (isInteractive)
             {
-                OpenOnClick = openOnClick,
-                ShowUsernameTooltip = showUsernameTooltip,
-                RelativeSizeAxes = Axes.Both,
-            };
-
-            return avatar;
+                return new ClickableAvatar(user)
+                {
+                    OpenOnClick = true,
+                    ShowUsernameTooltip = showUsernameTooltip,
+                    RelativeSizeAxes = Axes.Both,
+                };
+            }
+            else
+            {
+                return new DrawableAvatar(user)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
+            }
         }
     }
 }

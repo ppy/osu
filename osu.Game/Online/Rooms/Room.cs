@@ -134,7 +134,7 @@ namespace osu.Game.Online.Rooms
         /// The position of this <see cref="Room"/> in the list. This is not read from or written to the API.
         /// </summary>
         [JsonIgnore]
-        public readonly Bindable<int> Position = new Bindable<int>(-1);
+        public readonly Bindable<long> Position = new Bindable<long>(-1); // Todo: This does not need to exist.
 
         public Room()
         {

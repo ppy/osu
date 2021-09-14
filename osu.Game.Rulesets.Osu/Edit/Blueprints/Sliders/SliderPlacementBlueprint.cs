@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                         Debug.Assert(lastPoint != null);
 
                         segmentStart = lastPoint;
-                        segmentStart.Type.Value = PathType.Linear;
+                        segmentStart.Type = PathType.Linear;
 
                         currentSegmentLength = 1;
                     }
@@ -153,15 +153,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 case 1:
                 case 2:
-                    segmentStart.Type.Value = PathType.Linear;
+                    segmentStart.Type = PathType.Linear;
                     break;
 
                 case 3:
-                    segmentStart.Type.Value = PathType.PerfectCurve;
+                    segmentStart.Type = PathType.PerfectCurve;
                     break;
 
                 default:
-                    segmentStart.Type.Value = PathType.Bezier;
+                    segmentStart.Type = PathType.Bezier;
                     break;
             }
         }
@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 // The cursor does not overlap a previous control point, so it can be added if not already existing.
                 if (cursor == null)
                 {
-                    HitObject.Path.ControlPoints.Add(cursor = new PathControlPoint { Position = { Value = Vector2.Zero } });
+                    HitObject.Path.ControlPoints.Add(cursor = new PathControlPoint { Position = Vector2.Zero });
 
                     // The path type should be adjusted in the progression of updatePathType() (Linear -> PC -> Bezier).
                     currentSegmentLength++;
@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
 
                 // Update the cursor position.
-                cursor.Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+                cursor.Position = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
             }
             else if (cursor != null)
             {
