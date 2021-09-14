@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Timing;
@@ -73,10 +74,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            sliderVelocitySlider = new SliderWithTextBoxInput<double>("Slider Velocity")
+                            sliderVelocitySlider = new SliderWithTextBoxInput<double>("Velocity")
                             {
                                 Current = new DifficultyControlPoint().SliderVelocityBindable,
                                 KeyboardStep = 0.1f
+                            },
+                            new OsuTextFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                                Text = "Hold shift while dragging the end of an object to adjust velocity while snapping."
                             }
                         }
                     }
