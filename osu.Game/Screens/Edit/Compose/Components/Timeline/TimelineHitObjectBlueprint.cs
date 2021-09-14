@@ -227,7 +227,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 if (Item.SampleControlPoint != null)
                 {
-                    AddInternal(sampleOverrideDisplay = new SamplePointPiece(Item.SampleControlPoint)
+                    AddInternal(sampleOverrideDisplay = new SamplePointPiece(Item)
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.TopCentre
