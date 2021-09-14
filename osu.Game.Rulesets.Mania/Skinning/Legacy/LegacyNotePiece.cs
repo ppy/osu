@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
             if (noteAnimation is Sprite sprite)
                 texture = sprite.Texture;
-            else if (noteAnimation is TextureAnimation textureAnimation)
+            else if (noteAnimation is TextureAnimation textureAnimation && textureAnimation.FrameCount > 0)
                 texture = textureAnimation.CurrentFrame;
 
             if (texture != null)
