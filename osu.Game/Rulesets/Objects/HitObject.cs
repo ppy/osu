@@ -97,9 +97,9 @@ namespace osu.Game.Rulesets.Objects
 
                 if (DifficultyControlPoint != DifficultyControlPoint.DEFAULT)
                     DifficultyControlPoint.Time = time.NewValue;
-                // traditionally this used EndTime, but at the point changes are being made in the editor this should no longer be considered relevant.
+
                 if (SampleControlPoint != SampleControlPoint.DEFAULT)
-                    SampleControlPoint.Time = time.NewValue;
+                    SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
             };
         }
 
