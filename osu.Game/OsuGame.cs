@@ -1094,21 +1094,13 @@ namespace osu.Game
 
             // set AllowTrackAdjustments if new screen defines it, inherit otherwise
             if (newScreen is IOsuScreen newOsuScreen && newOsuScreen.AllowTrackAdjustments.HasValue)
-            {
-                allowTrackAdjustmentsStack.Push(newOsuScreen.AllowTrackAdjustments.Value);
-                Logger.Log($"Screen's AllowTrackAdjustments explicit → {allowTrackAdjustmentsStack.First()}");
-            }
-            else if (allowTrackAdjustmentsStack.Any())
-            {
-                allowTrackAdjustmentsStack.Push(allowTrackAdjustmentsStack.First());
-                Logger.Log($"Screen's AllowTrackAdjustments inherit → {allowTrackAdjustmentsStack.First()}");
-            }
+                allowTrackAdjustmentsDict[newScreen] = newOsuScreen.AllowTrackAdjustments.Value;
+            else if (allowTrackAdjustmentsDict.ContainsKey(lastScreen))
+                allowTrackAdjustmentsDict[newScreen] = allowTrackAdjustmentsDict[lastScreen];
             else
-            {
-                allowTrackAdjustmentsStack.Push(false);
-            }
+                allowTrackAdjustmentsDict[newScreen] = true;
 
-            MusicController.AllowTrackAdjustments = allowTrackAdjustmentsStack.First();
+            MusicController.AllowTrackAdjustments = allowTrackAdjustmentsDict[newScreen];
         }
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
@@ -1116,18 +1108,15 @@ namespace osu.Game
             ScreenChanged(lastScreen, newScreen);
             Logger.Log($"Screen changed ← {newScreen}");
 
+            allowTrackAdjustmentsDict.Remove(lastScreen);
+
             if (newScreen == null)
                 Exit();
-
-            if (allowTrackAdjustmentsStack.Count > 1)
-            {
-                allowTrackAdjustmentsStack.Pop();
-                MusicController.AllowTrackAdjustments = allowTrackAdjustmentsStack.First();
-                Logger.Log($"Screen's AllowTrackAdjustments return ← {allowTrackAdjustmentsStack.First()}");
-            }
+            else
+                MusicController.AllowTrackAdjustments = allowTrackAdjustmentsDict[newScreen];
         }
 
-        private readonly Stack<bool> allowTrackAdjustmentsStack = new Stack<bool>();
+        private readonly Dictionary<IScreen, bool> allowTrackAdjustmentsDict = new Dictionary<IScreen, bool>();
 
         IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
     }
