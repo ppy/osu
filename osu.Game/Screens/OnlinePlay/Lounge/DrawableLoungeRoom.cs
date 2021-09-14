@@ -193,13 +193,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             [BackgroundDependencyLoader]
             private void load()
             {
-                shakeContainer = new ShakeContainer
+                Child = shakeContainer = new ShakeContainer
                 {
                     Margin = new MarginPadding(10),
                     AutoSizeAxes = Axes.Both,
                     Child = new FillFlowContainer
                     {
-                        Margin = new MarginPadding(10),
                         Spacing = new Vector2(5),
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
@@ -218,7 +217,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         }
                     }
                 };
-                Child = shakeContainer;
 
                 joinButton.Action = () => lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
             }
