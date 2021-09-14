@@ -34,33 +34,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double scalingFactor = 52.0 / osuHitObject.Radius;
             double smallDistNerf = 1.0;
+            double cumulativeStrainTime = 0.0;
 
             double result = 0.0;
 
-            if (Previous.Count > 0)
+            for (int i = 0; i < Previous.Count; i++)
             {
-                double cumulativeStrainTime = 0.0;
+                var osuPrevious = (OsuDifficultyHitObject)Previous[i];
+                var osuPreviousHitObject = (OsuHitObject)(osuPrevious.BaseObject);
 
-                for (int i = 0; i < Previous.Count; i++)
+                if (!(osuPrevious.BaseObject is Spinner))
                 {
-                    var osuPrevious = (OsuDifficultyHitObject)Previous[i];
-                    var osuPreviousHitObject = (OsuHitObject)(osuPrevious.BaseObject);
+                    double jumpDistance = (osuHitObject.StackedPosition - osuPreviousHitObject.EndPosition).Length;
 
-                    if (!(osuPrevious.BaseObject is Spinner))
-                    {
-                        double jumpDistance = (osuHitObject.StackedPosition - osuPreviousHitObject.EndPosition).Length;
+                    cumulativeStrainTime += osuPrevious.StrainTime;
 
-                        cumulativeStrainTime += osuPrevious.StrainTime;
+                    // We want to nerf objects that can be easily seen within the Flashlight circle radius.
+                    if (i == 0)
+                        smallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
 
-                        // We want to nerf objects that can be easily seen within the Flashlight circle radius.
-                        if (i == 0)
-                            smallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
+                    // We also want to nerf stacks so that only the first object of the stack is accounted for.
+                    double stackNerf = Math.Min(1.0, (osuPrevious.JumpDistance / scalingFactor) / 25.0);
 
-                        // We also want to nerf stacks so that only the first object of the stack is accounted for.
-                        double stackNerf = Math.Min(1.0, (osuPrevious.JumpDistance / scalingFactor) / 25.0);
-
-                        result += Math.Pow(0.8, i) * stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
-                    }
+                    result += Math.Pow(0.8, i) * stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
                 }
             }
 
