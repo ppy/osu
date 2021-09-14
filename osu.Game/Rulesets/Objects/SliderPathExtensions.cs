@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Objects
         public static void Reverse(this SliderPath sliderPath, out Vector2 positionalOffset)
         {
             var points = sliderPath.ControlPoints.ToArray();
-            positionalOffset = points.Last().Position.Value;
+            positionalOffset = points.Last().Position;
 
             sliderPath.ControlPoints.Clear();
 
@@ -28,17 +28,13 @@ namespace osu.Game.Rulesets.Objects
             for (var i = 0; i < points.Length; i++)
             {
                 var p = points[i];
-                p.Position.Value -= positionalOffset;
+                p.Position -= positionalOffset;
 
                 // propagate types forwards to last null type
                 if (i == points.Length - 1)
-                    p.Type.Value = lastType;
-                else if (p.Type.Value != null)
-                {
-                    var newType = p.Type.Value;
-                    p.Type.Value = lastType;
-                    lastType = newType;
-                }
+                    p.Type = lastType;
+                else if (p.Type != null)
+                    (p.Type, lastType) = (lastType, p.Type);
 
                 sliderPath.ControlPoints.Insert(0, p);
             }

@@ -10,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;

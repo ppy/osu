@@ -9,6 +9,8 @@ namespace osu.Game.Tests.Resources
 {
     public static class TestResources
     {
+        public const double QUICK_BEATMAP_LENGTH = 10000;
+
         public static DllResourceStore GetStore() => new DllResourceStore(typeof(TestResources).Assembly);
 
         public static Stream OpenResource(string name) => GetStore().GetStream($"Resources/{name}");

@@ -79,6 +79,8 @@ namespace osu.Game.Screens.Select
 
         protected BeatmapCarousel Carousel { get; private set; }
 
+        protected Container LeftArea { get; private set; }
+
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
 
@@ -186,12 +188,12 @@ namespace osu.Game.Screens.Select
                             {
                                 new Drawable[]
                                 {
-                                    new Container
+                                    LeftArea = new Container
                                     {
                                         Origin = Anchor.BottomLeft,
                                         Anchor = Anchor.BottomLeft,
                                         RelativeSizeAxes = Axes.Both,
-
+                                        Padding = new MarginPadding { Top = left_area_padding },
                                         Children = new Drawable[]
                                         {
                                             beatmapInfoWedge = new BeatmapInfoWedge
@@ -200,8 +202,8 @@ namespace osu.Game.Screens.Select
                                                 RelativeSizeAxes = Axes.X,
                                                 Margin = new MarginPadding
                                                 {
-                                                    Top = left_area_padding,
                                                     Right = left_area_padding,
+                                                    Left = -BeatmapInfoWedge.BORDER_THICKNESS, // Hide the left border
                                                 },
                                             },
                                             new Container
@@ -210,7 +212,7 @@ namespace osu.Game.Screens.Select
                                                 Padding = new MarginPadding
                                                 {
                                                     Bottom = Footer.HEIGHT,
-                                                    Top = WEDGE_HEIGHT + left_area_padding,
+                                                    Top = WEDGE_HEIGHT,
                                                     Left = left_area_padding,
                                                     Right = left_area_padding * 2,
                                                 },
@@ -313,7 +315,7 @@ namespace osu.Game.Screens.Select
             (new FooterButtonOptions(), BeatmapOptions)
         };
 
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new LocalPlayerModSelectOverlay();
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay();
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {
@@ -347,7 +349,7 @@ namespace osu.Game.Screens.Select
                 throw new InvalidOperationException($"Attempted to edit when {nameof(AllowEditing)} is disabled");
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
-            this.Push(new Editor());
+            this.Push(new EditorLoader());
         }
 
         /// <summary>

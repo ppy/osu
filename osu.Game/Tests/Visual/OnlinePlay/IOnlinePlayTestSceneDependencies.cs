@@ -4,7 +4,6 @@
 using osu.Framework.Bindables;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
@@ -22,11 +21,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// The cached <see cref="IRoomManager"/>
         /// </summary>
         IRoomManager RoomManager { get; }
-
-        /// <summary>
-        /// The cached <see cref="FilterCriteria"/>.
-        /// </summary>
-        Bindable<FilterCriteria> Filter { get; }
 
         /// <summary>
         /// The cached <see cref="OngoingOperationTracker"/>.

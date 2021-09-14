@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -109,12 +110,14 @@ namespace osu.Game.Screens.Menu
 
             bool loadThemedIntro()
             {
-                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
+                setInfo = beatmaps.QueryBeatmapSets(b => b.Hash == BeatmapHash, IncludedDetails.AllButRuleset).FirstOrDefault();
 
                 if (setInfo == null)
                     return false;
 
-                return (initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0])) != null;
+                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+
+                return UsingThemedIntro = initialBeatmap != null;
             }
         }
 
@@ -164,7 +167,7 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
-        protected void StartTrack()
+        protected virtual void StartTrack()
         {
             // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
             if (UsingThemedIntro)
@@ -183,7 +186,6 @@ namespace osu.Game.Screens.Menu
             {
                 beatmap.Value = initialBeatmap;
                 Track = initialBeatmap.Track;
-                UsingThemedIntro = !initialBeatmap.Track.IsDummyDevice;
 
                 // ensure the track starts at maximum volume
                 musicController.CurrentTrack.FinishTransforms();

@@ -6,6 +6,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -45,7 +46,11 @@ namespace osu.Game.Graphics.UserInterface
                 },
             };
 
-            Current.ValueChanged += filled => fill.FadeTo(filled.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            Current.ValueChanged += filled =>
+            {
+                fill.FadeTo(filled.NewValue ? 1 : 0, 200, Easing.OutQuint);
+                this.TransformTo(nameof(BorderThickness), filled.NewValue ? 8.5f : border_width, 200, Easing.OutQuint);
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -57,16 +62,11 @@ namespace osu.Game.Graphics.UserInterface
 
             EdgeEffect = new EdgeEffectParameters
             {
-                Colour = GlowColour,
+                Colour = GlowColour.Opacity(0),
                 Type = EdgeEffectType.Glow,
                 Radius = 10,
                 Roundness = 8,
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            FadeEdgeEffectTo(0);
         }
 
         private bool glowing;
@@ -153,7 +153,7 @@ namespace osu.Game.Graphics.UserInterface
                 glowColour = value;
 
                 var effect = EdgeEffect;
-                effect.Colour = value;
+                effect.Colour = Glowing ? value : value.Opacity(0);
                 EdgeEffect = effect;
             }
         }

@@ -22,6 +22,9 @@ namespace osu.Game.Overlays.Settings
         private readonly Box selectionIndicator;
         private readonly Container text;
 
+        // always consider as part of flow, even when not visible (for the sake of the initial animation).
+        public override bool IsPresent => true;
+
         private SettingsSection section;
 
         public SettingsSection Section

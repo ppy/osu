@@ -40,6 +40,8 @@ namespace osu.Game.Screens.Ranking
 
         protected ScorePanelList ScorePanelList { get; private set; }
 
+        protected VerticalScrollContainer VerticalScrollContent { get; private set; }
+
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
 
@@ -50,8 +52,7 @@ namespace osu.Game.Screens.Ranking
         private Drawable bottomPanel;
         private Container<ScorePanel> detachedPanelContainer;
 
-        private bool fetchedInitialScores;
-        private APIRequest nextPageRequest;
+        private bool lastFetchCompleted;
 
         private readonly bool allowRetry;
         private readonly bool allowWatchingReplay;
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     new Drawable[]
                     {
-                        new VerticalScrollContainer
+                        VerticalScrollContent = new VerticalScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             ScrollbarVisible = false,
@@ -189,8 +190,10 @@ namespace osu.Game.Screens.Ranking
         {
             base.Update();
 
-            if (fetchedInitialScores && nextPageRequest == null)
+            if (lastFetchCompleted)
             {
+                APIRequest nextPageRequest = null;
+
                 if (ScorePanelList.IsScrolledToStart)
                     nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
                 else if (ScorePanelList.IsScrolledToEnd)
@@ -198,10 +201,7 @@ namespace osu.Game.Screens.Ranking
 
                 if (nextPageRequest != null)
                 {
-                    // Scheduled after children to give the list a chance to update its scroll position and not potentially trigger a second request too early.
-                    nextPageRequest.Success += () => ScheduleAfterChildren(() => nextPageRequest = null);
-                    nextPageRequest.Failure += _ => ScheduleAfterChildren(() => nextPageRequest = null);
-
+                    lastFetchCompleted = false;
                     api.Queue(nextPageRequest);
                 }
             }
@@ -227,7 +227,7 @@ namespace osu.Game.Screens.Ranking
             foreach (var s in scores)
                 addScore(s);
 
-            fetchedInitialScores = true;
+            lastFetchCompleted = true;
         });
 
         public override void OnEntering(IScreen last)
@@ -343,7 +343,7 @@ namespace osu.Game.Screens.Ranking
         {
         }
 
-        private class VerticalScrollContainer : OsuScrollContainer
+        protected class VerticalScrollContainer : OsuScrollContainer
         {
             protected override Container<Drawable> Content => content;
 
@@ -351,6 +351,8 @@ namespace osu.Game.Screens.Ranking
 
             public VerticalScrollContainer()
             {
+                Masking = false;
+
                 base.Content.Add(content = new Container { RelativeSizeAxes = Axes.X });
             }
 

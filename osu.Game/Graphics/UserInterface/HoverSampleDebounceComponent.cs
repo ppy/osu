@@ -15,11 +15,6 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public abstract class HoverSampleDebounceComponent : CompositeDrawable
     {
-        /// <summary>
-        /// Length of debounce for hover sound playback, in milliseconds.
-        /// </summary>
-        public double HoverDebounceTime { get; } = 20;
-
         private Bindable<double?> lastPlaybackTime;
 
         [BackgroundDependencyLoader]
@@ -34,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
             if (e.HasAnyButtonPressed)
                 return false;
 
-            bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= HoverDebounceTime;
+            bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
 
             if (enoughTimePassedSinceLastPlayback)
             {

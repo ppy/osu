@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 Add(importBeatmapsButton = new SettingsButton
                 {
-                    Text = "Import beatmaps from stable",
+                    Text = MaintenanceSettingsStrings.ImportBeatmapsFromStable,
                     Action = () =>
                     {
                         importBeatmapsButton.Enabled.Value = false;
@@ -48,7 +49,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Add(deleteBeatmapsButton = new DangerousSettingsButton
             {
-                Text = "Delete ALL beatmaps",
+                Text = MaintenanceSettingsStrings.DeleteAllBeatmaps,
                 Action = () =>
                 {
                     dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 Add(importScoresButton = new SettingsButton
                 {
-                    Text = "Import scores from stable",
+                    Text = MaintenanceSettingsStrings.ImportScoresFromStable,
                     Action = () =>
                     {
                         importScoresButton.Enabled.Value = false;
@@ -74,7 +75,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Add(deleteScoresButton = new DangerousSettingsButton
             {
-                Text = "Delete ALL scores",
+                Text = MaintenanceSettingsStrings.DeleteAllScores,
                 Action = () =>
                 {
                     dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
@@ -89,7 +90,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 Add(importSkinsButton = new SettingsButton
                 {
-                    Text = "Import skins from stable",
+                    Text = MaintenanceSettingsStrings.ImportSkinsFromStable,
                     Action = () =>
                     {
                         importSkinsButton.Enabled.Value = false;
@@ -100,7 +101,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Add(deleteSkinsButton = new DangerousSettingsButton
             {
-                Text = "Delete ALL skins",
+                Text = MaintenanceSettingsStrings.DeleteAllSkins,
                 Action = () =>
                 {
                     dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
@@ -117,7 +118,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 {
                     Add(importCollectionsButton = new SettingsButton
                     {
-                        Text = "Import collections from stable",
+                        Text = MaintenanceSettingsStrings.ImportCollectionsFromStable,
                         Action = () =>
                         {
                             importCollectionsButton.Enabled.Value = false;
@@ -128,7 +129,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
                 Add(new DangerousSettingsButton
                 {
-                    Text = "Delete ALL collections",
+                    Text = MaintenanceSettingsStrings.DeleteAllCollections,
                     Action = () =>
                     {
                         dialogOverlay?.Push(new DeleteAllBeatmapsDialog(collectionManager.DeleteAll));
@@ -140,7 +141,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 restoreButton = new SettingsButton
                 {
-                    Text = "Restore all hidden difficulties",
+                    Text = MaintenanceSettingsStrings.RestoreAllHiddenDifficulties,
                     Action = () =>
                     {
                         restoreButton.Enabled.Value = false;
@@ -153,7 +154,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 },
                 undeleteButton = new SettingsButton
                 {
-                    Text = "Restore all recently deleted beatmaps",
+                    Text = MaintenanceSettingsStrings.RestoreAllRecentlyDeletedBeatmaps,
                     Action = () =>
                     {
                         undeleteButton.Enabled.Value = false;

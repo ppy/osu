@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
@@ -27,8 +26,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class TaikoPlayfield : ScrollingPlayfield
     {
-        private readonly ControlPointInfo controlPoints;
-
         /// <summary>
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
         /// </summary>
@@ -55,11 +52,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         private BarLinePlayfield barLinePlayfield;
 
         private Container hitTargetOffsetContent;
-
-        public TaikoPlayfield(ControlPointInfo controlPoints)
-        {
-            this.controlPoints = controlPoints;
-        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -131,7 +123,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Children = new Drawable[]
                     {
                         new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundLeft), _ => new PlayfieldBackgroundLeft()),
-                        new InputDrum(controlPoints)
+                        new InputDrum(HitObjectContainer)
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
