@@ -355,6 +355,12 @@ namespace osu.Game.Overlays.Volume
             return base.OnMouseMove(e);
         }
 
+        protected override bool OnHover(HoverEvent e)
+        {
+            State = SelectionState.Selected;
+            return false;
+        }
+
         protected override void OnHoverLost(HoverLostEvent e)
         {
         }
