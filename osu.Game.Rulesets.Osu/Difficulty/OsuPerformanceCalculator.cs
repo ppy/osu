@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
 
-            double rawFlashlight = Attributes.FlashlightStrain;
+            double rawFlashlight = Attributes.FlashlightRating;
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawFlashlight = Math.Pow(rawFlashlight, 0.8);
