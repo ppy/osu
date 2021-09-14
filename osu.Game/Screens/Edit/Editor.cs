@@ -317,6 +317,16 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public void UpdateClockSource() => clock.ChangeSource(Beatmap.Value.Track);
 
+        /// <summary>
+        /// Restore the editor to a provided state.
+        /// </summary>
+        /// <param name="state">The state to restore.</param>
+        public void RestoreState([NotNull] EditorState state) => Schedule(() =>
+        {
+            clock.Seek(state.Time);
+            clipboard.Value = state.ClipboardContent;
+        });
+
         protected void Save()
         {
             // no longer new after first user-triggered save.
@@ -476,8 +486,6 @@ namespace osu.Game.Screens.Edit
             });
 
             resetTrack(true);
-            if (loader?.State != null)
-                restoreState(loader.State);
         }
 
         public override bool OnExiting(IScreen next)
@@ -745,16 +753,8 @@ namespace osu.Game.Screens.Edit
         protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
         {
             Time = clock.CurrentTimeAccurate,
-            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? clipboard.Value : null
+            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? clipboard.Value : string.Empty
         });
-
-        private void restoreState([NotNull] EditorState state)
-        {
-            if (state.Time != null)
-                clock.Seek(state.Time.Value);
-
-            clipboard.Value = state.ClipboardContent ?? clipboard.Value;
-        }
 
         private void cancelExit() => loader?.CancelPendingDifficultySwitch();
 

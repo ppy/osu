@@ -91,7 +91,13 @@ namespace osu.Game.Screens.Edit
 
         private void pushEditor()
         {
-            this.Push(CreateEditor());
+            var editor = CreateEditor();
+
+            this.Push(editor);
+
+            if (state != null)
+                editor.RestoreState(state);
+
             ValidForResume = false;
         }
 
