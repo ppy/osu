@@ -15,8 +15,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Replays.Legacy;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
@@ -46,14 +44,7 @@ namespace osu.Game.Online.Spectator
         private readonly BindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
 
         private IBeatmap? currentBeatmap;
-
         private Score? currentScore;
-
-        [Resolved]
-        private IBindable<RulesetInfo> currentRuleset { get; set; } = null!;
-
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> currentMods { get; set; } = null!;
 
         private readonly SpectatorState currentState = new SpectatorState();
 
