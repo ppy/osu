@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
@@ -19,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private Container directionContainer;
-        private Sprite noteSprite;
+        private Drawable noteAnimation;
 
         private float? minimumColumnWidth;
 
@@ -39,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 Origin = Anchor.BottomCentre,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = noteSprite = new Sprite { Texture = GetTexture(skin) }
+                Child = noteAnimation = GetAnimation(skin)
             };
 
             direction.BindTo(scrollingInfo.Direction);
@@ -50,12 +52,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             base.Update();
 
-            if (noteSprite.Texture != null)
+            Texture texture = null;
+
+            if (noteAnimation is Sprite sprite)
+                texture = sprite.Texture;
+            else if (noteAnimation is TextureAnimation textureAnimation)
+                texture = textureAnimation.CurrentFrame;
+
+            if (texture != null)
             {
                 // The height is scaled to the minimum column width, if provided.
                 float minimumWidth = minimumColumnWidth ?? DrawWidth;
-
-                noteSprite.Scale = Vector2.Divide(new Vector2(DrawWidth, minimumWidth), noteSprite.Texture.DisplayWidth);
+                noteAnimation.Scale = Vector2.Divide(new Vector2(DrawWidth, minimumWidth), texture.DisplayWidth);
             }
         }
 
@@ -73,9 +81,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             }
         }
 
-        protected virtual Texture GetTexture(ISkinSource skin) => GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.NoteImage);
+        [CanBeNull]
+        protected virtual Drawable GetAnimation(ISkinSource skin) => GetAnimationFromLookup(skin, LegacyManiaSkinConfigurationLookups.NoteImage);
 
-        protected Texture GetTextureFromLookup(ISkin skin, LegacyManiaSkinConfigurationLookups lookup)
+        [CanBeNull]
+        protected Drawable GetAnimationFromLookup(ISkin skin, LegacyManiaSkinConfigurationLookups lookup)
         {
             string suffix = string.Empty;
 
@@ -93,7 +103,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             string noteImage = GetColumnSkinConfig<string>(skin, lookup)?.Value
                                ?? $"mania-note{FallbackColumnIndex}{suffix}";
 
-            return skin.GetTexture(noteImage, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
+            return skin.GetAnimation(noteImage, WrapMode.ClampToEdge, WrapMode.ClampToEdge, true, true);
         }
     }
 }
