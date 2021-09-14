@@ -195,8 +195,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Padding = new MarginPadding(10);
-
                 Child = new FillFlowContainer
                 {
                     Margin = new MarginPadding(10),
