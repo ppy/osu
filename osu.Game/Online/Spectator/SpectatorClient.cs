@@ -153,9 +153,9 @@ namespace osu.Game.Online.Spectator
             IsPlaying = true;
 
             // transfer state at point of beginning play
-            currentState.BeatmapID = beatmap.BeatmapInfo.OnlineBeatmapID;
-            currentState.RulesetID = currentRuleset.Value.ID;
-            currentState.Mods = currentMods.Value.Select(m => new APIMod(m));
+            currentState.BeatmapID = score.ScoreInfo.Beatmap.OnlineBeatmapID;
+            currentState.RulesetID = score.ScoreInfo.RulesetID;
+            currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
 
             currentBeatmap = beatmap.PlayableBeatmap;
             currentScore = score;
