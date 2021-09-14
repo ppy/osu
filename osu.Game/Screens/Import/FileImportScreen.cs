@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Import
     {
         public override bool HideOverlaysOnEnter => true;
 
-        public override bool AllowTrackAdjustments => false;
+        public override bool? AllowTrackAdjustments => false;
 
         private OsuFileSelector fileSelector;
         private Container contentContainer;

@@ -1075,8 +1075,6 @@ namespace osu.Game
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
                 API.Activity.BindTo(newOsuScreen.Activity);
 
-                MusicController.AllowTrackAdjustments = newOsuScreen.AllowTrackAdjustments;
-
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
                 else
@@ -1093,6 +1091,24 @@ namespace osu.Game
         {
             ScreenChanged(lastScreen, newScreen);
             Logger.Log($"Screen changed → {newScreen}");
+
+            // set AllowTrackAdjustments if new screen defines it, inherit otherwise
+            if (newScreen is IOsuScreen newOsuScreen && newOsuScreen.AllowTrackAdjustments.HasValue)
+            {
+                allowTrackAdjustmentsStack.Push(newOsuScreen.AllowTrackAdjustments.Value);
+                Logger.Log($"Screen's AllowTrackAdjustments explicit → {allowTrackAdjustmentsStack.First()}");
+            }
+            else if (allowTrackAdjustmentsStack.Any())
+            {
+                allowTrackAdjustmentsStack.Push(allowTrackAdjustmentsStack.First());
+                Logger.Log($"Screen's AllowTrackAdjustments inherit → {allowTrackAdjustmentsStack.First()}");
+            }
+            else
+            {
+                allowTrackAdjustmentsStack.Push(false);
+            }
+
+            MusicController.AllowTrackAdjustments = allowTrackAdjustmentsStack.First();
         }
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
@@ -1102,7 +1118,16 @@ namespace osu.Game
 
             if (newScreen == null)
                 Exit();
+
+            if (allowTrackAdjustmentsStack.Count > 1)
+            {
+                allowTrackAdjustmentsStack.Pop();
+                MusicController.AllowTrackAdjustments = allowTrackAdjustmentsStack.First();
+                Logger.Log($"Screen's AllowTrackAdjustments return ← {allowTrackAdjustmentsStack.First()}");
+            }
         }
+
+        private Stack<bool> allowTrackAdjustmentsStack = new Stack<bool>();
 
         IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
     }
