@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 if (Item.DifficultyControlPoint != null && Item is IHasDistance)
                 {
-                    AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(Item.DifficultyControlPoint)
+                    AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(Item)
                     {
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.BottomCentre
