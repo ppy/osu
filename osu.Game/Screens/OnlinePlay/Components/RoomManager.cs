@@ -87,10 +87,10 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             currentJoinRoomRequest.Failure += exception =>
             {
-                // provide error output if the operation wasn't canceled and the error doesn't stem from an invalid password
-                if (!(exception is OperationCanceledException) && !((APIException)exception).Message.Equals("Invalid room password", StringComparison.Ordinal))
-                    Logger.Log($"Failed to join room: {exception}", level: LogLevel.Important);
-                onError?.Invoke(exception.ToString());
+                if (exception is OperationCanceledException)
+                    return;
+
+                onError?.Invoke(exception.Message);
             };
 
             api.Queue(currentJoinRoomRequest);
