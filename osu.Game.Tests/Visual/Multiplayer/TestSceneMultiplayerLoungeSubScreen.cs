@@ -53,6 +53,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestPopoverHidesOnBackButton()
+        {
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
+            AddStep("select room", () => InputManager.Key(Key.Down));
+            AddStep("attempt join room", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("password prompt appeared", () => InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().Any());
+
+            AddAssert("textbox has focus", () => InputManager.FocusedDrawable is OsuPasswordTextBox);
+
+            AddStep("hit escape", () => InputManager.Key(Key.Escape));
+            AddAssert("textbox lost focus", () => InputManager.FocusedDrawable is SearchTextBox);
+
+            AddStep("hit escape", () => InputManager.Key(Key.Escape));
+            AddUntilStep("password prompt hidden", () => !InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().Any());
+        }
+
+        [Test]
         public void TestPopoverHidesOnLeavingScreen()
         {
             AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
