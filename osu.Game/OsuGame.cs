@@ -1127,7 +1127,7 @@ namespace osu.Game
             }
         }
 
-        private Stack<bool> allowTrackAdjustmentsStack = new Stack<bool>();
+        private readonly Stack<bool> allowTrackAdjustmentsStack = new Stack<bool>();
 
         IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
     }
