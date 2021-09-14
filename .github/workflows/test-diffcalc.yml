@@ -120,8 +120,9 @@ jobs:
           mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} -e "CREATE DATABASE osu_master"
           mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} -e "CREATE DATABASE osu_pr"
 
-          cat *.sql | mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} --database=osu_master
-          cat *.sql | mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} --database=osu_pr
+          echo "Importing SQL..."
+          { pv -f *.sql | mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} --database=osu_master; } 2>&1 | stdbuf -oL tr '\r' '\n'
+          { pv -f *.sql | mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} --database=osu_pr; } 2>&1 | stdbuf -oL tr '\r' '\n'
 
       # Run diffcalc
       - name: Run diffcalc (master)
