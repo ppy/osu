@@ -25,9 +25,45 @@ namespace osu.Game.Users
             public override string Status => "Choosing a beatmap";
         }
 
-        public class MultiplayerGame : UserActivity
+        public abstract class InGame : UserActivity
         {
-            public override string Status => "Playing with others";
+            public BeatmapInfo Beatmap { get; }
+
+            public RulesetInfo Ruleset { get; }
+
+            protected InGame(BeatmapInfo info, RulesetInfo ruleset)
+            {
+                Beatmap = info;
+                Ruleset = ruleset;
+            }
+
+            public override string Status => Ruleset.CreateInstance().PlayingVerb;
+        }
+
+        public class InMultiplayerGame : InGame
+        {
+            public InMultiplayerGame(BeatmapInfo beatmap, RulesetInfo ruleset)
+                : base(beatmap, ruleset)
+            {
+            }
+
+            public override string Status => $@"{base.Status} with others";
+        }
+
+        public class InPlaylistGame : InGame
+        {
+            public InPlaylistGame(BeatmapInfo beatmap, RulesetInfo ruleset)
+                : base(beatmap, ruleset)
+            {
+            }
+        }
+
+        public class InSoloGame : InGame
+        {
+            public InSoloGame(BeatmapInfo info, RulesetInfo ruleset)
+                : base(info, ruleset)
+            {
+            }
         }
 
         public class Editing : UserActivity
@@ -42,21 +78,6 @@ namespace osu.Game.Users
             public override string Status => @"Editing a beatmap";
         }
 
-        public class SoloGame : UserActivity
-        {
-            public BeatmapInfo Beatmap { get; }
-
-            public RulesetInfo Ruleset { get; }
-
-            public SoloGame(BeatmapInfo info, RulesetInfo ruleset)
-            {
-                Beatmap = info;
-                Ruleset = ruleset;
-            }
-
-            public override string Status => Ruleset.CreateInstance().PlayingVerb;
-        }
-
         public class Spectating : UserActivity
         {
             public override string Status => @"Spectating a game";
@@ -69,7 +90,7 @@ namespace osu.Game.Users
 
         public class InLobby : UserActivity
         {
-            public override string Status => @"In a multiplayer lobby";
+            public override string Status => @"In a lobby";
 
             public readonly Room Room;
 

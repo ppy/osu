@@ -10,39 +10,44 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public class MatchChatDisplay : StandAloneChatDisplay
     {
-        [Resolved(typeof(Room), nameof(Room.RoomID))]
-        private Bindable<long?> roomId { get; set; }
-
-        [Resolved(typeof(Room), nameof(Room.ChannelId))]
-        private Bindable<int> channelId { get; set; }
+        private readonly IBindable<int> channelId = new Bindable<int>();
 
         [Resolved(CanBeNull = true)]
         private ChannelManager channelManager { get; set; }
 
-        public MatchChatDisplay()
+        private readonly Room room;
+        private readonly bool leaveChannelOnDispose;
+
+        public MatchChatDisplay(Room room, bool leaveChannelOnDispose = true)
             : base(true)
         {
+            this.room = room;
+            this.leaveChannelOnDispose = leaveChannelOnDispose;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            // Required for the time being since this component is created prior to the room being joined.
+            channelId.BindTo(room.ChannelId);
             channelId.BindValueChanged(_ => updateChannel(), true);
         }
 
         private void updateChannel()
         {
-            if (roomId.Value == null || channelId.Value == 0)
+            if (room.RoomID.Value == null || channelId.Value == 0)
                 return;
 
-            Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId.Value, Type = ChannelType.Multiplayer, Name = $"#lazermp_{roomId.Value}" });
+            Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId.Value, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID.Value}" });
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            channelManager?.LeaveChannel(Channel.Value);
+
+            if (leaveChannelOnDispose)
+                channelManager?.LeaveChannel(Channel.Value);
         }
     }
 }

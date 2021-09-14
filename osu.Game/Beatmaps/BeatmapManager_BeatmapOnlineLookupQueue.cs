@@ -153,6 +153,11 @@ namespace osu.Game.Beatmaps
                 if (!storage.Exists(cache_database_name))
                     return false;
 
+                if (string.IsNullOrEmpty(beatmap.MD5Hash)
+                    && string.IsNullOrEmpty(beatmap.Path)
+                    && beatmap.OnlineBeatmapID == null)
+                    return false;
+
                 try
                 {
                     using (var db = new SqliteConnection(storage.GetDatabaseConnectionString("online")))

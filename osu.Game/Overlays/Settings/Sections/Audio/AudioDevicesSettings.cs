@@ -8,28 +8,38 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class AudioDevicesSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Devices";
+        protected override LocalisableString Header => AudioSettingsStrings.AudioDevicesHeader;
 
         [Resolved]
         private AudioManager audio { get; set; }
 
         private SettingsDropdown<string> dropdown;
 
-        protected override void Dispose(bool isDisposing)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.Dispose(isDisposing);
-
-            if (audio != null)
+            Children = new Drawable[]
             {
-                audio.OnNewDevice -= onDeviceChanged;
-                audio.OnLostDevice -= onDeviceChanged;
-            }
+                dropdown = new AudioDeviceSettingsDropdown
+                {
+                    Keywords = new[] { "speaker", "headphone", "output" }
+                }
+            };
+
+            updateItems();
+
+            audio.OnNewDevice += onDeviceChanged;
+            audio.OnLostDevice += onDeviceChanged;
+            dropdown.Current = audio.AudioDevice;
         }
+
+        private void onDeviceChanged(string name) => updateItems();
 
         private void updateItems()
         {
@@ -49,26 +59,15 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             dropdown.Items = deviceItems.Distinct().ToList();
         }
 
-        private void onDeviceChanged(string name) => updateItems();
-
-        protected override void LoadComplete()
+        protected override void Dispose(bool isDisposing)
         {
-            base.LoadComplete();
+            base.Dispose(isDisposing);
 
-            Children = new Drawable[]
+            if (audio != null)
             {
-                dropdown = new AudioDeviceSettingsDropdown
-                {
-                    Keywords = new[] { "speaker", "headphone", "output" }
-                }
-            };
-
-            updateItems();
-
-            dropdown.Current = audio.AudioDevice;
-
-            audio.OnNewDevice += onDeviceChanged;
-            audio.OnLostDevice += onDeviceChanged;
+                audio.OnNewDevice -= onDeviceChanged;
+                audio.OnLostDevice -= onDeviceChanged;
+            }
         }
 
         private class AudioDeviceSettingsDropdown : SettingsDropdown<string>
@@ -78,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             private class AudioDeviceDropdownControl : DropdownControl
             {
                 protected override LocalisableString GenerateItemText(string item)
-                    => string.IsNullOrEmpty(item) ? "Default" : base.GenerateItemText(item);
+                    => string.IsNullOrEmpty(item) ? CommonStrings.Default : base.GenerateItemText(item);
             }
         }
     }

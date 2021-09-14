@@ -158,8 +158,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             var mania = new ManiaRuleset();
 
             testModsWithSameBaseType(
-                mania.GetAllMods().Single(m => m.GetType() == typeof(ManiaModFadeIn)),
-                mania.GetAllMods().Single(m => m.GetType() == typeof(ManiaModHidden)));
+                mania.CreateMod<ManiaModFadeIn>(),
+                mania.CreateMod<ManiaModHidden>());
         }
 
         [Test]
@@ -422,7 +422,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class TestModSelectOverlay : LocalPlayerModSelectOverlay
+        private class TestModSelectOverlay : UserModSelectOverlay
         {
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 

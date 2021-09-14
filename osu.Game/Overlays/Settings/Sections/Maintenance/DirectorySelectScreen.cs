@@ -14,6 +14,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -22,6 +23,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton selectionButton;
 
         private OsuDirectorySelector directorySelector;
+
+        public override bool AllowTrackAdjustments => false;
 
         /// <summary>
         /// Text to display in the header to inform the user of what they are selecting.
@@ -104,7 +107,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     Origin = Anchor.Centre,
                                     Width = 300,
                                     Margin = new MarginPadding(10),
-                                    Text = "Select directory",
+                                    Text = MaintenanceSettingsStrings.SelectDirectory,
                                     Action = () => OnSelection(directorySelector.CurrentPath.Value)
                                 },
                             }

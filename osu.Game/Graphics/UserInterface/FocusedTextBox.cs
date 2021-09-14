@@ -22,8 +22,13 @@ namespace osu.Game.Graphics.UserInterface
 
         public void TakeFocus()
         {
-            if (allowImmediateFocus) GetContainingInputManager().ChangeFocus(this);
+            if (!allowImmediateFocus)
+                return;
+
+            Scheduler.Add(() => GetContainingInputManager().ChangeFocus(this), false);
         }
+
+        public new void KillFocus() => base.KillFocus();
 
         public bool HoldFocus
         {
@@ -65,7 +70,7 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnKeyDown(e);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(GlobalAction action)
         {
             if (!HasFocus) return false;
 

@@ -24,6 +24,8 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             AddRepeatStep("add some users", () => Client.AddUser(new User { Id = id++ }), 5);
             checkPlayingUserCount(0);
 
+            AddAssert("playlist item is available", () => Client.CurrentMatchPlayingItem.Value != null);
+
             changeState(3, MultiplayerUserState.WaitingForLoad);
             checkPlayingUserCount(3);
 
@@ -41,6 +43,8 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
 
             AddStep("leave room", () => Client.LeaveRoom());
             checkPlayingUserCount(0);
+
+            AddAssert("playlist item is null", () => Client.CurrentMatchPlayingItem.Value == null);
         }
 
         [Test]

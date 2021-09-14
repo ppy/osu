@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -75,6 +76,9 @@ namespace osu.Game.Screens.Edit
 
         private Container<EditorScreen> screenContainer;
 
+        [CanBeNull]
+        private readonly EditorLoader loader;
+
         private EditorScreen currentScreen;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
@@ -100,6 +104,11 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private MusicController music { get; set; }
+
+        public Editor(EditorLoader loader = null)
+        {
+            this.loader = loader;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OsuConfigManager config)
@@ -153,7 +162,7 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.Skin));
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin()));
             dependencies.CacheAs(editorBeatmap);
             changeHandler = new EditorChangeHandler(editorBeatmap);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
@@ -489,7 +498,7 @@ namespace osu.Game.Screens.Edit
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
-                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
+                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave, cancelExit));
                     return true;
                 }
             }
@@ -605,19 +614,14 @@ namespace osu.Game.Screens.Edit
         {
             var lastScreen = currentScreen;
 
-            lastScreen?
-                .ScaleTo(0.98f, 200, Easing.OutQuint)
-                .FadeOut(200, Easing.OutQuint);
+            lastScreen?.Hide();
 
             try
             {
                 if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
                 {
                     screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
-
-                    currentScreen
-                        .ScaleTo(1, 200, Easing.OutQuint)
-                        .FadeIn(200, Easing.OutQuint);
+                    currentScreen.Show();
                     return;
                 }
 
@@ -650,7 +654,10 @@ namespace osu.Game.Screens.Edit
                 LoadComponentAsync(currentScreen, newScreen =>
                 {
                     if (newScreen == currentScreen)
+                    {
                         screenContainer.Add(newScreen);
+                        newScreen.Show();
+                    }
                 });
             }
             finally
@@ -706,9 +713,36 @@ namespace osu.Game.Screens.Edit
                 fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
+
+            var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
+
+            var difficultyItems = new List<MenuItem>();
+
+            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.RulesetID).OrderBy(group => group.Key))
+            {
+                if (difficultyItems.Count > 0)
+                    difficultyItems.Add(new EditorMenuItemSpacer());
+
+                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarDifficulty))
+                    difficultyItems.Add(createDifficultyMenuItem(beatmap));
+            }
+
+            fileMenuItems.Add(new EditorMenuItem("Change difficulty") { Items = difficultyItems });
+
+            fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
             return fileMenuItems;
         }
+
+        private DifficultyMenuItem createDifficultyMenuItem(BeatmapInfo beatmapInfo)
+        {
+            bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmapInfo);
+            return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
+        }
+
+        protected void SwitchToDifficulty(BeatmapInfo beatmapInfo) => loader?.ScheduleDifficultySwitch(beatmapInfo);
+
+        private void cancelExit() => loader?.CancelPendingDifficultySwitch();
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 

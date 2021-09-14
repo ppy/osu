@@ -323,7 +323,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
 
             // The first control point must have a definite type.
-            vertices[0].Type.Value = type;
+            vertices[0].Type = type;
 
             // A path can have multiple implicit segments of the same type if there are two sequential control points with the same position.
             // To handle such cases, this code may return multiple path segments with the final control point in each segment having a non-null type.
@@ -337,7 +337,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             while (++endIndex < vertices.Length - endPointLength)
             {
                 // Keep incrementing while an implicit segment doesn't need to be started
-                if (vertices[endIndex].Position.Value != vertices[endIndex - 1].Position.Value)
+                if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
                     continue;
 
                 // The last control point of each segment is not allowed to start a new implicit segment.
@@ -345,7 +345,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     continue;
 
                 // Force a type on the last point, and return the current control point set as a segment.
-                vertices[endIndex - 1].Type.Value = type;
+                vertices[endIndex - 1].Type = type;
                 yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
 
                 // Skip the current control point - as it's the same as the one that's just been returned.
@@ -360,11 +360,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 string[] vertexSplit = value.Split(':');
 
                 Vector2 pos = new Vector2((int)Parsing.ParseDouble(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE)) - startPos;
-                point = new PathControlPoint { Position = { Value = pos } };
+                point = new PathControlPoint { Position = pos };
             }
 
-            static bool isLinear(PathControlPoint[] p) => Precision.AlmostEquals(0, (p[1].Position.Value.Y - p[0].Position.Value.Y) * (p[2].Position.Value.X - p[0].Position.Value.X)
-                                                                                    - (p[1].Position.Value.X - p[0].Position.Value.X) * (p[2].Position.Value.Y - p[0].Position.Value.Y));
+            static bool isLinear(PathControlPoint[] p) => Precision.AlmostEquals(0, (p[1].Position.Y - p[0].Position.Y) * (p[2].Position.X - p[0].Position.X)
+                                                                                    - (p[1].Position.X - p[0].Position.X) * (p[2].Position.Y - p[0].Position.Y));
         }
 
         private PathControlPoint[] mergePointsLists(List<Memory<PathControlPoint>> controlPointList)

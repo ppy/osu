@@ -128,7 +128,7 @@ namespace osu.Game.Beatmaps
                 return storyboard;
             }
 
-            protected override ISkin GetSkin()
+            protected internal override ISkin GetSkin()
             {
                 try
                 {

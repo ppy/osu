@@ -10,6 +10,7 @@ using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
@@ -64,7 +65,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         [BackgroundDependencyLoader]
         private void load()
         {
-            Text = "Reset all bindings in section";
+            Text = InputSettingsStrings.ResetSectionButton;
             RelativeSizeAxes = Axes.X;
             Width = 0.5f;
             Anchor = Anchor.TopCentre;
