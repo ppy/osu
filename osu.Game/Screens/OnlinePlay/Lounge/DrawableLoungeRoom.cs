@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -238,7 +239,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 passwordTextbox.Text = string.Empty;
 
                 errorText.Text = error;
-                errorText.FadeOutFromOne(1000, Easing.In);
+                errorText
+                    .FadeIn()
+                    .FlashColour(Color4.White, 200)
+                    .Delay(1000)
+                    .FadeOutFromOne(1000, Easing.In);
+
+                Body.Shake();
             }
 
             protected override void LoadComplete()
