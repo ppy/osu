@@ -39,7 +39,7 @@ namespace osu.Game.Extensions
         }
 
         /// <summary>
-        /// Shake the contents of this container.
+        /// Shakes this drawable.
         /// </summary>
         /// <param name="target">The target to shake.</param>
         /// <param name="shakeDuration">The length of a single shake.</param>
