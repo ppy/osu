@@ -6,19 +6,18 @@
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
-    /// Structure used to transport data between <see cref="Editor"/> instances on difficulty change.
-    /// It's intended to be received by <see cref="EditorLoader"/> from one editor instance and passed down to the next one.
+    /// Structure used to convey the general state of an <see cref="Editor"/> instance.
     /// </summary>
     public class EditorState
     {
         /// <summary>
-        /// The current clock time when a difficulty switch was requested.
+        /// The current audio time.
         /// </summary>
-        public double? Time { get; set; }
+        public double Time { get; set; }
 
         /// <summary>
-        /// The current editor clipboard content at the time when a difficulty switch was requested.
+        /// The editor clipboard content.
         /// </summary>
-        public string? ClipboardContent { get; set; }
+        public string ClipboardContent { get; set; } = string.Empty;
     }
 }
