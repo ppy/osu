@@ -418,6 +418,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
             AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroTriangles);
+            AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
             AddUntilStep("Wait for game exit", () => Game.ScreenStack.CurrentScreen == null);
             AddStep("test dispose doesn't crash", () => Game.Dispose());
         }
