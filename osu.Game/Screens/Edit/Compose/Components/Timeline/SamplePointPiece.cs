@@ -12,23 +12,24 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Timing;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class SamplePointPiece : HitObjectPointPiece, IHasPopover
     {
-        private readonly SampleControlPoint samplePoint;
+        private readonly HitObject hitObject;
 
         private readonly Bindable<string> bank;
         private readonly BindableNumber<int> volume;
 
-        public SamplePointPiece(SampleControlPoint samplePoint)
-            : base(samplePoint)
+        public SamplePointPiece(HitObject hitObject)
+            : base(hitObject.SampleControlPoint)
         {
-            this.samplePoint = samplePoint;
-            volume = samplePoint.SampleVolumeBindable.GetBoundCopy();
-            bank = samplePoint.SampleBankBindable.GetBoundCopy();
+            this.hitObject = hitObject;
+            volume = hitObject.SampleControlPoint.SampleVolumeBindable.GetBoundCopy();
+            bank = hitObject.SampleControlPoint.SampleBankBindable.GetBoundCopy();
         }
 
         [BackgroundDependencyLoader]
@@ -49,21 +50,23 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Label.Text = $"{bank.Value} {volume.Value}";
         }
 
-        public Popover GetPopover() => new SampleEditPopover(samplePoint);
+        public Popover GetPopover() => new SampleEditPopover(hitObject);
 
         public class SampleEditPopover : OsuPopover
         {
+            private readonly HitObject hitObject;
             private readonly SampleControlPoint point;
 
             private LabelledTextBox bank;
             private SliderWithTextBoxInput<int> volume;
 
             [Resolved(canBeNull: true)]
-            protected IEditorChangeHandler ChangeHandler { get; private set; }
+            private EditorBeatmap beatmap { get; set; }
 
-            public SampleEditPopover(SampleControlPoint point)
+            public SampleEditPopover(HitObject hitObject)
             {
-                this.point = point;
+                this.hitObject = hitObject;
+                point = hitObject.SampleControlPoint;
             }
 
             [BackgroundDependencyLoader]
@@ -91,10 +94,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 };
 
                 bank.Current = point.SampleBankBindable;
-                bank.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+                bank.Current.BindValueChanged(_ => beatmap.Update(hitObject));
 
                 volume.Current = point.SampleVolumeBindable;
-                volume.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+                volume.Current.BindValueChanged(_ => beatmap.Update(hitObject));
             }
         }
     }
