@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Screens;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Menus
@@ -79,5 +80,55 @@ namespace osu.Game.Tests.Visual.Menus
                 trackChangeQueue.Count == 1 &&
                 trackChangeQueue.Dequeue().changeDirection == TrackChangeDirection.Next);
         }
+
+        [Test]
+        public void TestAllowTrackAdjustments()
+        {
+            AddStep("push allowing screen", () => Game.ScreenStack.Push(new AllowScreen()));
+            AddAssert("allows adjustments", () => Game.MusicController.AllowTrackAdjustments);
+
+            AddStep("push inheriting screen", () => Game.ScreenStack.Push(new InheritScreen()));
+            AddAssert("allows adjustments", () => Game.MusicController.AllowTrackAdjustments);
+
+            AddStep("push disallowing screen", () => Game.ScreenStack.Push(new DisallowScreen()));
+            AddAssert("disallows adjustments", () => !Game.MusicController.AllowTrackAdjustments);
+
+            AddStep("push inheriting screen", () => Game.ScreenStack.Push(new InheritScreen()));
+            AddAssert("disallows adjustments", () => !Game.MusicController.AllowTrackAdjustments);
+
+            AddStep("push inheriting screen", () => Game.ScreenStack.Push(new InheritScreen()));
+            AddAssert("disallows adjustments", () => !Game.MusicController.AllowTrackAdjustments);
+
+            AddStep("push allowing screen", () => Game.ScreenStack.Push(new AllowScreen()));
+            AddAssert("allows adjustments", () => Game.MusicController.AllowTrackAdjustments);
+
+            // Now start exiting from screens
+            AddStep("exit screen", () => Game.ScreenStack.Exit());
+            AddAssert("disallows adjustments", () => !Game.MusicController.AllowTrackAdjustments);
+
+            AddStep("exit screen", () => Game.ScreenStack.Exit());
+            AddAssert("disallows adjustments", () => !Game.MusicController.AllowTrackAdjustments);
+
+            AddStep("exit screen", () => Game.ScreenStack.Exit());
+            AddAssert("disallows adjustments", () => !Game.MusicController.AllowTrackAdjustments);
+
+            AddStep("exit screen", () => Game.ScreenStack.Exit());
+            AddAssert("allows adjustments", () => Game.MusicController.AllowTrackAdjustments);
+
+            AddStep("exit screen", () => Game.ScreenStack.Exit());
+            AddAssert("allows adjustments", () => Game.MusicController.AllowTrackAdjustments);
+        }
+
+        private class AllowScreen : OsuScreen
+        {
+            public override bool? AllowTrackAdjustments => true;
+        }
+
+        private class DisallowScreen : OsuScreen
+        {
+            public override bool? AllowTrackAdjustments => false;
+        }
+
+        private class InheritScreen : OsuScreen { }
     }
 }
