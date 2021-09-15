@@ -5,6 +5,8 @@ using System;
 using osu.Game.Database;
 using Realms;
 
+#nullable enable
+
 namespace osu.Game.Configuration
 {
     [MapTo(@"RulesetSetting")]
@@ -16,12 +18,13 @@ namespace osu.Game.Configuration
         [Indexed]
         public int RulesetID { get; set; }
 
-        public int? Variant { get; set; }
+        [Indexed]
+        public int Variant { get; set; }
 
-        public string Key { get; set; }
+        public string Key { get; set; } = string.Empty;
 
         [MapTo(nameof(Value))]
-        public string ValueString { get; set; }
+        public string ValueString { get; set; } = string.Empty;
 
         public object Value
         {
