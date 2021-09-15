@@ -450,25 +450,7 @@ namespace osu.Game
             using (var db = contextFactory.GetForWrite())
             using (var usage = realmFactory.GetForWrite())
             {
-                var existingBindings = db.Context.DatabasedKeyBinding;
-
-                // only migrate data if the realm database is empty.
-                if (!usage.Realm.All<RealmKeyBinding>().Any())
-                {
-                    foreach (var dkb in existingBindings)
-                    {
-                        usage.Realm.Add(new RealmKeyBinding
-                        {
-                            KeyCombinationString = dkb.KeyCombination.ToString(),
-                            ActionInt = (int)dkb.Action,
-                            RulesetID = dkb.RulesetID,
-                            Variant = dkb.Variant
-                        });
-                    }
-                }
-
-                db.Context.RemoveRange(existingBindings);
-
+                // migrate ruleset settings. can be removed 20220315.
                 var existingSettings = db.Context.DatabasedSetting;
 
                 // only migrate data if the realm database is empty.
