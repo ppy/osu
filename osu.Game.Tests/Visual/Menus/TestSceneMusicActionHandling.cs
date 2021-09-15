@@ -4,13 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
-using osu.Game.Screens;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Menus
