@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Configuration.Tracking;
-using osu.Game.Database;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 
@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Mania.Configuration
 {
     public class ManiaRulesetConfigManager : RulesetConfigManager<ManiaRulesetSetting>
     {
-        public ManiaRulesetConfigManager(RealmContextFactory realmFactory, RulesetInfo ruleset, int? variant = null)
-            : base(realmFactory, ruleset, variant)
+        public ManiaRulesetConfigManager(SettingsStore settings, RulesetInfo ruleset, int? variant = null)
+            : base(settings, ruleset, variant)
         {
         }
 
