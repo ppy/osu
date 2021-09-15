@@ -21,17 +21,12 @@ namespace osu.Game.Configuration
         [Indexed]
         public int Variant { get; set; }
 
+        [Required]
         public string Key { get; set; } = string.Empty;
 
-        [MapTo(nameof(Value))]
-        public string ValueString { get; set; } = string.Empty;
+        [Required]
+        public string Value { get; set; } = string.Empty;
 
-        public object Value
-        {
-            get => ValueString;
-            set => ValueString = value.ToString();
-        }
-
-        public override string ToString() => $"{Key}=>{Value}";
+        public override string ToString() => $"{Key} => {Value}";
     }
 }
