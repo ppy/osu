@@ -11,8 +11,11 @@ using Tmds.DBus;
 namespace osu.Desktop.DBus.Tray
 {
     /// <summary>
-    ///     todo: 找到文档并实现所有目前未实现的功能
-    ///     https://github.com/gnustep/libs-dbuskit/blob/master/Bundles/DBusMenu/com.canonical.dbusmenu.xml
+    /// todo: 找到文档并实现所有目前未实现的功能<br/>
+    /// https://github.com/gnustep/libs-dbuskit/blob/master/Bundles/DBusMenu/com.canonical.dbusmenu.xml<br/>
+    /// <br/>
+    /// 似乎dde不支持com.canonical.dbusmenu?<br/>
+    /// https://github.com/linuxdeepin/dtkwidget/issues/85
     /// </summary>
     public class CanonicalTrayService : IDBusMenu
     {
@@ -219,8 +222,13 @@ namespace osu.Desktop.DBus.Tray
 
         public Task<int[]> EventGroupAsync((int, string, object, uint)[] events)
         {
-            Logger.Log($"未实现的方法被调用：EventGroupAsync: {events}");
-            throw new NotImplementedException("未实现的接口");
+            foreach (var obj in events)
+            {
+                EventAsync(obj.Item1, obj.Item2, obj.Item3, obj.Item4);
+            }
+
+            Logger.Log($"未完全实现的方法被调用：EventGroupAsync: {events}");
+            return Task.FromResult(Array.Empty<int>());
         }
 
         public Task<bool> AboutToShowAsync(int id)
@@ -235,7 +243,7 @@ namespace osu.Desktop.DBus.Tray
         public Task<(int[] updatesNeeded, int[] idErrors)> AboutToShowGroupAsync(int[] ids)
         {
             Logger.Log($"未实现的方法被调用：AboutToShowGroupAsync: {ids}");
-            throw new NotImplementedException("未实现的接口");
+            return Task.FromResult((Array.Empty<int>(), Array.Empty<int>()));
         }
 
         public event Action<((int, IDictionary<string, object>)[] updatedProps, (int, string[])[] removedProps)> OnEntriesUpdated;
