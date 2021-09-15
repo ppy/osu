@@ -458,11 +458,13 @@ namespace osu.Game
                 {
                     foreach (var dkb in existingSettings)
                     {
+                        if (dkb.RulesetID == null) continue;
+
                         usage.Realm.Add(new RealmRulesetSetting
                         {
                             ValueString = dkb.StringValue,
                             Key = dkb.Key,
-                            RulesetID = dkb.RulesetID,
+                            RulesetID = dkb.RulesetID.Value,
                             Variant = dkb.Variant
                         });
                     }
