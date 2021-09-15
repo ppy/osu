@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using M.DBus;
+using M.DBus.Services.Notifications;
 using M.DBus.Tray;
 using Newtonsoft.Json;
 using osu.Framework;
@@ -119,13 +120,19 @@ namespace osu.Game.Screens.Mvis.Plugins
         public void AddDBusMenuEntry(SimpleEntry entry)
         {
             if (platformSupportsDBus)
-                dBusManager?.AddEntry(entry);
+                dBusManager?.TrayManager.AddEntry(entry);
         }
 
         public void RemoveDBusMenuEntry(SimpleEntry entry)
         {
             if (platformSupportsDBus)
-                dBusManager?.RemoveEntry(entry);
+                dBusManager?.TrayManager.RemoveEntry(entry);
+        }
+
+        public void PostSystemNotification(SystemNotification notification)
+        {
+            if (platformSupportsDBus)
+                dBusManager?.Notifications.PostAsync(notification);
         }
 
         private bool platformSupportsDBus => RuntimeInfo.OS == RuntimeInfo.Platform.Linux;

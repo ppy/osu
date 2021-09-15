@@ -73,12 +73,11 @@ namespace osu.Game.Configuration
             //DBus集成
             SetDefault(MSetting.DBusIntegration, true);
             SetDefault(MSetting.DBusAllowPost, true);
+            SetDefault(MSetting.EnableTray, true);
+            SetDefault(MSetting.EnableSystemNotifications, true);
 
             //Mpris
             SetDefault(MSetting.MprisUseAvatarlogoAsCover, true);
-
-            //DBus托盘
-            SetDefault(MSetting.EnableTray, true);
         }
 
         public Color4 GetCustomLoaderColor()
@@ -135,7 +134,8 @@ namespace osu.Game.Configuration
         DBusIntegration,
         DBusAllowPost,
         MprisUseAvatarlogoAsCover,
-        EnableTray
+        EnableTray,
+        EnableSystemNotifications
     }
 
     public enum GamemodeActivateCondition

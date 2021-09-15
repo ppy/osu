@@ -156,7 +156,7 @@ namespace osu.Desktop.DBus.Tray
         public Task<(int, IDictionary<string, object>)[]> GetGroupPropertiesAsync(int[] ids, string[] propertyNames)
         {
             //Logger.Log("方法被调用：GetGroupPropertiesAsync: ids:", level: LogLevel.Verbose);
-            foreach (var id in ids) Logger.Log(id.ToString());
+            //foreach (var id in ids) Logger.Log(id.ToString());
 
             try
             {
