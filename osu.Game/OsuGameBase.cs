@@ -469,6 +469,25 @@ namespace osu.Game
 
                 db.Context.RemoveRange(existingBindings);
 
+                var existingSettings = db.Context.DatabasedSetting;
+
+                // only migrate data if the realm database is empty.
+                if (!usage.Realm.All<RealmSetting>().Any())
+                {
+                    foreach (var dkb in existingSettings)
+                    {
+                        usage.Realm.Add(new RealmSetting
+                        {
+                            ValueString = dkb.StringValue,
+                            Key = dkb.Key,
+                            RulesetID = dkb.RulesetID,
+                            Variant = dkb.Variant
+                        });
+                    }
+                }
+
+                db.Context.RemoveRange(existingSettings);
+
                 usage.Commit();
             }
         }
