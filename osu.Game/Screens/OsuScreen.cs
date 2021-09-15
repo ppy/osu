@@ -81,13 +81,7 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
-        private bool? allowTrackAdjustments = null;
-
-        public virtual bool? AllowTrackAdjustments
-        {
-            set => allowTrackAdjustments = value;
-            get => allowTrackAdjustments;
-        }
+        public virtual bool? AllowTrackAdjustments { get; set; }
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
