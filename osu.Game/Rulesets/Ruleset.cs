@@ -5,32 +5,32 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.IO.Stores;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.UI;
 using osu.Game.Beatmaps.Legacy;
-using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Extensions;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
-using osu.Game.Skinning;
-using osu.Game.Users;
-using JetBrains.Annotations;
-using osu.Framework.Extensions;
-using osu.Framework.Extensions.EnumExtensions;
-using osu.Framework.Testing;
-using osu.Game.Extensions;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Filter;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
+using osu.Game.Users;
 
 namespace osu.Game.Rulesets
 {
@@ -262,8 +262,8 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Creates the <see cref="IRulesetConfigManager"/> for this <see cref="Ruleset"/>.
         /// </summary>
-        /// <param name="settings">The <see cref="SettingsStore"/> to store the settings.</param>
-        public virtual IRulesetConfigManager CreateConfig(SettingsStore settings) => null;
+        /// <param name="realmFactory">The <see cref="RealmContextFactory"/> to store the settings.</param>
+        public virtual IRulesetConfigManager CreateConfig(RealmContextFactory realmFactory) => null;
 
         /// <summary>
         /// A unique short name to reference this ruleset in online requests.

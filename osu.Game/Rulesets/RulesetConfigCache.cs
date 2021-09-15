@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Rulesets.Configuration;
 
 namespace osu.Game.Rulesets
@@ -15,12 +15,29 @@ namespace osu.Game.Rulesets
     /// </summary>
     public class RulesetConfigCache : Component
     {
-        private readonly ConcurrentDictionary<int, IRulesetConfigManager> configCache = new ConcurrentDictionary<int, IRulesetConfigManager>();
-        private readonly RealmSettingsStore settingsStore;
+        private readonly RealmContextFactory realmFactory;
+        private readonly RulesetStore rulesets;
 
-        public RulesetConfigCache(RealmSettingsStore settingsStore)
+        private readonly Dictionary<int, IRulesetConfigManager> configCache = new Dictionary<int, IRulesetConfigManager>();
+
+        public RulesetConfigCache(RealmContextFactory realmFactory, RulesetStore rulesets)
         {
-            this.settingsStore = settingsStore;
+            this.realmFactory = realmFactory;
+            this.rulesets = rulesets;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // let's keep things simple for now and just retrieve all the required configs at startup..
+            foreach (var ruleset in rulesets.AvailableRulesets)
+            {
+                if (ruleset.ID == null)
+                    continue;
+
+                configCache[ruleset.ID.Value] = ruleset.CreateInstance().CreateConfig(realmFactory);
+            }
         }
 
         /// <summary>
@@ -34,7 +51,10 @@ namespace osu.Game.Rulesets
             if (ruleset.RulesetInfo.ID == null)
                 return null;
 
-            return configCache.GetOrAdd(ruleset.RulesetInfo.ID.Value, _ => ruleset.CreateConfig(settingsStore));
+            if (!configCache.TryGetValue(ruleset.RulesetInfo.ID.Value, out var config))
+                return null;
+
+            return config;
         }
 
         protected override void Dispose(bool isDisposing)

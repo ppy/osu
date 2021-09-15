@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Testing
             }
 
             public override IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(TestResources.GetStore(), @"Resources");
-            public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new TestRulesetConfigManager();
+            public override IRulesetConfigManager CreateConfig(RealmContextFactory realmFactory) => new TestRulesetConfigManager();
 
             public override IEnumerable<Mod> GetModsFor(ModType type) => Array.Empty<Mod>();
             public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => null;

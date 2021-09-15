@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Configuration
@@ -13,19 +14,17 @@ namespace osu.Game.Configuration
     public abstract class DatabasedConfigManager<TLookup> : ConfigManager<TLookup>
         where TLookup : struct, Enum
     {
-        private readonly SettingsStore settings;
+        private readonly RealmContextFactory realmFactory;
 
         private readonly int? variant;
 
-        private List<DatabasedSetting> databasedSettings;
+        private List<RealmSetting> databasedSettings;
 
         private readonly RulesetInfo ruleset;
 
-        private bool legacySettingsExist;
-
-        protected DatabasedConfigManager(SettingsStore settings, RulesetInfo ruleset = null, int? variant = null)
+        protected DatabasedConfigManager(RealmContextFactory realmFactory, RulesetInfo ruleset = null, int? variant = null)
         {
-            this.settings = settings;
+            this.realmFactory = realmFactory;
             this.ruleset = ruleset;
             this.variant = variant;
 
@@ -36,38 +35,21 @@ namespace osu.Game.Configuration
 
         protected override void PerformLoad()
         {
-            databasedSettings = settings.Query(ruleset?.ID, variant);
-            legacySettingsExist = databasedSettings.Any(s => int.TryParse(s.Key, out _));
+            var rulesetID = ruleset?.ID;
+
+            // As long as RulesetConfigCache exists, there is no need to subscribe to realm events.
+            databasedSettings = realmFactory.Context.All<RealmSetting>().Where(b => b.RulesetID == rulesetID && b.Variant == variant).ToList();
         }
 
         protected override bool PerformSave()
         {
-            lock (dirtySettings)
-            {
-                foreach (var setting in dirtySettings)
-                    settings.Update(setting);
-                dirtySettings.Clear();
-            }
-
+            // do nothing, realm saves immediately
             return true;
         }
-
-        private readonly List<DatabasedSetting> dirtySettings = new List<DatabasedSetting>();
 
         protected override void AddBindable<TBindable>(TLookup lookup, Bindable<TBindable> bindable)
         {
             base.AddBindable(lookup, bindable);
-
-            if (legacySettingsExist)
-            {
-                var legacySetting = databasedSettings.Find(s => s.Key == ((int)(object)lookup).ToString());
-
-                if (legacySetting != null)
-                {
-                    bindable.Parse(legacySetting.Value);
-                    settings.Delete(legacySetting);
-                }
-            }
 
             var setting = databasedSettings.Find(s => s.Key == lookup.ToString());
 
@@ -77,12 +59,15 @@ namespace osu.Game.Configuration
             }
             else
             {
-                settings.Update(setting = new DatabasedSetting
+                realmFactory.Context.Write(() =>
                 {
-                    Key = lookup.ToString(),
-                    Value = bindable.Value,
-                    RulesetID = ruleset?.ID,
-                    Variant = variant,
+                    realmFactory.Context.Add(setting = new RealmSetting
+                    {
+                        Key = lookup.ToString(),
+                        Value = bindable.Value,
+                        RulesetID = ruleset?.ID,
+                        Variant = variant,
+                    });
                 });
 
                 databasedSettings.Add(setting);
@@ -90,13 +75,7 @@ namespace osu.Game.Configuration
 
             bindable.ValueChanged += b =>
             {
-                setting.Value = b.NewValue;
-
-                lock (dirtySettings)
-                {
-                    if (!dirtySettings.Contains(setting))
-                        dirtySettings.Add(setting);
-                }
+                realmFactory.Context.Write(() => setting.Value = b.NewValue);
             };
         }
     }
