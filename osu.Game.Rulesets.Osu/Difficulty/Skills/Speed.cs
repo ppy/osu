@@ -33,12 +33,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly double greatWindow;
 
-        public Speed(Mod[] mods, float od, double clockRate)
+        public Speed(Mod[] mods, double hitWindowGreat)
             : base(mods)
         {
-            HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(od);
-            greatWindow = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
+            greatWindow = hitWindowGreat;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
