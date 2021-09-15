@@ -58,9 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
                 foreach (var incoming in result)
                 {
-                    // Copy the room to itself to populate some members (such as status and playlist expiry).
-                    incoming.CopyFrom(incoming);
-
+                    incoming.RemoveExpiredPlaylistItems();
                     RoomManager.AddOrUpdateRoom(incoming);
                 }
 
