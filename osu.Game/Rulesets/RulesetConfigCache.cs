@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets
                 return null;
 
             if (!configCache.TryGetValue(ruleset.RulesetInfo.ID.Value, out var config))
-                return null;
+                return ruleset.CreateConfig(realmFactory);
 
             return config;
         }
