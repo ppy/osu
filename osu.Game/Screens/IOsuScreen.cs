@@ -60,7 +60,7 @@ namespace osu.Game.Screens
 
         /// <summary>
         /// Whether mod track adjustments are allowed to be applied.
-        /// Null means to inherit from the parent screen.
+        /// A <see langword="null"/> value means that the parent screen's value of this setting will be used.
         /// </summary>
         bool? AllowTrackAdjustments { set; get; }
 
