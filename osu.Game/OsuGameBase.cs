@@ -465,7 +465,7 @@ namespace osu.Game
                             ValueString = dkb.StringValue,
                             Key = dkb.Key,
                             RulesetID = dkb.RulesetID.Value,
-                            Variant = dkb.Variant
+                            Variant = dkb.Variant ?? 0,
                         });
                     }
                 }

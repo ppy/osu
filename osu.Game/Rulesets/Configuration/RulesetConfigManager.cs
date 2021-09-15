@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Configuration
     {
         private readonly RealmContextFactory realmFactory;
 
-        private readonly int? variant;
+        private readonly int variant;
 
         private List<RealmRulesetSetting> databasedSettings = new List<RealmRulesetSetting>();
 
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Configuration
 
             rulesetId = ruleset.ID ?? -1;
 
-            this.variant = variant;
+            this.variant = variant ?? 0;
 
             Load();
 
