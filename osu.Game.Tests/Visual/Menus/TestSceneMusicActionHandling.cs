@@ -121,12 +121,12 @@ namespace osu.Game.Tests.Visual.Menus
 
         private class AllowScreen : OsuScreen
         {
-            public override bool? AllowTrackAdjustments => true;
+            public override bool AllowTrackAdjustments => true;
         }
 
         private class DisallowScreen : OsuScreen
         {
-            public override bool? AllowTrackAdjustments => false;
+            public override bool AllowTrackAdjustments => false;
         }
 
         private class InheritScreen : OsuScreen
