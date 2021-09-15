@@ -7,8 +7,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Osu.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
