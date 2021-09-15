@@ -17,6 +17,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 
         /// <summary>
+        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 1ms to account for simultaneous <see cref="OsuDifficultyHitObject"/>s.
+        /// </summary>
+        public double StrainTime { get; private set; }
+
+        /// <summary>
         /// Normalized distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double JumpDistance { get; private set; }
@@ -42,6 +47,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastObject = (OsuHitObject)lastObject;
 
             setDistances();
+
+            // Capped to 1ms to prevent difficulty calculation breaking from simulatenous objects.
+            StrainTime = Math.Max(DeltaTime, 1);
         }
 
         private void setDistances()

@@ -47,25 +47,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuCurrent = (OsuDifficultyHitObject)current;
 
             double distance = Math.Min(single_spacing_threshold, osuCurrent.TravelDistance + osuCurrent.JumpDistance);
-            double deltaTime = current.DeltaTime;
+            double strainTime = osuCurrent.StrainTime;
 
             double greatWindowFull = greatWindow * 2;
-            double speedWindowRatio = deltaTime / greatWindowFull;
+            double speedWindowRatio = strainTime / greatWindowFull;
 
             // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
-            if (Previous.Count > 0 && deltaTime < greatWindowFull && Previous[0].DeltaTime > deltaTime)
+            if (Previous.Count > 0 && strainTime < greatWindowFull && (Previous[0] as OsuDifficultyHitObject).StrainTime > strainTime)
             {
-               
-                deltaTime = Interpolation.Lerp(Previous[0].DeltaTime, deltaTime, speedWindowRatio);
+                strainTime = Interpolation.Lerp(Previous[0].DeltaTime, strainTime, speedWindowRatio);
             }
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, 
-            deltaTime /= Math.Clamp(speedWindowRatio / 0.93, 0.92, 1);
+            strainTime /= Math.Clamp(speedWindowRatio / 0.93, 0.92, 1);
 
             double speedBonus = 1.0;
-            if (deltaTime < min_speed_bonus)
-                speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
+            if (strainTime < min_speed_bonus)
+                speedBonus = 1 + Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
             double angleBonus = 1.0;
 
@@ -86,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return (1 + (speedBonus - 1) * 0.75)
                 * angleBonus
                 * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5))
-                / Math.Max(deltaTime, 1);
+                / strainTime;
         }
     }
 }
