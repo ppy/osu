@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Configuration
                 setting = new RealmRulesetSetting
                 {
                     Key = lookup.ToString(),
-                    Value = bindable.Value,
+                    Value = bindable.Value.ToString(),
                     RulesetID = rulesetId,
                     Variant = variant,
                 };
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Configuration
 
             bindable.ValueChanged += b =>
             {
-                realmFactory?.Context.Write(() => setting.Value = b.NewValue);
+                realmFactory?.Context.Write(() => setting.Value = b.NewValue.ToString());
             };
         }
     }

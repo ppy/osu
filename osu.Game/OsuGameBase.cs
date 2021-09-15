@@ -462,8 +462,8 @@ namespace osu.Game
 
                         usage.Realm.Add(new RealmRulesetSetting
                         {
-                            ValueString = dkb.StringValue,
                             Key = dkb.Key,
+                            Value = dkb.StringValue,
                             RulesetID = dkb.RulesetID.Value,
                             Variant = dkb.Variant ?? 0,
                         });
