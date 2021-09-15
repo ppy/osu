@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, 
-            deltaTime /= Math.Clamp(speedWindowRatio * (1/0.93), 0.92, 1);
+            deltaTime /= Math.Clamp(speedWindowRatio / 0.93, 0.92, 1);
 
             double speedBonus = 1.0;
             if (deltaTime < min_speed_bonus)
