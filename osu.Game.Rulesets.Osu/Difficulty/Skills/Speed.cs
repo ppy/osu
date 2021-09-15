@@ -30,7 +30,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
-        private double greatWindow;
+
+        private readonly double greatWindow;
 
         public Speed(Mod[] mods, float od, double clockRate)
             : base(mods)
