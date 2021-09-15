@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using M.DBus;
 using M.DBus.Services.Kde;
 using M.DBus.Tray;
@@ -58,6 +59,9 @@ namespace osu.Desktop.DBus
         [Resolved]
         private LargeTextureStore textureStore { get; set; }
 
+        [Resolved]
+        private MConfigManager config { get; set; }
+
         public DBusManagerContainer(bool autoStart = false, Bindable<bool> controlSource = null)
         {
             if (autoStart && controlSource != null)
@@ -89,8 +93,10 @@ namespace osu.Desktop.DBus
             mprisService.TrackRunning = musicController.CurrentTrack.IsRunning;
         }
 
+        private Bindable<bool> enableTray;
+
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, MConfigManager config, Storage storage)
+        private void load(IAPIProvider api, Storage storage)
         {
             DBusManager.RegisterNewObjects(new IDBusObject[]
             {
@@ -106,9 +112,6 @@ namespace osu.Desktop.DBus
             {
                 DBusManager.RegisterNewObject(mprisService,
                     "org.mpris.MediaPlayer2.mfosu");
-
-                DBusManager.RegisterNewObject(canonicalTrayService,
-                    "io.matrix_feather.dbus.menu");
 
                 canonicalTrayService.AddEntryRange(new[]
                 {
@@ -140,13 +143,12 @@ namespace osu.Desktop.DBus
                     }
                 });
 
-                DBusManager.RegisterNewObject(kdeTrayService,
-                    "org.kde.StatusNotifierItem.mfosu");
-
-                registerTrayToDBus();
+                enableTray.BindValueChanged(onEnableTrayChanged, true);
 
                 DBusManager.OnConnected -= onDBusConnected;
             }
+
+            enableTray = config.GetBindable<bool>(MSetting.EnableTray);
 
             DBusManager.OnConnected += onDBusConnected;
 
@@ -171,6 +173,25 @@ namespace osu.Desktop.DBus
             mprisService.WindowRaise += raiseWindow;
 
             kdeTrayService.WindowRaise += raiseWindow;
+        }
+
+        private void onEnableTrayChanged(ValueChangedEvent<bool> v)
+        {
+            if (v.NewValue)
+            {
+                DBusManager.RegisterNewObject(canonicalTrayService,
+                    "io.matrix_feather.dbus.menu");
+
+                DBusManager.RegisterNewObject(kdeTrayService,
+                    "org.kde.StatusNotifierItem.mfosu");
+
+                Task.Run(ConnectToWatcher);
+            }
+            else
+            {
+                DBusManager.UnRegisterObject(kdeTrayService);
+                DBusManager.UnRegisterObject(canonicalTrayService);
+            }
         }
 
         private void raiseWindow()
@@ -217,11 +238,24 @@ namespace osu.Desktop.DBus
 
         #region 托盘
 
-        private void registerTrayToDBus()
-        {
-            var trayWatcher = DBusManager.GetDBusObject<IStatusNotifierWatcher>(new ObjectPath("/StatusNotifierWatcher"), "org.kde.StatusNotifierWatcher");
+        private IStatusNotifierWatcher trayWatcher;
 
-            trayWatcher.RegisterStatusNotifierItemAsync("org.kde.StatusNotifierItem.mfosu").ConfigureAwait(false);
+        public async Task<bool> ConnectToWatcher()
+        {
+            try
+            {
+                trayWatcher = DBusManager.GetDBusObject<IStatusNotifierWatcher>(new ObjectPath("/StatusNotifierWatcher"), "org.kde.StatusNotifierWatcher");
+
+                await trayWatcher.RegisterStatusNotifierItemAsync("org.kde.StatusNotifierItem.mfosu").ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                trayWatcher = null;
+                Logger.Error(e, "未能连接到 org.kde.StatusNotifierWatcher, 请检查相关配置");
+                return false;
+            }
+
+            return true;
         }
 
         public void AddEntry(SimpleEntry entry)
