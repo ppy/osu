@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
             if (Previous.Count > 0 && strainTime < greatWindowFull && (Previous[0] as OsuDifficultyHitObject).StrainTime > strainTime)
             {
-                strainTime = Interpolation.Lerp(Previous[0].DeltaTime, strainTime, speedWindowRatio);
+                strainTime = Interpolation.Lerp((Previous[0] as OsuDifficultyHitObject).StrainTime, strainTime, speedWindowRatio);
             }
 
             // Cap deltatime to the OD 300 hitwindow.
