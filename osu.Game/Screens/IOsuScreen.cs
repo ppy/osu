@@ -62,7 +62,7 @@ namespace osu.Game.Screens
         /// Whether mod track adjustments are allowed to be applied.
         /// A <see langword="null"/> value means that the parent screen's value of this setting will be used.
         /// </summary>
-        bool? AllowTrackAdjustments { set; get; }
+        bool? AllowTrackAdjustments { get; set; }
 
         /// <summary>
         /// Invoked when the back button has been pressed to close any overlays before exiting this <see cref="IOsuScreen"/>.
