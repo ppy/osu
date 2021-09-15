@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                         angleBonus *= Math.Max(acuteAngleBonus * acuteAngleMultiplier, wideAngleBonus * wideAngleMultiplier);
                     }
-                    else if (osuCurrObj.StrainTime < osuPrevObj.StrainTime)
+                    else if (osuCurrObj.StrainTime + 10 < osuPrevObj.StrainTime && osuPrevObj.StrainTime > osuLastObj.StrainTime + 10)
                         angleBonus = 0 * rhythmVarianceMultiplier;
 
                     aimStrain += angleBonus; // add in angle or rhythmVariance velocity.
