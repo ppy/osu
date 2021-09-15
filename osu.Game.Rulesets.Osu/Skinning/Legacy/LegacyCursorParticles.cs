@@ -39,6 +39,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             var texture = skin.GetTexture("star2");
             var starBreakAdditive = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.StarBreakAdditive)?.Value ?? new Color4(255, 182, 193, 255);
 
+            if (texture != null)
+            {
+                // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
+                texture.ScaleAdjust *= 1.6f;
+            }
+
             InternalChildren = new[]
             {
                 breakSpewer = new LegacyCursorParticleSpewer(texture, 20)
