@@ -13,12 +13,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
 using osuTK.Graphics;
@@ -50,7 +48,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             Recorder = new TestReplayRecorder(new Score
                             {
                                 Replay = replay,
-                                ScoreInfo = { Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo }
+                                ScoreInfo = { Beatmap = gameplayBeatmap.BeatmapInfo }
                             })
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos)
