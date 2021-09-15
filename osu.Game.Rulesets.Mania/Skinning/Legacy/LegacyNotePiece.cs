@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private Container directionContainer;
+
+        [CanBeNull]
         private Drawable noteAnimation;
 
         private float? minimumColumnWidth;
@@ -41,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 Origin = Anchor.BottomCentre,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = noteAnimation = GetAnimation(skin)
+                Child = noteAnimation = GetAnimation(skin) ?? Empty()
             };
 
             direction.BindTo(scrollingInfo.Direction);
