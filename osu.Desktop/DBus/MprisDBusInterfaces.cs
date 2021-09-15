@@ -159,7 +159,7 @@ namespace osu.Desktop.DBus
 
         public IDictionary<string, object> Metadata => _Metadata;
 
-        private double _Volume = 0.0;
+        private double _Volume;
 
         public double Volume
         {
@@ -202,5 +202,9 @@ namespace osu.Desktop.DBus
         private readonly bool _CanControl = true;
 
         public bool CanControl => _CanControl;
+
+        //https://github.com/linuxdeepin/dtkwidget/blob/82bbc6fb20b43c17a957b10ebfd586a90a4a909f/src/widgets/private/mpris/dbusmpris.h#L70
+        private readonly bool _CanShowInUI = true;
+        public bool CanShowInUI => _CanShowInUI;
     }
 }
