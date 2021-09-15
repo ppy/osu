@@ -10,8 +10,6 @@ namespace osu.Game.Screens.Play
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-        public override bool? AllowTrackAdjustments => true;
-
         public void ApplyToBackground(Action<BackgroundScreenBeatmap> action) => base.ApplyToBackground(b => action.Invoke((BackgroundScreenBeatmap)b));
     }
 }
