@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                             acuteAngleBonus = 0;
                         else
                         {
-                            acuteAngleBonus *= Math.Min(1.5, (100 - osuCurrObj.StrainTime) / 15);
+                            acuteAngleBonus *= Math.Min(2, Math.Pow((100 - osuCurrObj.StrainTime) / 15, 1.5));
                             wideAngleBonus *= Math.Pow(osuCurrObj.StrainTime / 100, 6);
                         }
 
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 if (osuCurrObj.TravelDistance != 0)
                 {
-                    double sliderBuff = Math.Max(osuCurrObj.TravelDistance, Math.Sqrt(osuCurrObj.TravelDistance * osuCurrObj.JumpDistance)) / osuCurrObj.StrainTime;
+                    double sliderBuff = Math.Max(osuCurrObj.TravelDistance, 0.875 * Math.Sqrt(osuCurrObj.TravelDistance * osuCurrObj.JumpDistance)) / osuCurrObj.StrainTime;
 
                     aimStrain += sliderBuff * sliderMultiplier; // Add in slider velocity.
                 }

@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : OsuStrainSkill
     {
-        private const double single_spacing_threshold = 125;
+        private const double single_spacing_threshold = 135;
 
         private const double angle_bonus_begin = 5 * Math.PI / 6;
         private const double pi_over_4 = Math.PI / 4;
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
-            return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / osuCurrent.StrainTime;
+            return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3)) / osuCurrent.StrainTime;
         }
     }
 }
