@@ -20,12 +20,17 @@ namespace osu.Game.Rulesets.Configuration
 
         private List<RealmRulesetSetting> databasedSettings = new List<RealmRulesetSetting>();
 
-        private readonly RulesetInfo ruleset;
+        private readonly int rulesetId;
 
         protected RulesetConfigManager(SettingsStore store, RulesetInfo ruleset, int? variant = null)
         {
             realmFactory = store?.Realm;
-            this.ruleset = ruleset;
+
+            if (realmFactory != null && !ruleset.ID.HasValue)
+                throw new InvalidOperationException("Attempted to add databased settings for a non-databased ruleset");
+
+            rulesetId = ruleset.ID ?? -1;
+
             this.variant = variant;
 
             Load();
@@ -35,12 +40,10 @@ namespace osu.Game.Rulesets.Configuration
 
         protected override void PerformLoad()
         {
-            var rulesetID = ruleset?.ID;
-
             if (realmFactory != null)
             {
                 // As long as RulesetConfigCache exists, there is no need to subscribe to realm events.
-                databasedSettings = realmFactory.Context.All<RealmRulesetSetting>().Where(b => b.RulesetID == rulesetID && b.Variant == variant).ToList();
+                databasedSettings = realmFactory.Context.All<RealmRulesetSetting>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
             }
         }
 
@@ -66,7 +69,7 @@ namespace osu.Game.Rulesets.Configuration
                 {
                     Key = lookup.ToString(),
                     Value = bindable.Value,
-                    RulesetID = ruleset?.ID,
+                    RulesetID = rulesetId,
                     Variant = variant,
                 };
 

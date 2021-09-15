@@ -13,7 +13,8 @@ namespace osu.Game.Configuration
         [PrimaryKey]
         public Guid ID { get; set; } = Guid.NewGuid();
 
-        public int? RulesetID { get; set; }
+        [Indexed]
+        public int RulesetID { get; set; }
 
         public int? Variant { get; set; }
 
