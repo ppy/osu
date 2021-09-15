@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        public override bool? AllowTrackAdjustments => false;
+        public override bool AllowTrackAdjustments => false;
 
         protected bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
 
