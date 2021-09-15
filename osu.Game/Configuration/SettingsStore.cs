@@ -4,15 +4,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Database;
-using Realms;
 
 namespace osu.Game.Configuration
 {
-    public class RealmSettingsStore
+    public class SettingsStore
     {
         private readonly RealmContextFactory realmFactory;
 
-        public RealmSettingsStore(RealmContextFactory realmFactory)
+        public SettingsStore(RealmContextFactory realmFactory)
         {
             this.realmFactory = realmFactory;
         }
@@ -26,22 +25,6 @@ namespace osu.Game.Configuration
         {
             using (var context = realmFactory.GetForRead())
                 return context.Realm.All<RealmSetting>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
-        }
-
-        public void Update(RealmSetting setting)
-        {
-            using (ContextFactory.GetForWrite())
-            {
-                var newValue = setting.Value;
-                Refresh(ref setting);
-                setting.Value = newValue;
-            }
-        }
-
-        public void Delete(RealmSetting setting)
-        {
-            using (var usage = ContextFactory.GetForWrite())
-                usage.Context.Remove(setting);
         }
     }
 }

@@ -3,14 +3,15 @@
 
 using System;
 using osu.Game.Configuration;
+using osu.Game.Database;
 
 namespace osu.Game.Rulesets.Configuration
 {
     public abstract class RulesetConfigManager<TLookup> : DatabasedConfigManager<TLookup>, IRulesetConfigManager
         where TLookup : struct, Enum
     {
-        protected RulesetConfigManager(SettingsStore settings, RulesetInfo ruleset, int? variant = null)
-            : base(settings, ruleset, variant)
+        protected RulesetConfigManager(RealmContextFactory realmFactory, RulesetInfo ruleset, int? variant = null)
+            : base(realmFactory, ruleset, variant)
         {
         }
     }
