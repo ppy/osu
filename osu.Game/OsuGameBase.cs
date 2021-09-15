@@ -454,11 +454,11 @@ namespace osu.Game
                 var existingSettings = db.Context.DatabasedSetting;
 
                 // only migrate data if the realm database is empty.
-                if (!usage.Realm.All<RealmSetting>().Any())
+                if (!usage.Realm.All<RealmRulesetSetting>().Any())
                 {
                     foreach (var dkb in existingSettings)
                     {
-                        usage.Realm.Add(new RealmSetting
+                        usage.Realm.Add(new RealmRulesetSetting
                         {
                             ValueString = dkb.StringValue,
                             Key = dkb.Key,

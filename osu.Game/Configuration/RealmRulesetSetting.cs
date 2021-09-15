@@ -7,8 +7,8 @@ using Realms;
 
 namespace osu.Game.Configuration
 {
-    [MapTo(@"Setting")]
-    public class RealmSetting : RealmObject, IHasGuidPrimaryKey
+    [MapTo(@"RulesetSetting")]
+    public class RealmRulesetSetting : RealmObject, IHasGuidPrimaryKey
     {
         [PrimaryKey]
         public Guid ID { get; set; } = Guid.NewGuid();
