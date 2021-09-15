@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets.Configuration;
 
@@ -30,13 +31,15 @@ namespace osu.Game.Rulesets
         {
             base.LoadComplete();
 
+            var settingsStore = new SettingsStore(realmFactory);
+
             // let's keep things simple for now and just retrieve all the required configs at startup..
             foreach (var ruleset in rulesets.AvailableRulesets)
             {
                 if (ruleset.ID == null)
                     continue;
 
-                configCache[ruleset.ID.Value] = ruleset.CreateInstance().CreateConfig(realmFactory);
+                configCache[ruleset.ID.Value] = ruleset.CreateInstance().CreateConfig(settingsStore);
             }
         }
 
@@ -52,7 +55,9 @@ namespace osu.Game.Rulesets
                 return null;
 
             if (!configCache.TryGetValue(ruleset.RulesetInfo.ID.Value, out var config))
-                return ruleset.CreateConfig(realmFactory);
+                // any ruleset request which wasn't initialised on startup should not be stored to realm.
+                // this should only be used by tests.
+                return ruleset.CreateConfig(null);
 
             return config;
         }

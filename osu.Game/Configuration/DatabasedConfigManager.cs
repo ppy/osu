@@ -18,13 +18,13 @@ namespace osu.Game.Configuration
 
         private readonly int? variant;
 
-        private List<RealmSetting> databasedSettings;
+        private List<RealmSetting> databasedSettings = new List<RealmSetting>();
 
         private readonly RulesetInfo ruleset;
 
-        protected DatabasedConfigManager(RealmContextFactory realmFactory, RulesetInfo ruleset = null, int? variant = null)
+        protected DatabasedConfigManager(SettingsStore store = null, RulesetInfo ruleset = null, int? variant = null)
         {
-            this.realmFactory = realmFactory;
+            realmFactory = store?.Realm;
             this.ruleset = ruleset;
             this.variant = variant;
 
@@ -37,8 +37,11 @@ namespace osu.Game.Configuration
         {
             var rulesetID = ruleset?.ID;
 
-            // As long as RulesetConfigCache exists, there is no need to subscribe to realm events.
-            databasedSettings = realmFactory.Context.All<RealmSetting>().Where(b => b.RulesetID == rulesetID && b.Variant == variant).ToList();
+            if (realmFactory != null)
+            {
+                // As long as RulesetConfigCache exists, there is no need to subscribe to realm events.
+                databasedSettings = realmFactory.Context.All<RealmSetting>().Where(b => b.RulesetID == rulesetID && b.Variant == variant).ToList();
+            }
         }
 
         protected override bool PerformSave()
@@ -59,23 +62,22 @@ namespace osu.Game.Configuration
             }
             else
             {
-                realmFactory.Context.Write(() =>
+                setting = new RealmSetting
                 {
-                    realmFactory.Context.Add(setting = new RealmSetting
-                    {
-                        Key = lookup.ToString(),
-                        Value = bindable.Value,
-                        RulesetID = ruleset?.ID,
-                        Variant = variant,
-                    });
-                });
+                    Key = lookup.ToString(),
+                    Value = bindable.Value,
+                    RulesetID = ruleset?.ID,
+                    Variant = variant,
+                };
+
+                realmFactory?.Context.Write(() => realmFactory.Context.Add(setting));
 
                 databasedSettings.Add(setting);
             }
 
             bindable.ValueChanged += b =>
             {
-                realmFactory.Context.Write(() => setting.Value = b.NewValue);
+                realmFactory?.Context.Write(() => setting.Value = b.NewValue);
             };
         }
     }
