@@ -49,19 +49,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double distance = Math.Min(single_spacing_threshold, osuCurrent.TravelDistance + osuCurrent.JumpDistance);
             double deltaTime = current.DeltaTime;
 
-            // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
-            double deltaTimeThreshold = greatWindow * 2;
+            double greatWindowFull = greatWindow * 2;
+            double speedWindowRatio = deltaTime / greatWindowFull;
 
-            if (Previous.Count > 0 && deltaTime < deltaTimeThreshold && Previous[0].DeltaTime > deltaTime)
+            // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
+            if (Previous.Count > 0 && deltaTime < greatWindowFull && Previous[0].DeltaTime > deltaTime)
             {
-                double speedWindowRatio = deltaTime / deltaTimeThreshold;
+               
                 deltaTime = Interpolation.Lerp(Previous[0].DeltaTime, deltaTime, speedWindowRatio);
             }
 
             // Cap deltatime to the OD 300 hitwindow.
-            // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly
-            var hitWindowNerf = deltaTime / (greatWindow * 2 * 0.93);
-            deltaTime /= Math.Clamp(hitWindowNerf, 0.92, 1);
+            // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, 
+            deltaTime /= Math.Clamp(speedWindowRatio * (1/0.93), 0.92, 1);
 
             double speedBonus = 1.0;
             if (deltaTime < min_speed_bonus)
