@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using M.DBus.Services;
 using M.DBus.Tray;
+using M.DBus.Utils;
 using osu.Framework.Logging;
 using Tmds.DBus;
 
@@ -20,15 +21,19 @@ namespace M.DBus
         private ConnectionState connectionState = ConnectionState.NotConnected;
 
         private bool isDisposed { get; set; }
-        private readonly IHandleTrayManagement trayManagement;
 
-        public DBusManager(bool startOnLoad, IHandleTrayManagement trayManagement)
+        public readonly IHandleTrayManagement TrayManager;
+
+        public readonly IHandleSystemNotifications Notifications;
+
+        public DBusManager(bool startOnLoad, IHandleTrayManagement trayManagement, IHandleSystemNotifications systemNotifications)
         {
             //如果在初始化时启动服务
             if (startOnLoad)
                 Connect();
 
-            this.trayManagement = trayManagement;
+            TrayManager = trayManagement;
+            Notifications = systemNotifications;
 
             Task.Run(() => RegisterNewObject(GreetService));
         }
@@ -105,16 +110,6 @@ namespace M.DBus
             foreach (var service in services) Logger.Log(service);
         }
 
-        public string ObjectPathToName(ObjectPath path)
-        {
-            return path.ToString().Replace('/', '.').Remove(0, 1);
-        }
-
-        public static string ObjectPathToNameStatic(ObjectPath path)
-        {
-            return path.ToString().Replace('/', '.').Remove(0, 1);
-        }
-
         private void onServiceNameChanged(ServiceOwnerChangedEventArgs args)
         {
             Logger.Log($"服务 '{args.ServiceName}' 的归属现在从 '{args.OldOwner}' 变为 '{args.NewOwner}'");
@@ -124,7 +119,7 @@ namespace M.DBus
         {
             connectionState = ConnectionState.Faulted;
 
-            Logger.Error(e, $"位于 '{ObjectPathToName(dbusObject.ObjectPath)}' 的DBus服务出现错误");
+            Logger.Error(e, $"位于 '{dbusObject.ObjectPath.ToServiceName()}' 的DBus服务出现错误");
         }
 
         public bool CheckIfAlreadyRegistered(IDBusObject dBusObject)
@@ -144,17 +139,10 @@ namespace M.DBus
                 throw new NotSupportedException("未连接");
 
             if (string.IsNullOrEmpty(name))
-                name = ObjectPathToName(path);
+                name = path.ToServiceName();
 
             return currentConnection.CreateProxy<T>(name, path);
         }
-
-        #endregion
-
-        #region 托盘
-
-        public void AddEntry(SimpleEntry entry) => trayManagement.AddEntry(entry);
-        public void RemoveEntry(SimpleEntry entry) => trayManagement.RemoveEntry(entry);
 
         #endregion
 
@@ -165,7 +153,7 @@ namespace M.DBus
         public async Task RegisterNewObject(IDBusObject dbusObject, string targetName = null)
         {
             if (string.IsNullOrEmpty(targetName))
-                targetName = ObjectPathToName(dbusObject.ObjectPath);
+                targetName = dbusObject.ObjectPath.ToServiceName();
 
             //添加物件与其目标名称添加到词典
             registerDictionary[dbusObject] = targetName;
@@ -178,7 +166,7 @@ namespace M.DBus
         {
             //添加物件到列表
             foreach (var obj in objects)
-                registerDictionary[obj] = ObjectPathToName(obj.ObjectPath);
+                registerDictionary[obj] = obj.ObjectPath.ToServiceName();
 
             if (connectionState == ConnectionState.Connected)
             {

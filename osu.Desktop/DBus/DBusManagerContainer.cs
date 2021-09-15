@@ -1,7 +1,10 @@
 using System;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using M.DBus;
+using M.DBus.Services;
 using M.DBus.Services.Kde;
+using M.DBus.Services.Notifications;
 using M.DBus.Tray;
 using M.DBus.Utils;
 using osu.Desktop.DBus.Tray;
@@ -23,7 +26,7 @@ using Tmds.DBus;
 
 namespace osu.Desktop.DBus
 {
-    public class DBusManagerContainer : Component, IHandleTrayManagement
+    public class DBusManagerContainer : Component, IHandleTrayManagement, IHandleSystemNotifications
     {
         public DBusManager DBusManager;
 
@@ -68,7 +71,7 @@ namespace osu.Desktop.DBus
                 this.controlSource = controlSource;
             else if (controlSource == null && autoStart) throw new InvalidOperationException("设置了自动启动但是控制源是null?");
 
-            DBusManager = new DBusManager(false, this);
+            DBusManager = new DBusManager(false, this, this);
         }
 
         #region Disposal
@@ -94,6 +97,7 @@ namespace osu.Desktop.DBus
         }
 
         private Bindable<bool> enableTray;
+        private Bindable<bool> enableSystemNotifications;
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, Storage storage)
@@ -144,11 +148,13 @@ namespace osu.Desktop.DBus
                 });
 
                 enableTray.BindValueChanged(onEnableTrayChanged, true);
+                enableSystemNotifications.BindValueChanged(onEnableNotificationsChanged, true);
 
                 DBusManager.OnConnected -= onDBusConnected;
             }
 
             enableTray = config.GetBindable<bool>(MSetting.EnableTray);
+            enableSystemNotifications = config.GetBindable<bool>(MSetting.EnableSystemNotifications);
 
             DBusManager.OnConnected += onDBusConnected;
 
@@ -266,6 +272,104 @@ namespace osu.Desktop.DBus
         public void RemoveEntry(SimpleEntry entry)
         {
             canonicalTrayService.RemoveEntryFromMenu(entry);
+        }
+
+        #endregion
+
+        #region 通知
+
+        private void onEnableNotificationsChanged(ValueChangedEvent<bool> v)
+        {
+            if (v.NewValue)
+            {
+                connectToNotifications();
+            }
+            else
+            {
+                systemNotification = null;
+            }
+        }
+
+        [CanBeNull]
+        private INotifications systemNotification;
+
+        private bool connectToNotifications()
+        {
+            try
+            {
+                var path = new ObjectPath("/org/freedesktop/Notifications");
+                systemNotification = DBusManager.GetDBusObject<INotifications>(path, path.ToServiceName());
+            }
+            catch (Exception e)
+            {
+                systemNotification = null;
+                Logger.Error(e, "未能连接到 org.freedesktop.Notifications, 请检查相关配置");
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<uint> PostAsync(SystemNotification notification)
+        {
+            try
+            {
+                if (systemNotification != null)
+                {
+                    notification.Name = "mfosu -" + notification.Name;
+                    notification.Title = "mfosu - " + notification.Title;
+
+                    var target = notification.ToDBusObject();
+
+                    return await systemNotification.NotifyAsync(target.appName,
+                        target.replacesID,
+                        target.appIcon,
+                        target.title,
+                        target.description,
+                        target.actions,
+                        target.hints,
+                        target.displayTime).ConfigureAwait(false);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "发送系统通知时出现了问题");
+            }
+
+            return 0;
+        }
+
+        public async Task<bool> CloseNotificationAsync(uint id)
+        {
+            if (systemNotification != null)
+            {
+                await systemNotification.CloseNotificationAsync(id).ConfigureAwait(false);
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<string[]> GetCapabilitiesAsync()
+        {
+            if (systemNotification != null)
+            {
+                return await systemNotification.GetCapabilitiesAsync().ConfigureAwait(false);
+            }
+
+            return Array.Empty<string>();
+        }
+
+        private readonly (string name, string vendor, string version, string specVersion) defaultServerInfo = ("mfosu", "mfosu", "0", "0");
+
+        public async Task<(string name, string vendor, string version, string specVersion)> GetServerInformationAsync()
+        {
+            if (systemNotification != null)
+            {
+                return await systemNotification.GetServerInformationAsync().ConfigureAwait(false);
+            }
+
+            return defaultServerInfo;
         }
 
         #endregion

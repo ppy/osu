@@ -119,13 +119,13 @@ namespace osu.Game.Screens.Mvis.Plugins
         public void AddDBusMenuEntry(SimpleEntry entry)
         {
             if (platformSupportsDBus)
-                dBusManager?.AddEntry(entry);
+                dBusManager?.TrayManager.AddEntry(entry);
         }
 
         public void RemoveDBusMenuEntry(SimpleEntry entry)
         {
             if (platformSupportsDBus)
-                dBusManager?.RemoveEntry(entry);
+                dBusManager?.TrayManager.RemoveEntry(entry);
         }
 
         private bool platformSupportsDBus => RuntimeInfo.OS == RuntimeInfo.Platform.Linux;
