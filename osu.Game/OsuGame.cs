@@ -1075,6 +1075,11 @@ namespace osu.Game
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
                 API.Activity.BindTo(newOsuScreen.Activity);
 
+                if (newOsuScreen.AllowTrackAdjustments.HasValue)
+                    MusicController.AllowTrackAdjustments = newOsuScreen.AllowTrackAdjustments.Value;
+                else
+                    newOsuScreen.AllowTrackAdjustments = MusicController.AllowTrackAdjustments;
+
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
                 else
@@ -1091,16 +1096,6 @@ namespace osu.Game
         {
             ScreenChanged(lastScreen, newScreen);
             Logger.Log($"Screen changed → {newScreen}");
-
-            // set AllowTrackAdjustments if new screen defines it, inherit otherwise
-            if (newScreen is IOsuScreen newOsuScreen && newOsuScreen.AllowTrackAdjustments.HasValue)
-                allowTrackAdjustmentsDict[newScreen] = newOsuScreen.AllowTrackAdjustments.Value;
-            else if (allowTrackAdjustmentsDict.ContainsKey(lastScreen))
-                allowTrackAdjustmentsDict[newScreen] = allowTrackAdjustmentsDict[lastScreen];
-            else
-                allowTrackAdjustmentsDict[newScreen] = true;
-
-            MusicController.AllowTrackAdjustments = allowTrackAdjustmentsDict[newScreen];
         }
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
@@ -1108,15 +1103,9 @@ namespace osu.Game
             ScreenChanged(lastScreen, newScreen);
             Logger.Log($"Screen changed ← {newScreen}");
 
-            allowTrackAdjustmentsDict.Remove(lastScreen);
-
             if (newScreen == null)
                 Exit();
-            else
-                MusicController.AllowTrackAdjustments = allowTrackAdjustmentsDict[newScreen];
         }
-
-        private readonly Dictionary<IScreen, bool> allowTrackAdjustmentsDict = new Dictionary<IScreen, bool>();
 
         IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
     }
