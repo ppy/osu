@@ -25,8 +25,6 @@ namespace osu.Game.Tests.Visual
         private void load()
         {
             stack = new TestOsuScreenStack { RelativeSizeAxes = Axes.Both };
-            stack.ScreenPushed += screenChanged;
-            stack.ScreenExited += screenChanged;
 
             Add(musicController);
             Add(stack);
@@ -129,12 +127,12 @@ namespace osu.Game.Tests.Visual
 
         private class AllowScreen : OsuScreen
         {
-            public override bool AllowTrackAdjustments => true;
+            public override bool? AllowTrackAdjustments => true;
         }
 
         public class DisallowScreen : OsuScreen
         {
-            public override bool AllowTrackAdjustments => false;
+            public override bool? AllowTrackAdjustments => false;
         }
 
         private class InheritScreen : OsuScreen
@@ -146,12 +144,6 @@ namespace osu.Game.Tests.Visual
             OsuScreen screen = new T();
             LoadComponent(screen);
             return screen;
-        }
-
-        private void screenChanged(IScreen current, IScreen newScreen)
-        {
-            if (newScreen is IOsuScreen newOsuScreen)
-                musicController.AllowTrackAdjustments = newOsuScreen.AllowTrackAdjustments;
         }
     }
 }

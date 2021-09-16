@@ -1075,8 +1075,6 @@ namespace osu.Game
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
                 API.Activity.BindTo(newOsuScreen.Activity);
 
-                MusicController.AllowTrackAdjustments = newOsuScreen.AllowTrackAdjustments;
-
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
                 else

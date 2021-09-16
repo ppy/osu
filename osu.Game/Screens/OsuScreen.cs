@@ -11,11 +11,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
-using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
-using osu.Game.Users;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Menu;
+using osu.Game.Users;
 
 namespace osu.Game.Screens
 {
@@ -84,9 +84,7 @@ namespace osu.Game.Screens
         [Resolved]
         private MusicController musicController { get; set; }
 
-        private bool? allowTrackAdjustments;
-
-        public virtual bool AllowTrackAdjustments => allowTrackAdjustments ??= (musicController?.AllowTrackAdjustments ?? false);
+        public virtual bool? AllowTrackAdjustments => null;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
@@ -95,6 +93,8 @@ namespace osu.Game.Screens
         public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
 
         private OsuScreenDependencies screenDependencies;
+
+        private bool trackAdjustmentStateAtSuspend;
 
         internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
 
@@ -175,7 +175,10 @@ namespace osu.Game.Screens
         {
             if (PlayResumeSound)
                 sampleExit?.Play();
+
             applyArrivingDefaults(true);
+
+            musicController.AllowTrackAdjustments = trackAdjustmentStateAtSuspend;
 
             base.OnResuming(last);
         }
@@ -184,12 +187,17 @@ namespace osu.Game.Screens
         {
             base.OnSuspending(next);
 
+            trackAdjustmentStateAtSuspend = musicController.AllowTrackAdjustments;
+
             onSuspendingLogo();
         }
 
         public override void OnEntering(IScreen last)
         {
             applyArrivingDefaults(false);
+
+            if (AllowTrackAdjustments != null)
+                musicController.AllowTrackAdjustments = AllowTrackAdjustments.Value;
 
             if (backgroundStack?.Push(ownedBackground = CreateBackground()) != true)
             {
