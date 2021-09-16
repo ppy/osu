@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             var osuCurrent = (OsuDifficultyHitObject)current;
+            var osuPrevious = Previous.Count > 0 ? (OsuDifficultyHitObject)Previous[0] : null;
 
             double distance = Math.Min(single_spacing_threshold, osuCurrent.TravelDistance + osuCurrent.JumpDistance);
             double strainTime = osuCurrent.StrainTime;
@@ -51,10 +52,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double speedWindowRatio = strainTime / greatWindowFull;
 
             // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
-            if (Previous.Count > 0 && strainTime < greatWindowFull && (Previous[0] as OsuDifficultyHitObject).StrainTime > strainTime)
-            {
-                strainTime = Interpolation.Lerp((Previous[0] as OsuDifficultyHitObject).StrainTime, strainTime, speedWindowRatio);
-            }
+            if (osuPrevious != null && strainTime < greatWindowFull && osuPrevious.StrainTime > strainTime)
+                strainTime = Interpolation.Lerp(osuPrevious.StrainTime, strainTime, speedWindowRatio);
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
@@ -81,9 +80,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return (1 + (speedBonus - 1) * 0.75)
-                * angleBonus
-                * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5))
-                / strainTime;
+                   * angleBonus
+                   * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5))
+                   / strainTime;
         }
     }
 }
