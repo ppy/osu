@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
@@ -230,15 +231,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 CornerExponent = 2;
             }
 
-            public bool OnPressed(OsuAction action)
+            public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
             {
-                switch (action)
+                switch (e.Action)
                 {
                     case OsuAction.LeftButton:
                     case OsuAction.RightButton:
                         if (IsHovered && (Hit?.Invoke() ?? false))
                         {
-                            HitAction = action;
+                            HitAction = e.Action;
                             return true;
                         }
 
@@ -248,7 +249,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return false;
             }
 
-            public void OnReleased(OsuAction action)
+            public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
             }
         }

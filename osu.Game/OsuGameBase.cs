@@ -527,7 +527,7 @@ namespace osu.Game
             BeatmapManager?.Dispose();
             LocalConfig?.Dispose();
 
-            contextFactory.FlushConnections();
+            contextFactory?.FlushConnections();
         }
     }
 }
