@@ -99,6 +99,6 @@
     <PackageReference Include="SharpRaven" Version="2.4.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2021.805.0" ExcludeAssets="all" />
-    <PackageReference Include="Realm" Version="10.3.0" />
+    <PackageReference Include="Realm" Version="10.5.0" />
   </ItemGroup>
 </Project>

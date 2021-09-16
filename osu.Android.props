@@ -56,6 +56,6 @@
   </ItemGroup>
   <ItemGroup Label="Transitive Dependencies">
     <!-- Realm needs to be directly referenced in all Xamarin projects, as it will not pull in its transitive dependencies otherwise. -->
-    <PackageReference Include="Realm" Version="10.3.0" />
+    <PackageReference Include="Realm" Version="10.5.0" />
   </ItemGroup>
 </Project>
