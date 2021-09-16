@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double rhythmVarianceMultiplier = 1.0;
         private double sliderMultiplier = 6.5;
         private double sliderJumpMultiplier = 0.875;
-        private double velChangeMultiplier = 5;
+        private double velChangeMultiplier = 7.5;
 
         private double calcWideAngleBonus(double angle)
         {
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                     if (prevVector.Length > currVector.Length)
                     {
-                        double velChangeBonus = Math.Max(0, Math.Sqrt((prevVector.Length - currVector.Length) * currVector.Length) - currVector.Length);
+                        double velChangeBonus = Math.Max(0, Math.Sqrt((prevVector.Length - currVector.Length) * currVector.Length) - currVector.Length) * Math.Min(1, osuCurrObj.JumpDistance / 100);
 
                         aimStrain += velChangeBonus * velChangeMultiplier;
                     }
