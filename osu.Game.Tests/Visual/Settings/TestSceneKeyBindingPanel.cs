@@ -234,7 +234,7 @@ namespace osu.Game.Tests.Visual.Settings
         {
             AddAssert($"Check {name} is bound to {keyName}", () =>
             {
-                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text == name));
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
                 var firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
 
                 return firstButton.Text.Text == keyName;
@@ -247,7 +247,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep($"Scroll to {name}", () =>
             {
-                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text == name));
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
                 firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
 
                 panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollTo(firstButton);
