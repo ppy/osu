@@ -53,7 +53,10 @@ namespace osu.Game.Graphics
 
             if (Active.Value && CanSpawnParticles && Time.Current > lastParticleAdded + cooldown)
             {
-                particles[currentIndex] = SpawnParticle();
+                var newParticle = CreateParticle();
+                newParticle.StartTime = (float)Time.Current;
+
+                particles[currentIndex] = newParticle;
 
                 currentIndex = (currentIndex + 1) % particles.Length;
                 lastParticleAdded = Time.Current;
@@ -65,13 +68,7 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Called each time a new particle should be spawned.
         /// </summary>
-        protected virtual FallingParticle SpawnParticle()
-        {
-            return new FallingParticle
-            {
-                StartTime = (float)Time.Current,
-            };
-        }
+        protected virtual FallingParticle CreateParticle() => new FallingParticle();
 
         protected override DrawNode CreateDrawNode() => new ParticleSpewerDrawNode(this);
 
