@@ -53,6 +53,8 @@ namespace osu.Game.Screens.Select
 
         protected virtual bool DisplayStableImportPrompt => stableImportManager?.SupportsImportFromStable == true;
 
+        public override bool? AllowTrackAdjustments => true;
+
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
