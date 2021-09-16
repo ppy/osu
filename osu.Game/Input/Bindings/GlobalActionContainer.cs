@@ -7,6 +7,8 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Input.Bindings
 {
@@ -137,151 +139,199 @@ namespace osu.Game.Input.Bindings
 
     public enum GlobalAction
     {
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChat))]
         [Description("Toggle chat overlay")]
         ToggleChat,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleSocial))]
         [Description("Toggle social overlay")]
         ToggleSocial,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ResetInputSettings))]
         [Description("Reset input settings")]
         ResetInputSettings,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleToolbar))]
         [Description("Toggle toolbar")]
         ToggleToolbar,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleSettings))]
         [Description("Toggle settings")]
         ToggleSettings,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleBeatmapListing))]
         [Description("Toggle beatmap listing")]
         ToggleBeatmapListing,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseVolume))]
         [Description("Increase volume")]
         IncreaseVolume,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseVolume))]
         [Description("Decrease volume")]
         DecreaseVolume,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleMute))]
         [Description("Toggle mute")]
         ToggleMute,
 
         // In-Game Keybindings
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SkipCutscene))]
         [Description("Skip cutscene")]
         SkipCutscene,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.QuickRetry))]
         [Description("Quick retry (hold)")]
         QuickRetry,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TakeScreenshot))]
         [Description("Take screenshot")]
         TakeScreenshot,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons))]
         [Description("Toggle gameplay mouse buttons")]
         ToggleGameplayMouseButtons,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Back))]
         [Description("Back")]
         Back,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseScrollSpeed))]
         [Description("Increase scroll speed")]
         IncreaseScrollSpeed,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseScrollSpeed))]
         [Description("Decrease scroll speed")]
         DecreaseScrollSpeed,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Select))]
         [Description("Select")]
         Select,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.QuickExit))]
         [Description("Quick exit (hold)")]
         QuickExit,
 
         // Game-wide beatmap music controller keybindings
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MusicNext))]
         [Description("Next track")]
         MusicNext,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MusicPrev))]
         [Description("Previous track")]
         MusicPrev,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MusicPlay))]
         [Description("Play / pause")]
         MusicPlay,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleNowPlaying))]
         [Description("Toggle now playing overlay")]
         ToggleNowPlaying,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPrevious))]
         [Description("Previous selection")]
         SelectPrevious,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNext))]
         [Description("Next selection")]
         SelectNext,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Home))]
         [Description("Home")]
         Home,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleNotifications))]
         [Description("Toggle notifications")]
         ToggleNotifications,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PauseGameplay))]
         [Description("Pause gameplay")]
         PauseGameplay,
 
         // Editor
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSetupMode))]
         [Description("Setup mode")]
         EditorSetupMode,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorComposeMode))]
         [Description("Compose mode")]
         EditorComposeMode,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDesignMode))]
         [Description("Design mode")]
         EditorDesignMode,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTimingMode))]
         [Description("Timing mode")]
         EditorTimingMode,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.HoldForHUD))]
         [Description("Hold for HUD")]
         HoldForHUD,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.RandomSkin))]
         [Description("Random skin")]
         RandomSkin,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TogglePauseReplay))]
         [Description("Pause / resume replay")]
         TogglePauseReplay,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleInGameInterface))]
         [Description("Toggle in-game interface")]
         ToggleInGameInterface,
 
         // Song select keybindings
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleModSelection))]
         [Description("Toggle Mod Select")]
         ToggleModSelection,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNextRandom))]
         [Description("Random")]
         SelectNextRandom,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPreviousRandom))]
         [Description("Rewind")]
         SelectPreviousRandom,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleBeatmapOptions))]
         [Description("Beatmap Options")]
         ToggleBeatmapOptions,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorVerifyMode))]
         [Description("Verify mode")]
         EditorVerifyMode,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorNudgeLeft))]
         [Description("Nudge selection left")]
         EditorNudgeLeft,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorNudgeRight))]
         [Description("Nudge selection right")]
         EditorNudgeRight,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleSkinEditor))]
         [Description("Toggle skin editor")]
         ToggleSkinEditor,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PreviousVolumeMeter))]
         [Description("Previous volume meter")]
         PreviousVolumeMeter,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.NextVolumeMeter))]
         [Description("Next volume meter")]
         NextVolumeMeter,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SeekReplayForward))]
         [Description("Seek replay forward")]
         SeekReplayForward,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SeekReplayBackward))]
         [Description("Seek replay backward")]
         SeekReplayBackward,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChatFocus))]
         [Description("Toggle chat focus")]
         ToggleChatFocus
     }
