@@ -132,12 +132,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             })
         };
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (SelectedRoom.Value != Room)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Select:
                     TriggerClick();
@@ -147,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
