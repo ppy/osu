@@ -144,9 +144,9 @@ namespace osu.Game.Screens.Play
             return base.OnMouseMove(e);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.SkipCutscene:
                     if (!button.Enabled.Value)
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 

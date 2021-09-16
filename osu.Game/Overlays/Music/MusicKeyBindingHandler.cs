@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
@@ -26,23 +27,23 @@ namespace osu.Game.Overlays.Music
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (beatmap.Disabled)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.MusicPlay:
                     // use previous state as TogglePause may not update the track's state immediately (state update is run on the audio thread see https://github.com/ppy/osu/issues/9880#issuecomment-674668842)
                     bool wasPlaying = musicController.IsPlaying;
 
                     if (musicController.TogglePause())
-                        onScreenDisplay?.Display(new MusicActionToast(wasPlaying ? "Pause track" : "Play track", action));
+                        onScreenDisplay?.Display(new MusicActionToast(wasPlaying ? "Pause track" : "Play track", e.Action));
                     return true;
 
                 case GlobalAction.MusicNext:
-                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast("Next track", action)));
+                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast("Next track", e.Action)));
 
                     return true;
 
@@ -52,11 +53,11 @@ namespace osu.Game.Overlays.Music
                         switch (res)
                         {
                             case PreviousTrackResult.Restart:
-                                onScreenDisplay?.Display(new MusicActionToast("Restart track", action));
+                                onScreenDisplay?.Display(new MusicActionToast("Restart track", e.Action));
                                 break;
 
                             case PreviousTrackResult.Previous:
-                                onScreenDisplay?.Display(new MusicActionToast("Previous track", action));
+                                onScreenDisplay?.Display(new MusicActionToast("Previous track", e.Action));
                                 break;
                         }
                     });
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays.Music
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 

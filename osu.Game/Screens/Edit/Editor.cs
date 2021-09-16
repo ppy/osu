@@ -347,9 +347,9 @@ namespace osu.Game.Screens.Edit
             clock.ProcessFrame();
         }
 
-        public bool OnPressed(PlatformAction action)
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case PlatformAction.Cut:
                     Cut();
@@ -379,7 +379,7 @@ namespace osu.Game.Screens.Edit
             return false;
         }
 
-        public void OnReleased(PlatformAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
         }
 
@@ -434,9 +434,9 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Back:
                     // as we don't want to display the back button, manual handling of exit action is required.
@@ -468,7 +468,7 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
