@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -38,13 +39,58 @@ namespace osu.Game.Rulesets
     {
         public RulesetInfo RulesetInfo { get; internal set; }
 
-        public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
-                                                    // Confine all mods of each mod type into a single IEnumerable<Mod>
-                                                    .SelectMany(GetModsFor)
-                                                    // Filter out all null mods
-                                                    .Where(mod => mod != null)
-                                                    // Resolve MultiMods as their .Mods property
-                                                    .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
+        private static readonly ConcurrentDictionary<int, IMod[]> mod_reference_cache = new ConcurrentDictionary<int, IMod[]>();
+
+        /// <summary>
+        /// A queryable source containing all available mods.
+        /// Call <see cref="IMod.CreateInstance"/> for consumption purposes.
+        /// </summary>
+        public IEnumerable<IMod> AllMods
+        {
+            get
+            {
+                if (!(RulesetInfo.ID is int id))
+                    return CreateAllMods();
+
+                if (!mod_reference_cache.TryGetValue(id, out var mods))
+                    mod_reference_cache[id] = mods = CreateAllMods().Cast<IMod>().ToArray();
+
+                return mods;
+            }
+        }
+
+        /// <summary>
+        /// Returns fresh instances of all mods.
+        /// </summary>
+        /// <remarks>
+        /// This comes with considerable allocation overhead. If only accessing for reference purposes (ie. not changing bindables / settings)
+        /// use <see cref="AllMods"/> instead.
+        /// </remarks>
+        public IEnumerable<Mod> CreateAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
+                                                       // Confine all mods of each mod type into a single IEnumerable<Mod>
+                                                       .SelectMany(GetModsFor)
+                                                       // Filter out all null mods
+                                                       .Where(mod => mod != null)
+                                                       // Resolve MultiMods as their .Mods property
+                                                       .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
+
+        /// <summary>
+        /// Returns a fresh instance of the mod matching the specified acronym.
+        /// </summary>
+        /// <param name="acronym">The acronym to query for .</param>
+        public Mod CreateModFromAcronym(string acronym)
+        {
+            return AllMods.FirstOrDefault(m => m.Acronym == acronym)?.CreateInstance();
+        }
+
+        /// <summary>
+        /// Returns a fresh instance of the mod matching the specified type.
+        /// </summary>
+        public T CreateMod<T>()
+            where T : Mod
+        {
+            return AllMods.FirstOrDefault(m => m is T)?.CreateInstance() as T;
+        }
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
@@ -126,7 +172,7 @@ namespace osu.Game.Rulesets
         }
 
         [CanBeNull]
-        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().FirstOrDefault();
+        public ModAutoplay GetAutoplayMod() => CreateMod<ModAutoplay>();
 
         public virtual ISkin CreateLegacySkinProvider([NotNull] ISkin skin, IBeatmap beatmap) => null;
 
