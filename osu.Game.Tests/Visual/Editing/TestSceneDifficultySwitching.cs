@@ -56,6 +56,59 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestClockPositionPreservedBetweenSwitches()
+        {
+            BeatmapInfo targetDifficulty = null;
+            AddStep("seek editor to 00:05:00", () => EditorClock.Seek(5000));
+
+            AddStep("set target difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo)));
+            switchToDifficulty(() => targetDifficulty);
+            confirmEditingBeatmap(() => targetDifficulty);
+            AddAssert("editor clock at 00:05:00", () => EditorClock.CurrentTime == 5000);
+
+            AddStep("exit editor", () => Stack.Exit());
+            // ensure editor loader didn't resume.
+            AddAssert("stack empty", () => Stack.CurrentScreen == null);
+        }
+
+        [Test]
+        public void TestClipboardPreservedAfterSwitch([Values] bool sameRuleset)
+        {
+            BeatmapInfo targetDifficulty = null;
+
+            AddStep("select first object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.First()));
+            AddStep("copy object", () => Editor.Copy());
+
+            AddStep("set target difficulty", () =>
+            {
+                targetDifficulty = sameRuleset
+                    ? importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo) && beatmap.RulesetID == Beatmap.Value.BeatmapInfo.RulesetID)
+                    : importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo) && beatmap.RulesetID != Beatmap.Value.BeatmapInfo.RulesetID);
+            });
+            switchToDifficulty(() => targetDifficulty);
+            confirmEditingBeatmap(() => targetDifficulty);
+
+            AddAssert("no objects selected", () => !EditorBeatmap.SelectedHitObjects.Any());
+            AddStep("paste object", () => Editor.Paste());
+
+            if (sameRuleset)
+                AddAssert("object was pasted", () => EditorBeatmap.SelectedHitObjects.Any());
+            else
+                AddAssert("object was not pasted", () => !EditorBeatmap.SelectedHitObjects.Any());
+
+            AddStep("exit editor", () => Stack.Exit());
+
+            if (sameRuleset)
+            {
+                AddUntilStep("prompt for save dialog shown", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
+                AddStep("discard changes", () => ((PromptForSaveDialog)DialogOverlay.CurrentDialog).PerformOkAction());
+            }
+
+            // ensure editor loader didn't resume.
+            AddAssert("stack empty", () => Stack.CurrentScreen == null);
+        }
+
+        [Test]
         public void TestPreventSwitchDueToUnsavedChanges()
         {
             BeatmapInfo targetDifficulty = null;
@@ -118,7 +171,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void confirmEditingBeatmap(Func<BeatmapInfo> targetDifficulty)
         {
             AddUntilStep("current beatmap is correct", () => Beatmap.Value.BeatmapInfo.Equals(targetDifficulty.Invoke()));
-            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen == Editor && Editor?.IsLoaded == true);
         }
     }
 }
