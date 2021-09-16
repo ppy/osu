@@ -148,6 +148,7 @@ jobs:
             SELECT
               m.beatmap_id,
               m.mods,
+              b.filename,
               m.diff_unified as 'sr_master',
               p.diff_unified as 'sr_pr',
               (p.diff_unified - m.diff_unified) as 'diff'
@@ -156,6 +157,8 @@ jobs:
               ON m.beatmap_id = p.beatmap_id
               AND m.mode = p.mode
               AND m.mods = p.mods
+            JOIN osu_pr.osu_beatmaps b
+              ON b.beatmap_id = p.beatmap_id
             WHERE abs(m.diff_unified - p.diff_unified) > 0.1
             ORDER BY abs(m.diff_unified - p.diff_unified)
               DESC
