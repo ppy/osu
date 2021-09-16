@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
     public class OsuDifficultyHitObject : DifficultyHitObject
     {
-        private const int normalized_radius = 50;
+        private const int normalized_radius = 50; // Change radius to 50 to make 100 the diameter. Easier for mental maths.
 
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 

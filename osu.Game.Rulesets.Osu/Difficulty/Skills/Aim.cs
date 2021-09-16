@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 var prevVector = Vector2.Divide(osuPrevObj.JumpVector, (float)osuPrevObj.StrainTime);
                 // var lastVector = Vector2.Divide(osuLastObj.JumpVector, (float)osuLastObj.StrainTime); // not needed right now.
 
-                if (Precision.AlmostEquals(osuCurrObj.StrainTime, osuPrevObj.StrainTime)) // Rhythms are the same.
+                if (Precision.AlmostEquals(osuCurrObj.StrainTime, osuPrevObj.StrainTime, 10)) // Rhythms are the same.
                 {
                     if (osuCurrObj.Angle != null)
                     {
