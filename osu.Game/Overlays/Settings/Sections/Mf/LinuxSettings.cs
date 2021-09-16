@@ -51,29 +51,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 {
                     LabelText = "允许发送系统通知",
                     Current = config.GetBindable<bool>(MSetting.EnableSystemNotifications)
-                },
-                new SettingsButton
-                {
-                    Text = "发送！",
-                    Action = () =>
-                    {
-                        dBusManager.Notifications.PostAsync(new SystemNotification
-                        {
-                            Name = "设置",
-                            Title = "标题",
-                            Description = "内容: https://bilibili.com",
-                            Actions = new[]
-                            {
-                                new NotificationAction("OK", "好", () => Logger.Log("OK被调用！")),
-                                new NotificationAction("NO", "不要！", () => Logger.Log("NO被调用！")),
-                                new NotificationAction("PENDING", "我再想想", () => Logger.Log("PENDING被调用！")),
-                            },
-                            OnClosed = v =>
-                            {
-                                Logger.Log($"通知关闭！{v}");
-                            }
-                        });
-                    }
                 }
             };
 

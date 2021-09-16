@@ -33,14 +33,11 @@ namespace M.DBus.Tray
         /// <param name="entry">目标目录</param>
         /// <param name="order">这个项目的id</param>
         /// <param name="maxOrder">DBus目录上最后一个项目的id，确保不会发生id冲突</param>
-        /// <param name="additionalEntries">添加的子项词典</param>
-        /// <param name="additonalOrders">添加了多少个子项</param>
+        /// <param name="additionalEntries">所有新发现的子项</param>
         /// <returns>一个能被Tmds.DBus转换的数据</returns>
-        /// <exception cref="InvalidOperationException">某个子项的id被赋予，但是noChildren是false</exception>
         public static (int, IDictionary<string, object>, object[]) ToDbusObject(
             this SimpleEntry entry,
             int order, int maxOrder,
-            out int additonalOrders,
             out IDictionary<int, SimpleEntry> additionalEntries)
         {
             var result = new Dictionary<string, object>
@@ -60,8 +57,6 @@ namespace M.DBus.Tray
             IList<object> subMenus = new List<object>();
 
             additionalEntries = new Dictionary<int, SimpleEntry>();
-            additonalOrders = 0;
-            int originalMaxOrder = maxOrder;
 
             if (entry.ChildrenDisplay == ChildrenDisplayType.SSubmenu)
             {
@@ -70,26 +65,35 @@ namespace M.DBus.Tray
                     //遍历所有子菜单
                     foreach (var subEntry in entry.Children)
                     {
+                        //额外产生的SimpleEntry
+                        //如果某一个subEntry是SSubmenu，则其Children中的所有SimpleEntry都将加入这个词典
                         IDictionary<int, SimpleEntry> additDict;
-                        int addit;
 
-                        //id自加
+                        //如果subEntry没有被指定ChildID
                         if (subEntry.ChildId == -2)
                         {
+                            //最大id+1
                             maxOrder++;
 
+                            //设置subEntry的ChildID
                             subEntry.ChildId = maxOrder;
 
+                            //加入要返回的词典中
                             additionalEntries[subEntry.ChildId] = subEntry;
 
-                            Logger.Log($"{subEntry} 获取了新的ChildId: {subEntry.ChildId}", level: LogLevel.Verbose);
+                            //记录
+                            //Logger.Log($"{subEntry} 获取了新的ChildId: {subEntry.ChildId}");
                         }
 
                         //添加目录
-                        subMenus.Add(subEntry.ToDbusObject(subEntry.ChildId, maxOrder, out addit, out additDict));
+                        //不需要处理additonalOrders，因为已经有additDict可以用作计数了
+                        subMenus.Add(subEntry.ToDbusObject(subEntry.ChildId, maxOrder, out additDict));
 
+                        //将循环调用返回的 额外词典 加进要返回的 词典 中
                         additionalEntries.AddRange(additDict);
-                        maxOrder += addit + additDict.Count;
+
+                        //当前的最大id += 多出的目录数量 + 额外目录的数量
+                        maxOrder += additDict.Count;
                     }
                 }
                 catch (Exception e)
@@ -98,7 +102,6 @@ namespace M.DBus.Tray
                 }
             }
 
-            additonalOrders = maxOrder - originalMaxOrder;
             return (order, result, subMenus.ToArray());
         }
 

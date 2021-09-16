@@ -113,25 +113,29 @@ namespace osu.Desktop.DBus.Tray
             {
                 if (updatedEntries.Count != 0)
                 {
-                    Logger.Log("刷新DBus目录缓存", level: LogLevel.Verbose);
+                    //Logger.Log("刷新DBus目录缓存", level: LogLevel.Verbose);
                     IDictionary<int, SimpleEntry> additDict;
-                    int addit;
+                    //int addit;
 
                     var result =
                         (menuRevision, rootEntry.ToDbusObject(
                             rootEntry.ChildId,
                             dbusItemMaxOrder,
-                            out addit,
                             out additDict));
 
+                    //缓存当前结果到cachedLayoutObject中
                     cachedLayoutObject = result;
 
-                    dbusItemMaxOrder += addit;
+                    //更新最大id
+                    dbusItemMaxOrder += additDict.Count;
 
+                    //递归检查所有新增的SimpleEntry
                     foreach (var kvp in additDict)
                     {
+                        //尝试添加到entries中
                         if (entries.TryAdd(kvp.Key, kvp.Value))
                         {
+                            //如果成功了，订阅OnPropertyChanged
                             kvp.Value.OnPropertyChanged = () =>
                             {
                                 triggerLayoutUpdate(kvp.Value);
@@ -139,11 +143,13 @@ namespace osu.Desktop.DBus.Tray
                         }
                     }
 
+                    //因为Layout已经更新，updatedEntries中现有的值已经不需要了，故对其清空
                     updatedEntries.Clear();
 
                     return Task.FromResult(result);
                 }
 
+                //返回缓存的列表
                 return Task.FromResult(cachedLayoutObject);
             }
             catch (Exception e)
