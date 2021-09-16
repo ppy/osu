@@ -96,9 +96,6 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddStep("create game", () =>
             {
-                game = new OsuGame();
-                game.SetHost(host);
-
                 Children = new Drawable[]
                 {
                     new Box
@@ -106,8 +103,9 @@ namespace osu.Game.Tests.Visual.Navigation
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                     },
-                    game
                 };
+
+                AddGame(game = new OsuGame());
             });
 
             AddUntilStep("wait for load", () => game.IsLoaded);
