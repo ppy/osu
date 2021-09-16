@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -94,7 +95,7 @@ namespace osu.Game.Screens
 
         private OsuScreenDependencies screenDependencies;
 
-        private bool trackAdjustmentStateAtSuspend;
+        private bool? trackAdjustmentStateAtSuspend;
 
         internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
 
@@ -178,7 +179,9 @@ namespace osu.Game.Screens
 
             applyArrivingDefaults(true);
 
-            musicController.AllowTrackAdjustments = trackAdjustmentStateAtSuspend;
+            Debug.Assert(trackAdjustmentStateAtSuspend != null);
+
+            musicController.AllowTrackAdjustments = trackAdjustmentStateAtSuspend.Value;
 
             base.OnResuming(last);
         }
