@@ -20,6 +20,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
@@ -86,9 +87,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 if (firstObject == null)
                     return false;
 
-                var skinnable = firstObject.ApproachCircle.Child as SkinnableDrawable;
+                var skinnable = firstObject.ApproachCircle;
 
-                if (skin == null && skinnable?.Drawable is Sprite)
+                if (skin == null && skinnable?.Drawable is DefaultApproachCircle)
                     // check for default skin provider
                     return true;
 
