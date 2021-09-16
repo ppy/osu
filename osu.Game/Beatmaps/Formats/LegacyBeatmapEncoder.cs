@@ -182,11 +182,8 @@ namespace osu.Game.Beatmaps.Formats
             bool isOsuRuleset = beatmap.BeatmapInfo.RulesetID == 0;
 
             // iterate over hitobjects and pull out all required sample and difficulty changes
-            foreach (var h in beatmap.HitObjects)
-            {
-                extractDifficultyControlPoints(h);
-                extractSampleControlPoints(h);
-            }
+            extractDifficultyControlPoints(beatmap.HitObjects);
+            extractSampleControlPoints(beatmap.HitObjects);
 
             // handle scroll speed, which is stored as "slider velocity" in legacy formats.
             // this is relevant for scrolling ruleset beatmaps.
@@ -239,36 +236,52 @@ namespace osu.Game.Beatmaps.Formats
                 writer.WriteLine();
             }
 
-            void extractDifficultyControlPoints(HitObject hitObject)
+            IEnumerable<DifficultyControlPoint> collectDifficultyControlPoints(IEnumerable<HitObject> hitObjects)
             {
                 if (!isOsuRuleset)
-                    return;
+                    yield break;
 
-                var hDifficultyPoint = hitObject.DifficultyControlPoint;
-
-                if (!hDifficultyPoint.IsRedundant(lastRelevantDifficultyPoint))
+                foreach (var hitObject in hitObjects)
                 {
-                    legacyControlPoints.Add(hDifficultyPoint.Time, hDifficultyPoint);
-                    lastRelevantDifficultyPoint = hDifficultyPoint;
-                }
+                    yield return hitObject.DifficultyControlPoint;
 
-                foreach (var nested in hitObject.NestedHitObjects)
-                    extractDifficultyControlPoints(nested);
+                    foreach (var nested in collectDifficultyControlPoints(hitObject.NestedHitObjects))
+                        yield return nested;
+                }
             }
 
-            void extractSampleControlPoints(HitObject hitObject)
+            void extractDifficultyControlPoints(IEnumerable<HitObject> hitObjects)
             {
-                // process nested objects first as these use EndTime for legacy storage.
-
-                foreach (var nested in hitObject.NestedHitObjects)
-                    extractSampleControlPoints(nested);
-
-                var hSamplePoint = hitObject.SampleControlPoint;
-
-                if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
+                foreach (var hDifficultyPoint in collectDifficultyControlPoints(hitObjects).OrderBy(dp => dp.Time))
                 {
-                    legacyControlPoints.Add(hSamplePoint.Time, hSamplePoint);
-                    lastRelevantSamplePoint = hSamplePoint;
+                    if (!hDifficultyPoint.IsRedundant(lastRelevantDifficultyPoint))
+                    {
+                        legacyControlPoints.Add(hDifficultyPoint.Time, hDifficultyPoint);
+                        lastRelevantDifficultyPoint = hDifficultyPoint;
+                    }
+                }
+            }
+
+            IEnumerable<SampleControlPoint> collectSampleControlPoints(IEnumerable<HitObject> hitObjects)
+            {
+                foreach (var hitObject in hitObjects)
+                {
+                    yield return hitObject.SampleControlPoint;
+
+                    foreach (var nested in collectSampleControlPoints(hitObject.NestedHitObjects))
+                        yield return nested;
+                }
+            }
+
+            void extractSampleControlPoints(IEnumerable<HitObject> hitObject)
+            {
+                foreach (var hSamplePoint in collectSampleControlPoints(hitObject).OrderBy(sp => sp.Time))
+                {
+                    if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
+                    {
+                        legacyControlPoints.Add(hSamplePoint.Time, hSamplePoint);
+                        lastRelevantSamplePoint = hSamplePoint;
+                    }
                 }
             }
         }
