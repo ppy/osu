@@ -53,10 +53,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Origin = Anchor.Centre,
                     Colour = starBreakAdditive,
                     Direction = SpewDirection.None,
-                    Active =
-                    {
-                        Value = false,
-                    }
                 },
                 kiaiSpewer = new LegacyCursorParticleSpewer(texture, 60)
                 {
@@ -64,10 +60,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Origin = Anchor.Centre,
                     Colour = starBreakAdditive,
                     Direction = SpewDirection.None,
-                    Active =
-                    {
-                        Value = false,
-                    }
                 },
             };
 
