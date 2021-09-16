@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -179,9 +178,10 @@ namespace osu.Game.Screens
 
             applyArrivingDefaults(true);
 
-            Debug.Assert(trackAdjustmentStateAtSuspend != null);
-
-            musicController.AllowTrackAdjustments = trackAdjustmentStateAtSuspend.Value;
+            // it's feasible to resume to a screen if the target screen never loaded successfully.
+            // in such a case there's no need to restore this value.
+            if (trackAdjustmentStateAtSuspend != null)
+                musicController.AllowTrackAdjustments = trackAdjustmentStateAtSuspend.Value;
 
             base.OnResuming(last);
         }
