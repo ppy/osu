@@ -75,20 +75,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            protected override FallingParticle SpawnParticle()
-            {
-                var p = base.SpawnParticle();
-                p.Velocity = new Vector2(
-                    RNG.NextSingle(-MaxVelocity, MaxVelocity),
-                    RNG.NextSingle(-MaxVelocity, MaxVelocity)
-                );
-                p.Duration = RNG.NextSingle(lifetime);
-                p.StartAngle = RNG.NextSingle(MathF.PI * 2);
-                p.EndAngle = RNG.NextSingle(MathF.PI * 2);
-                p.EndScale = RNG.NextSingle(0.5f, 1.5f);
-
-                return p;
-            }
+            protected override FallingParticle CreateParticle() =>
+                new FallingParticle
+                {
+                    Velocity = new Vector2(
+                        RNG.NextSingle(-MaxVelocity, MaxVelocity),
+                        RNG.NextSingle(-MaxVelocity, MaxVelocity)
+                    ),
+                    Duration = RNG.NextSingle(lifetime),
+                    StartAngle = RNG.NextSingle(MathF.PI * 2),
+                    EndAngle = RNG.NextSingle(MathF.PI * 2),
+                    EndScale = RNG.NextSingle(0.5f, 1.5f)
+                };
         }
     }
 }

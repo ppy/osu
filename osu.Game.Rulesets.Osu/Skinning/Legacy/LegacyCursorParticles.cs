@@ -179,47 +179,48 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 velocityFrameLength = 0;
             }
 
-            protected override FallingParticle SpawnParticle()
-            {
-                var p = base.SpawnParticle();
+            protected override FallingParticle CreateParticle() =>
+                new FallingParticle
+                {
+                    StartPosition = ToLocalSpace(cursorScreenPosition ?? Vector2.Zero),
+                    Duration = RNG.NextSingle(particle_lifetime_min, particle_lifetime_max),
+                    StartAngle = (float)(RNG.NextDouble() * 4 - 2),
+                    EndAngle = RNG.NextSingle(-2f, 2f),
+                    EndScale = RNG.NextSingle(2f),
+                    Velocity = getVelocity(),
+                };
 
-                p.StartPosition = ToLocalSpace(cursorScreenPosition ?? Vector2.Zero);
-                p.Duration = RNG.NextSingle(particle_lifetime_min, particle_lifetime_max);
-                p.StartAngle = (float)(RNG.NextDouble() * 4 - 2);
-                p.EndAngle = RNG.NextSingle(-2f, 2f);
-                p.EndScale = RNG.NextSingle(2f);
+            private Vector2 getVelocity()
+            {
+                Vector2 velocity = Vector2.Zero;
 
                 switch (Direction)
                 {
-                    case SpewDirection.None:
-                        p.Velocity = Vector2.Zero;
-                        break;
-
                     case SpewDirection.Left:
-                        p.Velocity = new Vector2(
+                        velocity = new Vector2(
                             RNG.NextSingle(-460f, 0),
                             RNG.NextSingle(-40f, 40f)
                         );
                         break;
 
                     case SpewDirection.Right:
-                        p.Velocity = new Vector2(
+                        velocity = new Vector2(
                             RNG.NextSingle(0, 460f),
                             RNG.NextSingle(-40f, 40f)
                         );
                         break;
 
                     case SpewDirection.Omni:
-                        p.Velocity = new Vector2(
+                        velocity = new Vector2(
                             RNG.NextSingle(-460f, 460f),
                             RNG.NextSingle(-160f, 160f)
                         );
                         break;
                 }
 
-                p.Velocity += cursorVelocity * 40;
+                velocity += cursorVelocity * 40;
 
-                return p;
+                return velocity;
             }
         }
 
