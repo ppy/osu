@@ -109,15 +109,6 @@ namespace Mvis.Plugin.CollectionSupport
             });
 
             PluginManager.RegisterDBusObject(dBusObject = new CollectionDBusObject());
-            PluginManager.AddDBusMenuEntry(trayEntry);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            CurrentCollection.BindValueChanged(OnCollectionChanged);
-
-            collectionManager.Collections.CollectionChanged += triggerRefresh;
 
             if (MvisScreen != null)
             {
@@ -126,10 +117,21 @@ namespace Mvis.Plugin.CollectionSupport
             }
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            CurrentCollection.BindValueChanged(OnCollectionChanged);
+
+            collectionManager.Collections.CollectionChanged += triggerRefresh;
+        }
+
         private void onMvisExiting()
         {
             PluginManager.UnRegisterDBusObject(new CollectionDBusObject());
-            PluginManager.RemoveDBusMenuEntry(trayEntry);
+
+            if (!Disabled.Value)
+                PluginManager.RemoveDBusMenuEntry(trayEntry);
+
             resetDBusMessage();
         }
 
@@ -154,6 +156,7 @@ namespace Mvis.Plugin.CollectionSupport
             this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
 
             resetDBusMessage();
+            PluginManager.RemoveDBusMenuEntry(trayEntry);
 
             return base.Disable();
         }
@@ -164,6 +167,7 @@ namespace Mvis.Plugin.CollectionSupport
             {
                 dBusObject.Position = currentPosition;
                 dBusObject.CollectionName = CurrentCollection.Value?.Name.Value ?? "-";
+                PluginManager.AddDBusMenuEntry(trayEntry);
             }
 
             return base.Enable();
@@ -267,46 +271,55 @@ namespace Mvis.Plugin.CollectionSupport
             {
                 //获取当前BeatmapSet
                 var currentSet = item.BeatmapSet;
-                var subEntry = new SimpleEntry
-                {
-                    Label = item.BeatmapSet.Metadata.ToRomanisableString().GetPreferred(true),
-                    OnActive = () =>
-                    {
-                        Schedule(() => Play(beatmaps.GetWorkingBeatmap(item)));
-                    }
-                };
-
                 //进行比对，如果beatmapList中不存在，则添加。
                 if (!beatmapList.Contains(currentSet))
                     beatmapList.Add(currentSet);
 
-                if (trayEntry.Children.All(s => s.Label != subEntry.Label))
-                    trayEntry.Children.Add(subEntry);
+                if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                {
+                    var subEntry = new SimpleEntry
+                    {
+                        Label = item.BeatmapSet.Metadata.ToRomanisableString().GetPreferred(true),
+                        OnActive = () =>
+                        {
+                            Schedule(() => Play(beatmaps.GetWorkingBeatmap(item)));
+                        }
+                    };
+
+                    if (trayEntry.Children.All(s => s.Label != subEntry.Label))
+                        trayEntry.Children.Add(subEntry);
+                }
             }
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                 dBusObject.CollectionName = collection.Name.Value;
 
+            updateCurrentPosition(true);
             trayEntry.Label = $"收藏夹（{collection.Name}）";
-            updateCurrentPosition();
         }
 
         private SimpleEntry currentSubEntry;
 
-        private void updateCurrentPosition()
+        private void updateCurrentPosition(bool triggerDBusSubmenu = false)
         {
             CurrentPosition = beatmapList.IndexOf(b.Value.BeatmapSetInfo);
 
-            if (currentSubEntry != null)
-                currentSubEntry.ToggleState = 0;
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            {
+                if (currentSubEntry != null)
+                    currentSubEntry.ToggleState = 0;
 
-            var targetEntry = trayEntry.Children.FirstOrDefault(s =>
-                s.Label == b.Value.BeatmapSetInfo.Metadata.ToRomanisableString().GetPreferred(true));
+                var targetEntry = trayEntry.Children.FirstOrDefault(s =>
+                    s.Label == b.Value.BeatmapSetInfo.Metadata.ToRomanisableString().GetPreferred(true));
 
-            if (targetEntry != null)
-                targetEntry.ToggleState = 1;
+                if (targetEntry != null)
+                    targetEntry.ToggleState = 1;
 
-            currentSubEntry = targetEntry;
+                currentSubEntry = targetEntry;
+
+                if (triggerDBusSubmenu)
+                    trayEntry.TriggerPropertyChangedEvent();
+            }
         }
 
         public void UpdateBeatmaps() => updateBeatmaps(CurrentCollection.Value);

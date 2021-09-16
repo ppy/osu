@@ -9,6 +9,14 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         private MvisPluginManager manager { get; set; }
 
         protected BindableBool Value = new BindableBool();
+        private bool mvisExiting;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (MvisScreen != null)
+                MvisScreen.OnScreenExiting += () => mvisExiting = true;
+        }
 
         protected override void LoadComplete()
         {
@@ -18,7 +26,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
 
         protected virtual void OnValueChanged(ValueChangedEvent<bool> v)
         {
-            if (Value.Value)
+            if (Value.Value && !mvisExiting)
                 manager.ActivePlugin(this);
             else
                 manager.DisablePlugin(this);

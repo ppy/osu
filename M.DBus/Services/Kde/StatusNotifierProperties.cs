@@ -141,7 +141,7 @@ namespace M.DBus.Services.Kde
 
         private bool _ItemIsMenu;
 
-        private string _IconName = "xorg";
+        private string _IconName = string.Empty;
 
         private (int, int, byte[])[] _IconPixmap =
         {

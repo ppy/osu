@@ -132,7 +132,10 @@ namespace Mvis.Plugin.CloudMusicSupport
         [Resolved]
         private OsuGame game { get; set; }
 
-        private SimpleEntry lyricEntry;
+        private readonly SimpleEntry lyricEntry = new SimpleEntry
+        {
+            Enabled = false
+        };
 
         [BackgroundDependencyLoader]
         private void load()
@@ -146,10 +149,6 @@ namespace Mvis.Plugin.CloudMusicSupport
             AddInternal(processor);
 
             PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
-            PluginManager.AddDBusMenuEntry(lyricEntry = new SimpleEntry
-            {
-                Enabled = false
-            });
 
             if (MvisScreen != null)
             {
@@ -161,7 +160,9 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             resetDBusMessage();
             PluginManager.UnRegisterDBusObject(new LyricDBusObject());
-            PluginManager.RemoveDBusMenuEntry(lyricEntry);
+
+            if (!Disabled.Value)
+                PluginManager.RemoveDBusMenuEntry(lyricEntry);
         }
 
         public void WriteLyricToDisk()
@@ -227,6 +228,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
 
             resetDBusMessage();
+            PluginManager.RemoveDBusMenuEntry(lyricEntry);
 
             return base.Disable();
         }
@@ -243,6 +245,8 @@ namespace Mvis.Plugin.CloudMusicSupport
             {
                 dbusObject.RawLyric = currentLine?.Content;
                 dbusObject.TranslatedLyric = currentLine?.TranslatedString;
+
+                PluginManager.AddDBusMenuEntry(lyricEntry);
             }
 
             return result;

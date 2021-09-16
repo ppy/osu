@@ -493,6 +493,56 @@ namespace osu.Game.Screens.Mvis
                     Icon = FontAwesome.Solid.Lock
                 }
             });
+
+            //添加插件
+            foreach (var pl in pluginManager.GetAllPlugins(true))
+            {
+                try
+                {
+                    //决定要把插件放在何处
+                    switch (pl.Target)
+                    {
+                        case MvisPlugin.TargetLayer.Background:
+                            background.Add(pl);
+                            break;
+
+                        case MvisPlugin.TargetLayer.Foreground:
+                            foreground.Add(pl);
+                            break;
+                    }
+
+                    var pluginSidebarPage = pl.CreateSidebarPage();
+
+                    //如果插件有侧边栏页面
+                    if (pluginSidebarPage != null)
+                    {
+                        sidebar.Add(pluginSidebarPage);
+                        var btn = pluginSidebarPage.GetFunctionEntry();
+
+                        //如果插件的侧边栏页面有入口按钮
+                        if (btn != null)
+                        {
+                            btn.Action = () => updateSidebarState(pluginSidebarPage);
+                            btn.Description += $" ({pluginSidebarPage.ShortcutKey})";
+
+                            functionProviders.Add(btn);
+                        }
+
+                        //如果插件的侧边栏页面有调用快捷键
+                        if (pluginSidebarPage.ShortcutKey != Key.Unknown)
+                        {
+                            RegisterKeybind(pl, new PluginKeybind(pluginSidebarPage.ShortcutKey, () =>
+                            {
+                                if (!pl.Disabled.Value) btn?.Active();
+                            }));
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方: {e.Message}");
+                }
+            }
         }
 
         protected override void LoadComplete()
@@ -564,56 +614,6 @@ namespace osu.Game.Screens.Mvis
 
             //当插件卸载时调用onPluginUnload
             pluginManager.OnPluginUnLoad += onPluginUnLoad;
-
-            //添加插件
-            foreach (var pl in pluginManager.GetAllPlugins(true))
-            {
-                try
-                {
-                    //决定要把插件放在何处
-                    switch (pl.Target)
-                    {
-                        case MvisPlugin.TargetLayer.Background:
-                            background.Add(pl);
-                            break;
-
-                        case MvisPlugin.TargetLayer.Foreground:
-                            foreground.Add(pl);
-                            break;
-                    }
-
-                    var pluginSidebarPage = pl.CreateSidebarPage();
-
-                    //如果插件有侧边栏页面
-                    if (pluginSidebarPage != null)
-                    {
-                        sidebar.Add(pluginSidebarPage);
-                        var btn = pluginSidebarPage.GetFunctionEntry();
-
-                        //如果插件的侧边栏页面有入口按钮
-                        if (btn != null)
-                        {
-                            btn.Action = () => updateSidebarState(pluginSidebarPage);
-                            btn.Description += $" ({pluginSidebarPage.ShortcutKey})";
-
-                            functionProviders.Add(btn);
-                        }
-
-                        //如果插件的侧边栏页面有调用快捷键
-                        if (pluginSidebarPage.ShortcutKey != Key.Unknown)
-                        {
-                            RegisterKeybind(pl, new PluginKeybind(pluginSidebarPage.ShortcutKey, () =>
-                            {
-                                if (!pl.Disabled.Value) btn?.Active();
-                            }));
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方: {e.Message}");
-                }
-            }
 
             //添加选歌入口
             sidebar.Add(new SongSelectPage
@@ -839,8 +839,6 @@ namespace osu.Game.Screens.Mvis
 
         public override bool OnExiting(IScreen next)
         {
-            pluginManager.RemoveDBusMenuEntry(mvisEntry);
-
             //重置Track
             CurrentTrack.ResetSpeedAdjustments();
             CurrentTrack.Looping = false;
@@ -860,6 +858,8 @@ namespace osu.Game.Screens.Mvis
 
             OnScreenExiting?.Invoke();
             pluginManager.OnPluginUnLoad -= onPluginUnLoad;
+
+            pluginManager.RemoveDBusMenuEntry(mvisEntry);
 
             return base.OnExiting(next);
         }

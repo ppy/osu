@@ -54,7 +54,7 @@ namespace M.DBus.Tray
                 ["shortcuts"] = entry.Shortcuts,
                 ["toggle-type"] = entry.ToggleType,
                 ["toggle-state"] = entry.ToggleState,
-                ["children-display"] = entry.ChildrenDisplay,
+                ["children-display"] = entry.ChildrenDisplay
             };
 
             IList<object> subMenus = new List<object>();
@@ -94,7 +94,7 @@ namespace M.DBus.Tray
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, "转换时发生了错误");
+                    Logger.Error(e, $"尝试转换{entry}时出现了错误");
                 }
             }
 

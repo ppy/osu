@@ -215,7 +215,7 @@ namespace M.DBus.Tray
             }
         }
 
-        private int toggleState = 0;
+        private int toggleState;
 
         /// <summary>
         /// 如果菜单项有子项，则此属性应设置为 ChildrenDisplayType.Submenu ("submenu")
@@ -259,6 +259,6 @@ namespace M.DBus.Tray
 
         private IList<SimpleEntry> children = new List<SimpleEntry>();
 
-        public override string ToString() => $"({ChildId}) DBusMenuEntry '{Label}'";
+        public override string ToString() => $"({ChildId}) DBusMenuEntry '{Label.Replace("\n", "\\n")}'";
     }
 }
