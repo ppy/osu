@@ -43,6 +43,8 @@ namespace Mvis.Plugin.StoryboardSupport
         [Resolved]
         private Bindable<WorkingBeatmap> currentBeatmap { get; set; }
 
+        public override int Version => 7;
+
         public BackgroundStoryBoardLoader()
         {
             RelativeSizeAxes = Axes.Both;
@@ -147,8 +149,6 @@ namespace Mvis.Plugin.StoryboardSupport
 
             return true;
         }
-
-        public override int Version => 6;
 
         private Drawable prevProxy;
 

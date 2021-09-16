@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using M.DBus;
-using M.DBus.Services.Notifications;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf

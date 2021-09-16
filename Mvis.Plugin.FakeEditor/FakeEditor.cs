@@ -36,7 +36,7 @@ namespace Mvis.Plugin.FakeEditor
 
         private WorkingBeatmap beatmap;
 
-        public override int Version => 6;
+        public override int Version => 7;
 
         public FakeEditor()
         {
