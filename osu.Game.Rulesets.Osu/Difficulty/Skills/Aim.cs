@@ -34,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double rhythmVarianceMultiplier = 1.0;
         private double sliderMultiplier = 6.5;
         private double sliderJumpMultiplier = 0.875;
+        private double velChangeMultiplier = 5;
 
         private double calcWideAngleBonus(double angle)
         {
@@ -97,6 +98,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                         aimStrain += angleBonus; // add in angle velocity.
                     }
+
+                    if (prevVector.Length > currVector.Length)
+                    {
+                        double velChangeBonus = Math.Max(0, Math.Sqrt((prevVector.Length - currVector.Length) * currVector.Length) - currVector.Length);
+
+                        aimStrain += velChangeBonus * velChangeMultiplier;
+                    }
                 }
                 else // There is a rhythm change
                 {
@@ -110,9 +118,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 if (osuCurrObj.TravelDistance != 0)
                 {
-                    double sliderBuff = Math.Max(osuCurrObj.TravelDistance, sliderJumpMultiplier * Math.Sqrt(osuCurrObj.TravelDistance * osuCurrObj.JumpDistance)) / osuCurrObj.StrainTime;
+                    double sliderBonus = Math.Max(osuCurrObj.TravelDistance, sliderJumpMultiplier * Math.Sqrt(osuCurrObj.TravelDistance * osuCurrObj.JumpDistance)) / osuCurrObj.StrainTime;
 
-                    aimStrain += sliderBuff * sliderMultiplier; // Add in slider velocity.
+                    aimStrain += sliderBonus * sliderMultiplier; // Add in slider velocity.
                 }
 
                 aimStrain += currVector.Length; // Add in regular velocity.
@@ -120,7 +128,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return aimStrain;
         }
-
-        private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
     }
 }
