@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private DrawableHitObject drawableObject { get; set; }
 
         public LegacyApproachCircle()
-            : base("approachcircle")
+            : base("Gameplay/osu/approachcircle")
         {
         }
 
