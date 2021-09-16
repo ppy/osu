@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double acuteAngleMultiplier = 1.0;
         private double rhythmVarianceMultiplier = 1.0;
         private double sliderMultiplier = 6.5;
+        private double sliderJumpMultiplier = 0.875;
 
         private double calcWideAngleBonus(double angle)
         {
@@ -69,18 +70,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 var currVector = Vector2.Divide(osuCurrObj.JumpVector, (float)osuCurrObj.StrainTime);
                 var prevVector = Vector2.Divide(osuPrevObj.JumpVector, (float)osuPrevObj.StrainTime);
-                var lastVector = Vector2.Divide(osuLastObj.JumpVector, (float)osuLastObj.StrainTime);
+                // var lastVector = Vector2.Divide(osuLastObj.JumpVector, (float)osuLastObj.StrainTime); // not needed right now.
 
-                if (osuCurrObj.Angle != null)
+                if (Precision.AlmostEquals(osuCurrObj.StrainTime, osuPrevObj.StrainTime)) // Rhythms are the same.
                 {
-                    double angle = osuCurrObj.Angle.Value;
-                    double angleBonus = Math.Min(currVector.Length, prevVector.Length); // Rewarding angles, take the smaller velocity as base.
-
-                    double wideAngleBonus = calcWideAngleBonus(angle);
-                    double acuteAngleBonus = calcAcuteAngleBonus(angle);
-
-                    if (Precision.AlmostEquals(osuCurrObj.StrainTime, osuPrevObj.StrainTime, 10))
+                    if (osuCurrObj.Angle != null)
                     {
+                        double angle = osuCurrObj.Angle.Value;
+                        double angleBonus = Math.Min(currVector.Length, prevVector.Length); // Rewarding angles, take the smaller velocity as base.
+
+                        double wideAngleBonus = calcWideAngleBonus(angle);
+                        double acuteAngleBonus = calcAcuteAngleBonus(angle);
+
                         if (osuCurrObj.StrainTime > 100)
                             acuteAngleBonus = 0;
                         else
@@ -93,16 +94,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                             angleBonus = Math.Min(angleBonus, 150 / osuCurrObj.StrainTime) * Math.Min(1, Math.Pow(Math.Min(osuCurrObj.JumpDistance, osuPrevObj.JumpDistance) / 150, 2));;
 
                         angleBonus *= Math.Max(acuteAngleBonus * acuteAngleMultiplier, wideAngleBonus * wideAngleMultiplier);
-                    }
-                    else if (osuCurrObj.StrainTime + 10 < osuPrevObj.StrainTime && osuPrevObj.StrainTime > osuLastObj.StrainTime + 10)
-                        angleBonus = 0 * rhythmVarianceMultiplier;
 
-                    aimStrain += angleBonus; // add in angle or rhythmVariance velocity.
+                        aimStrain += angleBonus; // add in angle velocity.
+                    }
+                }
+                else // There is a rhythm change
+                {
+                    double rhythmBonus = Math.Min(currVector.Length, prevVector.Length); // Rewarding rhythm, take the smaller velocity as base.
+
+                    if (osuCurrObj.StrainTime + 10 < osuPrevObj.StrainTime && osuPrevObj.StrainTime > osuLastObj.StrainTime + 10)
+                        rhythmBonus = 0; // Don't want to reward for a rhythm change back to back (unless its a double, which is why this only checks for fast -> slow -> fast).
+
+                    aimStrain += rhythmBonus * rhythmVarianceMultiplier; // add in rhythm velocity.
                 }
 
                 if (osuCurrObj.TravelDistance != 0)
                 {
-                    double sliderBuff = Math.Max(osuCurrObj.TravelDistance, 0.875 * Math.Sqrt(osuCurrObj.TravelDistance * osuCurrObj.JumpDistance)) / osuCurrObj.StrainTime;
+                    double sliderBuff = Math.Max(osuCurrObj.TravelDistance, sliderJumpMultiplier * Math.Sqrt(osuCurrObj.TravelDistance * osuCurrObj.JumpDistance)) / osuCurrObj.StrainTime;
 
                     aimStrain += sliderBuff * sliderMultiplier; // Add in slider velocity.
                 }
