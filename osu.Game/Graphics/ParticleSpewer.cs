@@ -26,11 +26,12 @@ namespace osu.Game.Graphics
         /// </summary>
         public readonly BindableBool Active = new BindableBool();
 
-        public bool HasActiveParticles => Active.Value || (lastParticleAdded + maxLifetime) > Time.Current;
-        public override bool IsPresent => base.IsPresent && HasActiveParticles;
+        public override bool IsPresent => base.IsPresent && hasActiveParticles;
 
         protected virtual bool CanSpawnParticles => true;
         protected virtual float ParticleGravity => 0;
+
+        private bool hasActiveParticles => Active.Value || (lastParticleAdded + maxLifetime) > Time.Current;
 
         protected ParticleSpewer(Texture texture, int perSecond, double maxLifetime)
         {
