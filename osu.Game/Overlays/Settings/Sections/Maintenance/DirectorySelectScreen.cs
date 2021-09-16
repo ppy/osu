@@ -24,6 +24,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         private OsuDirectorySelector directorySelector;
 
+        public override bool AllowTrackAdjustments => false;
+
         /// <summary>
         /// Text to display in the header to inform the user of what they are selecting.
         /// </summary>
