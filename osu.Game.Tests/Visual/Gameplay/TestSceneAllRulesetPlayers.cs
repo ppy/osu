@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
@@ -71,7 +70,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var working = CreateWorkingBeatmap(rulesetInfo);
 
             Beatmap.Value = working;
-            SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
+            SelectedMods.Value = new[] { ruleset.CreateMod<ModNoFail>() };
 
             Player = CreatePlayer(ruleset);
 

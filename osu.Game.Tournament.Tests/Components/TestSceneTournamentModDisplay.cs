@@ -45,7 +45,7 @@ namespace osu.Game.Tournament.Tests.Components
         private void success(APIBeatmap apiBeatmap)
         {
             beatmap = apiBeatmap.ToBeatmap(rulesets);
-            var mods = rulesets.GetRuleset(Ladder.Ruleset.Value.ID ?? 0).CreateInstance().GetAllMods();
+            var mods = rulesets.GetRuleset(Ladder.Ruleset.Value.ID ?? 0).CreateInstance().AllMods;
 
             foreach (var mod in mods)
             {

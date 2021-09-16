@@ -140,8 +140,6 @@ namespace osu.Game
 
         private FileStore fileStore;
 
-        private SettingsStore settingsStore;
-
         private RulesetConfigCache rulesetConfigCache;
 
         private SpectatorClient spectatorClient;
@@ -243,7 +241,7 @@ namespace osu.Game
             dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, true));
 
             // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
@@ -279,8 +277,7 @@ namespace osu.Game
 
             migrateDataToRealm();
 
-            dependencies.Cache(settingsStore = new SettingsStore(contextFactory));
-            dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(settingsStore));
+            dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(realmFactory, RulesetStore));
 
             var powerStatus = CreateBatteryInfo();
             if (powerStatus != null)
@@ -453,24 +450,27 @@ namespace osu.Game
             using (var db = contextFactory.GetForWrite())
             using (var usage = realmFactory.GetForWrite())
             {
-                var existingBindings = db.Context.DatabasedKeyBinding;
+                // migrate ruleset settings. can be removed 20220315.
+                var existingSettings = db.Context.DatabasedSetting;
 
                 // only migrate data if the realm database is empty.
-                if (!usage.Realm.All<RealmKeyBinding>().Any())
+                if (!usage.Realm.All<RealmRulesetSetting>().Any())
                 {
-                    foreach (var dkb in existingBindings)
+                    foreach (var dkb in existingSettings)
                     {
-                        usage.Realm.Add(new RealmKeyBinding
+                        if (dkb.RulesetID == null) continue;
+
+                        usage.Realm.Add(new RealmRulesetSetting
                         {
-                            KeyCombinationString = dkb.KeyCombination.ToString(),
-                            ActionInt = (int)dkb.Action,
-                            RulesetID = dkb.RulesetID,
-                            Variant = dkb.Variant
+                            Key = dkb.Key,
+                            Value = dkb.StringValue,
+                            RulesetID = dkb.RulesetID.Value,
+                            Variant = dkb.Variant ?? 0,
                         });
                     }
                 }
 
-                db.Context.RemoveRange(existingBindings);
+                db.Context.RemoveRange(existingSettings);
 
                 usage.Commit();
             }

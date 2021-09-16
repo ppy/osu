@@ -54,7 +54,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            Recorder = recorder = new TestReplayRecorder(new Score { Replay = replay })
+                            Recorder = recorder = new TestReplayRecorder(new Score
+                            {
+                                Replay = replay,
+                                ScoreInfo = { Beatmap = gameplayBeatmap.BeatmapInfo }
+                            })
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
                             },

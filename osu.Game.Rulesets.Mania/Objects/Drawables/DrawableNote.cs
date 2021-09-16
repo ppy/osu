@@ -66,6 +66,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
 
+        protected override void OnApply()
+        {
+            base.OnApply();
+            updateSnapColour();
+        }
+
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {
             base.OnDirectionChanged(e);

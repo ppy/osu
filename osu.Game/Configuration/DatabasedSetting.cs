@@ -7,7 +7,7 @@ using osu.Game.Database;
 namespace osu.Game.Configuration
 {
     [Table("Settings")]
-    public class DatabasedSetting : IHasPrimaryKey
+    public class DatabasedSetting : IHasPrimaryKey // can be removed 20220315.
     {
         public int ID { get; set; }
 
