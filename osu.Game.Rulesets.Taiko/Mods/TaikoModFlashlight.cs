@@ -36,24 +36,25 @@ namespace osu.Game.Rulesets.Taiko.Mods
             public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
             {
                 this.taikoPlayfield = taikoPlayfield;
-                FlashlightSize = new Vector2(0, getSizeFor(0));
+                FlashlightSize = getSizeFor(0);
 
                 AddLayout(flashlightProperties);
             }
 
-            private float getSizeFor(int combo)
+            private Vector2 getSizeFor(int combo)
             {
                 if (combo > 200)
-                    return default_flashlight_size * 0.8f;
-                else if (combo > 100)
-                    return default_flashlight_size * 0.9f;
-                else
-                    return default_flashlight_size;
+                    return new Vector2(0, default_flashlight_size * 0.8f);
+
+                if (combo > 100)
+                    return new Vector2(0, default_flashlight_size * 0.9f);
+
+                return new Vector2(0, default_flashlight_size);
             }
 
             protected override void OnComboChange(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), getSizeFor(e.NewValue), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
