@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
 
@@ -74,16 +75,16 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             }
         }
 
-        public bool OnPressed(ManiaAction action)
+        public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action == column.Action.Value)
+            if (e.Action == column.Action.Value)
                 backgroundOverlay.FadeTo(1, 50, Easing.OutQuint).Then().FadeTo(0.5f, 250, Easing.OutQuint);
             return false;
         }
 
-        public void OnReleased(ManiaAction action)
+        public void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
-            if (action == column.Action.Value)
+            if (e.Action == column.Action.Value)
                 backgroundOverlay.FadeTo(0, 250, Easing.OutQuint);
         }
     }

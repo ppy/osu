@@ -77,7 +77,13 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
 
-            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+            AddUntilStep("wait for player", () =>
+            {
+                // dismiss any notifications that may appear (ie. muted notification).
+                clickMouseInCentre();
+                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
+            });
+
             AddAssert("retry count is 0", () => player.RestartCount == 0);
 
             AddStep("attempt to retry", () => player.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
@@ -104,7 +110,14 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("set mods", () => Game.SelectedMods.Value = new Mod[] { new OsuModNoFail(), new OsuModDoubleTime { SpeedChange = { Value = 2 } } });
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
-            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+
+            AddUntilStep("wait for player", () =>
+            {
+                // dismiss any notifications that may appear (ie. muted notification).
+                clickMouseInCentre();
+                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
+            });
+
             AddUntilStep("wait for track playing", () => beatmap().Track.IsRunning);
             AddStep("seek to near end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Beatmap.HitObjects[^1].StartTime - 1000));
             AddUntilStep("wait for pass", () => (results = Game.ScreenStack.CurrentScreen as ResultsScreen) != null && results.IsLoaded);
@@ -131,7 +144,13 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
 
-            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+            AddUntilStep("wait for player", () =>
+            {
+                // dismiss any notifications that may appear (ie. muted notification).
+                clickMouseInCentre();
+                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
+            });
+
             AddUntilStep("wait for fail", () => player.HasFailed);
 
             AddUntilStep("wait for track stop", () => !Game.MusicController.IsPlaying);
@@ -399,7 +418,15 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
             AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroTriangles);
+            AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
             AddUntilStep("Wait for game exit", () => Game.ScreenStack.CurrentScreen == null);
+            AddStep("test dispose doesn't crash", () => Game.Dispose());
+        }
+
+        private void clickMouseInCentre()
+        {
+            InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre);
+            InputManager.Click(MouseButton.Left);
         }
 
         private void pushEscape() =>
