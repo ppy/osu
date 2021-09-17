@@ -12,6 +12,7 @@ on:
 env:
   DB_USER: root
   DB_HOST: 127.0.0.1
+  DB_PORT: 33306:3306
   CONCURRENCY: 4
   ALLOW_DOWNLOAD: 1
   SAVE_DOWNLOADED: 1
@@ -19,7 +20,7 @@ env:
 jobs:
   diffcalc:
     name: Diffcalc
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     continue-on-error: true
 
     if: github.event.issue.pull_request && contains(github.event.comment.body, '!pp check') && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')
@@ -39,7 +40,7 @@ jobs:
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
         ports:
-          - 3306:3306
+          - 33306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
@@ -54,8 +55,7 @@ jobs:
 
       - name: Verify MySQL connection from host
         run: |
-          sudo apt-get install -y mysql-client
-          mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} -e "SHOW DATABASES"
+          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "SHOW DATABASES"
 
       - name: Create directory structure
         run: |
@@ -120,12 +120,12 @@ jobs:
 
           cd $GITHUB_WORKSPACE/$PERFORMANCE_DATA_NAME
 
-          mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} -e "CREATE DATABASE osu_master"
-          mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} -e "CREATE DATABASE osu_pr"
+          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "CREATE DATABASE osu_master"
+          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "CREATE DATABASE osu_pr"
 
           echo "Importing SQL..."
-          { pv -f *.sql | mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} --database=osu_master; } 2>&1 | stdbuf -oL tr '\r' '\n'
-          { pv -f *.sql | mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} --database=osu_pr; } 2>&1 | stdbuf -oL tr '\r' '\n'
+          { pv -f *.sql | mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} --database=osu_master; } 2>&1 | stdbuf -oL tr '\r' '\n'
+          { pv -f *.sql | mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} --database=osu_pr; } 2>&1 | stdbuf -oL tr '\r' '\n'
 
       # Run diffcalc
       - name: Run diffcalc (master)
@@ -144,7 +144,7 @@ jobs:
       # Print diffs
       - name: Print diffs
         run: |
-          mysql --host ${{ env.DB_HOST }} -u${{ env.DB_USER }} -e "
+          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "
             SELECT
               m.beatmap_id,
               m.mods,
