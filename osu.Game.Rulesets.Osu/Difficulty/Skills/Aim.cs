@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double rhythmVarianceMultiplier = 1.0;
         private double sliderMultiplier = 6.5;
         private double sliderJumpMultiplier = 0.875;
-        private double velChangeMultiplier = 7.5;
+        private double velChangeMultiplier = 6.5;
 
         private double calcWideAngleBonus(double angle)
         {
