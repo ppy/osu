@@ -43,17 +43,15 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             private Vector2 getSizeFor(int combo)
             {
-                Vector2 size;
+                float size = default_flashlight_size;
 
                 if (combo > 200)
-                    size = new Vector2(0, default_flashlight_size * 0.8f);
+                    size *= 0.8f;
                 else if (combo > 100)
-                    size = new Vector2(0, default_flashlight_size * 0.9f);
-                else
-                    size = new Vector2(0, default_flashlight_size);
+                    size *= 0.9f;
 
                 // Preserve flashlight size through the playfield's aspect adjustment.
-                return size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT;
+                return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
 
             protected override void OnComboChange(ValueChangedEvent<int> e)
