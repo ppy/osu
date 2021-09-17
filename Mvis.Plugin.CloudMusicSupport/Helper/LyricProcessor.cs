@@ -23,7 +23,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         {
             var result = new List<Lyric>();
 
-            if (lyricResponseRoot.Lyrics == null) return result;
+            if (lyricResponseRoot?.Lyrics == null) return result;
 
             //先处理原始歌词信息
             foreach (var s in lyricResponseRoot.Lyrics)
@@ -169,10 +169,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             currentSearchRequest?.Dispose();
             currentLyricRequest?.Dispose();
 
-            //处理要搜索的歌名: "艺术家-标题"
+            //处理要搜索的歌名: "艺术家 标题"
             var title = beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title;
             var artist = beatmap.Metadata.ArtistUnicode ?? beatmap.Metadata.Artist;
-            var target = encoder.Encode($"{artist}-{title}");
+            var target = encoder.Encode($"{artist} {title}");
 
             var req = new OsuJsonWebRequest<ResponseRoot>(
                 $"https://music.163.com/api/search/get/web?hlpretag=&hlposttag=&s={target}&type=1&total=true&limit=1");
@@ -241,21 +241,18 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         {
             try
             {
-                var id = working.BeatmapSetInfo.ID;
+                var target = $"custom/lyrics/beatmap-{working.BeatmapSetInfo.ID}.json";
+                string content = string.Empty;
 
-                var stream = storage.GetStream($"custom/lyrics/beatmap-{id}.json", FileAccess.Read, FileMode.Create);
+                if (storage.Exists(target))
+                    content = File.ReadAllText(storage.GetFullPath(target));
 
-                if (stream == null)
+                if (string.IsNullOrEmpty(content))
                 {
-                    Logger.Log("未找到对应文件", LoggingTarget.Runtime, LogLevel.Important);
                     return new List<Lyric>();
                 }
 
-                var lrcRead = new StreamReader(stream);
-
-                var obj = JsonConvert.DeserializeObject<LyricResponseRoot>(lrcRead.ReadToEnd());
-                stream.Dispose();
-                lrcRead.Dispose();
+                var obj = JsonConvert.DeserializeObject<LyricResponseRoot>(content);
 
                 return parse(obj);
             }
@@ -270,10 +267,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         {
             try
             {
-                var id = working.BeatmapSetInfo.ID;
-
-                var stream = storage.GetStream($"custom/lyrics/beatmap-{id}.json", FileAccess.Write, FileMode.Create);
-                var lrcWrite = new StreamWriter(stream);
+                var target = $"custom/lyrics/beatmap-{working.BeatmapSetInfo.ID}.json";
 
                 var lrc = new LyricInfo();
                 var tLrc = new LyricInfo();
@@ -298,10 +292,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                     RawTLyric = tLrc
                 });
 
-                lrcWrite.Write(serializeObject);
-
-                lrcWrite.Dispose();
-                stream.Dispose();
+                File.WriteAllText(storage.GetFullPath(target), serializeObject);
             }
             catch (Exception e)
             {

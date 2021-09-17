@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -31,8 +32,9 @@ namespace osu.Game.Rulesets.Osu.Replays.Movers
 
         public static bool IsStream(params OsuHitObject[] hitObjects)
         {
-            const float min = 50f;
-            const float max = 10000f;
+            var config = OsuRulesetConfigManager.Instance;
+            var max = config.Get<float>(OsuRulesetSetting.StreamMaximum);
+            var min = config.Get<float>(OsuRulesetSetting.StreamMinimum);
 
             var h = hitObjects[0];
             var isStream = false;

@@ -67,7 +67,7 @@ namespace osu.Game.Scoring.Legacy
 
                 // lazer replays get a really high version number.
                 if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
-                    scoreInfo.Mods = scoreInfo.Mods.Append(currentRuleset.GetAllMods().OfType<ModClassic>().Single()).ToArray();
+                    scoreInfo.Mods = scoreInfo.Mods.Append(currentRuleset.CreateMod<ModClassic>()).ToArray();
 
                 currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
                 scoreInfo.Beatmap = currentBeatmap.BeatmapInfo;

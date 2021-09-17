@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
@@ -266,13 +267,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool? lastWasCentre;
 
-        public override bool OnPressed(TaikoAction action)
+        public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
             // Don't handle keys before the swell starts
             if (Time.Current < HitObject.StartTime)
                 return false;
 
-            var isCentre = action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre;
+            var isCentre = e.Action == TaikoAction.LeftCentre || e.Action == TaikoAction.RightCentre;
 
             // Ensure alternating centre and rim hits
             if (lastWasCentre == isCentre)

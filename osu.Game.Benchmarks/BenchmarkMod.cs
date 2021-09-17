@@ -14,9 +14,9 @@ namespace osu.Game.Benchmarks
         [Params(1, 10, 100)]
         public int Times { get; set; }
 
-        [GlobalSetup]
-        public void GlobalSetup()
+        public override void SetUp()
         {
+            base.SetUp();
             mod = new OsuModDoubleTime();
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using M.DBus.Tray;
 using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.DBus;
@@ -44,7 +45,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
             => new LyricSidebarSection(this);
 
-        public override int Version => 6;
+        public override int Version => 7;
 
         private WorkingBeatmap currentWorkingBeatmap;
         private LyricLineHandler lrcLine;
@@ -131,6 +132,11 @@ namespace Mvis.Plugin.CloudMusicSupport
         [Resolved]
         private OsuGame game { get; set; }
 
+        private readonly SimpleEntry lyricEntry = new SimpleEntry
+        {
+            Enabled = false
+        };
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -154,6 +160,9 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             resetDBusMessage();
             PluginManager.UnRegisterDBusObject(new LyricDBusObject());
+
+            if (!Disabled.Value)
+                PluginManager.RemoveDBusMenuEntry(lyricEntry);
         }
 
         public void WriteLyricToDisk()
@@ -219,6 +228,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
 
             resetDBusMessage();
+            PluginManager.RemoveDBusMenuEntry(lyricEntry);
 
             return base.Disable();
         }
@@ -235,6 +245,8 @@ namespace Mvis.Plugin.CloudMusicSupport
             {
                 dbusObject.RawLyric = currentLine?.Content;
                 dbusObject.TranslatedLyric = currentLine?.TranslatedString;
+
+                PluginManager.AddDBusMenuEntry(lyricEntry);
             }
 
             return result;
@@ -244,26 +256,31 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
-                dbusObject.RawLyric = "-";
-                dbusObject.TranslatedLyric = "-";
+                dbusObject.RawLyric = string.Empty;
+                dbusObject.TranslatedLyric = string.Empty;
             }
         }
 
         protected override bool PostInit() => true;
 
         private Lyric currentLine;
+        private readonly Lyric emptyLine = new Lyric();
 
         public Lyric CurrentLine
         {
             get => currentLine;
             set
             {
+                value ??= emptyLine;
+
                 currentLine = value;
 
                 if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                 {
-                    dbusObject.RawLyric = value?.Content;
-                    dbusObject.TranslatedLyric = value?.TranslatedString;
+                    dbusObject.RawLyric = value.Content;
+                    dbusObject.TranslatedLyric = value.TranslatedString;
+
+                    lyricEntry.Label = value.Content + "\n" + value.TranslatedString;
                 }
             }
         }

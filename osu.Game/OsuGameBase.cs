@@ -143,8 +143,6 @@ namespace osu.Game
 
         private FileStore fileStore;
 
-        private SettingsStore settingsStore;
-
         private RulesetConfigCache rulesetConfigCache;
 
         private SpectatorClient spectatorClient;
@@ -203,7 +201,9 @@ namespace osu.Game
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
+
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
+
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(this);
@@ -213,7 +213,10 @@ namespace osu.Game
             //fallback机制: 先加载的字体会覆盖后加载的字体，即从上到下覆盖(如果在OsuFont.Typeface中)
             InitialiseFonts();
 
-            dependencies.Cache(new CustomStore(Storage, this));
+            //CustomStore在字体后初始化，避免覆盖原有字体
+            var customStore = new CustomStore(Storage, this);
+            largeStore.AddStore(new TextureLoaderStore(customStore));
+            dependencies.Cache(customStore);
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
@@ -291,8 +294,7 @@ namespace osu.Game
 
             migrateDataToRealm();
 
-            dependencies.Cache(settingsStore = new SettingsStore(contextFactory));
-            dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(settingsStore));
+            dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(realmFactory, RulesetStore));
 
             var powerStatus = CreateBatteryInfo();
             if (powerStatus != null)
@@ -467,24 +469,27 @@ namespace osu.Game
             using (var db = contextFactory.GetForWrite())
             using (var usage = realmFactory.GetForWrite())
             {
-                var existingBindings = db.Context.DatabasedKeyBinding;
+                // migrate ruleset settings. can be removed 20220315.
+                var existingSettings = db.Context.DatabasedSetting;
 
                 // only migrate data if the realm database is empty.
-                if (!usage.Realm.All<RealmKeyBinding>().Any())
+                if (!usage.Realm.All<RealmRulesetSetting>().Any())
                 {
-                    foreach (var dkb in existingBindings)
+                    foreach (var dkb in existingSettings)
                     {
-                        usage.Realm.Add(new RealmKeyBinding
+                        if (dkb.RulesetID == null) continue;
+
+                        usage.Realm.Add(new RealmRulesetSetting
                         {
-                            KeyCombinationString = dkb.KeyCombination.ToString(),
-                            ActionInt = (int)dkb.Action,
-                            RulesetID = dkb.RulesetID,
-                            Variant = dkb.Variant
+                            Key = dkb.Key,
+                            Value = dkb.StringValue,
+                            RulesetID = dkb.RulesetID.Value,
+                            Variant = dkb.Variant ?? 0,
                         });
                     }
                 }
 
-                db.Context.RemoveRange(existingBindings);
+                db.Context.RemoveRange(existingSettings);
 
                 usage.Commit();
             }
@@ -541,7 +546,7 @@ namespace osu.Game
             BeatmapManager?.Dispose();
             LocalConfig?.Dispose();
 
-            contextFactory.FlushConnections();
+            contextFactory?.FlushConnections();
         }
     }
 }

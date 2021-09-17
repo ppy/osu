@@ -25,12 +25,14 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
             Icon = FontAwesome.Solid.Boxes;
         }
 
-        protected override float PieceWidth => 270;
+        protected override float PieceWidth => 300;
 
         [BackgroundDependencyLoader]
         private void load(MvisPluginManager pluginManager)
         {
             manager = pluginManager;
+            FillFlow.Width = 600;
+            FillFlow.Direction = FillDirection.Vertical;
 
             AddInternal(placeholder = new FillFlowContainer
             {

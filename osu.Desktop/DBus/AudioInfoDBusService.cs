@@ -19,9 +19,9 @@ namespace osu.Desktop.DBus
         public WorkingBeatmap Beatmap { get; set; }
 
         public Task<double> GetTrackLengthAsync()
-            => Task.FromResult(Beatmap.Track.Length);
+            => Task.FromResult(Beatmap?.Track.Length ?? 0d);
 
         public Task<double> GetTrackProgressAsync()
-            => Task.FromResult(Beatmap.Track.CurrentTime);
+            => Task.FromResult(Beatmap?.Track.CurrentTime ?? 0d);
     }
 }

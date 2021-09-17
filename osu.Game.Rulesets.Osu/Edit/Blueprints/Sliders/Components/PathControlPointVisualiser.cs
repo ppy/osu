@@ -127,9 +127,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             return false;
         }
 
-        public bool OnPressed(PlatformAction action)
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case PlatformAction.Delete:
                     return DeleteSelected();
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             return false;
         }
 
-        public void OnReleased(PlatformAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
         }
 

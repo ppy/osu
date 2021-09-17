@@ -44,9 +44,9 @@ namespace osu.Game.Rulesets.Catch.Mods
             }
 
             // disable keyboard controls
-            public bool OnPressed(CatchAction action) => true;
+            public bool OnPressed(KeyBindingPressEvent<CatchAction> e) => true;
 
-            public void OnReleased(CatchAction action)
+            public void OnReleased(KeyBindingReleaseEvent<CatchAction> e)
             {
             }
 

@@ -23,10 +23,10 @@ namespace osu.Game.Online.API.Requests.Responses
 
             var rulesetInstance = ruleset.CreateInstance();
 
-            var mods = Mods != null ? rulesetInstance.GetAllMods().Where(mod => Mods.Contains(mod.Acronym)).ToArray() : Array.Empty<Mod>();
+            var mods = Mods != null ? Mods.Select(acronym => rulesetInstance.CreateModFromAcronym(acronym)).Where(m => m != null).ToArray() : Array.Empty<Mod>();
 
             // all API scores provided by this class are considered to be legacy.
-            mods = mods.Append(rulesetInstance.GetAllMods().OfType<ModClassic>().Single()).ToArray();
+            mods = mods.Append(rulesetInstance.CreateMod<ModClassic>()).ToArray();
 
             var scoreInfo = new ScoreInfo
             {

@@ -7,6 +7,8 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Input.Bindings
 {
@@ -152,78 +154,78 @@ namespace osu.Game.Input.Bindings
 
     public enum GlobalAction
     {
-        [Description("切换聊天界面")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChat))]
         ToggleChat,
 
-        [Description("切换玩家列表界面")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleSocial))]
         ToggleSocial,
 
-        [Description("重置输入设置")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ResetInputSettings))]
         ResetInputSettings,
 
-        [Description("切换顶栏")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleToolbar))]
         ToggleToolbar,
 
-        [Description("切换设置界面")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleSettings))]
         ToggleSettings,
 
-        [Description("切换谱面列表界面")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleBeatmapListing))]
         ToggleBeatmapListing,
 
-        [Description("增加音量")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseVolume))]
         IncreaseVolume,
 
-        [Description("减小音量")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseVolume))]
         DecreaseVolume,
 
-        [Description("切换静音")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleMute))]
         ToggleMute,
 
         // In-Game Keybindings
-        [Description("跳过")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SkipCutscene))]
         SkipCutscene,
 
-        [Description("快速重试 (按住)")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.QuickRetry))]
         QuickRetry,
 
-        [Description("屏幕截图")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TakeScreenshot))]
         TakeScreenshot,
 
-        [Description("切换游戏内鼠标按键")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons))]
         ToggleGameplayMouseButtons,
 
-        [Description("返回")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Back))]
         Back,
 
-        [Description("增加下落速度")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseScrollSpeed))]
         IncreaseScrollSpeed,
 
-        [Description("减小下落速度")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseScrollSpeed))]
         DecreaseScrollSpeed,
 
-        [Description("选择")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Select))]
         Select,
 
-        [Description("快速退出(按住)")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.QuickExit))]
         QuickExit,
 
         // Game-wide beatmap music controller keybindings
-        [Description("下一首")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MusicNext))]
         MusicNext,
 
-        [Description("上一首")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MusicPrev))]
         MusicPrev,
 
-        [Description("播放/暂停")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MusicPlay))]
         MusicPlay,
 
-        [Description("切换正在播放列表")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleNowPlaying))]
         ToggleNowPlaying,
 
-        [Description("上一个")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPrevious))]
         SelectPrevious,
 
-        [Description("下一个")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNext))]
         SelectNext,
 
         [Description("上一首")]
@@ -247,87 +249,87 @@ namespace osu.Game.Input.Bindings
         [Description("在歌曲选择中打开")]
         MvisOpenInSongSelect,
 
-        [Description("返回主页")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Home))]
         Home,
 
-        [Description("切换通知栏是否可见")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleNotifications))]
         ToggleNotifications,
 
-        [Description("暂停游戏")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PauseGameplay))]
         PauseGameplay,
 
         [Description("切换强制锁定")]
         MvisForceLockOverlayChanges,
 
         // Editor
-        [Description("谱面设置模式")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSetupMode))]
         EditorSetupMode,
 
-        [Description("物件排布模式")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorComposeMode))]
         EditorComposeMode,
 
-        [Description("谱面设计模式")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDesignMode))]
         EditorDesignMode,
 
-        [Description("Timing设计模式")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTimingMode))]
         EditorTimingMode,
 
         [Description("选择收藏夹")]
         MvisSelectCollection,
 
-        [Description("长按以显示HUD")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.HoldForHUD))]
         HoldForHUD,
 
-        [Description("随机皮肤")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.RandomSkin))]
         RandomSkin,
 
-        [Description("暂停 / 恢复重放")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TogglePauseReplay))]
         TogglePauseReplay,
 
-        [Description("切换游戏内界面")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleInGameInterface))]
         ToggleInGameInterface,
 
         [Description("打开插件列表")]
         MvisTogglePluginPage,
 
         // Song select keybindings
-        [Description("切换Mod选择")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleModSelection))]
         ToggleModSelection,
 
-        [Description("随机选择")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNextRandom))]
         SelectNextRandom,
 
-        [Description("撤销随机")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPreviousRandom))]
         SelectPreviousRandom,
 
-        [Description("谱面选项")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleBeatmapOptions))]
         ToggleBeatmapOptions,
 
-        [Description("谱面检查")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorVerifyMode))]
         EditorVerifyMode,
 
-        [Description("向左移动选中物件")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorNudgeLeft))]
         EditorNudgeLeft,
 
-        [Description("向右移动选中物件")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorNudgeRight))]
         EditorNudgeRight,
 
-        [Description("切换皮肤编辑器")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleSkinEditor))]
         ToggleSkinEditor,
 
-        [Description("Previous volume meter")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PreviousVolumeMeter))]
         PreviousVolumeMeter,
 
-        [Description("Next volume meter")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.NextVolumeMeter))]
         NextVolumeMeter,
 
-        [Description("Seek replay forward")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SeekReplayForward))]
         SeekReplayForward,
 
-        [Description("Seek replay backward")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SeekReplayBackward))]
         SeekReplayBackward,
 
-        [Description("Toggle chat focus")]
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChatFocus))]
         ToggleChatFocus
     }
 }

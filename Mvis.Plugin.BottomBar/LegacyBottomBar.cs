@@ -32,7 +32,7 @@ namespace Mvis.Plugin.BottomBar
         [Resolved]
         private MvisScreen mvisScreen { get; set; }
 
-        public override int Version => 6;
+        public override int Version => 7;
 
         public override TargetLayer Target => TargetLayer.FunctionBar;
 

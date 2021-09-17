@@ -31,6 +31,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Platform.Linux;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -1060,11 +1061,11 @@ namespace osu.Game
             return component;
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (introScreen == null) return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.ResetInputSettings:
                     Host.ResetInputHandlers();
@@ -1098,7 +1099,7 @@ namespace osu.Game
 
         #endregion
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
@@ -1166,8 +1167,6 @@ namespace osu.Game
             {
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
                 API.Activity.BindTo(newOsuScreen.Activity);
-
-                MusicController.AllowTrackAdjustments = newOsuScreen.AllowTrackAdjustments;
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();

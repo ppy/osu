@@ -10,6 +10,9 @@ namespace M.DBus.Services
     {
         Task<string> GreetAsync(string message);
         Task<bool> SendMessageAsync(string message);
+        Task<bool> GetOnlineStateAsync();
+        public Task<IDisposable> WatchOfflineAsync(Action<string> handler);
+        public Task<IDisposable> WatchOnlineAsync(Action<string> handler);
     }
 
     public class Greet : IGreet
@@ -37,6 +40,30 @@ namespace M.DBus.Services
 
             return Task.FromResult(AllowPost.Value);
         }
+
+        public Task<bool> GetOnlineStateAsync() => Task.FromResult(isOnline);
+
+        private bool isOnline;
+
+        public void SwitchState(bool online, string reason)
+        {
+            if (online)
+                GoingOnline?.Invoke(reason);
+            else
+                GoingOffline?.Invoke(reason);
+
+            this.isOnline = online;
+        }
+
+        public event Action<string> GoingOffline;
+
+        public Task<IDisposable> WatchOfflineAsync(Action<string> handler)
+            => SignalWatcher.AddAsync(this, nameof(GoingOffline), handler);
+
+        public event Action<string> GoingOnline;
+
+        public Task<IDisposable> WatchOnlineAsync(Action<string> handler)
+            => SignalWatcher.AddAsync(this, nameof(GoingOnline), handler);
 
         public ObjectPath ObjectPath => PATH;
     }

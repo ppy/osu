@@ -1,4 +1,5 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -9,6 +10,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.OpenGL.Buffers;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
@@ -238,7 +240,10 @@ namespace osu.Game.Graphics.Backgrounds
 
         private void addTriangles(bool randomY)
         {
-            AimCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
+            // limited by the maximum size of QuadVertexBuffer for safety.
+            const int max_triangles = QuadVertexBuffer<TexturedVertex2D>.MAX_QUADS;
+
+            AimCount = (int)Math.Min(max_triangles, (DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio));
 
             for (int i = 0; i < AimCount - parts.Count; i++)
                 parts.Add(createTriangle(randomY));

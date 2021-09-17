@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using M.DBus;
+using M.DBus.Services.Notifications;
+using M.DBus.Tray;
 using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -43,7 +45,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         internal Action<MvisPlugin> OnPluginAdd;
         internal Action<MvisPlugin> OnPluginUnLoad;
 
-        public int PluginVersion => 6;
+        public int PluginVersion => 7;
         public int MinimumPluginVersion => 6;
         private const bool experimental = false;
 
@@ -105,15 +107,35 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public void RegisterDBusObject(IDBusObject target)
         {
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            if (platformSupportsDBus)
                 dBusManager?.RegisterNewObject(target);
         }
 
         public void UnRegisterDBusObject(IDBusObject target)
         {
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+            if (platformSupportsDBus)
                 dBusManager?.UnRegisterObject(target);
         }
+
+        public void AddDBusMenuEntry(SimpleEntry entry)
+        {
+            if (platformSupportsDBus)
+                dBusManager?.TrayManager.AddEntry(entry);
+        }
+
+        public void RemoveDBusMenuEntry(SimpleEntry entry)
+        {
+            if (platformSupportsDBus)
+                dBusManager?.TrayManager.RemoveEntry(entry);
+        }
+
+        public void PostSystemNotification(SystemNotification notification)
+        {
+            if (platformSupportsDBus)
+                dBusManager?.Notifications.PostAsync(notification);
+        }
+
+        private bool platformSupportsDBus => RuntimeInfo.OS == RuntimeInfo.Platform.Linux;
 
         internal bool AddPlugin(MvisPlugin pl)
         {

@@ -89,9 +89,9 @@ namespace osu.Game.Rulesets.Osu.UI
                 base.OnHoverLost(e);
             }
 
-            public bool OnPressed(OsuAction action)
+            public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
             {
-                switch (action)
+                switch (e.Action)
                 {
                     case OsuAction.LeftButton:
                     case OsuAction.RightButton:
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 return false;
             }
 
-            public void OnReleased(OsuAction action)
+            public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
             }
 

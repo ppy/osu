@@ -416,7 +416,7 @@ namespace osu.Game.Overlays.Mods
             return base.OnKeyDown(e);
         }
 
-        public override bool OnPressed(GlobalAction action) => false; // handled by back button
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e) => false; // handled by back button
 
         private void updateAvailableMods()
         {

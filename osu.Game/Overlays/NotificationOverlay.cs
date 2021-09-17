@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using M.DBus;
+using M.DBus.Services.Notifications;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
@@ -133,7 +136,35 @@ namespace osu.Game.Overlays
 
             updateCounts();
             playDebouncedSample(notification.PopInSampleName);
+
+            postToSystemIfPossible(notification);
         });
+
+        #region post通知到系统
+
+        [Resolved(CanBeNull = true)]
+        private DBusManager dBusManager { get; set; }
+
+        [Resolved]
+        private GameHost host { get; set; }
+
+        private void postToSystemIfPossible(Notification notification)
+        {
+            if (dBusManager != null
+                && host.Window is SDL2DesktopWindow sdl2DesktopWindow
+                && !sdl2DesktopWindow.Visible
+                && notification is SimpleNotification sn)
+            {
+                dBusManager.Notifications.PostAsync(new SystemNotification
+                {
+                    Title = "mfosu",
+                    Description = sn.Text,
+                    IconName = sn.IsImportant ? "dialog-warning" : "dialog-information"
+                });
+            }
+        }
+
+        #endregion
 
         protected override void Update()
         {

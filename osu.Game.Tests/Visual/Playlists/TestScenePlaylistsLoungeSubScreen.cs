@@ -33,6 +33,12 @@ namespace osu.Game.Tests.Visual.Playlists
         private RoomsContainer roomsContainer => loungeScreen.ChildrenOfType<RoomsContainer>().First();
 
         [Test]
+        public void TestManyRooms()
+        {
+            AddStep("add rooms", () => RoomManager.AddRooms(500));
+        }
+
+        [Test]
         public void TestScrollByDraggingRooms()
         {
             AddStep("reset mouse", () => InputManager.ReleaseButton(MouseButton.Left));

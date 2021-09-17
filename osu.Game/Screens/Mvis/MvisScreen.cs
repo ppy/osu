@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using JetBrains.Annotations;
+using M.DBus.Tray;
 using M.Resources.Localisation.Mvis;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -57,7 +58,7 @@ namespace osu.Game.Screens.Mvis
                                               || tabHeader.IsVisible.Value //TabHeader可见
                                               || IsHovered == false; //隐藏界面或侧边栏可见，显示光标
 
-        public override bool AllowTrackAdjustments => true;
+        public override bool? AllowTrackAdjustments => true;
 
         private bool okForHide => IsHovered
                                   && isIdle.Value
@@ -308,6 +309,12 @@ namespace osu.Game.Screens.Mvis
 
         public float BottombarHeight => currentFunctionBarProvider.GetSafeAreaPadding();
 
+        private readonly SimpleEntry mvisEntry = new SimpleEntry
+        {
+            Label = "Mvis播放器 - 插件",
+            Enabled = false
+        };
+
         #endregion
 
         public MvisScreen()
@@ -486,6 +493,56 @@ namespace osu.Game.Screens.Mvis
                     Icon = FontAwesome.Solid.Lock
                 }
             });
+
+            //添加插件
+            foreach (var pl in pluginManager.GetAllPlugins(true))
+            {
+                try
+                {
+                    //决定要把插件放在何处
+                    switch (pl.Target)
+                    {
+                        case MvisPlugin.TargetLayer.Background:
+                            background.Add(pl);
+                            break;
+
+                        case MvisPlugin.TargetLayer.Foreground:
+                            foreground.Add(pl);
+                            break;
+                    }
+
+                    var pluginSidebarPage = pl.CreateSidebarPage();
+
+                    //如果插件有侧边栏页面
+                    if (pluginSidebarPage != null)
+                    {
+                        sidebar.Add(pluginSidebarPage);
+                        var btn = pluginSidebarPage.GetFunctionEntry();
+
+                        //如果插件的侧边栏页面有入口按钮
+                        if (btn != null)
+                        {
+                            btn.Action = () => updateSidebarState(pluginSidebarPage);
+                            btn.Description += $" ({pluginSidebarPage.ShortcutKey})";
+
+                            functionProviders.Add(btn);
+                        }
+
+                        //如果插件的侧边栏页面有调用快捷键
+                        if (pluginSidebarPage.ShortcutKey != Key.Unknown)
+                        {
+                            RegisterKeybind(pl, new PluginKeybind(pluginSidebarPage.ShortcutKey, () =>
+                            {
+                                if (!pl.Disabled.Value) btn?.Active();
+                            }));
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方: {e.Message}");
+                }
+            }
         }
 
         protected override void LoadComplete()
@@ -552,58 +609,11 @@ namespace osu.Game.Screens.Mvis
             //设置键位
             setupKeyBindings();
 
+            //添加DBusEntry
+            pluginManager.AddDBusMenuEntry(mvisEntry);
+
             //当插件卸载时调用onPluginUnload
             pluginManager.OnPluginUnLoad += onPluginUnLoad;
-
-            //添加插件
-            foreach (var pl in pluginManager.GetAllPlugins(true))
-            {
-                try
-                {
-                    //决定要把插件放在何处
-                    switch (pl.Target)
-                    {
-                        case MvisPlugin.TargetLayer.Background:
-                            background.Add(pl);
-                            break;
-
-                        case MvisPlugin.TargetLayer.Foreground:
-                            foreground.Add(pl);
-                            break;
-                    }
-
-                    var pluginSidebarPage = pl.CreateSidebarPage();
-
-                    //如果插件有侧边栏页面
-                    if (pluginSidebarPage != null)
-                    {
-                        sidebar.Add(pluginSidebarPage);
-                        var btn = pluginSidebarPage.GetFunctionEntry();
-
-                        //如果插件的侧边栏页面有入口按钮
-                        if (btn != null)
-                        {
-                            btn.Action = () => updateSidebarState(pluginSidebarPage);
-                            btn.Description += $" ({pluginSidebarPage.ShortcutKey})";
-
-                            functionProviders.Add(btn);
-                        }
-
-                        //如果插件的侧边栏页面有调用快捷键
-                        if (pluginSidebarPage.ShortcutKey != Key.Unknown)
-                        {
-                            RegisterKeybind(pl, new PluginKeybind(pluginSidebarPage.ShortcutKey, () =>
-                            {
-                                if (!pl.Disabled.Value) btn?.Active();
-                            }));
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方: {e.Message}");
-                }
-            }
 
             //添加选歌入口
             sidebar.Add(new SongSelectPage
@@ -849,6 +859,8 @@ namespace osu.Game.Screens.Mvis
             OnScreenExiting?.Invoke();
             pluginManager.OnPluginUnLoad -= onPluginUnLoad;
 
+            pluginManager.RemoveDBusMenuEntry(mvisEntry);
+
             return base.OnExiting(next);
         }
 
@@ -899,15 +911,15 @@ namespace osu.Game.Screens.Mvis
             OnScreenResuming?.Invoke();
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> action)
         {
             //查找本体按键绑定
-            keyBindings.FirstOrDefault(b => b.Key == action).Value?.Invoke();
+            keyBindings.FirstOrDefault(b => b.Key == action.Action).Value?.Invoke();
 
             return false;
         }
 
-        public void OnReleased(GlobalAction action) { }
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> action) { }
 
         protected override bool Handle(UIEvent e)
         {
@@ -995,12 +1007,13 @@ namespace osu.Game.Screens.Mvis
 
         private void applyTrackAdjustments()
         {
+            //modRate
+            modRateAdjust.SpeedChange.Value = musicSpeed.Value;
+
             CurrentTrack.ResetSpeedAdjustments();
             CurrentTrack.Looping = loopToggleButton.Bindable.Value;
             CurrentTrack.RestartPoint = 0;
             CurrentTrack.AddAdjustment(adjustFreq.Value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, musicSpeed);
-
-            modRateAdjust.SpeedChange.Value = musicSpeed.Value;
         }
 
         private void updateBackground(WorkingBeatmap beatmap, bool applyBgBrightness = true)

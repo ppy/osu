@@ -6,6 +6,11 @@
     <Description>RulesetPanel</Description>
     <AssemblyName>Mvis.Plugin.Sandbox</AssemblyName>
     <RootNamespace>Mvis.Plugin.Sandbox</RootNamespace>
+    <Authors>MATRIX-夜翎</Authors>
+    <Copyright />
+    <PackageProjectUrl>https://github.com/MATRIX-feather/osu</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MATRIX-feather/osu</RepositoryUrl>
+    <Company />
   </PropertyGroup>
 
   <ItemGroup Label="Project References">

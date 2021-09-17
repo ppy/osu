@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -17,10 +17,11 @@ using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Users;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapListingOverlay : OsuTestScene
+    public class TestSceneBeatmapListingOverlay : OsuManualInputManagerTestScene
     {
         private readonly List<APIBeatmapSet> setsForResponse = new List<APIBeatmapSet>();
 
@@ -28,32 +29,83 @@ namespace osu.Game.Tests.Visual.Online
 
         private BeatmapListingSearchControl searchControl => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single();
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            Child = overlay = new BeatmapListingOverlay { State = { Value = Visibility.Visible } };
-
-            ((DummyAPIAccess)API).HandleRequest = req =>
+            AddStep("setup overlay", () =>
             {
-                if (!(req is SearchBeatmapSetsRequest searchBeatmapSetsRequest)) return false;
-
-                searchBeatmapSetsRequest.TriggerSuccess(new SearchBeatmapSetsResponse
-                {
-                    BeatmapSets = setsForResponse,
-                });
-
-                return true;
-            };
+                Child = overlay = new BeatmapListingOverlay { State = { Value = Visibility.Visible } };
+                setsForResponse.Clear();
+            });
 
             AddStep("initialize dummy", () =>
             {
+                var api = (DummyAPIAccess)API;
+
+                api.HandleRequest = req =>
+                {
+                    if (!(req is SearchBeatmapSetsRequest searchBeatmapSetsRequest)) return false;
+
+                    searchBeatmapSetsRequest.TriggerSuccess(new SearchBeatmapSetsResponse
+                    {
+                        BeatmapSets = setsForResponse,
+                    });
+
+                    return true;
+                };
+
                 // non-supporter user
-                ((DummyAPIAccess)API).LocalUser.Value = new User
+                api.LocalUser.Value = new User
                 {
                     Username = "TestBot",
                     Id = API.LocalUser.Value.Id + 1,
                 };
             });
+        }
+
+        [Test]
+        public void TestHideViaBack()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+            AddStep("hide", () => InputManager.Key(Key.Escape));
+            AddUntilStep("is hidden", () => overlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestHideViaBackWithSearch()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("search something", () => overlay.ChildrenOfType<SearchTextBox>().First().Text = "search");
+
+            AddStep("kill search", () => InputManager.Key(Key.Escape));
+
+            AddAssert("search textbox empty", () => string.IsNullOrEmpty(overlay.ChildrenOfType<SearchTextBox>().First().Text));
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("hide", () => InputManager.Key(Key.Escape));
+            AddUntilStep("is hidden", () => overlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestHideViaBackWithScrolledSearch()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet, 100).ToArray()));
+
+            AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
+
+            AddStep("scroll to bottom", () => overlay.ChildrenOfType<OverlayScrollContainer>().First().ScrollToEnd());
+
+            AddStep("kill search", () => InputManager.Key(Key.Escape));
+
+            AddUntilStep("search textbox empty", () => string.IsNullOrEmpty(overlay.ChildrenOfType<SearchTextBox>().First().Text));
+            AddUntilStep("is scrolled to top", () => overlay.ChildrenOfType<OverlayScrollContainer>().First().Current == 0);
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("hide", () => InputManager.Key(Key.Escape));
+            AddUntilStep("is hidden", () => overlay.State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -63,7 +115,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
 
             AddStep("fetch for 1 beatmap", () => fetchFor(CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet));
-            AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+            AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
 
             AddStep("fetch for 0 beatmaps", () => fetchFor());
             AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
@@ -193,13 +245,15 @@ namespace osu.Game.Tests.Visual.Online
             noPlaceholderShown();
         }
 
+        private static int searchCount;
+
         private void fetchFor(params BeatmapSetInfo[] beatmaps)
         {
             setsForResponse.Clear();
             setsForResponse.AddRange(beatmaps.Select(b => new TestAPIBeatmapSet(b)));
 
             // trigger arbitrary change for fetching.
-            searchControl.Query.TriggerChange();
+            searchControl.Query.Value = $"search {searchCount++}";
         }
 
         private void setRankAchievedFilter(ScoreRank[] ranks)
@@ -229,8 +283,8 @@ namespace osu.Game.Tests.Visual.Online
         private void noPlaceholderShown()
         {
             AddUntilStep("no placeholder shown", () =>
-                !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any()
-                && !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+                !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any(d => d.IsPresent)
+                && !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
         }
 
         private class TestAPIBeatmapSet : APIBeatmapSet
