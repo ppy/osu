@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Lists;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -188,12 +189,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <param name="amount">The amount to adjust by. Greater than 0 if the scroll speed should be increased, less than 0 if it should be decreased.</param>
         protected virtual void AdjustScrollSpeed(int amount) => this.TransformBindableTo(TimeRange, TimeRange.Value - amount * time_span_step, 200, Easing.OutQuint);
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (!UserScrollSpeedAdjustment)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.IncreaseScrollSpeed:
                     scheduleScrollSpeedAdjustment(1);
@@ -209,7 +210,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private ScheduledDelegate scheduledScrollSpeedAdjustment;
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
             scheduledScrollSpeedAdjustment?.Cancel();
             scheduledScrollSpeedAdjustment = null;

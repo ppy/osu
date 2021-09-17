@@ -107,9 +107,9 @@ namespace osu.Game.Overlays.Mods
 
                 var incompatibleTypes = mod.IncompatibleMods;
 
-                var allMods = ruleset.Value.CreateInstance().GetAllMods();
+                var allMods = ruleset.Value.CreateInstance().AllMods;
 
-                incompatibleMods.Value = allMods.Where(m => m.GetType() != mod.GetType() && incompatibleTypes.Any(t => t.IsInstanceOfType(m))).ToList();
+                incompatibleMods.Value = allMods.Where(m => m.GetType() != mod.GetType() && incompatibleTypes.Any(t => t.IsInstanceOfType(m))).Select(m => m.CreateInstance()).ToList();
                 incompatibleText.Text = incompatibleMods.Value.Any() ? "与这些Mod不兼容:" : "与所有Mod兼容";
             }
         }

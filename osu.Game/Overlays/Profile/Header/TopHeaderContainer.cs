@@ -70,10 +70,6 @@ namespace osu.Game.Overlays.Profile.Header
                     Child = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        RowDimensions = new[]
-                        {
-                            new Dimension()
-                        },
                         Content = new[]
                         {
                             new Drawable[]
@@ -215,7 +211,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                     CornerRadius = avatar_size * 0.25f,
                                                     Children = new Drawable[]
                                                     {
-                                                        avatar = new UpdateableAvatar(openOnClick: false, showGuestOnNull: false)
+                                                        avatar = new UpdateableAvatar(isInteractive: false, showGuestOnNull: false)
                                                         {
                                                             Anchor = Anchor.Centre,
                                                             Origin = Anchor.Centre,

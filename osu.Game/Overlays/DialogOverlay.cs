@@ -7,6 +7,7 @@ using osu.Game.Overlays.Dialog;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using System.Linq;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays
 {
@@ -83,16 +84,16 @@ namespace osu.Game.Overlays
             this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
         }
 
-        public override bool OnPressed(GlobalAction action)
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Select:
                     CurrentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerClick();
                     return true;
             }
 
-            return base.OnPressed(action);
+            return base.OnPressed(e);
         }
     }
 }

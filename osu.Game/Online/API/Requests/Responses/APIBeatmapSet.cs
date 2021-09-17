@@ -63,6 +63,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"ratings")]
         private int[] ratings { get; set; }
 
+        [JsonProperty(@"track_id")]
+        private int? trackId { get; set; }
+
         [JsonProperty(@"user_id")]
         private int creatorId
         {
@@ -106,7 +109,8 @@ namespace osu.Game.Online.API.Requests.Responses
                     Availability = availability,
                     HasFavourited = hasFavourited,
                     Genre = genre,
-                    Language = language
+                    Language = language,
+                    TrackId = trackId
                 },
             };
 

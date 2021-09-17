@@ -47,6 +47,9 @@ namespace osu.Game.Screens.Menu
             this.useTranslate = useTranslate;
         }
 
+        private DecoupleableInterpolatingFramedClock decoupledClock;
+        private TrianglesIntroSequence intro;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -62,10 +65,18 @@ namespace osu.Game.Screens.Menu
             {
                 PrepareMenuLoad();
 
-                LoadComponentAsync(new TrianglesIntroSequence(logo, background, useTranslate)
+                decoupledClock = new DecoupleableInterpolatingFramedClock
+                {
+                    IsCoupled = false
+                };
+
+                if (UsingThemedIntro)
+                    decoupledClock.ChangeSource(Track);
+
+                LoadComponentAsync(intro = new TrianglesIntroSequence(logo, background, useTranslate)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(UsingThemedIntro ? Track : null),
+                    Clock = decoupledClock,
                     LoadMenu = LoadMenu
                 }, t =>
                 {
@@ -78,10 +89,23 @@ namespace osu.Game.Screens.Menu
             }
         }
 
+        public override void OnSuspending(IScreen next)
+        {
+            base.OnSuspending(next);
+
+            // important as there is a clock attached to a track which will likely be disposed before returning to this screen.
+            intro.Expire();
+        }
+
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
             background.FadeOut(100);
+        }
+
+        protected override void StartTrack()
+        {
+            decoupledClock.Start();
         }
 
         private class TrianglesIntroSequence : CompositeDrawable

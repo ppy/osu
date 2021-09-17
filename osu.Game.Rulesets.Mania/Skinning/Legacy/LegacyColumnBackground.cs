@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
@@ -76,9 +77,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             }
         }
 
-        public bool OnPressed(ManiaAction action)
+        public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action == Column.Action.Value)
+            if (e.Action == Column.Action.Value)
             {
                 light.FadeIn();
                 light.ScaleTo(Vector2.One);
@@ -87,12 +88,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             return false;
         }
 
-        public void OnReleased(ManiaAction action)
+        public void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
             // Todo: Should be 400 * 100 / CurrentBPM
             const double animation_length = 250;
 
-            if (action == Column.Action.Value)
+            if (e.Action == Column.Action.Value)
             {
                 light.FadeTo(0, animation_length);
                 light.ScaleTo(new Vector2(1, 0), animation_length);

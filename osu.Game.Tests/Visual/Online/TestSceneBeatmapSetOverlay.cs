@@ -21,6 +21,8 @@ namespace osu.Game.Tests.Visual.Online
 
         protected override bool UseOnlineAPI => true;
 
+        private int nextBeatmapSetId = 1;
+
         public TestSceneBeatmapSetOverlay()
         {
             Add(overlay = new TestBeatmapSetOverlay());
@@ -240,8 +242,19 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("show explicit map", () =>
             {
-                var beatmapSet = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+                var beatmapSet = getBeatmapSet();
                 beatmapSet.OnlineInfo.HasExplicitContent = true;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+        }
+
+        [Test]
+        public void TestFeaturedBeatmap()
+        {
+            AddStep("show featured map", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.OnlineInfo.TrackId = 1;
                 overlay.ShowBeatmapSet(beatmapSet);
             });
         }
@@ -306,6 +319,14 @@ namespace osu.Game.Tests.Visual.Online
                 Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                 Beatmaps = beatmaps,
             };
+        }
+
+        private BeatmapSetInfo getBeatmapSet()
+        {
+            var beatmapSet = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+            // Make sure the overlay is reloaded (see `BeatmapSetInfo.Equals`).
+            beatmapSet.OnlineBeatmapSetID = nextBeatmapSetId++;
+            return beatmapSet;
         }
 
         private void downloadAssert(bool shown)

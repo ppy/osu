@@ -38,8 +38,6 @@ namespace osu.Game.Screens.Menu
 
         public override bool AllowExternalScreenChange => true;
 
-        public override bool AllowTrackAdjustments => false;
-
         private Screen songSelect;
 
         private MenuSideFlashes sideFlashes;
