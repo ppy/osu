@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Menu
         private OsuGame game { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures, CustomStore customStore, MConfigManager mConfig)
+        private void load(OsuColour colours, LargeTextureStore largeTextureStore, MConfigManager mConfig)
         {
             var enableAvatarSprite = mConfig.Get<bool>(MSetting.UseCustomGreetingPicture);
 
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Menu
 
             if (enableAvatarSprite)
             {
-                avatarTexture = textures.Get("avatarlogo");
+                avatarTexture = largeTextureStore.Get("avatarlogo");
 
                 AddInternal(new Sprite
                 {
