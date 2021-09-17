@@ -10,10 +10,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Testing;
 using osu.Game.Graphics;
-using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -21,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
-    public class BarHitErrorMeter : HitErrorMeter, IKeyBindingHandler<GlobalAction>
+    public class BarHitErrorMeter : HitErrorMeter
     {
         private const int arrow_move_duration = 400;
 
@@ -144,10 +141,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             arrow.Alpha = 0;
             arrow.Delay(200).FadeInFromZero(600);
-
-            var progressBar = Parent.ChildrenOfType<SongProgress>().FirstOrDefault();
-            if (progressBar != null)
-                progressBar.Bar.OnSeek += _ => handleSeek();
         }
 
         private void createColourBars(OsuColour colours)
@@ -287,26 +280,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        private void handleSeek()
-        {
-            judgementsContainer.Clear(true);
-        }
-
-        public bool OnPressed(GlobalAction action)
-        {
-            switch (action)
-            {
-                case GlobalAction.SeekReplayBackward:
-                case GlobalAction.SeekReplayForward:
-                    handleSeek();
-                    return false;
-            }
-
-            return false;
-        }
-
-        public void OnReleased(GlobalAction action)
-        {
-        }
+        public override void Clear() => judgementsContainer.Clear(true);
     }
 }
