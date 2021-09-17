@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Mvis
                                               || tabHeader.IsVisible.Value //TabHeader可见
                                               || IsHovered == false; //隐藏界面或侧边栏可见，显示光标
 
-        public override bool AllowTrackAdjustments => true;
+        public override bool? AllowTrackAdjustments => true;
 
         private bool okForHide => IsHovered
                                   && isIdle.Value
@@ -911,15 +911,15 @@ namespace osu.Game.Screens.Mvis
             OnScreenResuming?.Invoke();
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> action)
         {
             //查找本体按键绑定
-            keyBindings.FirstOrDefault(b => b.Key == action).Value?.Invoke();
+            keyBindings.FirstOrDefault(b => b.Key == action.Action).Value?.Invoke();
 
             return false;
         }
 
-        public void OnReleased(GlobalAction action) { }
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> action) { }
 
         protected override bool Handle(UIEvent e)
         {
