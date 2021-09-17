@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     {
                         double velChangeBonus = Math.Max(0, Math.Sqrt((prevVector.Length - currVector.Length) * currVector.Length) - currVector.Length) * Math.Min(1, osuCurrObj.JumpDistance / 100);
 
-                        aimStrain += velChangeBonus * velChangeMultiplier;
+                        aimStrain += velChangeBonus * velChangeMultiplier * Math.Sqrt(100 / osuCurrObj.StrainTime);
                     }
                 }
                 else // There is a rhythm change
