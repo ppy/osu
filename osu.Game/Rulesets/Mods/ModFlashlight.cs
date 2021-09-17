@@ -69,9 +69,11 @@ namespace osu.Game.Rulesets.Mods
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
             var flashlight = CreateFlashlight();
-            flashlight.Combo = Combo;
+
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
+
+            flashlight.Combo.BindTo(Combo);
             drawableRuleset.KeyBindingInputManager.Add(flashlight);
 
             flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
@@ -81,7 +83,8 @@ namespace osu.Game.Rulesets.Mods
 
         public abstract class Flashlight : Drawable
         {
-            internal BindableInt Combo;
+            public readonly BindableInt Combo = new BindableInt();
+
             private IShader shader;
 
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode(this);
