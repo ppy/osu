@@ -11,8 +11,6 @@ namespace osu.Game.Screens.OnlinePlay
     {
         public override bool DisallowExternalBeatmapRulesetChanges => false;
 
-        public override bool? AllowTrackAdjustments => true;
-
         public virtual string ShortTitle => Title;
 
         [Resolved(CanBeNull = true)]
