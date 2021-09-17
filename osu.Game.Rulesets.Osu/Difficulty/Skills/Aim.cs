@@ -16,9 +16,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-        private const double angle_bonus_begin = Math.PI / 3;
-        private const double timing_threshold = 107;
-
         public Aim(Mod[] mods)
             : base(mods)
         {
@@ -29,12 +26,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double SkillMultiplier => 24.75;
         protected override double StrainDecayBase => 0.15;
 
-        private double wideAngleMultiplier = 1.0;
-        private double acuteAngleMultiplier = 1.0;
-        private double rhythmVarianceMultiplier = 1.0;
-        private double sliderMultiplier = 6.5;
-        private double sliderJumpMultiplier = 0.875;
-        private double velChangeMultiplier = 6.5;
+        private const double wide_angle_multiplier = 1.0;
+        private const double acute_angle_multiplier = 1.0;
+        private const double rhythm_variance_multiplier = 1.0;
+        private const double slider_multiplier = 6.5;
+        private const double slider_jump_multiplier = 0.875;
+        private const double vel_change_multiplier = 6.5;
 
         private double calcWideAngleBonus(double angle)
         {
@@ -92,9 +89,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                         }
 
                         if (acuteAngleBonus > wideAngleBonus)
-                            angleBonus = Math.Min(angleBonus, 150 / osuCurrObj.StrainTime) * Math.Min(1, Math.Pow(Math.Min(osuCurrObj.JumpDistance, osuPrevObj.JumpDistance) / 150, 2));;
+                            angleBonus = Math.Min(angleBonus, 150 / osuCurrObj.StrainTime) * Math.Min(1, Math.Pow(Math.Min(osuCurrObj.JumpDistance, osuPrevObj.JumpDistance) / 150, 2));
 
-                        angleBonus *= Math.Max(acuteAngleBonus * acuteAngleMultiplier, wideAngleBonus * wideAngleMultiplier);
+                        angleBonus *= Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
 
                         aimStrain += angleBonus; // add in angle velocity.
                     }
@@ -103,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     {
                         double velChangeBonus = Math.Max(0, Math.Sqrt((prevVector.Length - currVector.Length) * currVector.Length) - currVector.Length) * Math.Min(1, osuCurrObj.JumpDistance / 100);
 
-                        aimStrain += velChangeBonus * velChangeMultiplier * Math.Sqrt(100 / osuCurrObj.StrainTime);
+                        aimStrain += velChangeBonus * vel_change_multiplier * Math.Sqrt(100 / osuCurrObj.StrainTime);
                     }
                 }
                 else // There is a rhythm change
@@ -113,14 +110,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     if (osuCurrObj.StrainTime + 10 < osuPrevObj.StrainTime && osuPrevObj.StrainTime > osuLastObj.StrainTime + 10)
                         rhythmBonus = 0; // Don't want to reward for a rhythm change back to back (unless its a double, which is why this only checks for fast -> slow -> fast).
 
-                    aimStrain += rhythmBonus * rhythmVarianceMultiplier; // add in rhythm velocity.
+                    aimStrain += rhythmBonus * rhythm_variance_multiplier; // add in rhythm velocity.
                 }
 
                 if (osuCurrObj.TravelDistance != 0)
                 {
-                    double sliderBonus = Math.Max(osuCurrObj.TravelDistance, sliderJumpMultiplier * Math.Sqrt(osuCurrObj.TravelDistance * osuCurrObj.JumpDistance)) / osuCurrObj.StrainTime;
+                    double sliderBonus = Math.Max(osuCurrObj.TravelDistance, slider_jump_multiplier * Math.Sqrt(osuCurrObj.TravelDistance * osuCurrObj.JumpDistance)) / osuCurrObj.StrainTime;
 
-                    aimStrain += sliderBonus * sliderMultiplier; // Add in slider velocity.
+                    aimStrain += sliderBonus * slider_multiplier; // Add in slider velocity.
                 }
 
                 aimStrain += currVector.Length; // Add in regular velocity.
