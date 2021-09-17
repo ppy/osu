@@ -234,6 +234,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             {
                 passwordTextbox.Text = string.Empty;
 
+                GetContainingInputManager().ChangeFocus(passwordTextbox);
+
                 errorText.Text = error;
                 errorText
                     .FadeIn()
