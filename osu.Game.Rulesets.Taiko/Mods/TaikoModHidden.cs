@@ -18,6 +18,18 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
 
+        /// <summary>
+        /// How far away from the hit target should hitobjects start to fade out.
+        /// Range: [0, 1]
+        /// </summary>
+        private const float fade_out_start_time = 0.6f;
+
+        /// <summary>
+        /// How long hitobjects take to fade out, in terms of the scrolling length.
+        /// Range: [0, 1]
+        /// </summary>
+        private const float fade_out_duration = 0.3f;
+
         private DrawableTaikoRuleset drawableRuleset;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
@@ -37,8 +49,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 case DrawableDrumRollTick _:
                 case DrawableHit _:
                     double preempt = drawableRuleset.TimeRange.Value / drawableRuleset.ControlPointAt(hitObject.HitObject.StartTime).Multiplier;
-                    double start = hitObject.HitObject.StartTime - preempt * 0.6;
-                    double duration = preempt * 0.3;
+                    double start = hitObject.HitObject.StartTime - preempt * fade_out_start_time;
+                    double duration = preempt * fade_out_duration;
 
                     using (hitObject.BeginAbsoluteSequence(start))
                     {
