@@ -189,9 +189,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             private OsuPasswordTextBox passwordTextbox;
             private TriangleButton joinButton;
             private OsuSpriteText errorText;
+            private Sample sampleJoinFail;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, AudioManager audio)
             {
                 Child = new FillFlowContainer
                 {
@@ -227,6 +228,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     }
                 };
 
+                sampleJoinFail = audio.Samples.Get(@"UI/password-fail");
+
                 joinButton.Action = () => lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
             }
 
@@ -244,6 +247,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     .FadeOutFromOne(1000, Easing.In);
 
                 Body.Shake();
+
+                Schedule(() => { sampleJoinFail?.Play(); });
             }
 
             protected override void LoadComplete()
