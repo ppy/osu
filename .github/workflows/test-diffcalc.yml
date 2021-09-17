@@ -50,9 +50,6 @@ jobs:
           echo "${{ github.event.comment.body }} doesn't contain ${{ matrix.ruleset.id }}"
           exit 1
 
-      - name: Install dependencies
-        run: sudo apt-get install -y pv
-
       - name: Verify MySQL connection from host
         run: |
           mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "SHOW DATABASES"
