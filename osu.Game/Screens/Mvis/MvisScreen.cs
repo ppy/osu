@@ -1007,12 +1007,13 @@ namespace osu.Game.Screens.Mvis
 
         private void applyTrackAdjustments()
         {
+            //modRate
+            modRateAdjust.SpeedChange.Value = musicSpeed.Value;
+
             CurrentTrack.ResetSpeedAdjustments();
             CurrentTrack.Looping = loopToggleButton.Bindable.Value;
             CurrentTrack.RestartPoint = 0;
             CurrentTrack.AddAdjustment(adjustFreq.Value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, musicSpeed);
-
-            modRateAdjust.SpeedChange.Value = musicSpeed.Value;
         }
 
         private void updateBackground(WorkingBeatmap beatmap, bool applyBgBrightness = true)

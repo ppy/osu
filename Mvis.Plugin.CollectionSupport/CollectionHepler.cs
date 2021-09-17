@@ -84,7 +84,7 @@ namespace Mvis.Plugin.CollectionSupport
             });
         }
 
-        private bool trackChangedAfterDisable;
+        private bool trackChangedAfterDisable = true;
 
         [Resolved]
         private OsuGame game { get; set; }
@@ -198,6 +198,10 @@ namespace Mvis.Plugin.CollectionSupport
                 if (trackChangedAfterDisable && value)
                 {
                     drawableTrack = new DrawableTrack(b.Value.Track);
+                    drawableTrack.Completed += () =>
+                    {
+                        if (IsCurrent) Schedule(NextTrack);
+                    };
                     trackChangedAfterDisable = false;
                 }
 
