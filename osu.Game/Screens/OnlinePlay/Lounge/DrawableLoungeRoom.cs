@@ -248,7 +248,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
                 Body.Shake();
 
-                Schedule(() => { sampleJoinFail?.Play(); });
+                sampleJoinFail?.Play();
             }
 
             protected override void LoadComplete()
