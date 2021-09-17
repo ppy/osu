@@ -88,6 +88,7 @@ namespace osu.Desktop.DBus
         protected override void LoadComplete()
         {
             controlSource?.BindValueChanged(onControlSourceChanged, true);
+            beatmap.DisabledChanged += b => mprisService.BeatmapDisabled = b;
             base.LoadComplete();
         }
 

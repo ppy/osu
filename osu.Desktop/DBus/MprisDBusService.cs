@@ -54,6 +54,17 @@ namespace osu.Desktop.DBus
             }
         }
 
+        internal bool BeatmapDisabled
+        {
+            set
+            {
+                playerProperties.CanGoNext = !value;
+                playerProperties.CanGoPrevious = !value;
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("CanGoNext", playerProperties.CanGoNext));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("CanGoPrevious", playerProperties.CanGoPrevious));
+            }
+        }
+
         /// <summary>
         /// 元数据
         /// </summary>

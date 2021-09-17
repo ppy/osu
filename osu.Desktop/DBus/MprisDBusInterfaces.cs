@@ -179,13 +179,21 @@ namespace osu.Desktop.DBus
 
         public double MaximumRate => _MaximumRate;
 
-        private readonly bool _CanGoNext = true;
+        private bool _CanGoNext = true;
 
-        public bool CanGoNext => _CanGoNext;
+        public bool CanGoNext
+        {
+            get => _CanGoNext;
+            set => _CanGoNext = value;
+        }
 
-        private readonly bool _CanGoPrevious = true;
+        private bool _CanGoPrevious = true;
 
-        public bool CanGoPrevious => _CanGoPrevious;
+        public bool CanGoPrevious
+        {
+            get => _CanGoPrevious;
+            set => _CanGoPrevious = value;
+        }
 
         private readonly bool _CanPlay = true;
 
