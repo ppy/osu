@@ -22,6 +22,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [Resolved]
         private OsuColour colours { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private Player player { get; set; }
+
         public bool UsesFixedAnchor { get; set; }
 
         [BackgroundDependencyLoader(true)]
@@ -33,6 +36,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (player != null)
+                player.OnSeek += Clear;
 
             processor.NewJudgement += OnNewJudgement;
         }
@@ -66,6 +72,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     return colours.BlueLight;
             }
         }
+
+        public abstract void Clear();
 
         protected override void Dispose(bool isDisposing)
         {

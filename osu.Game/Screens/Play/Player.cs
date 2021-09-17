@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Play
 
         public Action RestartRequested;
 
+        public Action OnSeek;
+
         public bool HasFailed { get; private set; }
 
         private Bindable<bool> mouseWheelDisabled;
@@ -584,7 +586,11 @@ namespace osu.Game.Screens.Play
         /// Seek to a specific time in gameplay.
         /// </summary>
         /// <param name="time">The destination time to seek to.</param>
-        public void Seek(double time) => GameplayClockContainer.Seek(time);
+        public void Seek(double time)
+        {
+            GameplayClockContainer.Seek(time);
+            OnSeek.Invoke();
+        }
 
         private ScheduledDelegate frameStablePlaybackResetDelegate;
 
