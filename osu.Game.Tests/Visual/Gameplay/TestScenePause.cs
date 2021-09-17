@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("time didn't go backwards", () => alwaysGoingForward);
 
-            AddStep("reset offset", () => LocalConfig.SetValue(OsuSetting.AudioOffset, 0));
+            AddStep("reset offset", () => LocalConfig.SetValue(OsuSetting.AudioOffset, 0.0));
         }
 
         [Test]
