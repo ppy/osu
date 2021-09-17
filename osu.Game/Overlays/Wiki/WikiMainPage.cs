@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Containers;
 using HtmlAgilityPack;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Wiki
 {
@@ -56,12 +56,12 @@ namespace osu.Game.Overlays.Wiki
                 {
                     Vertical = 30,
                 },
-                Child = new OsuSpriteText
+                Child = new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(Typeface.Inter, size: 12, weight: FontWeight.Light))
                 {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Text = blurbNode.InnerText,
-                    Font = OsuFont.GetFont(Typeface.Inter, size: 12, weight: FontWeight.Light),
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
+                    TextAnchor = Anchor.TopCentre,
                 }
             };
         }
