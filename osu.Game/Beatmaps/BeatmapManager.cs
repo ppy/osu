@@ -129,6 +129,7 @@ namespace osu.Game.Beatmaps
                         Ruleset = ruleset,
                         Metadata = metadata,
                         WidescreenStoryboard = true,
+                        SamplesMatchPlaybackRate = true,
                     }
                 }
             };

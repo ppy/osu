@@ -180,6 +180,10 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
+                case @"SamplesMatchPlaybackRate":
+                    beatmap.BeatmapInfo.SamplesMatchPlaybackRate = Parsing.ParseInt(pair.Value) == 1;
+                    break;
+
                 case @"Countdown":
                     beatmap.BeatmapInfo.Countdown = (CountdownType)Enum.Parse(typeof(CountdownType), pair.Value);
                     break;
