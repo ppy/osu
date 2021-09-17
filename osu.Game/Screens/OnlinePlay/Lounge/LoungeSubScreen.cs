@@ -37,6 +37,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     {
         public override string Title => "Lounge";
 
+        public override bool? AllowTrackAdjustments => false;
+
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
             SelectedRoom = { BindTarget = SelectedRoom }
