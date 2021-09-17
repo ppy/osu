@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestJoinRoomWithIncorrectPassword()
+        public void TestJoinRoomWithIncorrectPasswordViaButton()
         {
             DrawableLoungeRoom.PasswordEntryPopover passwordEntryPopover = null;
 
@@ -96,6 +96,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("room not joined", () => loungeScreen.IsCurrentScreen());
             AddUntilStep("password prompt still visible", () => passwordEntryPopover.State.Value == Visibility.Visible);
+            AddAssert("textbox still focused", () => InputManager.FocusedDrawable is OsuPasswordTextBox);
+        }
+
+        [Test]
+        public void TestJoinRoomWithIncorrectPasswordViaEnter()
+        {
+            DrawableLoungeRoom.PasswordEntryPopover passwordEntryPopover = null;
+
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
+            AddStep("select room", () => InputManager.Key(Key.Down));
+            AddStep("attempt join room", () => InputManager.Key(Key.Enter));
+            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
+            AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "wrong");
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddAssert("room not joined", () => loungeScreen.IsCurrentScreen());
+            AddUntilStep("password prompt still visible", () => passwordEntryPopover.State.Value == Visibility.Visible);
+            AddAssert("textbox still focused", () => InputManager.FocusedDrawable is OsuPasswordTextBox);
         }
 
         [Test]
