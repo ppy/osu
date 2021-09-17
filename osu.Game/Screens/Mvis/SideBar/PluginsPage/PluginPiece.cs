@@ -41,9 +41,16 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
         private readonly BindableBool disabled = new BindableBool();
         private GridContainer buttonsGrid;
         private Circle statusCircle;
+        private Box bgBox;
+        private DelayedLoadUnloadWrapper textureWrapper;
+
+        [Resolved]
+        private MvisPluginManager manager { get; set; }
+
+        private bool activeListContainsPlugin => manager?.GetActivePlugins().Contains(Plugin) ?? false;
 
         [BackgroundDependencyLoader]
-        private void load(MvisPluginManager manager)
+        private void load()
         {
             Width = 610;
             AutoSizeAxes = Axes.Y;
@@ -59,12 +66,11 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                bgBox = new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.InActiveColor
+                    RelativeSizeAxes = Axes.Both
                 },
-                new DelayedLoadUnloadWrapper(() =>
+                textureWrapper = new DelayedLoadUnloadWrapper(() =>
                 {
                     var coverName = Plugin.GetType().Namespace?.Replace(".", "") ?? "Plugin";
                     var s = new PluginBackgroundSprite($"{coverName}/{Plugin.GetType().Name}")
@@ -79,10 +85,6 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
                     return s;
                 }, 0)
                 {
-                    Colour = ColourInfo.GradientHorizontal(
-                        Color4.White.Opacity(0.25f),
-                        Color4.White),
-
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight
@@ -206,7 +208,6 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
 
                 disabled.BindValueChanged(v =>
                 {
-                    var activeListContainsPlugin = manager.GetActivePlugins().Contains(Plugin);
                     enableButton.Enabled.Value = v.NewValue;
                     disableButton.Enabled.Value = !v.NewValue;
                     statusCircle.FadeColour(v.NewValue
@@ -250,6 +251,27 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
             else
             {
                 unloadButton.Text = "目前不能通过此面板卸载该插件";
+            }
+
+            colourProvider.HueColour.BindValueChanged(_ => updateColors(), true);
+        }
+
+        private void updateColors()
+        {
+            bgBox.Colour = colourProvider.InActiveColor;
+            textureWrapper.Colour = ColourInfo.GradientHorizontal(
+                Color4.White.Opacity(0.25f),
+                Color4.White);
+
+            BorderColour = HasFocus ? colourProvider.Light2 : Color4.White;
+
+            if ((Plugin.Disabled.Value && activeListContainsPlugin) || (!Plugin.Disabled.Value && !activeListContainsPlugin))
+            {
+                statusCircle.Colour = Color4.Gold;
+            }
+            else
+            {
+                statusCircle.Colour = (Plugin.Disabled.Value ? colourProvider.Background5 : colourProvider.Light2);
             }
         }
 
