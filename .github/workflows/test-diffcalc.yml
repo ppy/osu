@@ -12,7 +12,7 @@ on:
 env:
   DB_USER: root
   DB_HOST: 127.0.0.1
-  DB_PORT: 33306:3306
+  DB_PORT: 3306
   CONCURRENCY: 4
   ALLOW_DOWNLOAD: 1
   SAVE_DOWNLOADED: 1
@@ -34,15 +34,6 @@ jobs:
           - { name: fruits, id: 2 }
           - { name: mania, id: 3 }
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-        ports:
-          - 33306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
       - name: Verify ruleset
         if: contains(github.event.comment.body, matrix.ruleset.id) == false
@@ -53,6 +44,11 @@ jobs:
       - name: Verify MySQL connection from host
         run: |
           mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "SHOW DATABASES"
+
+      - name: Drop previous databases
+        run: |
+          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "DROP DATABASE IF EXISTS osu_master"
+          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "DROP DATABASE IF EXISTS osu_pr"
 
       - name: Create directory structure
         run: |
