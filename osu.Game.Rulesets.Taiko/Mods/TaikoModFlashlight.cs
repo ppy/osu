@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                 if (!flashlightProperties.IsValid)
                 {
-                    FlashlightPosition = taikoPlayfield.HitTarget.ToSpaceOfOtherDrawable(taikoPlayfield.HitTarget.OriginPosition, this);
+                    FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
                     flashlightProperties.Validate();
                 }
             }
