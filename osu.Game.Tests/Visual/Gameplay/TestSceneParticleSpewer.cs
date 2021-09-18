@@ -28,8 +28,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             Child = spewer = createSpewer();
 
             AddToggleStep("toggle spawning", value => spewer.Active.Value = value);
-            AddSliderStep("particle gravity", 0f, 250f, 0f, value => spewer.Gravity = value);
-            AddSliderStep("particle velocity", 0f, 500f, 250f, value => spewer.MaxVelocity = value);
+            AddSliderStep("particle gravity", 0f, 1f, 0f, value => spewer.Gravity = value);
+            AddSliderStep("particle velocity", 0f, 1f, 0.25f, value => spewer.MaxVelocity = value);
+            AddStep("move to new location", () =>
+            {
+                spewer.TransformTo(nameof(spewer.SpawnPosition), new Vector2(RNG.NextSingle(), RNG.NextSingle()), 1000, Easing.Out);
+            });
         }
 
         [SetUpSteps]
@@ -51,14 +55,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("is not present", () => !spewer.IsPresent);
         }
 
-        private TestParticleSpewer createSpewer()
-        {
-            return new TestParticleSpewer(skinManager.DefaultLegacySkin.GetTexture("star2"))
+        private TestParticleSpewer createSpewer() =>
+            new TestParticleSpewer(skinManager.DefaultLegacySkin.GetTexture("star2"))
             {
-                Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                RelativePositionAxes = Axes.Both,
+                RelativeSizeAxes = Axes.Both,
+                Position = new Vector2(0.5f),
+                Size = new Vector2(0.5f),
             };
-        }
 
         private class TestParticleSpewer : ParticleSpewer
         {
@@ -66,7 +71,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             private const int rate = 250;
 
             public float Gravity;
-            public float MaxVelocity = 250;
+
+            public float MaxVelocity = 0.25f;
+
+            public Vector2 SpawnPosition { get; set; } = new Vector2(0.5f);
 
             protected override float ParticleGravity => Gravity;
 
@@ -82,6 +90,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         RNG.NextSingle(-MaxVelocity, MaxVelocity),
                         RNG.NextSingle(-MaxVelocity, MaxVelocity)
                     ),
+                    StartPosition = SpawnPosition,
                     Duration = RNG.NextSingle(lifetime),
                     StartAngle = RNG.NextSingle(MathF.PI * 2),
                     EndAngle = RNG.NextSingle(MathF.PI * 2),
