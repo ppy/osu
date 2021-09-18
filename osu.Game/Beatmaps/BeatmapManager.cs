@@ -266,22 +266,14 @@ namespace osu.Game.Beatmaps
                     // grab the original file (or create a new one if not found).
                     var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
 
-                    // removing incompatible characters before exporting
-                    string mArtist = metadata.Artist;
-                    string mTitle = metadata.Title;
-                    string mAuthor = metadata.Author.ToString();
-                    string mVersion = beatmapInfo.Version;
-                    List<char> incompatibleChars = new List<char>{'/','\\','<','>','|','?','*','\"',':'};
-                    for(int i = 0; i < incompatibleChars.Count; i++)
-                    {
-                        mArtist = mArtist.Replace(incompatibleChars[i].ToString(),"");
-                        mTitle = mTitle.Replace(incompatibleChars[i].ToString(),"");
-                        mAuthor = mAuthor.Replace(incompatibleChars[i].ToString(),"");
-                        mVersion = mVersion.Replace(incompatibleChars[i].ToString(),"");
-                    }
-
+                    
                     // metadata may have changed; update the path with the standard format.
-                    beatmapInfo.Path = $"{mArtist} - {mTitle} ({mAuthor}) [{mVersion}].osu";
+                    beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu";
+
+                    // removing incompatible characters before exporting
+                    foreach(char c in Path.GetInvalidFileNameChars())
+                        beatmapInfo.Path = beatmapInfo.Path.Replace(c.ToString(),"");
+
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 
                     // update existing or populate new file's filename.
