@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (angle < 2 * Math.PI / 3)
                 return Math.Pow(Math.Sin(1.5 * (angle - Math.PI / 3)), 2);
 
-            return 0.25 + 0.75 * Math.Pow(Math.Sin(1.5 * (Math.PI / 3 - (angle - 2 * Math.PI / 3))), 2);
+            return 0.25 + 0.75 * Math.Pow(Math.Sin(1.5 * (Math.PI - angle)), 2);
         }
 
         private double calcAcuteAngleBonus(double angle)
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (angle < Math.PI / 3)
                 return 0.5 + 0.5 * Math.Pow(Math.Sin(1.5 * angle), 2);
             if (angle < 2 * Math.PI / 3)
-                return Math.Pow(Math.Sin(1.5 * (Math.PI / 3 - (angle - Math.PI / 3))), 2);
+                return Math.Pow(Math.Sin(1.5 * (2 * Math.PI / 3 - angle)), 2);
 
             return 0;
         }
