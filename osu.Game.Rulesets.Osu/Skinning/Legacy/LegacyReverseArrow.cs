@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyReverseArrow : CompositeDrawable
     {
-        private ISkin skin { get; set; }
+        private ISkin skin { get; }
 
         [Resolved(canBeNull: true)]
         private DrawableHitObject drawableHitObject { get; set; }
