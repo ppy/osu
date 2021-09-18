@@ -376,18 +376,29 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
-#pragma warning disable 618
-            addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
-#pragma warning restore 618
-            {
-                SliderVelocity = speedMultiplier,
-            }, timingChange);
+            bool isOsuRuleset = beatmap.BeatmapInfo.RulesetID == 0;
 
-            addControlPoint(time, new EffectControlPoint
+            if (isOsuRuleset)
+            {
+#pragma warning disable 618
+                addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
+#pragma warning restore 618
+                {
+                    SliderVelocity = speedMultiplier,
+                }, timingChange);
+            }
+
+            var effectPoint = new EffectControlPoint
             {
                 KiaiMode = kiaiMode,
                 OmitFirstBarLine = omitFirstBarSignature,
-            }, timingChange);
+            };
+
+            // scrolling rulesets use effect points rather than difficulty points for scroll speed adjustments.
+            if (!isOsuRuleset)
+                effectPoint.ScrollSpeed = speedMultiplier;
+
+            addControlPoint(time, effectPoint, timingChange);
 
             addControlPoint(time, new LegacySampleControlPoint
             {

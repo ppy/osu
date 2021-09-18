@@ -189,7 +189,7 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             // handle scroll speed, which is stored as "slider velocity" in legacy formats.
-            // note that this is only relevant for mania beatmaps.
+            // this is relevant for scrolling ruleset beatmaps.
             if (!isOsuRuleset)
             {
                 foreach (var point in legacyControlPoints.EffectPoints)
