@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             repeatContainer.Clear(false);
             tickContainer.Clear(false);
 
-            OverlayElementContainer.Clear();
+            OverlayElementContainer.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
