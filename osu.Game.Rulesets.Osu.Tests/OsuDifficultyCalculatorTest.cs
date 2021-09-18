@@ -15,13 +15,13 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
-        [TestCase(6.6634445062299665d, "diffcalc-test")]
-        [TestCase(1.0414203870195022d, "zero-length-sliders")]
+        [TestCase(6.5453239669393799d, "diffcalc-test")]
+        [TestCase(1.4052074426689189d, "zero-length-sliders")]
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        [TestCase(8.3858089051603368d, "diffcalc-test")]
-        [TestCase(1.2723279173428435d, "zero-length-sliders")]
+        [TestCase(9.1001796216758404d, "diffcalc-test")]
+        [TestCase(1.69433543821419d, "zero-length-sliders")]
         public void TestClockRateAdjusted(double expected, string name)
             => Test(expected, name, new OsuModDoubleTime());
 
