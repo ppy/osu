@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             string lookupName = new OsuSkinComponent(OsuSkinComponents.ReverseArrow).LookupName;
 
-            InternalChild = skin.GetAnimation(lookupName, true, true) ?? Drawable.Empty();
+            InternalChild = skin.GetAnimation(lookupName, true, true) ?? Empty();
         }
 
         protected override void LoadComplete()
