@@ -589,7 +589,7 @@ namespace osu.Game.Screens.Play
         public void Seek(double time)
         {
             GameplayClockContainer.Seek(time);
-            OnSeek.Invoke();
+            OnSeek?.Invoke();
         }
 
         private ScheduledDelegate frameStablePlaybackResetDelegate;
