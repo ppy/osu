@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             aimValue *= Math.Max(flashlightBonus, approachRateBonus);
 
-            // Scale the aim value with accuracy _slightly_
+            // Scale the aim value with accuracy
             aimValue *= accuracy;
             // It is important to also consider accuracy difficulty when doing that
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
