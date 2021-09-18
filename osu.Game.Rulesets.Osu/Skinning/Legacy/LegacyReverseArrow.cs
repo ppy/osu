@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             this.skin = skin;
         }
 
-        [BackgroundDependencyLoader(true)]
+        [BackgroundDependencyLoader]
         private void load()
         {
             AutoSizeAxes = Axes.Both;
