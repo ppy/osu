@@ -32,11 +32,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double TravelDistance { get; private set; }
 
         /// <summary>
-        /// Normalized distance between the start and end position of the previous <see cref="OsuDifficultyHitObject"/>.
-        /// </summary>
-        public Vector2 TravelVector { get; private set; }
-
-        /// <summary>
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
@@ -108,11 +103,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 return;
 
             slider.LazyEndPosition = slider.StackedPosition;
-
-            TravelVector = Vector2.Subtract((Vector2)slider.LazyEndPosition, slider.StackedPosition);
-
-            if (slider.LazyEndPosition == null)
-                TravelVector = Vector2.Multiply(TravelVector, (float)0.0);
 
             float approxFollowCircleRadius = (float)(slider.Radius * 3);
             var computeVertex = new Action<double>(t =>
