@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
@@ -83,6 +84,8 @@ namespace osu.Game.Graphics
 
             private float currentTime;
             private float gravity;
+            private Axes relativePositionAxes;
+            private Vector2 sourceSize;
 
             public ParticleSpewerDrawNode(Sprite source)
                 : base(source)
@@ -98,6 +101,8 @@ namespace osu.Game.Graphics
 
                 currentTime = (float)Source.Time.Current;
                 gravity = Source.ParticleGravity;
+                relativePositionAxes = Source.RelativePositionAxes;
+                sourceSize = Source.DrawSize;
             }
 
             protected override void Blit(Action<TexturedVertex2D> vertexAction)
@@ -116,18 +121,11 @@ namespace osu.Game.Graphics
                     var alpha = p.AlphaAtTime(timeSinceStart);
                     if (alpha <= 0) continue;
 
-                    var scale = p.ScaleAtTime(timeSinceStart);
                     var pos = p.PositionAtTime(timeSinceStart, gravity);
+                    var scale = p.ScaleAtTime(timeSinceStart);
                     var angle = p.AngleAtTime(timeSinceStart);
 
-                    var width = Texture.DisplayWidth * scale;
-                    var height = Texture.DisplayHeight * scale;
-
-                    var rect = new RectangleF(
-                        pos.X - width / 2,
-                        pos.Y - height / 2,
-                        width,
-                        height);
+                    var rect = createDrawRect(pos, scale);
 
                     var quad = new Quad(
                         transformPosition(rect.TopLeft, rect.Centre, angle),
@@ -140,6 +138,23 @@ namespace osu.Game.Graphics
                         new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
                         null, TextureCoords);
                 }
+            }
+
+            private RectangleF createDrawRect(Vector2 position, float scale)
+            {
+                var width = Texture.DisplayWidth * scale;
+                var height = Texture.DisplayHeight * scale;
+
+                if (relativePositionAxes.HasFlagFast(Axes.X))
+                    position.X *= sourceSize.X;
+                if (relativePositionAxes.HasFlagFast(Axes.Y))
+                    position.Y *= sourceSize.Y;
+
+                return new RectangleF(
+                    position.X - width / 2,
+                    position.Y - height / 2,
+                    width,
+                    height);
             }
 
             private Vector2 transformPosition(Vector2 pos, Vector2 centre, float angle)
