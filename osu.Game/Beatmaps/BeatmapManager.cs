@@ -146,7 +146,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSkin">The skin specific to the beatmap being added.</param>
         /// <returns>The usable <see cref="WorkingBeatmap"/> corresponding to <paramref name="beatmap"/> and associated with the supplied <paramref name="beatmapSet"/>.</returns>
         /// <exception cref="InvalidOperationException">If <paramref name="beatmapSet"/> does not exist in the database.</exception>
-        public WorkingBeatmap AddToExistingSet(BeatmapSetInfo beatmapSet, IBeatmap beatmap, ISkin beatmapSkin = null)
+        public virtual WorkingBeatmap AddToExistingSet(BeatmapSetInfo beatmapSet, IBeatmap beatmap, ISkin beatmapSkin = null)
         {
             var beatmapInfo = beatmap.BeatmapInfo;
 

@@ -135,6 +135,12 @@ namespace osu.Game.Tests.Visual
             {
                 // don't actually care about saving for this context.
             }
+
+            public override WorkingBeatmap AddToExistingSet(BeatmapSetInfo beatmapSet, IBeatmap beatmap, ISkin beatmapSkin = null)
+            {
+                // don't actually care about saving for this context.
+                return testBeatmap;
+            }
         }
     }
 }
