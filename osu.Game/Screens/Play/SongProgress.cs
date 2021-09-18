@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Play
         private readonly SongProgressGraph graph;
         private readonly SongProgressInfo info;
 
-        public SongProgressBar Bar => bar;
-
         public Action<double> RequestSeek;
 
         /// <summary>
