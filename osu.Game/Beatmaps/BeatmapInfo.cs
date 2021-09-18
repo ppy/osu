@@ -152,6 +152,25 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
 
+        /// <summary>
+        /// Creates a new <see cref="BeatmapInfo"/> with initialised defaults.
+        /// </summary>
+        /// <remarks>
+        /// The defaults applied below are not applied directly to <see cref="BeatmapInfo"/> members,
+        /// because they have changed from the legacy defaults
+        /// (e.g. the legacy beatmap format specifies widescreen storyboard to be off by default).
+        /// </remarks>
+        /// <param name="ruleset">The ruleset to use when populating the <see cref="BeatmapInfo"/>.</param>
+        /// <param name="metadata">The metadata to use when populating the <see cref="BeatmapInfo"/>.</param>
+        public static BeatmapInfo CreateDefault(RulesetInfo ruleset, BeatmapMetadata metadata) => new BeatmapInfo
+        {
+            BaseDifficulty = new BeatmapDifficulty(),
+            Ruleset = ruleset,
+            Metadata = metadata,
+            WidescreenStoryboard = true,
+            SamplesMatchPlaybackRate = true,
+        };
+
         public string[] SearchableTerms => new[]
         {
             Version

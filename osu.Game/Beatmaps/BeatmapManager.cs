@@ -123,14 +123,7 @@ namespace osu.Game.Beatmaps
                 Metadata = metadata,
                 Beatmaps = new List<BeatmapInfo>
                 {
-                    new BeatmapInfo
-                    {
-                        BaseDifficulty = new BeatmapDifficulty(),
-                        Ruleset = ruleset,
-                        Metadata = metadata,
-                        WidescreenStoryboard = true,
-                        SamplesMatchPlaybackRate = true,
-                    }
+                    BeatmapInfo.CreateDefault(ruleset, metadata)
                 }
             };
 

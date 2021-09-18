@@ -759,15 +759,12 @@ namespace osu.Game.Screens.Edit
 
         protected void CreateNewDifficulty(RulesetInfo rulesetInfo)
         {
+            var newBeatmapInfo = BeatmapInfo.CreateDefault(rulesetInfo, editorBeatmap.BeatmapInfo.Metadata.DeepClone());
+            newBeatmapInfo.BeatmapSet = editorBeatmap.BeatmapInfo.BeatmapSet;
+
             var newDifficulty = new Beatmap
             {
-                BeatmapInfo = new BeatmapInfo
-                {
-                    BaseDifficulty = new BeatmapDifficulty(),
-                    BeatmapSet = editorBeatmap.BeatmapInfo.BeatmapSet,
-                    Metadata = editorBeatmap.BeatmapInfo.Metadata.DeepClone(),
-                    Ruleset = rulesetInfo,
-                }
+                BeatmapInfo = newBeatmapInfo
             };
 
             foreach (var timingPoint in editorBeatmap.ControlPointInfo.TimingPoints)
