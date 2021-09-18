@@ -73,6 +73,10 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
+        /// <summary>
+        /// Invoked by <see cref="Player.OnSeek"/> when the active <see cref="Player"/> seeks through the current beatmap.
+        /// Any inheritors of <see cref="HitErrorMeter"/> should have this method clear their container that displays the hit error results.
+        /// </summary>
         public abstract void Clear();
 
         protected override void Dispose(bool isDisposing)
