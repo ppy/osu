@@ -82,6 +82,8 @@ namespace osu.Game.Graphics
 
             protected new ParticleSpewer Source => (ParticleSpewer)base.Source;
 
+            private readonly float maxLifetime;
+
             private float currentTime;
             private float gravity;
             private Axes relativePositionAxes;
@@ -91,6 +93,7 @@ namespace osu.Game.Graphics
                 : base(source)
             {
                 particles = new FallingParticle[Source.particles.Length];
+                maxLifetime = (float)Source.maxLifetime;
             }
 
             public override void ApplyState()
@@ -121,7 +124,7 @@ namespace osu.Game.Graphics
                     var alpha = p.AlphaAtTime(timeSinceStart);
                     if (alpha <= 0) continue;
 
-                    var pos = p.PositionAtTime(timeSinceStart, gravity);
+                    var pos = p.PositionAtTime(timeSinceStart, gravity, maxLifetime);
                     var scale = p.ScaleAtTime(timeSinceStart);
                     var angle = p.AngleAtTime(timeSinceStart);
 
@@ -187,12 +190,12 @@ namespace osu.Game.Graphics
 
             public float AngleAtTime(float timeSinceStart) => StartAngle + (EndAngle - StartAngle) * progressAtTime(timeSinceStart);
 
-            public Vector2 PositionAtTime(float timeSinceStart, float gravity)
+            public Vector2 PositionAtTime(float timeSinceStart, float gravity, float maxDuration)
             {
                 var progress = progressAtTime(timeSinceStart);
-                var currentGravity = new Vector2(0, gravity * Duration / 1000 * progress);
+                var currentGravity = new Vector2(0, gravity * Duration / maxDuration * progress);
 
-                return StartPosition + (Velocity + currentGravity) * timeSinceStart / 1000;
+                return StartPosition + (Velocity + currentGravity) * timeSinceStart / maxDuration;
             }
 
             private float progressAtTime(float timeSinceStart) => Math.Clamp(timeSinceStart / Duration, 0, 1);
