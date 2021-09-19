@@ -139,6 +139,11 @@ namespace osu.Game.Screens.Edit
             {
                 playableBeatmap = loadableBeatmap.GetPlayableBeatmap(loadableBeatmap.BeatmapInfo.Ruleset);
 
+                // the game-wide beatmap doesn't necessarily have all of the difficulties in its BeatmapSet.Beatmaps property, due to EF idiosyncrasies.
+                // re-query explicitly during this process to prevent difficulties getting truncated on beatmap save.
+                var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
+                playableBeatmap.BeatmapInfo.BeatmapSet = beatmapSet;
+
                 // clone these locally for now to avoid incurring overhead on GetPlayableBeatmap usages.
                 // eventually we will want to improve how/where this is done as there are issues with *not* cloning it in all cases.
                 playableBeatmap.ControlPointInfo = playableBeatmap.ControlPointInfo.DeepClone();
@@ -775,9 +780,9 @@ namespace osu.Game.Screens.Edit
 
         private EditorMenuItem createDifficultySwitchMenu()
         {
-            var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
-
             var difficultyItems = new List<MenuItem>();
+
+            var beatmapSet = editorBeatmap.BeatmapInfo.BeatmapSet;
 
             foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.RulesetID).OrderBy(group => group.Key))
             {
