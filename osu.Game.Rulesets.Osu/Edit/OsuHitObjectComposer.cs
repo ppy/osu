@@ -17,7 +17,6 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -309,7 +308,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (gridSnapToggle.Value == TernaryState.True)
             {
-                rectangularPositionSnapGridContainer.Add(rectangularPositionSnapGrid = new RectangularPositionSnapGrid(OsuPlayfield.BASE_SIZE / 2, new Vector2(16))
+                rectangularPositionSnapGridContainer.Add(rectangularPositionSnapGrid = new OsuRectangularPositionSnapGrid(EditorBeatmap.BeatmapInfo.GridSize)
                 {
                     RelativeSizeAxes = Axes.Both
                 });

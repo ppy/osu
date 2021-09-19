@@ -49,9 +49,10 @@ namespace osu.Game.Tests.Visual.Editing
         {
             RectangularPositionSnapGrid grid = null;
 
-            AddStep("create grid", () => Child = grid = new RectangularPositionSnapGrid(position, spacing)
+            AddStep("create grid", () => Child = grid = new RectangularPositionSnapGrid(position)
             {
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
+                Spacing = spacing
             });
 
             AddStep("add snapping cursor", () => Add(new SnappingCursorContainer

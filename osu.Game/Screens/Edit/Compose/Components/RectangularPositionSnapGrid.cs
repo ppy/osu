@@ -17,17 +17,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         public Vector2 StartPosition { get; }
 
+        private Vector2 spacing = Vector2.One;
+
         /// <summary>
         /// The spacing between grid lines of this <see cref="RectangularPositionSnapGrid"/>.
         /// </summary>
-        public Vector2 Spacing { get; }
+        public Vector2 Spacing
+        {
+            get => spacing;
+            set
+            {
+                if (spacing.X <= 0 || spacing.Y <= 0)
+                    throw new ArgumentException("Grid spacing must be positive.");
+
+                spacing = value;
+                gridCache.Invalidate();
+            }
+        }
 
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
 
-        public RectangularPositionSnapGrid(Vector2 startPosition, Vector2 spacing)
+        public RectangularPositionSnapGrid(Vector2 startPosition)
         {
             StartPosition = startPosition;
-            Spacing = spacing;
 
             AddLayout(gridCache);
         }
