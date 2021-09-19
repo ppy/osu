@@ -1,11 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -20,12 +20,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyCursorParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
+    public class LegacyCursorParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>, IRequireHighFrequencyMousePosition
     {
+        private const int particle_lifetime_min = 300;
+        private const int particle_lifetime_max = 1000;
+        private const float particle_gravity = 240;
+
         public bool Active => breakSpewer?.Active.Value == true || kiaiSpewer?.Active.Value == true;
 
-        private LegacyCursorParticleSpewer breakSpewer;
-        private LegacyCursorParticleSpewer kiaiSpewer;
+        private Vector2 cursorVelocity;
+        private ParticleSpewer breakSpewer;
+        private ParticleSpewer kiaiSpewer;
 
         [Resolved(canBeNull: true)]
         private Player player { get; set; }
@@ -45,21 +50,25 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 texture.ScaleAdjust *= 1.6f;
             }
 
+            RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.Centre;
             InternalChildren = new[]
             {
-                breakSpewer = new LegacyCursorParticleSpewer(texture, 20)
+                breakSpewer = new ParticleSpewer(texture, 20, particle_lifetime_max)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = Vector2.One,
                     Colour = starBreakAdditive,
-                    Direction = SpewDirection.None,
+                    ParticleGravity = particle_gravity,
+                    CreateParticle = createBreakParticle,
                 },
-                kiaiSpewer = new LegacyCursorParticleSpewer(texture, 60)
+                kiaiSpewer = new ParticleSpewer(texture, 60, particle_lifetime_max)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = Vector2.One,
                     Colour = starBreakAdditive,
-                    Direction = SpewDirection.None,
+                    ParticleGravity = particle_gravity,
+                    CreateParticle = createParticle,
                 },
             };
 
@@ -83,6 +92,39 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             );
 
             kiaiSpewer.Active.Value = kiaiHitObject != null;
+        }
+
+        private Vector2? cursorScreenPosition;
+
+        private const double max_velocity_frame_length = 15;
+        private double velocityFrameLength;
+        private Vector2 totalPosDifference;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            if (cursorScreenPosition == null)
+            {
+                cursorScreenPosition = e.ScreenSpaceMousePosition;
+                return base.OnMouseMove(e);
+            }
+
+            // calculate cursor velocity.
+            totalPosDifference += e.ScreenSpaceMousePosition - cursorScreenPosition.Value;
+            cursorScreenPosition = e.ScreenSpaceMousePosition;
+
+            velocityFrameLength += Math.Abs(Clock.ElapsedFrameTime);
+
+            if (velocityFrameLength > max_velocity_frame_length)
+            {
+                cursorVelocity = totalPosDifference / (float)velocityFrameLength;
+
+                totalPosDifference = Vector2.Zero;
+                velocityFrameLength = 0;
+            }
+
+            return base.OnMouseMove(e);
         }
 
         public bool OnPressed(OsuAction action)
@@ -111,125 +153,53 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     rightPressed = pressed;
                     break;
             }
+        }
+
+        private ParticleSpewer.FallingParticle? createParticle()
+        {
+            if (!cursorScreenPosition.HasValue) return null;
+
+            return new ParticleSpewer.FallingParticle
+            {
+                StartPosition = ToLocalSpace(cursorScreenPosition.Value),
+                Duration = RNG.NextSingle(particle_lifetime_min, particle_lifetime_max),
+                StartAngle = (float)(RNG.NextDouble() * 4 - 2),
+                EndAngle = RNG.NextSingle(-2f, 2f),
+                EndScale = RNG.NextSingle(2f),
+                Velocity = cursorVelocity * 40,
+            };
+        }
+
+        private ParticleSpewer.FallingParticle? createBreakParticle()
+        {
+            var baseParticle = createParticle();
+            if (!baseParticle.HasValue) return null;
+
+            var p = baseParticle.Value;
 
             if (leftPressed && rightPressed)
-                breakSpewer.Direction = SpewDirection.Omni;
+            {
+                p.Velocity += new Vector2(
+                    RNG.NextSingle(-460f, 460f),
+                    RNG.NextSingle(-160f, 160f)
+                );
+            }
             else if (leftPressed)
-                breakSpewer.Direction = SpewDirection.Left;
+            {
+                p.Velocity += new Vector2(
+                    RNG.NextSingle(-460f, 0),
+                    RNG.NextSingle(-40f, 40f)
+                );
+            }
             else if (rightPressed)
-                breakSpewer.Direction = SpewDirection.Right;
-            else
-                breakSpewer.Direction = SpewDirection.None;
-        }
-
-        private class LegacyCursorParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
-        {
-            private const int particle_lifetime_min = 300;
-            private const int particle_lifetime_max = 1000;
-
-            public SpewDirection Direction { get; set; }
-
-            protected override bool CanSpawnParticles => base.CanSpawnParticles && cursorScreenPosition.HasValue;
-            protected override float ParticleGravity => 240;
-
-            public LegacyCursorParticleSpewer(Texture texture, int perSecond)
-                : base(texture, perSecond, particle_lifetime_max)
             {
-                Active.BindValueChanged(_ => resetVelocityCalculation());
+                p.Velocity += new Vector2(
+                    RNG.NextSingle(0, 460f),
+                    RNG.NextSingle(-40f, 40f)
+                );
             }
 
-            private Vector2? cursorScreenPosition;
-            private Vector2 cursorVelocity;
-
-            private const double max_velocity_frame_length = 15;
-            private double velocityFrameLength;
-            private Vector2 totalPosDifference;
-
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
-            protected override bool OnMouseMove(MouseMoveEvent e)
-            {
-                if (cursorScreenPosition == null)
-                {
-                    cursorScreenPosition = e.ScreenSpaceMousePosition;
-                    return base.OnMouseMove(e);
-                }
-
-                // calculate cursor velocity.
-                totalPosDifference += e.ScreenSpaceMousePosition - cursorScreenPosition.Value;
-                cursorScreenPosition = e.ScreenSpaceMousePosition;
-
-                velocityFrameLength += Clock.ElapsedFrameTime;
-
-                if (velocityFrameLength > max_velocity_frame_length)
-                {
-                    cursorVelocity = totalPosDifference / (float)velocityFrameLength;
-
-                    totalPosDifference = Vector2.Zero;
-                    velocityFrameLength = 0;
-                }
-
-                return base.OnMouseMove(e);
-            }
-
-            private void resetVelocityCalculation()
-            {
-                cursorScreenPosition = null;
-                totalPosDifference = Vector2.Zero;
-                velocityFrameLength = 0;
-            }
-
-            protected override FallingParticle CreateParticle() =>
-                new FallingParticle
-                {
-                    StartPosition = ToLocalSpace(cursorScreenPosition ?? Vector2.Zero),
-                    Duration = RNG.NextSingle(particle_lifetime_min, particle_lifetime_max),
-                    StartAngle = (float)(RNG.NextDouble() * 4 - 2),
-                    EndAngle = RNG.NextSingle(-2f, 2f),
-                    EndScale = RNG.NextSingle(2f),
-                    Velocity = getVelocity(),
-                };
-
-            private Vector2 getVelocity()
-            {
-                Vector2 velocity = Vector2.Zero;
-
-                switch (Direction)
-                {
-                    case SpewDirection.Left:
-                        velocity = new Vector2(
-                            RNG.NextSingle(-460f, 0),
-                            RNG.NextSingle(-40f, 40f)
-                        );
-                        break;
-
-                    case SpewDirection.Right:
-                        velocity = new Vector2(
-                            RNG.NextSingle(0, 460f),
-                            RNG.NextSingle(-40f, 40f)
-                        );
-                        break;
-
-                    case SpewDirection.Omni:
-                        velocity = new Vector2(
-                            RNG.NextSingle(-460f, 460f),
-                            RNG.NextSingle(-160f, 160f)
-                        );
-                        break;
-                }
-
-                velocity += cursorVelocity * 40;
-
-                return velocity;
-            }
-        }
-
-        private enum SpewDirection
-        {
-            None,
-            Left,
-            Right,
-            Omni,
+            return p;
         }
     }
 }
