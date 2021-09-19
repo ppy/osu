@@ -9,6 +9,7 @@ using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Utils;
 using osuTK;
 
 namespace osu.Game.Graphics
@@ -179,9 +180,9 @@ namespace osu.Game.Graphics
 
             public float AlphaAtTime(float timeSinceStart) => 1 - progressAtTime(timeSinceStart);
 
-            public float ScaleAtTime(float timeSinceStart) => 1 + (EndScale - 1) * progressAtTime(timeSinceStart);
+            public float ScaleAtTime(float timeSinceStart) => (float)Interpolation.Lerp(1, EndScale, progressAtTime(timeSinceStart));
 
-            public float AngleAtTime(float timeSinceStart) => StartAngle + (EndAngle - StartAngle) * progressAtTime(timeSinceStart);
+            public float AngleAtTime(float timeSinceStart) => (float)Interpolation.Lerp(StartAngle, EndAngle, progressAtTime(timeSinceStart));
 
             public Vector2 PositionAtTime(float timeSinceStart, float gravity, float maxDuration)
             {
