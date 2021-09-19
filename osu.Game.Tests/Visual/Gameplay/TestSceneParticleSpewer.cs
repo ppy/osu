@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
@@ -55,6 +56,26 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("is not present", () => !spewer.IsPresent);
         }
 
+        [Test]
+        public void TestTimeJumps()
+        {
+            ManualClock testClock = new ManualClock();
+
+            AddStep("prepare clock", () =>
+            {
+                testClock.CurrentTime = TestParticleSpewer.MAX_DURATION * -3;
+                spewer.Clock = new FramedClock(testClock);
+            });
+            AddStep("start spewer", () => spewer.Active.Value = true);
+            AddAssert("spawned first particle", () => spewer.TotalCreatedParticles == 1);
+
+            AddStep("move clock forward", () => testClock.CurrentTime = TestParticleSpewer.MAX_DURATION * 3);
+            AddAssert("spawned second particle", () => spewer.TotalCreatedParticles == 2);
+
+            AddStep("move clock backwards", () => testClock.CurrentTime = TestParticleSpewer.MAX_DURATION * -1);
+            AddAssert("spawned third particle", () => spewer.TotalCreatedParticles == 3);
+        }
+
         private TestParticleSpewer createSpewer() =>
             new TestParticleSpewer(skinManager.DefaultLegacySkin.GetTexture("star2"))
             {
@@ -67,8 +88,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestParticleSpewer : ParticleSpewer
         {
-            private const int max_duration = 1500;
+            public const int MAX_DURATION = 1500;
             private const int rate = 250;
+
+            public int TotalCreatedParticles { get; private set; }
 
             public float Gravity;
 
@@ -79,23 +102,27 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override float ParticleGravity => Gravity;
 
             public TestParticleSpewer(Texture texture)
-                : base(texture, rate, max_duration)
+                : base(texture, rate, MAX_DURATION)
             {
             }
 
-            protected override FallingParticle CreateParticle() =>
-                new FallingParticle
+            protected override FallingParticle CreateParticle()
+            {
+                TotalCreatedParticles++;
+
+                return new FallingParticle
                 {
                     Velocity = new Vector2(
                         RNG.NextSingle(-MaxVelocity, MaxVelocity),
                         RNG.NextSingle(-MaxVelocity, MaxVelocity)
                     ),
                     StartPosition = SpawnPosition,
-                    Duration = RNG.NextSingle(max_duration),
+                    Duration = RNG.NextSingle(MAX_DURATION),
                     StartAngle = RNG.NextSingle(MathF.PI * 2),
                     EndAngle = RNG.NextSingle(MathF.PI * 2),
                     EndScale = RNG.NextSingle(0.5f, 1.5f)
                 };
+            }
         }
     }
 }
