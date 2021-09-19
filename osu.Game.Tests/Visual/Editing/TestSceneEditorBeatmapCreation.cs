@@ -56,6 +56,9 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestCreateNewBeatmapWithMultipleDifficulties()
         {
+            WorkingBeatmap firstBeatmap = null;
+            AddStep("store beatmap", () => firstBeatmap = Beatmap.Value);
+
             AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.Version = Guid.NewGuid().ToString());
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
@@ -66,6 +69,8 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddUntilStep("wait for switch", () => firstBeatmap != Beatmap.Value && Editor.IsLoaded);
+
             AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.Version = Guid.NewGuid().ToString());
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
@@ -98,6 +103,9 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestCreateNewBeatmapFailsWithSameNamedDifficulties()
         {
+            WorkingBeatmap firstBeatmap = null;
+            AddStep("store beatmap", () => firstBeatmap = Beatmap.Value);
+
             AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.Version = "duplicate");
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
@@ -108,6 +116,8 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddUntilStep("wait for switch", () => firstBeatmap != Beatmap.Value && Editor.IsLoaded);
+
             AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.Version = "duplicate");
             AddStep("try to save beatmap", () => Editor.Save());
             AddAssert("beatmap set not corrupted", () =>
