@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Graphics
 {
-    public class ParticleSpewer : Sprite
+    public abstract class ParticleSpewer : Sprite
     {
         private readonly FallingParticle[] particles;
         private int currentIndex;
@@ -29,16 +29,12 @@ namespace osu.Game.Graphics
 
         public override bool IsPresent => base.IsPresent && hasActiveParticles;
 
-        /// <summary>
-        /// Called each time a new particle should be spawned.
-        /// </summary>
-        public Func<FallingParticle?> CreateParticle = () => new FallingParticle();
-
-        public float ParticleGravity;
+        protected virtual bool CanSpawnParticles => true;
+        protected virtual float ParticleGravity => 0;
 
         private bool hasActiveParticles => Active.Value || (lastParticleAdded + maxDuration) > Time.Current;
 
-        public ParticleSpewer(Texture texture, int perSecond, double maxDuration)
+        protected ParticleSpewer(Texture texture, int perSecond, double maxDuration)
         {
             Texture = texture;
             Blending = BlendingParameters.Additive;
@@ -57,24 +53,24 @@ namespace osu.Game.Graphics
             // this can happen when seeking in replays.
             if (lastParticleAdded > Time.Current) lastParticleAdded = 0;
 
-            if (Active.Value && Time.Current > lastParticleAdded + cooldown)
+            if (Active.Value && CanSpawnParticles && Time.Current > lastParticleAdded + cooldown)
             {
                 var newParticle = CreateParticle();
+                newParticle.StartTime = (float)Time.Current;
 
-                if (newParticle.HasValue)
-                {
-                    var particle = newParticle.Value;
-                    particle.StartTime = (float)Time.Current;
+                particles[currentIndex] = newParticle;
 
-                    particles[currentIndex] = particle;
-
-                    currentIndex = (currentIndex + 1) % particles.Length;
-                    lastParticleAdded = Time.Current;
-                }
+                currentIndex = (currentIndex + 1) % particles.Length;
+                lastParticleAdded = Time.Current;
             }
 
             Invalidate(Invalidation.DrawNode);
         }
+
+        /// <summary>
+        /// Called each time a new particle should be spawned.
+        /// </summary>
+        protected virtual FallingParticle CreateParticle() => new FallingParticle();
 
         protected override DrawNode CreateDrawNode() => new ParticleSpewerDrawNode(this);
 
@@ -178,7 +174,7 @@ namespace osu.Game.Graphics
 
         #endregion
 
-        public struct FallingParticle
+        protected struct FallingParticle
         {
             public float StartTime;
             public Vector2 StartPosition;
