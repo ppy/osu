@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
@@ -32,9 +33,9 @@ namespace osu.Game.Skinning.Editor
             RelativeSizeAxes = Axes.Both;
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Back:
                     if (skinEditor?.State.Value != Visibility.Visible)
@@ -81,7 +82,7 @@ namespace osu.Game.Skinning.Editor
         {
             if (visibility.NewValue == Visibility.Visible)
             {
-                target.Masking = true;
+                updateMasking();
                 target.AllowScaling = false;
                 target.RelativePositionAxes = Axes.Both;
 
@@ -92,12 +93,15 @@ namespace osu.Game.Skinning.Editor
             {
                 target.AllowScaling = true;
 
-                target.ScaleTo(1, SkinEditor.TRANSITION_DURATION, Easing.OutQuint).OnComplete(_ => target.Masking = false);
+                target.ScaleTo(1, SkinEditor.TRANSITION_DURATION, Easing.OutQuint).OnComplete(_ => updateMasking());
                 target.MoveToX(0f, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
             }
         }
 
-        public void OnReleased(GlobalAction action)
+        private void updateMasking() =>
+            target.Masking = skinEditor.State.Value == Visibility.Visible;
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
