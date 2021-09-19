@@ -127,15 +127,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             return base.OnMouseMove(e);
         }
 
-        public bool OnPressed(OsuAction action)
+        public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
-            handleInput(action, true);
+            handleInput(e.Action, true);
             return false;
         }
 
-        public void OnReleased(OsuAction action)
+        public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
         {
-            handleInput(action, false);
+            handleInput(e.Action, false);
         }
 
         private bool leftPressed;
