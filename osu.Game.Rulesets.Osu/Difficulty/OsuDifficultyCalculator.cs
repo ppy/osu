@@ -80,6 +80,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 var last = beatmap.HitObjects[i - 1];
                 var current = beatmap.HitObjects[i];
 
+                mods.OfType<IApplicableToRate>().ForEach(m => clockRate = m.ApplyToRate(current.StartTime));
+
                 yield return new OsuDifficultyHitObject(current, lastLast, last, clockRate);
             }
         }
