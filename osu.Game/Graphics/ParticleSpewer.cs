@@ -85,7 +85,7 @@ namespace osu.Game.Graphics
             private Axes relativePositionAxes;
             private Vector2 sourceSize;
 
-            public ParticleSpewerDrawNode(Sprite source)
+            public ParticleSpewerDrawNode(ParticleSpewer source)
                 : base(source)
             {
                 particles = new FallingParticle[Source.particles.Length];
