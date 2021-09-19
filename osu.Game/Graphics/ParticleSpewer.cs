@@ -49,11 +49,7 @@ namespace osu.Game.Graphics
         {
             base.Update();
 
-            // reset cooldown if the clock was rewound.
-            // this can happen when seeking in replays.
-            if (lastParticleAdded > Time.Current) lastParticleAdded = 0;
-
-            if (Active.Value && CanSpawnParticles && Time.Current > lastParticleAdded + cooldown)
+            if (Active.Value && CanSpawnParticles && Math.Abs(Time.Current - lastParticleAdded) > cooldown)
             {
                 var newParticle = CreateParticle();
                 newParticle.StartTime = (float)Time.Current;
@@ -112,9 +108,6 @@ namespace osu.Game.Graphics
             {
                 foreach (var p in particles)
                 {
-                    // ignore particles that weren't initialized.
-                    if (p.StartTime <= 0) continue;
-
                     var timeSinceStart = currentTime - p.StartTime;
 
                     // ignore particles from the future.
