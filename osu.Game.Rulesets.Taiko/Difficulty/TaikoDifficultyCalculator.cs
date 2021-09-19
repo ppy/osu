@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -51,6 +52,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
+                mods.OfType<IApplicableToRate>().ForEach(m => clockRate = m.ApplyToRate(beatmap.HitObjects[i].StartTime));
+
                 taikoDifficultyHitObjects.Add(
                     new TaikoDifficultyHitObject(
                         beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, i

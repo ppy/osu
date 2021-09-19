@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Catch.Difficulty.Skills;
@@ -59,6 +60,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 // We want to only consider fruits that contribute to the combo.
                 if (hitObject is BananaShower || hitObject is TinyDroplet)
                     continue;
+
+                mods.OfType<IApplicableToRate>().ForEach(m => clockRate = m.ApplyToRate(hitObject.StartTime));
 
                 if (lastObject != null)
                     yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth);

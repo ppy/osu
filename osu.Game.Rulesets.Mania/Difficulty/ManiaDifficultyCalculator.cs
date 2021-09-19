@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -62,7 +63,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             LegacySortHelper<HitObject>.Sort(sortedObjects, Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
 
             for (int i = 1; i < sortedObjects.Length; i++)
+            {
+                mods.OfType<IApplicableToRate>().ForEach(m => clockRate = m.ApplyToRate(sortedObjects[i].StartTime));
+
                 yield return new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate);
+            }
         }
 
         // Sorting is done in CreateDifficultyHitObjects, since the full list of hitobjects is required.
