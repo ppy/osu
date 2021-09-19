@@ -13,14 +13,14 @@ using osuTK;
 
 namespace osu.Game.Graphics
 {
-    public abstract class ParticleSpewer : Sprite
+    public class ParticleSpewer : Sprite
     {
         private readonly FallingParticle[] particles;
         private int currentIndex;
         private double lastParticleAdded;
 
         private readonly double cooldown;
-        private readonly double maxLifetime;
+        private readonly double maxDuration;
 
         /// <summary>
         /// Determines whether particles are being spawned.
@@ -29,20 +29,24 @@ namespace osu.Game.Graphics
 
         public override bool IsPresent => base.IsPresent && hasActiveParticles;
 
-        protected virtual bool CanSpawnParticles => true;
-        protected virtual float ParticleGravity => 0;
+        /// <summary>
+        /// Called each time a new particle should be spawned.
+        /// </summary>
+        public Func<FallingParticle?> CreateParticle = () => new FallingParticle();
 
-        private bool hasActiveParticles => Active.Value || (lastParticleAdded + maxLifetime) > Time.Current;
+        public float ParticleGravity;
 
-        protected ParticleSpewer(Texture texture, int perSecond, double maxLifetime)
+        private bool hasActiveParticles => Active.Value || (lastParticleAdded + maxDuration) > Time.Current;
+
+        public ParticleSpewer(Texture texture, int perSecond, double maxDuration)
         {
             Texture = texture;
             Blending = BlendingParameters.Additive;
 
-            particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxLifetime / 1000)];
+            particles = new FallingParticle[perSecond * (int)Math.Ceiling(maxDuration / 1000)];
 
             cooldown = 1000f / perSecond;
-            this.maxLifetime = maxLifetime;
+            this.maxDuration = maxDuration;
         }
 
         protected override void Update()
@@ -53,24 +57,24 @@ namespace osu.Game.Graphics
             // this can happen when seeking in replays.
             if (lastParticleAdded > Time.Current) lastParticleAdded = 0;
 
-            if (Active.Value && CanSpawnParticles && Time.Current > lastParticleAdded + cooldown)
+            if (Active.Value && Time.Current > lastParticleAdded + cooldown)
             {
                 var newParticle = CreateParticle();
-                newParticle.StartTime = (float)Time.Current;
 
-                particles[currentIndex] = newParticle;
+                if (newParticle.HasValue)
+                {
+                    var particle = newParticle.Value;
+                    particle.StartTime = (float)Time.Current;
 
-                currentIndex = (currentIndex + 1) % particles.Length;
-                lastParticleAdded = Time.Current;
+                    particles[currentIndex] = particle;
+
+                    currentIndex = (currentIndex + 1) % particles.Length;
+                    lastParticleAdded = Time.Current;
+                }
             }
 
             Invalidate(Invalidation.DrawNode);
         }
-
-        /// <summary>
-        /// Called each time a new particle should be spawned.
-        /// </summary>
-        protected virtual FallingParticle CreateParticle() => new FallingParticle();
 
         protected override DrawNode CreateDrawNode() => new ParticleSpewerDrawNode(this);
 
@@ -82,7 +86,7 @@ namespace osu.Game.Graphics
 
             protected new ParticleSpewer Source => (ParticleSpewer)base.Source;
 
-            private readonly float maxLifetime;
+            private readonly float maxDuration;
 
             private float currentTime;
             private float gravity;
@@ -93,7 +97,7 @@ namespace osu.Game.Graphics
                 : base(source)
             {
                 particles = new FallingParticle[Source.particles.Length];
-                maxLifetime = (float)Source.maxLifetime;
+                maxDuration = (float)Source.maxDuration;
             }
 
             public override void ApplyState()
@@ -124,7 +128,7 @@ namespace osu.Game.Graphics
                     var alpha = p.AlphaAtTime(timeSinceStart);
                     if (alpha <= 0) continue;
 
-                    var pos = p.PositionAtTime(timeSinceStart, gravity, maxLifetime);
+                    var pos = p.PositionAtTime(timeSinceStart, gravity, maxDuration);
                     var scale = p.ScaleAtTime(timeSinceStart);
                     var angle = p.AngleAtTime(timeSinceStart);
 
@@ -174,7 +178,7 @@ namespace osu.Game.Graphics
 
         #endregion
 
-        protected struct FallingParticle
+        public struct FallingParticle
         {
             public float StartTime;
             public Vector2 StartPosition;
