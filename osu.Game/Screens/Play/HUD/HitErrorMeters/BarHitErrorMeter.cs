@@ -286,5 +286,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration).Expire();
             }
         }
+
+        public override void Clear() => judgementsContainer.Clear();
     }
 }
