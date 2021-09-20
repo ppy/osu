@@ -24,6 +24,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
+    [Cached]
     public class OsuPlayfield : Playfield
     {
         private readonly PlayfieldBorder playfieldBorder;
