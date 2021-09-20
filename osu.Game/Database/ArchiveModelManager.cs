@@ -468,7 +468,7 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
-            using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
+            using (var outputStream = exportStorage.GetStream($"{GetValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
                 ExportModelTo(retrievedItem, outputStream);
 
             exportStorage.OpenInNativeExplorer();
@@ -893,7 +893,7 @@ namespace osu.Game.Database
 
         #endregion
 
-        protected static string getValidFilename(string filename)
+        protected static string GetValidFilename(string filename)
         {
             foreach (char c in Path.GetInvalidFileNameChars())
                 filename = filename.Replace(c, '_');

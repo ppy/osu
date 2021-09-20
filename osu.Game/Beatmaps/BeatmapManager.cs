@@ -270,7 +270,7 @@ namespace osu.Game.Beatmaps
                     beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu";
 
                     // remove incompatible characters from path
-                    beatmapInfo.Path = getValidFilename(beatmapInfo.Path);
+                    beatmapInfo.Path = GetValidFilename(beatmapInfo.Path);
 
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 
