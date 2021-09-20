@@ -69,7 +69,10 @@ namespace osu.Game.Screens.Play
 
         public Action RestartRequested;
 
-        public Action OnSeek;
+        /// <summary>
+        /// Invoked when a seek has been performed via <see cref="Seek"/>
+        /// </summary>
+        public event Action OnSeek;
 
         public bool HasFailed { get; private set; }
 
