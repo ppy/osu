@@ -16,29 +16,50 @@ env:
   SKIP_INSERT_ATTRIBUTES: 1
 
 jobs:
+  metadata:
+    runs-on: self-hosted
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '!pp check') && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.matrix }}
+      continue: ${{ steps.generate-matrix.outputs.continue }}
+    steps:
+      - name: generate matrix
+        id: generate-matrix
+        run: |
+          if [[ "${{ github.event.comment.body }}" =~ "1" ]] ; then
+            MATRIX_PROJECTS_JSON+='{ "name": "osu", "id": 0 },'
+          fi
+          if [[ "${{ github.event.comment.body }}" =~ "2" ]] ; then
+            MATRIX_PROJECTS_JSON+='{ "name": "taiko", "id": 1 },'
+          fi
+          if [[ "${{ github.event.comment.body }}" =~ "3" ]] ; then
+            MATRIX_PROJECTS_JSON+='{ "name": "catch", "id": 2 },'
+          fi
+          if [[ "${{ github.event.comment.body }}" =~ "4" ]] ; then
+            MATRIX_PROJECTS_JSON+='{ "name": "mania", "id": 3 },'
+          fi
+
+          if [[ "${MATRIX_PROJECTS_JSON}" != "" ]]; then
+            MATRIX_JSON="{ \"ruleset\": [ ${MATRIX_PROJECTS_JSON} ] }"
+            echo "${MATRIX_JSON}"
+            CONTINUE="yes"
+          else
+            CONTINUE="no"
+          fi
+
+          echo "::set-output name=continue::${CONTINUE}"
+          echo "::set-output name=matrix::${MATRIX_JSON}"
   diffcalc:
     name: Diffcalc
     runs-on: self-hosted
     continue-on-error: true
-
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '!pp check') && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')
+    if: needs.metadata.outputs.continue == 'yes'
+    needs: metadata
 
     strategy:
-      fail-fast: false
-      matrix:
-        ruleset:
-          - { name: osu, id: 0 }
-          - { name: taiko, id: 1 }
-          - { name: fruits, id: 2 }
-          - { name: mania, id: 3 }
+      matrix: ${{ fromJson(needs.metadata.outputs.matrix) }}
 
     steps:
-      - name: Verify ruleset
-        if: contains(github.event.comment.body, matrix.ruleset.id) == false
-        run: |
-          echo "${{ github.event.comment.body }} doesn't contain ${{ matrix.ruleset.id }}"
-          exit 1
-
       - name: Verify MySQL connection from host
         run: |
           mysql -e "SHOW DATABASES"
