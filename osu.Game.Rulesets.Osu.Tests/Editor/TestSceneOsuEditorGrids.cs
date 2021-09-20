@@ -57,12 +57,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             AddStep("enable rectangular grid", () => InputManager.Key(Key.Y));
             AddUntilStep("rectangular grid visible", () => this.ChildrenOfType<OsuRectangularPositionSnapGrid>().Any());
-            gridSizeIs(4);
+            gridSizeIs(32);
 
+            nextGridSizeIs(4);
             nextGridSizeIs(8);
             nextGridSizeIs(16);
             nextGridSizeIs(32);
-            nextGridSizeIs(4);
         }
 
         private void nextGridSizeIs(int size)
