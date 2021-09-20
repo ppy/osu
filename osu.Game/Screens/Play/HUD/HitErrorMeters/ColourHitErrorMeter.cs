@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             judgementsFlow.Push(GetColourForHitResult(judgement.Type));
         }
 
-        public override void Clear() => judgementsFlow.Clear(true);
+        protected override void Clear() => judgementsFlow.Clear();
 
         private class JudgementFlow : FillFlowContainer<HitErrorCircle>
         {

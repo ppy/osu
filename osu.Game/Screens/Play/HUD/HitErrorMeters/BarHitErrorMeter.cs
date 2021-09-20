@@ -280,6 +280,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        public override void Clear() => judgementsContainer.Clear(true);
+        protected override void Clear() => judgementsContainer.Clear();
     }
 }
