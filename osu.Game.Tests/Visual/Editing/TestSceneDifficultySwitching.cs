@@ -7,28 +7,19 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Components.Menus;
-using osu.Game.Screens.Menu;
 using osu.Game.Tests.Beatmaps.IO;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneDifficultySwitching : ScreenTestScene
+    public class TestSceneDifficultySwitching : EditorTestScene
     {
-        private BeatmapSetInfo importedBeatmapSet;
-        private Editor editor;
+        protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
-        // required for screen transitions to work properly
-        // (see comment in EditorLoader.LogoArriving).
-        [Cached]
-        private OsuLogo logo = new OsuLogo
-        {
-            Alpha = 0
-        };
+        protected override bool IsolateSavingFromDatabase => false;
 
         [Resolved]
         private OsuGameBase game { get; set; }
@@ -36,20 +27,18 @@ namespace osu.Game.Tests.Visual.Editing
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load() => Add(logo);
+        private BeatmapSetInfo importedBeatmapSet;
 
-        [SetUpSteps]
-        public void SetUp()
+        public override void SetUpSteps()
         {
             AddStep("import test beatmap", () => importedBeatmapSet = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).Result);
+            base.SetUpSteps();
+        }
 
-            AddStep("set current beatmap", () => Beatmap.Value = beatmaps.GetWorkingBeatmap(importedBeatmapSet.Beatmaps.First()));
-            AddStep("push loader", () => Stack.Push(new EditorLoader()));
-
-            AddUntilStep("wait for editor push", () => Stack.CurrentScreen is Editor);
-            AddStep("store editor", () => editor = (Editor)Stack.CurrentScreen);
-            AddUntilStep("wait for editor to load", () => editor.IsLoaded);
+        protected override void LoadEditor()
+        {
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(importedBeatmapSet.Beatmaps.First());
+            base.LoadEditor();
         }
 
         [Test]
@@ -67,16 +56,65 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestClockPositionPreservedBetweenSwitches()
+        {
+            BeatmapInfo targetDifficulty = null;
+            AddStep("seek editor to 00:05:00", () => EditorClock.Seek(5000));
+
+            AddStep("set target difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo)));
+            switchToDifficulty(() => targetDifficulty);
+            confirmEditingBeatmap(() => targetDifficulty);
+            AddAssert("editor clock at 00:05:00", () => EditorClock.CurrentTime == 5000);
+
+            AddStep("exit editor", () => Stack.Exit());
+            // ensure editor loader didn't resume.
+            AddAssert("stack empty", () => Stack.CurrentScreen == null);
+        }
+
+        [Test]
+        public void TestClipboardPreservedAfterSwitch([Values] bool sameRuleset)
+        {
+            BeatmapInfo targetDifficulty = null;
+
+            AddStep("select first object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.First()));
+            AddStep("copy object", () => Editor.Copy());
+
+            AddStep("set target difficulty", () =>
+            {
+                targetDifficulty = sameRuleset
+                    ? importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo) && beatmap.RulesetID == Beatmap.Value.BeatmapInfo.RulesetID)
+                    : importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo) && beatmap.RulesetID != Beatmap.Value.BeatmapInfo.RulesetID);
+            });
+            switchToDifficulty(() => targetDifficulty);
+            confirmEditingBeatmap(() => targetDifficulty);
+
+            AddAssert("no objects selected", () => !EditorBeatmap.SelectedHitObjects.Any());
+            AddStep("paste object", () => Editor.Paste());
+
+            if (sameRuleset)
+                AddAssert("object was pasted", () => EditorBeatmap.SelectedHitObjects.Any());
+            else
+                AddAssert("object was not pasted", () => !EditorBeatmap.SelectedHitObjects.Any());
+
+            AddStep("exit editor", () => Stack.Exit());
+
+            if (sameRuleset)
+            {
+                AddUntilStep("prompt for save dialog shown", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
+                AddStep("discard changes", () => ((PromptForSaveDialog)DialogOverlay.CurrentDialog).PerformOkAction());
+            }
+
+            // ensure editor loader didn't resume.
+            AddAssert("stack empty", () => Stack.CurrentScreen == null);
+        }
+
+        [Test]
         public void TestPreventSwitchDueToUnsavedChanges()
         {
             BeatmapInfo targetDifficulty = null;
             PromptForSaveDialog saveDialog = null;
 
-            AddStep("remove first hitobject", () =>
-            {
-                var editorBeatmap = editor.ChildrenOfType<EditorBeatmap>().Single();
-                editorBeatmap.RemoveAt(0);
-            });
+            AddStep("remove first hitobject", () => EditorBeatmap.RemoveAt(0));
 
             AddStep("set target difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo)));
             switchToDifficulty(() => targetDifficulty);
@@ -105,11 +143,7 @@ namespace osu.Game.Tests.Visual.Editing
             BeatmapInfo targetDifficulty = null;
             PromptForSaveDialog saveDialog = null;
 
-            AddStep("remove first hitobject", () =>
-            {
-                var editorBeatmap = editor.ChildrenOfType<EditorBeatmap>().Single();
-                editorBeatmap.RemoveAt(0);
-            });
+            AddStep("remove first hitobject", () => EditorBeatmap.RemoveAt(0));
 
             AddStep("set target difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo)));
             switchToDifficulty(() => targetDifficulty);
@@ -132,39 +166,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("stack empty", () => Stack.CurrentScreen == null);
         }
 
-        private void switchToDifficulty(Func<BeatmapInfo> difficulty)
-        {
-            AddUntilStep("wait for menubar to load", () => editor.ChildrenOfType<EditorMenuBar>().Any());
-            AddStep("open file menu", () =>
-            {
-                var menuBar = editor.ChildrenOfType<EditorMenuBar>().Single();
-                var fileMenu = menuBar.ChildrenOfType<DrawableOsuMenuItem>().First();
-                InputManager.MoveMouseTo(fileMenu);
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddStep("open difficulty menu", () =>
-            {
-                var difficultySelector =
-                    editor.ChildrenOfType<DrawableOsuMenuItem>().Single(item => item.Item.Text.Value.ToString().Contains("Change difficulty"));
-                InputManager.MoveMouseTo(difficultySelector);
-            });
-            AddWaitStep("wait for open", 3);
-
-            AddStep("switch to target difficulty", () =>
-            {
-                var difficultyMenuItem =
-                    editor.ChildrenOfType<DrawableOsuMenuItem>()
-                          .Last(item => item.Item is DifficultyMenuItem difficultyItem && difficultyItem.Beatmap.Equals(difficulty.Invoke()));
-                InputManager.MoveMouseTo(difficultyMenuItem);
-                InputManager.Click(MouseButton.Left);
-            });
-        }
+        private void switchToDifficulty(Func<BeatmapInfo> difficulty) => AddStep("switch to difficulty", () => Editor.SwitchToDifficulty(difficulty.Invoke()));
 
         private void confirmEditingBeatmap(Func<BeatmapInfo> targetDifficulty)
         {
             AddUntilStep("current beatmap is correct", () => Beatmap.Value.BeatmapInfo.Equals(targetDifficulty.Invoke()));
-            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen == Editor && Editor?.IsLoaded == true);
         }
     }
 }

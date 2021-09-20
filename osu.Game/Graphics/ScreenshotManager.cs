@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
@@ -57,9 +58,9 @@ namespace osu.Game.Graphics
             shutter = audio.Samples.Get("UI/shutter");
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.TakeScreenshot:
                     shutter.Play();
@@ -70,7 +71,7 @@ namespace osu.Game.Graphics
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 

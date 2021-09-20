@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -122,16 +123,16 @@ namespace osu.Game.Rulesets.Mania.UI
             HitObjectArea.Explosions.Add(hitExplosionPool.Get(e => e.Apply(result)));
         }
 
-        public bool OnPressed(ManiaAction action)
+        public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action != Action.Value)
+            if (e.Action != Action.Value)
                 return false;
 
             sampleTriggerSource.Play();
             return true;
         }
 
-        public void OnReleased(ManiaAction action)
+        public void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
         }
 
