@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         private static readonly int[] grid_sizes = { 4, 8, 16, 32 };
 
-        private int currentGridSizeIndex;
+        private int currentGridSizeIndex = grid_sizes.Length - 1;
 
         public OsuRectangularPositionSnapGrid(int gridSize)
             : base(OsuPlayfield.BASE_SIZE / 2)
