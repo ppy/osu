@@ -72,6 +72,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         private void gridSizeIs(int size)
-            => AddAssert($"grid size is {size}", () => this.ChildrenOfType<OsuRectangularPositionSnapGrid>().Single().Spacing == new Vector2(size));
+            => AddAssert($"grid size is {size}", () => this.ChildrenOfType<OsuRectangularPositionSnapGrid>().Single().Spacing == new Vector2(size)
+                                                       && EditorBeatmap.BeatmapInfo.GridSize == size);
     }
 }

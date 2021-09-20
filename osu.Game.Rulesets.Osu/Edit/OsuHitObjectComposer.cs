@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                rectangularPositionSnapGrid = new OsuRectangularPositionSnapGrid(EditorBeatmap.BeatmapInfo.GridSize)
+                rectangularPositionSnapGrid = new OsuRectangularPositionSnapGrid
                 {
                     RelativeSizeAxes = Axes.Both
                 }

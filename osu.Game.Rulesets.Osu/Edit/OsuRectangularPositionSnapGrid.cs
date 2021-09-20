@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -17,10 +19,18 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private int currentGridSizeIndex = grid_sizes.Length - 1;
 
-        public OsuRectangularPositionSnapGrid(int gridSize)
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; }
+
+        public OsuRectangularPositionSnapGrid()
             : base(OsuPlayfield.BASE_SIZE / 2)
         {
-            var gridSizeIndex = Array.IndexOf(grid_sizes, gridSize);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var gridSizeIndex = Array.IndexOf(grid_sizes, editorBeatmap.BeatmapInfo.GridSize);
             if (gridSizeIndex > 0)
                 currentGridSizeIndex = gridSizeIndex;
             updateSpacing();
@@ -34,7 +44,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void updateSpacing()
         {
-            Spacing = new Vector2(grid_sizes[currentGridSizeIndex]);
+            int gridSize = grid_sizes[currentGridSizeIndex];
+
+            editorBeatmap.BeatmapInfo.GridSize = gridSize;
+            Spacing = new Vector2(gridSize);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
