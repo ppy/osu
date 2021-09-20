@@ -63,7 +63,8 @@ jobs:
       - name: Checkout osu (master)
         uses: actions/checkout@v2
         with:
-          repository: ppy/osu
+          repository: peppy/osu
+          ref: 'diffcalc-optimisations'
           path: 'master/osu'
       - name: Checkout osu (pr)
         uses: actions/checkout@v2
