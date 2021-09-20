@@ -42,12 +42,12 @@ namespace osu.Game.Rulesets.Osu.Edit
         };
 
         private readonly Bindable<TernaryState> distanceSnapToggle = new Bindable<TernaryState>();
-        private readonly Bindable<TernaryState> gridSnapToggle = new Bindable<TernaryState>();
+        private readonly Bindable<TernaryState> rectangularGridSnapToggle = new Bindable<TernaryState>();
 
         protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
         {
             new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler }),
-            new TernaryButton(gridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Th })
+            new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Th })
         });
 
         private BindableList<HitObject> selectedHitObjects;
@@ -84,12 +84,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                 updateDistanceSnapGrid();
 
                 if (distanceSnapToggle.Value == TernaryState.True)
-                    gridSnapToggle.Value = TernaryState.False;
+                    rectangularGridSnapToggle.Value = TernaryState.False;
             };
 
-            gridSnapToggle.ValueChanged += _ =>
+            rectangularGridSnapToggle.ValueChanged += _ =>
             {
-                if (gridSnapToggle.Value == TernaryState.True)
+                if (rectangularGridSnapToggle.Value == TernaryState.True)
                     distanceSnapToggle.Value = TernaryState.False;
             };
 
@@ -142,13 +142,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (positionSnap.ScreenSpacePosition != screenSpacePosition)
                 return positionSnap;
 
-            if (distanceSnapGrid != null)
+            if (distanceSnapToggle.Value == TernaryState.True && distanceSnapGrid != null)
             {
                 (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
                 return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time, PlayfieldAtScreenSpacePosition(screenSpacePosition));
             }
 
-            if (rectangularPositionSnapGrid != null)
+            if (rectangularGridSnapToggle.Value == TernaryState.True)
             {
                 Vector2 pos = rectangularPositionSnapGrid.GetSnappedPosition(rectangularPositionSnapGrid.ToLocalSpace(screenSpacePosition));
                 return new SnapResult(rectangularPositionSnapGrid.ToScreenSpace(pos), null, PlayfieldAtScreenSpacePosition(screenSpacePosition));
