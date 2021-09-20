@@ -4,7 +4,7 @@
 #   !pp check 0 2      | Runs only the osu! and catch rulesets.
 #
 
-name: Diffcalc Consistency Checks
+name: Difficulty Calculation
 on:
   issue_comment:
     types: [ created ]
@@ -17,13 +17,14 @@ env:
 
 jobs:
   metadata:
+    name: Check for requests
     runs-on: self-hosted
     if: github.event.issue.pull_request && contains(github.event.comment.body, '!pp check') && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')
     outputs:
       matrix: ${{ steps.generate-matrix.outputs.matrix }}
       continue: ${{ steps.generate-matrix.outputs.continue }}
     steps:
-      - name: generate matrix
+      - name: Construct build matrix
         id: generate-matrix
         run: |
           if [[ "${{ github.event.comment.body }}" =~ "1" ]] ; then
@@ -50,15 +51,13 @@ jobs:
           echo "::set-output name=continue::${CONTINUE}"
           echo "::set-output name=matrix::${MATRIX_JSON}"
   diffcalc:
-    name: Diffcalc
+    name: Run
     runs-on: self-hosted
     continue-on-error: true
     if: needs.metadata.outputs.continue == 'yes'
     needs: metadata
-
     strategy:
       matrix: ${{ fromJson(needs.metadata.outputs.matrix) }}
-
     steps:
       - name: Verify MySQL connection from host
         run: |
