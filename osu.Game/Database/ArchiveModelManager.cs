@@ -893,7 +893,7 @@ namespace osu.Game.Database
 
         #endregion
 
-        private string getValidFilename(string filename)
+        protected static string getValidFilename(string filename)
         {
             foreach (char c in Path.GetInvalidFileNameChars())
                 filename = filename.Replace(c, '_');
