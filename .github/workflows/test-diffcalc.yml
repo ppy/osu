@@ -113,7 +113,7 @@ jobs:
           tar -xf $PERFORMANCE_DATA_NAME.tar.bz2
 
           echo "Downloading beatmap dump $BEATMAPS_DATA_NAME.."
-          wget -q https://data.ppy.sh/$BEATMAPS_DATA_NAME.tar.bz2
+          wget -q -nc https://data.ppy.sh/$BEATMAPS_DATA_NAME.tar.bz2
           echo "Extracting.."
           tar -xf $BEATMAPS_DATA_NAME.tar.bz2
 
