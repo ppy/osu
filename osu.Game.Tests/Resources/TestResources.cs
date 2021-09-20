@@ -1,15 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using NUnit.Framework;
 using osu.Framework.IO.Stores;
+using osu.Framework.Testing;
 
 namespace osu.Game.Tests.Resources
 {
     public static class TestResources
     {
         public const double QUICK_BEATMAP_LENGTH = 10000;
+
+        private static readonly TemporaryNativeStorage temp_storage = new TemporaryNativeStorage("TestResources");
 
         public static DllResourceStore GetStore() => new DllResourceStore(typeof(TestResources).Assembly);
 
@@ -25,7 +29,7 @@ namespace osu.Game.Tests.Resources
         /// <returns>A path to a copy of a beatmap archive (osz). Should be deleted after use.</returns>
         public static string GetQuickTestBeatmapForImport()
         {
-            var tempPath = Path.GetTempFileName() + ".osz";
+            var tempPath = getTempFilename();
             using (var stream = OpenResource("Archives/241526 Soleily - Renatus_virtual_quick.osz"))
             using (var newFile = File.Create(tempPath))
                 stream.CopyTo(newFile);
@@ -41,7 +45,7 @@ namespace osu.Game.Tests.Resources
         /// <returns>A path to a copy of a beatmap archive (osz). Should be deleted after use.</returns>
         public static string GetTestBeatmapForImport(bool virtualTrack = false)
         {
-            var tempPath = Path.GetTempFileName() + ".osz";
+            var tempPath = getTempFilename();
 
             using (var stream = GetTestBeatmapStream(virtualTrack))
             using (var newFile = File.Create(tempPath))
@@ -50,5 +54,7 @@ namespace osu.Game.Tests.Resources
             Assert.IsTrue(File.Exists(tempPath));
             return tempPath;
         }
+
+        private static string getTempFilename() => temp_storage.GetFullPath(Guid.NewGuid() + ".osz");
     }
 }

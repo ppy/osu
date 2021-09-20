@@ -290,7 +290,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             popoverContainer.HidePopover();
         }
 
-        public void Join(Room room, string password) => Schedule(() =>
+        public void Join(Room room, string password, Action<Room> onSuccess = null, Action<string> onFailure = null) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
@@ -302,10 +302,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 Open(room);
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
-            }, _ =>
+                onSuccess?.Invoke(room);
+            }, error =>
             {
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
+                onFailure?.Invoke(error);
             });
         });
 

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -43,9 +44,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // it will be hidden along with its parenting hold note when required.
         }
 
-        public override bool OnPressed(ManiaAction action) => false; // Handled by the hold note
+        public override bool OnPressed(KeyBindingPressEvent<ManiaAction> e) => false; // Handled by the hold note
 
-        public override void OnReleased(ManiaAction action)
+        public override void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
         }
     }
