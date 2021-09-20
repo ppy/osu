@@ -4,6 +4,7 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Objects;
@@ -97,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void scheduleHit() => AddStep("schedule action", () =>
         {
             var delay = hitCircle.StartTime - hitCircle.HitWindows.WindowFor(HitResult.Great) - Time.Current;
-            Scheduler.AddDelayed(() => hitAreaReceptor.OnPressed(OsuAction.LeftButton), delay);
+            Scheduler.AddDelayed(() => hitAreaReceptor.OnPressed(new KeyBindingPressEvent<OsuAction>(GetContainingInputManager().CurrentState, OsuAction.LeftButton)), delay);
         });
     }
 }

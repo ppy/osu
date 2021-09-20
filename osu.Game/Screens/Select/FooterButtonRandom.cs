@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
@@ -58,11 +59,11 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        public override bool OnPressed(GlobalAction action)
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            rewindSearch = action == GlobalAction.SelectPreviousRandom;
+            rewindSearch = e.Action == GlobalAction.SelectPreviousRandom;
 
-            if (action != GlobalAction.SelectNextRandom && action != GlobalAction.SelectPreviousRandom)
+            if (e.Action != GlobalAction.SelectNextRandom && e.Action != GlobalAction.SelectPreviousRandom)
             {
                 return false;
             }
@@ -71,9 +72,9 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
-        public override void OnReleased(GlobalAction action)
+        public override void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            if (action == GlobalAction.SelectPreviousRandom)
+            if (e.Action == GlobalAction.SelectPreviousRandom)
             {
                 rewindSearch = false;
             }

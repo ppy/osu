@@ -279,13 +279,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return base.OnMouseMove(e);
             }
 
-            public bool OnPressed(TestAction action)
+            public bool OnPressed(KeyBindingPressEvent<TestAction> e)
             {
                 box.Colour = Color4.White;
                 return true;
             }
 
-            public void OnReleased(TestAction action)
+            public void OnReleased(KeyBindingReleaseEvent<TestAction> e)
             {
                 box.Colour = Color4.Black;
             }
@@ -354,7 +354,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         internal class TestReplayRecorder : ReplayRecorder<TestAction>
         {
             public TestReplayRecorder()
-                : base(new Score())
+                : base(new Score { ScoreInfo = { Beatmap = new BeatmapInfo() } })
             {
             }
 

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Scoring;
@@ -37,6 +38,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             Result.Type = Type;
         }
 
-        public override bool OnPressed(TaikoAction action) => false;
+        public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
     }
 }
