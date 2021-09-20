@@ -69,11 +69,6 @@ namespace osu.Game.Screens.Play
 
         public Action RestartRequested;
 
-        /// <summary>
-        /// Invoked when a seek has been performed via <see cref="Seek"/>
-        /// </summary>
-        public event Action OnSeek;
-
         public bool HasFailed { get; private set; }
 
         private Bindable<bool> mouseWheelDisabled;
@@ -592,7 +587,6 @@ namespace osu.Game.Screens.Play
         public void Seek(double time)
         {
             GameplayClockContainer.Seek(time);
-            OnSeek?.Invoke();
         }
 
         private ScheduledDelegate frameStablePlaybackResetDelegate;
