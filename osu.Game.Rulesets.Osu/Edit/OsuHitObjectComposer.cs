@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                rectangularPositionSnapGridContainer = new Container
+                rectangularPositionSnapGrid = new OsuRectangularPositionSnapGrid(EditorBeatmap.BeatmapInfo.GridSize)
                 {
                     RelativeSizeAxes = Axes.Both
                 }
@@ -89,8 +89,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             gridSnapToggle.ValueChanged += _ =>
             {
-                updateRectangularPositionSnapGrid();
-
                 if (gridSnapToggle.Value == TernaryState.True)
                     distanceSnapToggle.Value = TernaryState.False;
             };
@@ -110,6 +108,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly Cached distanceSnapGridCache = new Cached();
         private double? lastDistanceSnapGridTime;
+
+        private RectangularPositionSnapGrid rectangularPositionSnapGrid;
 
         protected override void Update()
         {
@@ -297,22 +297,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return null;
 
             return new OsuDistanceSnapGrid((OsuHitObject)sourceObject, (OsuHitObject)targetObject);
-        }
-
-        private Container rectangularPositionSnapGridContainer;
-        private RectangularPositionSnapGrid rectangularPositionSnapGrid;
-
-        private void updateRectangularPositionSnapGrid()
-        {
-            rectangularPositionSnapGridContainer.Clear();
-
-            if (gridSnapToggle.Value == TernaryState.True)
-            {
-                rectangularPositionSnapGridContainer.Add(rectangularPositionSnapGrid = new OsuRectangularPositionSnapGrid(EditorBeatmap.BeatmapInfo.GridSize)
-                {
-                    RelativeSizeAxes = Axes.Both
-                });
-            }
         }
     }
 }
