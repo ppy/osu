@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        avatar = new UpdateableAvatar(openOnClick: false, showGuestOnNull: false)
+                        avatar = new UpdateableAvatar(isInteractive: false, showGuestOnNull: false)
                         {
                             Size = new Vector2(avatar_size),
                             Masking = true,

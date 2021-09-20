@@ -355,16 +355,22 @@ namespace osu.Game.Overlays.Volume
             return base.OnMouseMove(e);
         }
 
+        protected override bool OnHover(HoverEvent e)
+        {
+            State = SelectionState.Selected;
+            return false;
+        }
+
         protected override void OnHoverLost(HoverLostEvent e)
         {
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (!IsHovered)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.SelectPrevious:
                     State = SelectionState.Selected;
@@ -380,7 +386,7 @@ namespace osu.Game.Overlays.Volume
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 

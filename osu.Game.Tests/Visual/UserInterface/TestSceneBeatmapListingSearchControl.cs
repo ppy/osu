@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -73,7 +74,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
 
             control.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
-            control.General.BindCollectionChanged((u, v) => general.Text = $"General: {(control.General.Any() ? string.Join('.', control.General.Select(i => i.ToString().ToLowerInvariant())) : "")}", true);
+            control.General.BindCollectionChanged((u, v) => general.Text = $"General: {(control.General.Any() ? string.Join('.', control.General.Select(i => i.ToString().Underscore())) : "")}", true);
             control.Ruleset.BindValueChanged(r => ruleset.Text = $"Ruleset: {r.NewValue}", true);
             control.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
             control.Genre.BindValueChanged(g => genre.Text = $"Genre: {g.NewValue}", true);

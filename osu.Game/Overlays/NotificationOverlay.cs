@@ -9,6 +9,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
@@ -28,6 +29,9 @@ namespace osu.Game.Overlays
         public const float TRANSITION_LENGTH = 600;
 
         private FlowContainer<NotificationSection> sections;
+
+        [Resolved]
+        private AudioManager audio { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -98,14 +102,18 @@ namespace osu.Game.Overlays
 
         private int runningDepth;
 
-        private void notificationClosed() => updateCounts();
-
         private readonly Scheduler postScheduler = new Scheduler();
 
         public override bool IsPresent => base.IsPresent || postScheduler.HasPendingTasks;
 
         private bool processingPosts = true;
 
+        private double? lastSamplePlayback;
+
+        /// <summary>
+        /// Post a new notification for display.
+        /// </summary>
+        /// <param name="notification">The notification to display.</param>
         public void Post(Notification notification) => postScheduler.Add(() =>
         {
             ++runningDepth;
@@ -124,11 +132,13 @@ namespace osu.Game.Overlays
                 Show();
 
             updateCounts();
+            playDebouncedSample(notification.PopInSampleName);
         });
 
         protected override void Update()
         {
             base.Update();
+
             if (processingPosts)
                 postScheduler.Update();
         }
@@ -149,6 +159,24 @@ namespace osu.Game.Overlays
 
             this.MoveToX(WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
+        }
+
+        private void notificationClosed()
+        {
+            updateCounts();
+
+            // this debounce is currently shared between popin/popout sounds, which means one could potentially not play when the user is expecting it.
+            // popout is constant across all notification types, and should therefore be handled using playback concurrency instead, but seems broken at the moment.
+            playDebouncedSample("UI/overlay-pop-out");
+        }
+
+        private void playDebouncedSample(string sampleName)
+        {
+            if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > OsuGameBase.SAMPLE_DEBOUNCE_TIME)
+            {
+                audio.Samples.Get(sampleName)?.Play();
+                lastSamplePlayback = Time.Current;
+            }
         }
 
         private void updateCounts()
