@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
@@ -12,6 +13,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Play;
@@ -32,7 +34,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private Player player { get; set; }
 
         [Resolved(canBeNull: true)]
-        private OsuPlayfield osuPlayfield { get; set; }
+        private OsuPlayfield playfield { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private GameplayBeatmap gameplayBeatmap { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, OsuColour colours)
@@ -65,25 +73,37 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             };
 
             if (player != null)
-            {
-                breakSpewer.Active.BindTarget = player.IsBreakTime;
-            }
+                ((IBindable<bool>)breakSpewer.Active).BindTo(player.IsBreakTime);
         }
 
         protected override void Update()
         {
-            if (osuPlayfield == null) return;
+            if (playfield == null || gameplayBeatmap == null) return;
 
-            // find active kiai slider or spinner.
-            var kiaiHitObject = osuPlayfield.HitObjectContainer.AliveObjects.FirstOrDefault(h =>
-                h.HitObject.Kiai &&
-                (
-                    (h is DrawableSlider slider && slider.Tracking.Value) ||
-                    (h is DrawableSpinner spinner && spinner.RotationTracker.Tracking)
-                )
-            );
+            DrawableHitObject kiaiHitObject = null;
+
+            // Check whether currently in a kiai section first. This is only done as an optimisation to avoid enumerating AliveObjects when not necessary.
+            if (gameplayBeatmap.ControlPointInfo.EffectPointAt(gameplayBeatmap.Time.Current).KiaiMode)
+                kiaiHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isTracking);
 
             kiaiSpewer.Active.Value = kiaiHitObject != null;
+        }
+
+        private bool isTracking(DrawableHitObject h)
+        {
+            if (!h.HitObject.Kiai)
+                return false;
+
+            switch (h)
+            {
+                case DrawableSlider slider:
+                    return slider.Tracking.Value;
+
+                case DrawableSpinner spinner:
+                    return spinner.RotationTracker.Tracking;
+            }
+
+            return false;
         }
 
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
