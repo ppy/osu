@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
@@ -11,26 +12,25 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
     /// </summary>
     internal class Pattern
     {
-        private readonly List<ManiaHitObject> hitObjects = new List<ManiaHitObject>();
-
-        private readonly HashSet<int> containedColumns = new HashSet<int>();
+        private List<ManiaHitObject> hitObjects;
+        private HashSet<int> containedColumns;
 
         /// <summary>
         /// All the hit objects contained in this pattern.
         /// </summary>
-        public IEnumerable<ManiaHitObject> HitObjects => hitObjects;
+        public IEnumerable<ManiaHitObject> HitObjects => hitObjects ?? Enumerable.Empty<ManiaHitObject>();
 
         /// <summary>
         /// Check whether a column of this patterns contains a hit object.
         /// </summary>
         /// <param name="column">The column index.</param>
         /// <returns>Whether the column with index <paramref name="column"/> contains a hit object.</returns>
-        public bool ColumnHasObject(int column) => containedColumns.Contains(column);
+        public bool ColumnHasObject(int column) => containedColumns?.Contains(column) ?? false;
 
         /// <summary>
         /// Amount of columns taken up by hit objects in this pattern.
         /// </summary>
-        public int ColumnWithObjects => containedColumns.Count;
+        public int ColumnWithObjects => containedColumns?.Count ?? 0;
 
         /// <summary>
         /// Adds a hit object to this pattern.
@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// <param name="hitObject">The hit object to add.</param>
         public void Add(ManiaHitObject hitObject)
         {
+            prepareStorage();
+
             hitObjects.Add(hitObject);
             containedColumns.Add(hitObject.Column);
         }
@@ -48,10 +50,15 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// <param name="other">The other pattern.</param>
         public void Add(Pattern other)
         {
-            hitObjects.AddRange(other.HitObjects);
+            prepareStorage();
 
-            foreach (var h in other.hitObjects)
-                containedColumns.Add(h.Column);
+            if (other.hitObjects != null)
+            {
+                hitObjects.AddRange(other.hitObjects);
+
+                foreach (var h in other.hitObjects)
+                    containedColumns.Add(h.Column);
+            }
         }
 
         /// <summary>
@@ -59,8 +66,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// </summary>
         public void Clear()
         {
-            hitObjects.Clear();
-            containedColumns.Clear();
+            hitObjects?.Clear();
+            containedColumns?.Clear();
+        }
+
+        private void prepareStorage()
+        {
+            hitObjects ??= new List<ManiaHitObject>();
+            containedColumns ??= new HashSet<int>();
         }
     }
 }
