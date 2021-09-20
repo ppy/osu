@@ -584,10 +584,7 @@ namespace osu.Game.Screens.Play
         /// Seek to a specific time in gameplay.
         /// </summary>
         /// <param name="time">The destination time to seek to.</param>
-        public void Seek(double time)
-        {
-            GameplayClockContainer.Seek(time);
-        }
+        public void Seek(double time) => GameplayClockContainer.Seek(time);
 
         private ScheduledDelegate frameStablePlaybackResetDelegate;
 
