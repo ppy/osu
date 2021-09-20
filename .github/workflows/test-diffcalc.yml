@@ -27,16 +27,16 @@ jobs:
       - name: Construct build matrix
         id: generate-matrix
         run: |
-          if [[ "${{ github.event.comment.body }}" =~ "1" ]] ; then
+          if [[ "${{ github.event.comment.body }}" =~ "osu" ]] ; then
             MATRIX_PROJECTS_JSON+='{ "name": "osu", "id": 0 },'
           fi
-          if [[ "${{ github.event.comment.body }}" =~ "2" ]] ; then
+          if [[ "${{ github.event.comment.body }}" =~ "taiko" ]] ; then
             MATRIX_PROJECTS_JSON+='{ "name": "taiko", "id": 1 },'
           fi
-          if [[ "${{ github.event.comment.body }}" =~ "3" ]] ; then
+          if [[ "${{ github.event.comment.body }}" =~ "catch" ]] ; then
             MATRIX_PROJECTS_JSON+='{ "name": "catch", "id": 2 },'
           fi
-          if [[ "${{ github.event.comment.body }}" =~ "4" ]] ; then
+          if [[ "${{ github.event.comment.body }}" =~ "mania" ]] ; then
             MATRIX_PROJECTS_JSON+='{ "name": "mania", "id": 3 },'
           fi
 
