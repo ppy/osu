@@ -67,7 +67,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     case OsuSkinComponents.SliderHeadHitCircle:
                         if (hasHitCircle.Value)
-                            return new LegacyMainCirclePiece("sliderstartcircle");
+                            return new LegacySliderHeadHitCircle();
+
+                        return null;
+
+                    case OsuSkinComponents.ReverseArrow:
+                        if (hasHitCircle.Value)
+                            return new LegacyReverseArrow(this);
 
                         return null;
 
