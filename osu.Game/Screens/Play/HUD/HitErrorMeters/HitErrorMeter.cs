@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         /// Invoked by <see cref="Player.OnSeek"/> when the active <see cref="Player"/> seeks through the current beatmap.
         /// Any inheritors of <see cref="HitErrorMeter"/> should have this method clear their container that displays the hit error results.
         /// </summary>
-        protected abstract void Clear();
+        public abstract void Clear();
 
         protected override void Dispose(bool isDisposing)
         {
