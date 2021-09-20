@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Difficulty.Preprocessing
@@ -40,14 +41,14 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which this <see cref="DifficultyHitObject"/> wraps.</param>
         /// <param name="lastObject">The last <see cref="HitObject"/> which occurs before <paramref name="hitObject"/> in the beatmap.</param>
-        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
-        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate)
+        /// <param name="clockRateAt">The rate at which the gameplay clock is run at.</param>
+        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, Func<double, double> clockRateAt)
         {
+            StartTime = hitObject.StartTime / clockRateAt(hitObject.StartTime);
+            EndTime = hitObject.GetEndTime() / clockRateAt(hitObject.GetEndTime());
             BaseObject = hitObject;
             LastObject = lastObject;
-            DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;
-            StartTime = hitObject.StartTime / clockRate;
-            EndTime = hitObject.GetEndTime() / clockRate;
+            DeltaTime = StartTime - (LastObject.StartTime / clockRateAt(hitObject.StartTime));
         }
     }
 }
