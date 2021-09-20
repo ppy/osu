@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private OsuColour colours { get; set; }
 
         [Resolved(canBeNull: true)]
-        private Player player { get; set; }
+        private GameplayClockContainer gameplayClockContainer { get; set; }
 
         public bool UsesFixedAnchor { get; set; }
 
@@ -37,8 +37,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             base.LoadComplete();
 
-            if (player != null)
-                player.OnSeek += Clear;
+            if (gameplayClockContainer != null)
+                gameplayClockContainer.OnSeek += Clear;
 
             processor.NewJudgement += OnNewJudgement;
         }
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         }
 
         /// <summary>
-        /// Invoked by <see cref="Player.OnSeek"/> when the active <see cref="Player"/> seeks through the current beatmap.
+        /// Invoked by <see cref="GameplayClockContainer.OnSeek"/>.
         /// Any inheritors of <see cref="HitErrorMeter"/> should have this method clear their container that displays the hit error results.
         /// </summary>
         public abstract void Clear();
@@ -86,8 +86,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             if (processor != null)
                 processor.NewJudgement -= OnNewJudgement;
 
-            if (player != null)
-                player.OnSeek -= Clear;
+            if (gameplayClockContainer != null)
+                gameplayClockContainer.OnSeek -= Clear;
         }
     }
 }
