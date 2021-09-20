@@ -107,10 +107,14 @@ jobs:
 
           cd $GITHUB_WORKSPACE
 
-          wget https://data.ppy.sh/$PERFORMANCE_DATA_NAME.tar.bz2
-          wget https://data.ppy.sh/$BEATMAPS_DATA_NAME.tar.bz2
-
+          echo "Downloading database dump $PERFORMANCE_DATA_NAME.."
+          wget -q -nc https://data.ppy.sh/$PERFORMANCE_DATA_NAME.tar.bz2
+          echo "Extracting.."
           tar -xf $PERFORMANCE_DATA_NAME.tar.bz2
+
+          echo "Downloading beatmap dump $BEATMAPS_DATA_NAME.."
+          wget -q https://data.ppy.sh/$BEATMAPS_DATA_NAME.tar.bz2
+          echo "Extracting.."
           tar -xf $BEATMAPS_DATA_NAME.tar.bz2
 
           cd $PERFORMANCE_DATA_NAME
@@ -121,19 +125,21 @@ jobs:
 
             mysql -e "CREATE DATABASE $db"
 
-            echo "Importing beatmaps..."
+            echo "Importing beatmaps.."
             cat osu_beatmaps.sql | mysql $db
+            echo "Importing beatmapsets.."
             cat osu_beatmapsets.sql | mysql $db
 
-            mysql $db -e "CREATE TABLE `osu_beatmap_difficulty` (
+            echo "Creating table structure.."
+            mysql $db -e 'CREATE TABLE `osu_beatmap_difficulty` (
                 `beatmap_id` int unsigned NOT NULL,
-                `mode` tinyint NOT NULL DEFAULT '0',
+                `mode` tinyint NOT NULL DEFAULT 0,
                 `mods` int unsigned NOT NULL,
                 `diff_unified` float NOT NULL,
                 `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY (`beatmap_id`,`mode`,`mods`),
                 KEY `diff_sort` (`mode`,`mods`,`diff_unified`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;"
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;'
           done
 
       - name: Run diffcalc (master)
