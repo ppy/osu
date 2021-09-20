@@ -10,9 +10,6 @@ on:
     types: [ created ]
 
 env:
-  DB_USER: root
-  DB_HOST: 127.0.0.1
-  DB_PORT: 3306
   CONCURRENCY: 4
   ALLOW_DOWNLOAD: 1
   SAVE_DOWNLOADED: 1
@@ -44,12 +41,14 @@ jobs:
 
       - name: Verify MySQL connection from host
         run: |
-          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "SHOW DATABASES"
+          mysql -e "SHOW DATABASES"
 
       - name: Drop previous databases
         run: |
-          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "DROP DATABASE IF EXISTS osu_master"
-          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "DROP DATABASE IF EXISTS osu_pr"
+          for db in osu_master osu_pr
+          do
+            mysql -e "DROP DATABASE IF EXISTS $db"
+          done
 
       - name: Create directory structure
         run: |
@@ -68,7 +67,6 @@ jobs:
         with:
           path: 'pr/osu'
 
-      # Checkout osu-difficulty-calculator
       - name: Checkout osu-difficulty-calculator (master)
         uses: actions/checkout@v2
         with:
@@ -99,7 +97,6 @@ jobs:
           ./UseLocalOsu.sh
           dotnet build
 
-      # Initial data imports
       - name: Download + import data
         run: |
           PERFORMANCE_DATA_NAME=$(curl https://data.ppy.sh/ | grep performance_${{ matrix.ruleset.name }}_top_1000 | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
@@ -112,19 +109,33 @@ jobs:
 
           wget https://data.ppy.sh/$PERFORMANCE_DATA_NAME.tar.bz2
           wget https://data.ppy.sh/$BEATMAPS_DATA_NAME.tar.bz2
+
           tar -xf $PERFORMANCE_DATA_NAME.tar.bz2
           tar -xf $BEATMAPS_DATA_NAME.tar.bz2
 
-          cd $GITHUB_WORKSPACE/$PERFORMANCE_DATA_NAME
+          cd $PERFORMANCE_DATA_NAME
 
-          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "CREATE DATABASE osu_master"
-          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "CREATE DATABASE osu_pr"
+          for db in osu_master osu_pr
+          do
+            echo "Setting up database $db.."
 
-          echo "Importing SQL..."
-          { pv -f *.sql | mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} --database=osu_master; } 2>&1 | stdbuf -oL tr '\r' '\n'
-          { pv -f *.sql | mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} --database=osu_pr; } 2>&1 | stdbuf -oL tr '\r' '\n'
+            mysql -e "CREATE DATABASE $db"
 
-      # Run diffcalc
+            echo "Importing beatmaps..."
+            cat osu_beatmaps.sql | mysql $db
+            cat osu_beatmapsets.sql | mysql $db
+
+            mysql $db -e "CREATE TABLE `osu_beatmap_difficulty` (
+                `beatmap_id` int unsigned NOT NULL,
+                `mode` tinyint NOT NULL DEFAULT '0',
+                `mods` int unsigned NOT NULL,
+                `diff_unified` float NOT NULL,
+                `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`beatmap_id`,`mode`,`mods`),
+                KEY `diff_sort` (`mode`,`mods`,`diff_unified`)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;"
+          done
+
       - name: Run diffcalc (master)
         env:
           DB_NAME: osu_master
@@ -138,10 +149,9 @@ jobs:
           cd $GITHUB_WORKSPACE/pr/osu-difficulty-calculator/osu.Server.DifficultyCalculator
           dotnet run -c:Release -- all -m ${{ matrix.ruleset.id }} -ac -c ${{ env.CONCURRENCY }}
 
-      # Print diffs
       - name: Print diffs
         run: |
-          mysql --host ${{ env.DB_HOST }} --port ${{ env.DB_PORT }} -u${{ env.DB_USER }} -e "
+          mysql -e "
             SELECT
               m.beatmap_id,
               m.mods,
