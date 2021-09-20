@@ -141,8 +141,16 @@ namespace osu.Game.Screens.Edit
 
                 // the game-wide beatmap doesn't necessarily have all of the difficulties in its BeatmapSet.Beatmaps property, due to EF idiosyncrasies.
                 // re-query explicitly during this process to prevent difficulties getting truncated on beatmap save.
-                var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
-                playableBeatmap.BeatmapInfo.BeatmapSet = beatmapSet;
+
+                // it's important to query the beatmap *set*, rather than the single beatmap, to ensure all beatmaps from the set are present,
+                // and to replace the playableBeatmap.BeatmapInfo reference with the one re-fetched from database to ensure changes to the editor beatmap's BeatmapInfo are persisted to EF.
+                var refetchedBeatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID);
+
+                if (refetchedBeatmapSet != null)
+                {
+                    playableBeatmap.BeatmapInfo = refetchedBeatmapSet.Beatmaps.Single(b => b.ID == playableBeatmap.BeatmapInfo.ID);
+                    playableBeatmap.BeatmapInfo.Metadata ??= refetchedBeatmapSet.Metadata;
+                }
 
                 // clone these locally for now to avoid incurring overhead on GetPlayableBeatmap usages.
                 // eventually we will want to improve how/where this is done as there are issues with *not* cloning it in all cases.
@@ -536,7 +544,7 @@ namespace osu.Game.Screens.Edit
             // To update the game-wide beatmap with any changes, perform a re-fetch on exit.
             // This is required as the editor makes its local changes via EditorBeatmap
             // (which are not propagated outwards to a potentially cached WorkingBeatmap).
-            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
+            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(editorBeatmap.BeatmapInfo);
 
             if (!(refetchedBeatmap is DummyWorkingBeatmap))
                 Beatmap.Value = refetchedBeatmap;
