@@ -183,5 +183,15 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="clockRate">Clockrate to calculate difficulty with.</param>
         /// <returns>The <see cref="Skill"/>s.</returns>
         protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
+
+        /// <summary>
+        /// Creates a function used to calculate clocktime at a point in time.
+        /// </summary>
+        /// <param name="mods">Mods to calculate clocktime with.</param>
+        /// <returns></returns>
+        protected virtual Func<double, double> bakeClockRate(Mod[] mods)
+        {
+            return T => mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, mod) => prod * mod.ApplyToRate(T));
+        }
     }
 }
