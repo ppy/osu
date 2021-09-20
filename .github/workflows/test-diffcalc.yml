@@ -16,6 +16,7 @@ env:
   CONCURRENCY: 4
   ALLOW_DOWNLOAD: 1
   SAVE_DOWNLOADED: 1
+  SKIP_INSERT_ATTRIBUTES: 1
 
 jobs:
   diffcalc:
@@ -71,12 +72,14 @@ jobs:
       - name: Checkout osu-difficulty-calculator (master)
         uses: actions/checkout@v2
         with:
-          repository: ppy/osu-difficulty-calculator
+          repository: peppy/osu-difficulty-calculator
+          ref: 'bypass-attrib-row-insert'
           path: 'master/osu-difficulty-calculator'
       - name: Checkout osu-difficulty-calculator (pr)
         uses: actions/checkout@v2
         with:
-          repository: ppy/osu-difficulty-calculator
+          repository: peppy/osu-difficulty-calculator
+          ref: 'bypass-attrib-row-insert'
           path: 'pr/osu-difficulty-calculator'
 
       - name: Install .NET 5.0.x
