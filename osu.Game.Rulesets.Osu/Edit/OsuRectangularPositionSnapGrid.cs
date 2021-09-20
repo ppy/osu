@@ -2,15 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuRectangularPositionSnapGrid : RectangularPositionSnapGrid
+    public class OsuRectangularPositionSnapGrid : RectangularPositionSnapGrid, IKeyBindingHandler<GlobalAction>
     {
         private static readonly int[] grid_sizes = { 4, 8, 16, 32 };
 
@@ -25,17 +26,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateSpacing();
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.Key == Key.G)
-            {
-                nextGridSize();
-                return true;
-            }
-
-            return false;
-        }
-
         private void nextGridSize()
         {
             currentGridSizeIndex = (currentGridSizeIndex + 1) % grid_sizes.Length;
@@ -45,6 +35,22 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void updateSpacing()
         {
             Spacing = new Vector2(grid_sizes[currentGridSizeIndex]);
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.EditorCycleGridDisplayMode:
+                    nextGridSize();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
     }
 }
