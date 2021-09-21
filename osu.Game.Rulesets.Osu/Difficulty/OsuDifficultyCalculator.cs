@@ -44,12 +44,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
-            double baseClockRate = 1;
-            baseClockRate = mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, mod) => prod * mod.ApplyToRate(prod));
-
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            double hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / baseClockRate;
-            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / baseClockRate;
+            double hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great));
+            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
+
+            // For the time being, we use the clockrate at the beginning of the map for OD and AR attributes.
+            mods.OfType<IApplicableToRate>().ForEach(m => m.ApplyToRate(hitWindowGreat));
+            mods.OfType<IApplicableToRate>().ForEach(m => m.ApplyToRate(preempt));
 
             int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
