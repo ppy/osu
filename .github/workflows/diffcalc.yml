@@ -78,8 +78,7 @@ jobs:
       - name: Checkout osu (master)
         uses: actions/checkout@v2
         with:
-          repository: peppy/osu
-          ref: 'diffcalc-optimisations'
+          repository: ppy/osu
           path: 'master/osu'
       - name: Checkout osu (pr)
         uses: actions/checkout@v2
@@ -89,14 +88,12 @@ jobs:
       - name: Checkout osu-difficulty-calculator (master)
         uses: actions/checkout@v2
         with:
-          repository: peppy/osu-difficulty-calculator
-          ref: 'bypass-attrib-row-insert'
+          repository: ppy/osu-difficulty-calculator
           path: 'master/osu-difficulty-calculator'
       - name: Checkout osu-difficulty-calculator (pr)
         uses: actions/checkout@v2
         with:
-          repository: peppy/osu-difficulty-calculator
-          ref: 'bypass-attrib-row-insert'
+          repository: ppy/osu-difficulty-calculator
           path: 'pr/osu-difficulty-calculator'
 
       - name: Install .NET 5.0.x
