@@ -41,14 +41,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="hitObject">The gameplay <see cref="HitObject"/> associated with this difficulty object.</param>
         /// <param name="lastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="hitObject"/>.</param>
         /// <param name="lastLastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="lastObject"/>.</param>
-        /// <param name="clockRate">The rate of the gameplay clock. Modified by speed-changing mods.</param>
+        /// <param name="clockRateAt">The rate of the gameplay clock at a point in time. Modified by speed-changing mods.</param>
         /// <param name="objectIndex">The index of the object in the beatmap.</param>
-        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, int objectIndex)
-            : base(hitObject, lastObject, clockRate)
+        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, Func<double, double> clockRateAt, int objectIndex)
+            : base(hitObject, lastObject, clockRateAt)
         {
             var currentHit = hitObject as Hit;
 
-            Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRate);
+            Rhythm = getClosestRhythm(lastObject, lastLastObject, clockRateAt);
             HitType = currentHit?.Type;
 
             ObjectIndex = objectIndex;
@@ -82,10 +82,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// </summary>
         /// <param name="lastObject">The gameplay <see cref="HitObject"/> preceding this one.</param>
         /// <param name="lastLastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="lastObject"/>.</param>
-        /// <param name="clockRate">The rate of the gameplay clock.</param>
-        private TaikoDifficultyHitObjectRhythm getClosestRhythm(HitObject lastObject, HitObject lastLastObject, double clockRate)
+        /// <param name="clockRateAt">The rate of the gameplay clock at a point in time.</param>
+        private TaikoDifficultyHitObjectRhythm getClosestRhythm(HitObject lastObject, HitObject lastLastObject, Func<double, double> clockRateAt)
         {
-            double prevLength = (lastObject.StartTime - lastLastObject.StartTime) / clockRate;
+            double prevLength = clockRateAt(lastObject.StartTime) - clockRateAt(lastLastObject.StartTime);
             double ratio = DeltaTime / prevLength;
 
             return common_rhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();

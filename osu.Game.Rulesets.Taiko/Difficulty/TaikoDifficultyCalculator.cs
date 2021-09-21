@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, Func<double, double> clockRateAt) => new Skill[]
         {
             new Colour(mods),
             new Rhythm(mods),
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             new TaikoModHardRock(),
         };
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Func<double, double> clockRateAt)
         {
             List<TaikoDifficultyHitObject> taikoDifficultyHitObjects = new List<TaikoDifficultyHitObject>();
 
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 taikoDifficultyHitObjects.Add(
                     new TaikoDifficultyHitObject(
-                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, i
+                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRateAt, i
                     )
                 );
             }
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return taikoDifficultyHitObjects;
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, Func<double, double> clockRateAt)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods, Skills = skills };
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 RhythmStrain = rhythmRating,
                 ColourStrain = colourRating,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)hitWindows.WindowFor(HitResult.Great) / clockRate,
+                GreatHitWindow = (int)hitWindows.WindowFor(HitResult.Great) / clockRateAt(1),
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
                 Skills = skills
             };
