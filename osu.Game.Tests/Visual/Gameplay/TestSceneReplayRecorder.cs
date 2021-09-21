@@ -54,7 +54,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            Recorder = recorder = new TestReplayRecorder(new Score { Replay = replay })
+                            Recorder = recorder = new TestReplayRecorder(new Score
+                            {
+                                Replay = replay,
+                                ScoreInfo = { Beatmap = gameplayBeatmap.BeatmapInfo }
+                            })
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
                             },
@@ -222,13 +226,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return base.OnMouseMove(e);
             }
 
-            public bool OnPressed(TestAction action)
+            public bool OnPressed(KeyBindingPressEvent<TestAction> e)
             {
                 box.Colour = Color4.White;
                 return true;
             }
 
-            public void OnReleased(TestAction action)
+            public void OnReleased(KeyBindingReleaseEvent<TestAction> e)
             {
                 box.Colour = Color4.Black;
             }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
@@ -80,13 +81,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public bool ReceivedAction;
 
-            public bool OnPressed(TestAction action)
+            public bool OnPressed(KeyBindingPressEvent<TestAction> e)
             {
-                ReceivedAction = action == TestAction.Down;
+                ReceivedAction = e.Action == TestAction.Down;
                 return true;
             }
 
-            public void OnReleased(TestAction action)
+            public void OnReleased(KeyBindingReleaseEvent<TestAction> e)
             {
             }
         }
