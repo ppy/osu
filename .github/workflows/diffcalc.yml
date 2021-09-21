@@ -80,6 +80,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "::set-output name=branchname::$(curl -H "Authorization: token ${GITHUB_TOKEN}" ${{ github.event.issue.pull_request.url }} | jq '.head.ref' | sed 's/\"//g')"
+          echo "::set-output name=repo::$(curl -H "Authorization: token ${GITHUB_TOKEN}" ${{ github.event.issue.pull_request.url }} | jq '.head.repo.full_name' | sed 's/\"//g')"
 
       # Checkout osu
       - name: Checkout osu (master)
@@ -90,6 +91,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: 'pr/osu'
+          repository: $${{ steps.upstreambranch.outputs.repo }}
           ref: ${{ steps.upstreambranch.outputs.branchname }}
 
       - name: Checkout osu-difficulty-calculator (master)
