@@ -53,7 +53,6 @@ jobs:
   diffcalc:
     name: Run
     runs-on: self-hosted
-    continue-on-error: true
     if: needs.metadata.outputs.continue == 'yes'
     needs: metadata
     strategy:
