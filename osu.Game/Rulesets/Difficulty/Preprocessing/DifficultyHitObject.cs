@@ -44,11 +44,11 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// <param name="clockRateAt">The rate at which the gameplay clock is run at.</param>
         public DifficultyHitObject(HitObject hitObject, HitObject lastObject, Func<double, double> clockRateAt)
         {
-            StartTime = hitObject.StartTime / clockRateAt(hitObject.StartTime);
-            EndTime = hitObject.GetEndTime() / clockRateAt(hitObject.GetEndTime());
+            StartTime = clockRateAt(hitObject.StartTime);
+            EndTime = clockRateAt(hitObject.GetEndTime());
             BaseObject = hitObject;
             LastObject = lastObject;
-            DeltaTime = StartTime - (LastObject.StartTime / clockRateAt(hitObject.StartTime));
+            DeltaTime = StartTime - clockRateAt(lastObject.StartTime);
         }
     }
 }
