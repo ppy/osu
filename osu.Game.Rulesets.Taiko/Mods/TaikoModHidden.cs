@@ -22,13 +22,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
         /// How far away from the hit target should hitobjects start to fade out.
         /// Range: [0, 1]
         /// </summary>
-        private const float fade_out_start_time = 0.6f;
+        private const float fade_out_start_time = 1f;
 
         /// <summary>
         /// How long hitobjects take to fade out, in terms of the scrolling length.
         /// Range: [0, 1]
         /// </summary>
-        private const float fade_out_duration = 0.3f;
+        private const float fade_out_duration = 0.375f;
 
         private DrawableTaikoRuleset drawableRuleset;
 
