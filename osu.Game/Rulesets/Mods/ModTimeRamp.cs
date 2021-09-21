@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
 
-        public double finalRateTime;
-        public double beginRampTime;
+        private double finalRateTime;
+        private double beginRampTime;
 
         public BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
@@ -84,6 +84,13 @@ namespace osu.Game.Rulesets.Mods
 
             // round the end result to match the bindable SpeedChange's precision, in case this is called externally.
             return rate * Math.Round(ramp, 2);
+        }
+
+        public double GetTimeAt(double time)
+        {
+            var amount = (FinalRate.Value - InitialRate.Value) / (finalRateTime - beginRampTime);
+
+            return (InitialRate.Value * Math.Min(time, finalRateTime)) + (0.5 * amount * Math.Pow(Math.Max(Math.Min(time, finalRateTime) - beginRampTime, 0), 2));
         }
 
         public virtual void Update(Playfield playfield)
