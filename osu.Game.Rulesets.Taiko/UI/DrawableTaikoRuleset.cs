@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,6 +17,7 @@ using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
@@ -58,6 +60,14 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var playfieldScreen = Playfield.ScreenSpaceDrawQuad;
             scroller.Height = ToLocalSpace(playfieldScreen.TopLeft + new Vector2(0, playfieldScreen.Height / 20)).Y;
+        }
+
+        public MultiplierControlPoint ControlPointAt(double time)
+        {
+            int result = ControlPoints.BinarySearch(new MultiplierControlPoint(time));
+            if (result < 0)
+                result = Math.Clamp(~result - 1, 0, ControlPoints.Count);
+            return ControlPoints[result];
         }
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
