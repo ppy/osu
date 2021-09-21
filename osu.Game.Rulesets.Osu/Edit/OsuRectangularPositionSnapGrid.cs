@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void load()
         {
             var gridSizeIndex = Array.IndexOf(grid_sizes, editorBeatmap.BeatmapInfo.GridSize);
-            if (gridSizeIndex > 0)
+            if (gridSizeIndex >= 0)
                 currentGridSizeIndex = gridSizeIndex;
             updateSpacing();
         }
