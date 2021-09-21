@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Mods
             }
             else if(time <= finalRateTime)
             {
-                var amount = (InitialRate.Value - FinalRate.Value) / (finalRateTime - beginRampTime);
+                var amount = ((1/FinalRate.Value) - (1/InitialRate.Value)) / (finalRateTime - beginRampTime);
                 return (time / InitialRate.Value) + (0.5 * amount * (Math.Pow(Math.Max(time - beginRampTime, 0), 2)));
             }
             else
