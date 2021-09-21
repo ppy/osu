@@ -132,12 +132,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             })
         };
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (SelectedRoom.Value != Room)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Select:
                     TriggerClick();
@@ -147,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
@@ -189,9 +189,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             private OsuPasswordTextBox passwordTextbox;
             private TriangleButton joinButton;
             private OsuSpriteText errorText;
+            private Sample sampleJoinFail;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, AudioManager audio)
             {
                 Child = new FillFlowContainer
                 {
@@ -227,12 +228,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     }
                 };
 
+                sampleJoinFail = audio.Samples.Get(@"UI/password-fail");
+
                 joinButton.Action = () => lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
             }
 
             private void joinFailed(string error)
             {
                 passwordTextbox.Text = string.Empty;
+
+                GetContainingInputManager().ChangeFocus(passwordTextbox);
 
                 errorText.Text = error;
                 errorText
@@ -242,6 +247,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     .FadeOutFromOne(1000, Easing.In);
 
                 Body.Shake();
+
+                sampleJoinFail?.Play();
             }
 
             protected override void LoadComplete()

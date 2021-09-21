@@ -184,9 +184,9 @@ namespace osu.Game.Overlays.Toolbar
             tooltipContainer.FadeOut(100);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (action == Hotkey)
+            if (e.Action == Hotkey)
             {
                 TriggerClick();
                 return true;
@@ -195,7 +195,7 @@ namespace osu.Game.Overlays.Toolbar
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 

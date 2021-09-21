@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
@@ -144,9 +145,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 Catcher.VisualDirection = Direction.Left;
         }
 
-        public bool OnPressed(CatchAction action)
+        public bool OnPressed(KeyBindingPressEvent<CatchAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case CatchAction.MoveLeft:
                     currentDirection--;
@@ -164,9 +165,9 @@ namespace osu.Game.Rulesets.Catch.UI
             return false;
         }
 
-        public void OnReleased(CatchAction action)
+        public void OnReleased(KeyBindingReleaseEvent<CatchAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case CatchAction.MoveLeft:
                     currentDirection++;
