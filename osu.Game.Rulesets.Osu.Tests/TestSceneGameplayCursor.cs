@@ -12,6 +12,7 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.Testing.Input;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -143,9 +144,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                     pressed = value;
                     if (value)
-                        OnPressed(OsuAction.LeftButton);
+                        OnPressed(new KeyBindingPressEvent<OsuAction>(GetContainingInputManager().CurrentState, OsuAction.LeftButton));
                     else
-                        OnReleased(OsuAction.LeftButton);
+                        OnReleased(new KeyBindingReleaseEvent<OsuAction>(GetContainingInputManager().CurrentState, OsuAction.LeftButton));
                 }
             }
 
