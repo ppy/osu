@@ -56,7 +56,7 @@ namespace osu.Game.Skinning
                 if (texture == null)
                     return null;
 
-                return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, null), texture, 1f / texture.ScaleAdjust);
+                return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 1f / texture.ScaleAdjust);
             }
 
             private static string getLookupName(char character)

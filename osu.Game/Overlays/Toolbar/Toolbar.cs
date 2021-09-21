@@ -178,12 +178,12 @@ namespace osu.Game.Overlays.Toolbar
             this.FadeOut(transition_time, Easing.InQuint);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (OverlayActivationMode.Value == OverlayActivation.Disabled)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.ToggleToolbar:
                     hiddenByUser = State.Value == Visibility.Visible; // set before toggling to allow the operation to always succeed.
@@ -194,7 +194,7 @@ namespace osu.Game.Overlays.Toolbar
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
     }

@@ -24,8 +24,6 @@ namespace osu.Game.Screens.OnlinePlay
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        public override bool AllowTrackAdjustments => false;
-
         public override bool CursorVisible => (screenStack?.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
 
         // this is required due to PlayerLoader eventually being pushed to the main stack
