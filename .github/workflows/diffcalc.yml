@@ -74,16 +74,23 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/master/
           mkdir -p $GITHUB_WORKSPACE/pr/
 
+      - name: Get upstream branch # https://akaimo.hatenablog.jp/entry/2020/05/16/101251
+        id: upstreambranch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::set-output name=branchname::$(curl -H "Authorization: token ${GITHUB_TOKEN}" ${{ github.event.issue.pull_request.url }} | jq '.head.ref' | sed 's/\"//g')"
+
       # Checkout osu
       - name: Checkout osu (master)
         uses: actions/checkout@v2
         with:
-          repository: ppy/osu
           path: 'master/osu'
       - name: Checkout osu (pr)
         uses: actions/checkout@v2
         with:
           path: 'pr/osu'
+          ref: ${{ steps.upstreambranch.outputs.branchname }}
 
       - name: Checkout osu-difficulty-calculator (master)
         uses: actions/checkout@v2
