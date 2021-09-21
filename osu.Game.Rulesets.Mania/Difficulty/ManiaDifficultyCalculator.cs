@@ -43,12 +43,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             HitWindows hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
+            // For the time being, we use the clockrate at the beginning of the map for OD and AR attributes
+            double baseClockRate = 1;
+            baseClockRate = mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, mod) => prod * mod.ApplyToRate(prod));
+
             return new ManiaDifficultyAttributes
             {
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
                 Mods = mods,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)Math.Ceiling(getHitWindow300(mods) / clockTimeAt(1)),
+                GreatHitWindow = (int)Math.Ceiling(getHitWindow300(mods) / baseClockRate),
                 ScoreMultiplier = getScoreMultiplier(beatmap, mods),
                 MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
                 Skills = skills

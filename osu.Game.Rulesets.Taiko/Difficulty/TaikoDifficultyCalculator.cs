@@ -84,6 +84,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double starRating = 1.4 * separatedRating + 0.5 * combinedRating;
             starRating = rescale(starRating);
 
+            // For the time being, we use the clockrate at the beginning of the map for OD and AR attributes
+            double baseClockRate = 1;
+            baseClockRate = mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, mod) => prod * mod.ApplyToRate(prod));
+
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
@@ -95,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 RhythmStrain = rhythmRating,
                 ColourStrain = colourRating,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)hitWindows.WindowFor(HitResult.Great) / clockTimeAt(1),
+                GreatHitWindow = (int)hitWindows.WindowFor(HitResult.Great) / baseClockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
                 Skills = skills
             };
