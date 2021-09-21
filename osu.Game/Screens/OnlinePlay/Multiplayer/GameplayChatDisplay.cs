@@ -71,9 +71,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }, true);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.ToggleChatFocus:
                     if (Textbox.HasFocus)
@@ -94,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 

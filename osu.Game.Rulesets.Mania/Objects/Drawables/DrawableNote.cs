@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -97,9 +98,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             ApplyResult(r => r.Type = result);
         }
 
-        public virtual bool OnPressed(ManiaAction action)
+        public virtual bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action != Action.Value)
+            if (e.Action != Action.Value)
                 return false;
 
             if (CheckHittable?.Invoke(this, Time.Current) == false)
@@ -108,7 +109,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             return UpdateResult(true);
         }
 
-        public virtual void OnReleased(ManiaAction action)
+        public virtual void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
         }
 

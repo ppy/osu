@@ -186,9 +186,9 @@ namespace osu.Game.Overlays.BeatmapListing
                 return true;
             }
 
-            public override bool OnPressed(GlobalAction action)
+            public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                if (!base.OnPressed(action))
+                if (!base.OnPressed(e))
                     return false;
 
                 TextChanged?.Invoke();

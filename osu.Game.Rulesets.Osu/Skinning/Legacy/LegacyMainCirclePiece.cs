@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
 
-        private Container circleSprites;
         private Drawable hitCircleSprite;
-        private Drawable hitCircleOverlay;
+
+        protected Drawable HitCircleOverlay { get; private set; }
 
         private SkinnableSpriteText hitCircleText;
 
@@ -70,28 +70,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png (potentially from the default/fall-through skin).
             Texture overlayTexture = getTextureWithFallback("overlay");
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                circleSprites = new Container
+                hitCircleSprite = new KiaiFlashingSprite
                 {
+                    Texture = baseTexture,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
-                    {
-                        hitCircleSprite = new KiaiFlashingSprite
-                        {
-                            Texture = baseTexture,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        hitCircleOverlay = new KiaiFlashingSprite
-                        {
-                            Texture = overlayTexture,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }
-                    }
+                },
+                HitCircleOverlay = new KiaiFlashingSprite
+                {
+                    Texture = overlayTexture,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                 },
             };
 
@@ -111,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
 
             if (overlayAboveNumber)
-                AddInternal(hitCircleOverlay.CreateProxy());
+                ChangeInternalChildDepth(HitCircleOverlay, float.MinValue);
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
@@ -153,8 +144,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        circleSprites.FadeOut(legacy_fade_duration, Easing.Out);
-                        circleSprites.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        hitCircleSprite.FadeOut(legacy_fade_duration, Easing.Out);
+                        hitCircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+
+                        HitCircleOverlay.FadeOut(legacy_fade_duration, Easing.Out);
+                        HitCircleOverlay.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
                         if (hasNumber)
                         {
