@@ -39,9 +39,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [Resolved(canBeNull: true)]
         private GameplayBeatmap gameplayBeatmap { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private GameplayClock gameplayClock { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, OsuColour colours)
         {
