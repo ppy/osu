@@ -164,6 +164,8 @@ namespace osu.Game.Graphics
 
                 return Vector2Extensions.Transform(new Vector2(x, y), DrawInfo.Matrix);
             }
+
+            protected override bool CanDrawOpaqueInterior => false;
         }
 
         #endregion
