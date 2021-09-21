@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 
@@ -18,9 +19,9 @@ namespace osu.Game.Screens.Menu
         {
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (action == GlobalAction.Back)
+            if (e.Action == GlobalAction.Back)
             {
                 BeginConfirm();
                 return true;
@@ -29,9 +30,9 @@ namespace osu.Game.Screens.Menu
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            if (action == GlobalAction.Back)
+            if (e.Action == GlobalAction.Back)
             {
                 if (!Fired)
                     AbortConfirm();

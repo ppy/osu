@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         },
                         text = new OsuSpriteText
                         {
-                            Text = action.GetDescription(),
+                            Text = action.GetLocalisableDescription(),
                             Margin = new MarginPadding(padding),
                         },
                         buttons = new FillFlowContainer<KeyButton>
