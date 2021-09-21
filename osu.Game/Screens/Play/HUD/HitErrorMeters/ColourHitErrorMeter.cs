@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             judgementsFlow.Push(GetColourForHitResult(judgement.Type));
         }
 
+        public override void Clear() => judgementsFlow.Clear();
+
         private class JudgementFlow : FillFlowContainer<HitErrorCircle>
         {
             private const int max_available_judgements = 20;
