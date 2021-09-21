@@ -88,9 +88,19 @@ namespace osu.Game.Rulesets.Mods
 
         public double GetTimeAt(double time)
         {
-            var amount = (FinalRate.Value - InitialRate.Value) / (finalRateTime - beginRampTime);
-
-            return (InitialRate.Value * Math.Min(time, finalRateTime)) + (0.5 * amount * Math.Pow(Math.Max(Math.Min(time, finalRateTime) - beginRampTime, 0), 2));
+            if (time < beginRampTime)
+            {
+                return time / InitialRate.Value;
+            }
+            else if(time <= finalRateTime)
+            {
+                var amount = (InitialRate.Value - FinalRate.Value) / (finalRateTime - beginRampTime);
+                return (time / InitialRate.Value) + (0.5 * amount * (Math.Pow(Math.Max(time - beginRampTime, 0), 2)));
+            }
+            else
+            {
+                return GetTimeAt(finalRateTime) + ((time - finalRateTime) / FinalRate.Value);
+            }
         }
 
         public virtual void Update(Playfield playfield)
