@@ -76,7 +76,7 @@ namespace osu.Desktop
                     if (!DebugUtils.IsDebugBuild)
                     {
                         Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
-                        Environment.Exit(0);
+                        return 0;
                     }
                 }
 
