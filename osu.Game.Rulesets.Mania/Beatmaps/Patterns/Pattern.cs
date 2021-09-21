@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// </summary>
         /// <param name="column">The column index.</param>
         /// <returns>Whether the column with index <paramref name="column"/> contains a hit object.</returns>
-        public bool ColumnHasObject(int column) => containedColumns?.Contains(column) ?? false;
+        public bool ColumnHasObject(int column) => containedColumns?.Contains(column) == true;
 
         /// <summary>
         /// Amount of columns taken up by hit objects in this pattern.
