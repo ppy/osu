@@ -249,6 +249,9 @@ namespace M.DBus
                 throw new ObjectDisposedException(ToString(), "已处理的对象不能再次连接。");
 
             //默认连接到会话
+            if (string.IsNullOrEmpty(Address.Session))
+                throw new AddressNotFoundException("会话地址为空，请检查dbus服务是否已经启动");
+
             target ??= Address.Session;
             currentConnectTarget = target;
 
@@ -266,34 +269,41 @@ namespace M.DBus
 
         private async Task connectTask(string target)
         {
-            switch (connectionState)
+            try
             {
-                case ConnectionState.NotConnected:
-                    //初始化到DBus的连接
-                    currentConnection ??= new Connection(target);
+                switch (connectionState)
+                {
+                    case ConnectionState.NotConnected:
+                        //初始化到DBus的连接
+                        currentConnection ??= new Connection(target);
 
-                    //连接到DBus
-                    connectionState = ConnectionState.Connecting;
+                        //连接到DBus
+                        connectionState = ConnectionState.Connecting;
 
-                    //等待连接
-                    await currentConnection.ConnectAsync().ConfigureAwait(false);
+                        //等待连接
+                        await currentConnection.ConnectAsync().ConfigureAwait(false);
 
-                    //设置连接状态
-                    connectionState = ConnectionState.Connected;
+                        //设置连接状态
+                        connectionState = ConnectionState.Connected;
 
-                    await registerObjects().ConfigureAwait(false);
-                    OnConnected?.Invoke();
-                    GreetService.SwitchState(true, "");
-                    break;
+                        await registerObjects().ConfigureAwait(false);
+                        OnConnected?.Invoke();
+                        GreetService.SwitchState(true, "");
+                        break;
 
-                case ConnectionState.Connected:
-                    Logger.Log($"已经连接到{currentConnectTarget}，直接注册!");
+                    case ConnectionState.Connected:
+                        Logger.Log($"已经连接到{currentConnectTarget}，直接注册!");
 
-                    //直接注册
-                    await registerObjects().ConfigureAwait(false);
-                    OnConnected?.Invoke();
-                    GreetService.SwitchState(true, "");
-                    break;
+                        //直接注册
+                        await registerObjects().ConfigureAwait(false);
+                        OnConnected?.Invoke();
+                        GreetService.SwitchState(true, "");
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "连接到DBus时出现错误");
             }
         }
 
@@ -305,6 +315,14 @@ namespace M.DBus
             Connecting,
             Connected,
             Faulted
+        }
+
+        private class AddressNotFoundException : InvalidOperationException
+        {
+            public AddressNotFoundException(string s)
+                : base(s)
+            {
+            }
         }
     }
 }

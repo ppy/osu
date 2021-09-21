@@ -125,16 +125,13 @@ namespace osu.Desktop
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-            {
-                dBusManagerContainer = new DBusManagerContainer(
-                    true,
-                    MConfig.GetBindable<bool>(MSetting.DBusIntegration));
+            dBusManagerContainer = new DBusManagerContainer(
+                true,
+                MConfig.GetBindable<bool>(MSetting.DBusIntegration));
 
-                dependencies.Cache(dBusManagerContainer.DBusManager);
-                Add(dBusManagerContainer);
-                dBusManagerContainer.NotificationAction += n => Notifications.Post(n);
-            }
+            dependencies.Cache(dBusManagerContainer.DBusManager);
+            Add(dBusManagerContainer);
+            dBusManagerContainer.NotificationAction += n => Notifications.Post(n);
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
         }
