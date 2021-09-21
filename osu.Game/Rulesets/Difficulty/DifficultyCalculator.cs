@@ -193,6 +193,17 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns></returns>
         protected virtual Func<double, double> bakeClockRate(Mod[] mods)
         {
+            if(mods.OfType<IApplicableToRate>().First() is ModTimeRamp mod)
+            {
+                var initialRate = mod.InitialRate.Value;
+                var finalRate = mod.FinalRate.Value;
+                var beginRampTime = mod.beginRampTime;
+                var finalRateTime = mod.finalRateTime;
+                var amount = (finalRate - initialRate) / (finalRateTime - beginRampTime);
+
+                return T => (initialRate * Math.Min(T, finalRateTime)) + (0.5 * amount * Math.Pow(Math.Max(Math.Min(T, finalRateTime) - beginRampTime, 0), 2));
+            }
+
             return T => mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, mod) => prod * mod.ApplyToRate(T));
         }
     }

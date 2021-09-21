@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
 
-        private double finalRateTime;
-        private double beginRampTime;
+        public double finalRateTime;
+        public double beginRampTime;
 
         public BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
