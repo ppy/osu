@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(m => m is OsuModBlinds))
-                aimValue *= 1.0 + ((0.12 + totalHits * (0.0008 / (1 + 3 * countMiss))) * Math.Pow(accuracy, 16));
+                aimValue *= blindsMultiplier;
             else if (mods.Any(h => h is OsuModHidden))
                 aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
 
             if (mods.Any(m => m is OsuModBlinds))
-                speedValue *= 1.0 + ((0.12 + totalHits * (0.0008 / (1 + 3 * countMiss))) * Math.Pow(accuracy, 16));
+                speedValue *= blindsMultiplier;
             else if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
@@ -184,7 +184,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
             accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
 
-            if (mods.Any(m => m is OsuModHidden))
+            if (mods.Any(m => m is OsuModBlinds))
+                accuracyValue *= blindsMultiplier;
+            else if (mods.Any(m => m is OsuModHidden))
                 accuracyValue *= 1.08;
             if (mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
@@ -230,5 +232,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
+        private double blindsMultiplier => 1.0 + ((0.12 + totalHits * (0.0008 / (1 + 3 * countMiss))) * Math.Pow(accuracy, 16));
     }
 }
