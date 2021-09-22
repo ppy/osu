@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
 
             if (mods.Any(m => m is OsuModBlinds))
-                multiplier *= 1.12 + (totalHits * (0.0008 / (1 + 3 * countMiss)));
+                multiplier *= 1.0 + ((0.12 + totalHits * (0.0008 / (1 + 3 * countMiss))) * Math.Pow(accuracy, 16));
 
 
             double aimValue = computeAimValue();
