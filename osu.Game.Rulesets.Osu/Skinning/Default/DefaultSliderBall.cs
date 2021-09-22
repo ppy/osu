@@ -19,10 +19,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     {
         private Box box;
 
+        private DrawableSlider slider;
+
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject, ISkinSource skin)
         {
-            var slider = (DrawableSlider)drawableObject;
+            slider = (DrawableSlider)drawableObject;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -50,9 +52,31 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             };
 
             slider.Tracking.BindValueChanged(trackingChanged, true);
+            slider.ApplyCustomUpdateState += updateStateTransforms;
         }
 
         private void trackingChanged(ValueChangedEvent<bool> tracking) =>
             box.FadeTo(tracking.NewValue ? 0.3f : 0.05f, 200, Easing.OutQuint);
+        
+        private void updateStateTransforms(DrawableHitObject obj, ArmedState state)
+        {
+            using (BeginAbsoluteSequence(slider.StateUpdateTime))
+            {
+                this.FadeIn();
+            }
+
+            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
+            {
+                const float fade_out_time = 450;
+
+                this.FadeOut(fade_out_time / 4, Easing.Out);
+                switch (state)
+                {
+                    case ArmedState.Hit:
+                        this.ScaleTo(slider.HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
+                        break;
+                }
+            }
+        }
     }
 }

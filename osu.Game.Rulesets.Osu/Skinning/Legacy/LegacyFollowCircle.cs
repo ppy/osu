@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     public class LegacyFollowCircle : CompositeDrawable
     {
         private readonly Drawable animationContent;
-        private DrawableSliderBall sliderBall;
+        private DrawableSlider slider;
 
         public LegacyFollowCircle(Drawable animationContent)
         {
@@ -23,8 +23,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject)
         {
-            var slider = (DrawableSlider)drawableObject;
-            sliderBall = slider.Ball;
+            slider = (DrawableSlider)drawableObject;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -39,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             bool tracking = e.NewValue;
 
-            if (sliderBall.InputTracksVisualSize)
+            if (slider.Ball.InputTracksVisualSize)
             {
                 if (tracking)
                     this.ScaleTo(2.4f, 200, Easing.OutQuint);

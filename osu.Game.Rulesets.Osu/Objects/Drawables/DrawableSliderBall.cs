@@ -182,11 +182,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ball.Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
 
             lastPosition = newPos;
-
-            if (completionProgress >= 1f)
-                ball.FadeOut();
-            else
-                ball.FadeIn();
         }
 
         private class FollowReceptor : CircularContainer
@@ -217,8 +212,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
                     this.ScaleTo(tracking ? 2.4f : 1f);
                 }
-
-                this.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
     }

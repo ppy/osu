@@ -14,15 +14,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class DefaultFollowCircle : CompositeDrawable
     {
-        private DrawableSliderBall sliderBall;
+        private DrawableSlider slider;
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject)
         {
-            var slider = (DrawableSlider)drawableObject;
-            sliderBall = slider.Ball;
+            slider = (DrawableSlider)drawableObject;
 
             RelativeSizeAxes = Axes.Both;
+            Alpha = 1f;
 
             InternalChild = new CircularContainer
             {
@@ -40,13 +40,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             };
 
             slider.Tracking.BindValueChanged(trackingChanged, true);
+            slider.ApplyCustomUpdateState += updateStateTransforms;
         }
 
         private void trackingChanged(ValueChangedEvent<bool> e)
         {
             bool tracking = e.NewValue;
 
-            if (sliderBall.InputTracksVisualSize)
+            if (slider.Ball.InputTracksVisualSize)
                 this.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
             else
             {
@@ -55,6 +56,22 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             }
 
             this.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
+        }
+
+        private void updateStateTransforms(DrawableHitObject obj, ArmedState state)
+        {
+            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
+            {
+                const float fade_out_time = 450;
+
+                this.FadeOut(fade_out_time / 4, Easing.Out);
+                switch (state)
+                {
+                    case ArmedState.Hit:
+                        this.ScaleTo(slider.HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
+                        break;
+                }
+            }
         }
     }
 }
