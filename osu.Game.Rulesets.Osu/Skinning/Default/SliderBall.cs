@@ -103,14 +103,22 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 tracking = value;
 
                 if (InputTracksVisualSize)
-                    followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
+                {
+                    if (tracking)
+                        followCircle.ScaleTo(2f, 200, Easing.OutQuint);
+                    else
+                        followCircle.ScaleTo(1.6f, 200, Easing.None);
+                }
                 else
                 {
                     // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
-                    followCircle.ScaleTo(tracking ? 2.4f : 1f);
+                    followCircle.ScaleTo(tracking ? 2f : 1f);
                 }
 
-                followCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
+                if (tracking)
+                    followCircle.FadeIn(100, Easing.OutQuint);
+                else
+                    followCircle.FadeOut(200, Easing.InQuint);
             }
         }
 
@@ -205,6 +213,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             ball.Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
 
             lastPosition = newPos;
+
+            if (completionProgress >= 1f)
+                ball.FadeOut();
+            else
+                ball.FadeIn();
         }
 
         private class FollowCircleContainer : CircularContainer
