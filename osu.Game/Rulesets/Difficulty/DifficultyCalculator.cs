@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Difficulty
 
         private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods)
         {
-            Func<double, double> clockTimeAt = bakeClockRate(mods);
+            Func<double, double> clockTimeAt = BakeClockRate(mods);
 
             var skills = CreateSkills(beatmap, mods, clockTimeAt);
 
@@ -191,17 +191,17 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="mods">Mods to calculate clocktime with.</param>
         /// <returns></returns>
-        protected virtual Func<double, double> bakeClockRate(Mod[] mods)
+        protected virtual Func<double, double> BakeClockRate(Mod[] mods)
         {
             if (!mods.OfType<IApplicableToRate>().Any())
-                return T => T;
+                return t => t;
 
-            if(mods.OfType<IApplicableToRate>().FirstOrDefault() is ModTimeRamp mod)
+            if(mods.OfType<IApplicableToRate>().FirstOrDefault() is ModTimeRamp rateMod)
             {
-                return T => mod.GetTimeAt(T);
+                return t => rateMod.GetTimeAt(t);
             }
 
-            return T => T / mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, mod) => prod * mod.ApplyToRate(T));
+            return t => t / mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, rateMod) => prod * rateMod.ApplyToRate(t));
         }
     }
 }
