@@ -136,6 +136,53 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        public async Task TestImportThenExportThenImport()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+                    string extractedFolder = $"{temp}_extracted";
+                    Directory.CreateDirectory(extractedFolder);
+
+                    //Full path to the export folder created in Temp\of-test-headless
+                    string exportFullPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp\\of-test-headless\\TestImportThenExportThenImportImportBeatmapTest\\exports");
+
+                    try
+                    {
+                        var firstImport = await LoadOszIntoOsu(osu);
+
+                        var manager = osu.Dependencies.Get<BeatmapManager>();
+                        manager.Export(firstImport);
+
+                        var exportFile = $"{firstImport.Metadata}.osz";
+                        foreach (char c in Path.GetInvalidFileNameChars())
+                            exportFile = exportFile.Replace(c, '_');
+                        exportFullPath += "\\" + exportFile;
+
+                        var secondImport = await LoadOszIntoOsu(osu, exportFullPath);
+
+                        ensureLoaded(osu);
+                        Assert.IsTrue(firstImport.ID == secondImport.ID);
+                        Assert.IsTrue(firstImport.Beatmaps.First().ID == secondImport.Beatmaps.First().ID);
+                    }
+                    finally
+                    {
+                        Directory.Delete(extractedFolder, true);
+                        File.Delete(exportFullPath);
+                    }
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
         public async Task TestImportThenImportWithReZip()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
