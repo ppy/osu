@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.0675;
+        private double hitWindowGreat;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -52,11 +53,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double starRating = basePerformance > 0.00001 ? Math.Cbrt(1.12) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
 
-            HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
-
-            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            double hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
             double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
             int maxCombo = beatmap.HitObjects.Count;
@@ -96,12 +92,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            new Aim(mods),
-            new Speed(mods),
-            new Flashlight(mods)
-        };
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+
+            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
+            hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
+
+            return new Skill[]
+            {
+                new Aim(mods),
+                new Speed(mods, hitWindowGreat),
+                new Flashlight(mods)
+            };
+        }
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
