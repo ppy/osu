@@ -62,15 +62,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
             {
-                const float fade_out_time = 450;
+                const float fade_out_time = 100;
 
                 this.FadeOut(fade_out_time / 4, Easing.Out);
-                switch (state)
-                {
-                    case ArmedState.Hit:
-                        this.ScaleTo(slider.HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
-                        break;
-                }
             }
         }
     }
