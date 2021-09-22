@@ -105,14 +105,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 if (InputTracksVisualSize)
                 {
                     if (tracking)
-                        followCircle.ScaleTo(2f, 200, Easing.OutQuint);
+                        followCircle.ScaleTo(2.4f, 200, Easing.OutQuint);
                     else
                         followCircle.ScaleTo(1.6f, 200, Easing.None);
                 }
                 else
                 {
                     // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
-                    followCircle.ScaleTo(tracking ? 2f : 1f);
+                    followCircle.ScaleTo(tracking ? 2.4f : 1f);
                 }
 
                 if (tracking)
