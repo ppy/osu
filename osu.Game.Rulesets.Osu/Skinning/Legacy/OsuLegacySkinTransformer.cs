@@ -36,11 +36,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return this.GetAnimation(component.LookupName, true, false, true, startAtCurrentTime: false);
 
                     case OsuSkinComponents.SliderFollowCircle:
-                        var followCircle = this.GetAnimation("sliderfollowcircle", true, true, true);
-                        if (followCircle != null)
+                        var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true);
+                        if (followCircleContent != null)
+                        {
                             // follow circles are 2x the hitcircle resolution in legacy skins (since they are scaled down from >1x
-                            followCircle.Scale *= 0.5f;
-                        return followCircle;
+                            followCircleContent.Scale *= 0.5f;
+                            return new LegacyFollowCircle(followCircleContent);
+                        }
+
+                        return null;
 
                     case OsuSkinComponents.SliderBall:
                         var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "");

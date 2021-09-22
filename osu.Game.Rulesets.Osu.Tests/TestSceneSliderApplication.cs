@@ -89,10 +89,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             AddStep("set accent white", () => dho.AccentColour.Value = Color4.White);
-            AddAssert("ball is white", () => dho.ChildrenOfType<SliderBall>().Single().AccentColour == Color4.White);
+            AddAssert("ball is white", () => dho.ChildrenOfType<DrawableSliderBall>().Single().AccentColour == Color4.White);
 
             AddStep("set accent red", () => dho.AccentColour.Value = Color4.Red);
-            AddAssert("ball is red", () => dho.ChildrenOfType<SliderBall>().Single().AccentColour == Color4.Red);
+            AddAssert("ball is red", () => dho.ChildrenOfType<DrawableSliderBall>().Single().AccentColour == Color4.Red);
         }
 
         private Slider prepareObject(Slider slider)

@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSliderHead HeadCircle => headContainer.Child;
         public DrawableSliderTail TailCircle => tailContainer.Child;
 
-        public SliderBall Ball { get; private set; }
+        public DrawableSliderBall Ball { get; private set; }
         public SkinnableDrawable Body { get; private set; }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
                 OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
-                Ball = new SliderBall(this)
+                Ball = new DrawableSliderBall(this)
                 {
                     GetInitialHitAction = () => HeadCircle.HitAction,
                     BypassAutoSizeAxes = Axes.Both,

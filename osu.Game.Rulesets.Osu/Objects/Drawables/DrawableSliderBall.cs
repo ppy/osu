@@ -1,28 +1,23 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Skinning.Default
+namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition, IHasAccentColour
+    public class DrawableSliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition, IHasAccentColour
     {
         public Func<OsuAction?> GetInitialHitAction;
 
@@ -33,16 +28,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         }
 
         /// <summary>
-        /// Whether to track accurately to the visual size of this <see cref="SliderBall"/>.
+        /// Whether to track accurately to the visual size of this <see cref="DrawableSliderBall"/>.
         /// If <c>false</c>, tracking will be performed at the final scale at all times.
         /// </summary>
         public bool InputTracksVisualSize = true;
 
-        private readonly Drawable followCircle;
         private readonly DrawableSlider drawableSlider;
-        private readonly Drawable ball;
+        private readonly SkinnableDrawable followCircle;
+        private readonly SkinnableDrawable ball;
 
-        public SliderBall(DrawableSlider drawableSlider)
+        private readonly FollowReceptor followArea;
+
+        public DrawableSliderBall(DrawableSlider drawableSlider)
         {
             this.drawableSlider = drawableSlider;
 
@@ -50,15 +47,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
-            Children = new[]
+            Children = new Drawable[]
             {
-                followCircle = new FollowCircleContainer
+                followArea = new FollowReceptor
                 {
-                    Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle()),
+                    Origin = Anchor.Centre,
+                },
+                followCircle = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                 },
                 ball = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall())
                 {
@@ -90,37 +89,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             base.ApplyTransformsAt(time, false);
         }
 
-        private bool tracking;
-
-        public bool Tracking
-        {
-            get => tracking;
-            private set
-            {
-                if (value == tracking)
-                    return;
-
-                tracking = value;
-
-                if (InputTracksVisualSize)
-                {
-                    if (tracking)
-                        followCircle.ScaleTo(2.4f, 200, Easing.OutQuint);
-                    else
-                        followCircle.ScaleTo(1.6f, 200, Easing.None);
-                }
-                else
-                {
-                    // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
-                    followCircle.ScaleTo(tracking ? 2.4f : 1f);
-                }
-
-                if (tracking)
-                    followCircle.FadeIn(100, Easing.OutQuint);
-                else
-                    followCircle.FadeOut(200, Easing.InQuint);
-            }
-        }
+        public bool Tracking { get; private set; }
 
         /// <summary>
         /// If the cursor moves out of the ball's radius we still need to be able to receive positional updates to stop tracking.
@@ -176,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 // in valid time range
                 Time.Current >= drawableSlider.HitObject.StartTime && Time.Current < drawableSlider.HitObject.EndTime &&
                 // in valid position range
-                lastScreenSpaceMousePosition.HasValue && followCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                lastScreenSpaceMousePosition.HasValue && followArea.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
 
@@ -220,73 +189,37 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 ball.FadeIn();
         }
 
-        private class FollowCircleContainer : CircularContainer
+        private class FollowReceptor : CircularContainer
         {
             public override bool HandlePositionalInput => true;
-        }
 
-        public class DefaultFollowCircle : CompositeDrawable
-        {
-            public DefaultFollowCircle()
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                InternalChild = new CircularContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    BorderThickness = 5,
-                    BorderColour = Color4.Orange,
-                    Blending = BlendingParameters.Additive,
-                    Child = new Box
-                    {
-                        Colour = Color4.Orange,
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.2f,
-                    }
-                };
-            }
-        }
-
-        public class DefaultSliderBall : CompositeDrawable
-        {
-            private Box box;
+            private DrawableSliderBall sliderBall;
 
             [BackgroundDependencyLoader]
-            private void load(DrawableHitObject drawableObject, ISkinSource skin)
+            private void load(DrawableHitObject drawableObject)
             {
                 var slider = (DrawableSlider)drawableObject;
+                sliderBall = slider.Ball;
 
                 RelativeSizeAxes = Axes.Both;
-
-                float radius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
-
-                InternalChild = new CircularContainer
-                {
-                    Masking = true,
-                    RelativeSizeAxes = Axes.Both,
-                    Scale = new Vector2(radius / OsuHitObject.OBJECT_RADIUS),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Blending = BlendingParameters.Additive,
-                    BorderThickness = 10,
-                    BorderColour = Color4.White,
-                    Alpha = 1,
-                    Child = box = new Box
-                    {
-                        Blending = BlendingParameters.Additive,
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
-                        AlwaysPresent = true,
-                        Alpha = 0
-                    }
-                };
 
                 slider.Tracking.BindValueChanged(trackingChanged, true);
             }
 
-            private void trackingChanged(ValueChangedEvent<bool> tracking) =>
-                box.FadeTo(tracking.NewValue ? 0.3f : 0.05f, 200, Easing.OutQuint);
+            private void trackingChanged(ValueChangedEvent<bool> e)
+            {
+                bool tracking = e.NewValue;
+
+                if (sliderBall.InputTracksVisualSize)
+                    this.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
+                else
+                {
+                    // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
+                    this.ScaleTo(tracking ? 2.4f : 1f);
+                }
+
+                this.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
+            }
         }
     }
 }
