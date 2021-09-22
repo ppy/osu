@@ -48,11 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModSpunOut))
                 multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
-
-            if (mods.Any(m => m is OsuModBlinds))
-                multiplier *= 1.0 + ((0.12 + totalHits * (0.0008 / (1 + 3 * countMiss))) * Math.Pow(accuracy, 16));
-
-
+                
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
             double accuracyValue = computeAccuracyValue();
@@ -113,7 +109,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double approachRateBonus = 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-            if (mods.Any(h => h is OsuModHidden))
+            if (mods.Any(m => m is OsuModBlinds))
+                aimValue *= 1.0 + ((0.12 + totalHits * (0.0008 / (1 + 3 * countMiss))) * Math.Pow(accuracy, 16));
+            else if (mods.Any(h => h is OsuModHidden))
                 aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
             aimValue *= approachRateBonus;
@@ -151,7 +149,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             speedValue *= 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
 
-            if (mods.Any(m => m is OsuModHidden))
+            if (mods.Any(m => m is OsuModBlinds))
+                speedValue *= 1.0 + ((0.12 + totalHits * (0.0008 / (1 + 3 * countMiss))) * Math.Pow(accuracy, 16));
+            else if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
             // Scale the speed value with accuracy and OD.
