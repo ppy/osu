@@ -24,9 +24,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestBasic()
         {
-            TestPopupDialog dialog = null;
+            TestPopupDialog firstDialog = null;
+            TestPopupDialog secondDialog = null;
 
-            AddStep("dialog #1", () => overlay.Push(dialog = new TestPopupDialog
+            AddStep("dialog #1", () => overlay.Push(firstDialog = new TestPopupDialog
             {
                 Icon = FontAwesome.Regular.TrashAlt,
                 HeaderText = @"Confirm deletion of",
@@ -46,9 +47,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             }));
 
-            AddAssert("first dialog displayed", () => overlay.CurrentDialog == dialog);
+            AddAssert("first dialog displayed", () => overlay.CurrentDialog == firstDialog);
 
-            AddStep("dialog #2", () => overlay.Push(dialog = new TestPopupDialog
+            AddStep("dialog #2", () => overlay.Push(secondDialog = new TestPopupDialog
             {
                 Icon = FontAwesome.Solid.Cog,
                 HeaderText = @"What do you want to do with",
@@ -82,30 +83,33 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             }));
 
-            AddAssert("second dialog displayed", () => overlay.CurrentDialog == dialog);
+            AddAssert("second dialog displayed", () => overlay.CurrentDialog == secondDialog);
+            AddAssert("first dialog is not part of hierarchy", () => firstDialog.Parent == null);
         }
 
         [Test]
         public void TestDismissBeforePush()
         {
+            TestPopupDialog testDialog = null;
             AddStep("dismissed dialog push", () =>
             {
-                overlay.Push(new TestPopupDialog
+                overlay.Push(testDialog = new TestPopupDialog
                 {
                     State = { Value = Visibility.Hidden }
                 });
             });
 
             AddAssert("no dialog pushed", () => overlay.CurrentDialog == null);
+            AddAssert("dialog is not part of hierarchy", () => testDialog.Parent == null);
         }
 
         [Test]
         public void TestDismissBeforePushViaButtonPress()
         {
+            TestPopupDialog testDialog = null;
             AddStep("dismissed dialog push", () =>
             {
-                TestPopupDialog dialog;
-                overlay.Push(dialog = new TestPopupDialog
+                overlay.Push(testDialog = new TestPopupDialog
                 {
                     Buttons = new PopupDialogButton[]
                     {
@@ -113,10 +117,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                 });
 
-                dialog.PerformOkAction();
+                testDialog.PerformOkAction();
             });
 
             AddAssert("no dialog pushed", () => overlay.CurrentDialog == null);
+            AddAssert("dialog is not part of hierarchy", () => testDialog.Parent == null);
         }
 
         private class TestPopupDialog : PopupDialog
