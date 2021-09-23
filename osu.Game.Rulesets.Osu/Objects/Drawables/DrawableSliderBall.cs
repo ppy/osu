@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public Func<OsuAction?> GetInitialHitAction;
 
+        public const float FOLLOW_AREA = 2.4f;
+
         public Color4 AccentColour
         {
             get => ball.Colour;
@@ -206,11 +208,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 bool tracking = e.NewValue;
 
                 if (sliderBall.InputTracksVisualSize)
-                    this.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
+                    this.ScaleTo(tracking ? FOLLOW_AREA : 1f, 300, Easing.OutQuint);
                 else
                 {
                     // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
-                    this.ScaleTo(tracking ? 2.4f : 1f);
+                    this.ScaleTo(tracking ? FOLLOW_AREA : 1f);
                 }
             }
         }

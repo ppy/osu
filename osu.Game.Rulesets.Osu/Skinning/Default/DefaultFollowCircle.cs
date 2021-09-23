@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             };
 
             slider.Tracking.BindValueChanged(trackingChanged, true);
-            slider.ApplyCustomUpdateState += updateStateTransforms;
+            slider.HitObjectApplied += hitObjectApplied;
         }
 
         private void trackingChanged(ValueChangedEvent<bool> e)
@@ -48,21 +48,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             bool tracking = e.NewValue;
 
             if (slider.Ball.InputTracksVisualSize)
-                this.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
+                this.ScaleTo(tracking ? DrawableSliderBall.FOLLOW_AREA: 1f, 300, Easing.OutQuint);
             else
             {
                 // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
-                this.ScaleTo(tracking ? 2.4f : 1f);
+                this.ScaleTo(tracking ? DrawableSliderBall.FOLLOW_AREA : 1f);
             }
 
             this.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
         }
 
-        private void updateStateTransforms(DrawableHitObject obj, ArmedState state)
+        private void hitObjectApplied(DrawableHitObject obj)
         {
-            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
+            using (BeginAbsoluteSequence(slider.HitObject.EndTime))
             {
-                const float fade_out_time = 100;
+                const float fade_out_time = 450;
 
                 this.FadeOut(fade_out_time / 4, Easing.Out);
             }

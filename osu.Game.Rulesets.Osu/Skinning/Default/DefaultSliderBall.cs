@@ -52,25 +52,29 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             };
 
             slider.Tracking.BindValueChanged(trackingChanged, true);
+            slider.HitObjectApplied += hitObjectApplied;
             slider.ApplyCustomUpdateState += updateStateTransforms;
         }
 
         private void trackingChanged(ValueChangedEvent<bool> tracking) =>
             box.FadeTo(tracking.NewValue ? 0.3f : 0.05f, 200, Easing.OutQuint);
-        
-        private void updateStateTransforms(DrawableHitObject obj, ArmedState state)
+
+        private void hitObjectApplied(DrawableHitObject obj)
         {
-            using (BeginAbsoluteSequence(slider.StateUpdateTime))
+            using (BeginAbsoluteSequence(slider.HitObject.StartTime))
             {
                 this.FadeIn();
                 this.ScaleTo(1f);
             }
+        }
 
-            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
+        private void updateStateTransforms(DrawableHitObject obj, ArmedState state)
+        {
+            using (BeginAbsoluteSequence(slider.HitObject.EndTime))
             {
                 const float fade_out_time = 450;
 
-                this.FadeOut(fade_out_time / 4, Easing.Out);
+                this.FadeOut(fade_out_time / 4, Easing.In);
                 switch (state)
                 {
                     case ArmedState.Hit:

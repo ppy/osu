@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 },
             };
 
-            slider.ApplyCustomUpdateState += updateStateTransforms;
+            slider.HitObjectApplied += hitObjectApplied;
         }
 
         protected override void UpdateAfterChildren()
@@ -74,13 +74,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             layerSpec.Rotation = -appliedRotation;
         }
 
-        private void updateStateTransforms(DrawableHitObject obj, ArmedState state)
+        private void hitObjectApplied(DrawableHitObject obj)
         {
-            using (BeginAbsoluteSequence(slider.StateUpdateTime))
+            using (BeginAbsoluteSequence(slider.HitObject.StartTime))
             {
                 this.FadeIn();
             }
-            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
+
+            using (BeginAbsoluteSequence(slider.HitObject.EndTime))
             {
                 this.FadeOut();
             }

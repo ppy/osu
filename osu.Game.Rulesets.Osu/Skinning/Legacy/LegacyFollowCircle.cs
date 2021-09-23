@@ -41,14 +41,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (slider.Ball.InputTracksVisualSize)
             {
                 if (tracking)
-                    this.ScaleTo(2.4f, 200, Easing.OutQuint);
+                    this.ScaleTo(DrawableSliderBall.FOLLOW_AREA, 200, Easing.OutQuint);
                 else
                     this.ScaleTo(1.9f, 200, Easing.None);
             }
             else
             {
                 // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
-                this.ScaleTo(tracking ? 2.4f : 1f);
+                this.ScaleTo(tracking ? DrawableSliderBall.FOLLOW_AREA : 1f);
             }
 
             if (tracking)
