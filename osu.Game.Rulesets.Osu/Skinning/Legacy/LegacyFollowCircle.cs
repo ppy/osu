@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Framework.Logging;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -32,10 +33,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             animationContent.Origin = Anchor.Centre;
 
             slider.Tracking.BindValueChanged(trackingChanged, true);
+            slider.ApplyCustomUpdateState += updateStateTransforms;
         }
 
         private void trackingChanged(ValueChangedEvent<bool> e)
         {
+            if (slider.Judged)
+                return;
+
             bool tracking = e.NewValue;
 
             if (slider.Ball.InputTracksVisualSize)
@@ -43,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 if (tracking)
                     this.ScaleTo(DrawableSliderBall.FOLLOW_AREA, 200, Easing.OutQuint);
                 else
-                    this.ScaleTo(1.9f, 200, Easing.None);
+                    this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 2, 100, Easing.OutQuint).Then().ScaleTo(1f);
             }
             else
             {
@@ -51,10 +56,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 this.ScaleTo(tracking ? DrawableSliderBall.FOLLOW_AREA : 1f);
             }
 
-            if (tracking)
-                this.FadeIn(100, Easing.OutQuint);
-            else
-                this.FadeOut(200, Easing.InQuint);
+            this.FadeTo(tracking ? 1f : 0f, 100, Easing.OutQuint);
+        }
+
+        private void updateStateTransforms(DrawableHitObject obj, ArmedState state)
+        {
+            if (!(obj is DrawableSlider))
+                return;
+
+            const float fade_out_time = 200f;
+
+            using (BeginAbsoluteSequence(slider.HitObject.EndTime))
+            {
+                this.FadeOut(fade_out_time, Easing.InQuint);
+                this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 0.8f, fade_out_time, Easing.None);
+            }
         }
     }
 }
