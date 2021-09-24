@@ -145,6 +145,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = LoadOsuIntoHost(host);
 
                     var temp = TestResources.GetTestBeatmapForImport();
+                    //var temp = "C:\\Users\\youss\\ASP.NET projects\\423194 Reol - SYSTEMATIC LOVE [no video].osz";
                     string extractedFolder = $"{temp}_extracted";
                     Directory.CreateDirectory(extractedFolder);
 
@@ -153,15 +154,18 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     try
                     {
-                        var firstImport = await LoadOszIntoOsu(osu);
+                        var firstImport = await LoadOszIntoOsu(osu, temp); //, extractedFolder);
+
+                        foreach (var beatmapInfo in firstImport.Beatmaps)
+                        {
+                            foreach (char c in Path.GetInvalidFileNameChars())
+                                beatmapInfo.Path = beatmapInfo.Path.Replace(c, '_');
+                        }
 
                         var manager = osu.Dependencies.Get<BeatmapManager>();
                         manager.Export(firstImport);
 
-                        var exportFile = $"{firstImport.Metadata}.osz";
-                        foreach (char c in Path.GetInvalidFileNameChars())
-                            exportFile = exportFile.Replace(c, '_');
-                        exportFullPath += "\\" + exportFile;
+                        exportFullPath += $"\\{firstImport.Metadata}.osz";
 
                         var secondImport = await LoadOszIntoOsu(osu, exportFullPath);
 
