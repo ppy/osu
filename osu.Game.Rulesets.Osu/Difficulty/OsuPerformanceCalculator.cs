@@ -232,6 +232,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
-        private double blindsMultiplier => 1.0 + ((0.12 + totalHits * (0.0008 / (1 + 2 * countMiss))) * Math.Pow(accuracy, 16));
+        private double blindsMultiplier => 1.0 + ((0.12 + totalHits * (0.0008 / (1 + 2 * countMiss))) * Math.Pow(accuracy, 16)) * (1 - 0.003 * Attributes.DrainRate * Attributes.DrainRate);
     }
 }
