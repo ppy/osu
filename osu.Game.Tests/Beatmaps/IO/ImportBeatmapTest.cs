@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,10 +25,10 @@ using osu.Game.Tests.Resources;
 using osu.Game.Tests.Scores.IO;
 using osu.Game.Users;
 using SharpCompress.Archives;
-using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Writers.Zip;
 using FileInfo = System.IO.FileInfo;
+using ZipArchive = SharpCompress.Archives.Zip.ZipArchive;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -136,7 +137,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
-        public async Task TestImportThenExportThenImport()
+        public async Task TestExportBeatMapWithInvalidCharactersPath()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
@@ -145,37 +146,63 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = LoadOsuIntoHost(host);
 
                     var temp = TestResources.GetTestBeatmapForImport();
-                    //var temp = "C:\\Users\\youss\\ASP.NET projects\\423194 Reol - SYSTEMATIC LOVE [no video].osz";
-                    string extractedFolder = $"{temp}_extracted";
-                    Directory.CreateDirectory(extractedFolder);
 
                     //Full path to the export folder created in Temp\of-test-headless
-                    string exportFullPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp\\of-test-headless\\TestImportThenExportThenImportImportBeatmapTest\\exports");
+                    string exportFullPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp\\of-test-headless\\TestExportBeatMapWithInvalidCharactersPathImportBeatmapTest\\exports");
 
                     try
                     {
-                        var firstImport = await LoadOszIntoOsu(osu, temp); //, extractedFolder);
+                        //Storing the content of .osz archive before and after being exported
+                        List<string> firstOszFiles = new List<string>();
+                        List<string> secondOszFiles = new List<string>();
 
-                        foreach (var beatmapInfo in firstImport.Beatmaps)
+                        //Before Export
+                        using (var firstZip = ZipFile.Open(temp, ZipArchiveMode.Read))
                         {
+                            foreach (var entry in firstZip.Entries)
+                                firstOszFiles.Add(entry.FullName);
+                        }
+
+                        var firstImport = await LoadOszIntoOsu(osu, temp);
+
+                        //Clone firstImport data to modify the path to match the path construction created in osu.Game/Beatmaps/BeatmapManager.cs function Save() Line 270
+                        var cloneFirstImport = firstImport;
+                        var metadata = cloneFirstImport.Metadata;
+
+                        foreach (var beatmapInfo in cloneFirstImport.Beatmaps)
+                        {
+                            //Construct path as in osu.Game/Beatmaps/BeatmapManager.cs function Save() Line 270
+                            beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu";
+
+                            //Remove invalid characters as done in the same Save() function by calling the protected static function GetValidFilename()
                             foreach (char c in Path.GetInvalidFileNameChars())
                                 beatmapInfo.Path = beatmapInfo.Path.Replace(c, '_');
                         }
 
+                        // Exporting the new cloneFirstImport
                         var manager = osu.Dependencies.Get<BeatmapManager>();
-                        manager.Export(firstImport);
+                        manager.Export(cloneFirstImport);
 
-                        exportFullPath += $"\\{firstImport.Metadata}.osz";
+                        exportFullPath += $"\\{cloneFirstImport.Metadata}.osz";
 
-                        var secondImport = await LoadOszIntoOsu(osu, exportFullPath);
+                        //After Export
+                        using (var secondZip = ZipFile.Open(exportFullPath, ZipArchiveMode.Read))
+                        {
+                            foreach (var entry in secondZip.Entries)
+                                secondOszFiles.Add(entry.FullName);
+                        }
 
-                        ensureLoaded(osu);
-                        Assert.IsTrue(firstImport.ID == secondImport.ID);
-                        Assert.IsTrue(firstImport.Beatmaps.First().ID == secondImport.Beatmaps.First().ID);
+                        //Checking if both .osz are the same size
+                        Assert.IsTrue(firstOszFiles.Count == secondOszFiles.Count);
+
+                        //Sorting both lists to compare
+                        firstOszFiles.Sort();
+                        secondOszFiles.Sort();
+                        for (int i = 0; i < firstOszFiles.Count; i++)
+                            Assert.IsTrue(firstOszFiles[i] == secondOszFiles[i]);
                     }
                     finally
                     {
-                        Directory.Delete(extractedFolder, true);
                         File.Delete(exportFullPath);
                     }
                 }
