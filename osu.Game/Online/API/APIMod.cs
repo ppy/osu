@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Humanizer;
 using MessagePack;
@@ -73,6 +74,16 @@ namespace osu.Game.Online.API
             if (ReferenceEquals(this, other)) return true;
 
             return Acronym == other.Acronym && Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
+        }
+
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            hashCode.Add(Acronym);
+            foreach (var s in Settings)
+                hashCode.Add(ModSettingsEqualityComparer.Default.GetHashCode(s));
+            return hashCode.ToHashCode();
         }
 
         public override string ToString()

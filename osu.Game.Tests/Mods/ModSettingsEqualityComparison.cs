@@ -19,9 +19,16 @@ namespace osu.Game.Tests.Mods
             var apiMod3 = new APIMod(new OsuModDoubleTime { SpeedChange = { Value = 1.26 } });
 
             Assert.That(apiMod1, Is.Not.EqualTo(apiMod2));
+            Assert.That(apiMod1.GetHashCode(), Is.Not.EqualTo(apiMod2.GetHashCode()));
+
             Assert.That(apiMod2, Is.EqualTo(apiMod2));
+            Assert.That(apiMod2.GetHashCode(), Is.EqualTo(apiMod2.GetHashCode()));
+
             Assert.That(apiMod2, Is.EqualTo(apiMod3));
+            Assert.That(apiMod2.GetHashCode(), Is.EqualTo(apiMod3.GetHashCode()));
+
             Assert.That(apiMod3, Is.EqualTo(apiMod2));
+            Assert.That(apiMod3.GetHashCode(), Is.EqualTo(apiMod2.GetHashCode()));
         }
 
         [Test]
@@ -34,20 +41,24 @@ namespace osu.Game.Tests.Mods
             var mod3 = new OsuModDoubleTime { SpeedChange = { Value = 1.26 } };
 
             var doubleConvertedMod1 = new APIMod(mod1).ToMod(ruleset);
-            var doulbeConvertedMod2 = new APIMod(mod2).ToMod(ruleset);
-            var doulbeConvertedMod3 = new APIMod(mod3).ToMod(ruleset);
+            var doubleConvertedMod2 = new APIMod(mod2).ToMod(ruleset);
+            var doubleConvertedMod3 = new APIMod(mod3).ToMod(ruleset);
 
             Assert.That(mod1, Is.Not.EqualTo(mod2));
-            Assert.That(doubleConvertedMod1, Is.Not.EqualTo(doulbeConvertedMod2));
+            Assert.That(doubleConvertedMod1, Is.Not.EqualTo(doubleConvertedMod2));
+            Assert.That(doubleConvertedMod1.GetHashCode(), Is.Not.EqualTo(doubleConvertedMod2.GetHashCode()));
 
             Assert.That(mod2, Is.EqualTo(mod2));
-            Assert.That(doulbeConvertedMod2, Is.EqualTo(doulbeConvertedMod2));
+            Assert.That(doubleConvertedMod2, Is.EqualTo(doubleConvertedMod2));
+            Assert.That(doubleConvertedMod2.GetHashCode(), Is.EqualTo(doubleConvertedMod2.GetHashCode()));
 
             Assert.That(mod2, Is.EqualTo(mod3));
-            Assert.That(doulbeConvertedMod2, Is.EqualTo(doulbeConvertedMod3));
+            Assert.That(doubleConvertedMod2, Is.EqualTo(doubleConvertedMod3));
+            Assert.That(doubleConvertedMod2.GetHashCode(), Is.EqualTo(doubleConvertedMod3.GetHashCode()));
 
             Assert.That(mod3, Is.EqualTo(mod2));
-            Assert.That(doulbeConvertedMod3, Is.EqualTo(doulbeConvertedMod2));
+            Assert.That(doubleConvertedMod3, Is.EqualTo(doubleConvertedMod2));
+            Assert.That(doubleConvertedMod3.GetHashCode(), Is.EqualTo(doubleConvertedMod2.GetHashCode()));
         }
     }
 }
