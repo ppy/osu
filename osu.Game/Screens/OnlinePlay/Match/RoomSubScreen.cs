@@ -29,6 +29,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached(typeof(IBindable<PlaylistItem>))]
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
+        public override bool? AllowTrackAdjustments => true;
+
         protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(Room.Playlist.FirstOrDefault())
         {
             SelectedItem = { BindTarget = SelectedItem }

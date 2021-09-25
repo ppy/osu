@@ -20,6 +20,13 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorLoader : ScreenWithBeatmapBackground
     {
+        /// <summary>
+        /// The stored state from the last editor opened.
+        /// This will be read by the next editor instance to be opened to restore any relevant previous state.
+        /// </summary>
+        [CanBeNull]
+        private EditorState state;
+
         public override float BackgroundParallaxAmount => 0.1f;
 
         public override bool AllowBackButton => false;
@@ -34,6 +41,20 @@ namespace osu.Game.Screens.Edit
         [CanBeNull]
         private ScheduledDelegate scheduledDifficultySwitch;
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddRangeInternal(new Drawable[]
+            {
+                new LoadingSpinner(true)
+                {
+                    State = { Value = Visibility.Visible },
+                }
+            });
+        }
+
+        protected virtual Editor CreateEditor() => new Editor(this);
+
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
@@ -47,19 +68,7 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            AddRangeInternal(new Drawable[]
-            {
-                new LoadingSpinner(true)
-                {
-                    State = { Value = Visibility.Visible },
-                }
-            });
-        }
-
-        public void ScheduleDifficultySwitch(BeatmapInfo beatmapInfo)
+        public void ScheduleDifficultySwitch(BeatmapInfo nextBeatmap, EditorState editorState)
         {
             scheduledDifficultySwitch?.Cancel();
             ValidForResume = true;
@@ -68,7 +77,8 @@ namespace osu.Game.Screens.Edit
 
             scheduledDifficultySwitch = Schedule(() =>
             {
-                Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(nextBeatmap);
+                state = editorState;
 
                 // This screen is a weird exception to the rule that nothing after song select changes the global beatmap.
                 // Because of this, we need to update the background stack's beatmap to match.
@@ -81,7 +91,13 @@ namespace osu.Game.Screens.Edit
 
         private void pushEditor()
         {
-            this.Push(new Editor(this));
+            var editor = CreateEditor();
+
+            this.Push(editor);
+
+            if (state != null)
+                editor.RestoreState(state);
+
             ValidForResume = false;
         }
 

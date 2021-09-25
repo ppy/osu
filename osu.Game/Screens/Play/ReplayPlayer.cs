@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -49,11 +50,11 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate keyboardSeekDelegate;
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             const double keyboard_seek_amount = 5000;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.SeekReplayBackward:
                     keyboardSeekDelegate?.Cancel();
@@ -83,9 +84,9 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.SeekReplayBackward:
                 case GlobalAction.SeekReplayForward:

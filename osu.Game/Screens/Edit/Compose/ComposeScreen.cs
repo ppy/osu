@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -77,15 +78,15 @@ namespace osu.Game.Screens.Edit.Compose
 
         #region Input Handling
 
-        public bool OnPressed(PlatformAction action)
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            if (action == PlatformAction.Copy)
-                host.GetClipboard().SetText(formatSelectionAsString());
+            if (e.Action == PlatformAction.Copy)
+                host.GetClipboard()?.SetText(formatSelectionAsString());
 
             return false;
         }
 
-        public void OnReleased(PlatformAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
         }
 
