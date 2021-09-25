@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double wide_angle_multiplier = 1.0;
         private const double acute_angle_multiplier = 1.0;
         private const double rhythm_variance_multiplier = 1.0;
+        private const double vel_change_multiplier = 2.0;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -72,6 +73,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                     // add in angle velocity.
                     aimStrain += angleBonus;
+                }
+
+                if (prevVector.Length > currVector.Length)
+                {
+                    double velChangeBonus = Math.Max(0, Math.Sqrt((prevVector.Length - currVector.Length) * currVector.Length) - Math.Max(0, currVector.Length - 100 / osuCurrObj.StrainTime)) * Math.Min(1, osuCurrObj.JumpDistance / 100);
+
+                    aimStrain += velChangeBonus * vel_change_multiplier;
                 }
             }
             else // There is a rhythm change
