@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double wide_angle_multiplier = 1.0;
         private const double acute_angle_multiplier = 1.0;
         private const double rhythm_variance_multiplier = 1.0;
-        private const double vel_change_multiplier = 2.0;
+        private const double vel_change_multiplier = 1.0;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -76,9 +76,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                     if (prevVector.Length > currVector.Length)
                     {
-                        double velChangeBonus = Math.Max(0, Math.Sqrt((prevVector.Length - currVector.Length) * currVector.Length) - Math.Max(0, currVector.Length - 100 / osuCurrObj.StrainTime)) * Math.Min(1, osuCurrObj.JumpDistance / 100);
+                        double velChangeBonus = Math.Max(0, (prevVector.Length - currVector.Length) - Math.Min(0, currVector.Length - 100 / osuCurrObj.StrainTime))
+                                                * Math.Min(1, osuCurrObj.JumpDistance / 100)
+                                                * Math.Min(1, (osuPrevObj.JumpDistance - osuCurrObj.JumpDistance) / 100);
 
-                        aimStrain += velChangeBonus * (1 + wideAngleBonus)* vel_change_multiplier;
+                        aimStrain += velChangeBonus * Math.Sqrt(100 / osuCurrObj.StrainTime) * (1 + wideAngleBonus) * vel_change_multiplier;
                     }
                 }
             }
