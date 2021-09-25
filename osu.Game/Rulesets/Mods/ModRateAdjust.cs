@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Mods
 
         public double ApplyToRate(double time, double rate) => rate * SpeedChange.Value;
 
+        public double GetTimeAt(double time) => time / SpeedChange.Value;
+
         public override Type[] IncompatibleMods => new[] { typeof(ModTimeRamp) };
 
         public override string SettingDescription => SpeedChange.IsDefault ? string.Empty : $"{SpeedChange.Value:N2}x";

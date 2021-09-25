@@ -193,15 +193,10 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns></returns>
         protected virtual Func<double, double> BakeClockRate(Mod[] mods)
         {
-            if (!mods.OfType<IApplicableToRate>().Any())
-                return t => t;
+            if (mods.OfType<IApplicableToRate>().SingleOrDefault() is IApplicableToRate mod)
+                return t => mod.GetTimeAt(t);
 
-            if(mods.OfType<IApplicableToRate>().FirstOrDefault() is ModTimeRamp rateMod)
-            {
-                return t => rateMod.GetTimeAt(t);
-            }
-
-            return t => t / mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, rateMod) => prod * rateMod.ApplyToRate(t));
+            return t => t;
         }
     }
 }
