@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which this <see cref="DifficultyHitObject"/> wraps.</param>
         /// <param name="lastObject">The last <see cref="HitObject"/> which occurs before <paramref name="hitObject"/> in the beatmap.</param>
-        /// <param name="clockTimeAt">The rate at which the gameplay clock is run at.</param>
+        /// <param name="clockTimeAt">The clock time at a given point in time.</param>
         public DifficultyHitObject(HitObject hitObject, HitObject lastObject, Func<double, double> clockTimeAt)
         {
             StartTime = clockTimeAt(hitObject.StartTime);

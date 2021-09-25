@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="hitObject">The gameplay <see cref="HitObject"/> associated with this difficulty object.</param>
         /// <param name="lastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="hitObject"/>.</param>
         /// <param name="lastLastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="lastObject"/>.</param>
-        /// <param name="clockTimeAt">The rate of the gameplay clock at a point in time. Modified by speed-changing mods.</param>
+        /// <param name="clockTimeAt">The clock time at a given point in time.</param>
         /// <param name="objectIndex">The index of the object in the beatmap.</param>
         public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, Func<double, double> clockTimeAt, int objectIndex)
             : base(hitObject, lastObject, clockTimeAt)
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// </summary>
         /// <param name="lastObject">The gameplay <see cref="HitObject"/> preceding this one.</param>
         /// <param name="lastLastObject">The gameplay <see cref="HitObject"/> preceding <paramref name="lastObject"/>.</param>
-        /// <param name="clockTimeAt">The rate of the gameplay clock at a point in time.</param>
+        /// <param name="clockTimeAt">The clock time at a given point in time.</param>
         private TaikoDifficultyHitObjectRhythm getClosestRhythm(HitObject lastObject, HitObject lastLastObject, Func<double, double> clockTimeAt)
         {
             double prevLength = clockTimeAt(lastObject.StartTime) - clockTimeAt(lastLastObject.StartTime);
