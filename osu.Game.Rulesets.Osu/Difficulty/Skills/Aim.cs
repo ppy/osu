@@ -73,13 +73,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                     // add in angle velocity.
                     aimStrain += angleBonus;
-                }
 
-                if (prevVector.Length > currVector.Length)
-                {
-                    double velChangeBonus = Math.Max(0, Math.Sqrt((prevVector.Length - currVector.Length) * currVector.Length) - Math.Max(0, currVector.Length - 100 / osuCurrObj.StrainTime)) * Math.Min(1, osuCurrObj.JumpDistance / 100);
+                    if (prevVector.Length > currVector.Length)
+                    {
+                        double velChangeBonus = Math.Max(0, Math.Sqrt((prevVector.Length - currVector.Length) * currVector.Length) - Math.Max(0, currVector.Length - 100 / osuCurrObj.StrainTime)) * Math.Min(1, osuCurrObj.JumpDistance / 100);
 
-                    aimStrain += velChangeBonus * vel_change_multiplier;
+                        aimStrain += velChangeBonus * (1 + wideAngleBonus)* vel_change_multiplier;
+                    }
                 }
             }
             else // There is a rhythm change
