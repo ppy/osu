@@ -64,19 +64,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             if (!(obj is DrawableSlider))
                 return;
 
-            const float fade_out_time = 112.5f;
+            const float fade_out_time = 450f;
 
             using (BeginAbsoluteSequence(slider.StateUpdateTime))
                 this.FadeIn().ScaleTo(1f);
 
             using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
             {
-                this.FadeOut(fade_out_time, Easing.Out);
+                this.FadeOut(fade_out_time / 4, Easing.Out);
 
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        this.ScaleTo(1.1f, fade_out_time, Easing.Out);
+                        this.ScaleTo(1.4f, fade_out_time, Easing.Out);
                         break;
                 }
             }

@@ -64,13 +64,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             if (!(obj is DrawableSlider))
                 return;
 
-            const float fade_out_time = 112.5f;
+            const float fade_out_time = 450f;
 
             using (BeginAbsoluteSequence(slider.StateUpdateTime))
                 this.FadeIn();
 
             using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
-                this.FadeOut(fade_out_time, Easing.Out);
+                this.FadeOut(fade_out_time / 4, Easing.Out);
         }
 
         protected override void Dispose(bool isDisposing)
