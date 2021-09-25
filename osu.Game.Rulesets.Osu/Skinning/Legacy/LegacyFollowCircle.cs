@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Framework.Logging;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -15,6 +14,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     {
         private readonly Drawable animationContent;
         private DrawableSlider slider;
+        private readonly Bindable<bool> trackingBindable = new Bindable<bool>();
 
         public LegacyFollowCircle(Drawable animationContent)
         {
@@ -32,7 +32,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             animationContent.Anchor = Anchor.Centre;
             animationContent.Origin = Anchor.Centre;
 
-            slider.Tracking.BindValueChanged(trackingChanged, true);
+            trackingBindable.BindTo(slider.Tracking);
+            trackingBindable.BindValueChanged(trackingChanged, true);
             slider.ApplyCustomUpdateState += updateStateTransforms;
         }
 
@@ -66,11 +67,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             const float fade_out_time = 200f;
 
-            using (BeginAbsoluteSequence(slider.HitObject.EndTime))
+            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
             {
                 this.FadeOut(fade_out_time, Easing.InQuint);
-                this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 0.8f, fade_out_time, Easing.None);
+                this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 0.8f, fade_out_time);
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (slider != null)
+                slider.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

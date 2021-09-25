@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     case OsuSkinComponents.SliderFollowCircle:
                         var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true);
+
                         if (followCircleContent != null)
                         {
                             // follow circles are 2x the hitcircle resolution in legacy skins (since they are scaled down from >1x

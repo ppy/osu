@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     public class DefaultSliderBall : CompositeDrawable
     {
         private Box box;
-
         private DrawableSlider slider;
+        private readonly Bindable<bool> trackingBindable = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject, ISkinSource skin)
@@ -51,7 +51,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 }
             };
 
-            slider.Tracking.BindValueChanged(trackingChanged, true);
+            trackingBindable.BindTo(slider.Tracking);
+            trackingBindable.BindValueChanged(trackingChanged, true);
             slider.ApplyCustomUpdateState += updateStateTransforms;
         }
 
@@ -65,12 +66,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             const float fade_out_time = 112.5f;
 
-            using (BeginAbsoluteSequence(slider.HitObject.StartTime))
+            using (BeginAbsoluteSequence(slider.StateUpdateTime))
                 this.FadeIn().ScaleTo(1f);
 
-            using (BeginAbsoluteSequence(slider.HitObject.EndTime))
+            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
             {
                 this.FadeOut(fade_out_time, Easing.Out);
+
                 switch (state)
                 {
                     case ArmedState.Hit:
@@ -78,6 +80,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         break;
                 }
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (slider != null)
+                slider.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

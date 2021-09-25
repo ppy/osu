@@ -79,11 +79,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (!(obj is DrawableSlider))
                 return;
 
-            using (BeginAbsoluteSequence(slider.HitObject.StartTime))
+            using (BeginAbsoluteSequence(slider.StateUpdateTime))
                 this.FadeIn();
 
-            using (BeginAbsoluteSequence(slider.HitObject.EndTime))
+            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
                 this.FadeOut();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (slider != null)
+                slider.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     public class DefaultFollowCircle : CompositeDrawable
     {
         private DrawableSlider slider;
+        private readonly Bindable<bool> trackingBindable = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject)
@@ -22,7 +23,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             slider = (DrawableSlider)drawableObject;
 
             RelativeSizeAxes = Axes.Both;
-            Alpha = 1f;
 
             InternalChild = new CircularContainer
             {
@@ -39,7 +39,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 }
             };
 
-            slider.Tracking.BindValueChanged(trackingChanged, true);
+            trackingBindable.BindTo(slider.Tracking);
+            trackingBindable.BindValueChanged(trackingChanged, true);
             slider.ApplyCustomUpdateState += updateStateTransforms;
         }
 
@@ -48,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             bool tracking = e.NewValue;
 
             if (slider.Ball.InputTracksVisualSize)
-                this.ScaleTo(tracking ? DrawableSliderBall.FOLLOW_AREA: 1f, 300, Easing.OutQuint);
+                this.ScaleTo(tracking ? DrawableSliderBall.FOLLOW_AREA : 1f, 300, Easing.OutQuint);
             else
             {
                 // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
@@ -62,11 +63,22 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             if (!(obj is DrawableSlider))
                 return;
-            
+
             const float fade_out_time = 112.5f;
 
-            using (BeginAbsoluteSequence(slider.HitObject.EndTime))
+            using (BeginAbsoluteSequence(slider.StateUpdateTime))
+                this.FadeIn();
+
+            using (BeginAbsoluteSequence(slider.HitStateUpdateTime))
                 this.FadeOut(fade_out_time, Easing.Out);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (slider != null)
+                slider.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
