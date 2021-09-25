@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(m => m is OsuModBlinds))
-                aimValue *= blindsMultiplier;
+                aimValue *= 1.0 + blindsMultiplier;
             else if (mods.Any(h => h is OsuModHidden))
                 aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
@@ -149,8 +149,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             speedValue *= 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
 
+            // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (mods.Any(m => m is OsuModBlinds))
-                speedValue *= blindsMultiplier;
+                speedValue *= 1.12;
             else if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
@@ -184,8 +185,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
             accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
 
+            // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (mods.Any(m => m is OsuModBlinds))
-                accuracyValue *= blindsMultiplier;
+                accuracyValue *= 1.14;
             else if (mods.Any(m => m is OsuModHidden))
                 accuracyValue *= 1.08;
             if (mods.Any(m => m is OsuModFlashlight))
@@ -232,6 +234,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
-        private double blindsMultiplier => 1.0 + ((0.12 + totalHits * (0.0008 / (1 + 2 * countMiss))) * Math.Pow(accuracy, 16)) * (1 - 0.003 * Attributes.DrainRate * Attributes.DrainRate);
+        private double blindsMultiplier => (0.12 + totalHits * (0.0008 / (1 + 2 * countMiss)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * Attributes.DrainRate * Attributes.DrainRate);
     }
 }
