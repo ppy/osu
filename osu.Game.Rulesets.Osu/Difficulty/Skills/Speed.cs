@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
 
-        private const double rhythm_multiplier = 2.5;
-        private const int history_time_max = 3000; // 3 seconds of calculatingRhythmBonus max.
+        private const double rhythm_multiplier = 0.75;
+        private const int history_time_max = 5000; // 5 seconds of calculatingRhythmBonus max.
 
         private double skillMultiplier => 1375;
         private double strainDecayBase => 0.3;
@@ -35,20 +35,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double DifficultyMultiplier => 1.04;
 
         private const double min_speed_bonus = 75; // ~200BPM
-        private const double max_speed_bonus = 45; // ~330BPM
+        private const double max_speed_bonus = 45;
         private const double speed_balancing_factor = 40;
 
         protected override int HistoryLength => 32;
 
-        public Speed(Mod[] mods)
+        private readonly double greatWindow;
+
+        public Speed(Mod[] mods, double hitWindowGreat)
             : base(mods)
         {
+            greatWindow = hitWindowGreat;
         }
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        private double calculateRhythmBonus(DifficultyHitObject current)
+        private double calculateRhythmBonus(DifficultyHitObject current, double greatWindowFull)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -77,7 +80,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     double effectiveRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
 
                     if (effectiveRatio > 0.5)
-                        effectiveRatio = 0.5 + (effectiveRatio - 0.5) * 5; // large buff for 1/3 -> 1/4 type transitions.
+                        effectiveRatio = 0.5 + (effectiveRatio - 0.5) * 10; // large buff for 1/3 -> 1/4 type transitions.
+
+                    effectiveRatio *= Math.Max(prevDelta, currDelta) / greatWindowFull; // Increase scaling for when hitwindow is large but accuracy range is small.
 
                     effectiveRatio *= currHistoricalDecay; // scale with time
 
@@ -89,6 +94,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                         }
                         else
                         {
+
+
                             if (islandSize > 6)
                                 islandSize = 6;
 
@@ -123,20 +130,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
-            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity)
+            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
         }
 
-        private double tapStrainOf(DifficultyHitObject current, double speedBonus)
+        private double tapStrainOf(DifficultyHitObject current, double speedBonus, double strainTime)
         {
             if (current.BaseObject is Spinner)
                 return 0;
 
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-
-            return speedBonus / osuCurrObj.StrainTime;
+            return speedBonus / strainTime;
         }
 
-        private double movementStrainOf(DifficultyHitObject current, double speedBonus)
+        private double movementStrainOf(DifficultyHitObject current, double speedBonus, double strainTime)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -144,7 +149,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuCurrObj = (OsuDifficultyHitObject)current;
 
             double distance = Math.Min(single_spacing_threshold, osuCurrObj.TravelDistance + osuCurrObj.JumpDistance);
-
             double angleBonus = 1.0;
 
             if (osuCurrObj.Angle != null)
@@ -157,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     angleBonus = 1 + Math.Pow(Math.Sin(1.5 * (angle_bonus_begin - angle)), 2) / 4;
             }
 
-            return (angleBonus * speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / osuCurrObj.StrainTime;
+            return (angleBonus * speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / strainTime;
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -166,21 +170,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
+            // derive strainTime for calculation
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            var osuPrevObj = Previous.Count > 0 ? (OsuDifficultyHitObject)Previous[0] : null;
+
+            double strainTime = osuCurrObj.StrainTime;
+            double greatWindowFull = greatWindow * 2;
+            double speedWindowRatio = strainTime / greatWindowFull;
+
+            // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
+            if (osuPrevObj != null && strainTime < greatWindowFull && osuPrevObj.StrainTime > strainTime)
+                strainTime = Interpolation.Lerp(osuPrevObj.StrainTime, strainTime, speedWindowRatio);
+
+            // Cap deltatime to the OD 300 hitwindow.
+            // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
+            strainTime /= Math.Clamp((strainTime / greatWindowFull) / 0.93, 0.92, 1);
+
+            // derive speedBonus for calculation
             double speedBonus = 1.0;
-            double deltaTime = Math.Max(max_speed_bonus, current.DeltaTime);
 
-            if (deltaTime < min_speed_bonus)
-                speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
+            if (strainTime < min_speed_bonus)
+                speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
-            currentRhythm = calculateRhythmBonus(current);
+            currentRhythm = calculateRhythmBonus(current, greatWindowFull);
 
             double decay = strainDecay(current.DeltaTime);
 
             currentTapStrain *= decay;
-            currentTapStrain += tapStrainOf(current, speedBonus) * skillMultiplier;
+            currentTapStrain += tapStrainOf(current, speedBonus, strainTime) * skillMultiplier;
 
             currentMovementStrain *= decay;
-            currentMovementStrain += movementStrainOf(current, speedBonus) * skillMultiplier;
+            currentMovementStrain += movementStrainOf(current, speedBonus, strainTime) * skillMultiplier;
 
             return currentMovementStrain + currentTapStrain * currentRhythm;
         }

@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
@@ -55,12 +56,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
             this.FadeOut(fade_duration, Easing.OutQuint);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (State.Value == Visibility.Hidden)
                 return false;
 
-            if (action == GlobalAction.Back)
+            if (e.Action == GlobalAction.Back)
             {
                 Hide();
                 return true;
@@ -69,7 +70,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
     }
