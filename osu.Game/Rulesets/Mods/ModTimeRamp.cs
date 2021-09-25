@@ -86,6 +86,8 @@ namespace osu.Game.Rulesets.Mods
             return rate * Math.Round(ramp, 2);
         }
 
+        public double GetAverageRate() => ((2 * InitialRate.Value) + (3 * FinalRate.Value)) / 5;
+
         public double GetTimeAt(double time)
         {
             if (time < beginRampTime)

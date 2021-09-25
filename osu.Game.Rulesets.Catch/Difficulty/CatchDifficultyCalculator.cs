@@ -34,8 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 return new CatchDifficultyAttributes { Mods = mods, Skills = skills };
 
             // For the time being, we use the clockrate at the beginning of the map for OD and AR attributes
-            double baseClockRate = 1;
-            baseClockRate = mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, mod) => prod * mod.ApplyToRate(prod));
+            double baseClockRate = mods.OfType<IApplicableToRate>().SingleOrDefault()?.GetAverageRate() ?? 1.0;
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / baseClockRate;
