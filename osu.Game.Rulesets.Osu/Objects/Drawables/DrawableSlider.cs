@@ -32,6 +32,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SliderBall Ball { get; private set; }
         public SkinnableDrawable Body { get; private set; }
 
+        /// <summary>
+        /// A target container which can be used to add top level elements to the slider's display.
+        /// Intended to be used for proxy purposes only.
+        /// </summary>
+        public Container OverlayElementContainer { get; private set; }
+
         public override bool DisplayResult => !HitObject.OnlyJudgeNestedObjects;
 
         [CanBeNull]
@@ -65,6 +71,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
+                headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
+                OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
                 Ball = new SliderBall(this)
                 {
                     GetInitialHitAction = () => HeadCircle.HitAction,
@@ -72,7 +80,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
                 slidingSample = new PausableSkinnableSound { Looping = true }
             };
 
@@ -179,6 +186,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             tailContainer.Clear(false);
             repeatContainer.Clear(false);
             tickContainer.Clear(false);
+
+            OverlayElementContainer.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)

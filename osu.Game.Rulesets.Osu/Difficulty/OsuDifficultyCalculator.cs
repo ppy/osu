@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.0675;
+        private double hitWindowGreat;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -35,15 +36,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
+            double flashlightRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
 
             double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
             double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating / 0.0675) - 4, 3) / 100000;
-            double basePerformance = Math.Pow(Math.Pow(baseAimPerformance, 1.1) + Math.Pow(baseSpeedPerformance, 1.1), 1 / 1.1);
+            double baseFlashlightPerformance = 0.0;
+
+            if (mods.Any(h => h is OsuModFlashlight))
+                baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
+
+            double basePerformance =
+                Math.Pow(
+                    Math.Pow(baseAimPerformance, 1.1) +
+                    Math.Pow(baseSpeedPerformance, 1.1) +
+                    Math.Pow(baseFlashlightPerformance, 1.1), 1.0 / 1.1
+                );
+
             double starRating = basePerformance > 0.00001 ? Math.Cbrt(1.12) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
-
-            HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
-
+            
             // For the time being, we use the clockrate at the beginning of the map for OD and AR attributes
             double baseClockRate = 1;
             baseClockRate = mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, mod) => prod * mod.ApplyToRate(prod));
@@ -65,6 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Mods = mods,
                 AimStrain = aimRating,
                 SpeedStrain = speedRating,
+                FlashlightRating = flashlightRating,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo,
@@ -88,11 +99,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, Func<double, double> clockTimeAt) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, Func<double, double> clockTimeAt)
         {
-            new Aim(mods),
-            new Speed(mods)
-        };
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            
+            // For the time being, we use the clockrate at the beginning of the map for OD and AR attributes
+            double baseClockRate = 1;
+            baseClockRate = mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, mod) => prod * mod.ApplyToRate(prod));
+
+            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
+            hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / baseClockRate;
+
+            return new Skill[]
+            {
+                new Aim(mods),
+                new Speed(mods, hitWindowGreat),
+                new Flashlight(mods)
+            };
+        }
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
@@ -100,6 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new OsuModHalfTime(),
             new OsuModEasy(),
             new OsuModHardRock(),
+            new OsuModFlashlight(),
         };
     }
 }
