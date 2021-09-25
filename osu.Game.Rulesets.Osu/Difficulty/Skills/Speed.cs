@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
 
-        private const double rhythm_multiplier = 0.75;
+        private const double rhythm_multiplier = 0.5;
         private const int history_time_max = 5000; // 5 seconds of calculatingRhythmBonus max.
 
         private double skillMultiplier => 1375;
