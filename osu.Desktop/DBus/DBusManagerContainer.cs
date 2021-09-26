@@ -166,15 +166,17 @@ namespace osu.Desktop.DBus
             beatmapService.Storage = storage;
 
             mprisService.UseAvatarLogoAsDefault = config.GetBindable<bool>(MSetting.MprisUseAvatarlogoAsCover);
-            mprisService.Next += () => musicController.NextTrack();
+
+            //添加Schedule确保这些调用会在Update上执行
+            mprisService.Next += () => musicController.NextTrack(); //NextTrack和PreviousTrack已经有Schedule了
             mprisService.Previous += () => musicController.PreviousTrack();
-            mprisService.Play += () => musicController.Play(requestedByUser: true);
-            mprisService.Pause += () => musicController.Stop(true);
+            mprisService.Play += () => Schedule(() => musicController.Play(requestedByUser: true));
+            mprisService.Pause += () => Schedule(() => musicController.Stop(true));
             mprisService.Quit += exitGame;
-            mprisService.Seek += t => musicController.SeekTo(t);
-            mprisService.Stop += () => musicController.Stop(true);
-            mprisService.PlayPause += () => musicController.TogglePause();
-            mprisService.OpenUri += game.HandleLink;
+            mprisService.Seek += t => Schedule(() => musicController.SeekTo(t));
+            mprisService.Stop += () => Schedule(() => musicController.Stop(true));
+            mprisService.PlayPause += () => Schedule(() => musicController.TogglePause());
+            mprisService.OpenUri += s => Schedule(() => game.HandleLink(s));
             mprisService.WindowRaise += raiseWindow;
 
             kdeTrayService.WindowRaise += raiseWindow;
@@ -203,11 +205,10 @@ namespace osu.Desktop.DBus
         {
             if (!sdl2DesktopWindow.Visible) sdl2DesktopWindow.Visible = true;
 
-            sdl2DesktopWindow.Raise();
+            Schedule(sdl2DesktopWindow.Raise);
         }
 
-        private void exitGame()
-            => Schedule(game.GracefullyExit);
+        private void exitGame() => Schedule(game.GracefullyExit);
 
         private void onMessageRevicedFromDBus(string message)
         {
