@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -45,13 +46,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Put earlier blueprints towards the end of the list, so they handle input first
             int i = yObj.Item.StartTime.CompareTo(xObj.Item.StartTime);
-
             if (i != 0) return i;
 
             // Fall back to end time if the start time is equal.
             i = yObj.Item.GetEndTime().CompareTo(xObj.Item.GetEndTime());
+            if (i != 0) return i;
 
-            return i == 0 ? CompareReverseChildID(y, x) : i;
+            // As a final fallback, use combo information if available.
+            if (xObj.Item is IHasComboInformation xHasCombo && yObj.Item is IHasComboInformation yHasCombo)
+            {
+                i = yHasCombo.ComboIndex.CompareTo(xHasCombo.ComboIndex);
+                if (i != 0) return i;
+
+                i = yHasCombo.IndexInCurrentCombo.CompareTo(xHasCombo.IndexInCurrentCombo);
+                if (i != 0) return i;
+            }
+
+            return CompareReverseChildID(y, x);
         }
 
         protected override void Dispose(bool isDisposing)
