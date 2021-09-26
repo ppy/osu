@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -165,6 +166,8 @@ namespace osu.Desktop
             desktopWindow.SetIconFromStream(iconStream);
             desktopWindow.Title = Name;
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
+
+            desktopWindow.MinimumSize = new Size(600, 600);
 
             desktopWindow.OnTextEdit += s =>
             {

@@ -143,10 +143,7 @@ namespace osu.Desktop.DBus
                         OnActive = exitGame,
                         IconName = "application-exit"
                     },
-                    new SeparatorEntry
-                    {
-                        Label = "分割符"
-                    }
+                    new SeparatorEntry()
                 });
 
                 enableTray.BindValueChanged(onEnableTrayChanged, true);
