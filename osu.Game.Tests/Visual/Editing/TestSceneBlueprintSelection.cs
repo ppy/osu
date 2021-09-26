@@ -7,9 +7,13 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
@@ -66,5 +70,36 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("selection is unchanged", () => EditorBeatmap.SelectedHitObjects.Single() == firstSlider);
         }
+
+        [Test]
+        public void TestOverlappingObjectsWithSameStartTime()
+        {
+            AddStep("add overlapping circles", () =>
+            {
+                EditorBeatmap.Add(createHitCircle(50, OsuPlayfield.BASE_SIZE / 2));
+                EditorBeatmap.Add(createHitCircle(50, OsuPlayfield.BASE_SIZE / 2 + new Vector2(-10, -20)));
+                EditorBeatmap.Add(createHitCircle(50, OsuPlayfield.BASE_SIZE / 2 + new Vector2(10, -20)));
+            });
+
+            AddStep("click at centre of playfield", () =>
+            {
+                var hitObjectContainer = Editor.ChildrenOfType<HitObjectContainer>().Single();
+                var centre = hitObjectContainer.ToScreenSpace(OsuPlayfield.BASE_SIZE / 2);
+                InputManager.MoveMouseTo(centre);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("frontmost object selected", () =>
+            {
+                var hasCombo = Editor.ChildrenOfType<HitCircleSelectionBlueprint>().Single(b => b.IsSelected).Item as IHasComboInformation;
+                return hasCombo?.IndexInCurrentCombo == 0;
+            });
+        }
+
+        private HitCircle createHitCircle(double startTime, Vector2 position) => new HitCircle
+        {
+            StartTime = startTime,
+            Position = position,
+        };
     }
 }
