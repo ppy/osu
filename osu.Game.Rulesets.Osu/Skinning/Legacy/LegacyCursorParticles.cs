@@ -39,9 +39,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [Resolved(canBeNull: true)]
         private GameplayBeatmap gameplayBeatmap { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private GameplayClock gameplayClock { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, OsuColour colours)
         {
@@ -83,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             DrawableHitObject kiaiHitObject = null;
 
             // Check whether currently in a kiai section first. This is only done as an optimisation to avoid enumerating AliveObjects when not necessary.
-            if (gameplayBeatmap.ControlPointInfo.EffectPointAt(gameplayBeatmap.Time.Current).KiaiMode)
+            if (gameplayBeatmap.ControlPointInfo.EffectPointAt(Time.Current).KiaiMode)
                 kiaiHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(isTracking);
 
             kiaiSpewer.Active.Value = kiaiHitObject != null;

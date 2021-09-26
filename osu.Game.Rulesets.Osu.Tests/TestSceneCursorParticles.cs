@@ -98,6 +98,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     var controlPointInfo = new ControlPointInfo();
                     controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
+                    controlPointInfo.Add(5000, new EffectControlPoint { KiaiMode = false });
 
                     return new Beatmap
                     {
