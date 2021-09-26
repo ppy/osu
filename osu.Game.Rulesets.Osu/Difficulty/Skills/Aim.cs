@@ -29,8 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double wide_angle_multiplier = 1.0;
         private const double acute_angle_multiplier = 1.0;
         private const double rhythm_variance_multiplier = 1.0;
-        private const double slider_multiplier = 6.5;
-        private const double slider_jump_multiplier = 0.875;
+        private const double slider_multiplier = 4.25;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -90,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (osuCurrObj.TravelDistance != 0)
             {
-                double sliderBonus = Math.Max(osuCurrObj.TravelDistance, slider_jump_multiplier * Math.Sqrt(osuCurrObj.TravelDistance * osuCurrObj.JumpDistance)) / osuCurrObj.StrainTime;
+                double sliderBonus = (Math.Max(0, Vector2.Subtract(osuCurrObj.TravelVector, osuCurrObj.JumpVector).Length - osuCurrObj.JumpDistance) + osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
 
                 // Add in slider velocity.
                 aimStrain += sliderBonus * slider_multiplier;
