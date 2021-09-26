@@ -20,14 +20,14 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorSelection : EditorTestScene
+    public class TestSceneComposerSelection : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 
-        private EditorBlueprintContainer blueprintContainer
-            => Editor.ChildrenOfType<EditorBlueprintContainer>().First();
+        private ComposeBlueprintContainer blueprintContainer
+            => Editor.ChildrenOfType<ComposeBlueprintContainer>().First();
 
         private void moveMouseToObject(Func<HitObject> targetFunc)
         {
