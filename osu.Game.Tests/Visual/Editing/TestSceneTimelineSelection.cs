@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -159,5 +160,72 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count == 0);
         }
+
+        [Test]
+        public void TestRangeSelect()
+        {
+            var addedObjects = new[]
+            {
+                new HitCircle { StartTime = 100 },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
+                new HitCircle { StartTime = 500, Position = new Vector2(400) },
+            };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
+
+            moveMouseToObject(() => addedObjects[1]);
+            AddStep("click second", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObjects[1]);
+
+            AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
+
+            moveMouseToObject(() => addedObjects[3]);
+            AddStep("click fourth", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(addedObjects.Skip(1).Take(3));
+
+            moveMouseToObject(() => addedObjects[0]);
+            AddStep("click first", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(addedObjects.Take(2));
+
+            AddStep("clear selection", () => EditorBeatmap.SelectedHitObjects.Clear());
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+
+            moveMouseToObject(() => addedObjects[0]);
+            AddStep("click first", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(addedObjects.Take(1));
+
+            AddStep("hold ctrl", () => InputManager.PressKey(Key.ControlLeft));
+            moveMouseToObject(() => addedObjects[2]);
+            AddStep("click third", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(new[] { addedObjects[0], addedObjects[2] });
+
+            AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
+            moveMouseToObject(() => addedObjects[4]);
+            AddStep("click fifth", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(addedObjects.Except(new[] { addedObjects[1] }));
+
+            moveMouseToObject(() => addedObjects[0]);
+            AddStep("click first", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(addedObjects);
+
+            AddStep("clear selection", () => EditorBeatmap.SelectedHitObjects.Clear());
+            moveMouseToObject(() => addedObjects[0]);
+            AddStep("click first", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(addedObjects.Take(1));
+
+            moveMouseToObject(() => addedObjects[1]);
+            AddStep("click first", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(addedObjects.Take(2));
+
+            moveMouseToObject(() => addedObjects[2]);
+            AddStep("click first", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(addedObjects.Take(3));
+        }
+
+        private void assertSelectionIs(IEnumerable<HitObject> hitObjects)
+            => AddAssert("correct hitobjects selected", () => EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).SequenceEqual(hitObjects));
     }
 }

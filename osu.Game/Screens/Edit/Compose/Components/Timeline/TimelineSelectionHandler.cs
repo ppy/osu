@@ -1,13 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -61,6 +64,36 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 h.StartTime += adjustment;
                 EditorBeatmap.Update(h);
             });
+        }
+
+        internal override bool MouseDownSelectionRequested(SelectionBlueprint<HitObject> blueprint, MouseButtonEvent e)
+        {
+            if (e.ShiftPressed && e.Button == MouseButton.Left && SelectedItems.Any())
+            {
+                handleRangeSelection(blueprint);
+                return true;
+            }
+
+            return base.MouseDownSelectionRequested(blueprint, e);
+        }
+
+        private void handleRangeSelection(SelectionBlueprint<HitObject> blueprint)
+        {
+            var clickedObject = blueprint.Item;
+            double rangeStart = clickedObject.StartTime;
+            double rangeEnd = clickedObject.GetEndTime();
+
+            foreach (var selectedObject in SelectedItems)
+            {
+                rangeStart = Math.Min(rangeStart, selectedObject.StartTime);
+                rangeEnd = Math.Max(rangeEnd, selectedObject.GetEndTime());
+            }
+
+            EditorBeatmap.SelectedHitObjects.Clear();
+            EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects.Where(obj => isInRange(obj, rangeStart, rangeEnd)));
+
+            bool isInRange(HitObject hitObject, double start, double end)
+                => hitObject.StartTime >= start && hitObject.GetEndTime() <= end;
         }
     }
 }
