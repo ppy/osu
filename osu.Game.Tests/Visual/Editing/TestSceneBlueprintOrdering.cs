@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
@@ -94,6 +95,32 @@ namespace osu.Game.Tests.Visual.Editing
                 var hasCombo = Editor.ChildrenOfType<HitCircleSelectionBlueprint>().Single(b => b.IsSelected).Item as IHasComboInformation;
                 return hasCombo?.IndexInCurrentCombo == 0;
             });
+        }
+
+        [Test]
+        public void TestPlacementOfConcurrentObjectWithDuration()
+        {
+            AddStep("seek to timing point", () => EditorClock.Seek(2170));
+            AddStep("add hit circle", () => EditorBeatmap.Add(createHitCircle(2170, Vector2.Zero)));
+
+            AddStep("choose spinner placement tool", () =>
+            {
+                InputManager.Key(Key.Number4);
+                var hitObjectContainer = Editor.ChildrenOfType<HitObjectContainer>().Single();
+                InputManager.MoveMouseTo(hitObjectContainer.ScreenSpaceDrawQuad.Centre);
+            });
+
+            AddStep("begin placing spinner", () =>
+            {
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("end placing spinner", () =>
+            {
+                EditorClock.Seek(2500);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddAssert("two timeline blueprints present", () => Editor.ChildrenOfType<TimelineHitObjectBlueprint>().Count() == 2);
         }
 
         private HitCircle createHitCircle(double startTime, Vector2 position) => new HitCircle
