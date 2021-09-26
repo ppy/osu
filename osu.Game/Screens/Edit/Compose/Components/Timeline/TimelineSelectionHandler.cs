@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -66,31 +69,58 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
         }
 
+        /// <summary>
+        /// The "pivot" object, used in range selection mode.
+        /// When in range selection, the range to select is determined by the pivot object
+        /// (last existing object interacted with prior to holding down Shift)
+        /// and by the object clicked last when Shift was pressed.
+        /// </summary>
+        [CanBeNull]
+        private HitObject pivot;
+
         internal override bool MouseDownSelectionRequested(SelectionBlueprint<HitObject> blueprint, MouseButtonEvent e)
         {
             if (e.ShiftPressed && e.Button == MouseButton.Left && SelectedItems.Any())
             {
-                handleRangeSelection(blueprint);
+                handleRangeSelection(blueprint, e.ControlPressed);
                 return true;
             }
 
-            return base.MouseDownSelectionRequested(blueprint, e);
+            bool result = base.MouseDownSelectionRequested(blueprint, e);
+            // ensure that the object wasn't removed by the base implementation before making it the new pivot.
+            if (EditorBeatmap.HitObjects.Contains(blueprint.Item))
+                pivot = blueprint.Item;
+            return result;
         }
 
-        private void handleRangeSelection(SelectionBlueprint<HitObject> blueprint)
+        /// <summary>
+        /// Handles a request for range selection (triggered when Shift is held down).
+        /// </summary>
+        /// <param name="blueprint">The blueprint which was clicked in range selection mode.</param>
+        /// <param name="cumulative">
+        /// Whether the selection should be cumulative.
+        /// In cumulative mode, consecutive range selections will shift the pivot (which usually stays fixed for the duration of a range selection)
+        /// and will never deselect an object that was previously selected.
+        /// </param>
+        private void handleRangeSelection(SelectionBlueprint<HitObject> blueprint, bool cumulative)
         {
             var clickedObject = blueprint.Item;
-            double rangeStart = clickedObject.StartTime;
-            double rangeEnd = clickedObject.GetEndTime();
 
-            foreach (var selectedObject in SelectedItems)
+            Debug.Assert(pivot != null);
+
+            double rangeStart = Math.Min(clickedObject.StartTime, pivot.StartTime);
+            double rangeEnd = Math.Max(clickedObject.GetEndTime(), pivot.GetEndTime());
+
+            var newSelection = new HashSet<HitObject>(EditorBeatmap.HitObjects.Where(obj => isInRange(obj, rangeStart, rangeEnd)));
+
+            if (cumulative)
             {
-                rangeStart = Math.Min(rangeStart, selectedObject.StartTime);
-                rangeEnd = Math.Max(rangeEnd, selectedObject.GetEndTime());
+                pivot = clickedObject;
+                newSelection.UnionWith(EditorBeatmap.SelectedHitObjects);
             }
 
             EditorBeatmap.SelectedHitObjects.Clear();
-            EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects.Where(obj => isInRange(obj, rangeStart, rangeEnd)));
+            EditorBeatmap.SelectedHitObjects.AddRange(newSelection);
 
             bool isInRange(HitObject hitObject, double start, double end)
                 => hitObject.StartTime >= start && hitObject.GetEndTime() <= end;
