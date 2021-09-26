@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
 
-        private const double rhythm_multiplier = 0.5;
+        private const double rhythm_multiplier = 2.0;
         private const int history_time_max = 5000; // 5 seconds of calculatingRhythmBonus max.
 
         private double skillMultiplier => 1375;
@@ -80,9 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     double effectiveRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
 
                     if (effectiveRatio > 0.5)
-                        effectiveRatio = 0.5 + (effectiveRatio - 0.5) * 10; // large buff for 1/3 -> 1/4 type transitions.
-
-                    effectiveRatio *= Math.Max(prevDelta, currDelta) / greatWindowFull; // Increase scaling for when hitwindow is large but accuracy range is small.
+                        effectiveRatio = 0.5 + (effectiveRatio - 0.5) * 5; // large buff for 1/3 -> 1/4 type transitions.
 
                     effectiveRatio *= currHistoricalDecay; // scale with time
 
@@ -130,7 +128,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
-            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
+            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier * Math.Sqrt(52 / greatWindowFull)) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
         }
 
         private double tapStrainOf(DifficultyHitObject current, double speedBonus, double strainTime)
