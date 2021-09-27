@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             string lookupName = new OsuSkinComponent(OsuSkinComponents.ReverseArrow).LookupName;
 
-            var skin = skinSource.FindProvider(skin => skin.GetTexture(lookupName) != null);
+            var skin = skinSource.FindProvider(s => s.GetTexture(lookupName) != null);
             InternalChild = skin?.GetAnimation(lookupName, true, true) ?? Empty();
         }
 
