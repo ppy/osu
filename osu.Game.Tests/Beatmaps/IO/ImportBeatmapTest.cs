@@ -146,13 +146,16 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = LoadOsuIntoHost(host);
 
                     var temp = TestResources.GetTestBeatmapForImport();
+                    //Folder to export to
+                    string extractedFolder = $"{temp}_extracted";
+                    Directory.CreateDirectory(extractedFolder);
 
-                    //Full path to the export folder created in Temp\of-test-headless
-                    string exportFullPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp\\of-test-headless\\TestExportBeatMapWithInvalidCharactersPathImportBeatmapTest\\exports");
+                    //Full path to the exported .osz file (the last part of the path gets added on Line 188 after the beatmap gets loaded)
+                    string exportFullPath = extractedFolder;
 
                     try
                     {
-                        //Storing the content of .osz archive before and after being exported
+                        //Lists for storing the content of .osz archive before and after being exported
                         List<string> firstOszFiles = new List<string>();
                         List<string> secondOszFiles = new List<string>();
 
@@ -172,7 +175,9 @@ namespace osu.Game.Tests.Beatmaps.IO
                         foreach (var beatmapInfo in cloneFirstImport.Beatmaps)
                         {
                             //Construct path as in osu.Game/Beatmaps/BeatmapManager.cs function Save() Line 270
-                            beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu";
+                            //The extra \\ are added in case the beatmap metadata doesn't contain invalid characters, it ensures that the path has invalid characters
+                            //Before applying the fix on line 183
+                            beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [\\{beatmapInfo.Version}].osu";
 
                             //Remove invalid characters as done in the same Save() function by calling the protected static function GetValidFilename()
                             foreach (char c in Path.GetInvalidFileNameChars())
@@ -180,10 +185,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                         }
 
                         // Exporting the new cloneFirstImport
-                        var manager = osu.Dependencies.Get<BeatmapManager>();
-                        manager.Export(cloneFirstImport);
-
-                        exportFullPath += $"\\{cloneFirstImport.Metadata}.osz";
+                        exportFullPath += $"\\{cloneFirstImport}.osz";
+                        exportTestBeatmap(osu, cloneFirstImport, exportFullPath);
 
                         //After Export
                         using (var secondZip = ZipFile.Open(exportFullPath, ZipArchiveMode.Read))
@@ -195,7 +198,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                         //Checking if both .osz are the same size
                         Assert.IsTrue(firstOszFiles.Count == secondOszFiles.Count);
 
-                        //Sorting both lists to compare
+                        //Sorting both lists before comparison
                         firstOszFiles.Sort();
                         secondOszFiles.Sort();
                         for (int i = 0; i < firstOszFiles.Count; i++)
@@ -204,6 +207,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     finally
                     {
                         File.Delete(exportFullPath);
+                        Directory.Delete(extractedFolder);
                     }
                 }
                 finally
@@ -1057,6 +1061,26 @@ namespace osu.Game.Tests.Beatmaps.IO
         private static void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
         {
             Assert.AreEqual(expected, osu.Dependencies.Get<FileStore>().QueryFiles(f => f.ReferenceCount == 1).Count());
+        }
+
+        /// <summary>
+        /// Function that mimics the behaviour of Export in ArchiveModelManager, only difference is that it controls where exactly to export the beatmap
+        /// </summary>
+        /// <param name="osu"> Current TestOsuGameBase object</param>
+        /// <param name="beatmapToExport">BeatmapSetInfo object that needs to be exported</param>
+        /// <param name="path"> Full path to export the beatmap to (including the .osz part at the end)</param>
+        private void exportTestBeatmap(TestOsuGameBase osu, BeatmapSetInfo beatmapToExport, string path)
+        {
+            using (var outputStream = File.OpenWrite(path))
+            {
+                using (var archive = ZipArchive.Create())
+                {
+                    var files = osu.Dependencies.Get<FileStore>();
+                    foreach (var file in beatmapToExport.Files)
+                        archive.AddEntry(file.Filename, files.Storage.GetStream(file.FileInfo.StoragePath));
+                    archive.SaveTo(outputStream);
+                }
+            }
         }
 
         private static void ensureLoaded(OsuGameBase osu, int timeout = 60000)
