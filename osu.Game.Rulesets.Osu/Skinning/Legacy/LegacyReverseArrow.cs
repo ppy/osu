@@ -13,26 +13,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyReverseArrow : CompositeDrawable
     {
-        private ISkin skin { get; }
-
         [Resolved(canBeNull: true)]
         private DrawableHitObject drawableHitObject { get; set; }
 
         private Drawable proxy;
 
-        public LegacyReverseArrow(ISkin skin)
-        {
-            this.skin = skin;
-        }
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ISkinSource skinSource)
         {
             AutoSizeAxes = Axes.Both;
 
             string lookupName = new OsuSkinComponent(OsuSkinComponents.ReverseArrow).LookupName;
 
-            InternalChild = skin.GetAnimation(lookupName, true, true) ?? Empty();
+            var skin = skinSource.FindProvider(skin => skin.GetTexture(lookupName) != null);
+            InternalChild = skin?.GetAnimation(lookupName, true, true) ?? Empty();
         }
 
         protected override void LoadComplete()
