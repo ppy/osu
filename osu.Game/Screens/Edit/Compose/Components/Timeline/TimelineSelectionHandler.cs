@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         internal override bool MouseDownSelectionRequested(SelectionBlueprint<HitObject> blueprint, MouseButtonEvent e)
         {
-            if (e.ShiftPressed && e.Button == MouseButton.Left && SelectedItems.Any())
+            if (e.ShiftPressed && e.Button == MouseButton.Left && pivot != null)
             {
                 handleRangeSelection(blueprint, e.ControlPressed);
                 return true;
