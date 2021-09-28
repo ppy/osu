@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Pippidon
             return new DifficultyAttributes(mods, skills, 0);
         }
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Func<double, double> clockTimeAte) => Enumerable.Empty<DifficultyHitObject>();
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Func<double, double> clockTimeAt) => Enumerable.Empty<DifficultyHitObject>();
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, Func<double, double> clockTimeAt) => new Skill[0];
     }
