@@ -29,9 +29,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
 
-        private const double min_doubletap_nerf = 0.9; // minimum speedBonus value (eventually on stacked)
+        private const double min_doubletap_nerf = 0.75; // minimum speedBonus value (eventually on stacked)
         private const double max_doubletap_nerf = 1.0; // maximum speedBonus value 
-        private const double threshold_fully_contributing = 0.75; // minimum distance not influenced
+        private const double threshold_fully_contributing = 1.0; // minimum distance not influenced
 
         private readonly double greatWindow;
 
@@ -57,12 +57,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double speedWindowRatio = strainTime / greatWindowFull;
 
             // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
-            if (osuPrevious != null && strainTime < greatWindowFull && osuPrevious.StrainTime > strainTime)
-                strainTime = Interpolation.Lerp(osuPrevious.StrainTime, strainTime, speedWindowRatio);
+            //if (osuPrevious != null && strainTime < greatWindowFull && osuPrevious.StrainTime > strainTime)
+            //    strainTime = Interpolation.Lerp(osuPrevious.StrainTime, strainTime, speedWindowRatio);
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
-            strainTime /= Math.Clamp((strainTime / greatWindowFull) / 0.93, 0.92, 1);
+            //strainTime /= Math.Clamp((strainTime / greatWindowFull) / 0.93, 0.92, 1);
 
 
 
