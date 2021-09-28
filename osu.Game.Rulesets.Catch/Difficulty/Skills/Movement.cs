@@ -34,17 +34,21 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         /// </summary>
         private double catcherSpeedMultiplier;
 
+        private Func<double, double> getRateAt; 
+
         public Movement(Mod[] mods, float halfCatcherWidth, Func<double, double> clockTimeAt)
             : base(mods)
         {
             HalfCatcherWidth = halfCatcherWidth;
+
+            getRateAt = T => Mods.OfType<IApplicableToRate>().SingleOrDefault()?.ApplyToRate(T) ?? 1.0;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
 
-            catcherSpeedMultiplier = Mods.OfType<IApplicableToRate>().Aggregate(1.0, (prod, mod) => prod * mod.ApplyToRate(current.BaseObject.StartTime));
+            catcherSpeedMultiplier = getRateAt(current.BaseObject.StartTime);
 
             lastPlayerPosition ??= catchCurrent.LastNormalizedPosition;
 
