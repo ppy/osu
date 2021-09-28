@@ -46,25 +46,25 @@ namespace osu.Game.Overlays.Login
             {
                 username = new OsuTextBox
                 {
-                    PlaceholderText = "username",
+                    PlaceholderText = "用户名",
                     RelativeSizeAxes = Axes.X,
                     Text = api?.ProvidedUsername ?? string.Empty,
                     TabbableContentContainer = this
                 },
                 password = new OsuPasswordTextBox
                 {
-                    PlaceholderText = "password",
+                    PlaceholderText = "密码",
                     RelativeSizeAxes = Axes.X,
                     TabbableContentContainer = this,
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Remember username",
+                    LabelText = "记住用户名",
                     Current = config.GetBindable<bool>(OsuSetting.SaveUsername),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Stay signed in",
+                    LabelText = "自动登录",
                     Current = config.GetBindable<bool>(OsuSetting.SavePassword),
                 },
                 new Container
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Login
                             AutoSizeAxes = Axes.Y,
                             Child = new SettingsButton
                             {
-                                Text = "Sign in",
+                                Text = "登录",
                                 Action = performLogin
                             },
                         }
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Login
                 },
                 new SettingsButton
                 {
-                    Text = "Register",
+                    Text = "注册",
                     Action = () =>
                     {
                         RequestHide();

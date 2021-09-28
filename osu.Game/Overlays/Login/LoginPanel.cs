@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Login
                     {
                         new OsuSpriteText
                         {
-                            Text = "ACCOUNT",
+                            Text = "账号",
                             Margin = new MarginPadding { Bottom = 5 },
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         },
@@ -107,12 +107,12 @@ namespace osu.Game.Overlays.Login
                             Origin = Anchor.TopCentre,
                             TextAnchor = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
-                            Text = state.NewValue == APIState.Failing ? "Connection is failing, will attempt to reconnect... " : "Attempting to connect... ",
+                            Text = state.NewValue == APIState.Failing ? "连接失败，将尝试重新连接... " : "连接中... ",
                             Margin = new MarginPadding { Top = 10, Bottom = 10 },
                         },
                     };
 
-                    linkFlow.AddLink("cancel", api.Logout, string.Empty);
+                    linkFlow.AddLink("取消", api.Logout, string.Empty);
                     break;
 
                 case APIState.Online:
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Login
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "Signed in",
+                                            Text = "欢迎回来",
                                             Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                                             Margin = new MarginPadding { Top = 5, Bottom = 5 },
                                         },

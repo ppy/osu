@@ -7,15 +7,16 @@ namespace osu.Game.Overlays.Login
 {
     public enum UserAction
     {
+        [Description("在线")]
         Online,
 
-        [Description(@"Do not disturb")]
+        [Description(@"请勿打扰")]
         DoNotDisturb,
 
-        [Description(@"Appear offline")]
+        [Description(@"隐身")]
         AppearOffline,
 
-        [Description(@"Sign out")]
+        [Description(@"登出")]
         SignOut,
     }
 }
