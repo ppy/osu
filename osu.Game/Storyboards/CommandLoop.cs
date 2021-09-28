@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Storyboards
@@ -16,7 +17,7 @@ namespace osu.Game.Storyboards
         public CommandLoop(double startTime, int loopCount)
         {
             LoopStartTime = startTime;
-            LoopCount = loopCount;
+            LoopCount = Math.Max(1, loopCount);
         }
 
         public override IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)
