@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 double multiplierSpeedBonus = min_doubletap_nerf +
                     Math.Max(Math.Min(distance / (radius * threshold_doubletap_contributing), 1.0), 0.0)
-                    * (max_doubletap_nerf - min_doubletap_nerf);
+                    * (max_doubletap_nerf - min_doubletap_nerf); 
                 
                 speedBonus = 1 + Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2)
                             * multiplierSpeedBonus;
