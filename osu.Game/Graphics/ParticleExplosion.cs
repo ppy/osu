@@ -115,6 +115,8 @@ namespace osu.Game.Graphics
                         null, TextureCoords);
                 }
             }
+
+            protected override bool CanDrawOpaqueInterior => false;
         }
 
         private readonly struct ParticlePart
