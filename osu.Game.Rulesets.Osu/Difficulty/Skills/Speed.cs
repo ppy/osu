@@ -29,9 +29,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
 
-        private const double min_doubletap_nerf = 0.5; // minimum speedBonus value (eventually on stacked)
+        private const double min_doubletap_nerf = 0.3; // minimum speedBonus value (eventually on stacked)
         private const double max_doubletap_nerf = 1.0; // maximum speedBonus value 
-        private const double threshold_fully_contributing = 0.75; // minimum distance not influenced
+        private const double threshold_fully_contributing = 0.65; // minimum distance not influenced
 
         private readonly double greatWindow;
 
@@ -83,9 +83,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     Math.Min(Math.Max(distance / (radius * threshold_fully_contributing), 1.0), 0.0)
                     * (max_doubletap_nerf - min_doubletap_nerf)
                     ;
-                speedBonus = 1 + Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor
-                    * multiplierForSpeedBonus
-                    , 2);
+                speedBonus = 1 + Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2)
+                                    * multiplierForSpeedBonus;
             }
 
 
