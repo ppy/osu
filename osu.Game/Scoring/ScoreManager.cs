@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -36,6 +37,7 @@ namespace osu.Game.Scoring
 
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
+        private readonly Scheduler scheduler;
 
         [CanBeNull]
         private readonly Func<BeatmapDifficultyCache> difficulties;
@@ -43,12 +45,13 @@ namespace osu.Game.Scoring
         [CanBeNull]
         private readonly OsuConfigManager configManager;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
-                            Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, Scheduler scheduler,
+                            IIpcHost importHost = null, Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
+            this.scheduler = scheduler;
             this.difficulties = difficulties;
             this.configManager = configManager;
         }
@@ -104,6 +107,32 @@ namespace osu.Game.Scoring
                || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
 
         /// <summary>
+        /// Orders an array of <see cref="ScoreInfo"/>s by total score.
+        /// </summary>
+        /// <param name="scores">The array of <see cref="ScoreInfo"/>s to reorder.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to cancel the process.</param>
+        /// <returns>The given <paramref name="scores"/> ordered by decreasing total score.</returns>
+        public async Task<ScoreInfo[]> OrderByTotalScoreAsync(ScoreInfo[] scores, CancellationToken cancellationToken = default)
+        {
+            var difficultyCache = difficulties?.Invoke();
+
+            if (difficultyCache != null)
+            {
+                // Compute difficulties asynchronously first to prevent blocking via the GetTotalScore() call below.
+                foreach (var s in scores)
+                {
+                    await difficultyCache.GetDifficultyAsync(s.Beatmap, s.Ruleset, s.Mods, cancellationToken).ConfigureAwait(false);
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+            }
+
+            // We're calling .Result, but this should not be a blocking call due to the above GetDifficultyAsync() calls.
+            return scores.OrderByDescending(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken).Result)
+                         .ThenBy(s => s.OnlineScoreID)
+                         .ToArray();
+        }
+
+        /// <summary>
         /// Retrieves a bindable that represents the total score of a <see cref="ScoreInfo"/>.
         /// </summary>
         /// <remarks>
@@ -111,9 +140,9 @@ namespace osu.Game.Scoring
         /// </remarks>
         /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
         /// <returns>The bindable containing the total score.</returns>
-        public Bindable<long> GetBindableTotalScore(ScoreInfo score)
+        public Bindable<long> GetBindableTotalScore([NotNull] ScoreInfo score)
         {
-            var bindable = new TotalScoreBindable(score, difficulties);
+            var bindable = new TotalScoreBindable(score, this);
             configManager?.BindWith(OsuSetting.ScoreDisplayMode, bindable.ScoringMode);
             return bindable;
         }
@@ -126,7 +155,83 @@ namespace osu.Game.Scoring
         /// </remarks>
         /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
         /// <returns>The bindable containing the formatted total score string.</returns>
-        public Bindable<string> GetBindableTotalScoreString(ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
+        public Bindable<string> GetBindableTotalScoreString([NotNull] ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
+
+        /// <summary>
+        /// Retrieves the total score of a <see cref="ScoreInfo"/> in the given <see cref="ScoringMode"/>.
+        /// The score is returned in a callback that is run on the update thread.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to calculate the total score of.</param>
+        /// <param name="callback">The callback to be invoked with the total score.</param>
+        /// <param name="mode">The <see cref="ScoringMode"/> to return the total score as.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to cancel the process.</param>
+        public void GetTotalScore([NotNull] ScoreInfo score, [NotNull] Action<long> callback, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
+        {
+            GetTotalScoreAsync(score, mode, cancellationToken)
+                .ContinueWith(s => scheduler.Add(() => callback(s.Result)), TaskContinuationOptions.OnlyOnRanToCompletion);
+        }
+
+        /// <summary>
+        /// Retrieves the total score of a <see cref="ScoreInfo"/> in the given <see cref="ScoringMode"/>.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to calculate the total score of.</param>
+        /// <param name="mode">The <see cref="ScoringMode"/> to return the total score as.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to cancel the process.</param>
+        /// <returns>The total score.</returns>
+        public async Task<long> GetTotalScoreAsync([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
+        {
+            if (score.Beatmap == null)
+                return score.TotalScore;
+
+            int beatmapMaxCombo;
+            double accuracy = score.Accuracy;
+
+            if (score.IsLegacyScore)
+            {
+                if (score.RulesetID == 3)
+                {
+                    // In osu!stable, a full-GREAT score has 100% accuracy in mania. Along with a full combo, the score becomes indistinguishable from a full-PERFECT score.
+                    // To get around this, recalculate accuracy based on the hit statistics.
+                    // Note: This cannot be applied universally to all legacy scores, as some rulesets (e.g. catch) group multiple judgements together.
+                    double maxBaseScore = score.Statistics.Select(kvp => kvp.Value).Sum() * Judgement.ToNumericResult(HitResult.Perfect);
+                    double baseScore = score.Statistics.Select(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value).Sum();
+                    if (maxBaseScore > 0)
+                        accuracy = baseScore / maxBaseScore;
+                }
+
+                // This score is guaranteed to be an osu!stable score.
+                // The combo must be determined through either the beatmap's max combo value or the difficulty calculator, as lazer's scoring has changed and the score statistics cannot be used.
+                if (score.Beatmap.MaxCombo != null)
+                    beatmapMaxCombo = score.Beatmap.MaxCombo.Value;
+                else
+                {
+                    if (score.Beatmap.ID == 0 || difficulties == null)
+                    {
+                        // We don't have enough information (max combo) to compute the score, so use the provided score.
+                        return score.TotalScore;
+                    }
+
+                    // We can compute the max combo locally after the async beatmap difficulty computation.
+                    var difficulty = await difficulties().GetDifficultyAsync(score.Beatmap, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
+                    beatmapMaxCombo = difficulty.MaxCombo;
+                }
+            }
+            else
+            {
+                // This is guaranteed to be a non-legacy score.
+                // The combo must be determined through the score's statistics, as both the beatmap's max combo and the difficulty calculator will provide osu!stable combo values.
+                beatmapMaxCombo = Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.AffectsCombo()).Select(r => score.Statistics.GetValueOrDefault(r)).Sum();
+            }
+
+            if (beatmapMaxCombo == 0)
+                return 0;
+
+            var ruleset = score.Ruleset.CreateInstance();
+            var scoreProcessor = ruleset.CreateScoreProcessor();
+            scoreProcessor.Mods.Value = score.Mods;
+
+            return (long)Math.Round(scoreProcessor.GetScore(mode, beatmapMaxCombo, accuracy, (double)score.MaxCombo / beatmapMaxCombo, score.Statistics));
+        }
 
         /// <summary>
         /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
@@ -136,99 +241,29 @@ namespace osu.Game.Scoring
             public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
 
             private readonly ScoreInfo score;
-            private readonly Func<BeatmapDifficultyCache> difficulties;
+            private readonly ScoreManager scoreManager;
+
+            private CancellationTokenSource difficultyCalculationCancellationSource;
 
             /// <summary>
             /// Creates a new <see cref="TotalScoreBindable"/>.
             /// </summary>
             /// <param name="score">The <see cref="ScoreInfo"/> to provide the total score of.</param>
-            /// <param name="difficulties">A function to retrieve the <see cref="BeatmapDifficultyCache"/>.</param>
-            public TotalScoreBindable(ScoreInfo score, Func<BeatmapDifficultyCache> difficulties)
+            /// <param name="scoreManager">The <see cref="ScoreManager"/>.</param>
+            public TotalScoreBindable(ScoreInfo score, ScoreManager scoreManager)
             {
                 this.score = score;
-                this.difficulties = difficulties;
+                this.scoreManager = scoreManager;
 
                 ScoringMode.BindValueChanged(onScoringModeChanged, true);
             }
 
-            private IBindable<StarDifficulty?> difficultyBindable;
-            private CancellationTokenSource difficultyCancellationSource;
-
             private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
             {
-                difficultyCancellationSource?.Cancel();
-                difficultyCancellationSource = null;
+                difficultyCalculationCancellationSource?.Cancel();
+                difficultyCalculationCancellationSource = new CancellationTokenSource();
 
-                if (score.Beatmap == null)
-                {
-                    Value = score.TotalScore;
-                    return;
-                }
-
-                int beatmapMaxCombo;
-                double accuracy = score.Accuracy;
-
-                if (score.IsLegacyScore)
-                {
-                    if (score.RulesetID == 3)
-                    {
-                        // In osu!stable, a full-GREAT score has 100% accuracy in mania. Along with a full combo, the score becomes indistinguishable from a full-PERFECT score.
-                        // To get around this, recalculate accuracy based on the hit statistics.
-                        // Note: This cannot be applied universally to all legacy scores, as some rulesets (e.g. catch) group multiple judgements together.
-                        double maxBaseScore = score.Statistics.Select(kvp => kvp.Value).Sum() * Judgement.ToNumericResult(HitResult.Perfect);
-                        double baseScore = score.Statistics.Select(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value).Sum();
-                        if (maxBaseScore > 0)
-                            accuracy = baseScore / maxBaseScore;
-                    }
-
-                    // This score is guaranteed to be an osu!stable score.
-                    // The combo must be determined through either the beatmap's max combo value or the difficulty calculator, as lazer's scoring has changed and the score statistics cannot be used.
-                    if (score.Beatmap.MaxCombo == null)
-                    {
-                        if (score.Beatmap.ID == 0 || difficulties == null)
-                        {
-                            // We don't have enough information (max combo) to compute the score, so use the provided score.
-                            Value = score.TotalScore;
-                            return;
-                        }
-
-                        // We can compute the max combo locally after the async beatmap difficulty computation.
-                        difficultyBindable = difficulties().GetBindableDifficulty(score.Beatmap, score.Ruleset, score.Mods, (difficultyCancellationSource = new CancellationTokenSource()).Token);
-                        difficultyBindable.BindValueChanged(d =>
-                        {
-                            if (d.NewValue is StarDifficulty diff)
-                                updateScore(diff.MaxCombo, accuracy);
-                        }, true);
-
-                        return;
-                    }
-
-                    beatmapMaxCombo = score.Beatmap.MaxCombo.Value;
-                }
-                else
-                {
-                    // This is guaranteed to be a non-legacy score.
-                    // The combo must be determined through the score's statistics, as both the beatmap's max combo and the difficulty calculator will provide osu!stable combo values.
-                    beatmapMaxCombo = Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.AffectsCombo()).Select(r => score.Statistics.GetValueOrDefault(r)).Sum();
-                }
-
-                updateScore(beatmapMaxCombo, accuracy);
-            }
-
-            private void updateScore(int beatmapMaxCombo, double accuracy)
-            {
-                if (beatmapMaxCombo == 0)
-                {
-                    Value = 0;
-                    return;
-                }
-
-                var ruleset = score.Ruleset.CreateInstance();
-                var scoreProcessor = ruleset.CreateScoreProcessor();
-
-                scoreProcessor.Mods.Value = score.Mods;
-
-                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, beatmapMaxCombo, accuracy, (double)score.MaxCombo / beatmapMaxCombo, score.Statistics));
+                scoreManager.GetTotalScore(score, s => Value = s, mode.NewValue, difficultyCalculationCancellationSource.Token);
             }
         }
 

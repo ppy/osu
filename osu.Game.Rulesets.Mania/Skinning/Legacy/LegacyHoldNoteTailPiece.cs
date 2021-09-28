@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 
@@ -18,12 +18,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 : new ValueChangedEvent<ScrollingDirection>(ScrollingDirection.Up, ScrollingDirection.Up));
         }
 
-        protected override Texture GetTexture(ISkinSource skin)
+        protected override Drawable GetAnimation(ISkinSource skin)
         {
             // TODO: Should fallback to the head from default legacy skin instead of note.
-            return GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteTailImage)
-                   ?? GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteHeadImage)
-                   ?? GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.NoteImage);
+            return GetAnimationFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteTailImage)
+                   ?? GetAnimationFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteHeadImage)
+                   ?? GetAnimationFromLookup(skin, LegacyManiaSkinConfigurationLookups.NoteImage);
         }
     }
 }

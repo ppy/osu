@@ -141,29 +141,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         #region Key selection logic (shared with BeatmapCarousel)
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.SelectNext:
-                    beginRepeatSelection(() => selectNext(1), action);
+                    beginRepeatSelection(() => selectNext(1), e.Action);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                    beginRepeatSelection(() => selectNext(-1), action);
+                    beginRepeatSelection(() => selectNext(-1), e.Action);
                     return true;
             }
 
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.SelectNext:
                 case GlobalAction.SelectPrevious:
-                    endRepeatSelection(action);
+                    endRepeatSelection(e.Action);
                     break;
             }
         }
