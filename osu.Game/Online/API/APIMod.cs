@@ -16,7 +16,7 @@ using osu.Game.Utils;
 namespace osu.Game.Online.API
 {
     [MessagePackObject]
-    public class APIMod : IMod, IEquatable<APIMod>
+    public class APIMod : IEquatable<APIMod>
     {
         [JsonProperty("acronym")]
         [Key(0)]
@@ -48,31 +48,31 @@ namespace osu.Game.Online.API
 
         public Mod ToMod(Ruleset ruleset)
         {
-            Mod resultMod = ruleset.GetAllMods().FirstOrDefault(m => m.Acronym == Acronym);
+            Mod resultMod = ruleset.CreateModFromAcronym(Acronym);
 
             if (resultMod == null)
                 throw new InvalidOperationException($"There is no mod in the ruleset ({ruleset.ShortName}) matching the acronym {Acronym}.");
 
-            foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
+            if (Settings.Count > 0)
             {
-                if (!Settings.TryGetValue(property.Name.Underscore(), out object settingValue))
-                    continue;
+                foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
+                {
+                    if (!Settings.TryGetValue(property.Name.Underscore(), out object settingValue))
+                        continue;
 
-                resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                    resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
+                }
             }
 
             return resultMod;
         }
-
-        public bool Equals(IMod other) => other is APIMod them && Equals(them);
 
         public bool Equals(APIMod other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return Acronym == other.Acronym &&
-                   Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
+            return Acronym == other.Acronym && Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
         }
 
         public override string ToString()

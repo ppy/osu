@@ -23,7 +23,10 @@ namespace osu.Game.Tests.Beatmaps
         protected abstract string ResourceAssembly { get; }
 
         protected void Test(double expected, string name, params Mod[] mods)
-            => Assert.AreEqual(expected, CreateDifficultyCalculator(getBeatmap(name)).Calculate(mods).StarRating);
+        {
+            // Platform-dependent math functions (Pow, Cbrt, Exp, etc) may result in minute differences.
+            Assert.That(CreateDifficultyCalculator(getBeatmap(name)).Calculate(mods).StarRating, Is.EqualTo(expected).Within(0.00001));
+        }
 
         private WorkingBeatmap getBeatmap(string name)
         {

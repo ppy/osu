@@ -64,6 +64,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsFalse(beatmapInfo.LetterboxInBreaks);
                 Assert.IsFalse(beatmapInfo.SpecialStyle);
                 Assert.IsFalse(beatmapInfo.WidescreenStoryboard);
+                Assert.IsFalse(beatmapInfo.SamplesMatchPlaybackRate);
                 Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);
                 Assert.AreEqual(0, beatmapInfo.CountdownOffset);
             }

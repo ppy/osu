@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -55,7 +56,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        public override bool AllowTrackAdjustments => false;
+        public override bool? AllowTrackAdjustments => false;
 
         protected bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
 
@@ -74,6 +75,9 @@ namespace osu.Game.Screens.Edit
         private string lastSavedHash;
 
         private Container<EditorScreen> screenContainer;
+
+        [CanBeNull]
+        private readonly EditorLoader loader;
 
         private EditorScreen currentScreen;
 
@@ -100,6 +104,11 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private MusicController music { get; set; }
+
+        public Editor(EditorLoader loader = null)
+        {
+            this.loader = loader;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OsuConfigManager config)
@@ -308,6 +317,16 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public void UpdateClockSource() => clock.ChangeSource(Beatmap.Value.Track);
 
+        /// <summary>
+        /// Restore the editor to a provided state.
+        /// </summary>
+        /// <param name="state">The state to restore.</param>
+        public void RestoreState([NotNull] EditorState state) => Schedule(() =>
+        {
+            clock.Seek(state.Time);
+            clipboard.Value = state.ClipboardContent;
+        });
+
         protected void Save()
         {
             // no longer new after first user-triggered save.
@@ -328,9 +347,9 @@ namespace osu.Game.Screens.Edit
             clock.ProcessFrame();
         }
 
-        public bool OnPressed(PlatformAction action)
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case PlatformAction.Cut:
                     Cut();
@@ -360,7 +379,7 @@ namespace osu.Game.Screens.Edit
             return false;
         }
 
-        public void OnReleased(PlatformAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
         }
 
@@ -415,9 +434,9 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Back:
                     // as we don't want to display the back button, manual handling of exit action is required.
@@ -449,7 +468,7 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
@@ -489,7 +508,7 @@ namespace osu.Game.Screens.Edit
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
-                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
+                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave, cancelExit));
                     return true;
                 }
             }
@@ -704,9 +723,40 @@ namespace osu.Game.Screens.Edit
                 fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
+
+            var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
+
+            var difficultyItems = new List<MenuItem>();
+
+            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.RulesetID).OrderBy(group => group.Key))
+            {
+                if (difficultyItems.Count > 0)
+                    difficultyItems.Add(new EditorMenuItemSpacer());
+
+                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarDifficulty))
+                    difficultyItems.Add(createDifficultyMenuItem(beatmap));
+            }
+
+            fileMenuItems.Add(new EditorMenuItem("Change difficulty") { Items = difficultyItems });
+
+            fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
             return fileMenuItems;
         }
+
+        private DifficultyMenuItem createDifficultyMenuItem(BeatmapInfo beatmapInfo)
+        {
+            bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmapInfo);
+            return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
+        }
+
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
+        {
+            Time = clock.CurrentTimeAccurate,
+            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? clipboard.Value : string.Empty
+        });
+
+        private void cancelExit() => loader?.CancelPendingDifficultySwitch();
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 

@@ -13,6 +13,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> via DI for gameplay components to use.
     /// </summary>
+    [Cached]
     public abstract class GameplayClockContainer : Container, IAdjustableClock
     {
         /// <summary>
@@ -34,6 +35,11 @@ namespace osu.Game.Screens.Play
         /// The source clock.
         /// </summary>
         protected IClock SourceClock { get; private set; }
+
+        /// <summary>
+        /// Invoked when a seek has been performed via <see cref="Seek"/>
+        /// </summary>
+        public event Action OnSeek;
 
         /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
@@ -88,6 +94,8 @@ namespace osu.Game.Screens.Play
 
             // Manually process to make sure the gameplay clock is correctly updated after a seek.
             GameplayClock.UnderlyingClock.ProcessFrame();
+
+            OnSeek?.Invoke();
         }
 
         /// <summary>
