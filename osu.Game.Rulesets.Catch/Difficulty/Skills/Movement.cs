@@ -28,20 +28,19 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private float? lastPlayerPosition;
         private float lastDistanceMoved;
         private double lastStrainTime;
+        private Func<double, double> getRateAt;
 
         /// <summary>
         /// The speed multiplier applied to the player's catcher.
         /// </summary>
         private double catcherSpeedMultiplier;
 
-        private Func<double, double> getRateAt; 
-
         public Movement(Mod[] mods, float halfCatcherWidth, Func<double, double> clockTimeAt)
             : base(mods)
         {
             HalfCatcherWidth = halfCatcherWidth;
 
-            getRateAt = T => Mods.OfType<IApplicableToRate>().SingleOrDefault()?.ApplyToRate(T) ?? 1.0;
+            getRateAt = t => Mods.OfType<IApplicableToRate>().SingleOrDefault()?.ApplyToRate(t) ?? 1.0;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
