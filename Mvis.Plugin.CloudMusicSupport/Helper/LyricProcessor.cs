@@ -242,10 +242,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             try
             {
                 var target = $"custom/lyrics/beatmap-{working.BeatmapSetInfo.ID}.json";
-                string content = string.Empty;
 
-                if (storage.Exists(target))
-                    content = File.ReadAllText(storage.GetFullPath(target));
+                var content = File.ReadAllText(storage.GetFullPath(target, true));
 
                 if (string.IsNullOrEmpty(content))
                 {
@@ -292,7 +290,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                     RawTLyric = tLrc
                 });
 
-                File.WriteAllText(storage.GetFullPath(target), serializeObject);
+                File.WriteAllText(storage.GetFullPath(target, true), serializeObject);
             }
             catch (Exception e)
             {
