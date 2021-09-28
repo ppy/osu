@@ -119,8 +119,8 @@ namespace osu.Game.Screens.Select
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
 
-            config.BindWith(MSetting.SongSelectBgBlur, BgBlur);
-            config.BindWith(MSetting.OptUI, OptUI);
+            config?.BindWith(MSetting.SongSelectBgBlur, BgBlur);
+            config?.BindWith(MSetting.OptUI, OptUI);
 
             LoadComponentAsync(Carousel = new BeatmapCarousel
             {

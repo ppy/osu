@@ -424,14 +424,14 @@ namespace osu.Game.Tests.Beatmaps.IO
                     checkBeatmapCount(osu, 12);
                     checkSingleReferencedFileCount(osu, 18);
 
-                    var breakTemp = TestResources.GetTestBeatmapForImport();
+                    var brokenTempFilename = TestResources.GetTestBeatmapForImport();
 
                     MemoryStream brokenOsu = new MemoryStream();
-                    MemoryStream brokenOsz = new MemoryStream(await File.ReadAllBytesAsync(breakTemp));
+                    MemoryStream brokenOsz = new MemoryStream(await File.ReadAllBytesAsync(brokenTempFilename));
 
-                    File.Delete(breakTemp);
+                    File.Delete(brokenTempFilename);
 
-                    using (var outStream = File.Open(breakTemp, FileMode.CreateNew))
+                    using (var outStream = File.Open(brokenTempFilename, FileMode.CreateNew))
                     using (var zip = ZipArchive.Open(brokenOsz))
                     {
                         zip.AddEntry("broken.osu", brokenOsu, false);
@@ -441,7 +441,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     // this will trigger purging of the existing beatmap (online set id match) but should rollback due to broken osu.
                     try
                     {
-                        await manager.Import(new ImportTask(breakTemp));
+                        await manager.Import(new ImportTask(brokenTempFilename));
                     }
                     catch
                     {
@@ -456,6 +456,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     checkSingleReferencedFileCount(osu, 18);
 
                     Assert.AreEqual(1, loggedExceptionCount);
+
+                    File.Delete(brokenTempFilename);
                 }
                 finally
                 {

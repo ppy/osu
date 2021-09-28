@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Toolbar
                     break;
 
                 case APIState.Online:
-                    DrawableText.Text = $"别来无恙, {api.LocalUser.Value.Username} !";
+                    DrawableText.Text = api.LocalUser.Value.Username;
                     avatar.User = api.LocalUser.Value;
                     break;
             }

@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            resetTime();
+            ResetTime();
         }
 
         private Texture texture = Texture.WhitePixel;
@@ -115,10 +115,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             time = (float)((Time.Current - timeOffset) / FadeDuration);
             if (time > fade_clock_reset_threshold)
-                resetTime();
+                ResetTime();
         }
 
-        private void resetTime()
+        protected void ResetTime()
         {
             for (int i = 0; i < parts.Length; ++i)
             {

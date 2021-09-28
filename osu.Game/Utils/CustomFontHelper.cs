@@ -6,7 +6,7 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Utils
 {
-    internal class CustomFontHelper : Component
+    public class CustomFontHelper : Component
     {
         public static Bindable<string> CurrentTypeface = new Bindable<string>();
         public Action OnFontChanged;

@@ -285,9 +285,7 @@ namespace osu.Desktop.DBus.Tray
 
         public Task SetAsync(string prop, object val)
         {
-            if (canonicalProperties.Set(prop, val))
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(prop, val));
-
+            SetProperty(prop, val);
             return Task.CompletedTask;
         }
 

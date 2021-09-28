@@ -29,7 +29,11 @@ namespace osu.Game.Graphics.Backgrounds
         [Resolved]
         private Bindable<WorkingBeatmap> b { get; set; }
 
-        private readonly Bindable<bool> trianglesEnabled = new Bindable<bool>();
+        private readonly Bindable<bool> trianglesEnabled = new Bindable<bool>
+        {
+            Value = true
+        };
+
         private float extraY;
         public bool IgnoreSettings;
         public bool EnableBeatSync;
@@ -113,13 +117,16 @@ namespace osu.Game.Graphics.Backgrounds
             texture = Texture.WhitePixel;
         }
 
+        [Resolved(CanBeNull = true)]
+        private MConfigManager config { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, MConfigManager config)
+        private void load(ShaderManager shaders)
         {
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
 
             alphaOrig = Alpha;
-            config.BindWith(MSetting.TrianglesEnabled, trianglesEnabled);
+            config?.BindWith(MSetting.TrianglesEnabled, trianglesEnabled);
 
             trianglesEnabled.ValueChanged += _ => updateIcons();
         }

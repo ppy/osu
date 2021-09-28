@@ -3,6 +3,7 @@
 
 using System;
 using System.ComponentModel;
+using osu.Framework;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Logging;
@@ -70,11 +71,13 @@ namespace osu.Game.Configuration
             //Gamemode集成
             SetDefault(MSetting.Gamemode, GamemodeActivateCondition.InGame);
 
+            var isLinuxPlatform = RuntimeInfo.OS == RuntimeInfo.Platform.Linux;
+
             //DBus集成
-            SetDefault(MSetting.DBusIntegration, true);
+            SetDefault(MSetting.DBusIntegration, isLinuxPlatform);
             SetDefault(MSetting.DBusAllowPost, true);
-            SetDefault(MSetting.EnableTray, true);
-            SetDefault(MSetting.EnableSystemNotifications, true);
+            SetDefault(MSetting.EnableTray, isLinuxPlatform);
+            SetDefault(MSetting.EnableSystemNotifications, isLinuxPlatform);
 
             //Mpris
             SetDefault(MSetting.MprisUseAvatarlogoAsCover, true);
