@@ -38,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private readonly Bindable<RoomCategory> roomCategory = new Bindable<RoomCategory>();
         private readonly Bindable<bool> hasPassword = new Bindable<bool>();
 
-        private RecentParticipantsList recentParticipantsList;
+        private DrawableRoomParticipantsList drawableRoomParticipantsList;
         private RoomSpecialCategoryPill specialCategoryPill;
         private PasswordProtectedIcon passwordIcon;
         private EndDateInfo endDateInfo;
@@ -217,7 +217,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     Children = new Drawable[]
                                     {
                                         ButtonsContainer,
-                                        recentParticipantsList = new RecentParticipantsList
+                                        drawableRoomParticipantsList = new DrawableRoomParticipantsList
                                         {
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
@@ -280,8 +280,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 numberOfAvatars = value;
 
-                if (recentParticipantsList != null)
-                    recentParticipantsList.NumberOfCircles = value;
+                if (drawableRoomParticipantsList != null)
+                    drawableRoomParticipantsList.NumberOfCircles = value;
             }
         }
 
