@@ -1,16 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Gameplay.Components;
@@ -36,17 +41,40 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         private Drawable chroma;
 
+        private TourneyVideo fallbackGameplayVideo;
+        private readonly List<(string, TourneyVideo)> modSpecificGameplayVideos = new List<(string, TourneyVideo)>();
+
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc, Storage storage)
+        private void load(LadderInfo ladder, MatchIPCInfo ipc, TournamentStorage storage)
         {
             this.ipc = ipc;
 
-            AddRangeInternal(new Drawable[]
+            var extraGameplayVideos = new List<TourneyVideo>();
+
+            // look for all video files that start with "gameplay-"
+            foreach (var name in storage.GetFiles("videos", "gameplay-*").Select(x1 => Path.GetFileNameWithoutExtension(x1[("videos".Length + 1)..])))
             {
-                new TourneyVideo("gameplay")
+                var vid = new TourneyVideo(name)
                 {
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,
+                    Alpha = 0
+                };
+                extraGameplayVideos.Add(vid);
+                modSpecificGameplayVideos.Add((name["gameplay-".Length..], vid));
+            }
+
+            AddRangeInternal(new Drawable[]
+            {
+                fallbackGameplayVideo = new TourneyVideo("gameplay")
+                {
+                    Loop = true,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                new Container<TourneyVideo>
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = extraGameplayVideos
                 },
                 header = new MatchHeader
                 {
@@ -139,6 +167,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             State.BindTo(ipc.State);
             State.BindValueChanged(stateChanged, true);
+            ipc.Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
@@ -150,6 +179,35 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             warmup.Value = match.NewValue.Team1Score.Value + match.NewValue.Team2Score.Value == 0;
             scheduledOperation?.Cancel();
+        }
+
+        private void beatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
+        {
+            if (beatmap.NewValue == null || CurrentMatch.Value == null)
+                return;
+
+            var currentSelectedBeatmapMods = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.ID == beatmap.NewValue.OnlineBeatmapID)?.Mods;
+            showVideoForModsAndHideAllElse(currentSelectedBeatmapMods);
+        }
+
+        private void showVideoForModsAndHideAllElse(string currentSelectedBeatmapMods)
+        {
+            float fallbackVidAlpha = 1f;
+
+            foreach (var (mods, video) in modSpecificGameplayVideos)
+            {
+                if (mods.Equals(currentSelectedBeatmapMods, StringComparison.OrdinalIgnoreCase))
+                {
+                    video.Alpha = 1;
+                    fallbackVidAlpha = 0;
+                }
+                else
+                {
+                    video.Alpha = 0;
+                }
+            }
+
+            fallbackGameplayVideo.Alpha = fallbackVidAlpha;
         }
 
         private ScheduledDelegate scheduledOperation;
