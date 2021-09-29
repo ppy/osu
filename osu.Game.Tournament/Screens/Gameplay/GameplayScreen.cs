@@ -52,7 +52,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             var extraGameplayVideos = new List<TourneyVideo>();
 
             // look for all video files that start with "gameplay-"
-            foreach (var name in storage.GetFiles("videos", "gameplay-*").Select(x1 => Path.GetFileNameWithoutExtension(x1[("videos".Length + 1)..])))
+            foreach (var name in storage.GetFiles("videos", "gameplay-*").Select(Path.GetFileNameWithoutExtension))
             {
                 var vid = new TourneyVideo(name)
                 {
