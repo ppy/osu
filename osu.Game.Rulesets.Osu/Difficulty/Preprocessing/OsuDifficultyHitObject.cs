@@ -32,6 +32,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double TravelDistance { get; private set; }
 
         /// <summary>
+        /// Normalized Vector from the start position of the previous <see cref="OsuDifficultyHitObject"/> to the end position of the previous <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        public Vector2 TravelVector { get; private set; }
+
+        /// <summary>
+        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 50ms.
+        /// </summary>
+        public readonly double TravelTime;
+
+        /// <summary>
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
@@ -71,6 +81,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (lastObject is Slider lastSlider)
             {
                 computeSliderCursorPosition(lastSlider);
+
+                TravelVector = Vector2.Multiply(Vector2.Subtract(lastSlider.TailCircle.Position, lastSlider.HeadCircle.Position), scalingFactor);
                 TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
             }
 
@@ -104,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             slider.LazyEndPosition = slider.StackedPosition;
 
-            float approxFollowCircleRadius = (float)(slider.Radius * 3);
+            float approxFollowCircleRadius = (float)(slider.Radius * 2.4);
             var computeVertex = new Action<double>(t =>
             {
                 double progress = (t - slider.StartTime) / slider.SpanDuration;
