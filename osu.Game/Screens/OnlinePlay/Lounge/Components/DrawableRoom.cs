@@ -137,7 +137,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     {
                                         new FillFlowContainer
                                         {
-                                            AutoSizeAxes = Axes.Both,
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
                                             Children = new Drawable[]
                                             {
@@ -167,7 +168,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                 },
                                                 new FillFlowContainer
                                                 {
-                                                    AutoSizeAxes = Axes.Both,
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
                                                     Padding = new MarginPadding { Top = 3 },
                                                     Direction = FillDirection.Vertical,
                                                     Children = new Drawable[]
@@ -310,23 +312,47 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             [Resolved]
             private OsuColour colours { get; set; }
 
-            private LinkFlowContainer linkFlow;
+            private SpriteText statusText;
+            private LinkFlowContainer beatmapText;
 
             public RoomStatusText()
             {
-                AutoSizeAxes = Axes.Both;
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Width = 0.5f;
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = linkFlow = new LinkFlowContainer(s =>
+                InternalChild = new GridContainer
                 {
-                    s.Font = OsuFont.Default.With(size: 16);
-                    s.Colour = colours.Lime1;
-                })
-                {
-                    AutoSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            statusText = new OsuSpriteText
+                            {
+                                Font = OsuFont.Default.With(size: 16),
+                                Colour = colours.Lime1
+                            },
+                            beatmapText = new LinkFlowContainer(s =>
+                            {
+                                s.Font = OsuFont.Default.With(size: 16);
+                                s.Colour = colours.Lime1;
+                            })
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y
+                            }
+                        }
+                    }
                 };
             }
 
@@ -338,18 +364,25 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
             {
+                beatmapText.Clear();
+
                 if (Type.Value == MatchType.Playlists)
                 {
-                    linkFlow.Text = "Waiting for players";
+                    statusText.Text = "Waiting for players";
                     return;
                 }
 
-                linkFlow.Clear();
-
                 if (item.NewValue?.Beatmap.Value != null)
                 {
-                    linkFlow.AddText("Currently playing ");
-                    linkFlow.AddLink(item.NewValue.Beatmap.Value.ToRomanisableString(), LinkAction.OpenBeatmap, item.NewValue.Beatmap.Value.OnlineBeatmapID.ToString());
+                    statusText.Text = "Currently playing ";
+                    beatmapText.AddLink(item.NewValue.Beatmap.Value.ToRomanisableString(),
+                        LinkAction.OpenBeatmap,
+                        item.NewValue.Beatmap.Value.OnlineBeatmapID.ToString(),
+                        creationParameters: s =>
+                        {
+                            s.Truncate = true;
+                            s.RelativeSizeAxes = Axes.X;
+                        });
                 }
             }
         }
