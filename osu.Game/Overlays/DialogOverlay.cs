@@ -89,8 +89,7 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            if (IsLoaded)
-                filter.Disable();
+            filter.Disable();
 
             if (CurrentDialog?.State.Value == Visibility.Visible)
             {
