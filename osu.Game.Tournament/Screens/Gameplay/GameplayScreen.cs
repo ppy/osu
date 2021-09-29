@@ -192,22 +192,29 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         private void showVideoForModsAndHideAllElse(string currentSelectedBeatmapMods)
         {
-            float fallbackVidAlpha = 1f;
+            bool showFallbackVideo = true;
 
             foreach (var (mods, video) in modSpecificGameplayVideos)
             {
                 if (mods.Equals(currentSelectedBeatmapMods, StringComparison.OrdinalIgnoreCase))
                 {
-                    video.Alpha = 1;
-                    fallbackVidAlpha = 0;
+                    video.FadeIn(FADE_DELAY);
+                    showFallbackVideo = false;
                 }
                 else
                 {
-                    video.Alpha = 0;
+                    video.FadeOut(FADE_DELAY);
                 }
             }
 
-            fallbackGameplayVideo.Alpha = fallbackVidAlpha;
+            if (showFallbackVideo)
+            {
+                fallbackGameplayVideo.FadeIn(FADE_DELAY);
+            }
+            else
+            {
+                fallbackGameplayVideo.FadeOut(FADE_DELAY);
+            }
         }
 
         private ScheduledDelegate scheduledOperation;
