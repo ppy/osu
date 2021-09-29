@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -172,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                     Children = new Drawable[]
                                                     {
                                                         new RoomNameText(),
-                                                        new RoomHostText(),
+                                                        new RoomStatusText()
                                                     }
                                                 }
                                             },
@@ -304,11 +305,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private class RoomHostText : OnlinePlayComposite
+        private class RoomStatusText : OnlinePlayComposite
         {
-            private LinkFlowContainer hostText;
+            [Resolved]
+            private OsuColour colours { get; set; }
 
-            public RoomHostText()
+            private LinkFlowContainer linkFlow;
+
+            public RoomStatusText()
             {
                 AutoSizeAxes = Axes.Both;
             }
@@ -316,26 +320,37 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = hostText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 16))
+                InternalChild = linkFlow = new LinkFlowContainer(s =>
                 {
-                    AutoSizeAxes = Axes.Both
+                    s.Font = OsuFont.Default.With(size: 16);
+                    s.Colour = colours.Lime1;
+                })
+                {
+                    AutoSizeAxes = Axes.Both,
                 };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+                SelectedItem.BindValueChanged(onSelectedItemChanged, true);
+            }
 
-                Host.BindValueChanged(host =>
+            private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
+            {
+                if (Type.Value == MatchType.Playlists)
                 {
-                    hostText.Clear();
+                    linkFlow.Text = "Waiting for players";
+                    return;
+                }
 
-                    if (host.NewValue != null)
-                    {
-                        hostText.AddText("hosted by ");
-                        hostText.AddUserLink(host.NewValue);
-                    }
-                }, true);
+                linkFlow.Clear();
+
+                if (item.NewValue?.Beatmap.Value != null)
+                {
+                    linkFlow.AddText("Currently playing ");
+                    linkFlow.AddLink(item.NewValue.Beatmap.Value.ToRomanisableString(), LinkAction.OpenBeatmap, item.NewValue.Beatmap.Value.OnlineBeatmapID.ToString());
+                }
             }
         }
 
