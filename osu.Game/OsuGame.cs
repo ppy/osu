@@ -210,12 +210,6 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (!Host.IsPrimaryInstance && !DebugUtils.IsDebugBuild)
-            {
-                Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
-                Environment.Exit(0);
-            }
-
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith('-')).ToArray();
