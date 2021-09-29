@@ -13,6 +13,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using SharpCompress.Compressors;
@@ -160,7 +161,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    using (var db = new SqliteConnection(storage.GetDatabaseConnectionString("online")))
+                    using (var db = new SqliteConnection(DatabaseContextFactory.CreateDatabaseConnectionString("online.db", storage)))
                     {
                         db.Open();
 

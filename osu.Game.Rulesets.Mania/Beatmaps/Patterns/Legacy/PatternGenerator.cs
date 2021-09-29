@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         {
             lowerBound ??= RandomStart;
             upperBound ??= TotalColumns;
-            nextColumn ??= (_ => GetRandomColumn(lowerBound, upperBound));
+            nextColumn ??= _ => GetRandomColumn(lowerBound, upperBound);
 
             // Check for the initial column
             if (isValid(initialColumn))
@@ -176,7 +176,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             return initialColumn;
 
-            bool isValid(int column) => validation?.Invoke(column) != false && !patterns.Any(p => p.ColumnHasObject(column));
+            bool isValid(int column)
+            {
+                if (validation?.Invoke(column) == false)
+                    return false;
+
+                foreach (var p in patterns)
+                {
+                    if (p.ColumnHasObject(column))
+                        return false;
+                }
+
+                return true;
+            }
         }
 
         /// <summary>
