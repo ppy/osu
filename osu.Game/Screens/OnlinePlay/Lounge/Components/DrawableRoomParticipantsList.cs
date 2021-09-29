@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class RecentParticipantsList : OnlinePlayComposite
+    public class DrawableRoomParticipantsList : OnlinePlayComposite
     {
         private const float avatar_size = 36;
 
@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private HiddenUserCount hiddenUsers;
         private OsuSpriteText totalCount;
 
-        public RecentParticipantsList()
+        public DrawableRoomParticipantsList()
         {
             AutoSizeAxes = Axes.X;
             Height = 60;
