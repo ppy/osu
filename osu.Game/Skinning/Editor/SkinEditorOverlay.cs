@@ -66,10 +66,8 @@ namespace osu.Game.Skinning.Editor
 
         public override void Hide()
         {
-            Debug.Assert(skinEditor != null);
-
             // base call intentionally omitted.
-            skinEditor.Hide();
+            skinEditor?.Hide();
         }
 
         public override void Show()
