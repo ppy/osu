@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,6 +22,8 @@ namespace osu.Game.Skinning.Editor
     public class SkinEditorOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private readonly ScalingContainer target;
+
+        [CanBeNull]
         private SkinEditor skinEditor;
 
         public const float VISIBLE_TARGET_SCALE = 0.8f;
@@ -62,6 +66,8 @@ namespace osu.Game.Skinning.Editor
 
         public override void Hide()
         {
+            Debug.Assert(skinEditor != null);
+
             // base call intentionally omitted.
             skinEditor.Hide();
         }
@@ -71,8 +77,12 @@ namespace osu.Game.Skinning.Editor
             // base call intentionally omitted.
             if (skinEditor == null)
             {
-                LoadComponentAsync(skinEditor = new SkinEditor(target), AddInternal);
+                skinEditor = new SkinEditor(target);
                 skinEditor.State.BindValueChanged(editorVisibilityChanged);
+
+                Debug.Assert(skinEditor != null);
+
+                LoadComponentAsync(skinEditor, AddInternal);
             }
             else
                 skinEditor.Show();
@@ -98,8 +108,13 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private void updateMasking() =>
+        private void updateMasking()
+        {
+            if (skinEditor == null)
+                return;
+
             target.Masking = skinEditor.State.Value == Visibility.Visible;
+        }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
