@@ -21,7 +21,7 @@ namespace osu.Game.Overlays
         protected override string PopInSampleName => "UI/dialog-pop-in";
         protected override string PopOutSampleName => "UI/dialog-pop-out";
 
-        private LowPassFilter filter;
+        private Filter filter;
 
         public PopupDialog CurrentDialog { get; private set; }
 
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            AddInternal(filter = new LowPassFilter(audio.TrackMixer));
+            AddInternal(filter = new Filter(audio.TrackMixer));
         }
 
         public void Push(PopupDialog dialog)

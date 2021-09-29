@@ -8,50 +8,62 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Audio.Effects
 {
-    public class LowPassFilter : Component
+    public class Filter : Component
     {
-        private const float filter_cutoff_start = 2000;
-        private const float filter_cutoff_end = 150;
-        private const float filter_sweep_duration = 100;
-        private readonly Bindable<float> filterFreq = new Bindable<float>(filter_cutoff_start);
+        public BQFType FilterType = BQFType.LowPass;
+        public float SweepCutoffStart = 2000;
+        public float SweepCutoffEnd = 150;
+        public float SweepDuration = 100;
+        public Easing SweepEasing = Easing.None;
+
+        public bool IsActive { get; private set; }
+
+        private readonly Bindable<float> filterFreq = new Bindable<float>();
         private readonly AudioMixer mixer;
-        private readonly BQFParameters filter;
+        private BQFParameters filter;
 
         /// <summary>
-        /// A toggle-able low-pass filter with a subtle filter-sweep effect when toggled that can be attached to an <see cref="AudioMixer"/>.
+        /// A BiQuad filter that performs a filter-sweep when toggled on or off.
         /// </summary>
-        public LowPassFilter(AudioMixer mixer)
+        /// <param name="mixer">The mixer this effect should be attached to.</param>
+        public Filter(AudioMixer mixer)
         {
             this.mixer = mixer;
-            filter = new BQFParameters
-            {
-                lFilter = BQFType.LowPass,
-                fCenter = filterFreq.Value
-            };
         }
 
         public void Enable()
         {
             attachFilter();
-            this.TransformBindableTo(filterFreq, filter_cutoff_end, filter_sweep_duration);
+            this.TransformBindableTo(filterFreq, SweepCutoffEnd, SweepDuration, SweepEasing);
         }
 
         public void Disable()
         {
-            this.TransformBindableTo(filterFreq, filter_cutoff_start, filter_sweep_duration)
-                .OnComplete(_ => detatchFilter());
+            this.TransformBindableTo(filterFreq, SweepCutoffStart, SweepDuration, SweepEasing).OnComplete(_ => detatchFilter());
         }
 
         private void attachFilter()
         {
+            if (IsActive) return;
+
+            filter = new BQFParameters
+            {
+                lFilter = FilterType,
+                fCenter = filterFreq.Value = SweepCutoffStart
+            };
+
             mixer.Effects.Add(filter);
             filterFreq.ValueChanged += updateFilter;
+            IsActive = true;
         }
 
         private void detatchFilter()
         {
+            if (!IsActive) return;
+
             filterFreq.ValueChanged -= updateFilter;
             mixer.Effects.Remove(filter);
+            IsActive = false;
         }
 
         private void updateFilter(ValueChangedEvent<float> cutoff)
