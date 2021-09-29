@@ -582,7 +582,6 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         [Test]
         [NonParallelizable]
-        [Ignore("Binding IPC on Appveyor isn't working (port in use). Need to figure out why")]
         public void TestImportOverIPC()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-host", true))

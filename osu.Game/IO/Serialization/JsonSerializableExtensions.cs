@@ -22,7 +22,7 @@ namespace osu.Game.IO.Serialization
             ObjectCreationHandling = ObjectCreationHandling.Replace,
             DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
             Converters = new List<JsonConverter> { new Vector2Converter() },
-            ContractResolver = new KeyContractResolver()
+            ContractResolver = new SnakeCaseKeyContractResolver()
         };
     }
 }

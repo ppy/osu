@@ -70,11 +70,6 @@ namespace osu.Game.IO
         public override Stream GetStream(string path, FileAccess access = FileAccess.Read, FileMode mode = FileMode.OpenOrCreate) =>
             UnderlyingStorage.GetStream(MutatePath(path), access, mode);
 
-        public override string GetDatabaseConnectionString(string name) =>
-            UnderlyingStorage.GetDatabaseConnectionString(MutatePath(name));
-
-        public override void DeleteDatabase(string name) => UnderlyingStorage.DeleteDatabase(MutatePath(name));
-
         public override void OpenPathInNativeExplorer(string path) => UnderlyingStorage.OpenPathInNativeExplorer(MutatePath(path));
 
         public override Storage GetStorageForDirectory(string path)
