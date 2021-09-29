@@ -6,7 +6,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace osu.Game.IO.Serialization
 {
-    public class KeyContractResolver : DefaultContractResolver
+    public class SnakeCaseKeyContractResolver : DefaultContractResolver
     {
         protected override string ResolvePropertyName(string propertyName)
         {
