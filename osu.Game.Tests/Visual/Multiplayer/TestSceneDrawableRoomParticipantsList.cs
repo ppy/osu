@@ -20,7 +20,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            SelectedRoom.Value = new Room { Name = { Value = "test room" } };
+            SelectedRoom.Value = new Room
+            {
+                Name = { Value = "test room" },
+                Host =
+                {
+                    Value = new User
+                    {
+                        Id = 2,
+                        Username = "peppy",
+                    }
+                }
+            };
 
             Child = list = new DrawableRoomParticipantsList
             {

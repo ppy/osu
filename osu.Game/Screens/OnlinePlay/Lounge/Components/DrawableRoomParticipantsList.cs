@@ -4,11 +4,13 @@
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Users;
@@ -23,6 +25,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private FillFlowContainer<CircularAvatar> avatarFlow;
 
+        private CircularAvatar hostAvatar;
+        private LinkFlowContainer hostText;
         private HiddenUserCount hiddenUsers;
         private OsuSpriteText totalCount;
 
@@ -51,42 +55,99 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 },
                 new FillFlowContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(4),
-                    Padding = new MarginPadding { Right = 16 },
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new SpriteIcon
+                        new FillFlowContainer
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Size = new Vector2(16),
-                            Margin = new MarginPadding { Left = 8 },
-                            Icon = FontAwesome.Solid.User,
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Spacing = new Vector2(8),
+                            Padding = new MarginPadding
+                            {
+                                Left = 8,
+                                Right = 16
+                            },
+                            Children = new Drawable[]
+                            {
+                                hostAvatar = new CircularAvatar
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                },
+                                hostText = new LinkFlowContainer
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    AutoSizeAxes = Axes.Both,
+                                    Text = "hosted by smoogipoo"
+                                }
+                            }
                         },
-                        totalCount = new OsuSpriteText
+                        new Container
                         {
-                            Font = OsuFont.Default.With(weight: FontWeight.Bold),
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Children = new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Masking = true,
+                                    CornerRadius = 10,
+                                    Shear = new Vector2(0.2f, 0),
+                                    Child = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = colours.Background3,
+                                    }
+                                },
+                                new FillFlowContainer
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(4),
+                                    Padding = new MarginPadding
+                                    {
+                                        Left = 8,
+                                        Right = 16
+                                    },
+                                    Children = new Drawable[]
+                                    {
+                                        new SpriteIcon
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Size = new Vector2(16),
+                                            Icon = FontAwesome.Solid.User,
+                                        },
+                                        totalCount = new OsuSpriteText
+                                        {
+                                            Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                        },
+                                        avatarFlow = new FillFlowContainer<CircularAvatar>
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(4),
+                                            Margin = new MarginPadding { Left = 4 },
+                                        },
+                                        hiddenUsers = new HiddenUserCount
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                        }
+                                    }
+                                }
+                            }
                         },
-                        avatarFlow = new FillFlowContainer<CircularAvatar>
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(4),
-                            Margin = new MarginPadding { Left = 4 },
-                        },
-                        hiddenUsers = new HiddenUserCount
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                        }
                     }
                 }
             };
@@ -102,6 +163,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 updateHiddenUsers();
                 totalCount.Text = ParticipantCount.Value.ToString();
             }, true);
+
+            Host.BindValueChanged(onHostChanged, true);
         }
 
         private int numberOfCircles = 4;
@@ -192,6 +255,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 var nextUser = RecentParticipants.FirstOrDefault(u => avatarFlow.All(a => a.User != u));
                 if (nextUser != null) addUser(nextUser);
             }
+        }
+
+        private void onHostChanged(ValueChangedEvent<User> host)
+        {
+            hostAvatar.User = host.NewValue;
+            hostText.Clear();
+
+            hostText.AddText(@"hosted by ");
+            if (host.NewValue != null)
+                hostText.AddUserLink(host.NewValue);
         }
 
         private class CircularAvatar : CompositeDrawable
