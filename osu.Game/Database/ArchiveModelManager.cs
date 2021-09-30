@@ -30,7 +30,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>, IPresentImports<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : class, INamedFileInfo, new()
     {
@@ -249,10 +249,7 @@ namespace osu.Game.Database
             return import;
         }
 
-        /// <summary>
-        /// Fired when the user requests to view the resulting import.
-        /// </summary>
-        public Action<IEnumerable<TModel>> PresentImport;
+        public Action<IEnumerable<TModel>> PresentImport { protected get; set; }
 
         /// <summary>
         /// Silently import an item from an <see cref="ArchiveReader"/>.
@@ -799,6 +796,17 @@ namespace osu.Game.Database
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
+        public bool IsAvailableLocally(TModel model) => CheckLocalAvailability(model, ModelStore.ConsumableItems.Where(m => !m.DeletePending));
+
+        /// <summary>
+        /// Performs implementation specific comparisons to determine whether a given model is present in the local store.
+        /// </summary>
+        /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
+        /// <param name="items">The usable items present in the store.</param>
+        /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
+        protected virtual bool CheckLocalAvailability(TModel model, IQueryable<TModel> items)
+            => model.ID > 0 && items.Any(i => i.ID == model.ID && i.Files.Any());
+
         /// <summary>
         /// Whether import can be skipped after finding an existing import early in the process.
         /// Only valid when <see cref="ComputeHash"/> is not overridden.
@@ -835,7 +843,7 @@ namespace osu.Game.Database
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
-        protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
+        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
 
         #region Event handling / delaying
 
