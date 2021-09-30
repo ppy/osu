@@ -51,7 +51,7 @@ namespace osu.Game.Database
                 {
                     if (context == null)
                     {
-                        context = createContext();
+                        context = CreateContext();
                         Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
                     }
 
@@ -73,14 +73,6 @@ namespace osu.Game.Database
                 Filename += realm_extension;
         }
 
-        public Realm CreateContext()
-        {
-            if (IsDisposed)
-                throw new ObjectDisposedException(nameof(RealmContextFactory));
-
-            return createContext();
-        }
-
         /// <summary>
         /// Compact this realm.
         /// </summary>
@@ -98,8 +90,11 @@ namespace osu.Game.Database
             }
         }
 
-        private Realm createContext()
+        public Realm CreateContext()
         {
+            if (IsDisposed)
+                throw new ObjectDisposedException(nameof(RealmContextFactory));
+
             try
             {
                 contextCreationLock.Wait();
@@ -161,7 +156,10 @@ namespace osu.Game.Database
 
         protected override void Dispose(bool isDisposing)
         {
-            context?.Dispose();
+            lock (contextLock)
+            {
+                context?.Dispose();
+            }
 
             if (!IsDisposed)
             {
