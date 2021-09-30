@@ -68,10 +68,9 @@ namespace osu.Game.Screens.Play.HUD
             Current.Value = (int)(ppProcessor?.Calculate() ?? 0);
         }
 
-        protected override LocalisableString FormatCount(int count) => $@"{count}pp";
+        protected override LocalisableString FormatCount(int count) => count.ToString(@"D");
 
-        protected override OsuSpriteText CreateSpriteText()
-            => base.CreateSpriteText().With(s => s.Font = s.Font.With(size: 20f));
+        protected override IHasText CreateText() => new TextComponent();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -79,6 +78,44 @@ namespace osu.Game.Screens.Play.HUD
 
             if (scoreProcessor != null)
                 scoreProcessor.NewJudgement -= onNewJudgement;
+        }
+
+        private class TextComponent : CompositeDrawable, IHasText
+        {
+            public LocalisableString Text
+            {
+                get => text.Text;
+                set => text.Text = value;
+            }
+
+            private readonly OsuSpriteText text;
+
+            public TextComponent()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                InternalChild = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(2),
+                    Children = new Drawable[]
+                    {
+                        text = new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = OsuFont.Numeric.With(size: 16)
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Text = @"pp",
+                            Font = OsuFont.Numeric.With(size: 8)
+                        }
+                    }
+                };
+            }
         }
 
         private class GameplayWorkingBeatmap : WorkingBeatmap

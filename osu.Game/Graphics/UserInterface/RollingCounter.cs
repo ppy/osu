@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterface
             set => current.Current = value;
         }
 
-        private SpriteText displayedCountSpriteText;
+        private IHasText displayedCountSpriteText;
 
         /// <summary>
         /// If true, the roll-up duration will be proportional to change in value.
@@ -72,10 +72,10 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load()
         {
-            displayedCountSpriteText = CreateSpriteText();
+            displayedCountSpriteText = CreateText();
 
             UpdateDisplay();
-            Child = displayedCountSpriteText;
+            Child = (Drawable)displayedCountSpriteText;
         }
 
         protected void UpdateDisplay()
@@ -159,6 +159,8 @@ namespace osu.Game.Graphics.UserInterface
 
             this.TransformTo(nameof(DisplayedCount), newValue, rollingTotalDuration, RollingEasing);
         }
+
+        protected virtual IHasText CreateText() => CreateSpriteText();
 
         protected virtual OsuSpriteText CreateSpriteText() => new OsuSpriteText
         {
