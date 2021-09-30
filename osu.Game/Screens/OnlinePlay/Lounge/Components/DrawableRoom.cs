@@ -372,7 +372,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 if (Type.Value == MatchType.Playlists)
                 {
-                    statusText.Text = "Waiting for players";
+                    statusText.Text = "Ready to play";
                     return;
                 }
 
