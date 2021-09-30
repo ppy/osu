@@ -8,9 +8,8 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
-using osu.Game.Tests.Visual;
 
-namespace osu.Game.Tests.Audio
+namespace osu.Game.Tests.Visual.Audio
 {
     public class TestSceneFilter : OsuTestScene
     {
