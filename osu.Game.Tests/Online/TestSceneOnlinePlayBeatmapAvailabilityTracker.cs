@@ -158,18 +158,34 @@ namespace osu.Game.Tests.Online
 
             public Task<BeatmapSetInfo> CurrentImportTask { get; private set; }
 
-            protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
-                => new TestDownloadRequest(set);
+            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host)
+            {
+                return new TestBeatmapModelManager(this, storage, contextFactory, rulesets, api, host);
+            }
 
             public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
                 : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
             {
             }
 
-            public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+            internal class TestBeatmapModelManager : BeatmapModelManager
             {
-                await AllowImport.Task.ConfigureAwait(false);
-                return await (CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken)).ConfigureAwait(false);
+                private readonly TestBeatmapManager testBeatmapManager;
+
+                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, IDatabaseContextFactory databaseContextFactory, RulesetStore rulesetStore, IAPIProvider apiProvider, GameHost gameHost)
+                    : base(storage, databaseContextFactory, rulesetStore, apiProvider, gameHost)
+                {
+                    this.testBeatmapManager = testBeatmapManager;
+                }
+
+                protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
+                    => new TestDownloadRequest(set);
+
+                public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+                {
+                    await testBeatmapManager.AllowImport.Task.ConfigureAwait(false);
+                    return await (testBeatmapManager.CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken)).ConfigureAwait(false);
+                }
             }
         }
 

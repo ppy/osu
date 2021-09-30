@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -17,14 +16,12 @@ using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
-using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
-using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
-    public class WorkingBeatmapCache : IBeatmapResourceProvider
+    public class WorkingBeatmapCache : IBeatmapResourceProvider, IWorkingBeatmapCache
     {
         private readonly WeakList<BeatmapManagerWorkingBeatmap> workingCache = new WeakList<BeatmapManagerWorkingBeatmap>();
 
@@ -33,7 +30,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public readonly WorkingBeatmap DefaultBeatmap;
 
-        public BeatmapManager BeatmapManager { private get; set; }
+        public BeatmapModelManager BeatmapManager { private get; set; }
 
         private readonly AudioManager audioManager;
         private readonly IResourceStore<byte[]> resources;
@@ -74,41 +71,6 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        /// <summary>
-        /// Create a new <see cref="WorkingBeatmap"/>.
-        /// </summary>
-        public WorkingBeatmap CreateNew(RulesetInfo ruleset, User user)
-        {
-            var metadata = new BeatmapMetadata
-            {
-                Author = user,
-            };
-
-            var set = new BeatmapSetInfo
-            {
-                Metadata = metadata,
-                Beatmaps = new List<BeatmapInfo>
-                {
-                    new BeatmapInfo
-                    {
-                        BaseDifficulty = new BeatmapDifficulty(),
-                        Ruleset = ruleset,
-                        Metadata = metadata,
-                        WidescreenStoryboard = true,
-                        SamplesMatchPlaybackRate = true,
-                    }
-                }
-            };
-
-            var working = BeatmapManager.Import(set).Result;
-            return GetWorkingBeatmap(working.Beatmaps.First());
-        }
-
-        /// <summary>
-        /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
-        /// </summary>
-        /// <param name="beatmapInfo">The beatmap to lookup.</param>
-        /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
             // if there are no files, presume the full beatmap info has not yet been fetched from the database.
