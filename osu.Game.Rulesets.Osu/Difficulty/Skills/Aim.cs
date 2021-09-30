@@ -6,6 +6,8 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Framework.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -14,9 +16,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-        private const double angle_bonus_begin = Math.PI / 3;
-        private const double timing_threshold = 107;
-
         public Aim(Mod[] mods)
             : base(mods)
         {
@@ -24,44 +23,116 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain = 1;
 
-        private double skillMultiplier => 26.25;
+        private double skillMultiplier => 24.75;
         private double strainDecayBase => 0.15;
+
+        protected override int HistoryLength => 2;
+
+        private const double wide_angle_multiplier = 1.5;
+        private const double acute_angle_multiplier = 1.25;
+        private const double rhythm_variance_multiplier = 1.0;
+        private const double vel_change_multiplier = 1.0;
+        private const double slider_multiplier = 6.5;
 
         private double aimStrainOf(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
+            if (current.BaseObject is Spinner || Previous.Count <= 1)
                 return 0;
 
-            var osuCurrent = (OsuDifficultyHitObject)current;
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            var osuPrevObj = (OsuDifficultyHitObject)Previous[0];
+            var osuLastObj = (OsuDifficultyHitObject)Previous[1];
 
-            double aimStrain = 0;
+            var currVector = Vector2.Divide(osuCurrObj.JumpVector, (float)osuCurrObj.StrainTime);
+            var prevVector = Vector2.Divide(osuPrevObj.JumpVector, (float)osuPrevObj.StrainTime);
 
-            if (Previous.Count > 0)
+            double angleBonus = 0;
+            double rhythmBonus = 0;
+            double velChangeBonus = 0;
+            double sliderBonus = 0;
+
+            // Start with regular velocity.
+            double aimStrain = currVector.Length;
+
+            if (Precision.AlmostEquals(osuCurrObj.StrainTime, osuPrevObj.StrainTime, 10)) // Rhythms are the same.
             {
-                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
-
-                if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
+                if (osuCurrObj.Angle != null)
                 {
-                    const double scale = 90;
+                    double angle = osuCurrObj.Angle.Value;
 
-                    var angleBonus = Math.Sqrt(
-                        Math.Max(osuPrevious.JumpDistance - scale, 0)
-                        * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
-                        * Math.Max(osuCurrent.JumpDistance - scale, 0));
-                    aimStrain = 1.4 * applyDiminishingExp(Math.Max(0, angleBonus)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
+                    // Rewarding angles, take the smaller velocity as base.
+                    angleBonus = Math.Max(Vector2.Subtract(currVector, prevVector).Length, Math.Min(currVector.Length, prevVector.Length));
+
+                    double wideAngleBonus = calcWideAngleBonus(angle);
+                    double acuteAngleBonus = calcAcuteAngleBonus(angle);
+
+                    if (osuCurrObj.StrainTime > 100) // 150 BPM 1/4
+                        acuteAngleBonus = 0;
+                    else
+                        acuteAngleBonus *= Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (100 - osuCurrObj.StrainTime) / 25)), 2); // sin curve from 150 bpm 1/4 to 200 bpm 1/4
+
+
+                    acuteAngleBonus *= Math.Min(angleBonus, 125 / osuCurrObj.StrainTime) * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (Math.Min(osuCurrObj.JumpDistance, osuPrevObj.JumpDistance) - 50) / 50)), 3); // scale buff to ensure that overlaps are penalize 0:0-50, 50-100 distance = sin curve
+                    wideAngleBonus *= wideAngleBonus * Math.Max(0, angleBonus - 125 / osuCurrObj.StrainTime); // remove wide angle buff for the 125 distance area since its near stream / overlap
+
+
+                    angleBonus = Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
                 }
             }
+            else // There is a rhythm change
+            {
+                // Rewarding rhythm, take the smaller velocity as base.
+                rhythmBonus = Math.Min(currVector.Length, prevVector.Length);
 
-            double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
-            double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance);
+                if (osuCurrObj.StrainTime + 10 < osuPrevObj.StrainTime && osuPrevObj.StrainTime > osuLastObj.StrainTime + 10)
+                    // Don't want to reward for a rhythm change back to back (unless its a double, which is why this only checks for fast -> slow -> fast).
+                    rhythmBonus = 0;
+            }
 
-            return Math.Max(
-                aimStrain + (jumpDistanceExp + travelDistanceExp + Math.Sqrt(travelDistanceExp * jumpDistanceExp)) / Math.Max(osuCurrent.StrainTime, timing_threshold),
-                (Math.Sqrt(travelDistanceExp * jumpDistanceExp) + jumpDistanceExp + travelDistanceExp) / osuCurrent.StrainTime
-            );
+            if (prevVector.Length > currVector.Length && prevVector.Length > 0)
+            {
+                velChangeBonus = (prevVector.Length - currVector.Length) * Math.Sqrt(100 / osuCurrObj.StrainTime)
+                                                  * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, osuCurrObj.JumpDistance / 125)), 2)
+                                                  * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (prevVector.Length - currVector.Length) / prevVector.Length)), 2);
+
+                if (Precision.AlmostEquals(osuCurrObj.StrainTime, osuPrevObj.StrainTime, 10))
+                    velChangeBonus = Math.Max(velChangeBonus,
+                                                  (Math.Min(125 / osuCurrObj.StrainTime, prevVector.Length) - Math.Min(125 / osuCurrObj.StrainTime, currVector.Length)) * Math.Sqrt(100 / osuCurrObj.StrainTime)
+                                                  * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (Math.Min(125 / osuCurrObj.StrainTime, prevVector.Length) - Math.Min(125 / osuCurrObj.StrainTime, currVector.Length)) / prevVector.Length)), 2));
+            }
+
+            if (osuCurrObj.TravelDistance != 0)
+            {
+                sliderBonus = (osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
+            }
+
+            // add in angle velocity.
+            aimStrain += angleBonus;
+            aimStrain += Math.Max(rhythmBonus * rhythm_variance_multiplier, velChangeBonus * vel_change_multiplier); // add in rhythm or velocity change, whichever is larger.
+            aimStrain += sliderBonus * slider_multiplier; // Add in slider velocity.
+
+            return aimStrain;
         }
 
-        private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
+        private double calcWideAngleBonus(double angle)
+        {
+            if (angle < Math.PI / 3)
+                return 0;
+            if (angle < 2 * Math.PI / 3)
+                return Math.Pow(Math.Sin(1.5 * (angle - Math.PI / 3)), 2);
+
+            return 0.5 + 0.5 * Math.Pow(Math.Sin(2 * (Math.PI - angle)), 2);
+        }
+
+        private double calcAcuteAngleBonus(double angle)
+        {
+            if (angle < Math.PI / 4)
+                return 0.75 + 0.25 * Math.Pow(Math.Sin(2 * angle), 2);
+            if (angle < 3 * Math.PI / 4)
+                return 1.0 - Math.Pow(Math.Sin(angle - Math.PI / 4), 2);
+
+            return 0;
+        }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 

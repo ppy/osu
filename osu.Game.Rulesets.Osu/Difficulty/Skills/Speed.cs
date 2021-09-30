@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     double effectiveRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
 
                     if (effectiveRatio > 0.5)
-                        effectiveRatio = 0.5 + (effectiveRatio - 0.5) * 6; // large buff for 1/3 -> 1/4 type transitions.
+                        Math.Min(1.5, effectiveRatio = 0.5 + (effectiveRatio - 0.5) * 6); // large buff for 1/3 -> 1/4 type transitions.
                     else
                         effectiveRatio = 0.5;
 
