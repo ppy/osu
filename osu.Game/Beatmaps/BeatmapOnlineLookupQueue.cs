@@ -211,7 +211,7 @@ namespace osu.Game.Beatmaps
         }
 
         private void logForModel(BeatmapSetInfo set, string message) =>
-            ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>.LogForModel(set, $"{nameof(BeatmapOnlineLookupQueue)}] {message}");
+            ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>.LogForModel(set, $"[{nameof(BeatmapOnlineLookupQueue)}] {message}");
 
         public void Dispose()
         {
