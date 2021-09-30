@@ -29,10 +29,11 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : IModelDownloader<BeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, ICanAcceptFiles, IWorkingBeatmapCache
+    public class BeatmapManager : IModelDownloader<BeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, ICanAcceptFiles, IWorkingBeatmapCache, IDisposable
     {
         private readonly BeatmapModelManager beatmapModelManager;
         private readonly WorkingBeatmapCache workingBeatmapCache;
+        private readonly BeatmapOnlineLookupQueue onlineBetamapLookupQueue;
 
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
@@ -44,8 +45,8 @@ namespace osu.Game.Beatmaps
 
             if (performOnlineLookups)
             {
-                var onlineBeatmapLookupCache = new BeatmapOnlineLookupQueue(api, storage);
-                beatmapModelManager.PopulateOnlineInformation = onlineBeatmapLookupCache.UpdateAsync;
+                onlineBetamapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+                beatmapModelManager.OnlineLookupQueue = onlineBetamapLookupQueue;
             }
         }
 
@@ -305,6 +306,15 @@ namespace osu.Game.Beatmaps
         public void AddFile(BeatmapSetInfo model, Stream contents, string filename)
         {
             beatmapModelManager.AddFile(model, contents, filename);
+        }
+
+        #endregion
+
+        #region Implementation of IDisposable
+
+        public void Dispose()
+        {
+            onlineBetamapLookupQueue?.Dispose();
         }
 
         #endregion

@@ -49,10 +49,9 @@ namespace osu.Game.Beatmaps
         public IBindable<WeakReference<BeatmapInfo>> BeatmapRestored => beatmapRestored;
 
         /// <summary>
-        /// A function which populates online information during the import process.
-        /// It is run as the final step of import.
+        /// An online lookup queue component which handles populating online beatmap metadata.
         /// </summary>
-        public Func<BeatmapSetInfo, CancellationToken, Task> PopulateOnlineInformation;
+        public BeatmapOnlineLookupQueue OnlineLookupQueue { private get; set; }
 
         /// <summary>
         /// The game working beatmap cache, used to invalidate entries on changes.
@@ -107,8 +106,8 @@ namespace osu.Game.Beatmaps
 
             bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0);
 
-            if (PopulateOnlineInformation != null)
-                await PopulateOnlineInformation(beatmapSet, cancellationToken).ConfigureAwait(false);
+            if (OnlineLookupQueue != null)
+                await OnlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken).ConfigureAwait(false);
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
