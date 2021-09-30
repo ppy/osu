@@ -368,12 +368,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateStoreFromButton(KeyButton button)
         {
-            using (var usage = realmFactory.GetForWrite())
+            using (var realm = realmFactory.CreateContext())
             {
-                var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
-                binding.KeyCombinationString = button.KeyBinding.KeyCombinationString;
-
-                usage.Commit();
+                var binding = realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
+                realm.Write(() => binding.KeyCombinationString = button.KeyBinding.KeyCombinationString);
             }
         }
 
