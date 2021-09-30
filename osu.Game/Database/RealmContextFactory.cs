@@ -37,6 +37,7 @@ namespace osu.Game.Database
         private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>("Realm", "Dirty Refreshes");
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>("Realm", "Contexts (Created)");
 
+        private readonly object contextLock = new object();
         private Realm? context;
 
         public Realm Context
@@ -46,14 +47,17 @@ namespace osu.Game.Database
                 if (!ThreadSafety.IsUpdateThread)
                     throw new InvalidOperationException($"Use {nameof(CreateContext)} when performing realm operations from a non-update thread");
 
-                if (context == null)
+                lock (contextLock)
                 {
-                    context = createContext();
-                    Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
-                }
+                    if (context == null)
+                    {
+                        context = CreateContext();
+                        Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
+                    }
 
-                // creating a context will ensure our schema is up-to-date and migrated.
-                return context;
+                    // creating a context will ensure our schema is up-to-date and migrated.
+                    return context;
+                }
             }
         }
 
@@ -69,14 +73,6 @@ namespace osu.Game.Database
                 Filename += realm_extension;
         }
 
-        public Realm CreateContext()
-        {
-            if (IsDisposed)
-                throw new ObjectDisposedException(nameof(RealmContextFactory));
-
-            return createContext();
-        }
-
         /// <summary>
         /// Compact this realm.
         /// </summary>
@@ -87,12 +83,18 @@ namespace osu.Game.Database
         {
             base.Update();
 
-            if (context?.Refresh() == true)
-                refreshes.Value++;
+            lock (contextLock)
+            {
+                if (context?.Refresh() == true)
+                    refreshes.Value++;
+            }
         }
 
-        private Realm createContext()
+        public Realm CreateContext()
         {
+            if (IsDisposed)
+                throw new ObjectDisposedException(nameof(RealmContextFactory));
+
             try
             {
                 contextCreationLock.Wait();
@@ -143,11 +145,14 @@ namespace osu.Game.Database
             {
                 contextCreationLock.Wait();
 
+                lock (contextLock)
+                {
+                    context?.Dispose();
+                    context = null;
+                }
+
                 const int sleep_length = 200;
                 int timeout = 5000;
-
-                context?.Dispose();
-                context = null;
 
                 // see https://github.com/realm/realm-dotnet/discussions/2657
                 while (!Compact())
@@ -174,7 +179,10 @@ namespace osu.Game.Database
 
         protected override void Dispose(bool isDisposing)
         {
-            context?.Dispose();
+            lock (contextLock)
+            {
+                context?.Dispose();
+            }
 
             if (!IsDisposed)
             {
