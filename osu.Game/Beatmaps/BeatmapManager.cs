@@ -42,9 +42,11 @@ namespace osu.Game.Beatmaps
 
             workingBeatmapCache.BeatmapManager = beatmapModelManager;
 
-            var onlineBeatmapLookupCache = new BeatmapOnlineLookupQueue(api, storage);
-
-            beatmapModelManager.PopulateOnlineInformation = onlineBeatmapLookupCache.UpdateAsync;
+            if (performOnlineLookups)
+            {
+                var onlineBeatmapLookupCache = new BeatmapOnlineLookupQueue(api, storage);
+                beatmapModelManager.PopulateOnlineInformation = onlineBeatmapLookupCache.UpdateAsync;
+            }
         }
 
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host) =>
