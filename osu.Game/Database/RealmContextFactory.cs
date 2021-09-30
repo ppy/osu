@@ -37,6 +37,7 @@ namespace osu.Game.Database
         private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>("Realm", "Dirty Refreshes");
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>("Realm", "Contexts (Created)");
 
+        private readonly object contextLock = new object();
         private Realm? context;
 
         public Realm Context
@@ -46,14 +47,17 @@ namespace osu.Game.Database
                 if (!ThreadSafety.IsUpdateThread)
                     throw new InvalidOperationException($"Use {nameof(CreateContext)} when performing realm operations from a non-update thread");
 
-                if (context == null)
+                lock (contextLock)
                 {
-                    context = createContext();
-                    Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
-                }
+                    if (context == null)
+                    {
+                        context = createContext();
+                        Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
+                    }
 
-                // creating a context will ensure our schema is up-to-date and migrated.
-                return context;
+                    // creating a context will ensure our schema is up-to-date and migrated.
+                    return context;
+                }
             }
         }
 
@@ -87,8 +91,11 @@ namespace osu.Game.Database
         {
             base.Update();
 
-            if (context?.Refresh() == true)
-                refreshes.Value++;
+            lock (contextLock)
+            {
+                if (context?.Refresh() == true)
+                    refreshes.Value++;
+            }
         }
 
         private Realm createContext()
@@ -137,8 +144,11 @@ namespace osu.Game.Database
 
             contextCreationLock.Wait();
 
-            context?.Dispose();
-            context = null;
+            lock (contextLock)
+            {
+                context?.Dispose();
+                context = null;
+            }
 
             return new InvokeOnDisposal<RealmContextFactory>(this, endBlockingSection);
 
