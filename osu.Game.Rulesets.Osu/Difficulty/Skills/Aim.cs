@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     double angle = osuCurrObj.Angle.Value;
 
                     // Rewarding angles, take the smaller velocity as base.
-                    angleBonus = Math.Max(Vector2.Subtract(currVector, prevVector).Length, Math.Min(currVector.Length, prevVector.Length));
+                    angleBonus = Math.Max(Vector2.Subtract(currVector, prevVector).Length, Math.Min(currVector.Length, prevVector.Length)); // take the subtracted vector, which grows as angle gets smaller.
 
                     double wideAngleBonus = calcWideAngleBonus(angle);
                     double acuteAngleBonus = calcAcuteAngleBonus(angle);
@@ -71,12 +71,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     else
                         acuteAngleBonus *= Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (100 - osuCurrObj.StrainTime) / 25)), 2); // sin curve from 150 bpm 1/4 to 200 bpm 1/4
 
+                    // scale acute buff to ensure that overlaps are penalize 0:0-50, 50-100 distance = sin curve
+                    acuteAngleBonus *= Math.Min(angleBonus, 125 / osuCurrObj.StrainTime) * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (Math.Min(osuCurrObj.JumpDistance, osuPrevObj.JumpDistance) - 50) / 50)), 3);
+                    // remove wide angle buff for the 125 distance area since its near stream / overlap
+                    wideAngleBonus *= wideAngleBonus * Math.Max(0, angleBonus - 125 / osuCurrObj.StrainTime);
 
-                    acuteAngleBonus *= Math.Min(angleBonus, 125 / osuCurrObj.StrainTime) * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (Math.Min(osuCurrObj.JumpDistance, osuPrevObj.JumpDistance) - 50) / 50)), 3); // scale buff to ensure that overlaps are penalize 0:0-50, 50-100 distance = sin curve
-                    wideAngleBonus *= wideAngleBonus * Math.Max(0, angleBonus - 125 / osuCurrObj.StrainTime); // remove wide angle buff for the 125 distance area since its near stream / overlap
-
-
-                    angleBonus = Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
+                    angleBonus = Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier); // reward the greater of the two anglebuffs.
                 }
             }
             else // There is a rhythm change
@@ -85,29 +85,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 rhythmBonus = Math.Min(currVector.Length, prevVector.Length);
 
                 if (osuCurrObj.StrainTime + 10 < osuPrevObj.StrainTime && osuPrevObj.StrainTime > osuLastObj.StrainTime + 10)
-                    // Don't want to reward for a rhythm change back to back (unless its a double, which is why this only checks for fast -> slow -> fast).
-                    rhythmBonus = 0;
+                    rhythmBonus = 0; // Don't want to reward for a rhythm change back to back (unless its a double, which is why this only checks for fast -> slow -> fast).
             }
 
-            if (prevVector.Length > currVector.Length && prevVector.Length > 0)
+            if (prevVector.Length > currVector.Length && prevVector.Length > 0) // If we have a slow down.
             {
-                velChangeBonus = (prevVector.Length - currVector.Length) * Math.Sqrt(100 / osuCurrObj.StrainTime)
-                                                  * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, osuCurrObj.JumpDistance / 125)), 2)
-                                                  * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (prevVector.Length - currVector.Length) / prevVector.Length)), 2);
+                velChangeBonus = (prevVector.Length - currVector.Length) * Math.Sqrt(100 / osuCurrObj.StrainTime) // reward for % distance slowed down compared to previous, paying attention to not award overlap
+                                  * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, osuCurrObj.JumpDistance / 125)), 2)
+                                  * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (prevVector.Length - currVector.Length) / prevVector.Length)), 2);
 
-                if (Precision.AlmostEquals(osuCurrObj.StrainTime, osuPrevObj.StrainTime, 10))
+                if (Precision.AlmostEquals(osuCurrObj.StrainTime, osuPrevObj.StrainTime, 10)) // If rhythm is the same, reward even if objects overlap. Cap distance to 125 (primarily jump stream buff)
                     velChangeBonus = Math.Max(velChangeBonus,
-                                                  (Math.Min(125 / osuCurrObj.StrainTime, prevVector.Length) - Math.Min(125 / osuCurrObj.StrainTime, currVector.Length)) * Math.Sqrt(100 / osuCurrObj.StrainTime)
-                                                  * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (Math.Min(125 / osuCurrObj.StrainTime, prevVector.Length) - Math.Min(125 / osuCurrObj.StrainTime, currVector.Length)) / prevVector.Length)), 2));
+                                              (Math.Min(125 / osuCurrObj.StrainTime, prevVector.Length) - Math.Min(125 / osuCurrObj.StrainTime, currVector.Length)) * Math.Sqrt(100 / osuCurrObj.StrainTime)
+                                                * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (Math.Min(125 / osuCurrObj.StrainTime, prevVector.Length) - Math.Min(125 / osuCurrObj.StrainTime, currVector.Length)) / prevVector.Length)), 2));
             }
 
             if (osuCurrObj.TravelDistance != 0)
             {
-                sliderBonus = (osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
+                sliderBonus = (osuCurrObj.TravelDistance) / osuCurrObj.StrainTime; // add some slider rewards
             }
 
-            // add in angle velocity.
-            aimStrain += angleBonus;
+            aimStrain += angleBonus; // add angle buff.
             aimStrain += Math.Max(rhythmBonus * rhythm_variance_multiplier, velChangeBonus * vel_change_multiplier); // add in rhythm or velocity change, whichever is larger.
             aimStrain += sliderBonus * slider_multiplier; // Add in slider velocity.
 
