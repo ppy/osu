@@ -93,9 +93,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
-        protected Ruleset GameplayRuleset { get; private set; }
+        public Ruleset GameplayRuleset { get; private set; }
 
-        protected GameplayBeatmap GameplayBeatmap { get; private set; }
+        public GameplayBeatmap GameplayBeatmap { get; private set; }
 
         private Sample sampleRestart;
 
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Play
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        public new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
         /// Whether failing should be allowed.
@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Play
 
         public readonly PlayerConfiguration Configuration;
 
-        protected Score Score { get; private set; }
+        public Score Score { get; private set; }
 
         /// <summary>
         /// Create a new player instance.
