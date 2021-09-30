@@ -21,6 +21,13 @@ using SharpCompress.Compressors.BZip2;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A component which handles population of online IDs for beatmaps using a two part lookup procedure.
+    /// </summary>
+    /// <remarks>
+    /// On creating the component, a copy of a database containing metadata for a large subset of beatmaps (stored to <see cref="cache_database_name"/>).
+    /// This will always be checked before doing a second online query to get required metadata.
+    /// </remarks>
     [ExcludeFromDynamicCompile]
     public class BeatmapOnlineLookupQueue : IDisposable
     {
