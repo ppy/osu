@@ -261,7 +261,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             hostAvatar.User = host.NewValue;
             hostText.Clear();
 
-            hostText.AddText(@"hosted by ");
+            hostText.AddText("hosted by ");
             if (host.NewValue != null)
                 hostText.AddUserLink(host.NewValue);
         }
