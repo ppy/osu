@@ -138,7 +138,7 @@ namespace osu.Game
 
         private UserLookupCache userCache;
 
-        private BeatmapOnlineLookupQueue onlineBeatmapLookupCache;
+        private BeatmapOnlineLookupQueue onlineBeatmapLookupQueue;
 
         private FileStore fileStore;
 
@@ -246,9 +246,9 @@ namespace osu.Game
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap));
 
-            onlineBeatmapLookupCache = new BeatmapOnlineLookupQueue(API, Storage);
+            onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(API, Storage);
 
-            BeatmapManager.PopulateOnlineInformation = onlineBeatmapLookupCache.UpdateAsync;
+            BeatmapManager.OnlineLookupQueue = onlineBeatmapLookupQueue;
 
             // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
@@ -531,7 +531,7 @@ namespace osu.Game
 
             RulesetStore?.Dispose();
             LocalConfig?.Dispose();
-            onlineBeatmapLookupCache?.Dispose();
+            onlineBeatmapLookupQueue?.Dispose();
 
             contextFactory?.FlushConnections();
         }
