@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
+using osu.Game.Models;
 using Realms;
 
 #nullable enable
@@ -70,6 +72,27 @@ namespace osu.Game.Database
 
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
+
+            cleanupPendingDeletions();
+        }
+
+        private void cleanupPendingDeletions()
+        {
+            using (var realm = CreateContext())
+            using (var transaction = realm.BeginWrite())
+            {
+                var pendingDeleteSets = realm.All<RealmBeatmapSet>().Where(s => s.DeletePending);
+
+                foreach (var s in pendingDeleteSets)
+                {
+                    foreach (var b in s.Beatmaps)
+                        realm.Remove(b);
+
+                    realm.Remove(s);
+                }
+
+                transaction.Commit();
+            }
         }
 
         /// <summary>
