@@ -5,9 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -21,6 +24,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -28,10 +32,12 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [Resolved]
+        [CanBeNull]
+        [Resolved(CanBeNull = true)]
         private ScoreProcessor scoreProcessor { get; set; }
 
-        [Resolved]
+        [CanBeNull]
+        [Resolved(CanBeNull = true)]
         private Player player { get; set; }
 
         private DifficultyCalculator.TimedDifficultyAttributes[] timedAttributes;
@@ -47,18 +53,26 @@ namespace osu.Game.Screens.Play.HUD
         {
             Colour = colours.BlueLighter;
 
-            gameplayRuleset = player.GameplayRuleset;
-            timedAttributes = gameplayRuleset.CreateDifficultyCalculator(new GameplayWorkingBeatmap(player.GameplayBeatmap)).CalculateTimed(player.Mods.Value.ToArray()).ToArray();
+            if (player != null)
+            {
+                gameplayRuleset = player.GameplayRuleset;
+                timedAttributes = gameplayRuleset.CreateDifficultyCalculator(new GameplayWorkingBeatmap(player.GameplayBeatmap)).CalculateTimed(player.Mods.Value.ToArray()).ToArray();
+            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            scoreProcessor.NewJudgement += onNewJudgement;
+
+            if (scoreProcessor != null)
+                scoreProcessor.NewJudgement += onNewJudgement;
         }
 
         private void onNewJudgement(JudgementResult judgement)
         {
+            if (player == null)
+                return;
+
             var attribIndex = Array.BinarySearch(timedAttributes, 0, timedAttributes.Length, new DifficultyCalculator.TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
             if (attribIndex < 0)
                 attribIndex = ~attribIndex - 1;
