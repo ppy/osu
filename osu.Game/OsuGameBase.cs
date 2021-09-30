@@ -531,6 +531,7 @@ namespace osu.Game
 
             RulesetStore?.Dispose();
             LocalConfig?.Dispose();
+            onlineBeatmapLookupCache?.Dispose();
 
             contextFactory?.FlushConnections();
         }
