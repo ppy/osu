@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     Alpha = 0
                 };
                 extraGameplayVideos.Add(vid);
-                modSpecificGameplayVideos.Add((name["gameplay-".Length..], vid));
+                modSpecificGameplayVideos.Add((name.Substring("gameplay-".Length), vid));
             }
 
             AddRangeInternal(new Drawable[]
