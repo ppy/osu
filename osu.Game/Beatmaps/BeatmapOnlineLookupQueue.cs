@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps
     /// A component which handles population of online IDs for beatmaps using a two part lookup procedure.
     /// </summary>
     /// <remarks>
-    /// On creating the component, a copy of a database containing metadata for a large subset of beatmaps (stored to <see cref="cache_database_name"/>).
+    /// On creating the component, a copy of a database containing metadata for a large subset of beatmaps (stored to <see cref="cache_database_name"/>) will be downloaded if not already present locally.
     /// This will always be checked before doing a second online query to get required metadata.
     /// </remarks>
     [ExcludeFromDynamicCompile]
