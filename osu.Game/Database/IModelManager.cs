@@ -123,5 +123,17 @@ namespace osu.Game.Database
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         Task<TModel> Import(TModel item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Checks whether a given <typeparamref name="TModel"/> is already available in the local store.
+        /// </summary>
+        /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
+        /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
+        bool IsAvailableLocally(TModel model);
+
+        /// <summary>
+        /// A user displayable name for the model type associated with this manager.
+        /// </summary>
+        string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
     }
 }

@@ -21,8 +21,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
@@ -34,7 +32,7 @@ namespace osu.Game.Beatmaps
     /// Handles ef-core storage of beatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapModelManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
+    public class BeatmapModelManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -72,8 +70,8 @@ namespace osu.Game.Beatmaps
         private readonly BeatmapStore beatmaps;
         private readonly RulesetStore rulesets;
 
-        public BeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host = null)
-            : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
+        public BeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, GameHost host = null)
+            : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
 
@@ -83,9 +81,6 @@ namespace osu.Game.Beatmaps
             beatmaps.ItemRemoved += b => WorkingBeatmapCache?.Invalidate(b);
             beatmaps.ItemUpdated += obj => WorkingBeatmapCache?.Invalidate(obj);
         }
-
-        protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize) =>
-            new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
 
@@ -175,10 +170,6 @@ namespace osu.Game.Beatmaps
 
             void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
         }
-
-        protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items)
-            => base.CheckLocalAvailability(model, items)
-               || (model.OnlineBeatmapSetID != null && items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID));
 
         /// <summary>
         /// Delete a beatmap difficulty.
@@ -347,7 +338,11 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
-        protected override string HumanisedModelName => "beatmap";
+        public override string HumanisedModelName => "beatmap";
+
+        protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items)
+            => base.CheckLocalAvailability(model, items)
+               || (model.OnlineBeatmapSetID != null && items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID));
 
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
