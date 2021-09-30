@@ -17,7 +17,7 @@ namespace osu.Game.Database
     /// Represents a model manager that publishes events when <typeparamref name="TModel"/>s are added or removed.
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
-    public interface IModelManager<TModel>
+    public interface IModelManager<TModel> : IPostNotifications
         where TModel : class
     {
         /// <summary>
