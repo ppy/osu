@@ -13,24 +13,23 @@ using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.IO.Stores;
-using osu.Framework.Platform;
-using osu.Game.Beatmaps;
-using osu.Game.Configuration;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Cursor;
-using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
+using osu.Framework.Platform;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
@@ -160,8 +159,6 @@ namespace osu.Game
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
 
-        private IBindable<GameThreadState> updateThreadState;
-
         public OsuGameBase()
         {
             UseDevelopmentServer = DebugUtils.IsDebugBuild;
@@ -188,9 +185,6 @@ namespace osu.Game
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
-
-            updateThreadState = Host.UpdateThread.State.GetBoundCopy();
-            updateThreadState.BindValueChanged(updateThreadStateChanged);
 
             AddInternal(realmFactory);
 
@@ -365,23 +359,6 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Light");
             AddFont(Resources, @"Fonts/Venera/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
-        }
-
-        private IDisposable blocking;
-
-        private void updateThreadStateChanged(ValueChangedEvent<GameThreadState> state)
-        {
-            switch (state.NewValue)
-            {
-                case GameThreadState.Running:
-                    blocking?.Dispose();
-                    blocking = null;
-                    break;
-
-                case GameThreadState.Paused:
-                    blocking = realmFactory.BlockAllOperations();
-                    break;
-            }
         }
 
         protected override void LoadComplete()
