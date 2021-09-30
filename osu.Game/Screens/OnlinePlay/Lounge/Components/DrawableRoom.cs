@@ -333,6 +333,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     {
                         new Dimension(GridSizeMode.AutoSize),
                     },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
                     Content = new[]
                     {
                         new Drawable[]
