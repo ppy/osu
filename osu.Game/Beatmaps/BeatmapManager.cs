@@ -89,8 +89,9 @@ namespace osu.Game.Beatmaps
                 }
             };
 
-            var working = beatmapModelManager.Import(set).Result;
-            return GetWorkingBeatmap(working.Beatmaps.First());
+            var imported = beatmapModelManager.Import(set).Result.Value;
+
+            return GetWorkingBeatmap(imported.Beatmaps.First());
         }
 
         #region Delegation to BeatmapModelManager (methods which previously existed locally).
@@ -176,7 +177,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<BeatmapSetInfo>> PresentImport { set => beatmapModelManager.PresentImport = value; }
+        public Action<IEnumerable<ILive<BeatmapSetInfo>>> PresentImport { set => beatmapModelManager.PresentImport = value; }
 
         /// <summary>
         /// Delete a beatmap difficulty.
@@ -275,22 +276,22 @@ namespace osu.Game.Beatmaps
             return beatmapModelManager.Import(tasks);
         }
 
-        public Task<IEnumerable<BeatmapSetInfo>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public Task<IEnumerable<ILive<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             return beatmapModelManager.Import(notification, tasks);
         }
 
-        public Task<BeatmapSetInfo> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<BeatmapSetInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return beatmapModelManager.Import(task, lowPriority, cancellationToken);
         }
 
-        public Task<BeatmapSetInfo> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<BeatmapSetInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return beatmapModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<BeatmapSetInfo>> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return beatmapModelManager.Import(item, archive, lowPriority, cancellationToken);
         }
