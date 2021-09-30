@@ -133,20 +133,43 @@ namespace osu.Game.Database
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
+            // TODO: this can be added for safety once we figure how to bypass in test
+            // if (!ThreadSafety.IsUpdateThread)
+            //     throw new InvalidOperationException($"{nameof(BlockAllOperations)} must be called from the update thread.");
+
             Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
-            contextCreationLock.Wait();
+            try
+            {
+                contextCreationLock.Wait();
 
-            context?.Dispose();
-            context = null;
+                const int sleep_length = 200;
+                int timeout = 5000;
 
-            return new InvokeOnDisposal<RealmContextFactory>(this, endBlockingSection);
+                context?.Dispose();
+                context = null;
 
-            static void endBlockingSection(RealmContextFactory factory)
+                // see https://github.com/realm/realm-dotnet/discussions/2657
+                while (!Compact())
+                {
+                    Thread.Sleep(sleep_length);
+                    timeout -= sleep_length;
+
+                    if (timeout < 0)
+                        throw new TimeoutException("Took too long to acquire lock");
+                }
+            }
+            catch
+            {
+                contextCreationLock.Release();
+                throw;
+            }
+
+            return new InvokeOnDisposal<RealmContextFactory>(this, factory =>
             {
                 factory.contextCreationLock.Release();
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
-            }
+            });
         }
 
         protected override void Dispose(bool isDisposing)
@@ -155,8 +178,8 @@ namespace osu.Game.Database
 
             if (!IsDisposed)
             {
-                // intentionally block all operations indefinitely. this ensures that nothing can start consuming a new context after disposal.
-                BlockAllOperations();
+                // intentionally block context creation indefinitely. this ensures that nothing can start consuming a new context after disposal.
+                contextCreationLock.Wait();
                 contextCreationLock.Dispose();
             }
 
