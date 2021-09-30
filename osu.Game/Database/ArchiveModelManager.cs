@@ -57,9 +57,6 @@ namespace osu.Game.Database
         /// </summary>
         private static readonly ThreadedTaskScheduler import_scheduler_low_priority = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager<TModel, TFileModel>));
 
-        /// <summary>
-        /// Set an endpoint for notifications to be posted to.
-        /// </summary>
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
