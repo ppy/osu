@@ -299,22 +299,22 @@ namespace osu.Game.Scoring
 
         public IEnumerable<string> HandledExtensions => scoreModelManager.HandledExtensions;
 
-        public Task<IEnumerable<ScoreInfo>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public Task<IEnumerable<ILive<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             return scoreModelManager.Import(notification, tasks);
         }
 
-        public Task<ScoreInfo> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<ScoreInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return scoreModelManager.Import(task, lowPriority, cancellationToken);
         }
 
-        public Task<ScoreInfo> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<ScoreInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return scoreModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public Task<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<ScoreInfo>> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return scoreModelManager.Import(item, archive, lowPriority, cancellationToken);
         }
@@ -365,7 +365,7 @@ namespace osu.Game.Scoring
 
         #region Implementation of IPresentImports<ScoreInfo>
 
-        public Action<IEnumerable<ScoreInfo>> PresentImport
+        public Action<IEnumerable<ILive<ScoreInfo>>> PresentImport
         {
             set => scoreModelManager.PresentImport = value;
         }
