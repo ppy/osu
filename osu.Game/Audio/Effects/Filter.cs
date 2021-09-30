@@ -39,7 +39,7 @@ namespace osu.Game.Audio.Effects
 
         public void Disable()
         {
-            this.TransformBindableTo(filterFreq, SweepCutoffStart, SweepDuration, SweepEasing).OnComplete(_ => detatchFilter());
+            this.TransformBindableTo(filterFreq, SweepCutoffStart, SweepDuration, SweepEasing).OnComplete(_ => detachFilter());
         }
 
         private void attachFilter()
@@ -57,7 +57,7 @@ namespace osu.Game.Audio.Effects
             IsActive = true;
         }
 
-        private void detatchFilter()
+        private void detachFilter()
         {
             if (!IsActive) return;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Audio.Effects
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            detatchFilter();
+            detachFilter();
         }
     }
 }
