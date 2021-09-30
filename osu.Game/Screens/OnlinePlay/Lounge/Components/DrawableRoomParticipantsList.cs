@@ -261,9 +261,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             hostAvatar.User = host.NewValue;
             hostText.Clear();
 
-            hostText.AddText("hosted by ");
             if (host.NewValue != null)
+            {
+                hostText.AddText("hosted by ");
                 hostText.AddUserLink(host.NewValue);
+            }
         }
 
         private class CircularAvatar : CompositeDrawable
