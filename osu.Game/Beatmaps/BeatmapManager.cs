@@ -9,18 +9,13 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
-using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
@@ -31,7 +26,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
-using osu.Game.Users;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Beatmaps
@@ -40,7 +34,7 @@ namespace osu.Game.Beatmaps
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IBeatmapResourceProvider
+    public class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -60,12 +54,12 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<BeatmapSetInfo, CancellationToken, Task> PopulateOnlineInformation;
 
-        private readonly Bindable<WeakReference<BeatmapInfo>> beatmapRestored = new Bindable<WeakReference<BeatmapInfo>>();
-
         /// <summary>
-        /// A default representation of a WorkingBeatmap to use when no beatmap is available.
+        /// The game working beatmap cache, used to invalidate entries on changes.
         /// </summary>
-        public readonly WorkingBeatmap DefaultBeatmap;
+        public WorkingBeatmapCache WorkingBeatmapCache { private get; set; }
+
+        private readonly Bindable<WeakReference<BeatmapInfo>> beatmapRestored = new Bindable<WeakReference<BeatmapInfo>>();
 
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
@@ -75,68 +69,25 @@ namespace osu.Game.Beatmaps
 
         protected override Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage.GetSongStorage();
 
-        private readonly RulesetStore rulesets;
         private readonly BeatmapStore beatmaps;
-        private readonly AudioManager audioManager;
-        private readonly IResourceStore<byte[]> resources;
-        private readonly LargeTextureStore largeTextureStore;
-        private readonly ITrackStore trackStore;
+        private readonly RulesetStore rulesets;
 
-        [CanBeNull]
-        private readonly GameHost host;
-
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null,
-                              WorkingBeatmap defaultBeatmap = null)
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host = null)
             : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
-            this.audioManager = audioManager;
-            this.resources = resources;
-            this.host = host;
-
-            DefaultBeatmap = defaultBeatmap;
 
             beatmaps = (BeatmapStore)ModelStore;
             beatmaps.BeatmapHidden += b => beatmapHidden.Value = new WeakReference<BeatmapInfo>(b);
             beatmaps.BeatmapRestored += b => beatmapRestored.Value = new WeakReference<BeatmapInfo>(b);
-            beatmaps.ItemRemoved += removeWorkingCache;
-            beatmaps.ItemUpdated += removeWorkingCache;
-
-            largeTextureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
-            trackStore = audioManager.GetTrackStore(Files.Store);
+            beatmaps.ItemRemoved += b => WorkingBeatmapCache?.Invalidate(b);
+            beatmaps.ItemUpdated += obj => WorkingBeatmapCache?.Invalidate(obj);
         }
 
         protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize) =>
             new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
-
-        public WorkingBeatmap CreateNew(RulesetInfo ruleset, User user)
-        {
-            var metadata = new BeatmapMetadata
-            {
-                Author = user,
-            };
-
-            var set = new BeatmapSetInfo
-            {
-                Metadata = metadata,
-                Beatmaps = new List<BeatmapInfo>
-                {
-                    new BeatmapInfo
-                    {
-                        BaseDifficulty = new BeatmapDifficulty(),
-                        Ruleset = ruleset,
-                        Metadata = metadata,
-                        WidescreenStoryboard = true,
-                        SamplesMatchPlaybackRate = true,
-                    }
-                }
-            };
-
-            var working = Import(set).Result;
-            return GetWorkingBeatmap(working.Beatmaps.First());
-        }
 
         protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
@@ -278,43 +229,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            removeWorkingCache(info);
-        }
-
-        private readonly WeakList<BeatmapManagerWorkingBeatmap> workingCache = new WeakList<BeatmapManagerWorkingBeatmap>();
-
-        /// <summary>
-        /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
-        /// </summary>
-        /// <param name="beatmapInfo">The beatmap to lookup.</param>
-        /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
-        public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
-        {
-            // if there are no files, presume the full beatmap info has not yet been fetched from the database.
-            if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
-            {
-                int lookupId = beatmapInfo.ID;
-                beatmapInfo = QueryBeatmap(b => b.ID == lookupId);
-            }
-
-            if (beatmapInfo?.BeatmapSet == null)
-                return DefaultBeatmap;
-
-            lock (workingCache)
-            {
-                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
-                if (working != null)
-                    return working;
-
-                beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
-
-                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
-
-                // best effort; may be higher than expected.
-                GlobalStatistics.Get<int>(nameof(Beatmaps), $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
-
-                return working;
-            }
+            WorkingBeatmapCache?.Invalidate(info);
         }
 
         /// <summary>
@@ -514,35 +429,6 @@ namespace osu.Game.Beatmaps
 
             return endTime - startTime;
         }
-
-        private void removeWorkingCache(BeatmapSetInfo info)
-        {
-            if (info.Beatmaps == null) return;
-
-            foreach (var b in info.Beatmaps)
-                removeWorkingCache(b);
-        }
-
-        private void removeWorkingCache(BeatmapInfo info)
-        {
-            lock (workingCache)
-            {
-                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
-                if (working != null)
-                    workingCache.Remove(working);
-            }
-        }
-
-        #region IResourceStorageProvider
-
-        TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
-        ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
-        AudioManager IStorageResourceProvider.AudioManager => audioManager;
-        IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
-        IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
-        IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);
-
-        #endregion
 
         /// <summary>
         /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.
