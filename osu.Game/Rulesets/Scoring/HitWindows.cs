@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Game.Models.Interfaces;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Scoring
