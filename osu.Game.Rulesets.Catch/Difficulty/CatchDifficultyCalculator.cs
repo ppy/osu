@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 return new CatchDifficultyAttributes { Mods = mods, Skills = skills };
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
-            double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
             return new CatchDifficultyAttributes
             {
