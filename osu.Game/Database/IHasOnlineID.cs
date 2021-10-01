@@ -3,7 +3,7 @@
 
 #nullable enable
 
-namespace osu.Game.Beatmaps
+namespace osu.Game.Database
 {
     public interface IHasOnlineID
     {

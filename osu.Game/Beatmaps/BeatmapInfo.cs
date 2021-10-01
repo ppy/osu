@@ -17,13 +17,14 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo
     {
         public int ID { get; set; }
 
         public int BeatmapVersion;
 
         private int? onlineBeatmapID;
+        private IRulesetInfo ruleset;
 
         [JsonProperty("id")]
         public int? OnlineBeatmapID
@@ -187,5 +188,21 @@ namespace osu.Game.Beatmaps
         /// Returns a shallow-clone of this <see cref="BeatmapInfo"/>.
         /// </summary>
         public BeatmapInfo Clone() => (BeatmapInfo)MemberwiseClone();
+
+        #region Implementation of IHasOnlineID
+
+        public int? OnlineID => ID;
+
+        #endregion
+
+        #region Implementation of IBeatmapInfo
+
+        public string DifficultyName => Version;
+        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
+        public IBeatmapDifficultyInfo Difficulty => BaseDifficulty;
+        IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+        public double StarRating => StarDifficulty;
+
+        #endregion
     }
 }

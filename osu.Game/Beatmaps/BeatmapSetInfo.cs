@@ -12,7 +12,7 @@ using osu.Game.Database;
 namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
-    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>
+    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
     {
         public int ID { get; set; }
 
@@ -90,5 +90,19 @@ namespace osu.Game.Beatmaps
 
             return ReferenceEquals(this, other);
         }
+
+        #region Implementation of IHasOnlineID
+
+        public int? OnlineID => ID;
+
+        #endregion
+
+        #region Implementation of IBeatmapSetInfo
+
+        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata;
+        IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
+        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
+
+        #endregion
     }
 }

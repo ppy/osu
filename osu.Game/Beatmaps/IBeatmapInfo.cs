@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Localisation;
+using osu.Game.Database;
+using osu.Game.Rulesets;
 
 #nullable enable
 
