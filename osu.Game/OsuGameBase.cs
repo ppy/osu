@@ -187,7 +187,7 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client"));
 
             updateThreadState = Host.UpdateThread.State.GetBoundCopy();
             updateThreadState.BindValueChanged(updateThreadStateChanged);
@@ -448,19 +448,20 @@ namespace osu.Game
         private void migrateDataToRealm()
         {
             using (var db = contextFactory.GetForWrite())
-            using (var usage = realmFactory.GetForWrite())
+            using (var realm = realmFactory.CreateContext())
+            using (var transaction = realm.BeginWrite())
             {
                 // migrate ruleset settings. can be removed 20220315.
                 var existingSettings = db.Context.DatabasedSetting;
 
                 // only migrate data if the realm database is empty.
-                if (!usage.Realm.All<RealmRulesetSetting>().Any())
+                if (!realm.All<RealmRulesetSetting>().Any())
                 {
                     foreach (var dkb in existingSettings)
                     {
                         if (dkb.RulesetID == null) continue;
 
-                        usage.Realm.Add(new RealmRulesetSetting
+                        realm.Add(new RealmRulesetSetting
                         {
                             Key = dkb.Key,
                             Value = dkb.StringValue,
@@ -472,7 +473,7 @@ namespace osu.Game
 
                 db.Context.RemoveRange(existingSettings);
 
-                usage.Commit();
+                transaction.Commit();
             }
         }
 
