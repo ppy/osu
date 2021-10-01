@@ -177,7 +177,7 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         var startTime = Parsing.ParseDouble(split[1]);
                         var repeatCount = Parsing.ParseInt(split[2]);
-                        timelineGroup = storyboardSprite?.AddLoop(startTime, Math.Max(0, repeatCount));
+                        timelineGroup = storyboardSprite?.AddLoop(startTime, Math.Max(0, repeatCount - 1));
                         break;
                     }
 
