@@ -117,7 +117,7 @@ namespace osu.Game.Tournament.Components
             if ((mods & LegacyMods.DoubleTime) > 0)
             {
                 // temporary local calculation (taken from OsuDifficultyCalculator)
-                double preempt = (int)BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / 1.5;
+                double preempt = (int)IBeatmapDifficultyInfo.DifficultyRange(ar, 1800, 1200, 450) / 1.5;
                 ar = (float)(preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5);
 
                 bpm *= 1.5f;

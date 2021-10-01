@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 case IHasDuration endTimeData:
                 {
-                    double hitMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 3, 5, 7.5) * swell_hit_multiplier;
+                    double hitMultiplier = IBeatmapDifficultyInfo.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 3, 5, 7.5) * swell_hit_multiplier;
 
                     yield return new Swell
                     {
@@ -193,9 +193,10 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         private class TaikoMutliplierAppliedDifficulty : BeatmapDifficulty
         {
-            public TaikoMutliplierAppliedDifficulty(BeatmapDifficulty difficulty)
+            public TaikoMutliplierAppliedDifficulty(IBeatmapDifficultyInfo difficulty)
             {
-                difficulty.CopyTo(this);
+                CopyFrom(difficulty);
+
                 SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
         }

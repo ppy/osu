@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         #region Reduce AR (IApplicableToDifficulty)
 
-        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
+        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
         {
         }
 

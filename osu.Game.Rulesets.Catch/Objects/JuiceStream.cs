@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public double SpanDuration => Duration / this.SpanCount();
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 

@@ -452,7 +452,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestSpinner : Spinner
         {
-            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
             {
                 base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
                 SpinsRequired = 1;
