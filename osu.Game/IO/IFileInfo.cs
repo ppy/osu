@@ -3,7 +3,7 @@
 
 #nullable enable
 
-namespace osu.Game.Beatmaps
+namespace osu.Game.IO
 {
     /// <summary>
     /// A representation of a tracked file.

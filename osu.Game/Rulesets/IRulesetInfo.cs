@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets;
+using osu.Game.Database;
 
 #nullable enable
 
-namespace osu.Game.Beatmaps
+namespace osu.Game.Rulesets
 {
     /// <summary>
     /// A representation of a ruleset's metadata.

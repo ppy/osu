@@ -15,7 +15,7 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey
+    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey, IBeatmapMetadataInfo
     {
         public int ID { get; set; }
 
@@ -128,5 +128,7 @@ namespace osu.Game.Beatmaps
                    && AudioFile == other.AudioFile
                    && BackgroundFile == other.BackgroundFile;
         }
+
+        string IBeatmapMetadataInfo.Author => AuthorString;
     }
 }
