@@ -157,13 +157,9 @@ namespace osu.Game.Beatmaps
             Version
         }.Concat(Metadata?.SearchableTerms ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
 
-        public override string ToString() => $"{Metadata ?? BeatmapSet?.Metadata} {versionString}".Trim();
+        public override string ToString() => ((IBeatmapInfo)this).DisplayTitle;
 
-        public RomanisableString ToRomanisableString()
-        {
-            var metadata = (Metadata ?? BeatmapSet?.Metadata)?.ToRomanisableString() ?? new RomanisableString(null, null);
-            return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
-        }
+        public RomanisableString ToRomanisableString() => ((IBeatmapInfo)this).DisplayTitleRomanisable;
 
         public bool Equals(BeatmapInfo other)
         {
