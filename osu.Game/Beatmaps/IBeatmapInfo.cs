@@ -64,8 +64,14 @@ namespace osu.Game.Beatmaps
         /// </summary>
         double StarRating { get; }
 
+        /// <summary>
+        /// A user-presentable display title representing this metadata.
+        /// </summary>
         string DisplayTitle => $"{Metadata} {versionString}".Trim();
 
+        /// <summary>
+        /// A user-presentable display title representing this beatmap, with localisation handling for potentially romanisable fields.
+        /// </summary>
         RomanisableString DisplayTitleRomanisable
         {
             get
