@@ -13,7 +13,7 @@ namespace osu.Game.Database
         Realm Context { get; }
 
         /// <summary>
-        /// Create a new realm context for use on an arbitrary thread.
+        /// Create a new realm context for use on the current thread.
         /// </summary>
         Realm CreateContext();
     }
