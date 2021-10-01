@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
 using Realms;
@@ -16,6 +17,19 @@ namespace osu.Game.Tests.Database
 {
     public class RealmLiveTests : RealmTest
     {
+        [Test]
+        public void TestLiveCastability()
+        {
+            RunTestWithRealm((realmFactory, _) =>
+            {
+                RealmLive<RealmBeatmap> beatmap = realmFactory.CreateContext().Write(r => r.Add(new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata()))).ToLive();
+
+                ILive<IBeatmapInfo> iBeatmap = beatmap;
+
+                Assert.AreEqual(0, iBeatmap.Value.Length);
+            });
+        }
+
         [Test]
         public void TestValueAccessWithOpenContext()
         {
