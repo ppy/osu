@@ -38,10 +38,26 @@ namespace osu.Game.Tests.Database
                     testAction(realmFactory, testStorage);
 
                     realmFactory.Dispose();
-                    Logger.Log($"Final database size: {testStorage.GetStream(realmFactory.Filename)?.Length ?? 0}");
+
+                    try
+                    {
+                        Logger.Log($"Final database size: {testStorage.GetStream(realmFactory.Filename)?.Length ?? 0}");
+                    }
+                    catch
+                    {
+                        // windows runs may error due to file still being open.
+                    }
 
                     realmFactory.Compact();
-                    Logger.Log($"Final database size after compact: {testStorage.GetStream(realmFactory.Filename)?.Length ?? 0}");
+
+                    try
+                    {
+                        Logger.Log($"Final database size after compact: {testStorage.GetStream(realmFactory.Filename)?.Length ?? 0}");
+                    }
+                    catch
+                    {
+                        // windows runs may error due to file still being open.
+                    }
                 }
             });
         }
