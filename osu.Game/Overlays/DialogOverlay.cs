@@ -21,7 +21,7 @@ namespace osu.Game.Overlays
         protected override string PopInSampleName => "UI/dialog-pop-in";
         protected override string PopOutSampleName => "UI/dialog-pop-out";
 
-        private Filter filter;
+        private Filter lpFilter;
 
         public PopupDialog CurrentDialog { get; private set; }
 
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            AddInternal(filter = new Filter(audio.TrackMixer));
+            AddInternal(lpFilter = new Filter(audio.TrackMixer));
         }
 
         public void Push(PopupDialog dialog)
@@ -82,14 +82,12 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
             this.FadeIn(PopupDialog.ENTER_DURATION, Easing.OutQuint);
-            filter.Enable();
+            lpFilter.CutoffTo(2000).Then().CutoffTo(150, 100, Easing.OutCubic);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-
-            filter.Disable();
 
             if (CurrentDialog?.State.Value == Visibility.Visible)
             {
@@ -98,6 +96,7 @@ namespace osu.Game.Overlays
             }
 
             this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
+            lpFilter.CutoffTo(2000, 100, Easing.InCubic).Then().CutoffTo(lpFilter.MaxCutoff);
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

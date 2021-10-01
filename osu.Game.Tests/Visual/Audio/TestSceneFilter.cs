@@ -6,74 +6,77 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tests.Visual.Audio
 {
     public class TestSceneFilter : OsuTestScene
     {
-        [Resolved]
-        private AudioManager audio { get; set; }
-
         private WorkingBeatmap testBeatmap;
-        private Filter lowPassFilter;
-        private Filter highPassFilter;
-        private Filter bandPassFilter;
+
+        private OsuSpriteText lowpassText;
+        private OsuSpriteText highpassText;
+        private Filter lowpassFilter;
+        private Filter highpassFilter;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             testBeatmap = new WaveformTestBeatmap(audio);
-            AddRange(new Drawable[]
+            lowpassFilter = new Filter(audio.TrackMixer);
+            highpassFilter = new Filter(audio.TrackMixer, BQFType.HighPass);
+            Add(new FillFlowContainer
             {
-                lowPassFilter = new Filter(audio.TrackMixer)
+                Children = new Drawable[]
                 {
-                    FilterType = BQFType.LowPass,
-                    SweepCutoffStart = 2000,
-                    SweepCutoffEnd = 150,
-                    SweepDuration = 1000
-                },
-                highPassFilter = new Filter(audio.TrackMixer)
-                {
-                    FilterType = BQFType.HighPass,
-                    SweepCutoffStart = 150,
-                    SweepCutoffEnd = 2000,
-                    SweepDuration = 1000
-                },
-                bandPassFilter = new Filter(audio.TrackMixer)
-                {
-                    FilterType = BQFType.BandPass,
-                    SweepCutoffStart = 150,
-                    SweepCutoffEnd = 20000,
-                    SweepDuration = 1000
-                },
+                    lowpassText = new OsuSpriteText
+                    {
+                        Padding = new MarginPadding(20),
+                        Text = $"Low Pass: {lowpassFilter.Cutoff.Value}hz",
+                        Font = new FontUsage(size: 40)
+                    },
+                    new OsuSliderBar<int>
+                    {
+                        Width = 500,
+                        Height = 50,
+                        Padding = new MarginPadding(20),
+                        Current = { BindTarget = lowpassFilter.Cutoff }
+                    },
+                    highpassText = new OsuSpriteText
+                    {
+                        Padding = new MarginPadding(20),
+                        Text = $"High Pass: {highpassFilter.Cutoff.Value}hz",
+                        Font = new FontUsage(size: 40)
+                    },
+                    new OsuSliderBar<int>
+                    {
+                        Width = 500,
+                        Height = 50,
+                        Padding = new MarginPadding(20),
+                        Current = { BindTarget = highpassFilter.Cutoff }
+                    }
+                }
             });
+            lowpassFilter.Cutoff.ValueChanged += e => lowpassText.Text = $"Low Pass: {e.NewValue}hz";
+            highpassFilter.Cutoff.ValueChanged += e => highpassText.Text = $"High Pass: {e.NewValue}hz";
         }
 
         [Test]
-        public void TestLowPass()
-        {
-            testFilter(lowPassFilter);
-        }
+        public void TestLowPass() => testFilter(lowpassFilter, lowpassFilter.MaxCutoff, 0);
 
         [Test]
-        public void TestHighPass()
-        {
-            testFilter(highPassFilter);
-        }
+        public void TestHighPass() => testFilter(highpassFilter, 0, highpassFilter.MaxCutoff);
 
-        [Test]
-        public void TestBandPass()
+        private void testFilter(Filter filter, int cutoffFrom, int cutoffTo)
         {
-            testFilter(bandPassFilter);
-        }
-
-        private void testFilter(Filter filter)
-        {
+            Add(filter);
             AddStep("Prepare Track", () =>
             {
-                testBeatmap = new WaveformTestBeatmap(audio);
                 testBeatmap.LoadTrack();
             });
             AddStep("Play Track", () =>
@@ -81,14 +84,19 @@ namespace osu.Game.Tests.Visual.Audio
                 testBeatmap.Track.Start();
             });
             AddWaitStep("Let track play", 10);
-            AddStep("Enable Filter", filter.Enable);
-            AddWaitStep("Let track play", 10);
-            AddStep("Disable Filter", filter.Disable);
-            AddWaitStep("Let track play", 10);
-            AddStep("Stop Track", () =>
+            AddStep("Filter Sweep", () =>
             {
-                testBeatmap.Track.Stop();
+                filter.CutoffTo(cutoffFrom).Then()
+                      .CutoffTo(cutoffTo, 2000, cutoffFrom > cutoffTo ? Easing.OutCubic : Easing.InCubic);
             });
+            AddWaitStep("Let track play", 10);
+            AddStep("Filter Sweep (reverse)", () =>
+            {
+                filter.CutoffTo(cutoffTo).Then()
+                      .CutoffTo(cutoffFrom, 2000, cutoffTo > cutoffFrom ? Easing.OutCubic : Easing.InCubic);
+            });
+            AddWaitStep("Let track play", 10);
+            AddStep("Stop track", () => testBeatmap.Track.Stop());
         }
     }
 }
