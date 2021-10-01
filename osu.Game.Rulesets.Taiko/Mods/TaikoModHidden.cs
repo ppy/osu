@@ -2,34 +2,44 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.UI;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModHidden : ModHidden
+    public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>
     {
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
 
-        private ControlPointInfo controlPointInfo;
+        /// <summary>
+        /// How far away from the hit target should hitobjects start to fade out.
+        /// Range: [0, 1]
+        /// </summary>
+        private const float fade_out_start_time = 1f;
+
+        /// <summary>
+        /// How long hitobjects take to fade out, in terms of the scrolling length.
+        /// Range: [0, 1]
+        /// </summary>
+        private const float fade_out_duration = 0.375f;
+
+        private DrawableTaikoRuleset drawableRuleset;
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
+        {
+            this.drawableRuleset = (DrawableTaikoRuleset)drawableRuleset;
+        }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
             ApplyNormalVisibilityState(hitObject, state);
-        }
-
-        protected double MultiplierAt(double position)
-        {
-            double beatLength = controlPointInfo.TimingPointAt(position).BeatLength;
-            double speedMultiplier = controlPointInfo.DifficultyPointAt(position).SpeedMultiplier;
-
-            return speedMultiplier * TimingControlPoint.DEFAULT_BEAT_LENGTH / beatLength;
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
@@ -38,9 +48,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
             {
                 case DrawableDrumRollTick _:
                 case DrawableHit _:
-                    double preempt = 10000 / MultiplierAt(hitObject.HitObject.StartTime);
-                    double start = hitObject.HitObject.StartTime - preempt * 0.6;
-                    double duration = preempt * 0.3;
+                    double preempt = drawableRuleset.TimeRange.Value / drawableRuleset.ControlPointAt(hitObject.HitObject.StartTime).Multiplier;
+                    double start = hitObject.HitObject.StartTime - preempt * fade_out_start_time;
+                    double duration = preempt * fade_out_duration;
 
                     using (hitObject.BeginAbsoluteSequence(start))
                     {
@@ -55,11 +65,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                     break;
             }
-        }
-
-        public override void ApplyToBeatmap(IBeatmap beatmap)
-        {
-            controlPointInfo = beatmap.ControlPointInfo;
         }
     }
 }

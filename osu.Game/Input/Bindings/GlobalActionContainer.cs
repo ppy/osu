@@ -75,6 +75,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.A }, GlobalAction.EditorVerifyMode),
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
+            new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridDisplayMode),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -284,6 +285,9 @@ namespace osu.Game.Input.Bindings
         SeekReplayBackward,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChatFocus))]
-        ToggleChatFocus
+        ToggleChatFocus,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridDisplayMode))]
+        EditorCycleGridDisplayMode
     }
 }
