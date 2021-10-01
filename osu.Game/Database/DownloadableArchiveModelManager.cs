@@ -54,12 +54,6 @@ namespace osu.Game.Database
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool minimiseDownloadSize);
 
-        /// <summary>
-        /// Begin a download for the requested <typeparamref name="TModel"/>.
-        /// </summary>
-        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
-        /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
-        /// <returns>Whether the download was started.</returns>
         public bool Download(TModel model, bool minimiseDownloadSize = false)
         {
             if (!canDownload(model)) return false;
