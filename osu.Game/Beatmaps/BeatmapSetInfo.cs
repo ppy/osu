@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
 
@@ -61,6 +62,7 @@ namespace osu.Game.Beatmaps
 
         public string Hash { get; set; }
 
+        [JsonIgnore]
         public string StoryboardFile => ((IBeatmapSetInfo)this).StoryboardFile;
 
         /// <summary>
