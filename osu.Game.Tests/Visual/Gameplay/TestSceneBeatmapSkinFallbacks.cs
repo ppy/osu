@@ -84,17 +84,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             Remove(expectedComponentsAdjustmentContainer);
 
             return almostEqual(actualInfo, expectedInfo);
-
-            static bool almostEqual(SkinnableInfo info, SkinnableInfo other) =>
-                other != null
-                && info.Type == other.Type
-                && info.Anchor == other.Anchor
-                && info.Origin == other.Origin
-                && Precision.AlmostEquals(info.Position, other.Position)
-                && Precision.AlmostEquals(info.Scale, other.Scale)
-                && Precision.AlmostEquals(info.Rotation, other.Rotation)
-                && info.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableInfo>(almostEqual));
         }
+
+        private static bool almostEqual(SkinnableInfo info, SkinnableInfo other) =>
+            other != null
+            && info.Type == other.Type
+            && info.Anchor == other.Anchor
+            && info.Origin == other.Origin
+            && Precision.AlmostEquals(info.Position, other.Position, 1)
+            && Precision.AlmostEquals(info.Scale, other.Scale)
+            && Precision.AlmostEquals(info.Rotation, other.Rotation)
+            && info.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableInfo>(almostEqual));
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
             => new CustomSkinWorkingBeatmap(beatmap, storyboard, Clock, Audio, currentBeatmapSkin);
