@@ -524,6 +524,7 @@ namespace osu.Game
             base.Dispose(isDisposing);
 
             RulesetStore?.Dispose();
+            BeatmapManager?.Dispose();
             LocalConfig?.Dispose();
 
             contextFactory?.FlushConnections();
