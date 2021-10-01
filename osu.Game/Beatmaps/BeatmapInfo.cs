@@ -196,11 +196,12 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IBeatmapInfo
 
-        public string DifficultyName => Version;
+        string IBeatmapInfo.DifficultyName => Version;
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
-        public IBeatmapDifficultyInfo Difficulty => BaseDifficulty;
+        IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
+        IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
-        public double StarRating => StarDifficulty;
+        double IBeatmapInfo.StarRating => StarDifficulty;
 
         #endregion
     }

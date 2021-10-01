@@ -30,6 +30,11 @@ namespace osu.Game.Beatmaps
         IBeatmapDifficultyInfo Difficulty { get; }
 
         /// <summary>
+        /// The beatmap set this beatmap is part of.
+        /// </summary>
+        IBeatmapSetInfo BeatmapSet { get; }
+
+        /// <summary>
         /// The playable length in milliseconds of this beatmap.
         /// </summary>
         double Length { get; }
