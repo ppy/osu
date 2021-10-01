@@ -12,6 +12,9 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Play
 {
+    /// <summary>
+    /// The state of an active gameplay session, generally constructed and exposed by <see cref="Player"/>.
+    /// </summary>
     public class GameplayState
     {
         /// <summary>
@@ -19,9 +22,22 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public readonly IBeatmap Beatmap;
 
+        /// <summary>
+        /// The ruleset used in gameplay.
+        /// </summary>
         public readonly Ruleset Ruleset;
 
+        /// <summary>
+        /// The mods applied to the gameplay.
+        /// </summary>
         public IReadOnlyList<Mod> Mods;
+
+        /// <summary>
+        /// A bindable tracking the last judgement result applied to any hit object.
+        /// </summary>
+        public IBindable<JudgementResult> LastJudgementResult => lastJudgementResult;
+
+        private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
 
         public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod> mods)
         {
@@ -30,10 +46,10 @@ namespace osu.Game.Screens.Play
             Mods = mods;
         }
 
-        private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
-
-        public IBindable<JudgementResult> LastJudgementResult => lastJudgementResult;
-
+        /// <summary>
+        /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="GameplayState"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
         public void ApplyResult(JudgementResult result) => lastJudgementResult.Value = result;
     }
 }
