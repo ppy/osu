@@ -222,20 +222,9 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>The <see cref="Skill"/>s.</returns>
         protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
 
-        public class TimedDifficultyAttributes : IComparable<TimedDifficultyAttributes>
-        {
-            public readonly double Time;
-            public readonly DifficultyAttributes Attributes;
-
-            public TimedDifficultyAttributes(double time, DifficultyAttributes attributes)
-            {
-                Time = time;
-                Attributes = attributes;
-            }
-
-            public int CompareTo(TimedDifficultyAttributes other) => Time.CompareTo(other.Time);
-        }
-
+        /// <summary>
+        /// Used to calculate timed difficulty attributes, where only a subset of hitobjects should be visible at any point in time.
+        /// </summary>
         private class ProgressiveCalculationBeatmap : IBeatmap
         {
             private readonly IBeatmap baseBeatmap;
