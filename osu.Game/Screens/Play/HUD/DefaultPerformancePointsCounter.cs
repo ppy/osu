@@ -143,9 +143,9 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             public override IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
-                => gameplayBeatmap;
+                => gameplayBeatmap.PlayableBeatmap;
 
-            protected override IBeatmap GetBeatmap() => gameplayBeatmap;
+            protected override IBeatmap GetBeatmap() => gameplayBeatmap.PlayableBeatmap;
 
             protected override Texture GetBackground() => throw new NotImplementedException();
 
