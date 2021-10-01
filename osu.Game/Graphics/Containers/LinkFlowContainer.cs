@@ -87,22 +87,24 @@ namespace osu.Game.Graphics.Containers
 
         private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
         {
-            AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
+            var linkCompiler = CreateLinkCompiler(drawables.OfType<SpriteText>());
+            linkCompiler.RelativeSizeAxes = Axes.Both;
+            linkCompiler.TooltipText = tooltipText;
+            linkCompiler.Action = () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                TooltipText = tooltipText,
-                Action = () =>
-                {
-                    if (action != null)
-                        action();
-                    else if (game != null)
-                        game.HandleLink(link);
-                    // fallback to handle cases where OsuGame is not available, ie. tournament client.
-                    else if (link.Action == LinkAction.External)
-                        host.OpenUrlExternally(link.Argument);
-                },
-            });
+                if (action != null)
+                    action();
+                else if (game != null)
+                    game.HandleLink(link);
+                // fallback to handle cases where OsuGame is not available, ie. tournament client.
+                else if (link.Action == LinkAction.External)
+                    host.OpenUrlExternally(link.Argument);
+            };
+
+            AddInternal(linkCompiler);
         }
+
+        protected virtual DrawableLinkCompiler CreateLinkCompiler(IEnumerable<SpriteText> parts) => new DrawableLinkCompiler(parts);
 
         // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
         // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for the compilers to be relative size in the flow's auto-size axes - an unsupported operation.

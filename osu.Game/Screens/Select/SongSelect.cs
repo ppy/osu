@@ -53,6 +53,8 @@ namespace osu.Game.Screens.Select
 
         protected virtual bool DisplayStableImportPrompt => stableImportManager?.SupportsImportFromStable == true;
 
+        public override bool? AllowTrackAdjustments => true;
+
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
@@ -349,7 +351,7 @@ namespace osu.Game.Screens.Select
                 throw new InvalidOperationException($"Attempted to edit when {nameof(AllowEditing)} is disabled");
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
-            this.Push(new Editor());
+            this.Push(new EditorLoader());
         }
 
         /// <summary>
@@ -810,11 +812,11 @@ namespace osu.Game.Screens.Select
                 Schedule(() => BeatmapDetails.Refresh())));
         }
 
-        public virtual bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (!this.IsCurrentScreen()) return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Select:
                     FinaliseSelection();
@@ -824,7 +826,7 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 

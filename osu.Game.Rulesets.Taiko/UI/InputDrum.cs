@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
@@ -151,19 +152,19 @@ namespace osu.Game.Rulesets.Taiko.UI
             [Resolved(canBeNull: true)]
             private GameplayClock gameplayClock { get; set; }
 
-            public bool OnPressed(TaikoAction action)
+            public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
                 Drawable target = null;
                 Drawable back = null;
 
-                if (action == CentreAction)
+                if (e.Action == CentreAction)
                 {
                     target = centreHit;
                     back = centre;
 
                     sampleTriggerSource.Play(HitType.Centre);
                 }
-                else if (action == RimAction)
+                else if (e.Action == RimAction)
                 {
                     target = rimHit;
                     back = rim;
@@ -195,7 +196,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 return false;
             }
 
-            public void OnReleased(TaikoAction action)
+            public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
             {
             }
         }

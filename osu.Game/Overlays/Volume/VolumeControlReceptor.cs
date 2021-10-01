@@ -19,27 +19,27 @@ namespace osu.Game.Overlays.Volume
 
         private ScheduledDelegate keyRepeat;
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.DecreaseVolume:
                 case GlobalAction.IncreaseVolume:
                     keyRepeat?.Cancel();
-                    keyRepeat = this.BeginKeyRepeat(Scheduler, () => ActionRequested?.Invoke(action), 150);
+                    keyRepeat = this.BeginKeyRepeat(Scheduler, () => ActionRequested?.Invoke(e.Action), 150);
                     return true;
 
                 case GlobalAction.ToggleMute:
                 case GlobalAction.NextVolumeMeter:
                 case GlobalAction.PreviousVolumeMeter:
-                    ActionRequested?.Invoke(action);
+                    ActionRequested?.Invoke(e.Action);
                     return true;
             }
 
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
             keyRepeat?.Cancel();
         }
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Volume
             return true;
         }
 
-        public bool OnScroll(GlobalAction action, float amount, bool isPrecise) =>
-            ScrollActionRequested?.Invoke(action, amount, isPrecise) ?? false;
+        public bool OnScroll(KeyBindingScrollEvent<GlobalAction> e) =>
+            ScrollActionRequested?.Invoke(e.Action, e.ScrollAmount, e.IsPrecise) ?? false;
     }
 }

@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
@@ -84,37 +82,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
-
-            if (IsForCurrentRuleset && original.ControlPointInfo is LegacyControlPointInfo originalLegacyControlPoints)
-            {
-                // original is cloned so we're safe to replace control point storage at this point.
-                original.ControlPointInfo = new LegacyControlPointInfo();
-
-                // convert all slider velocity adjustments to scroll speed adjustments.
-                foreach (var controlPoint in originalLegacyControlPoints.AllControlPoints)
-                {
-                    double time = controlPoint.Time;
-
-                    switch (controlPoint)
-                    {
-                        default:
-                            original.ControlPointInfo.Add(time, controlPoint);
-                            break;
-
-                        case DifficultyControlPoint difficultyPoint:
-                            var reference = originalLegacyControlPoints.EffectPointAt(time);
-
-                            var scrollControlPoint = new EffectControlPoint();
-
-                            scrollControlPoint.CopyFrom(reference);
-                            scrollControlPoint.ScrollSpeed = difficultyPoint.SliderVelocity;
-
-                            original.ControlPointInfo.Add(time, scrollControlPoint);
-                            break;
-                    }
-                }
-            }
-
             int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new FastRandom(seed);
 

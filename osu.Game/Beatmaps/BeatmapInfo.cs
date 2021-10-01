@@ -93,6 +93,12 @@ namespace osu.Game.Beatmaps
         public bool WidescreenStoryboard { get; set; }
         public bool EpilepsyWarning { get; set; }
 
+        /// <summary>
+        /// Whether or not sound samples should change rate when playing with speed-changing mods.
+        /// TODO: only read/write supported for now, requires implementation in gameplay.
+        /// </summary>
+        public bool SamplesMatchPlaybackRate { get; set; }
+
         public CountdownType Countdown { get; set; } = CountdownType.Normal;
 
         /// <summary>

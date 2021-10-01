@@ -372,9 +372,9 @@ namespace osu.Game.Overlays
             return base.OnKeyDown(e);
         }
 
-        public bool OnPressed(PlatformAction action)
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case PlatformAction.TabNew:
                     ChannelTabControl.SelectChannelSelectorTab();
@@ -392,7 +392,7 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        public void OnReleased(PlatformAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
         }
 
