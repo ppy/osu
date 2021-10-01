@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
 
-        private DifficultyCalculator.TimedDifficultyAttributes[] timedAttributes;
+        private TimedDifficultyAttributes[] timedAttributes;
         private Ruleset gameplayRuleset;
 
         public DefaultPerformancePointsCounter()
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Play.HUD
             if (player == null)
                 return;
 
-            var attribIndex = Array.BinarySearch(timedAttributes, 0, timedAttributes.Length, new DifficultyCalculator.TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
+            var attribIndex = Array.BinarySearch(timedAttributes, 0, timedAttributes.Length, new TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
             if (attribIndex < 0)
                 attribIndex = ~attribIndex - 1;
             attribIndex = Math.Clamp(attribIndex, 0, timedAttributes.Length - 1);
