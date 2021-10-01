@@ -160,8 +160,15 @@ namespace osu.Game.Graphics.UserInterface
             this.TransformTo(nameof(DisplayedCount), newValue, rollingTotalDuration, RollingEasing);
         }
 
+        /// <summary>
+        /// Creates the text. Delegates to <see cref="CreateSpriteText"/> by default.
+        /// </summary>
         protected virtual IHasText CreateText() => CreateSpriteText();
 
+        /// <summary>
+        /// Creates an <see cref="OsuSpriteText"/> which may be used to display this counter's text.
+        /// May not be called if <see cref="CreateText"/> is overridden.
+        /// </summary>
         protected virtual OsuSpriteText CreateSpriteText() => new OsuSpriteText
         {
             Font = OsuFont.Numeric.With(size: 40f),
