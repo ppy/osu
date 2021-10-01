@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IDisposable, IBeatmapResourceProvider
+    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IBeatmapResourceProvider
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -53,6 +53,11 @@ namespace osu.Game.Beatmaps
         /// Fired when a single difficulty has been restored.
         /// </summary>
         public IBindable<WeakReference<BeatmapInfo>> BeatmapRestored => beatmapRestored;
+
+        /// <summary>
+        /// An online lookup queue component which handles populating online beatmap metadata.
+        /// </summary>
+        public BeatmapOnlineLookupQueue OnlineLookupQueue { private get; set; }
 
         private readonly Bindable<WeakReference<BeatmapInfo>> beatmapRestored = new Bindable<WeakReference<BeatmapInfo>>();
 
@@ -79,11 +84,8 @@ namespace osu.Game.Beatmaps
         [CanBeNull]
         private readonly GameHost host;
 
-        [CanBeNull]
-        private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
-
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null,
-                              WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
+                              WorkingBeatmap defaultBeatmap = null)
             : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
@@ -98,9 +100,6 @@ namespace osu.Game.Beatmaps
             beatmaps.BeatmapRestored += b => beatmapRestored.Value = new WeakReference<BeatmapInfo>(b);
             beatmaps.ItemRemoved += removeWorkingCache;
             beatmaps.ItemUpdated += removeWorkingCache;
-
-            if (performOnlineLookups)
-                onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
 
             largeTextureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
             trackStore = audioManager.GetTrackStore(Files.Store);
@@ -156,8 +155,8 @@ namespace osu.Game.Beatmaps
 
             bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0);
 
-            if (onlineLookupQueue != null)
-                await onlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken).ConfigureAwait(false);
+            if (OnlineLookupQueue != null)
+                await OnlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken).ConfigureAwait(false);
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
@@ -531,11 +530,6 @@ namespace osu.Game.Beatmaps
                 if (working != null)
                     workingCache.Remove(working);
             }
-        }
-
-        public void Dispose()
-        {
-            onlineLookupQueue?.Dispose();
         }
 
         #region IResourceStorageProvider
