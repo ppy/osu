@@ -65,8 +65,11 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room))]
         protected Bindable<TimeSpan?> Duration { get; private set; }
 
+        [Resolved(CanBeNull = true)]
+        private IBindable<PlaylistItem> subScreenSelectedItem { get; set; }
+
         /// <summary>
-        /// The currently selected item in the <see cref="RoomSubScreen"/>, or the first item from <see cref="Playlist"/>
+        /// The currently selected item in the <see cref="RoomSubScreen"/>, or the last item from <see cref="Playlist"/>
         /// if this <see cref="OnlinePlayComposite"/> is not within a <see cref="RoomSubScreen"/>.
         /// </summary>
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
@@ -75,12 +78,13 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.LoadComplete();
 
+            subScreenSelectedItem?.BindValueChanged(_ => UpdateSelectedItem());
             Playlist.BindCollectionChanged((_, __) => UpdateSelectedItem(), true);
         }
 
         protected virtual void UpdateSelectedItem()
-        {
-            SelectedItem.Value = Playlist.FirstOrDefault();
-        }
+            => SelectedItem.Value = RoomID.Value == null || subScreenSelectedItem == null
+                ? Playlist.LastOrDefault()
+                : subScreenSelectedItem.Value;
     }
 }
