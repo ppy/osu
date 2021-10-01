@@ -84,7 +84,7 @@ namespace osu.Game.Beatmaps
         /// </list>
         /// </param>
         /// <returns>Value to which the difficulty value maps in the specified range.</returns>
-        public static double DifficultyRange(double difficulty, (double od0, double od5, double od10) range)
+        static double DifficultyRange(double difficulty, (double od0, double od5, double od10) range)
             => DifficultyRange(difficulty, range.od0, range.od5, range.od10);
     }
 }

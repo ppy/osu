@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Game.Beatmaps;
+using osu.Game.Models.Interfaces;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Scoring
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             foreach (var range in GetRanges())
             {
-                var value = BeatmapDifficulty.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
+                var value = IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
 
                 switch (range.Result)
                 {
