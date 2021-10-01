@@ -158,14 +158,30 @@ namespace osu.Game.Tests.Online
 
             public Task<BeatmapSetInfo> CurrentImportTask { get; private set; }
 
+            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
+                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
+            {
+            }
+
             protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host)
             {
                 return new TestBeatmapModelManager(this, storage, contextFactory, rulesets, api, host);
             }
 
-            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
-                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
+            protected override BeatmapModelDownloader CreateBeatmapModelDownloader(BeatmapModelManager modelManager, IAPIProvider api, GameHost host)
             {
+                return new TestBeatmapModelDownloader(modelManager, api, host);
+            }
+
+            internal class TestBeatmapModelDownloader : BeatmapModelDownloader
+            {
+                public TestBeatmapModelDownloader(BeatmapModelManager modelManager, IAPIProvider apiProvider, GameHost gameHost)
+                    : base(modelManager, apiProvider, gameHost)
+                {
+                }
+
+                protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
+                    => new TestDownloadRequest(set);
             }
 
             internal class TestBeatmapModelManager : BeatmapModelManager
@@ -173,13 +189,10 @@ namespace osu.Game.Tests.Online
                 private readonly TestBeatmapManager testBeatmapManager;
 
                 public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, IDatabaseContextFactory databaseContextFactory, RulesetStore rulesetStore, IAPIProvider apiProvider, GameHost gameHost)
-                    : base(storage, databaseContextFactory, rulesetStore, apiProvider, gameHost)
+                    : base(storage, databaseContextFactory, rulesetStore, gameHost)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }
-
-                protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
-                    => new TestDownloadRequest(set);
 
                 public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
                 {

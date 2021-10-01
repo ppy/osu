@@ -32,6 +32,8 @@ namespace osu.Game.Beatmaps
     public class BeatmapManager : IModelDownloader<BeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, ICanAcceptFiles, IWorkingBeatmapCache, IDisposable
     {
         private readonly BeatmapModelManager beatmapModelManager;
+        private readonly BeatmapModelDownloader beatmapModelDownloader;
+
         private readonly WorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue onlineBetamapLookupQueue;
 
@@ -39,6 +41,7 @@ namespace osu.Game.Beatmaps
                               WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
         {
             beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, api, host);
+            beatmapModelDownloader = CreateBeatmapModelDownloader(beatmapModelManager, api, host);
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, resources, new FileStore(contextFactory, storage).Store, defaultBeatmap, host);
 
             workingBeatmapCache.BeatmapManager = beatmapModelManager;
@@ -50,11 +53,16 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        protected virtual BeatmapModelDownloader CreateBeatmapModelDownloader(BeatmapModelManager modelManager, IAPIProvider api, GameHost host)
+        {
+            return new BeatmapModelDownloader(modelManager, api, host);
+        }
+
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host) =>
             new WorkingBeatmapCache(audioManager, resources, storage, defaultBeatmap, host);
 
         protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host) =>
-            new BeatmapModelManager(storage, contextFactory, rulesets, api, host);
+            new BeatmapModelManager(storage, contextFactory, rulesets, host);
 
         /// <summary>
         /// Create a new <see cref="WorkingBeatmap"/>.
@@ -157,7 +165,14 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Fired when a notification should be presented to the user.
         /// </summary>
-        public Action<Notification> PostNotification { set => beatmapModelManager.PostNotification = value; }
+        public Action<Notification> PostNotification
+        {
+            set
+            {
+                beatmapModelManager.PostNotification = value;
+                beatmapModelDownloader.PostNotification = value;
+            }
+        }
 
         /// <summary>
         /// Fired when the user requests to view the resulting import.
@@ -179,6 +194,11 @@ namespace osu.Game.Beatmaps
         #endregion
 
         #region Implementation of IModelManager<BeatmapSetInfo>
+
+        public bool IsAvailableLocally(BeatmapSetInfo model)
+        {
+            return beatmapModelManager.IsAvailableLocally(model);
+        }
 
         public IBindable<WeakReference<BeatmapSetInfo>> ItemUpdated => beatmapModelManager.ItemUpdated;
 
@@ -228,23 +248,18 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelDownloader<BeatmapSetInfo>
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadBegan => beatmapModelManager.DownloadBegan;
+        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadBegan => beatmapModelDownloader.DownloadBegan;
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadFailed => beatmapModelManager.DownloadFailed;
-
-        public bool IsAvailableLocally(BeatmapSetInfo model)
-        {
-            return beatmapModelManager.IsAvailableLocally(model);
-        }
+        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
 
         public bool Download(BeatmapSetInfo model, bool minimiseDownloadSize = false)
         {
-            return beatmapModelManager.Download(model, minimiseDownloadSize);
+            return beatmapModelDownloader.Download(model, minimiseDownloadSize);
         }
 
         public ArchiveDownloadRequest<BeatmapSetInfo> GetExistingDownload(BeatmapSetInfo model)
         {
-            return beatmapModelManager.GetExistingDownload(model);
+            return beatmapModelDownloader.GetExistingDownload(model);
         }
 
         #endregion

@@ -9,102 +9,48 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
 using osu.Framework.Bindables;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : DownloadableArchiveModelManager<ScoreInfo, ScoreFileInfo>
+    public class ScoreManager : IModelManager<ScoreInfo>, IModelFileManager<ScoreInfo, ScoreFileInfo>, IModelDownloader<ScoreInfo>, ICanAcceptFiles, IPresentImports<ScoreInfo>
     {
-        public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
-
-        protected override string[] HashableFileTypes => new[] { ".osr" };
-
-        protected override string ImportFromStablePath => Path.Combine("Data", "r");
-
-        private readonly RulesetStore rulesets;
-        private readonly Func<BeatmapManager> beatmaps;
         private readonly Scheduler scheduler;
-
-        [CanBeNull]
         private readonly Func<BeatmapDifficultyCache> difficulties;
-
-        [CanBeNull]
         private readonly OsuConfigManager configManager;
+        private readonly ScoreModelManager scoreModelManager;
+        private readonly ScoreModelDownloader scoreModelDownloader;
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, Scheduler scheduler,
                             IIpcHost importHost = null, Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
-            : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
-            this.rulesets = rulesets;
-            this.beatmaps = beatmaps;
             this.scheduler = scheduler;
             this.difficulties = difficulties;
             this.configManager = configManager;
+
+            scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, contextFactory, importHost);
+            scoreModelDownloader = new ScoreModelDownloader(scoreModelManager, api, importHost);
         }
 
-        protected override ScoreInfo CreateModel(ArchiveReader archive)
-        {
-            if (archive == null)
-                return null;
+        public Score GetScore(ScoreInfo score) => scoreModelManager.GetScore(score);
 
-            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase))))
-            {
-                try
-                {
-                    return new DatabasedLegacyScoreDecoder(rulesets, beatmaps()).Parse(stream).ScoreInfo;
-                }
-                catch (LegacyScoreDecoder.BeatmapNotFoundException e)
-                {
-                    Logger.Log(e.Message, LoggingTarget.Information, LogLevel.Error);
-                    return null;
-                }
-            }
-        }
+        public List<ScoreInfo> GetAllUsableScores() => scoreModelManager.GetAllUsableScores();
 
-        protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
-            => Task.CompletedTask;
+        public IEnumerable<ScoreInfo> QueryScores(Expression<Func<ScoreInfo, bool>> query) => scoreModelManager.QueryScores(query);
 
-        public override void ExportModelTo(ScoreInfo model, Stream outputStream)
-        {
-            var file = model.Files.SingleOrDefault();
-            if (file == null)
-                return;
-
-            using (var inputStream = Files.Storage.GetStream(file.FileInfo.StoragePath))
-                inputStream.CopyTo(outputStream);
-        }
-
-        protected override IEnumerable<string> GetStableImportPaths(Storage storage)
-            => storage.GetFiles(ImportFromStablePath).Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false))
-                      .Select(path => storage.GetFullPath(path));
-
-        public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
-
-        public List<ScoreInfo> GetAllUsableScores() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
-
-        public IEnumerable<ScoreInfo> QueryScores(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().Where(query);
-
-        public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
-
-        protected override ArchiveDownloadRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, bool minimiseDownload) => new DownloadReplayRequest(score);
-
-        protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
-            => base.CheckLocalAvailability(model, items)
-               || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
+        public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query) => scoreModelManager.Query(query);
 
         /// <summary>
         /// Orders an array of <see cref="ScoreInfo"/>s by total score.
@@ -281,5 +227,149 @@ namespace osu.Game.Scoring
                 this.totalScore.BindValueChanged(v => Value = v.NewValue.ToString("N0"), true);
             }
         }
+
+        #region Implementation of IPostNotifications
+
+        public Action<Notification> PostNotification
+        {
+            set
+            {
+                scoreModelManager.PostNotification = value;
+                scoreModelDownloader.PostNotification = value;
+            }
+        }
+
+        #endregion
+
+        #region Implementation of IModelManager<ScoreInfo>
+
+        public IBindable<WeakReference<ScoreInfo>> ItemUpdated => scoreModelManager.ItemUpdated;
+
+        public IBindable<WeakReference<ScoreInfo>> ItemRemoved => scoreModelManager.ItemRemoved;
+
+        public Task ImportFromStableAsync(StableStorage stableStorage)
+        {
+            return scoreModelManager.ImportFromStableAsync(stableStorage);
+        }
+
+        public void Export(ScoreInfo item)
+        {
+            scoreModelManager.Export(item);
+        }
+
+        public void ExportModelTo(ScoreInfo model, Stream outputStream)
+        {
+            scoreModelManager.ExportModelTo(model, outputStream);
+        }
+
+        public void Update(ScoreInfo item)
+        {
+            scoreModelManager.Update(item);
+        }
+
+        public bool Delete(ScoreInfo item)
+        {
+            return scoreModelManager.Delete(item);
+        }
+
+        public void Delete(List<ScoreInfo> items, bool silent = false)
+        {
+            scoreModelManager.Delete(items, silent);
+        }
+
+        public void Undelete(List<ScoreInfo> items, bool silent = false)
+        {
+            scoreModelManager.Undelete(items, silent);
+        }
+
+        public void Undelete(ScoreInfo item)
+        {
+            scoreModelManager.Undelete(item);
+        }
+
+        public Task Import(params string[] paths)
+        {
+            return scoreModelManager.Import(paths);
+        }
+
+        public Task Import(params ImportTask[] tasks)
+        {
+            return scoreModelManager.Import(tasks);
+        }
+
+        public IEnumerable<string> HandledExtensions => scoreModelManager.HandledExtensions;
+
+        public Task<IEnumerable<ScoreInfo>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        {
+            return scoreModelManager.Import(notification, tasks);
+        }
+
+        public Task<ScoreInfo> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        {
+            return scoreModelManager.Import(task, lowPriority, cancellationToken);
+        }
+
+        public Task<ScoreInfo> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        {
+            return scoreModelManager.Import(archive, lowPriority, cancellationToken);
+        }
+
+        public Task<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        {
+            return scoreModelManager.Import(item, archive, lowPriority, cancellationToken);
+        }
+
+        public bool IsAvailableLocally(ScoreInfo model)
+        {
+            return scoreModelManager.IsAvailableLocally(model);
+        }
+
+        #endregion
+
+        #region Implementation of IModelFileManager<in ScoreInfo,in ScoreFileInfo>
+
+        public void ReplaceFile(ScoreInfo model, ScoreFileInfo file, Stream contents, string filename = null)
+        {
+            scoreModelManager.ReplaceFile(model, file, contents, filename);
+        }
+
+        public void DeleteFile(ScoreInfo model, ScoreFileInfo file)
+        {
+            scoreModelManager.DeleteFile(model, file);
+        }
+
+        public void AddFile(ScoreInfo model, Stream contents, string filename)
+        {
+            scoreModelManager.AddFile(model, contents, filename);
+        }
+
+        #endregion
+
+        #region Implementation of IModelDownloader<ScoreInfo>
+
+        public IBindable<WeakReference<ArchiveDownloadRequest<ScoreInfo>>> DownloadBegan => scoreModelDownloader.DownloadBegan;
+
+        public IBindable<WeakReference<ArchiveDownloadRequest<ScoreInfo>>> DownloadFailed => scoreModelDownloader.DownloadFailed;
+
+        public bool Download(ScoreInfo model, bool minimiseDownloadSize)
+        {
+            return scoreModelDownloader.Download(model, minimiseDownloadSize);
+        }
+
+        public ArchiveDownloadRequest<ScoreInfo> GetExistingDownload(ScoreInfo model)
+        {
+            return scoreModelDownloader.GetExistingDownload(model);
+        }
+
+        #endregion
+
+        #region Implementation of IPresentImports<ScoreInfo>
+
+        public Action<IEnumerable<ScoreInfo>> PresentImport
+        {
+            set => scoreModelManager.PresentImport = value;
+        }
+
+        #endregion
     }
 }
