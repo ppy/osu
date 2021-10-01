@@ -22,7 +22,6 @@ using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Development;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -210,12 +209,6 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (!Host.IsPrimaryInstance && !DebugUtils.IsDebugBuild)
-            {
-                Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
-                Environment.Exit(0);
-            }
-
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith('-')).ToArray();
