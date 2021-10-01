@@ -49,6 +49,8 @@ namespace osu.Game.Overlays
             Show();
         }
 
+        public override bool IsPresent => dialogContainer.Children.Count > 0;
+
         protected override bool BlockNonPositionalInput => true;
 
         private void onDialogOnStateChanged(VisibilityContainer dialog, Visibility v)
