@@ -23,7 +23,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.36" />
     <PackageReference Include="Humanizer" Version="2.11.10" />
     <PackageReference Include="MessagePack" Version="2.3.75" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
