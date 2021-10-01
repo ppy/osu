@@ -24,7 +24,6 @@ namespace osu.Game.Beatmaps
         public int BeatmapVersion;
 
         private int? onlineBeatmapID;
-        private IRulesetInfo ruleset;
 
         [JsonProperty("id")]
         public int? OnlineBeatmapID

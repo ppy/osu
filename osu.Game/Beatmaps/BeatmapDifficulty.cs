@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Database;
-using osu.Game.Models.Interfaces;
 
 namespace osu.Game.Beatmaps
 {
