@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
@@ -83,51 +82,16 @@ namespace osu.Game.Beatmaps
         public int PreviewTime { get; set; }
 
         public string AudioFile { get; set; }
+
         public string BackgroundFile { get; set; }
 
-        public override string ToString()
-        {
-            string author = Author == null ? string.Empty : $"({Author})";
-            return $"{Artist} - {Title} {author}".Trim();
-        }
+        public bool Equals(BeatmapMetadata other) => ((IBeatmapMetadataInfo)this).Equals(other);
 
-        public RomanisableString ToRomanisableString()
-        {
-            string author = Author == null ? string.Empty : $"({Author})";
-            var artistUnicode = string.IsNullOrEmpty(ArtistUnicode) ? Artist : ArtistUnicode;
-            var titleUnicode = string.IsNullOrEmpty(TitleUnicode) ? Title : TitleUnicode;
+        public override string ToString() => ((IBeatmapMetadataInfo)this).DisplayTitle;
 
-            return new RomanisableString($"{artistUnicode} - {titleUnicode} {author}".Trim(), $"{Artist} - {Title} {author}".Trim());
-        }
+        public RomanisableString ToRomanisableString() => ((IBeatmapMetadataInfo)this).DisplayTitleRomanisable;
 
-        [JsonIgnore]
-        public string[] SearchableTerms => new[]
-        {
-            Author?.Username,
-            Artist,
-            ArtistUnicode,
-            Title,
-            TitleUnicode,
-            Source,
-            Tags
-        }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
-
-        public bool Equals(BeatmapMetadata other)
-        {
-            if (other == null)
-                return false;
-
-            return Title == other.Title
-                   && TitleUnicode == other.TitleUnicode
-                   && Artist == other.Artist
-                   && ArtistUnicode == other.ArtistUnicode
-                   && AuthorString == other.AuthorString
-                   && Source == other.Source
-                   && Tags == other.Tags
-                   && PreviewTime == other.PreviewTime
-                   && AudioFile == other.AudioFile
-                   && BackgroundFile == other.BackgroundFile;
-        }
+        public IEnumerable<string> SearchableTerms => ((IBeatmapMetadataInfo)this).SearchableTerms;
 
         string IBeatmapMetadataInfo.Author => AuthorString;
     }
