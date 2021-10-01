@@ -137,9 +137,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether any items could be reversed.</returns>
         public virtual bool HandleReverse() => false;
 
-        public bool OnPressed(PlatformAction action)
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case PlatformAction.Delete:
                     DeleteSelected();
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public void OnReleased(PlatformAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
         }
 
@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         /// <param name="e">The mouse event responsible for selection.</param>
         /// <returns>Whether a selection was performed.</returns>
-        internal bool MouseDownSelectionRequested(SelectionBlueprint<T> blueprint, MouseButtonEvent e)
+        internal virtual bool MouseDownSelectionRequested(SelectionBlueprint<T> blueprint, MouseButtonEvent e)
         {
             if (e.ShiftPressed && e.Button == MouseButton.Right)
             {

@@ -33,13 +33,20 @@ namespace osu.Game.Screens.Play
 
         public KeyCounterDisplay()
         {
-            AutoSizeAxes = Axes.Both;
-
             InternalChild = KeyFlow = new FillFlowContainer<KeyCounter>
             {
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Don't use autosize as it will shrink to zero when KeyFlow is hidden.
+            // In turn this can cause the display to be masked off screen and never become visible again.
+            Size = KeyFlow.Size;
         }
 
         public override void Add(KeyCounter key)

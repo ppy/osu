@@ -130,6 +130,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Type = { Value = MatchType.HeadToHead },
             }));
 
+            AddUntilStep("wait for panel load", () => drawableRoom.ChildrenOfType<RecentParticipantsList>().Any());
+
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
 
             AddStep("set password", () => room.Password.Value = "password");

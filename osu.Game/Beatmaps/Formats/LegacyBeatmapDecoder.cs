@@ -180,6 +180,10 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
+                case @"SamplesMatchPlaybackRate":
+                    beatmap.BeatmapInfo.SamplesMatchPlaybackRate = Parsing.ParseInt(pair.Value) == 1;
+                    break;
+
                 case @"Countdown":
                     beatmap.BeatmapInfo.Countdown = (CountdownType)Enum.Parse(typeof(CountdownType), pair.Value);
                     break;
@@ -383,11 +387,18 @@ namespace osu.Game.Beatmaps.Formats
                 SliderVelocity = speedMultiplier,
             }, timingChange);
 
-            addControlPoint(time, new EffectControlPoint
+            var effectPoint = new EffectControlPoint
             {
                 KiaiMode = kiaiMode,
                 OmitFirstBarLine = omitFirstBarSignature,
-            }, timingChange);
+            };
+
+            bool isOsuRuleset = beatmap.BeatmapInfo.RulesetID == 0;
+            // scrolling rulesets use effect points rather than difficulty points for scroll speed adjustments.
+            if (!isOsuRuleset)
+                effectPoint.ScrollSpeed = speedMultiplier;
+
+            addControlPoint(time, effectPoint, timingChange);
 
             addControlPoint(time, new LegacySampleControlPoint
             {
