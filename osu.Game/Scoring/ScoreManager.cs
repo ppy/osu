@@ -78,7 +78,7 @@ namespace osu.Game.Scoring
         protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
             => Task.CompletedTask;
 
-        protected override void ExportModelTo(ScoreInfo model, Stream outputStream)
+        public override void ExportModelTo(ScoreInfo model, Stream outputStream)
         {
             var file = model.Files.SingleOrDefault();
             if (file == null)

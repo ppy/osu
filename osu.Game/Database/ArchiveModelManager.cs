@@ -30,7 +30,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : class, INamedFileInfo, new()
     {
@@ -135,7 +135,7 @@ namespace osu.Game.Database
             return Import(notification, tasks);
         }
 
-        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             if (tasks.Length == 0)
             {
@@ -227,7 +227,7 @@ namespace osu.Game.Database
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        internal async Task<TModel> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<TModel> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -479,7 +479,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The item to export.</param>
         /// <param name="outputStream">The output stream to export to.</param>
-        protected virtual void ExportModelTo(TModel model, Stream outputStream)
+        public virtual void ExportModelTo(TModel model, Stream outputStream)
         {
             using (var archive = ZipArchive.Create())
             {
@@ -745,9 +745,6 @@ namespace osu.Game.Database
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
 
-        /// <summary>
-        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
-        /// </summary>
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {
             var storage = PrepareStableStorage(stableStorage);
