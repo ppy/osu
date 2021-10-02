@@ -65,6 +65,9 @@ namespace osu.Game.Beatmaps
         /// </summary>
         string BackgroundFile { get; }
 
+        /// <summary>
+        /// A user-presentable display title representing this metadata.
+        /// </summary>
         string DisplayTitle
         {
             get
@@ -74,6 +77,9 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        /// <summary>
+        /// A user-presentable display title representing this metadata, with localisation handling for potentially romanisable fields.
+        /// </summary>
         RomanisableString DisplayTitleRomanisable
         {
             get
@@ -86,6 +92,9 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        /// <summary>
+        /// An array of all searchable terms provided in contained metadata.
+        /// </summary>
         string[] SearchableTerms => new[]
         {
             Author,

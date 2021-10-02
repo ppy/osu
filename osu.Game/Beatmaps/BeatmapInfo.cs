@@ -24,7 +24,6 @@ namespace osu.Game.Beatmaps
         public int BeatmapVersion;
 
         private int? onlineBeatmapID;
-        private IRulesetInfo ruleset;
 
         [JsonProperty("id")]
         public int? OnlineBeatmapID
@@ -158,13 +157,9 @@ namespace osu.Game.Beatmaps
             Version
         }.Concat(Metadata?.SearchableTerms ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
 
-        public override string ToString() => $"{Metadata ?? BeatmapSet?.Metadata} {versionString}".Trim();
+        public override string ToString() => ((IBeatmapInfo)this).DisplayTitle;
 
-        public RomanisableString ToRomanisableString()
-        {
-            var metadata = (Metadata ?? BeatmapSet?.Metadata)?.ToRomanisableString() ?? new RomanisableString(null, null);
-            return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
-        }
+        public RomanisableString ToRomanisableString() => ((IBeatmapInfo)this).DisplayTitleRomanisable;
 
         public bool Equals(BeatmapInfo other)
         {
@@ -191,17 +186,18 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IHasOnlineID
 
-        public int? OnlineID => ID;
+        public int? OnlineID => OnlineBeatmapID;
 
         #endregion
 
         #region Implementation of IBeatmapInfo
 
-        public string DifficultyName => Version;
+        string IBeatmapInfo.DifficultyName => Version;
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
-        public IBeatmapDifficultyInfo Difficulty => BaseDifficulty;
+        IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
+        IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
-        public double StarRating => StarDifficulty;
+        double IBeatmapInfo.StarRating => StarDifficulty;
 
         #endregion
     }
