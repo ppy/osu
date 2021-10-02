@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             return new CatchDifficultyAttributes
             {
+                DirectionChangeCount = ((Movement)skills[0]).DirectionChangeCount,
                 StarRating = Math.Sqrt(skills[0].DifficultyValue()) * star_scaling_factor,
                 Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,

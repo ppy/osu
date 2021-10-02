@@ -45,19 +45,18 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             int numTotalHits = totalComboHits();
 
             // Longer maps are worth more
-            double lengthBonus =
-                0.95 + 0.3 * Math.Min(1.0, numTotalHits / 2500.0) +
-                (numTotalHits > 2500 ? Math.Log10(numTotalHits / 2500.0) * 0.475 : 0.0);
+            double lenghtFactor = numTotalHits * 0.5 + Attributes.DirectionChangeCount * 0.9;
+            double lengthBonus = 0.84 + 0.38 * (lenghtFactor / 1700);
 
             // Longer maps are worth more
             value *= lengthBonus;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            value *= Math.Pow(0.97, misses);
+            value *= Math.Pow(0.96, misses);
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                value *= Math.Min(Math.Pow(Score.MaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
+                value *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(Attributes.MaxCombo, 0.5), 1.0);
 
             double approachRate = Attributes.ApproachRate;
             double approachRateFactor = 1.0;
@@ -66,7 +65,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (approachRate > 10.0)
                 approachRateFactor += 0.1 * (approachRate - 10.0); // Additional 10% at AR 11, 30% total
             else if (approachRate < 8.0)
-                approachRateFactor += 0.025 * (8.0 - approachRate); // 2.5% for each AR below 8
+                approachRateFactor += 0.04 * (8.0 - approachRate); // 4% for each AR below 8
 
             value *= approachRateFactor;
 
@@ -74,17 +73,32 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 // Hiddens gives almost nothing on max approach rate, and more the lower it is
                 if (approachRate <= 10.0)
-                    value *= 1.05 + 0.075 * (10.0 - approachRate); // 7.5% for each AR below 10
+                    value *= 1.05 + 0.10 * (10.0 - Math.Min(10.0, approachRate)); // 10% for each AR below 10
                 else if (approachRate > 10.0)
                     value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
+
+                if (approachRate <= 9.0)
+                    value *= 1 + 0.04 * (8.0 - approachRate); // Additional 4% for each AR below 9
             }
 
             if (mods.Any(m => m is ModFlashlight))
+            {
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
                 value *= 1.35 * lengthBonus;
 
+                if (approachRate > 8.0f)
+                    value *= 0.1f * (approachRate - 8.0) + 1; // 10% for each AR above 8
+
+                if (approachRate < 8.0f)
+                    value *= 0.06f * (8.0 - approachRate) + 1; // -6% for each AR below 8
+            }
+
             // Scale the aim value with accuracy _slightly_
-            value *= Math.Pow(accuracy(), 5.5);
+            value *= Math.Pow(accuracy(), 6);
+
+            // Custom multiplier for HalfTime -> slower catcher = easier to control
+            if (mods.Any(m => m is ModHalfTime))
+                value *= 0.90;
 
             // Custom multipliers for NoFail. SpunOut is not applicable.
             if (mods.Any(m => m is ModNoFail))

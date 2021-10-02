@@ -13,7 +13,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
     {
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
-        private const double direction_change_bonus = 21.0;
 
         protected override double SkillMultiplier => 900;
         protected override double StrainDecayBase => 0.2;
@@ -26,7 +25,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
         private float? lastPlayerPosition;
         private float lastDistanceMoved;
-        private double lastStrainTime;
+        private bool previousIsDoubleHdash;
+
+        public double DirectionChangeCount;
 
         /// <summary>
         /// The speed multiplier applied to the player's catcher.
@@ -57,49 +58,75 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                 catchCurrent.NormalizedPosition + (normalized_hitobject_radius - absolute_player_positioning_error)
             );
 
+            bool isDoubleHdash = catchCurrent.LastObject.HyperDash && catchCurrent.BaseObject.HyperDash;
+
             float distanceMoved = playerPosition - lastPlayerPosition.Value;
 
-            double weightedStrainTime = catchCurrent.StrainTime + 13 + (3 / catcherSpeedMultiplier);
-
-            double distanceAddition = (Math.Pow(Math.Abs(distanceMoved), 1.3) / 510);
-            double sqrtStrain = Math.Sqrt(weightedStrainTime);
-
+            double weightedStrainTime = catchCurrent.StrainTime / catcherSpeedMultiplier;
             double edgeDashBonus = 0;
 
-            // Direction change bonus.
-            if (Math.Abs(distanceMoved) > 0.1)
+
+            double distanceAddition;
+
+            // Counting direction changes for length scaling in the performance calculation
+            if (Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved) && Math.Sign(lastDistanceMoved) != 0 && Math.Abs(distanceMoved) > 4)
             {
-                if (Math.Abs(lastDistanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved))
-                {
-                    double bonusFactor = Math.Min(50, Math.Abs(distanceMoved)) / 50;
-                    double antiflowFactor = Math.Max(Math.Min(70, Math.Abs(lastDistanceMoved)) / 70, 0.38);
-
-                    distanceAddition += direction_change_bonus / Math.Sqrt(lastStrainTime + 16) * bonusFactor * antiflowFactor * Math.Max(1 - Math.Pow(weightedStrainTime / 1000, 3), 0);
-                }
-
-                // Base bonus for every movement, giving some weight to streams.
-                distanceAddition += 12.5 * Math.Min(Math.Abs(distanceMoved), normalized_hitobject_radius * 2) / (normalized_hitobject_radius * 6) / sqrtStrain;
+                DirectionChangeCount += 1;
             }
 
-            // Bonus for edge dashes.
-            if (catchCurrent.LastObject.DistanceToHyperDash <= 20.0f)
+            // Separating HyperDashes and basic fruits calculations
+
+            // Basic fruit calculation
+            if (!catchCurrent.LastObject.HyperDash)
+            {
+                // The base value is a ratio between distance moved and strain time
+                // The exponents are used to give emphasis on the distance or the strain time
+                // For basic fruits, the distance is usually slightly more important for the calculation than the strain time
+                distanceAddition = 0.026 * Math.Pow(Math.Abs(distanceMoved), 1.25) / Math.Pow(weightedStrainTime, 0.9);
+                distanceAddition /= Math.Max(1, 70 / Math.Abs(distanceMoved)); // Nerfes streams (shortest movements)
+
+                // Gives a slight buff to direction changes
+                if (Math.Abs(distanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved))
+                {
+                    distanceAddition *= 1 + 1 / (4 * Math.Abs(distanceMoved / weightedStrainTime));
+                }
+            }
+            else
+            {
+                // For Hyperdashes, the distance is usually way more important for the calculation than the strain time 
+                distanceAddition = 0.87 * Math.Log(Math.Abs(distanceMoved + 1), 2.13) / Math.Pow(weightedStrainTime, 0.85);
+
+                // Handling complex hyperdash chains
+                if (previousIsDoubleHdash)
+                {
+                    if (isDoubleHdash) // HDash chains, nerf is same direction, buff otherwise
+                        distanceAddition *= Math.Sign(distanceMoved) == Math.Sign(lastDistanceMoved) ? 0.8 : 1.8;
+                }
+                else if (isDoubleHdash) // Nerf same direction HDash
+                    distanceAddition *= 0.8;
+
+            }
+
+            // Edge dashes buff
+            if (catchCurrent.LastObject.DistanceToHyperDash <= 20.0)
             {
                 if (!catchCurrent.LastObject.HyperDash)
-                    edgeDashBonus += 5.7;
+                    edgeDashBonus += 4.2;
                 else
                 {
                     // After a hyperdash we ARE in the correct position. Always!
                     playerPosition = catchCurrent.NormalizedPosition;
                 }
 
-                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime * catcherSpeedMultiplier, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
+                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime, 265) / 265), 1.5) / Math.Max(1, catcherSpeedMultiplier); // Edge Dashes are easier at lower ms values
             }
+
 
             lastPlayerPosition = playerPosition;
             lastDistanceMoved = distanceMoved;
-            lastStrainTime = catchCurrent.StrainTime;
+            previousIsDoubleHdash = isDoubleHdash;
 
-            return distanceAddition / weightedStrainTime;
+            return distanceAddition * 0.15; // Difficulty scaling (could be handled somewhere else)
         }
     }
 }
