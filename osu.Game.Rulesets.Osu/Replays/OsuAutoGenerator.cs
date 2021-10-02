@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             : base(beatmap, mods)
         {
             defaultHitWindows = new OsuHitWindows();
-            defaultHitWindows.SetDifficulty(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            defaultHitWindows.SetDifficulty(Beatmap.Difficulty.OverallDifficulty);
         }
 
         #endregion
