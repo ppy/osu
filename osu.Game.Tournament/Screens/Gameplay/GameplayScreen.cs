@@ -52,16 +52,19 @@ namespace osu.Game.Tournament.Screens.Gameplay
             var extraGameplayVideos = new List<TourneyVideo>();
 
             // look for all video files that start with "gameplay-"
-            foreach (var name in storage.GetFiles("videos", "gameplay-*").Select(Path.GetFileNameWithoutExtension))
+            if (storage.ExistsDirectory("videos"))
             {
-                var vid = new TourneyVideo(name)
+                foreach (var name in storage.GetFiles("videos", "gameplay-*").Select(Path.GetFileNameWithoutExtension))
                 {
-                    Loop = true,
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0
-                };
-                extraGameplayVideos.Add(vid);
-                modSpecificGameplayVideos.Add((name.Substring("gameplay-".Length), vid));
+                    var vid = new TourneyVideo(name)
+                    {
+                        Loop = true,
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0
+                    };
+                    extraGameplayVideos.Add(vid);
+                    modSpecificGameplayVideos.Add((name.Substring("gameplay-".Length), vid));
+                }
             }
 
             AddRangeInternal(new Drawable[]
