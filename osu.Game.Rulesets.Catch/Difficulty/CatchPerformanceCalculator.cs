@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Longer maps are worth more
             double lenghtFactor = numTotalHits * 0.5 + Attributes.DirectionChangeCount * 0.9;
-            double lengthBonus = 0.84 + 0.38 * (lenghtFactor / 1700);
+            double lengthBonus = 0.84 + 0.38 * Math.Min(1.0, lenghtFactor / 1700);
 
             // Longer maps are worth more
             value *= lengthBonus;
