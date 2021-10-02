@@ -39,25 +39,9 @@ namespace osu.Game.Tests.Database
 
                     realmFactory.Dispose();
 
-                    try
-                    {
-                        Logger.Log($"Final database size: {testStorage.GetStream(realmFactory.Filename)?.Length ?? 0}");
-                    }
-                    catch
-                    {
-                        // windows runs may error due to file still being open.
-                    }
-
+                    Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
                     realmFactory.Compact();
-
-                    try
-                    {
-                        Logger.Log($"Final database size after compact: {testStorage.GetStream(realmFactory.Filename)?.Length ?? 0}");
-                    }
-                    catch
-                    {
-                        // windows runs may error due to file still being open.
-                    }
+                    Logger.Log($"Final database size after compact: {getFileSize(testStorage, realmFactory)}");
                 }
             });
         }
@@ -71,16 +55,28 @@ namespace osu.Game.Tests.Database
                 using (var realmFactory = new RealmContextFactory(testStorage, caller))
                 {
                     Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
-
                     await testAction(realmFactory, testStorage);
 
                     realmFactory.Dispose();
-                    Logger.Log($"Final database size: {testStorage.GetStream(realmFactory.Filename)?.Length ?? 0}");
 
+                    Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
                     realmFactory.Compact();
-                    Logger.Log($"Final database size after compact: {testStorage.GetStream(realmFactory.Filename)?.Length ?? 0}");
+                    Logger.Log($"Final database size after compact: {getFileSize(testStorage, realmFactory)}");
                 }
             });
+        }
+
+        private static long getFileSize(Storage testStorage, RealmContextFactory realmFactory)
+        {
+            try
+            {
+                return testStorage.GetStream(realmFactory.Filename)?.Length ?? 0;
+            }
+            catch
+            {
+                // windows runs may error due to file still being open.
+                return 0;
+            }
         }
     }
 }
