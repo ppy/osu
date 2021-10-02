@@ -245,27 +245,27 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private class ScoreBeatmapMetadataContainer : BeatmapMetadataContainer
         {
-            public ScoreBeatmapMetadataContainer(BeatmapInfo beatmap)
-                : base(beatmap)
+            public ScoreBeatmapMetadataContainer(BeatmapInfo beatmapInfo)
+                : base(beatmapInfo)
             {
             }
 
-            protected override Drawable[] CreateText(BeatmapInfo beatmap) => new Drawable[]
+            protected override Drawable[] CreateText(BeatmapInfo beatmapInfo) => new Drawable[]
             {
                 new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Text = new RomanisableString(
-                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} ",
-                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} "),
+                        $"{beatmapInfo.Metadata.TitleUnicode ?? beatmapInfo.Metadata.Title} ",
+                        $"{beatmapInfo.Metadata.Title ?? beatmapInfo.Metadata.TitleUnicode} "),
                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
                 },
                 new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Text = "by " + new RomanisableString(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
+                    Text = "by " + new RomanisableString(beatmapInfo.Metadata.ArtistUnicode, beatmapInfo.Metadata.Artist),
                     Font = OsuFont.GetFont(size: 12, italics: true)
                 },
             };
