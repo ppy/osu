@@ -400,9 +400,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Beatmap.Value = CreateWorkingBeatmap(new Beatmap<OsuHitObject>
                 {
                     HitObjects = hitObjects,
+                    Difficulty = new BeatmapDifficulty { SliderTickRate = 3 },
                     BeatmapInfo =
                     {
-                        BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
                         Ruleset = new OsuRuleset().RulesetInfo
                     },
                 });
