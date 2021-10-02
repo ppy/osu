@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
+
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Framework.Utils;
@@ -28,8 +30,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => 1.06;
 
-        protected OsuStrainSkill(Mod[] mods)
-            : base(mods)
+ 
+
+        protected OsuStrainSkill(Mod[] mods, double strainDecayBase, int sectionLength = 400)
+            : base(mods, strainDecayBase, sectionLength)
         {
         }
 

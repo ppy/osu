@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
+
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
@@ -11,44 +14,33 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     /// Used to processes strain values of <see cref="DifficultyHitObject"/>s, keep track of strain levels caused by the processed objects
     /// and to calculate a final difficulty value representing the difficulty of hitting all the processed objects.
     /// </summary>
-    public abstract class StrainDecaySkill : StrainSkill
+    public abstract class StrainDecaySkill : Skill
     {
-        /// <summary>
-        /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
-        /// </summary>
+        protected virtual double DecayWeight => 0.9;
+
         protected abstract double SkillMultiplier { get; }
 
-        /// <summary>
-        /// Determines how quickly strain decays for the given skill.
-        /// For example a value of 0.15 indicates that strain decays to 15% of its original value in one second.
-        /// </summary>
-        protected abstract double StrainDecayBase { get; }
+        protected readonly DecayingStrainSections strain;
 
-        /// <summary>
-        /// The current strain level.
-        /// </summary>
-        protected double CurrentStrain { get; private set; } = 1;
-
-        protected StrainDecaySkill(Mod[] mods)
+        protected StrainDecaySkill(Mod[] mods, double strainDecayBase, int sectionLength=400)
             : base(mods)
         {
+            strain = new DecayingStrainSections(strainDecayBase, sectionLength);
         }
 
-        protected override double CalculateInitialStrain(double time) => CurrentStrain * strainDecay(time - Previous[0].StartTime);
-
-        protected override double StrainValueAt(DifficultyHitObject current)
+        protected override void Process(DifficultyHitObject hitObject)
         {
-            CurrentStrain *= strainDecay(current.DeltaTime);
-            CurrentStrain += StrainValueOf(current) * SkillMultiplier;
-
-            return CurrentStrain;
+            strain.AddStrain(hitObject.StartTime, SkillMultiplier*StrainValueOf(hitObject));
         }
 
-        /// <summary>
-        /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
-        /// </summary>
-        protected abstract double StrainValueOf(DifficultyHitObject current);
+        protected abstract double StrainValueOf(DifficultyHitObject hitObject);
 
-        private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
+        public override double DifficultyValue()
+        {
+            return strain.sections.ExponentialWeightedSum(DecayWeight);
+        }
+
+        public IEnumerable<double> GetCurrentStrainPeaks() => strain.sections.GetCurrentStrainPeaks();
+
     }
 }

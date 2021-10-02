@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_2 = Math.PI / 2;
 
         protected override double SkillMultiplier => 1400;
-        protected override double StrainDecayBase => 0.3;
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
 
@@ -32,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly double greatWindow;
 
         public Speed(Mod[] mods, double hitWindowGreat)
-            : base(mods)
+            : base(mods, strainDecayBase: 0.3)
         {
             greatWindow = hitWindowGreat;
         }

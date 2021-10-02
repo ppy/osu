@@ -5,18 +5,19 @@ using System;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
+
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
-    public class Strain : StrainDecaySkill
+    public class Strain : StrainSkill
     {
+        protected override double SkillMultiplier => 1;
+
         private const double individual_decay_base = 0.125;
         private const double overall_decay_base = 0.30;
-
-        protected override double SkillMultiplier => 1;
-        protected override double StrainDecayBase => 1;
 
         private readonly double[] holdEndTimes;
         private readonly double[] individualStrains;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             overallStrain = 1;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainValueAt(DifficultyHitObject current)
         {
             var maniaCurrent = (ManiaDifficultyHitObject)current;
             var endTime = maniaCurrent.EndTime;
@@ -68,12 +69,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             overallStrain = applyDecay(overallStrain, current.DeltaTime, overall_decay_base) + (1 + holdAddition) * holdFactor;
 
-            return individualStrain + overallStrain - CurrentStrain;
+            return individualStrain + overallStrain;
         }
 
-        protected override double CalculateInitialStrain(double offset)
-            => applyDecay(individualStrain, offset - Previous[0].StartTime, individual_decay_base)
-               + applyDecay(overallStrain, offset - Previous[0].StartTime, overall_decay_base);
+        protected override double StrainAtTime(double time)
+            => applyDecay(individualStrain, time - Previous[0].StartTime, individual_decay_base)
+               + applyDecay(overallStrain, time - Previous[0].StartTime, overall_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);

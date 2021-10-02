@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     public class Colour : StrainDecaySkill
     {
         protected override double SkillMultiplier => 1;
-        protected override double StrainDecayBase => 0.4;
 
         /// <summary>
         /// Maximum number of entries to keep in <see cref="monoHistory"/>.
@@ -41,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private int currentMonoLength;
 
         public Colour(Mod[] mods)
-            : base(mods)
+            : base(mods, strainDecayBase: 0.4)
         {
         }
 

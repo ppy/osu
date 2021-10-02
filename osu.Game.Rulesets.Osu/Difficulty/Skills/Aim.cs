@@ -18,12 +18,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double timing_threshold = 107;
 
         public Aim(Mod[] mods)
-            : base(mods)
+            : base(mods: mods, strainDecayBase: 0.15)
         {
         }
 
         protected override double SkillMultiplier => 26.25;
-        protected override double StrainDecayBase => 0.15;
+
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {

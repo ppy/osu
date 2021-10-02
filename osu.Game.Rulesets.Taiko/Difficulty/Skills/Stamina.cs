@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     public class Stamina : StrainDecaySkill
     {
         protected override double SkillMultiplier => 1;
-        protected override double StrainDecayBase => 0.4;
 
         /// <summary>
         /// Maximum number of entries to keep in <see cref="notePairDurationHistory"/>.
@@ -52,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// <param name="mods">Mods for use in skill calculations.</param>
         /// <param name="rightHand">Whether this instance is performing calculations for the right hand.</param>
         public Stamina(Mod[] mods, bool rightHand)
-            : base(mods)
+            : base(mods, strainDecayBase: 0.4)
         {
             hand = rightHand ? 1 : 0;
         }
