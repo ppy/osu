@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Select
 
         private void updateStatistics()
         {
-            advanced.Beatmap = Beatmap;
+            advanced.BeatmapInfo = Beatmap;
             description.Text = Beatmap?.Version;
             source.Text = Beatmap?.Metadata?.Source;
             tags.Text = Beatmap?.Metadata?.Tags;

@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
         {
-            beatmap = panel.Beatmap;
+            beatmap = panel.BeatmapInfo;
             Item = panel;
         }
 

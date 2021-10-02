@@ -377,7 +377,7 @@ namespace osu.Game.Screens.Select
 
             // avoid attempting to continue before a selection has been obtained.
             // this could happen via a user interaction while the carousel is still in a loading state.
-            if (Carousel.SelectedBeatmap == null) return;
+            if (Carousel.SelectedBeatmapInfo == null) return;
 
             if (beatmap != null)
                 Carousel.SelectBeatmap(beatmap);
