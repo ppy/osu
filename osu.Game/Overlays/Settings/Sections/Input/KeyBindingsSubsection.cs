@@ -75,5 +75,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             Content.CornerRadius = 5;
         }
+
+        public override IEnumerable<string> FilterTerms => Enumerable.Empty<string>();
     }
 }
