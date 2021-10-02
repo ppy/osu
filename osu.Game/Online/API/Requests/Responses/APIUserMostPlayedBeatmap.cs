@@ -16,7 +16,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int PlayCount { get; set; }
 
         [JsonProperty]
-        private BeatmapInfo beatmap { get; set; }
+        private BeatmapInfo beatmapInfo { get; set; }
 
         [JsonProperty]
         private APIBeatmapSet beatmapSet { get; set; }
@@ -24,9 +24,9 @@ namespace osu.Game.Online.API.Requests.Responses
         public BeatmapInfo GetBeatmapInfo(RulesetStore rulesets)
         {
             BeatmapSetInfo setInfo = beatmapSet.ToBeatmapSet(rulesets);
-            beatmap.BeatmapSet = setInfo;
-            beatmap.Metadata = setInfo.Metadata;
-            return beatmap;
+            beatmapInfo.BeatmapSet = setInfo;
+            beatmapInfo.Metadata = setInfo.Metadata;
+            return beatmapInfo;
         }
     }
 }

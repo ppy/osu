@@ -242,15 +242,15 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Selects a given beatmap on the carousel.
         /// </summary>
-        /// <param name="beatmap">The beatmap to select.</param>
+        /// <param name="beatmapInfo">The beatmap to select.</param>
         /// <param name="bypassFilters">Whether to select the beatmap even if it is filtered (i.e., not visible on carousel).</param>
         /// <returns>True if a selection was made, False if it wasn't.</returns>
-        public bool SelectBeatmap(BeatmapInfo beatmap, bool bypassFilters = true)
+        public bool SelectBeatmap(BeatmapInfo beatmapInfo, bool bypassFilters = true)
         {
             // ensure that any pending events from BeatmapManager have been run before attempting a selection.
             Scheduler.Update();
 
-            if (beatmap?.Hidden != false)
+            if (beatmapInfo?.Hidden != false)
                 return false;
 
             foreach (CarouselBeatmapSet set in beatmapSets)
@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Select
                 if (!bypassFilters && set.Filtered.Value)
                     continue;
 
-                var item = set.Beatmaps.FirstOrDefault(p => p.BeatmapInfo.Equals(beatmap));
+                var item = set.Beatmaps.FirstOrDefault(p => p.BeatmapInfo.Equals(beatmapInfo));
 
                 if (item == null)
                     // The beatmap that needs to be selected doesn't exist in this set
