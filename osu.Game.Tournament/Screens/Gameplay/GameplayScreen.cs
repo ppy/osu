@@ -41,6 +41,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         private Drawable chroma;
 
+        private Container<TourneyVideo> videosContainer;
         private TourneyVideo fallbackGameplayVideo;
         private readonly List<(string, TourneyVideo)> modSpecificGameplayVideos = new List<(string, TourneyVideo)>();
 
@@ -49,7 +50,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         {
             this.ipc = ipc;
 
-            var extraGameplayVideos = new List<TourneyVideo>();
+            var videos = new List<TourneyVideo>();
 
             // look for all video files that start with "gameplay-"
             if (storage.ExistsDirectory("videos"))
@@ -58,26 +59,30 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 {
                     var vid = new TourneyVideo(name)
                     {
+                        Name = name,
                         Loop = true,
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0
                     };
-                    extraGameplayVideos.Add(vid);
+                    videos.Add(vid);
                     modSpecificGameplayVideos.Add((name.Substring("gameplay-".Length), vid));
                 }
             }
 
+            fallbackGameplayVideo = new TourneyVideo("gameplay")
+            {
+                Name = "gameplay",
+                Loop = true,
+                RelativeSizeAxes = Axes.Both,
+            };
+            videos.Add(fallbackGameplayVideo);
+
             AddRangeInternal(new Drawable[]
             {
-                fallbackGameplayVideo = new TourneyVideo("gameplay")
-                {
-                    Loop = true,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new Container<TourneyVideo>
+                videosContainer = new Container<TourneyVideo>
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = extraGameplayVideos
+                    Children = videos
                 },
                 header = new MatchHeader
                 {
@@ -193,31 +198,47 @@ namespace osu.Game.Tournament.Screens.Gameplay
             showVideoForModsAndHideAllElse(currentSelectedBeatmapMods);
         }
 
+        private ScheduledDelegate hideVideosScheduleOperation;
+
         private void showVideoForModsAndHideAllElse(string currentSelectedBeatmapMods)
         {
-            bool showFallbackVideo = true;
+            hideVideosScheduleOperation?.Cancel();
+            var videosThatShouldBeHidden = new List<TourneyVideo>();
+            TourneyVideo videoToShow = null;
 
             foreach (var (mods, video) in modSpecificGameplayVideos)
             {
                 if (mods.Equals(currentSelectedBeatmapMods, StringComparison.OrdinalIgnoreCase))
                 {
-                    video.FadeIn(FADE_DELAY);
-                    showFallbackVideo = false;
+                    videoToShow = video;
                 }
                 else
                 {
-                    video.FadeOut(FADE_DELAY);
+                    videosThatShouldBeHidden.Add(video);
                 }
             }
 
-            if (showFallbackVideo)
+            if (videoToShow == null)
             {
-                fallbackGameplayVideo.FadeIn(FADE_DELAY);
+                videoToShow = fallbackGameplayVideo;
             }
             else
             {
-                fallbackGameplayVideo.FadeOut(FADE_DELAY);
+                videosThatShouldBeHidden.Add(fallbackGameplayVideo);
             }
+
+            // put video to show on top, and fade it in
+            videosContainer.ChangeChildDepth(videoToShow, (float)-Clock.CurrentTime);
+            videoToShow.FadeIn(FADE_DELAY);
+
+            // after the fade, hide all others
+            hideVideosScheduleOperation = Scheduler.AddDelayed(() =>
+            {
+                foreach (var video in videosThatShouldBeHidden)
+                {
+                    video.FadeOut();
+                }
+            }, FADE_DELAY);
         }
 
         private ScheduledDelegate scheduledOperation;
