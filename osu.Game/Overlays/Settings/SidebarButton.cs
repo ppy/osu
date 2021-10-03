@@ -2,12 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -17,10 +17,15 @@ namespace osu.Game.Overlays.Settings
 {
     public class SidebarButton : OsuButton
     {
+        private const double fade_duration = 50;
+
         private readonly ConstrainedIconContainer iconContainer;
         private readonly SpriteText headerText;
-        private readonly Box selectionIndicator;
+        private readonly CircularContainer selectionIndicator;
         private readonly Container text;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
 
         // always consider as part of flow, even when not visible (for the sake of the initial animation).
         public override bool IsPresent => true;
@@ -47,25 +52,15 @@ namespace osu.Game.Overlays.Settings
             {
                 selected = value;
 
-                if (selected)
-                {
-                    selectionIndicator.FadeIn(50);
-                    text.FadeColour(Color4.White, 50);
-                }
-                else
-                {
-                    selectionIndicator.FadeOut(50);
-                    text.FadeColour(OsuColour.Gray(0.6f), 50);
-                }
+                if (IsLoaded)
+                    updateState();
             }
         }
 
         public SidebarButton()
         {
-            Height = Sidebar.DEFAULT_WIDTH;
             RelativeSizeAxes = Axes.X;
-
-            BackgroundColour = Color4.Black;
+            Height = 46;
 
             AddRange(new Drawable[]
             {
@@ -90,21 +85,60 @@ namespace osu.Game.Overlays.Settings
                         },
                     }
                 },
-                selectionIndicator = new Box
+                selectionIndicator = new CircularContainer
                 {
                     Alpha = 0,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 5,
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
+                    Width = 3,
+                    Height = 18,
+                    Masking = true,
+                    CornerRadius = 1.5f,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Margin = new MarginPadding
+                    {
+                        Left = 9,
+                    },
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.White
+                    }
                 },
             });
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            selectionIndicator.Colour = colours.Yellow;
+            BackgroundColour = colourProvider.Background5;
+            selectionIndicator.Colour = colourProvider.Highlight1;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateState();
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateState();
+            return false;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e) => updateState();
+
+        private void updateState()
+        {
+            if (Selected)
+            {
+                text.FadeColour(colourProvider.Content1, fade_duration, Easing.OutQuint);
+                selectionIndicator.FadeIn(fade_duration, Easing.OutQuint);
+                return;
+            }
+
+            text.FadeColour(IsHovered ? colourProvider.Light1 : colourProvider.Light3, fade_duration, Easing.OutQuint);
+            selectionIndicator.FadeOut(fade_duration, Easing.OutQuint);
         }
     }
 }

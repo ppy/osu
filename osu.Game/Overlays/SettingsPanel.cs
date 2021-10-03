@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -15,7 +14,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -64,6 +62,9 @@ namespace osu.Game.Overlays
 
         public IBindable<SettingsSection> CurrentSection = new Bindable<SettingsSection>();
 
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
         protected SettingsPanel(bool showSidebar)
         {
             this.showSidebar = showSidebar;
@@ -89,7 +90,7 @@ namespace osu.Game.Overlays
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(2, 1), // over-extend to the left for transitions
                         RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.Gray(0.05f),
+                        Colour = colourProvider.Background4,
                         Alpha = 1,
                     },
                     loading = new LoadingLayer
@@ -292,11 +293,12 @@ namespace osu.Game.Overlays
                     Direction = FillDirection.Vertical,
                 };
 
-            public SettingsSectionsContainer()
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
             {
                 HeaderBackground = new Box
                 {
-                    Colour = Color4.Black,
+                    Colour = colourProvider.Background4,
                     RelativeSizeAxes = Axes.Both
                 };
             }
