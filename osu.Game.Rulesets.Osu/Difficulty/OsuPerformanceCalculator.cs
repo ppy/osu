@@ -40,6 +40,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMeh = Score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = Score.Statistics.GetValueOrDefault(HitResult.Miss);
 
+            if (mods.Any(h => h is OsuModRelax))
+            {
+                countMiss += countOk + countMeh;
+            }
+
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
@@ -92,8 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModRelax))
             {
-                aimValue *= 0.75;
-                countMiss += countOk + countMeh;
+                aimValue *= 0.6;
             }
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
@@ -134,8 +138,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModRelax))
             {
-                speedValue *= 0.75;
-                countMiss += countOk + countMeh;
+                speedValue *= 0.6;
             }
 
             // Longer maps are worth more.
@@ -218,6 +221,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Add an additional bonus for HDFL.
             if (mods.Any(h => h is OsuModHidden))
                 flashlightValue *= 1.3;
+
+            if (mods.Any(h => h is OsuModRelax))
+            {
+                flashlightValue *= 0.6;
+            }
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (countMiss > 0)
