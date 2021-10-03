@@ -82,13 +82,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                 // The base value is a ratio between distance moved and strain time
                 // The exponents are used to give emphasis on the distance or the strain time
                 // For basic fruits, the distance is usually slightly more important for the calculation than the strain time
-                distanceAddition = 0.026 * Math.Pow(Math.Abs(distanceMoved), 1.25) / Math.Pow(weightedStrainTime, 0.9);
-                distanceAddition /= Math.Max(1, 70 / Math.Abs(distanceMoved)); // Nerfes streams (shortest movements)
+                distanceAddition = 0.025 * Math.Pow(Math.Abs(distanceMoved), 1.22) / Math.Pow(weightedStrainTime, 0.9);
+                distanceAddition /= Math.Max(1, 50 / Math.Abs(distanceMoved)); // Nerfes streams (shortest movements)
 
                 // Gives a slight buff to direction changes
                 if (Math.Abs(distanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved))
                 {
-                    distanceAddition *= 1 + 1 / (4 * Math.Abs(distanceMoved / weightedStrainTime));
+                    distanceAddition *= 1 + 1 / (0.09 * Math.Abs(distanceMoved) / Math.Pow(weightedStrainTime, 0.4));
                 }
             }
             else
@@ -100,10 +100,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                 if (previousIsDoubleHdash)
                 {
                     if (isDoubleHdash) // HDash chains, nerf is same direction, buff otherwise
-                        distanceAddition *= Math.Sign(distanceMoved) == Math.Sign(lastDistanceMoved) ? 0.8 : 1.8;
+                        distanceAddition *= Math.Sign(distanceMoved) == Math.Sign(lastDistanceMoved) ? 0.4 : 2;
                 }
                 else if (isDoubleHdash) // Nerf same direction HDash
-                    distanceAddition *= 0.8;
+                    distanceAddition *= 0.2;
 
             }
 
@@ -111,14 +111,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (catchCurrent.LastObject.DistanceToHyperDash <= 20.0)
             {
                 if (!catchCurrent.LastObject.HyperDash)
-                    edgeDashBonus += 4.2;
+                    edgeDashBonus += 4;
                 else
                 {
                     // After a hyperdash we ARE in the correct position. Always!
                     playerPosition = catchCurrent.NormalizedPosition;
                 }
 
-                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime, 265) / 265), 1.5) / Math.Max(1, catcherSpeedMultiplier); // Edge Dashes are easier at lower ms values
+                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
             }
 
 
