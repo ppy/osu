@@ -12,7 +12,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -33,7 +32,7 @@ namespace osu.Game.Overlays.Settings
 
         private const int header_size = 26;
         private const int margin = 20;
-        private const int border_size = 2;
+        private const int border_size = 4;
 
         public bool MatchingFilter
         {
@@ -63,14 +62,14 @@ namespace osu.Game.Overlays.Settings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             AddRangeInternal(new Drawable[]
             {
                 new Box
                 {
                     Name = "separator",
-                    Colour = new Color4(0, 0, 0, 255),
+                    Colour = colourProvider.Background6,
                     RelativeSizeAxes = Axes.X,
                     Height = border_size,
                 },
