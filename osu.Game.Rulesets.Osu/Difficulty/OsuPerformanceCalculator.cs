@@ -160,28 +160,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAccuracyValue()
         {
+            // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
+            double betterAccuracyPercentage;
             int amountHitObjectsWithAccuracy = Attributes.HitCircleCount;
 
-            // This section should be documented by Tr3, but effectively we're calculating the exact same way as before, but
-            // we calculate a variance based on the object count and # of 50s, 100s, etc. This prevents us from having cases
-            // where an SS on lower OD is actually worth more than a 95% on OD11, even though the OD11 requires a greater
-            // window of precision.
+            if (amountHitObjectsWithAccuracy > 0)
+                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countOk * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
+            else
+                betterAccuracyPercentage = 0;
 
-            double p100 = (2 * (double)countOk) / amountHitObjectsWithAccuracy; // this is multiplied by two to encourage better accuracy. (scales better)
-            double p50 = (1 * (double)countMeh) / amountHitObjectsWithAccuracy;
-            double pm = (1 * (double)countMiss) / amountHitObjectsWithAccuracy;
-            double p300 = Math.Max(0, 1.0 - pm - p100 - p50);
+            // It is possible to reach a negative accuracy with this formula. Cap it at zero - zero points.
+            if (betterAccuracyPercentage < 0)
+                betterAccuracyPercentage = 0;
 
-            double m300 = 79.5 - 6.0 * Attributes.OverallDifficulty;
-            double m100 = 139.5 - 8.0 * Attributes.OverallDifficulty;
-            double m50 = 199.5 - 10.0 * Attributes.OverallDifficulty;
+            // Lots of arbitrary values from testing.
+            // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution.
+            double accuracyValue = Math.Pow(1.52163, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
 
-            double variance = p300 * Math.Pow(m300 / 2.0, 2.0) +
-                              p100 * Math.Pow((m300 + m100) / 2.0, 2.0) +
-                              p50 * Math.Pow((m100 + m50) / 2.0, 2.0);
-
-            double accuracyValue = 2.83 * Math.Pow(1.52163, (79.5 - 2 * Math.Sqrt(variance)) / 6.0)
-                                        * Math.Pow(Math.Log(1.0 + (Math.E - 1.0) * (Math.Min(amountHitObjectsWithAccuracy, 1600) / 1000.0)), 0.5);
+            // Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
+            accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
 
             if (mods.Any(m => m is OsuModHidden))
                 accuracyValue *= 1.08;
