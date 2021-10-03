@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Speed : OsuStrainSkill
     {
         private const double single_spacing_threshold = 125;
-        private const double rhythm_multiplier = 4.0;
+        private const double rhythm_multiplier = 0.675;
         private const int history_time_max = 5000; // 5 seconds of calculatingRhythmBonus max.
         private const double min_speed_bonus = 75; // ~200BPM
         private const double max_speed_bonus = 45;
@@ -44,14 +44,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        private double calculateRhythmBonus(DifficultyHitObject current, double greatWindowFull)
+        private double calculateRhythmBonus(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
 
-            int previousIslandSize = -1;
+            int previousIslandSize = 0;
+
             double rhythmComplexitySum = 0;
-            int islandSize = 0;
+            int islandSize = 1;
             double startRatio = 0; // store the ratio of the current start of an island to buff for tighter rhythms
 
             bool firstDeltaSwitch = false;
@@ -66,70 +67,66 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 if (currHistoricalDecay != 0)
                 {
-                    currHistoricalDecay = Math.Min(currHistoricalDecay, (double)(Previous.Count - i) / Previous.Count); // either we're limited by time or limited by object count.
+                    currHistoricalDecay = Math.Min((double)(Previous.Count - i) / Previous.Count, currHistoricalDecay); // either we're limited by time or limited by object count.
 
                     double currDelta = Math.Max(25, currObj.DeltaTime);
                     double prevDelta = Math.Max(25, prevObj.DeltaTime);
                     double lastDelta = ((OsuDifficultyHitObject)lastObj).StrainTime;
-                    double effectiveRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
+                    double currRatio = 1.0 + Math.Min(4.5, 6 * Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
-                    if (effectiveRatio > 0.5)
-                        effectiveRatio = 0.5 + (effectiveRatio - 0.5) * 6; // large buff for 1/3 -> 1/4 type transitions.
-                    else
-                        effectiveRatio = 0.5;
+                    double windowPenalty = Math.Min(1, Math.Max(0, Math.Max(prevDelta, currDelta) - Math.Min(prevDelta, currDelta) - greatWindow) / greatWindow);
 
-                    effectiveRatio *= currHistoricalDecay; // scale with time
+                    windowPenalty = Math.Min(1, windowPenalty * (previousIslandSize + islandSize));
 
                     if (firstDeltaSwitch)
                     {
-                        if (Precision.AlmostEquals(prevDelta, currDelta, 15))
+                        if (!(prevDelta > 1.25 * currDelta || prevDelta * 1.25 < currDelta))
                         {
                             islandSize++; // island is still progressing, count size.
                         }
                         else
                         {
-                            if (islandSize > 12)
-                                islandSize = 12;
+                            double effectiveRatio = windowPenalty * currRatio;
+
+                            if (islandSize > 7)
+                                islandSize = 7;
 
                             if (Previous[i - 1].BaseObject is Slider) // bpm change is into slider, this is easy acc window
-                                effectiveRatio *= 0.25;
+                                effectiveRatio *= 0.125;
 
                             if (Previous[i].BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
-                                effectiveRatio *= 0.5;
+                                effectiveRatio *= 0.25;
 
                             if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
-                                effectiveRatio *= 0.35;
+                                effectiveRatio *= 0.25;
 
                             if (previousIslandSize % 2 == islandSize % 2) // repeated island polartiy (2 -> 4, 3 -> 5)
-                                effectiveRatio *= 0.75;
+                                effectiveRatio *= 0.50;
 
                             if (lastDelta > prevDelta + 10 && prevDelta > currDelta + 10) // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
                                 effectiveRatio *= 0.125;
 
-                            rhythmComplexitySum += effectiveRatio * startRatio;
+                            rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay * Math.Sqrt(4 + islandSize) / 2 * Math.Sqrt(4 + previousIslandSize) / 2;
 
-                            startRatio = Math.Sqrt(Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta));
+                            startRatio = windowPenalty * currRatio;
 
                             previousIslandSize = islandSize; // log the last island size.
 
                             if (prevDelta * 1.25 < currDelta) // we're slowing down, stop counting
                                 firstDeltaSwitch = false; // if we're speeding up, this stays true and  we keep counting island size.
 
-                            islandSize = 0;
+                            islandSize = 1;
                         }
                     }
                     else if (prevDelta > 1.25 * currDelta) // we want to be speeding up.
                     {
                         // Begin counting island until we change speed again.
                         firstDeltaSwitch = true;
-                        islandSize = 0;
-                        startRatio = Math.Sqrt(Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta));
+                        startRatio = windowPenalty * currRatio;
+                        islandSize = 1;
                     }
                 }
             }
-
-            if (greatWindowFull > 62)
-                rhythmComplexitySum *= Math.Sqrt(62 / greatWindowFull);
 
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
         }
@@ -156,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
-        protected override double CalculateInitialStrain(double time) => (currentMovementStrain + currentTapStrain * currentRhythm) * strainDecay(time - Previous[0].StartTime);
+        protected override double CalculateInitialStrain(double time) => ((currentMovementStrain + currentTapStrain) * currentRhythm) * strainDecay(time - Previous[0].StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -182,9 +179,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (strainTime < min_speed_bonus)
                 speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
-            currentRhythm = calculateRhythmBonus(current, greatWindowFull);
+            currentRhythm = calculateRhythmBonus(current);
 
             double decay = strainDecay(current.DeltaTime);
+            double tapStrain = tapStrainOf(current, speedBonus, strainTime) * skillMultiplier;
+            double maxStrain = (1 / decay) * tapStrain;
 
             currentTapStrain *= decay;
             currentTapStrain += tapStrainOf(current, speedBonus, strainTime) * skillMultiplier;
@@ -192,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentMovementStrain *= decay;
             currentMovementStrain += movementStrainOf(current, speedBonus, strainTime) * skillMultiplier;
 
-            return currentMovementStrain + currentTapStrain * currentRhythm;
+            return (currentMovementStrain + currentTapStrain) * currentRhythm;
         }
     }
 }
