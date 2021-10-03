@@ -7,6 +7,8 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Framework.Utils;
+using System.Linq;
+using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -78,6 +80,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                         angleBonus += (1 - angleBonus) * Math.Min((90 - distance) / 10, 1) * Math.Sin((pi_over_2 - osuCurrent.Angle.Value) / pi_over_4);
                 }
             }
+
+            if (Mods.Any(m => m is OsuModRelax))
+                speedBonus = 0.0;
 
             return (1 + (speedBonus - 1) * 0.75)
                    * angleBonus
