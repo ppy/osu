@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuDropdown<T> : Dropdown<T>, IHasAccentColour
     {
-        private const float corner_radius = 4;
+        private const float corner_radius = 5;
 
         private Color4 accentColour;
 
@@ -267,7 +267,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public OsuDropdownHeader()
             {
-                Foreground.Padding = new MarginPadding(4);
+                Foreground.Padding = new MarginPadding(10);
 
                 AutoSizeAxes = Axes.None;
                 Margin = new MarginPadding { Bottom = 4 };
@@ -303,8 +303,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Icon = FontAwesome.Solid.ChevronDown,
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
-                                Margin = new MarginPadding { Horizontal = 5 },
-                                Size = new Vector2(12),
+                                Size = new Vector2(16),
                             },
                         }
                     }
