@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplier => 26.25;
         private double strainDecayBase => 0.15;
 
-        private double aimStrainOf(DifficultyHitObject current)
+        private double strainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -69,10 +69,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            double aimStrain = aimStrainOf(current);
-
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += aimStrain * skillMultiplier;
+            currentStrain += strainValueOf(current) * skillMultiplier;
 
             return currentStrain;
         }

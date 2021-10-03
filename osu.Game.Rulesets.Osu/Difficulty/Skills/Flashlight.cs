@@ -70,10 +70,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            double flashlightStrain = strainValueOf(current);
-
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += flashlightStrain * skillMultiplier;
+            currentStrain += strainValueOf(current) * skillMultiplier;
 
             return currentStrain;
         }
