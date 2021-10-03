@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -12,13 +13,16 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class Nub : CircularContainer, IHasCurrentValue<bool>, IHasAccentColour
     {
-        public const float COLLAPSED_SIZE = 20;
-        public const float EXPANDED_SIZE = 40;
+        public const float HEIGHT = 15;
+
+        public const float COLLAPSED_SIZE = 30;
+        public const float EXPANDED_SIZE = 50;
 
         private const float border_width = 3;
 
@@ -29,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Box fill;
 
-            Size = new Vector2(COLLAPSED_SIZE, 12);
+            Size = new Vector2(COLLAPSED_SIZE, HEIGHT);
 
             BorderColour = Color4.White;
             BorderThickness = border_width;
@@ -53,12 +57,12 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
         {
-            AccentColour = colours.Pink;
-            GlowingAccentColour = colours.PinkLighter;
-            GlowColour = colours.PinkDarker;
+            AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
+            GlowingAccentColour = colourProvider?.Highlight1.Lighten(0.2f) ?? colours.PinkLighter;
+            GlowColour = colourProvider?.Dark3 ?? colours.PinkDarker;
 
             EdgeEffect = new EdgeEffectParameters
             {
@@ -96,9 +100,9 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 if (value)
-                    this.ResizeTo(new Vector2(EXPANDED_SIZE, 12), animate_in_duration, Easing.OutQuint);
+                    this.ResizeTo(new Vector2(EXPANDED_SIZE, HEIGHT), animate_in_duration, Easing.OutQuint);
                 else
-                    this.ResizeTo(new Vector2(COLLAPSED_SIZE, 12), animate_out_duration, Easing.OutQuint);
+                    this.ResizeTo(new Vector2(COLLAPSED_SIZE, HEIGHT), animate_out_duration, Easing.OutQuint);
             }
         }
 
