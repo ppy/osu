@@ -90,6 +90,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             aimValue *= lengthBonus;
 
+            if (mods.Any(h => h is OsuModRelax))
+            {
+                aimValue *= 0.75;
+                countMiss += countOk + countMeh;
+            }
+
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (countMiss > 0)
                 aimValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), countMiss);
@@ -126,6 +132,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.SpeedStrain / 0.0675) - 4.0, 3.0) / 100000.0;
 
+            if (mods.Any(h => h is OsuModRelax))
+            {
+                speedValue *= 0.75;
+                countMiss += countOk + countMeh;
+            }
+
             // Longer maps are worth more.
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
@@ -160,6 +172,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAccuracyValue()
         {
+            if (mods.Any(h => h is OsuModRelax))
+                return 0.0;
+
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
             double betterAccuracyPercentage;
             int amountHitObjectsWithAccuracy = Attributes.HitCircleCount;
