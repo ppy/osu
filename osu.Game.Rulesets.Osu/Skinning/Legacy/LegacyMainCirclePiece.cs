@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private Drawable hitCircleSprite;
 
-        protected Container OverlayLayer;
+        protected Container OverlayLayer { get; private set; }
 
         private Drawable hitCircleOverlay;
         private SkinnableSpriteText hitCircleText;
