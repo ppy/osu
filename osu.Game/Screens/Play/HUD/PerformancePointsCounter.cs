@@ -132,6 +132,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        // Todo: This class shouldn't exist, but requires breaking changes to allow DifficultyCalculator to receive an IBeatmap.
         private class GameplayWorkingBeatmap : WorkingBeatmap
         {
             private readonly IBeatmap gameplayBeatmap;
