@@ -430,7 +430,7 @@ namespace osu.Game.Overlays
             base.PopOut();
         }
 
-        private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args) => Schedule(() =>
+        private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             switch (args.Action)
             {
@@ -458,7 +458,7 @@ namespace osu.Game.Overlays
 
                     break;
             }
-        });
+        }
 
         private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
