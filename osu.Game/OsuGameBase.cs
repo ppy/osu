@@ -250,7 +250,7 @@ namespace osu.Game
             List<ScoreInfo> getBeatmapScores(BeatmapSetInfo set)
             {
                 var beatmapIds = BeatmapManager.QueryBeatmaps(b => b.BeatmapSetInfoID == set.ID).Select(b => b.ID).ToList();
-                return ScoreManager.QueryScores(s => beatmapIds.Contains(s.Beatmap.ID)).ToList();
+                return ScoreManager.QueryScores(s => beatmapIds.Contains(s.BeatmapInfo.ID)).ToList();
             }
 
             BeatmapManager.ItemRemoved.BindValueChanged(i =>

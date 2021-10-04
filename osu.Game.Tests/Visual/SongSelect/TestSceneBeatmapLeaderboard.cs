@@ -197,7 +197,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User
                     {
                         Id = 6602580,
@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User
                     {
                         Id = 4608074,
@@ -235,7 +235,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User
                     {
                         Id = 1014222,
@@ -254,7 +254,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User
                     {
                         Id = 1541390,
@@ -273,7 +273,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User
                     {
                         Id = 2243452,
@@ -292,7 +292,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User
                     {
                         Id = 2705430,
@@ -311,7 +311,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User
                     {
                         Id = 7151382,
@@ -330,7 +330,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User
                     {
                         Id = 2051389,
@@ -349,7 +349,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User
                     {
                         Id = 6169483,
@@ -368,7 +368,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User
                     {
                         Id = 6702666,

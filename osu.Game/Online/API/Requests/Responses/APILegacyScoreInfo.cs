@@ -37,7 +37,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineScoreID = OnlineScoreID,
                 Date = Date,
                 PP = PP,
-                Beatmap = BeatmapInfo,
+                BeatmapInfo = BeatmapInfo,
                 RulesetID = OnlineRulesetID,
                 Hash = Replay ? "online" : string.Empty, // todo: temporary?
                 Rank = Rank,
