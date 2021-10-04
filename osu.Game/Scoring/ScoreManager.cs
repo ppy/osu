@@ -25,7 +25,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : IModelManager<ScoreInfo>, IModelFileManager<ScoreInfo, ScoreFileInfo>, IModelDownloader<ScoreInfo>, ICanAcceptFiles, IPresentImports<ScoreInfo>
+    public class ScoreManager : IModelManager<ScoreInfo>, IModelFileManager<ScoreInfo, ScoreFileInfo>, IModelDownloader<ScoreInfo>, ICanAcceptFiles, IPostImports<ScoreInfo>
     {
         private readonly Scheduler scheduler;
         private readonly Func<BeatmapDifficultyCache> difficulties;
@@ -67,7 +67,7 @@ namespace osu.Game.Scoring
                 // Compute difficulties asynchronously first to prevent blocking via the GetTotalScore() call below.
                 foreach (var s in scores)
                 {
-                    await difficultyCache.GetDifficultyAsync(s.Beatmap, s.Ruleset, s.Mods, cancellationToken).ConfigureAwait(false);
+                    await difficultyCache.GetDifficultyAsync(s.BeatmapInfo, s.Ruleset, s.Mods, cancellationToken).ConfigureAwait(false);
                     cancellationToken.ThrowIfCancellationRequested();
                 }
             }
@@ -126,7 +126,7 @@ namespace osu.Game.Scoring
         /// <returns>The total score.</returns>
         public async Task<long> GetTotalScoreAsync([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
-            if (score.Beatmap == null)
+            if (score.BeatmapInfo == null)
                 return score.TotalScore;
 
             int beatmapMaxCombo;
@@ -147,18 +147,18 @@ namespace osu.Game.Scoring
 
                 // This score is guaranteed to be an osu!stable score.
                 // The combo must be determined through either the beatmap's max combo value or the difficulty calculator, as lazer's scoring has changed and the score statistics cannot be used.
-                if (score.Beatmap.MaxCombo != null)
-                    beatmapMaxCombo = score.Beatmap.MaxCombo.Value;
+                if (score.BeatmapInfo.MaxCombo != null)
+                    beatmapMaxCombo = score.BeatmapInfo.MaxCombo.Value;
                 else
                 {
-                    if (score.Beatmap.ID == 0 || difficulties == null)
+                    if (score.BeatmapInfo.ID == 0 || difficulties == null)
                     {
                         // We don't have enough information (max combo) to compute the score, so use the provided score.
                         return score.TotalScore;
                     }
 
                     // We can compute the max combo locally after the async beatmap difficulty computation.
-                    var difficulty = await difficulties().GetDifficultyAsync(score.Beatmap, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
+                    var difficulty = await difficulties().GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
                     beatmapMaxCombo = difficulty.MaxCombo;
                 }
             }
@@ -299,22 +299,22 @@ namespace osu.Game.Scoring
 
         public IEnumerable<string> HandledExtensions => scoreModelManager.HandledExtensions;
 
-        public Task<IEnumerable<ScoreInfo>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public Task<IEnumerable<ILive<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             return scoreModelManager.Import(notification, tasks);
         }
 
-        public Task<ScoreInfo> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<ScoreInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return scoreModelManager.Import(task, lowPriority, cancellationToken);
         }
 
-        public Task<ScoreInfo> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<ScoreInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return scoreModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public Task<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<ScoreInfo>> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return scoreModelManager.Import(item, archive, lowPriority, cancellationToken);
         }
@@ -365,9 +365,9 @@ namespace osu.Game.Scoring
 
         #region Implementation of IPresentImports<ScoreInfo>
 
-        public Action<IEnumerable<ScoreInfo>> PresentImport
+        public Action<IEnumerable<ILive<ScoreInfo>>> PostImport
         {
-            set => scoreModelManager.PresentImport = value;
+            set => scoreModelManager.PostImport = value;
         }
 
         #endregion

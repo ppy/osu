@@ -23,7 +23,7 @@ namespace osu.Game.Tournament.Tests.Components
 
         private FillFlowContainer<TournamentBeatmapPanel> fillFlow;
 
-        private BeatmapInfo beatmap;
+        private BeatmapInfo beatmapInfo;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -44,12 +44,12 @@ namespace osu.Game.Tournament.Tests.Components
 
         private void success(APIBeatmap apiBeatmap)
         {
-            beatmap = apiBeatmap.ToBeatmap(rulesets);
+            beatmapInfo = apiBeatmap.ToBeatmapInfo(rulesets);
             var mods = rulesets.GetRuleset(Ladder.Ruleset.Value.ID ?? 0).CreateInstance().AllMods;
 
             foreach (var mod in mods)
             {
-                fillFlow.Add(new TournamentBeatmapPanel(beatmap, mod.Acronym)
+                fillFlow.Add(new TournamentBeatmapPanel(beatmapInfo, mod.Acronym)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre

@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Select
             {
                 beatmap = value;
 
-                Details.Beatmap = value?.BeatmapInfo;
+                Details.BeatmapInfo = value?.BeatmapInfo;
             }
         }
 

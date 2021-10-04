@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Spectate
             {
                 ScoreInfo = new ScoreInfo
                 {
-                    Beatmap = resolvedBeatmap,
+                    BeatmapInfo = resolvedBeatmap,
                     User = user,
                     Mods = spectatorState.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
                     Ruleset = resolvedRuleset.RulesetInfo,
