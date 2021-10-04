@@ -28,7 +28,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultPerformancePointsCounter : RollingCounter<int>, ISkinnableDrawable
+    public class PerformancePointsCounter : RollingCounter<int>, ISkinnableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play.HUD
         private TimedDifficultyAttributes[] timedAttributes;
         private Ruleset gameplayRuleset;
 
-        public DefaultPerformancePointsCounter()
+        public PerformancePointsCounter()
         {
             Current.Value = DisplayedCount = 0;
         }
