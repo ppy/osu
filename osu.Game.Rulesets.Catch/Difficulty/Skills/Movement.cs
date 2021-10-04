@@ -79,27 +79,26 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (!catchCurrent.LastObject.HyperDash)
             {
                 // The base value is a ratio between distance moved and strain time
-                // The exponents are used to give emphasis on the distance or the strain time
                 // For basic fruits, the distance is usually slightly more important for the calculation than the strain time
-                distanceAddition = 0.025 * Math.Pow(Math.Abs(distanceMoved), 1.22) / Math.Pow(weightedStrainTime, 0.9);
-                distanceAddition /= Math.Max(1, 50 / Math.Abs(distanceMoved)); // Nerfes streams (shortest movements)
+                distanceAddition = 0.06 * Math.Pow(Math.Pow(Math.Abs(distanceMoved), 1) / weightedStrainTime, 2) / Math.Pow(Math.Max(1, catchCurrent.ClockRate), 2);
+                distanceAddition /= Math.Max(1, 40 / Math.Abs(distanceMoved)); // Nerfes streams (shortest movements)
 
                 // Gives a slight buff to direction changes
                 if (Math.Abs(distanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved))
                 {
-                    distanceAddition *= 1 + 1 / (0.09 * Math.Abs(distanceMoved) / Math.Pow(weightedStrainTime, 0.4));
+                    distanceAddition *= 1 + (1 / (0.008 * Math.Abs(distanceMoved) / Math.Pow(weightedStrainTime, 0.2)));
                 }
             }
             else
             {
                 // For Hyperdashes, the distance is usually way more important for the calculation than the strain time 
-                distanceAddition = 0.87 * Math.Log(Math.Abs(distanceMoved + 1), 2.13) / Math.Pow(weightedStrainTime, 0.85);
+                distanceAddition = 0.91 * Math.Log(Math.Abs(distanceMoved + 1), 2) / Math.Pow(weightedStrainTime, 0.85);
 
                 // Handling complex hyperdash chains
                 if (previousIsDoubleHdash)
                 {
                     if (isDoubleHdash) // HDash chains, nerf is same direction, buff otherwise
-                        distanceAddition *= Math.Sign(distanceMoved) == Math.Sign(lastDistanceMoved) ? 0.4 : 2;
+                        distanceAddition *= Math.Sign(distanceMoved) == Math.Sign(lastDistanceMoved) ? 0.2 : 2;
                 }
                 else if (isDoubleHdash) // Nerf same direction HDash
                     distanceAddition *= 0.2;
@@ -109,7 +108,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (catchCurrent.LastObject.DistanceToHyperDash <= 20.0)
             {
                 if (!catchCurrent.LastObject.HyperDash)
-                    edgeDashBonus += 4;
+                    edgeDashBonus += 5.1;
                 else
                 {
                     // After a hyperdash we ARE in the correct position. Always!
