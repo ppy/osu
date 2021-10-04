@@ -751,7 +751,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("import huge difficulty count map", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
-                imported = manager.Import(createTestBeatmapSet(usableRulesets, 50)).Result;
+                imported = manager.Import(createTestBeatmapSet(usableRulesets, 50)).Result.Value;
             });
 
             AddStep("select the first beatmap of import", () => Beatmap.Value = manager.GetWorkingBeatmap(imported.Beatmaps.First()));
