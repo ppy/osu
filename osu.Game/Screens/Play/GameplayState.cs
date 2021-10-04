@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The mods applied to the gameplay.
         /// </summary>
-        public IReadOnlyList<Mod> Mods;
+        public readonly IReadOnlyList<Mod> Mods;
 
         /// <summary>
         /// A bindable tracking the last judgement result applied to any hit object.
