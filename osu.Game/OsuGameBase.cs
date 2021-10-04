@@ -184,7 +184,7 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client"));
 
             AddInternal(realmFactory);
 
@@ -236,7 +236,7 @@ namespace osu.Game
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, true));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
@@ -341,6 +341,11 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Torus/Torus-SemiBold");
             AddFont(Resources, @"Fonts/Torus/Torus-Bold");
 
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Regular");
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Light");
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-SemiBold");
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Bold");
+
             AddFont(Resources, @"Fonts/Inter/Inter-Regular");
             AddFont(Resources, @"Fonts/Inter/Inter-RegularItalic");
             AddFont(Resources, @"Fonts/Inter/Inter-Light");
@@ -425,19 +430,20 @@ namespace osu.Game
         private void migrateDataToRealm()
         {
             using (var db = contextFactory.GetForWrite())
-            using (var usage = realmFactory.GetForWrite())
+            using (var realm = realmFactory.CreateContext())
+            using (var transaction = realm.BeginWrite())
             {
                 // migrate ruleset settings. can be removed 20220315.
                 var existingSettings = db.Context.DatabasedSetting;
 
                 // only migrate data if the realm database is empty.
-                if (!usage.Realm.All<RealmRulesetSetting>().Any())
+                if (!realm.All<RealmRulesetSetting>().Any())
                 {
                     foreach (var dkb in existingSettings)
                     {
                         if (dkb.RulesetID == null) continue;
 
-                        usage.Realm.Add(new RealmRulesetSetting
+                        realm.Add(new RealmRulesetSetting
                         {
                             Key = dkb.Key,
                             Value = dkb.StringValue,
@@ -449,7 +455,7 @@ namespace osu.Game
 
                 db.Context.RemoveRange(existingSettings);
 
-                usage.Commit();
+                transaction.Commit();
             }
         }
 
