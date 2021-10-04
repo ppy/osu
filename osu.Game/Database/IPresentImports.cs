@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Database
 {
-    public interface IPresentImports<TModel>
+    public interface IPresentImports<out TModel>
         where TModel : class
     {
         /// <summary>
