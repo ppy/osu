@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Play.HUD
             attribIndex = Math.Clamp(attribIndex, 0, timedAttributes.Length - 1);
 
             var ppProcessor = gameplayRuleset.CreatePerformanceCalculator(timedAttributes[attribIndex].Attributes, gameplayState.Score.ScoreInfo);
-            Current.Value = (int)(ppProcessor?.Calculate() ?? 0);
+            Current.Value = (int)Math.Round(ppProcessor?.Calculate() ?? 0, MidpointRounding.AwayFromZero);
         }
 
         protected override LocalisableString FormatCount(int count) => count.ToString(@"D");
