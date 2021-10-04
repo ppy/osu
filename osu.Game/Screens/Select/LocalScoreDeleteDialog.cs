@@ -29,8 +29,8 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load()
         {
-            BeatmapInfo beatmap = beatmapManager.QueryBeatmap(b => b.ID == score.BeatmapInfoID);
-            Debug.Assert(beatmap != null);
+            BeatmapInfo beatmapInfo = beatmapManager.QueryBeatmap(b => b.ID == score.BeatmapInfoID);
+            Debug.Assert(beatmapInfo != null);
 
             BodyText = $"{score.User} ({score.DisplayAccuracy}, {score.Rank})";
 
