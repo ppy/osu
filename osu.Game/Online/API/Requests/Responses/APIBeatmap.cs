@@ -64,7 +64,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"max_combo")]
         private int? maxCombo { get; set; }
 
-        public virtual BeatmapInfo ToBeatmap(RulesetStore rulesets)
+        public virtual BeatmapInfo ToBeatmapInfo(RulesetStore rulesets)
         {
             var set = BeatmapSet?.ToBeatmapSet(rulesets);
 

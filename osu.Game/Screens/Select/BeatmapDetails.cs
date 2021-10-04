@@ -41,16 +41,16 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private BeatmapInfo beatmap;
+        private BeatmapInfo beatmapInfo;
 
-        public BeatmapInfo Beatmap
+        public BeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (value == beatmap) return;
+                if (value == beatmapInfo) return;
 
-                beatmap = value;
+                beatmapInfo = value;
 
                 Scheduler.AddOnce(updateStatistics);
             }
@@ -170,26 +170,26 @@ namespace osu.Game.Screens.Select
 
         private void updateStatistics()
         {
-            advanced.Beatmap = Beatmap;
-            description.Text = Beatmap?.Version;
-            source.Text = Beatmap?.Metadata?.Source;
-            tags.Text = Beatmap?.Metadata?.Tags;
+            advanced.BeatmapInfo = BeatmapInfo;
+            description.Text = BeatmapInfo?.Version;
+            source.Text = BeatmapInfo?.Metadata?.Source;
+            tags.Text = BeatmapInfo?.Metadata?.Tags;
 
             // metrics may have been previously fetched
-            if (Beatmap?.BeatmapSet?.Metrics != null && Beatmap?.Metrics != null)
+            if (BeatmapInfo?.BeatmapSet?.Metrics != null && BeatmapInfo?.Metrics != null)
             {
                 updateMetrics();
                 return;
             }
 
             // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
-            if (Beatmap?.OnlineBeatmapID == null || api.State.Value == APIState.Offline)
+            if (BeatmapInfo?.OnlineBeatmapID == null || api.State.Value == APIState.Offline)
             {
                 updateMetrics();
                 return;
             }
 
-            var requestedBeatmap = Beatmap;
+            var requestedBeatmap = BeatmapInfo;
 
             var lookup = new GetBeatmapRequest(requestedBeatmap);
 
@@ -197,11 +197,11 @@ namespace osu.Game.Screens.Select
             {
                 Schedule(() =>
                 {
-                    if (beatmap != requestedBeatmap)
+                    if (beatmapInfo != requestedBeatmap)
                         // the beatmap has been changed since we started the lookup.
                         return;
 
-                    var b = res.ToBeatmap(rulesets);
+                    var b = res.ToBeatmapInfo(rulesets);
 
                     if (requestedBeatmap.BeatmapSet == null)
                         requestedBeatmap.BeatmapSet = b.BeatmapSet;
@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Select
             {
                 Schedule(() =>
                 {
-                    if (beatmap != requestedBeatmap)
+                    if (beatmapInfo != requestedBeatmap)
                         // the beatmap has been changed since we started the lookup.
                         return;
 
@@ -232,12 +232,12 @@ namespace osu.Game.Screens.Select
 
         private void updateMetrics()
         {
-            var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) || (beatmap?.Metrics?.Fails?.Any() ?? false);
+            var hasRatings = beatmapInfo?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
+            var hasRetriesFails = (beatmapInfo?.Metrics?.Retries?.Any() ?? false) || (beatmapInfo?.Metrics?.Fails?.Any() ?? false);
 
             if (hasRatings)
             {
-                ratings.Metrics = beatmap.BeatmapSet.Metrics;
+                ratings.Metrics = beatmapInfo.BeatmapSet.Metrics;
                 ratings.FadeIn(transition_duration);
             }
             else
@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Select
 
             if (hasRetriesFails)
             {
-                failRetryGraph.Metrics = beatmap.Metrics;
+                failRetryGraph.Metrics = beatmapInfo.Metrics;
                 failRetryContainer.FadeIn(transition_duration);
             }
             else
