@@ -70,7 +70,7 @@ namespace osu.Game.Online.Rooms
                 OnlineScoreID = ID,
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
-                Beatmap = playlistItem.Beatmap.Value,
+                BeatmapInfo = playlistItem.Beatmap.Value,
                 BeatmapInfoID = playlistItem.BeatmapID,
                 Ruleset = playlistItem.Ruleset.Value,
                 RulesetID = playlistItem.RulesetID,

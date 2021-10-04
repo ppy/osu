@@ -35,9 +35,8 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
-        /// <summary>
-        /// The username/email provided by the user when initiating a login.
-        /// </summary>
+        public Exception LastLoginError { get; private set; }
+
         public string ProvidedUsername { get; private set; }
 
         private string password;
@@ -136,14 +135,23 @@ namespace osu.Game.Online.API
                         // save the username at this point, if the user requested for it to be.
                         config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
-                        if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(ProvidedUsername, password))
+                        if (!authentication.HasValidAccessToken)
                         {
-                            //todo: this fails even on network-related issues. we should probably handle those differently.
-                            //NotificationOverlay.ShowMessage("Login failed!");
-                            log.Add(@"Login failed!");
-                            password = null;
-                            authentication.Clear();
-                            continue;
+                            LastLoginError = null;
+
+                            try
+                            {
+                                authentication.AuthenticateWithLogin(ProvidedUsername, password);
+                            }
+                            catch (Exception e)
+                            {
+                                //todo: this fails even on network-related issues. we should probably handle those differently.
+                                LastLoginError = e;
+                                log.Add(@"Login failed!");
+                                password = null;
+                                authentication.Clear();
+                                continue;
+                            }
                         }
 
                         var userReq = new GetUserRequest();
