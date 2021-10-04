@@ -62,7 +62,7 @@ namespace osu.Game.Online.API
                         // attempt to decode a displayable error string.
                         var error = JsonConvert.DeserializeObject<OAuthError>(req.GetResponseString() ?? string.Empty);
                         if (error != null)
-                            throwableException = new APIException(error.Message, ex);
+                            throwableException = new APIException(error.UserDisplayableError, ex);
                     }
                     catch
                     {
@@ -201,10 +201,15 @@ namespace osu.Game.Online.API
 
         private class OAuthError
         {
+            public string UserDisplayableError => !string.IsNullOrEmpty(Hint) ? Hint : ErrorIdentifier;
+
             [JsonProperty("error")]
-            public string ErrorType { get; set; }
+            public string ErrorIdentifier { get; set; }
 
             [JsonProperty("hint")]
+            public string Hint { get; set; }
+
+            [JsonProperty("message")]
             public string Message { get; set; }
         }
     }
