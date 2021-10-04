@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
                     Text = @"Yes. Please.",
                     Action = () =>
                     {
-                        Task.Run(() => scoreManager.Delete(scoreManager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == beatmapInfo.ID).ToList()))
+                        Task.Run(() => scoreManager.Delete(scoreManager.QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == beatmapInfo.ID).ToList()))
                             .ContinueWith(_ => onCompletion);
                     }
                 },

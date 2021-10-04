@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 var score = new ScoreInfo
                 {
                     OnlineScoreID = i,
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     BeatmapInfoID = beatmapInfo.ID,
                     Accuracy = RNG.NextDouble(),
                     TotalScore = RNG.Next(1, 1000000),

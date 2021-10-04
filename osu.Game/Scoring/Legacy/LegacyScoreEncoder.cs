@@ -34,7 +34,7 @@ namespace osu.Game.Scoring.Legacy
             this.score = score;
             this.beatmap = beatmap;
 
-            if (score.ScoreInfo.Beatmap.RulesetID < 0 || score.ScoreInfo.Beatmap.RulesetID > 3)
+            if (score.ScoreInfo.BeatmapInfo.RulesetID < 0 || score.ScoreInfo.BeatmapInfo.RulesetID > 3)
                 throw new ArgumentException("Only scores in the osu, taiko, catch, or mania rulesets can be encoded to the legacy score format.", nameof(score));
         }
 
@@ -44,7 +44,7 @@ namespace osu.Game.Scoring.Legacy
             {
                 sw.Write((byte)(score.ScoreInfo.Ruleset.ID ?? 0));
                 sw.Write(LATEST_VERSION);
-                sw.Write(score.ScoreInfo.Beatmap.MD5Hash);
+                sw.Write(score.ScoreInfo.BeatmapInfo.MD5Hash);
                 sw.Write(score.ScoreInfo.UserString);
                 sw.Write($"lazer-{score.ScoreInfo.UserString}-{score.ScoreInfo.Date}".ComputeMD5Hash());
                 sw.Write((ushort)(score.ScoreInfo.GetCount300() ?? 0));

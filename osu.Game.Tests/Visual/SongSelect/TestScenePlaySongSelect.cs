@@ -805,7 +805,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 songSelect.PresentScore(new ScoreInfo
                 {
                     User = new User { Username = "woo" },
-                    Beatmap = getPresentBeatmap(),
+                    BeatmapInfo = getPresentBeatmap(),
                     Ruleset = getPresentBeatmap().Ruleset
                 });
             });
@@ -837,7 +837,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 songSelect.PresentScore(new ScoreInfo
                 {
                     User = new User { Username = "woo" },
-                    Beatmap = getPresentBeatmap(),
+                    BeatmapInfo = getPresentBeatmap(),
                     Ruleset = getPresentBeatmap().Ruleset
                 });
             });
