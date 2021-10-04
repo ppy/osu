@@ -65,7 +65,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             double weightedStrainTime = catchCurrent.StrainTime / catcherSpeedMultiplier;
             double edgeDashBonus = 0;
 
-
             double distanceAddition;
 
             // Counting direction changes for length scaling in the performance calculation
@@ -104,7 +103,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                 }
                 else if (isDoubleHdash) // Nerf same direction HDash
                     distanceAddition *= 0.2;
-
             }
 
             // Edge dashes buff
@@ -120,7 +118,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
                 distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
             }
-
 
             lastPlayerPosition = playerPosition;
             lastDistanceMoved = distanceMoved;
