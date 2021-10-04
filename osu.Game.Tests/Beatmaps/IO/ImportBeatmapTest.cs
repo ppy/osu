@@ -945,13 +945,13 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
         }
 
-        private static Task createScoreForBeatmap(OsuGameBase osu, BeatmapInfo beatmap)
+        private static Task createScoreForBeatmap(OsuGameBase osu, BeatmapInfo beatmapInfo)
         {
             return ImportScoreTest.LoadScoreIntoOsu(osu, new ScoreInfo
             {
                 OnlineScoreID = 2,
-                Beatmap = beatmap,
-                BeatmapInfoID = beatmap.ID
+                Beatmap = beatmapInfo,
+                BeatmapInfoID = beatmapInfo.ID
             }, new ImportScoreTest.TestArchiveReader());
         }
 

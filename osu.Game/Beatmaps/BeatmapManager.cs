@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps
         private readonly BeatmapModelDownloader beatmapModelDownloader;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
-        private readonly BeatmapOnlineLookupQueue onlineBetamapLookupQueue;
+        private readonly BeatmapOnlineLookupQueue onlineBeatmapLookupQueue;
 
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
@@ -48,8 +48,8 @@ namespace osu.Game.Beatmaps
 
             if (performOnlineLookups)
             {
-                onlineBetamapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
-                beatmapModelManager.OnlineLookupQueue = onlineBetamapLookupQueue;
+                onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+                beatmapModelManager.OnlineLookupQueue = onlineBeatmapLookupQueue;
             }
         }
 
@@ -183,14 +183,14 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Delete a beatmap difficulty.
         /// </summary>
-        /// <param name="beatmap">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmap) => beatmapModelManager.Hide(beatmap);
+        /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
+        public void Hide(BeatmapInfo beatmapInfo) => beatmapModelManager.Hide(beatmapInfo);
 
         /// <summary>
         /// Restore a beatmap difficulty.
         /// </summary>
-        /// <param name="beatmap">The beatmap difficulty to restore.</param>
-        public void Restore(BeatmapInfo beatmap) => beatmapModelManager.Restore(beatmap);
+        /// <param name="beatmapInfo">The beatmap difficulty to restore.</param>
+        public void Restore(BeatmapInfo beatmapInfo) => beatmapModelManager.Restore(beatmapInfo);
 
         #endregion
 
@@ -330,7 +330,7 @@ namespace osu.Game.Beatmaps
 
         public void Dispose()
         {
-            onlineBetamapLookupQueue?.Dispose();
+            onlineBeatmapLookupQueue?.Dispose();
         }
 
         #endregion
