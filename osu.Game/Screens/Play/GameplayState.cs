@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The gameplay score.
         /// </summary>
-        public Score? Score { get; set; } = null;
+        public Score? Score { get; set; }
 
         /// <summary>
         /// A bindable tracking the last judgement result applied to any hit object.
