@@ -25,6 +25,8 @@ using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.UI;
@@ -62,7 +64,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private SpectatorClient spectatorClient { get; set; }
 
         [Cached]
-        private GameplayBeatmap gameplayBeatmap = new GameplayBeatmap(new Beatmap());
+        private GameplayState gameplayState = new GameplayState(new Beatmap(), new OsuRuleset(), Array.Empty<Mod>());
 
         [SetUp]
         public void SetUp() => Schedule(() =>
