@@ -53,6 +53,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The filename for the storyboard.
         /// </summary>
-        string StoryboardFile => Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename ?? string.Empty;
+        string StoryboardFile => Files.FirstOrDefault(f => f.Filename.EndsWith(@".osb", StringComparison.OrdinalIgnoreCase))?.Filename ?? string.Empty;
     }
 }
