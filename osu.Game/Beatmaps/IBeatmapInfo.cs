@@ -50,7 +50,7 @@ namespace osu.Game.Beatmaps
         string Hash { get; }
 
         /// <summary>
-        /// MD5 is kept for legacy support (matching against replays, osu-web-10 etc.).
+        /// MD5 is kept for legacy support (matching against replays etc.).
         /// </summary>
         string MD5Hash { get; }
 
