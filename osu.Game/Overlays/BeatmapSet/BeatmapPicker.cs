@@ -178,21 +178,21 @@ namespace osu.Game.Overlays.BeatmapSet
             }
 
             starRatingContainer.FadeOut(100);
-            Beatmap.Value = Difficulties.FirstOrDefault()?.Beatmap;
+            Beatmap.Value = Difficulties.FirstOrDefault()?.BeatmapInfo;
             plays.Value = BeatmapSet?.OnlineInfo.PlayCount ?? 0;
             favourites.Value = BeatmapSet?.OnlineInfo.FavouriteCount ?? 0;
 
             updateDifficultyButtons();
         }
 
-        private void showBeatmap(BeatmapInfo beatmap)
+        private void showBeatmap(BeatmapInfo beatmapInfo)
         {
-            version.Text = beatmap?.Version;
+            version.Text = beatmapInfo?.Version;
         }
 
         private void updateDifficultyButtons()
         {
-            Difficulties.Children.ToList().ForEach(diff => diff.State = diff.Beatmap == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
+            Difficulties.Children.ToList().ForEach(diff => diff.State = diff.BeatmapInfo == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
         }
 
         public class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
@@ -216,7 +216,7 @@ namespace osu.Game.Overlays.BeatmapSet
             private readonly Box backgroundBox;
             private readonly DifficultyIcon icon;
 
-            public readonly BeatmapInfo Beatmap;
+            public readonly BeatmapInfo BeatmapInfo;
 
             public Action<BeatmapInfo> OnHovered;
             public Action<BeatmapInfo> OnClicked;
@@ -241,9 +241,9 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
             }
 
-            public DifficultySelectorButton(BeatmapInfo beatmap)
+            public DifficultySelectorButton(BeatmapInfo beatmapInfo)
             {
-                Beatmap = beatmap;
+                BeatmapInfo = beatmapInfo;
                 Size = new Vector2(size);
                 Margin = new MarginPadding { Horizontal = tile_spacing / 2 };
 
@@ -260,7 +260,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Alpha = 0.5f
                         }
                     },
-                    icon = new DifficultyIcon(beatmap, shouldShowTooltip: false)
+                    icon = new DifficultyIcon(beatmapInfo, shouldShowTooltip: false)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -273,7 +273,7 @@ namespace osu.Game.Overlays.BeatmapSet
             protected override bool OnHover(HoverEvent e)
             {
                 fadeIn();
-                OnHovered?.Invoke(Beatmap);
+                OnHovered?.Invoke(BeatmapInfo);
                 return base.OnHover(e);
             }
 
@@ -286,7 +286,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             protected override bool OnClick(ClickEvent e)
             {
-                OnClicked?.Invoke(Beatmap);
+                OnClicked?.Invoke(BeatmapInfo);
                 return base.OnClick(e);
             }
 
