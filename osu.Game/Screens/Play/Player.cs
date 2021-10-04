@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
             Score = CreateScore();
 
             // ensure the score is in a consistent state with the current player.
-            Score.ScoreInfo.Beatmap = Beatmap.Value.BeatmapInfo;
+            Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
             Score.ScoreInfo.Mods = Mods.Value.ToArray();
 

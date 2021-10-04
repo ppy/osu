@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             Recorder = recorder = new TestReplayRecorder(new Score
                             {
                                 Replay = replay,
-                                ScoreInfo = { Beatmap = gameplayState.Beatmap.BeatmapInfo }
+                                ScoreInfo = { BeatmapInfo = gameplayState.Beatmap.BeatmapInfo }
                             })
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),

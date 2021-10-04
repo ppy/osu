@@ -950,7 +950,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             return ImportScoreTest.LoadScoreIntoOsu(osu, new ScoreInfo
             {
                 OnlineScoreID = 2,
-                Beatmap = beatmapInfo,
+                BeatmapInfo = beatmapInfo,
                 BeatmapInfoID = beatmapInfo.ID
             }, new ImportScoreTest.TestArchiveReader());
         }
