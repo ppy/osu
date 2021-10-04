@@ -37,7 +37,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineScoreID = OnlineScoreID,
                 Date = Date,
                 PP = PP,
-                Beatmap = Beatmap,
+                BeatmapInfo = BeatmapInfo,
                 RulesetID = OnlineRulesetID,
                 Hash = Replay ? "online" : string.Empty, // todo: temporary?
                 Rank = Rank,
@@ -100,7 +100,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset Date { get; set; }
 
         [JsonProperty(@"beatmap")]
-        public BeatmapInfo Beatmap { get; set; }
+        public BeatmapInfo BeatmapInfo { get; set; }
 
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
@@ -114,10 +114,10 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 // extract the set ID to its correct place.
-                Beatmap.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = value.ID };
+                BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = value.ID };
                 value.ID = 0;
 
-                Beatmap.Metadata = value;
+                BeatmapInfo.Metadata = value;
             }
         }
 

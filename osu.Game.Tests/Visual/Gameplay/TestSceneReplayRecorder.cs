@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -17,6 +18,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -38,7 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestReplayRecorder recorder;
 
         [Cached]
-        private GameplayBeatmap gameplayBeatmap = new GameplayBeatmap(new Beatmap());
+        private GameplayState gameplayState = new GameplayState(new Beatmap(), new OsuRuleset(), Array.Empty<Mod>());
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -57,7 +60,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             Recorder = recorder = new TestReplayRecorder(new Score
                             {
                                 Replay = replay,
-                                ScoreInfo = { Beatmap = gameplayBeatmap.BeatmapInfo }
+                                ScoreInfo = { BeatmapInfo = gameplayState.Beatmap.BeatmapInfo }
                             })
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
