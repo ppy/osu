@@ -337,8 +337,8 @@ namespace osu.Game.Tests.Visual.Ranking
             public UnrankedSoloResultsScreen(ScoreInfo score)
                 : base(score, true)
             {
-                Score.Beatmap.OnlineBeatmapID = 0;
-                Score.Beatmap.Status = BeatmapSetOnlineStatus.Pending;
+                Score.BeatmapInfo.OnlineBeatmapID = 0;
+                Score.BeatmapInfo.Status = BeatmapSetOnlineStatus.Pending;
             }
 
             protected override void LoadComplete()

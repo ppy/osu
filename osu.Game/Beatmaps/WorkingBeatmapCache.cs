@@ -1,13 +1,18 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
+using osu.Framework.Lists;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
@@ -16,8 +21,96 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
-    public partial class BeatmapManager
+    public class WorkingBeatmapCache : IBeatmapResourceProvider, IWorkingBeatmapCache
     {
+        private readonly WeakList<BeatmapManagerWorkingBeatmap> workingCache = new WeakList<BeatmapManagerWorkingBeatmap>();
+
+        /// <summary>
+        /// A default representation of a WorkingBeatmap to use when no beatmap is available.
+        /// </summary>
+        public readonly WorkingBeatmap DefaultBeatmap;
+
+        public BeatmapModelManager BeatmapManager { private get; set; }
+
+        private readonly AudioManager audioManager;
+        private readonly IResourceStore<byte[]> resources;
+        private readonly LargeTextureStore largeTextureStore;
+        private readonly ITrackStore trackStore;
+        private readonly IResourceStore<byte[]> files;
+
+        [CanBeNull]
+        private readonly GameHost host;
+
+        public WorkingBeatmapCache([NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null, GameHost host = null)
+        {
+            DefaultBeatmap = defaultBeatmap;
+
+            this.audioManager = audioManager;
+            this.resources = resources;
+            this.host = host;
+            this.files = files;
+            largeTextureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(files));
+            trackStore = audioManager.GetTrackStore(files);
+        }
+
+        public void Invalidate(BeatmapSetInfo info)
+        {
+            if (info.Beatmaps == null) return;
+
+            foreach (var b in info.Beatmaps)
+                Invalidate(b);
+        }
+
+        public void Invalidate(BeatmapInfo info)
+        {
+            lock (workingCache)
+            {
+                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+                if (working != null)
+                    workingCache.Remove(working);
+            }
+        }
+
+        public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
+        {
+            // if there are no files, presume the full beatmap info has not yet been fetched from the database.
+            if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
+            {
+                int lookupId = beatmapInfo.ID;
+                beatmapInfo = BeatmapManager.QueryBeatmap(b => b.ID == lookupId);
+            }
+
+            if (beatmapInfo?.BeatmapSet == null)
+                return DefaultBeatmap;
+
+            lock (workingCache)
+            {
+                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+                if (working != null)
+                    return working;
+
+                beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
+
+                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
+
+                // best effort; may be higher than expected.
+                GlobalStatistics.Get<int>(nameof(Beatmaps), $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
+
+                return working;
+            }
+        }
+
+        #region IResourceStorageProvider
+
+        TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
+        ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
+        AudioManager IStorageResourceProvider.AudioManager => audioManager;
+        IResourceStore<byte[]> IStorageResourceProvider.Files => files;
+        IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
+        IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);
+
+        #endregion
+
         [ExcludeFromDynamicCompile]
         private class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {

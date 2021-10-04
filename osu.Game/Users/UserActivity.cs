@@ -27,13 +27,13 @@ namespace osu.Game.Users
 
         public abstract class InGame : UserActivity
         {
-            public BeatmapInfo Beatmap { get; }
+            public BeatmapInfo BeatmapInfo { get; }
 
             public RulesetInfo Ruleset { get; }
 
-            protected InGame(BeatmapInfo info, RulesetInfo ruleset)
+            protected InGame(BeatmapInfo beatmapInfo, RulesetInfo ruleset)
             {
-                Beatmap = info;
+                BeatmapInfo = beatmapInfo;
                 Ruleset = ruleset;
             }
 
@@ -42,8 +42,8 @@ namespace osu.Game.Users
 
         public class InMultiplayerGame : InGame
         {
-            public InMultiplayerGame(BeatmapInfo beatmap, RulesetInfo ruleset)
-                : base(beatmap, ruleset)
+            public InMultiplayerGame(BeatmapInfo beatmapInfo, RulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
             {
             }
 
@@ -52,27 +52,27 @@ namespace osu.Game.Users
 
         public class InPlaylistGame : InGame
         {
-            public InPlaylistGame(BeatmapInfo beatmap, RulesetInfo ruleset)
-                : base(beatmap, ruleset)
+            public InPlaylistGame(BeatmapInfo beatmapInfo, RulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
             {
             }
         }
 
         public class InSoloGame : InGame
         {
-            public InSoloGame(BeatmapInfo info, RulesetInfo ruleset)
-                : base(info, ruleset)
+            public InSoloGame(BeatmapInfo beatmapInfo, RulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
             {
             }
         }
 
         public class Editing : UserActivity
         {
-            public BeatmapInfo Beatmap { get; }
+            public BeatmapInfo BeatmapInfo { get; }
 
             public Editing(BeatmapInfo info)
             {
-                Beatmap = info;
+                BeatmapInfo = info;
             }
 
             public override string Status => @"Editing a beatmap";
