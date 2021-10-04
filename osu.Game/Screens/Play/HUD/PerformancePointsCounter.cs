@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved(CanBeNull = true)]
         private ScoreProcessor scoreProcessor { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         [CanBeNull]
         private GameplayState gameplayState { get; set; }
 
