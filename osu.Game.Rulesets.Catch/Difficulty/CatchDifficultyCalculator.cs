@@ -28,13 +28,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, Func<double, double> clockTimeAt)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, ClockWithMods clock)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new CatchDifficultyAttributes { Mods = mods, Skills = skills };
 
             // For the time being, we use the clockrate at the beginning of the map for OD and AR attributes
-            double baseClockRate = mods.OfType<IApplicableToRate>().SingleOrDefault()?.GetAverageRate() ?? 1.0;
+            double baseClockRate = clock.GetAverageRate();
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / baseClockRate;
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             };
         }
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Func<double, double> clockTimeAt)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, ClockWithMods clock)
         {
             CatchHitObject lastObject = null;
 
@@ -64,13 +64,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     continue;
 
                 if (lastObject != null)
-                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockTimeAt, halfCatcherWidth);
+                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clock, halfCatcherWidth);
 
                 lastObject = hitObject;
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, Func<double, double> clockTimeAt)
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, ClockWithMods clock)
         {
             halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) * 0.5f;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             return new Skill[]
             {
-                new Movement(mods, halfCatcherWidth, clockTimeAt),
+                new Movement(mods, halfCatcherWidth, clock),
             };
         }
 

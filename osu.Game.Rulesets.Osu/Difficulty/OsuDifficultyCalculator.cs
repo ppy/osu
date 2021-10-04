@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, Func<double, double> clockTimeAt)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, ClockWithMods clock)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods, Skills = skills };
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
         }
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Func<double, double> clockTimeAt)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, ClockWithMods clock)
         {
             // The first jump is formed by the first two hitobjects of the map.
             // If the map has less than two OsuHitObjects, the enumerator will not return anything.
@@ -87,17 +87,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 var last = beatmap.HitObjects[i - 1];
                 var current = beatmap.HitObjects[i];
 
-                yield return new OsuDifficultyHitObject(current, lastLast, last, clockTimeAt);
+                yield return new OsuDifficultyHitObject(current, lastLast, last, clock);
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, Func<double, double> clockTimeAt)
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, ClockWithMods clock)
         {
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
             // For the time being, we use the average rate for OD and AR attributes
-            double baseClockRate = mods.OfType<IApplicableToRate>().SingleOrDefault()?.GetAverageRate() ?? 1.0;
+            double baseClockRate = clock.GetAverageRate();
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
             hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / baseClockRate;

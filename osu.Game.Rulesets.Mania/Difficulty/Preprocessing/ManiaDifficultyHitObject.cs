@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
@@ -12,8 +13,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
     {
         public new ManiaHitObject BaseObject => (ManiaHitObject)base.BaseObject;
 
-        public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, Func<double, double> clockTimeAt)
-            : base(hitObject, lastObject, clockTimeAt)
+        public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, ClockWithMods clock)
+            : base(hitObject, lastObject, clock)
         {
         }
     }

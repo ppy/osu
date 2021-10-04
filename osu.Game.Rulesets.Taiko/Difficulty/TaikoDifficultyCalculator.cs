@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, Func<double, double> clockTimeAt) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, ClockWithMods clock) => new Skill[]
         {
             new Colour(mods),
             new Rhythm(mods),
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             new TaikoModHardRock(),
         };
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Func<double, double> clockTimeAt)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, ClockWithMods clock)
         {
             List<TaikoDifficultyHitObject> taikoDifficultyHitObjects = new List<TaikoDifficultyHitObject>();
 
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 taikoDifficultyHitObjects.Add(
                     new TaikoDifficultyHitObject(
-                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockTimeAt, i
+                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clock, i
                     )
                 );
             }
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return taikoDifficultyHitObjects;
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, Func<double, double> clockTimeAt)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, ClockWithMods clock)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods, Skills = skills };
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             starRating = rescale(starRating);
 
             // For the time being, we use the clockrate at the beginning of the map for OD and AR attributes
-            double baseClockRate = mods.OfType<IApplicableToRate>().SingleOrDefault()?.GetAverageRate() ?? 1.0;
+            double baseClockRate = clock.GetAverageRate();
 
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);

@@ -36,9 +36,6 @@ namespace osu.Game.Rulesets.Difficulty
 
             IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-            var track = new TrackVirtual(10000);
-            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-
             return calculate(playableBeatmap, mods);
         }
 
@@ -59,14 +56,14 @@ namespace osu.Game.Rulesets.Difficulty
 
         private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods)
         {
-            Func<double, double> clockTimeAt = BakeClockRate(mods);
+            var clock = new ClockWithMods(mods);
 
-            var skills = CreateSkills(beatmap, mods, clockTimeAt);
+            var skills = CreateSkills(beatmap, mods, clock);
 
             if (!beatmap.HitObjects.Any())
-                return CreateDifficultyAttributes(beatmap, mods, skills, clockTimeAt);
+                return CreateDifficultyAttributes(beatmap, mods, skills, clock);
 
-            var difficultyHitObjects = SortObjects(CreateDifficultyHitObjects(beatmap, clockTimeAt)).ToList();
+            var difficultyHitObjects = SortObjects(CreateDifficultyHitObjects(beatmap, clock)).ToList();
 
             foreach (var hitObject in difficultyHitObjects)
             {
@@ -76,7 +73,7 @@ namespace osu.Game.Rulesets.Difficulty
                 }
             }
 
-            return CreateDifficultyAttributes(beatmap, mods, skills, clockTimeAt);
+            return CreateDifficultyAttributes(beatmap, mods, skills, clock);
         }
 
         /// <summary>
@@ -166,37 +163,24 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.</param>
         /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
         /// <param name="skills">The skills which processed the beatmap.</param>
-        /// <param name="clockTimeAt">The clock time at a given point in time.</param>
-        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, Func<double, double> clockTimeAt);
+        /// <param name="clock">The rate-adjusted gameplay clock.</param>
+        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, ClockWithMods clock);
 
         /// <summary>
         /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
-        /// <param name="clockTimeAt">The clock time at a given point in time.</param>
+        /// <param name="clock">The rate-adjusted gameplay clock.</param>
         /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
-        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Func<double, double> clockTimeAt);
+        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, ClockWithMods clock);
 
         /// <summary>
         /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.</param>
         /// <param name="mods">Mods to calculate difficulty with.</param>
-        /// <param name="clockTimeAt">The clock time at a given point in time.</param>
+        /// <param name="clock">The rate-adjusted gameplay clock.</param>
         /// <returns>The <see cref="Skill"/>s.</returns>
-        protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, Func<double, double> clockTimeAt);
-
-        /// <summary>
-        /// Creates a function used to calculate clocktime at a point in time.
-        /// </summary>
-        /// <param name="mods">Mods to calculate clocktime with.</param>
-        /// <returns></returns>
-        protected virtual Func<double, double> BakeClockRate(Mod[] mods)
-        {
-            if (mods.OfType<IApplicableToRate>().SingleOrDefault() is IApplicableToRate mod)
-                return t => mod.GetTimeAt(t);
-
-            return t => t;
-        }
+        protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, ClockWithMods clock);
     }
 }
