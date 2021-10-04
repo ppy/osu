@@ -17,11 +17,11 @@ namespace osu.Game.Rulesets.Mods
             Mod = mods.OfType<IApplicableToRate>().SingleOrDefault();
         }
 
-        public double ApplyToRate(double time, double rate = 1) => Mod is null ? time : Mod.ApplyToRate(time);
+        public double ApplyToRate(double time, double rate = 1) => Mod?.ApplyToRate(time) ?? time;
 
-        public double GetAverageRate() => Mod is null ? 1 : Mod.GetAverageRate();
+        public double GetAverageRate() => Mod?.GetAverageRate() ?? 1;
 
-        public double GetTimeAt(double time) => Mod is null ? time : Mod.GetTimeAt(time);
+        public double GetTimeAt(double time) => Mod?.GetTimeAt(time) ?? time;
 
         public void ApplyToSample(DrawableSample sample)
         {
