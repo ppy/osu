@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects;
+using Newtonsoft.Json;
 
 namespace osu.Game.Rulesets.Difficulty.Preprocessing
 {
     /// <summary>
     /// Wraps a <see cref="HitObject"/> and provides additional information to be used for difficulty calculation.
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class DifficultyHitObject
     {
         /// <summary>
@@ -23,16 +25,19 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// <summary>
         /// Amount of time elapsed between <see cref="BaseObject"/> and <see cref="LastObject"/>, adjusted by clockrate.
         /// </summary>
+        [JsonProperty]
         public readonly double DeltaTime;
 
         /// <summary>
         /// Clockrate adjusted start time of <see cref="BaseObject"/>.
         /// </summary>
+        [JsonProperty]
         public readonly double StartTime;
 
         /// <summary>
         /// Clockrate adjusted end time of <see cref="BaseObject"/>.
         /// </summary>
+        [JsonProperty]
         public readonly double EndTime;
 
         /// <summary>

@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double angle_bonus_begin = 5 * Math.PI / 6;
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
+        private const double skill_multiplier = 1400;
 
-        protected override double SkillMultiplier => 1400;
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
 
@@ -35,53 +35,70 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             greatWindow = hitWindowGreat;
         }
-
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override void Process(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
-                return 0;
-
             var osuCurrent = (OsuDifficultyHitObject)current;
-            var osuPrevious = Previous.Count > 0 ? (OsuDifficultyHitObject)Previous[0] : null;
 
-            double distance = Math.Min(single_spacing_threshold, osuCurrent.TravelDistance + osuCurrent.JumpDistance);
-            double strainTime = osuCurrent.StrainTime;
+            osuCurrent.speed = new HitObjectAttributes(current, this);
+        }
 
-            double greatWindowFull = greatWindow * 2;
-            double speedWindowRatio = strainTime / greatWindowFull;
+        public struct HitObjectAttributes
+        {
+            public double CappedStrainTime;
+            public double AngleBonus;
+            public double SpeedBonus;
 
-            // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
-            if (osuPrevious != null && strainTime < greatWindowFull && osuPrevious.StrainTime > strainTime)
-                strainTime = Interpolation.Lerp(osuPrevious.StrainTime, strainTime, speedWindowRatio);
-
-            // Cap deltatime to the OD 300 hitwindow.
-            // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
-            strainTime /= Math.Clamp((strainTime / greatWindowFull) / 0.93, 0.92, 1);
-
-            double speedBonus = 1.0;
-            if (strainTime < min_speed_bonus)
-                speedBonus = 1 + Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
-
-            double angleBonus = 1.0;
-
-            if (osuCurrent.Angle != null && osuCurrent.Angle.Value < angle_bonus_begin)
+            public double Strain;
+            public double CumulativeStrain;
+            public HitObjectAttributes(DifficultyHitObject current, Speed state) : this()
             {
-                angleBonus = 1 + Math.Pow(Math.Sin(1.5 * (angle_bonus_begin - osuCurrent.Angle.Value)), 2) / 3.57;
+                if (current.BaseObject is Spinner)
+                    return;
 
-                if (osuCurrent.Angle.Value < pi_over_2)
+                var osuCurrent = (OsuDifficultyHitObject)current;
+                var osuPrevious = state.Previous.Count > 0 ? (OsuDifficultyHitObject)state.Previous[0] : null;
+
+                double distance = Math.Min(single_spacing_threshold, osuCurrent.TravelDistance + osuCurrent.JumpDistance);
+
+                double greatWindowFull = state.greatWindow * 2;
+                double speedWindowRatio = osuCurrent.StrainTime / greatWindowFull;
+                CappedStrainTime = osuCurrent.StrainTime;
+
+                // Aim to nerf cheesy rhythms (Very fast consecutive doubles with large deltatimes between)
+                if (osuPrevious != null && CappedStrainTime < greatWindowFull && osuPrevious.StrainTime > CappedStrainTime)
+                    CappedStrainTime = Interpolation.Lerp(osuPrevious.StrainTime, CappedStrainTime, speedWindowRatio);
+
+                // Cap deltatime to the OD 300 hitwindow.
+                // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
+                CappedStrainTime /= Math.Clamp((CappedStrainTime / greatWindowFull) / 0.93, 0.92, 1);
+
+                SpeedBonus = 1.0;
+                if (CappedStrainTime < min_speed_bonus)
+                    SpeedBonus = 1 + Math.Pow((min_speed_bonus - CappedStrainTime) / speed_balancing_factor, 2);
+
+                AngleBonus = 1.0;
+
+                if (osuCurrent.Angle != null && osuCurrent.Angle.Value < angle_bonus_begin)
                 {
-                    angleBonus = 1.28;
-                    if (distance < 90 && osuCurrent.Angle.Value < pi_over_4)
-                        angleBonus += (1 - angleBonus) * Math.Min((90 - distance) / 10, 1);
-                    else if (distance < 90)
-                        angleBonus += (1 - angleBonus) * Math.Min((90 - distance) / 10, 1) * Math.Sin((pi_over_2 - osuCurrent.Angle.Value) / pi_over_4);
-                }
-            }
+                    AngleBonus = 1 + Math.Pow(Math.Sin(1.5 * (angle_bonus_begin - osuCurrent.Angle.Value)), 2) / 3.57;
 
-            return (1 + (speedBonus - 1) * 0.75)
-                   * angleBonus
-                   * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5))
-                   / strainTime;
+                    if (osuCurrent.Angle.Value < pi_over_2)
+                    {
+                        AngleBonus = 1.28;
+                        if (distance < 90 && osuCurrent.Angle.Value < pi_over_4)
+                            AngleBonus += (1 - AngleBonus) * Math.Min((90 - distance) / 10, 1);
+                        else if (distance < 90)
+                            AngleBonus += (1 - AngleBonus) * Math.Min((90 - distance) / 10, 1) * Math.Sin((pi_over_2 - osuCurrent.Angle.Value) / pi_over_4);
+                    }
+                }
+
+                Strain = skill_multiplier * (1 + (SpeedBonus - 1) * 0.75)
+                       * AngleBonus
+                       * (0.95 + SpeedBonus * Math.Pow(distance / single_spacing_threshold, 3.5))
+                       / CappedStrainTime;
+
+                CumulativeStrain = state.AddStrain(current.StartTime, Strain);
+            }
         }
     }
 }

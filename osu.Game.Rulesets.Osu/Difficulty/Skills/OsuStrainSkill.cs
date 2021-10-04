@@ -12,7 +12,7 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public abstract class OsuStrainSkill : StrainDecaySkill
+    public abstract class OsuStrainSkill : Skill
     {
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
@@ -30,11 +30,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => 1.06;
 
- 
+        protected virtual double DecayWeight => 0.9;
+
+        protected DecayingStrainSections strainSections;
 
         protected OsuStrainSkill(Mod[] mods, double strainDecayBase, int sectionLength = 400)
-            : base(mods, strainDecayBase, sectionLength)
+            : base(mods)
         {
+            strainSections = new DecayingStrainSections(strainDecayBase, sectionLength);
+        }
+
+
+        protected double AddStrain(double time, double value)
+        {
+            return strainSections.AddStrain(time, value);
         }
 
         public override double DifficultyValue()
@@ -42,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double difficulty = 0;
             double weight = 1;
 
-            List<double> strains = GetCurrentStrainPeaks().OrderByDescending(d => d).ToList();
+            List<double> strains = strainSections.sections.GetCurrentStrainPeaks().OrderByDescending(d => d).ToList();
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)

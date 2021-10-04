@@ -19,47 +19,64 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        protected override double SkillMultiplier => 0.15;
+        private const double skill_multiplier = 0.15;
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
-
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override void Process(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
-                return 0;
-
             var osuCurrent = (OsuDifficultyHitObject)current;
-            var osuHitObject = (OsuHitObject)(osuCurrent.BaseObject);
+            osuCurrent.flashlight = new HitObjectAttributes(current, this);
+        }
 
-            double scalingFactor = 52.0 / osuHitObject.Radius;
-            double smallDistNerf = 1.0;
-            double cumulativeStrainTime = 0.0;
+        public struct HitObjectAttributes
+        {
+            public double SmallDistNerf;
+            public double Result;
+            public double CumulativeStrainTime;
+            public double StackNerf;
 
-            double result = 0.0;
+            public double Strain;
+            public double CumulativeStrain;
 
-            for (int i = 0; i < Previous.Count; i++)
+            public HitObjectAttributes(DifficultyHitObject current, Flashlight state) : this()
             {
-                var osuPrevious = (OsuDifficultyHitObject)Previous[i];
-                var osuPreviousHitObject = (OsuHitObject)(osuPrevious.BaseObject);
+                if (current.BaseObject is Spinner)
+                    return;
 
-                if (!(osuPrevious.BaseObject is Spinner))
+                var osuCurrent = (OsuDifficultyHitObject)current;
+                var osuHitObject = (OsuHitObject)(osuCurrent.BaseObject);
+
+                double scalingFactor = 52.0 / osuHitObject.Radius;
+                SmallDistNerf = 1.0;
+                CumulativeStrainTime = 0.0;
+
+                Result = 0.0;
+
+                for (int i = 0; i < state.Previous.Count; i++)
                 {
-                    double jumpDistance = (osuHitObject.StackedPosition - osuPreviousHitObject.EndPosition).Length;
+                    var osuPrevious = (OsuDifficultyHitObject)state.Previous[i];
+                    var osuPreviousHitObject = (OsuHitObject)(osuPrevious.BaseObject);
 
-                    cumulativeStrainTime += osuPrevious.StrainTime;
+                    if (!(osuPrevious.BaseObject is Spinner))
+                    {
+                        double jumpDistance = (osuHitObject.StackedPosition - osuPreviousHitObject.EndPosition).Length;
 
-                    // We want to nerf objects that can be easily seen within the Flashlight circle radius.
-                    if (i == 0)
-                        smallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
+                        CumulativeStrainTime += osuPrevious.StrainTime;
 
-                    // We also want to nerf stacks so that only the first object of the stack is accounted for.
-                    double stackNerf = Math.Min(1.0, (osuPrevious.JumpDistance / scalingFactor) / 25.0);
+                        // We want to nerf objects that can be easily seen within the Flashlight circle radius.
+                        if (i == 0)
+                            SmallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
 
-                    result += Math.Pow(0.8, i) * stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
+                        // We also want to nerf stacks so that only the first object of the stack is accounted for.
+                        double stackNerf = Math.Min(1.0, (osuPrevious.JumpDistance / scalingFactor) / 25.0);
+
+                        Result += Math.Pow(0.8, i) * stackNerf * scalingFactor * jumpDistance / CumulativeStrainTime;
+                    }
                 }
-            }
 
-            return Math.Pow(smallDistNerf * result, 2.0);
+                Strain = skill_multiplier * Math.Pow(SmallDistNerf * Result, 2.0);
+                CumulativeStrain = state.AddStrain(current.StartTime, Strain);
+            }
         }
     }
 }

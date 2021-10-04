@@ -29,6 +29,23 @@ namespace osu.Game.Rulesets.Difficulty
         /// Calculates the difficulty of the beatmap using a specific mod combination.
         /// </summary>
         /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <returns>A structure describing the difficulty of the beatmap, and information about the difficulty of each hit object.</returns>
+        public (DifficultyAttributes, List<DifficultyHitObject>) CalculateVerbose(params Mod[] mods)
+        {
+            mods = mods.Select(m => m.DeepClone()).ToArray();
+
+            IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
+
+            var track = new TrackVirtual(10000);
+            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+
+            return calculate(playableBeatmap, mods, track.Rate);
+        }
+
+        /// <summary>
+        /// Calculates the difficulty of the beatmap using a specific mod combination.
+        /// </summary>
+        /// <param name="mods">The mods that should be applied to the beatmap.</param>
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
         public DifficultyAttributes Calculate(params Mod[] mods)
         {
@@ -39,7 +56,7 @@ namespace osu.Game.Rulesets.Difficulty
             var track = new TrackVirtual(10000);
             mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
 
-            return calculate(playableBeatmap, mods, track.Rate);
+            return calculate(playableBeatmap, mods, track.Rate).Item1;
         }
 
         /// <summary>
@@ -57,12 +74,12 @@ namespace osu.Game.Rulesets.Difficulty
             }
         }
 
-        private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
+        private (DifficultyAttributes, List<DifficultyHitObject>) calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var skills = CreateSkills(beatmap, mods, clockRate);
 
             if (!beatmap.HitObjects.Any())
-                return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
+                return (CreateDifficultyAttributes(beatmap, mods, skills, clockRate), new List<DifficultyHitObject>());
 
             var difficultyHitObjects = SortObjects(CreateDifficultyHitObjects(beatmap, clockRate)).ToList();
 
@@ -74,7 +91,7 @@ namespace osu.Game.Rulesets.Difficulty
                 }
             }
 
-            return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
+            return (CreateDifficultyAttributes(beatmap, mods, skills, clockRate), difficultyHitObjects);
         }
 
         /// <summary>

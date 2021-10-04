@@ -16,49 +16,63 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
+        private const double skill_multipler = 26.25;
 
         public Aim(Mod[] mods)
             : base(mods: mods, strainDecayBase: 0.15)
         {
         }
 
-        protected override double SkillMultiplier => 26.25;
-
-
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override void Process(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
-                return 0;
-
             var osuCurrent = (OsuDifficultyHitObject)current;
-
-            double result = 0;
-
-            if (Previous.Count > 0)
-            {
-                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
-
-                if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
-                {
-                    const double scale = 90;
-
-                    var angleBonus = Math.Sqrt(
-                        Math.Max(osuPrevious.JumpDistance - scale, 0)
-                        * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
-                        * Math.Max(osuCurrent.JumpDistance - scale, 0));
-                    result = 1.4 * applyDiminishingExp(Math.Max(0, angleBonus)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
-                }
-            }
-
-            double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
-            double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance);
-
-            return Math.Max(
-                result + (jumpDistanceExp + travelDistanceExp + Math.Sqrt(travelDistanceExp * jumpDistanceExp)) / Math.Max(osuCurrent.StrainTime, timing_threshold),
-                (Math.Sqrt(travelDistanceExp * jumpDistanceExp) + jumpDistanceExp + travelDistanceExp) / osuCurrent.StrainTime
-            );
+            osuCurrent.aim = new HitObjectAttributes(current, this);
         }
 
-        private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
+        public struct HitObjectAttributes
+        {
+            public double AngleBonus;
+            public double TotalDistance;
+            public double TravelDistanceExp;
+
+            public double Strain;
+            public double CumulativeStrain;
+
+            public HitObjectAttributes(DifficultyHitObject current, Aim state) : this()
+            {
+                if (current.BaseObject is Spinner)
+                    return;
+
+                var osuCurrent = (OsuDifficultyHitObject)current;
+
+                if (state.Previous.Count > 0)
+                {
+                    var osuPrevious = (OsuDifficultyHitObject)state.Previous[0];
+
+                    if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
+                    {
+                        const double scale = 90;
+
+                        var rawAngleBonus = Math.Sqrt(
+                            Math.Max(osuPrevious.JumpDistance - scale, 0)
+                            * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
+                            * Math.Max(osuCurrent.JumpDistance - scale, 0));
+                        AngleBonus = 1.4 * applyDiminishingExp(Math.Max(0, rawAngleBonus)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
+                    }
+                }
+
+                double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
+                double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance);
+                TotalDistance = jumpDistanceExp + travelDistanceExp + Math.Sqrt(travelDistanceExp * jumpDistanceExp);
+
+                Strain = skill_multipler * Math.Max(
+                    AngleBonus + TotalDistance / Math.Max(osuCurrent.StrainTime, timing_threshold),
+                    TotalDistance / osuCurrent.StrainTime
+                );
+                CumulativeStrain = state.AddStrain(osuCurrent.StartTime, Strain);
+            }
+        }
+
+        private static double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
     }
 }
