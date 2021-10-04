@@ -7,6 +7,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 
 #nullable enable
 
@@ -31,6 +32,11 @@ namespace osu.Game.Screens.Play
         /// The mods applied to the gameplay.
         /// </summary>
         public readonly IReadOnlyList<Mod> Mods;
+
+        /// <summary>
+        /// The gameplay score.
+        /// </summary>
+        public Score? Score { get; set; } = null;
 
         /// <summary>
         /// A bindable tracking the last judgement result applied to any hit object.
