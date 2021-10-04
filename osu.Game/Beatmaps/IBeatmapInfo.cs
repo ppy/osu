@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -22,7 +23,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The metadata representing this beatmap. May be shared between multiple beatmaps.
         /// </summary>
-        IBeatmapMetadataInfo Metadata { get; }
+        IBeatmapMetadataInfo? Metadata { get; }
 
         /// <summary>
         /// The difficulty settings for this beatmap.
@@ -76,12 +77,20 @@ namespace osu.Game.Beatmaps
         {
             get
             {
-                var metadata = Metadata.DisplayTitleRomanisable;
+                var metadata = closestMetadata.DisplayTitleRomanisable;
 
                 return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
             }
         }
 
+        string[] SearchableTerms => new[]
+        {
+            DifficultyName
+        }.Concat(closestMetadata.SearchableTerms).Where(s => !string.IsNullOrEmpty(s)).ToArray();
+
         private string versionString => string.IsNullOrEmpty(DifficultyName) ? string.Empty : $"[{DifficultyName}]";
+
+        // temporary helper methods until we figure which metadata should be where.
+        private IBeatmapMetadataInfo closestMetadata => (Metadata ?? BeatmapSet.Metadata)!;
     }
 }
