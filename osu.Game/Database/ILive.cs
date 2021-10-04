@@ -9,7 +9,7 @@ namespace osu.Game.Database
     /// A wrapper to provide access to database backed classes in a thread-safe manner.
     /// </summary>
     /// <typeparam name="T">The databased type.</typeparam>
-    public interface ILive<out T> where T : class
+    public interface ILive<out T> where T : class // TODO: Add IHasGuidPrimaryKey once we don't need EF support any more.
     {
         Guid ID { get; }
 
