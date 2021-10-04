@@ -70,7 +70,8 @@ namespace osu.Game.Tests.Database
         {
             try
             {
-                return testStorage.GetStream(realmFactory.Filename)?.Length ?? 0;
+                using (var stream = testStorage.GetStream(realmFactory.Filename))
+                    return stream?.Length ?? 0;
             }
             catch
             {
