@@ -1,0 +1,15 @@
+osu file format v14
+
+[Events]
+Sprite,Background,TopCentre,"zero-times.png",320,240
+ L,1000,0
+  F,0,0,1000,0,1
+  F,0,1000,2000,1,0
+Sprite,Background,TopCentre,"one-time.png",320,240
+ L,4000,1
+  F,0,0,1000,0,1
+  F,0,1000,2000,1,0
+Sprite,Background,TopCentre,"many-times.png",320,240
+ L,9000,40
+  F,0,0,1000,0,1
+  F,0,1000,2000,1,0

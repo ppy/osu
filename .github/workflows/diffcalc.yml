@@ -53,6 +53,7 @@ jobs:
   diffcalc:
     name: Run
     runs-on: self-hosted
+    timeout-minutes: 1440
     if: needs.metadata.outputs.continue == 'yes'
     needs: metadata
     strategy:
