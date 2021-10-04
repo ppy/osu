@@ -6,12 +6,12 @@ using System.Collections.Generic;
 
 namespace osu.Game.Database
 {
-    public interface IPresentImports<out TModel>
+    public interface IPostImports<out TModel>
         where TModel : class
     {
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<ILive<TModel>>> PresentImport { set; }
+        public Action<IEnumerable<ILive<TModel>>> PostImport { set; }
     }
 }

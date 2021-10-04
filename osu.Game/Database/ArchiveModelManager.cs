@@ -30,7 +30,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>, IPresentImports<TModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>, IPostImports<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : class, INamedFileInfo, new()
     {
@@ -200,12 +200,12 @@ namespace osu.Game.Database
                     ? $"Imported {imported.First()}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
-                if (imported.Count > 0 && PresentImport != null)
+                if (imported.Count > 0 && PostImport != null)
                 {
                     notification.CompletionText += " Click to view.";
                     notification.CompletionClickAction = () =>
                     {
-                        PresentImport?.Invoke(imported);
+                        PostImport?.Invoke(imported);
                         return true;
                     };
                 }
@@ -249,7 +249,7 @@ namespace osu.Game.Database
             return import;
         }
 
-        public Action<IEnumerable<ILive<TModel>>> PresentImport { protected get; set; }
+        public Action<IEnumerable<ILive<TModel>>> PostImport { protected get; set; }
 
         /// <summary>
         /// Silently import an item from an <see cref="ArchiveReader"/>.
