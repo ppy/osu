@@ -36,9 +36,9 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved(CanBeNull = true)]
         private ScoreProcessor scoreProcessor { get; set; }
 
+        [Resolved]
         [CanBeNull]
-        [Resolved(CanBeNull = true)]
-        private Player player { get; set; }
+        private GameplayState gameplayState { get; set; }
 
         private TimedDifficultyAttributes[] timedAttributes;
         private Ruleset gameplayRuleset;
@@ -53,10 +53,10 @@ namespace osu.Game.Screens.Play.HUD
         {
             Colour = colours.BlueLighter;
 
-            if (player != null)
+            if (gameplayState != null)
             {
-                gameplayRuleset = player.GameplayRuleset;
-                timedAttributes = gameplayRuleset.CreateDifficultyCalculator(new GameplayWorkingBeatmap(player.GameplayBeatmap)).CalculateTimed(player.Mods.Value.ToArray()).ToArray();
+                gameplayRuleset = gameplayState.Ruleset;
+                timedAttributes = gameplayRuleset.CreateDifficultyCalculator(new GameplayWorkingBeatmap(gameplayState.Beatmap)).CalculateTimed(gameplayState.Mods.ToArray()).ToArray();
             }
         }
 
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult judgement)
         {
-            if (player == null || timedAttributes.Length == 0)
+            if (gameplayState?.Score == null || timedAttributes.Length == 0)
                 return;
 
             var attribIndex = Array.BinarySearch(timedAttributes, 0, timedAttributes.Length, new TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play.HUD
                 attribIndex = ~attribIndex - 1;
             attribIndex = Math.Clamp(attribIndex, 0, timedAttributes.Length - 1);
 
-            var ppProcessor = gameplayRuleset.CreatePerformanceCalculator(timedAttributes[attribIndex].Attributes, player.Score.ScoreInfo);
+            var ppProcessor = gameplayRuleset.CreatePerformanceCalculator(timedAttributes[attribIndex].Attributes, gameplayState.Score.ScoreInfo);
             Current.Value = (int)(ppProcessor?.Calculate() ?? 0);
         }
 
@@ -134,18 +134,18 @@ namespace osu.Game.Screens.Play.HUD
 
         private class GameplayWorkingBeatmap : WorkingBeatmap
         {
-            private readonly GameplayBeatmap gameplayBeatmap;
+            private readonly IBeatmap gameplayBeatmap;
 
-            public GameplayWorkingBeatmap(GameplayBeatmap gameplayBeatmap)
+            public GameplayWorkingBeatmap(IBeatmap gameplayBeatmap)
                 : base(gameplayBeatmap.BeatmapInfo, null)
             {
                 this.gameplayBeatmap = gameplayBeatmap;
             }
 
             public override IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
-                => gameplayBeatmap.PlayableBeatmap;
+                => gameplayBeatmap;
 
-            protected override IBeatmap GetBeatmap() => gameplayBeatmap.PlayableBeatmap;
+            protected override IBeatmap GetBeatmap() => gameplayBeatmap;
 
             protected override Texture GetBackground() => throw new NotImplementedException();
 
