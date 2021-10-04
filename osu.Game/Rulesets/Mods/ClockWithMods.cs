@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
             Mod = mods.OfType<IApplicableToRate>().SingleOrDefault();
         }
 
-        public double ApplyToRate(double time, double rate = 1) => Mod?.ApplyToRate(time) ?? time;
+        public double ApplyToRate(double time, double rate = 1) => Mod?.ApplyToRate(time) ?? 1;
 
         public double GetAverageRate() => Mod?.GetAverageRate() ?? 1;
 
