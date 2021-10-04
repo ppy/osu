@@ -162,6 +162,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             Score = CreateScore();
+            GameplayState.Score = Score;
 
             // ensure the score is in a consistent state with the current player.
             Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
