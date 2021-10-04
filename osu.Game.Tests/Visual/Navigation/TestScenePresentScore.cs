@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 {
                     Hash = Guid.NewGuid().ToString(),
                     OnlineScoreID = i,
-                    Beatmap = beatmap.Beatmaps.First(),
+                    BeatmapInfo = beatmap.Beatmaps.First(),
                     Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                 }).Result;
             });
