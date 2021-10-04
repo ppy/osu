@@ -627,7 +627,7 @@ namespace osu.Game
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
 
             ScoreManager.PostNotification = n => Notifications.Post(n);
-            ScoreManager.PresentImport = items => PresentScore(items.First().Value);
+            ScoreManager.PostImport = items => PresentScore(items.First().Value);
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.

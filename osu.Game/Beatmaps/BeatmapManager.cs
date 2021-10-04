@@ -178,7 +178,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<ILive<BeatmapSetInfo>>> PresentImport { set => beatmapModelManager.PresentImport = value; }
+        public Action<IEnumerable<ILive<BeatmapSetInfo>>> PresentImport { set => beatmapModelManager.PostImport = value; }
 
         /// <summary>
         /// Delete a beatmap difficulty.
