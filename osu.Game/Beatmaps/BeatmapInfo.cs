@@ -152,10 +152,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
 
-        public string[] SearchableTerms => new[]
-        {
-            Version
-        }.Concat(Metadata?.SearchableTerms ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
+        public IEnumerable<string> SearchableTerms => ((IBeatmapInfo)this).SearchableTerms;
 
         public override string ToString() => ((IBeatmapInfo)this).DisplayTitle;
 
