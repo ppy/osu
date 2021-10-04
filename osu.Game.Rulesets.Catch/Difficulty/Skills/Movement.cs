@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             {
                 // The base value is a ratio between distance moved and strain time
                 // For basic fruits, the distance is usually slightly more important for the calculation than the strain time
-                distanceAddition = 0.06 * Math.Pow(Math.Pow(Math.Abs(distanceMoved), 1) / weightedStrainTime, 2) / Math.Pow(Math.Max(1, catchCurrent.ClockRate), 2);
+                distanceAddition = 0.06 * Math.Pow(Math.Pow(Math.Abs(distanceMoved), 1) / weightedStrainTime, 2) / Math.Pow(Math.Max(1, catcherSpeedMultiplier), 2);
                 distanceAddition /= Math.Max(1, 40 / Math.Abs(distanceMoved)); // Nerfes streams (shortest movements)
 
                 // Gives a slight buff to direction changes
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                     playerPosition = catchCurrent.NormalizedPosition;
                 }
 
-                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
+                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime, 265) / 265), 1.5) / Math.Max(1, catcherSpeedMultiplier); // Edge Dashes are easier at lower ms values
             }
 
             lastPlayerPosition = playerPosition;
