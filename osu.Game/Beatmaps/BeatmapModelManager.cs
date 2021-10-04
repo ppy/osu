@@ -185,12 +185,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
         /// </summary>
-        /// <param name="baetmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo baetmapInfo, IBeatmap beatmapContent, ISkin beatmapSkin = null)
+        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin beatmapSkin = null)
         {
-            var setInfo = baetmapInfo.BeatmapSet;
+            var setInfo = beatmapInfo.BeatmapSet;
 
             using (var stream = new MemoryStream())
             {
@@ -201,7 +201,7 @@ namespace osu.Game.Beatmaps
 
                 using (ContextFactory.GetForWrite())
                 {
-                    var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == baetmapInfo.ID);
+                    beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == beatmapInfo.ID);
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 
                     // grab the original file (or create a new one if not found).
@@ -219,7 +219,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            WorkingBeatmapCache?.Invalidate(baetmapInfo);
+            WorkingBeatmapCache?.Invalidate(beatmapInfo);
         }
 
         /// <summary>
