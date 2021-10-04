@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 beatmap.BeatmapInfo.BaseDifficulty.CircleSize = 1;
 
-                importedSet = manager.Import(beatmap.BeatmapInfo.BeatmapSet).Result;
+                importedSet = manager.Import(beatmap.BeatmapInfo.BeatmapSet).Result.Value;
             });
 
             AddStep("load room", () =>
