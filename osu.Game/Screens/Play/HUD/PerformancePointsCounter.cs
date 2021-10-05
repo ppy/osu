@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -46,9 +45,6 @@ namespace osu.Game.Screens.Play.HUD
         [CanBeNull]
         private TimedDifficultyAttributes[] timedAttributes;
 
-        [CanBeNull]
-        private Ruleset gameplayRuleset;
-
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
 
         public PerformancePointsCounter()
@@ -63,8 +59,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (gameplayState != null)
             {
-                gameplayRuleset = gameplayState.Ruleset;
-                difficultyCache.GetTimedDifficultyAttributesAsync(new GameplayWorkingBeatmap(gameplayState.Beatmap), gameplayRuleset, gameplayState.Mods.ToArray(), loadCancellationSource.Token)
+                var gameplayWorkingBeatmap = new GameplayWorkingBeatmap(gameplayState.Beatmap);
+                difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, gameplayState.Mods.ToArray(), loadCancellationSource.Token)
                                .ContinueWith(r => Schedule(() => timedAttributes = r.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
         }
@@ -82,15 +78,14 @@ namespace osu.Game.Screens.Play.HUD
             if (gameplayState?.Score == null || timedAttributes == null || timedAttributes.Length == 0)
                 return;
 
-            Debug.Assert(gameplayRuleset != null);
-
-            var attribIndex = Array.BinarySearch(timedAttributes, 0, timedAttributes.Length, new TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
+            int attribIndex = Array.BinarySearch(timedAttributes, 0, timedAttributes.Length, new TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
             if (attribIndex < 0)
                 attribIndex = ~attribIndex - 1;
             attribIndex = Math.Clamp(attribIndex, 0, timedAttributes.Length - 1);
 
-            var ppProcessor = gameplayRuleset.CreatePerformanceCalculator(timedAttributes[attribIndex].Attributes, gameplayState.Score.ScoreInfo);
-            Current.Value = (int)Math.Round(ppProcessor?.Calculate() ?? 0, MidpointRounding.AwayFromZero);
+            var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(timedAttributes[attribIndex].Attributes, gameplayState.Score.ScoreInfo);
+
+            Current.Value = (int)Math.Round(calculator?.Calculate() ?? 0, MidpointRounding.AwayFromZero);
         }
 
         protected override LocalisableString FormatCount(int count) => count.ToString(@"D");
@@ -145,7 +140,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        // Todo: This class shouldn't exist, but requires breaking changes to allow DifficultyCalculator to receive an IBeatmap.
+        // TODO: This class shouldn't exist, but requires breaking changes to allow DifficultyCalculator to receive an IBeatmap.
         private class GameplayWorkingBeatmap : WorkingBeatmap
         {
             private readonly IBeatmap gameplayBeatmap;

@@ -234,13 +234,17 @@ namespace osu.Game.Rulesets.Difficulty
                 this.baseBeatmap = baseBeatmap;
             }
 
+            public readonly List<HitObject> HitObjects = new List<HitObject>();
+
+            IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;
+
+            #region Delegated IBeatmap implementation
+
             public BeatmapInfo BeatmapInfo
             {
                 get => baseBeatmap.BeatmapInfo;
                 set => baseBeatmap.BeatmapInfo = value;
             }
-
-            public BeatmapMetadata Metadata => baseBeatmap.Metadata;
 
             public ControlPointInfo ControlPointInfo
             {
@@ -248,19 +252,14 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.ControlPointInfo = value;
             }
 
+            public BeatmapMetadata Metadata => baseBeatmap.Metadata;
             public List<BreakPeriod> Breaks => baseBeatmap.Breaks;
-
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
-
-            public readonly List<HitObject> HitObjects = new List<HitObject>();
-
-            IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;
-
             public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
-
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
-
             public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
+
+            #endregion
         }
     }
 }
