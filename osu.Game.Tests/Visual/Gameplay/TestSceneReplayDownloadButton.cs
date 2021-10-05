@@ -8,34 +8,97 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osu.Game.Users;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Ranking;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneReplayDownloadButton : OsuTestScene
+    public class TestSceneReplayDownloadButton : OsuManualInputManagerTestScene
     {
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
         private TestReplayDownloadButton downloadButton;
 
-        public TestSceneReplayDownloadButton()
+        [Test]
+        public void TestDisplayStates()
         {
-            createButton(true);
+            AddStep(@"create button with replay", () =>
+            {
+                Child = downloadButton = new TestReplayDownloadButton(getScoreInfo(true))
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
+
+            AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+
+            AddStep("click button", () => downloadButton.TriggerClick());
+
             AddStep(@"downloading state", () => downloadButton.SetDownloadState(DownloadState.Downloading));
             AddStep(@"locally available state", () => downloadButton.SetDownloadState(DownloadState.LocallyAvailable));
             AddStep(@"not downloaded state", () => downloadButton.SetDownloadState(DownloadState.NotDownloaded));
-            createButton(false);
-            createButtonNoScore();
         }
 
-        private void createButton(bool withReplay)
+        [Test]
+        public void TestButtonWithReplayStartsDownload()
         {
-            AddStep(withReplay ? @"create button with replay" : "create button without replay", () =>
+            bool downloadStarted = false;
+            bool downloadFinished = false;
+
+            AddStep(@"create button with replay", () =>
             {
-                Child = downloadButton = new TestReplayDownloadButton(getScoreInfo(withReplay))
+                downloadStarted = false;
+                downloadFinished = false;
+
+                Child = downloadButton = new TestReplayDownloadButton(getScoreInfo(true))
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+
+                downloadButton.State.BindValueChanged(state =>
+                {
+                    switch (state.NewValue)
+                    {
+                        case DownloadState.Downloading:
+                            downloadStarted = true;
+                            break;
+                    }
+
+                    switch (state.OldValue)
+                    {
+                        case DownloadState.Downloading:
+                            downloadFinished = true;
+                            break;
+                    }
+                });
+            });
+
+            AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+
+            AddAssert("state is available", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+
+            AddStep("click button", () =>
+            {
+                InputManager.MoveMouseTo(downloadButton);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("state entered downloading", () => downloadStarted);
+            AddUntilStep("state left downloading", () => downloadFinished);
+        }
+
+        [Test]
+        public void TestButtonWithoutReplay()
+        {
+            AddStep("create button without replay", () =>
+            {
+                Child = downloadButton = new TestReplayDownloadButton(getScoreInfo(false))
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -45,7 +108,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
         }
 
-        private void createButtonNoScore()
+        [Test]
+        public void CreateButtonWithNoScore()
         {
             AddStep("create button with null score", () =>
             {
@@ -77,6 +141,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestReplayDownloadButton : ReplayDownloadButton
         {
             public void SetDownloadState(DownloadState state) => State.Value = state;
+
+            public new Bindable<DownloadState> State => base.State;
 
             public TestReplayDownloadButton(ScoreInfo score)
                 : base(score)
