@@ -143,6 +143,9 @@ namespace osu.Game.Overlays
             switch (request)
             {
                 case GetUserRankingsRequest userRequest:
+                    if (userRequest.Response == null)
+                        return null;
+
                     switch (userRequest.Type)
                     {
                         case UserRankingsType.Performance:
@@ -155,7 +158,12 @@ namespace osu.Game.Overlays
                     return null;
 
                 case GetCountryRankingsRequest countryRequest:
+                {
+                    if (countryRequest.Response == null)
+                        return null;
+
                     return new CountriesTable(1, countryRequest.Response.Countries);
+                }
             }
 
             return null;
