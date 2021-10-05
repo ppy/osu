@@ -25,7 +25,9 @@ namespace osu.Game.Graphics.UserInterface
             set => current.Current = value;
         }
 
-        private IHasText displayedCountSpriteText;
+        private IHasText displayedCountText;
+
+        public Drawable DrawableCount { get; private set; }
 
         /// <summary>
         /// If true, the roll-up duration will be proportional to change in value.
@@ -72,16 +74,16 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load()
         {
-            displayedCountSpriteText = CreateText();
+            displayedCountText = CreateText();
 
             UpdateDisplay();
-            Child = (Drawable)displayedCountSpriteText;
+            Child = DrawableCount = (Drawable)displayedCountText;
         }
 
         protected void UpdateDisplay()
         {
-            if (displayedCountSpriteText != null)
-                displayedCountSpriteText.Text = FormatCount(DisplayedCount);
+            if (displayedCountText != null)
+                displayedCountText.Text = FormatCount(DisplayedCount);
         }
 
         protected override void LoadComplete()

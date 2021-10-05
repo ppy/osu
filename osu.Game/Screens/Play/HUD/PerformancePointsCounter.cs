@@ -42,6 +42,9 @@ namespace osu.Game.Screens.Play.HUD
         [CanBeNull]
         private GameplayState gameplayState { get; set; }
 
+        [Resolved]
+        private GameplayClock gameplayClock { get; set; }
+
         [CanBeNull]
         private TimedDifficultyAttributes[] timedAttributes;
 
@@ -70,7 +73,24 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             if (scoreProcessor != null)
+            {
                 scoreProcessor.NewJudgement += onNewJudgement;
+                scoreProcessor.JudgementReverted += onJudgementReverted;
+            }
+        }
+
+        private bool isValid;
+
+        protected bool IsValid
+        {
+            set
+            {
+                if (value == isValid)
+                    return;
+
+                isValid = value;
+                DrawableCount.FadeTo(isValid ? 1 : 0.3f, 1000, Easing.OutQuint);
+            }
         }
 
         private void onNewJudgement(JudgementResult judgement)
@@ -86,6 +106,12 @@ namespace osu.Game.Screens.Play.HUD
             var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(timedAttributes[attribIndex].Attributes, gameplayState.Score.ScoreInfo);
 
             Current.Value = (int)Math.Round(calculator?.Calculate() ?? 0, MidpointRounding.AwayFromZero);
+            IsValid = true;
+        }
+
+        private void onJudgementReverted(JudgementResult obj)
+        {
+            IsValid = false;
         }
 
         protected override LocalisableString FormatCount(int count) => count.ToString(@"D");
