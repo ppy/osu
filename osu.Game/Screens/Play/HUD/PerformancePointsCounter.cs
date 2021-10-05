@@ -34,6 +34,10 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
+        protected override bool IsRollingProportional => true;
+
+        protected override double RollingDuration => 1000;
+
         [CanBeNull]
         [Resolved(CanBeNull = true)]
         private ScoreProcessor scoreProcessor { get; set; }
