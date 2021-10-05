@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Play.HUD
                                    timedAttributes = r.Result;
                                    IsValid = true;
                                    if (lastJudgement != null)
-                                       onNewJudgement(lastJudgement);
+                                       onJudgementChanged(lastJudgement);
                                }), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
         }
@@ -85,8 +85,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (scoreProcessor != null)
             {
-                scoreProcessor.NewJudgement += onNewJudgement;
-                scoreProcessor.JudgementReverted += onJudgementReverted;
+                scoreProcessor.NewJudgement += onJudgementChanged;
+                scoreProcessor.JudgementReverted += onJudgementChanged;
             }
         }
 
@@ -104,14 +104,17 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void onNewJudgement(JudgementResult judgement)
+        private void onJudgementChanged(JudgementResult judgement)
         {
             lastJudgement = judgement;
 
             var attrib = getAttributeAtTime(judgement);
 
             if (gameplayState == null || attrib == null)
+            {
+                IsValid = false;
                 return;
+            }
 
             var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(attrib, gameplayState.Score.ScoreInfo);
 
@@ -132,8 +135,6 @@ namespace osu.Game.Screens.Play.HUD
             return timedAttributes[Math.Clamp(attribIndex, 0, timedAttributes.Count - 1)].Attributes;
         }
 
-        private void onJudgementReverted(JudgementResult obj) => IsValid = false;
-
         protected override LocalisableString FormatCount(int count) => count.ToString(@"D");
 
         protected override IHasText CreateText() => new TextComponent
@@ -146,7 +147,7 @@ namespace osu.Game.Screens.Play.HUD
             base.Dispose(isDisposing);
 
             if (scoreProcessor != null)
-                scoreProcessor.NewJudgement -= onNewJudgement;
+                scoreProcessor.NewJudgement -= onJudgementChanged;
 
             loadCancellationSource?.Cancel();
         }
