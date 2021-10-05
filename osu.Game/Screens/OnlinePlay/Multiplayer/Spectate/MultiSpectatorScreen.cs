@@ -213,8 +213,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
-        protected override void StartGameplay(int userId, GameplayState gameplayState)
-            => instances.Single(i => i.UserId == userId).LoadScore(gameplayState.Score);
+        protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState)
+            => instances.Single(i => i.UserId == userId).LoadScore(spectatorGameplayState.Score);
 
         protected override void EndGameplay(int userId)
         {

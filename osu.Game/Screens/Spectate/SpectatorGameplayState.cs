@@ -8,9 +8,9 @@ using osu.Game.Scoring;
 namespace osu.Game.Screens.Spectate
 {
     /// <summary>
-    /// The gameplay state of a spectated user. This class is immutable.
+    /// An immutable spectator gameplay state.
     /// </summary>
-    public class GameplayState
+    public class SpectatorGameplayState
     {
         /// <summary>
         /// The score which the user is playing.
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Spectate
         /// </summary>
         public readonly WorkingBeatmap Beatmap;
 
-        public GameplayState(Score score, Ruleset ruleset, WorkingBeatmap beatmap)
+        public SpectatorGameplayState(Score score, Ruleset ruleset, WorkingBeatmap beatmap)
         {
             Score = score;
             Ruleset = ruleset;

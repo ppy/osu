@@ -211,7 +211,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Picker.Beatmap.ValueChanged += b =>
             {
-                Details.Beatmap = b.NewValue;
+                Details.BeatmapInfo = b.NewValue;
                 externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
             };
         }

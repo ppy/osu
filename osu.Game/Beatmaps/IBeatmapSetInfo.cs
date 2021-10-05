@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Database;
 
 #nullable enable
@@ -49,10 +48,5 @@ namespace osu.Game.Beatmaps
         /// The maximum BPM of all beatmaps in this set.
         /// </summary>
         double MaxBPM { get; }
-
-        /// <summary>
-        /// The filename for the storyboard.
-        /// </summary>
-        string StoryboardFile => Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename ?? string.Empty;
     }
 }

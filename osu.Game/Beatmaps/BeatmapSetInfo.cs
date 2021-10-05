@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
 
@@ -61,9 +60,6 @@ namespace osu.Game.Beatmaps
         public bool DeletePending { get; set; }
 
         public string Hash { get; set; }
-
-        [JsonIgnore]
-        public string StoryboardFile => ((IBeatmapSetInfo)this).StoryboardFile;
 
         /// <summary>
         /// Returns the storage path for the file in this beatmapset with the given filename, if any exists, otherwise null.

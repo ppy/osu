@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
-using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Users;
@@ -87,11 +86,7 @@ namespace osu.Game.Beatmaps
 
         public bool Equals(BeatmapMetadata other) => ((IBeatmapMetadataInfo)this).Equals(other);
 
-        public override string ToString() => ((IBeatmapMetadataInfo)this).DisplayTitle;
-
-        public RomanisableString ToRomanisableString() => ((IBeatmapMetadataInfo)this).DisplayTitleRomanisable;
-
-        public IEnumerable<string> SearchableTerms => ((IBeatmapMetadataInfo)this).SearchableTerms;
+        public override string ToString() => this.GetDisplayTitle();
 
         string IBeatmapMetadataInfo.Author => AuthorString;
     }
