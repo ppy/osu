@@ -146,16 +146,16 @@ namespace osu.Game.Overlays
                     switch (userRequest.Type)
                     {
                         case UserRankingsType.Performance:
-                            return new PerformanceTable(1, userRequest.Result.Users);
+                            return new PerformanceTable(1, userRequest.Response.Users);
 
                         case UserRankingsType.Score:
-                            return new ScoresTable(1, userRequest.Result.Users);
+                            return new ScoresTable(1, userRequest.Response.Users);
                     }
 
                     return null;
 
                 case GetCountryRankingsRequest countryRequest:
-                    return new CountriesTable(1, countryRequest.Result.Countries);
+                    return new CountriesTable(1, countryRequest.Response.Countries);
             }
 
             return null;
