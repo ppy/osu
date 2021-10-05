@@ -42,9 +42,6 @@ namespace osu.Game.Screens.Play.HUD
         [CanBeNull]
         private GameplayState gameplayState { get; set; }
 
-        [Resolved]
-        private GameplayClock gameplayClock { get; set; }
-
         [CanBeNull]
         private TimedDifficultyAttributes[] timedAttributes;
 
