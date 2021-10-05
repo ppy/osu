@@ -17,6 +17,7 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 
@@ -145,6 +146,14 @@ namespace osu.Game.Beatmaps
 
                 return computeDifficulty(lookup);
             }, token, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+        }
+
+        public Task<TimedDifficultyAttributes[]> GetTimedDifficultyAttributesAsync(WorkingBeatmap beatmap, Ruleset ruleset, Mod[] mods, CancellationToken token = default)
+        {
+            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods).ToArray(),
+                token,
+                TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
+                updateScheduler);
         }
 
         /// <summary>

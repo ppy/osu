@@ -3,8 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -40,7 +43,10 @@ namespace osu.Game.Screens.Play.HUD
         [CanBeNull]
         private GameplayState gameplayState { get; set; }
 
+        [CanBeNull]
         private TimedDifficultyAttributes[] timedAttributes;
+
+        [CanBeNull]
         private Ruleset gameplayRuleset;
 
         public PerformancePointsCounter()
@@ -49,14 +55,15 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache, CancellationToken cancellationToken)
         {
             Colour = colours.BlueLighter;
 
             if (gameplayState != null)
             {
                 gameplayRuleset = gameplayState.Ruleset;
-                timedAttributes = gameplayRuleset.CreateDifficultyCalculator(new GameplayWorkingBeatmap(gameplayState.Beatmap)).CalculateTimed(gameplayState.Mods.ToArray()).ToArray();
+                difficultyCache.GetTimedDifficultyAttributesAsync(new GameplayWorkingBeatmap(gameplayState.Beatmap), gameplayRuleset, gameplayState.Mods.ToArray(), cancellationToken)
+                               .ContinueWith(r => Schedule(() => timedAttributes = r.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
         }
 
@@ -70,8 +77,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult judgement)
         {
-            if (gameplayState?.Score == null || timedAttributes.Length == 0)
+            if (gameplayState?.Score == null || timedAttributes == null || timedAttributes.Length == 0)
                 return;
+
+            Debug.Assert(gameplayRuleset != null);
 
             var attribIndex = Array.BinarySearch(timedAttributes, 0, timedAttributes.Length, new TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
             if (attribIndex < 0)
