@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     public class CatchDifficultyAttributes : DifficultyAttributes
     {
         public double ApproachRate { get; set; }
-        public double DirectionChangeCount;
+        public int DirectionChangeCount;
     }
 }

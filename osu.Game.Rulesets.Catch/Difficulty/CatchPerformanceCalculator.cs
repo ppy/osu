@@ -96,10 +96,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Scale the aim value with accuracy _slightly_
             value *= Math.Pow(accuracy(), 6);
 
-            // Custom multiplier for HalfTime -> slower catcher = easier to control
-            if (mods.Any(m => m is ModHalfTime))
-                value *= 0.90;
-
             // Custom multipliers for NoFail. SpunOut is not applicable.
             if (mods.Any(m => m is ModNoFail))
                 value *= 0.90;

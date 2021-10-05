@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
 
-        protected override double SkillMultiplier => 900;
+        protected override double SkillMultiplier => 135;
         protected override double StrainDecayBase => 0.2;
 
         protected override double DecayWeight => 0.94;
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private float lastDistanceMoved;
         private bool previousIsDoubleHdash;
 
-        public double DirectionChangeCount;
+        public int DirectionChangeCount;
 
         /// <summary>
         /// The speed multiplier applied to the player's catcher.
@@ -65,10 +65,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             double weightedStrainTime = catchCurrent.StrainTime / catcherSpeedMultiplier;
             double edgeDashBonus = 0;
 
-            double distanceAddition;
+            double movementValue;
 
             // Counting direction changes for length scaling in the performance calculation
-            if (Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved) && Math.Sign(lastDistanceMoved) != 0 && Math.Abs(distanceMoved) > 4)
+            if (Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved) && Math.Sign(lastDistanceMoved) != 0 && Math.Abs(distanceMoved) > 0.1)
             {
                 DirectionChangeCount += 1;
             }
@@ -80,28 +80,28 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             {
                 // The base value is a ratio between distance moved and strain time
                 // For basic fruits, the distance is usually slightly more important for the calculation than the strain time
-                distanceAddition = 0.06 * Math.Pow(Math.Pow(Math.Abs(distanceMoved), 1) / weightedStrainTime, 2) / Math.Pow(Math.Max(1, catcherSpeedMultiplier), 2);
-                distanceAddition /= Math.Max(1, 40 / Math.Abs(distanceMoved)); // Nerfes streams (shortest movements)
+                movementValue = 0.06 * Math.Pow(Math.Abs(distanceMoved) / (weightedStrainTime * catcherSpeedMultiplier), 2);
+                movementValue /= Math.Max(1, HalfCatcherWidth / Math.Abs(distanceMoved)); // Nerfes streams (shortest movements)
 
                 // Gives a slight buff to direction changes
-                if (Math.Abs(distanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved))
+                if (Math.Abs(distanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved) && Math.Sign(lastDistanceMoved) != 0)
                 {
-                    distanceAddition *= 1 + (1 / (0.008 * Math.Abs(distanceMoved) / Math.Pow(weightedStrainTime, 0.2)));
+                    movementValue *= 1 + (1 / (0.008 * Math.Abs(distanceMoved) / Math.Pow(weightedStrainTime, 0.2)));
                 }
             }
             else
             {
                 // For Hyperdashes, the distance is usually way more important for the calculation than the strain time 
-                distanceAddition = 0.91 * Math.Log(Math.Abs(distanceMoved + 1), 2) / Math.Pow(weightedStrainTime, 0.85);
+                movementValue = 0.91 * Math.Log(Math.Abs(distanceMoved) + 1, 2) / Math.Pow(weightedStrainTime, 0.85);
 
                 // Handling complex hyperdash chains
                 if (previousIsDoubleHdash)
                 {
-                    if (isDoubleHdash) // HDash chains, nerf is same direction, buff otherwise
-                        distanceAddition *= Math.Sign(distanceMoved) == Math.Sign(lastDistanceMoved) ? 0.2 : 2;
+                    if (isDoubleHdash) // HDash chains, nerf if same direction, buff otherwise
+                        movementValue *= Math.Sign(distanceMoved) == Math.Sign(lastDistanceMoved) ? 0.2 : 2;
                 }
-                else if (isDoubleHdash) // Nerf same direction HDash
-                    distanceAddition *= 0.2;
+                else if (isDoubleHdash) // Nerf simple double HDashes
+                    movementValue *= 0.2;
             }
 
             // Edge dashes buff
@@ -115,14 +115,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                     playerPosition = catchCurrent.NormalizedPosition;
                 }
 
-                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime, 265) / 265), 1.5) / Math.Max(1, catcherSpeedMultiplier); // Edge Dashes are easier at lower ms values
+                movementValue *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime, 265) / 265), 1.5) / catcherSpeedMultiplier; // Edge Dashes are easier at lower ms values
             }
 
             lastPlayerPosition = playerPosition;
             lastDistanceMoved = distanceMoved;
             previousIsDoubleHdash = isDoubleHdash;
 
-            return distanceAddition * 0.15; // Difficulty scaling (could be handled somewhere else)
+            return movementValue;
         }
     }
 }
