@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Play
 
         public readonly PlayerConfiguration Configuration;
 
-        internal Score Score { get; private set; }
+        protected Score Score { get; private set; }
 
         /// <summary>
         /// Create a new player instance.
