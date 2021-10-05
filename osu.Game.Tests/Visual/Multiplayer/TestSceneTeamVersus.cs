@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for dependencies screen", () => Stack.CurrentScreen is DependenciesScreen);
-            AddUntilStep("wait for dependencies to start load", () => dependenciesScreen.LoadState > LoadState.Ready);
+            AddUntilStep("wait for dependencies to start load", () => dependenciesScreen.LoadState > LoadState.NotLoaded);
             AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
 
             AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
