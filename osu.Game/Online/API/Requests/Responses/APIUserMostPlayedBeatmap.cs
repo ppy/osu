@@ -15,7 +15,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("count")]
         public int PlayCount { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("beatmap")]
         private BeatmapInfo beatmapInfo { get; set; }
 
         [JsonProperty]
