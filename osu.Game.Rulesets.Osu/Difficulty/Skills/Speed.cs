@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Speed : OsuStrainSkill
     {
         private const double single_spacing_threshold = 125;
-        private const double rhythm_multiplier = 0.675;
+        private const double rhythm_multiplier = 0.75;
         private const int history_time_max = 5000; // 5 seconds of calculatingRhythmBonus max.
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
@@ -70,11 +70,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     double currDelta = currObj.StrainTime;
                     double prevDelta = prevObj.StrainTime;
                     double lastDelta = lastObj.StrainTime;
-                    double currRatio = 1.0 + Math.Min(4.5, 6 * Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
+                    double currRatio = 1.0 + 6.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
-                    double windowPenalty = Math.Min(1, Math.Max(0, Math.Max(prevDelta, currDelta) - Math.Min(prevDelta, currDelta) - greatWindow) / greatWindow);
+                    double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - greatWindow * 0.6) / (greatWindow * 0.6));
 
-                    windowPenalty = Math.Min(1, windowPenalty * (previousIslandSize + islandSize));
+                    windowPenalty = Math.Min(1, windowPenalty);
+
+                    double effectiveRatio = windowPenalty * currRatio;
 
                     if (firstDeltaSwitch)
                     {
@@ -85,8 +87,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                         }
                         else
                         {
-                            double effectiveRatio = windowPenalty * currRatio;
-
                             if (Previous[i - 1].BaseObject is Slider) // bpm change is into slider, this is easy acc window
                                 effectiveRatio *= 0.125;
 
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     {
                         // Begin counting island until we change speed again.
                         firstDeltaSwitch = true;
-                        startRatio = windowPenalty * currRatio;
+                        startRatio = effectiveRatio;
                         islandSize = 1;
                     }
                 }
