@@ -68,6 +68,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("Add judgement", applyOneJudgement, 10);
 
             AddUntilStep("counter non-zero", () => counter.Current.Value > 0);
+            AddUntilStep("counter opaque", () => counter.Child.Alpha == 1);
 
             AddStep("Revert judgement", () =>
             {
