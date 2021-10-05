@@ -197,7 +197,7 @@ namespace osu.Game.Database
             else
             {
                 notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First()}!"
+                    ? $"Imported {imported.First().Value}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PostImport != null)
