@@ -37,8 +37,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
 
-            AddStep("click button", () => downloadButton.TriggerClick());
-
             AddStep(@"downloading state", () => downloadButton.SetDownloadState(DownloadState.Downloading));
             AddStep(@"locally available state", () => downloadButton.SetDownloadState(DownloadState.LocallyAvailable));
             AddStep(@"not downloaded state", () => downloadButton.SetDownloadState(DownloadState.NotDownloaded));
