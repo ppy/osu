@@ -63,6 +63,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestBasicCounting()
         {
+            int previousValue = 0;
+
             AddAssert("counter displaying zero", () => counter.Current.Value == 0);
 
             AddRepeatStep("Add judgement", applyOneJudgement, 10);
@@ -72,14 +74,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Revert judgement", () =>
             {
+                previousValue = counter.Current.Value;
+
                 scoreProcessor.RevertResult(new JudgementResult(new HitObject(), new OsuJudgement()));
             });
 
-            AddUntilStep("counter faded", () => counter.Child.Alpha < 1);
+            AddUntilStep("counter decreased", () => counter.Current.Value < previousValue);
 
             AddStep("Add judgement", applyOneJudgement);
 
-            AddUntilStep("counter opaque", () => counter.Child.Alpha == 1);
+            AddUntilStep("counter non-zero", () => counter.Current.Value > 0);
         }
 
         private void applyOneJudgement()
