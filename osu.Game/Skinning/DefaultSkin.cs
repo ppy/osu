@@ -84,7 +84,7 @@ namespace osu.Game.Skinning
 
                                     if (ppCounter != null)
                                     {
-                                        ppCounter.Y = score.Position.Y + score.ScreenSpaceDrawQuad.Size.Y;
+                                        ppCounter.Y = score.Position.Y + ppCounter.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).Y - 4;
                                         ppCounter.Origin = Anchor.TopCentre;
                                         ppCounter.Anchor = Anchor.TopCentre;
                                     }
