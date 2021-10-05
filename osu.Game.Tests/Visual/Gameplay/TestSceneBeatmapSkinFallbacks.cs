@@ -42,6 +42,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestEmptyLegacyBeatmapSkinFallsBack()
         {
             CreateSkinTest(SkinInfo.Default, () => new LegacyBeatmapSkin(new BeatmapInfo(), null, null));
+            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
             AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(SkinnableTarget.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
 
