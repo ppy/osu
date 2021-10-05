@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         string InstantiationInfo { get; }
 
-        public Ruleset? CreateInstance()
+        Ruleset? CreateInstance()
         {
             var type = Type.GetType(InstantiationInfo);
 
