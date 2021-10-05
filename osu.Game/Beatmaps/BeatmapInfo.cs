@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -152,11 +151,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
 
-        public IEnumerable<string> SearchableTerms => ((IBeatmapInfo)this).SearchableTerms;
-
-        public override string ToString() => ((IBeatmapInfo)this).DisplayTitle;
-
-        public RomanisableString ToRomanisableString() => ((IBeatmapInfo)this).DisplayTitleRomanisable;
+        public override string ToString() => this.GetDisplayTitle();
 
         public bool Equals(BeatmapInfo other)
         {
