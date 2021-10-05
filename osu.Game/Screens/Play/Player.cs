@@ -161,13 +161,6 @@ namespace osu.Game.Screens.Play
             if (!LoadedBeatmapSuccessfully)
                 return;
 
-            Score = CreateScore();
-
-            // ensure the score is in a consistent state with the current player.
-            Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
-            Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
-            Score.ScoreInfo.Mods = Mods.Value.ToArray();
-
             PrepareReplay();
 
             ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(Score.ScoreInfo);
@@ -225,7 +218,14 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
-            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, Mods.Value));
+            Score = CreateScore(playableBeatmap);
+
+            // ensure the score is in a consistent state with the current player.
+            Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
+            Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
+            Score.ScoreInfo.Mods = Mods.Value.ToArray();
+
+            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, Mods.Value, Score));
 
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
@@ -988,8 +988,9 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Creates the player's <see cref="Scoring.Score"/>.
         /// </summary>
+        /// <param name="beatmap"></param>
         /// <returns>The <see cref="Scoring.Score"/>.</returns>
-        protected virtual Score CreateScore() => new Score
+        protected virtual Score CreateScore(IBeatmap beatmap) => new Score
         {
             ScoreInfo = new ScoreInfo { User = api.LocalUser.Value },
         };
