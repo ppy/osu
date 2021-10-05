@@ -148,9 +148,9 @@ namespace osu.Game.Beatmaps
             }, token, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
-        public Task<TimedDifficultyAttributes[]> GetTimedDifficultyAttributesAsync(WorkingBeatmap beatmap, Ruleset ruleset, Mod[] mods, CancellationToken token = default)
+        public Task<List<TimedDifficultyAttributes>> GetTimedDifficultyAttributesAsync(WorkingBeatmap beatmap, Ruleset ruleset, Mod[] mods, CancellationToken token = default)
         {
-            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods).ToArray(),
+            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods),
                 token,
                 TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
                 updateScheduler);

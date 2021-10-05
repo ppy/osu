@@ -58,12 +58,14 @@ namespace osu.Game.Rulesets.Difficulty
             return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
         }
 
-        public IEnumerable<TimedDifficultyAttributes> CalculateTimed(params Mod[] mods)
+        public List<TimedDifficultyAttributes> CalculateTimed(params Mod[] mods)
         {
             preProcess(mods);
 
+            var attribs = new List<TimedDifficultyAttributes>();
+
             if (!Beatmap.HitObjects.Any())
-                yield break;
+                return attribs;
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
@@ -75,8 +77,10 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                     skill.ProcessInternal(hitObject);
 
-                yield return new TimedDifficultyAttributes(hitObject.EndTime, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate));
+                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
+
+            return attribs;
         }
 
         /// <summary>
