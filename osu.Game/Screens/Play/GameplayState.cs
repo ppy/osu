@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The gameplay score.
         /// </summary>
-        public Score? Score { get; set; }
+        public readonly Score Score;
 
         /// <summary>
         /// A bindable tracking the last judgement result applied to any hit object.
@@ -45,11 +46,12 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
 
-        public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod> mods)
+        public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod>? mods = null, Score? score = null)
         {
             Beatmap = beatmap;
             Ruleset = ruleset;
-            Mods = mods;
+            Score = score ?? new Score();
+            Mods = mods ?? ArraySegment<Mod>.Empty;
         }
 
         /// <summary>
