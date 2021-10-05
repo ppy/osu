@@ -92,24 +92,31 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult judgement)
         {
-            if (gameplayState?.Score == null || timedAttributes == null || timedAttributes.Length == 0)
+            var attrib = getAttributeAtTime(judgement);
+
+            if (gameplayState == null || attrib == null)
                 return;
 
-            int attribIndex = Array.BinarySearch(timedAttributes, 0, timedAttributes.Length, new TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
-            if (attribIndex < 0)
-                attribIndex = ~attribIndex - 1;
-            attribIndex = Math.Clamp(attribIndex, 0, timedAttributes.Length - 1);
-
-            var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(timedAttributes[attribIndex].Attributes, gameplayState.Score.ScoreInfo);
+            var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(attrib, gameplayState.Score.ScoreInfo);
 
             Current.Value = (int)Math.Round(calculator?.Calculate() ?? 0, MidpointRounding.AwayFromZero);
             IsValid = true;
         }
 
-        private void onJudgementReverted(JudgementResult obj)
+        [CanBeNull]
+        private DifficultyAttributes getAttributeAtTime(JudgementResult judgement)
         {
-            IsValid = false;
+            if (timedAttributes == null || timedAttributes.Length == 0)
+                return null;
+
+            int attribIndex = Array.BinarySearch(timedAttributes, 0, timedAttributes.Length, new TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
+            if (attribIndex < 0)
+                attribIndex = ~attribIndex - 1;
+
+            return timedAttributes[Math.Clamp(attribIndex, 0, timedAttributes.Length - 1)].Attributes;
         }
+
+        private void onJudgementReverted(JudgementResult obj) => IsValid = false;
 
         protected override LocalisableString FormatCount(int count) => count.ToString(@"D");
 
