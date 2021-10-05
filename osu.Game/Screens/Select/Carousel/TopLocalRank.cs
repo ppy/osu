@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class TopLocalRank : UpdateableRank
     {
-        private readonly BeatmapInfo beatmap;
+        private readonly BeatmapInfo beatmapInfo;
 
         [Resolved]
         private ScoreManager scores { get; set; }
@@ -31,10 +31,10 @@ namespace osu.Game.Screens.Select.Carousel
         private IBindable<WeakReference<ScoreInfo>> itemUpdated;
         private IBindable<WeakReference<ScoreInfo>> itemRemoved;
 
-        public TopLocalRank(BeatmapInfo beatmap)
+        public TopLocalRank(BeatmapInfo beatmapInfo)
             : base(null)
         {
-            this.beatmap = beatmap;
+            this.beatmapInfo = beatmapInfo;
         }
 
         [BackgroundDependencyLoader]
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             if (weakScore.NewValue.TryGetTarget(out var score))
             {
-                if (score.BeatmapInfoID == beatmap.ID)
+                if (score.BeatmapInfoID == beatmapInfo.ID)
                     fetchAndLoadTopScore();
             }
         }
@@ -79,10 +79,10 @@ namespace osu.Game.Screens.Select.Carousel
 
         private ScoreInfo fetchTopScore()
         {
-            if (scores == null || beatmap == null || ruleset?.Value == null || api?.LocalUser.Value == null)
+            if (scores == null || beatmapInfo == null || ruleset?.Value == null || api?.LocalUser.Value == null)
                 return null;
 
-            return scores.QueryScores(s => s.UserID == api.LocalUser.Value.Id && s.BeatmapInfoID == beatmap.ID && s.RulesetID == ruleset.Value.ID && !s.DeletePending)
+            return scores.QueryScores(s => s.UserID == api.LocalUser.Value.Id && s.BeatmapInfoID == beatmapInfo.ID && s.RulesetID == ruleset.Value.ID && !s.DeletePending)
                          .OrderByDescending(s => s.TotalScore)
                          .FirstOrDefault();
         }

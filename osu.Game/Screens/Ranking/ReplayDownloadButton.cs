@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, ScoreManager scores)
+        private void load(OsuGame game, ScoreModelDownloader scores)
         {
             InternalChild = shakeContainer = new ShakeContainer
             {

@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 
@@ -22,7 +21,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The metadata representing this beatmap. May be shared between multiple beatmaps.
         /// </summary>
-        IBeatmapMetadataInfo Metadata { get; }
+        IBeatmapMetadataInfo? Metadata { get; }
 
         /// <summary>
         /// The difficulty settings for this beatmap.
@@ -50,7 +49,7 @@ namespace osu.Game.Beatmaps
         string Hash { get; }
 
         /// <summary>
-        /// MD5 is kept for legacy support (matching against replays, osu-web-10 etc.).
+        /// MD5 is kept for legacy support (matching against replays etc.).
         /// </summary>
         string MD5Hash { get; }
 
@@ -63,25 +62,5 @@ namespace osu.Game.Beatmaps
         /// The basic star rating for this beatmap (with no mods applied).
         /// </summary>
         double StarRating { get; }
-
-        /// <summary>
-        /// A user-presentable display title representing this metadata.
-        /// </summary>
-        string DisplayTitle => $"{Metadata} {versionString}".Trim();
-
-        /// <summary>
-        /// A user-presentable display title representing this beatmap, with localisation handling for potentially romanisable fields.
-        /// </summary>
-        RomanisableString DisplayTitleRomanisable
-        {
-            get
-            {
-                var metadata = Metadata.DisplayTitleRomanisable;
-
-                return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
-            }
-        }
-
-        private string versionString => string.IsNullOrEmpty(DifficultyName) ? string.Empty : $"[{DifficultyName}]";
     }
 }

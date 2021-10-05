@@ -256,7 +256,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         {
             public string CustomValue { get; set; }
 
-            public bool Matches(BeatmapInfo beatmap) => true;
+            public bool Matches(BeatmapInfo beatmapInfo) => true;
 
             public bool TryParseCustomKeywordCriteria(string key, Operator op, string value)
             {

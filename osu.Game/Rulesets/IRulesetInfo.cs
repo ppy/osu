@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets
             var ruleset = Activator.CreateInstance(type) as Ruleset;
 
             // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
+            // TODO: figure if we still want/need this after switching to realm.
             // ruleset.RulesetInfo = this;
 
             return ruleset;

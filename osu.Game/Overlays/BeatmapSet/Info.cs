@@ -24,10 +24,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
-        public BeatmapInfo Beatmap
+        public BeatmapInfo BeatmapInfo
         {
-            get => successRate.Beatmap;
-            set => successRate.Beatmap = value;
+            get => successRate.BeatmapInfo;
+            set => successRate.BeatmapInfo = value;
         }
 
         public Info()
