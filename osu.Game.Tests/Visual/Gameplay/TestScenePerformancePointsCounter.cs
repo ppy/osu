@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
@@ -26,6 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private ScoreProcessor scoreProcessor;
 
         private int iteration;
+        private PerformancePointsCounter counter;
 
         public TestScenePerformancePointsCounter()
         {
@@ -47,37 +49,55 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("Create counter", () =>
             {
-                Child = new PerformancePointsCounter
+                iteration = 0;
+
+                Child = counter = new PerformancePointsCounter
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Scale = new Vector2(5),
                 };
             });
+        }
 
-            AddRepeatStep("Add judgement", () =>
-            {
-                var scoreInfo = gameplayState.Score.ScoreInfo;
+        [Test]
+        public void TestBasicCounting()
+        {
+            AddAssert("counter displaying zero", () => counter.Current.Value == 0);
 
-                scoreInfo.MaxCombo = iteration * 1000;
-                scoreInfo.Accuracy = 1;
-                scoreInfo.Statistics[HitResult.Great] = iteration * 1000;
+            AddRepeatStep("Add judgement", applyOneJudgement, 10);
 
-                scoreProcessor.ApplyResult(new OsuJudgementResult(new HitObject
-                {
-                    StartTime = iteration * 10000,
-                }, new OsuJudgement())
-                {
-                    Type = HitResult.Perfect,
-                });
-
-                iteration++;
-            }, 10);
+            AddUntilStep("counter non-zero", () => counter.Current.Value > 0);
 
             AddStep("Revert judgement", () =>
             {
                 scoreProcessor.RevertResult(new JudgementResult(new HitObject(), new OsuJudgement()));
             });
+
+            AddUntilStep("counter faded", () => counter.Child.Alpha < 1);
+
+            AddStep("Add judgement", applyOneJudgement);
+
+            AddUntilStep("counter opaque", () => counter.Child.Alpha == 1);
+        }
+
+        private void applyOneJudgement()
+        {
+            var scoreInfo = gameplayState.Score.ScoreInfo;
+
+            scoreInfo.MaxCombo = iteration * 1000;
+            scoreInfo.Accuracy = 1;
+            scoreInfo.Statistics[HitResult.Great] = iteration * 1000;
+
+            scoreProcessor.ApplyResult(new OsuJudgementResult(new HitObject
+            {
+                StartTime = iteration * 10000,
+            }, new OsuJudgement())
+            {
+                Type = HitResult.Perfect,
+            });
+
+            iteration++;
         }
     }
 }
