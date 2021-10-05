@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
 
+        private JudgementResult lastJudgement;
+
         public PerformancePointsCounter()
         {
             Current.Value = DisplayedCount = 0;
@@ -65,7 +67,12 @@ namespace osu.Game.Screens.Play.HUD
             {
                 var gameplayWorkingBeatmap = new GameplayWorkingBeatmap(gameplayState.Beatmap);
                 difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, gameplayState.Mods.ToArray(), loadCancellationSource.Token)
-                               .ContinueWith(r => Schedule(() => timedAttributes = r.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+                               .ContinueWith(r => Schedule(() =>
+                               {
+                                   timedAttributes = r.Result;
+                                   if (lastJudgement != null)
+                                       onNewJudgement(lastJudgement);
+                               }), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
         }
 
@@ -96,6 +103,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult judgement)
         {
+            lastJudgement = judgement;
+
             var attrib = getAttributeAtTime(judgement);
 
             if (gameplayState == null || attrib == null)
