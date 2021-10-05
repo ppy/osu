@@ -30,7 +30,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>, IPostImports<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : class, INamedFileInfo, new()
     {
@@ -57,9 +57,6 @@ namespace osu.Game.Database
         /// </summary>
         private static readonly ThreadedTaskScheduler import_scheduler_low_priority = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager<TModel, TFileModel>));
 
-        /// <summary>
-        /// Set an endpoint for notifications to be posted to.
-        /// </summary>
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
@@ -135,13 +132,13 @@ namespace osu.Game.Database
             return Import(notification, tasks);
         }
 
-        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public async Task<IEnumerable<ILive<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             if (tasks.Length == 0)
             {
                 notification.CompletionText = $"No {HumanisedModelName}s were found to import!";
                 notification.State = ProgressNotificationState.Completed;
-                return Enumerable.Empty<TModel>();
+                return Enumerable.Empty<ILive<TModel>>();
             }
 
             notification.Progress = 0;
@@ -149,7 +146,7 @@ namespace osu.Game.Database
 
             int current = 0;
 
-            var imported = new List<TModel>();
+            var imported = new List<ILive<TModel>>();
 
             bool isLowPriorityImport = tasks.Length > low_priority_import_batch_size;
 
@@ -200,15 +197,15 @@ namespace osu.Game.Database
             else
             {
                 notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First()}!"
+                    ? $"Imported {imported.First().Value}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
-                if (imported.Count > 0 && PresentImport != null)
+                if (imported.Count > 0 && PostImport != null)
                 {
                     notification.CompletionText += " Click to view.";
                     notification.CompletionClickAction = () =>
                     {
-                        PresentImport?.Invoke(imported);
+                        PostImport?.Invoke(imported);
                         return true;
                     };
                 }
@@ -227,11 +224,11 @@ namespace osu.Game.Database
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        internal async Task<TModel> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<ILive<TModel>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            TModel import;
+            ILive<TModel> import;
             using (ArchiveReader reader = task.GetReader())
                 import = await Import(reader, lowPriority, cancellationToken).ConfigureAwait(false);
 
@@ -246,16 +243,13 @@ namespace osu.Game.Database
             }
             catch (Exception e)
             {
-                LogForModel(import, $@"Could not delete original file after import ({task})", e);
+                LogForModel(import?.Value, $@"Could not delete original file after import ({task})", e);
             }
 
             return import;
         }
 
-        /// <summary>
-        /// Fired when the user requests to view the resulting import.
-        /// </summary>
-        public Action<IEnumerable<TModel>> PresentImport;
+        public Action<IEnumerable<ILive<TModel>>> PostImport { protected get; set; }
 
         /// <summary>
         /// Silently import an item from an <see cref="ArchiveReader"/>.
@@ -263,7 +257,7 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public Task<TModel> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<TModel>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -274,7 +268,7 @@ namespace osu.Game.Database
                 model = CreateModel(archive);
 
                 if (model == null)
-                    return Task.FromResult<TModel>(null);
+                    return Task.FromResult<ILive<TModel>>(new EntityFrameworkLive<TModel>(null));
             }
             catch (TaskCanceledException)
             {
@@ -349,7 +343,7 @@ namespace osu.Game.Database
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual async Task<TModel> Import(TModel item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) => await Task.Factory.StartNew(async () =>
+        public virtual async Task<ILive<TModel>> Import(TModel item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) => await Task.Factory.StartNew(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -375,7 +369,7 @@ namespace osu.Game.Database
                     {
                         LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
                         Undelete(existing);
-                        return existing;
+                        return existing.ToEntityFrameworkLive();
                     }
 
                     LogForModel(item, @"Found existing (optimised) but failed pre-check.");
@@ -421,7 +415,7 @@ namespace osu.Game.Database
                                 // existing item will be used; rollback new import and exit early.
                                 rollback();
                                 flushEvents(true);
-                                return existing;
+                                return existing.ToEntityFrameworkLive();
                             }
 
                             LogForModel(item, @"Found existing but failed re-use check.");
@@ -454,7 +448,7 @@ namespace osu.Game.Database
             }
 
             flushEvents(true);
-            return item;
+            return item.ToEntityFrameworkLive();
         }, cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap().ConfigureAwait(false);
 
         /// <summary>
@@ -479,7 +473,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The item to export.</param>
         /// <param name="outputStream">The output stream to export to.</param>
-        protected virtual void ExportModelTo(TModel model, Stream outputStream)
+        public virtual void ExportModelTo(TModel model, Stream outputStream)
         {
             using (var archive = ZipArchive.Create())
             {
@@ -745,9 +739,6 @@ namespace osu.Game.Database
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
 
-        /// <summary>
-        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
-        /// </summary>
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {
             var storage = PrepareStableStorage(stableStorage);
@@ -805,6 +796,17 @@ namespace osu.Game.Database
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
+        public bool IsAvailableLocally(TModel model) => CheckLocalAvailability(model, ModelStore.ConsumableItems.Where(m => !m.DeletePending));
+
+        /// <summary>
+        /// Performs implementation specific comparisons to determine whether a given model is present in the local store.
+        /// </summary>
+        /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
+        /// <param name="items">The usable items present in the store.</param>
+        /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
+        protected virtual bool CheckLocalAvailability(TModel model, IQueryable<TModel> items)
+            => model.ID > 0 && items.Any(i => i.ID == model.ID && i.Files.Any());
+
         /// <summary>
         /// Whether import can be skipped after finding an existing import early in the process.
         /// Only valid when <see cref="ComputeHash"/> is not overridden.
@@ -841,7 +843,7 @@ namespace osu.Game.Database
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
-        protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
+        public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
 
         #region Event handling / delaying
 

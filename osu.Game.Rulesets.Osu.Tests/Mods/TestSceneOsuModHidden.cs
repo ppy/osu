@@ -4,13 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
@@ -122,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         private bool checkSomeHit() => Player.ScoreProcessor.JudgedHits >= 4;
 
         private bool objectWithIncreasedVisibilityHasIndex(int index)
-            => Player.Mods.Value.OfType<TestOsuModHidden>().Single().FirstObject == Player.ChildrenOfType<GameplayBeatmap>().Single().HitObjects[index];
+            => Player.Mods.Value.OfType<TestOsuModHidden>().Single().FirstObject == Player.GameplayState.Beatmap.HitObjects[index];
 
         private class TestOsuModHidden : OsuModHidden
         {

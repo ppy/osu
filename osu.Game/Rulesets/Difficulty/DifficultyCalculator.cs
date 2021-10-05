@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -15,6 +17,14 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class DifficultyCalculator
     {
+        /// <summary>
+        /// The beatmap for which difficulty will be calculated.
+        /// </summary>
+        protected IBeatmap Beatmap { get; private set; }
+
+        private Mod[] playableMods;
+        private ClockWithMods clock;
+
         private readonly Ruleset ruleset;
         private readonly WorkingBeatmap beatmap;
 
@@ -31,11 +41,45 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
         public DifficultyAttributes Calculate(params Mod[] mods)
         {
-            mods = mods.Select(m => m.DeepClone()).ToArray();
+            preProcess(mods);
 
-            IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
+            var skills = CreateSkills(Beatmap, playableMods, clockRate);
+          
+            if (!Beatmap.HitObjects.Any())
+                return CreateDifficultyAttributes(Beatmap, playableMods, skills, clock);
 
-            return calculate(playableBeatmap, mods);
+            foreach (var hitObject in getDifficultyHitObjects())
+            {
+                foreach (var skill in skills)
+                    skill.ProcessInternal(hitObject);
+            }
+
+            return CreateDifficultyAttributes(Beatmap, playableMods, skills, clock);
+        }
+
+        public List<TimedDifficultyAttributes> CalculateTimed(params Mod[] mods)
+        {
+            preProcess(mods);
+
+            var attribs = new List<TimedDifficultyAttributes>();
+
+            if (!Beatmap.HitObjects.Any())
+                return attribs;
+
+            var skills = CreateSkills(Beatmap, playableMods, clock);
+            var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
+
+            foreach (var hitObject in getDifficultyHitObjects())
+            {
+                progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
+
+                foreach (var skill in skills)
+                    skill.ProcessInternal(hitObject);
+
+                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clock)));
+            }
+
+            return attribs;
         }
 
         /// <summary>
@@ -53,24 +97,21 @@ namespace osu.Game.Rulesets.Difficulty
             }
         }
 
-        private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods)
+        /// <summary>
+        /// Retrieves the <see cref="DifficultyHitObject"/>s to calculate against.
+        /// </summary>
+        private IEnumerable<DifficultyHitObject> getDifficultyHitObjects() => SortObjects(CreateDifficultyHitObjects(Beatmap, clock));
+
+        /// <summary>
+        /// Performs required tasks before every calculation.
+        /// </summary>
+        /// <param name="mods">The original list of <see cref="Mod"/>s.</param>
+        private void preProcess(Mod[] mods)
         {
-            var clock = new ClockWithMods(mods);
-
-            var skills = CreateSkills(beatmap, mods, clock);
-
-            if (!beatmap.HitObjects.Any())
-                return CreateDifficultyAttributes(beatmap, mods, skills, clock);
-
-            var difficultyHitObjects = SortObjects(CreateDifficultyHitObjects(beatmap, clock)).ToList();
-
-            foreach (var hitObject in difficultyHitObjects)
-            {
-                foreach (var skill in skills)
-                {
-                    skill.ProcessInternal(hitObject);
-                }
-            }
+            playableMods = mods.Select(m => m.DeepClone()).ToArray();
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
+          
+            var clock = new ClockWithMods(clock);
 
             return CreateDifficultyAttributes(beatmap, mods, skills, clock);
         }
@@ -84,7 +125,7 @@ namespace osu.Game.Rulesets.Difficulty
             => input.OrderBy(h => h.BaseObject.StartTime);
 
         /// <summary>
-        /// Creates all <see cref="Mod"/> combinations which adjust the <see cref="Beatmap"/> difficulty.
+        /// Creates all <see cref="Mod"/> combinations which adjust the <see cref="Beatmaps.Beatmap"/> difficulty.
         /// </summary>
         public Mod[] CreateDifficultyAdjustmentModCombinations()
         {
@@ -152,14 +193,15 @@ namespace osu.Game.Rulesets.Difficulty
         }
 
         /// <summary>
-        /// Retrieves all <see cref="Mod"/>s which adjust the <see cref="Beatmap"/> difficulty.
+        /// Retrieves all <see cref="Mod"/>s which adjust the <see cref="Beatmaps.Beatmap"/> difficulty.
         /// </summary>
         protected virtual Mod[] DifficultyAdjustmentMods => Array.Empty<Mod>();
 
         /// <summary>
         /// Creates <see cref="DifficultyAttributes"/> to describe beatmap's calculated difficulty.
         /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.</param>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.
+        /// This may differ from <see cref="Beatmap"/> in the case of timed calculation.</param>
         /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
         /// <param name="skills">The skills which processed the beatmap.</param>
         /// <param name="clock">The rate-adjusted gameplay clock.</param>
@@ -176,10 +218,51 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
         /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.</param>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.
+        /// This may differ from <see cref="Beatmap"/> in the case of timed calculation.</param>
         /// <param name="mods">Mods to calculate difficulty with.</param>
         /// <param name="clock">The rate-adjusted gameplay clock.</param>
         /// <returns>The <see cref="Skill"/>s.</returns>
         protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, ClockWithMods clock);
+
+        /// <summary>
+        /// Used to calculate timed difficulty attributes, where only a subset of hitobjects should be visible at any point in time.
+        /// </summary>
+        private class ProgressiveCalculationBeatmap : IBeatmap
+        {
+            private readonly IBeatmap baseBeatmap;
+
+            public ProgressiveCalculationBeatmap(IBeatmap baseBeatmap)
+            {
+                this.baseBeatmap = baseBeatmap;
+            }
+
+            public readonly List<HitObject> HitObjects = new List<HitObject>();
+
+            IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;
+
+            #region Delegated IBeatmap implementation
+
+            public BeatmapInfo BeatmapInfo
+            {
+                get => baseBeatmap.BeatmapInfo;
+                set => baseBeatmap.BeatmapInfo = value;
+            }
+
+            public ControlPointInfo ControlPointInfo
+            {
+                get => baseBeatmap.ControlPointInfo;
+                set => baseBeatmap.ControlPointInfo = value;
+            }
+
+            public BeatmapMetadata Metadata => baseBeatmap.Metadata;
+            public List<BreakPeriod> Breaks => baseBeatmap.Breaks;
+            public double TotalBreakTime => baseBeatmap.TotalBreakTime;
+            public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
+            public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
+            public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
+
+            #endregion
+        }
     }
 }

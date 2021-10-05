@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
             foreach (var hitObject in beatmap.HitObjects
-                                             .SelectMany(obj => obj is JuiceStream stream ? stream.NestedHitObjects : new[] { obj })
+                                             .SelectMany(obj => obj is JuiceStream stream ? stream.NestedHitObjects.AsEnumerable() : new[] { obj })
                                              .Cast<CatchHitObject>()
                                              .OrderBy(x => x.StartTime))
             {

@@ -52,7 +52,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 Mods = mods,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
                 GreatHitWindow = (int)Math.Ceiling(getHitWindow300(mods) / baseClockRate),
-                ScoreMultiplier = getScoreMultiplier(beatmap, mods),
+                ScoreMultiplier = getScoreMultiplier(mods),
+
                 MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
                 Skills = skills
             };
@@ -73,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, ClockWithMods clock) => new Skill[]
         {
-            new Strain(mods, ((ManiaBeatmap)beatmap).TotalColumns)
+            new Strain(mods, ((ManiaBeatmap)Beatmap).TotalColumns)
         };
 
         protected override Mod[] DifficultyAdjustmentMods
@@ -141,7 +142,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             }
         }
 
-        private double getScoreMultiplier(IBeatmap beatmap, Mod[] mods)
+        private double getScoreMultiplier(Mod[] mods)
         {
             double scoreMultiplier = 1;
 
@@ -157,7 +158,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 }
             }
 
-            var maniaBeatmap = (ManiaBeatmap)beatmap;
+            var maniaBeatmap = (ManiaBeatmap)Beatmap;
             int diff = maniaBeatmap.TotalColumns - maniaBeatmap.OriginalTotalColumns;
 
             if (diff > 0)

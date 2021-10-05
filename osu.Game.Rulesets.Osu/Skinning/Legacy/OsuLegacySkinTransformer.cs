@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     case OsuSkinComponents.ReverseArrow:
                         if (hasHitCircle.Value)
-                            return new LegacyReverseArrow(this);
+                            return new LegacyReverseArrow();
 
                         return null;
 
