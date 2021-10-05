@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The beatmap set this beatmap is part of.
         /// </summary>
-        IBeatmapSetInfo BeatmapSet { get; }
+        IBeatmapSetInfo? BeatmapSet { get; }
 
         /// <summary>
         /// The playable length in milliseconds of this beatmap.
