@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online;
@@ -9,6 +10,8 @@ using osu.Game.Scoring;
 using osu.Game.Users;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Ranking;
 using osuTK.Input;
@@ -104,6 +107,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+
+            AddAssert("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
         [Test]
@@ -119,6 +125,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+
+            AddAssert("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
         private ScoreInfo getScoreInfo(bool replayAvailable)
