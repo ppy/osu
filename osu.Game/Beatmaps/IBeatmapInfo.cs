@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
-using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 
@@ -64,33 +62,5 @@ namespace osu.Game.Beatmaps
         /// The basic star rating for this beatmap (with no mods applied).
         /// </summary>
         double StarRating { get; }
-
-        /// <summary>
-        /// A user-presentable display title representing this metadata.
-        /// </summary>
-        string DisplayTitle => $"{Metadata} {versionString}".Trim();
-
-        /// <summary>
-        /// A user-presentable display title representing this beatmap, with localisation handling for potentially romanisable fields.
-        /// </summary>
-        RomanisableString DisplayTitleRomanisable
-        {
-            get
-            {
-                var metadata = closestMetadata.DisplayTitleRomanisable;
-
-                return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
-            }
-        }
-
-        string[] SearchableTerms => new[]
-        {
-            DifficultyName
-        }.Concat(closestMetadata.SearchableTerms).Where(s => !string.IsNullOrEmpty(s)).ToArray();
-
-        private string versionString => string.IsNullOrEmpty(DifficultyName) ? string.Empty : $"[{DifficultyName}]";
-
-        // temporary helper methods until we figure which metadata should be where.
-        private IBeatmapMetadataInfo closestMetadata => (Metadata ?? BeatmapSet.Metadata)!;
     }
 }

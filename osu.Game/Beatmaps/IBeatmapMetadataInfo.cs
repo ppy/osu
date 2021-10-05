@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
-using osu.Framework.Localisation;
 
 #nullable enable
 
@@ -64,47 +62,6 @@ namespace osu.Game.Beatmaps
         /// The filename of the background image file consumed by this beatmap.
         /// </summary>
         string BackgroundFile { get; }
-
-        /// <summary>
-        /// A user-presentable display title representing this metadata.
-        /// </summary>
-        string DisplayTitle
-        {
-            get
-            {
-                string author = string.IsNullOrEmpty(Author) ? string.Empty : $"({Author})";
-                return $"{Artist} - {Title} {author}".Trim();
-            }
-        }
-
-        /// <summary>
-        /// A user-presentable display title representing this metadata, with localisation handling for potentially romanisable fields.
-        /// </summary>
-        RomanisableString DisplayTitleRomanisable
-        {
-            get
-            {
-                string author = string.IsNullOrEmpty(Author) ? string.Empty : $"({Author})";
-                var artistUnicode = string.IsNullOrEmpty(ArtistUnicode) ? Artist : ArtistUnicode;
-                var titleUnicode = string.IsNullOrEmpty(TitleUnicode) ? Title : TitleUnicode;
-
-                return new RomanisableString($"{artistUnicode} - {titleUnicode} {author}".Trim(), $"{Artist} - {Title} {author}".Trim());
-            }
-        }
-
-        /// <summary>
-        /// An array of all searchable terms provided in contained metadata.
-        /// </summary>
-        string[] SearchableTerms => new[]
-        {
-            Author,
-            Artist,
-            ArtistUnicode,
-            Title,
-            TitleUnicode,
-            Source,
-            Tags
-        }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
 
         bool IEquatable<IBeatmapMetadataInfo>.Equals(IBeatmapMetadataInfo? other)
         {
