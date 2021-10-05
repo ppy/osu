@@ -32,6 +32,7 @@ namespace osu.Game.Beatmaps
         private static string getVersionString(IBeatmapInfo beatmapInfo) => string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? string.Empty : $"[{beatmapInfo.DifficultyName}]";
 
         // temporary helper methods until we figure which metadata should be where.
-        private static IBeatmapMetadataInfo getClosestMetadata(IBeatmapInfo beatmapInfo) => (beatmapInfo.Metadata ?? beatmapInfo.BeatmapSet.Metadata)!;
+        private static IBeatmapMetadataInfo getClosestMetadata(IBeatmapInfo beatmapInfo) =>
+            beatmapInfo.Metadata ?? beatmapInfo.BeatmapSet?.Metadata ?? new BeatmapMetadata();
     }
 }
