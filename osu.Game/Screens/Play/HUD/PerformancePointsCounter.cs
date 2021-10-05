@@ -49,20 +49,22 @@ namespace osu.Game.Screens.Play.HUD
         [CanBeNull]
         private Ruleset gameplayRuleset;
 
+        private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
+
         public PerformancePointsCounter()
         {
             Current.Value = DisplayedCount = 0;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache, CancellationToken cancellationToken)
+        private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache)
         {
             Colour = colours.BlueLighter;
 
             if (gameplayState != null)
             {
                 gameplayRuleset = gameplayState.Ruleset;
-                difficultyCache.GetTimedDifficultyAttributesAsync(new GameplayWorkingBeatmap(gameplayState.Beatmap), gameplayRuleset, gameplayState.Mods.ToArray(), cancellationToken)
+                difficultyCache.GetTimedDifficultyAttributesAsync(new GameplayWorkingBeatmap(gameplayState.Beatmap), gameplayRuleset, gameplayState.Mods.ToArray(), loadCancellationSource.Token)
                                .ContinueWith(r => Schedule(() => timedAttributes = r.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
         }
@@ -101,6 +103,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (scoreProcessor != null)
                 scoreProcessor.NewJudgement -= onNewJudgement;
+
+            loadCancellationSource?.Cancel();
         }
 
         private class TextComponent : CompositeDrawable, IHasText
