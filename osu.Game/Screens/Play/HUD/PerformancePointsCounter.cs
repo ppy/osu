@@ -38,6 +38,8 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override double RollingDuration => 1000;
 
+        private const float alpha_when_invalid = 0.3f;
+
         [CanBeNull]
         [Resolved(CanBeNull = true)]
         private ScoreProcessor scoreProcessor { get; set; }
@@ -70,6 +72,7 @@ namespace osu.Game.Screens.Play.HUD
                                .ContinueWith(r => Schedule(() =>
                                {
                                    timedAttributes = r.Result;
+                                   IsValid = true;
                                    if (lastJudgement != null)
                                        onNewJudgement(lastJudgement);
                                }), TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -97,7 +100,7 @@ namespace osu.Game.Screens.Play.HUD
                     return;
 
                 isValid = value;
-                DrawableCount.FadeTo(isValid ? 1 : 0.3f, 1000, Easing.OutQuint);
+                DrawableCount.FadeTo(isValid ? 1 : alpha_when_invalid, 1000, Easing.OutQuint);
             }
         }
 
@@ -133,7 +136,10 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override LocalisableString FormatCount(int count) => count.ToString(@"D");
 
-        protected override IHasText CreateText() => new TextComponent();
+        protected override IHasText CreateText() => new TextComponent
+        {
+            Alpha = alpha_when_invalid
+        };
 
         protected override void Dispose(bool isDisposing)
         {
