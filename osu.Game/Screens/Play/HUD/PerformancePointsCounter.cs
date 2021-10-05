@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Play.HUD
         private GameplayState gameplayState { get; set; }
 
         [CanBeNull]
-        private TimedDifficultyAttributes[] timedAttributes;
+        private List<TimedDifficultyAttributes> timedAttributes;
 
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
 
@@ -110,14 +110,14 @@ namespace osu.Game.Screens.Play.HUD
         [CanBeNull]
         private DifficultyAttributes getAttributeAtTime(JudgementResult judgement)
         {
-            if (timedAttributes == null || timedAttributes.Length == 0)
+            if (timedAttributes == null || timedAttributes.Count == 0)
                 return null;
 
-            int attribIndex = Array.BinarySearch(timedAttributes, 0, timedAttributes.Length, new TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
+            int attribIndex = timedAttributes.BinarySearch(new TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
             if (attribIndex < 0)
                 attribIndex = ~attribIndex - 1;
 
-            return timedAttributes[Math.Clamp(attribIndex, 0, timedAttributes.Length - 1)].Attributes;
+            return timedAttributes[Math.Clamp(attribIndex, 0, timedAttributes.Count - 1)].Attributes;
         }
 
         private void onJudgementReverted(JudgementResult obj) => IsValid = false;
