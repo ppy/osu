@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new CatchDifficultyAttributes { Mods = mods, Skills = skills };
 
-            // For the time being, we use the clockrate at the beginning of the map for OD and AR attributes
+            // For the time being, we will use the average clockrate for OD and AR attributes
             double baseClockRate = clock.GetAverageRate();
 
             // this is the same as osu!, so there's potential to share the implementation... maybe

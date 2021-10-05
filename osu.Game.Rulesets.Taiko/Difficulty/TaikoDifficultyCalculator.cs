@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double starRating = 1.4 * separatedRating + 0.5 * combinedRating;
             starRating = rescale(starRating);
 
-            // For the time being, we use the clockrate at the beginning of the map for OD and AR attributes
+            // For the time being, we will use the average clockrate for OD and AR attributes
             double baseClockRate = clock.GetAverageRate();
 
             HitWindows hitWindows = new TaikoHitWindows();

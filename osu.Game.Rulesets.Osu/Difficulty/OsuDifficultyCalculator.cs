@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
-            // For the time being, we use the average rate for OD and AR attributes
+            // For the time being, we will use the average clockrate for OD and AR attributes
             double baseClockRate = clock.GetAverageRate();
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future

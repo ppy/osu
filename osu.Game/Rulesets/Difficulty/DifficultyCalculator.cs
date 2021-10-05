@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Difficulty
         {
             preProcess(mods);
 
-            var skills = CreateSkills(Beatmap, playableMods, clockRate);
+            var skills = CreateSkills(Beatmap, playableMods, clock);
           
             if (!Beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(Beatmap, playableMods, skills, clock);
@@ -111,9 +111,7 @@ namespace osu.Game.Rulesets.Difficulty
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
             Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
           
-            var clock = new ClockWithMods(clock);
-
-            return CreateDifficultyAttributes(beatmap, mods, skills, clock);
+            clock = new ClockWithMods(mods);
         }
 
         /// <summary>
