@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                             rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay * Math.Sqrt(4 + islandSize) / 2 * Math.Sqrt(4 + previousIslandSize) / 2;
 
-                            startRatio = windowPenalty * currRatio;
+                            startRatio = effectiveRatio;
 
                             previousIslandSize = islandSize; // log the last island size.
 
