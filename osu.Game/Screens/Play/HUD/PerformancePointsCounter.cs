@@ -133,7 +133,8 @@ namespace osu.Game.Screens.Play.HUD
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Text = @"pp",
-                            Font = OsuFont.Numeric.With(size: 8)
+                            Font = OsuFont.Numeric.With(size: 8),
+                            Padding = new MarginPadding { Bottom = 1.5f }, // align baseline better
                         }
                     }
                 };
