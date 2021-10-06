@@ -162,6 +162,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
+            AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
+
             AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scoreBeingDeleted.OnlineScoreID));
         }
 
