@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using ManagedBass.Fx;
 using osu.Framework.Audio.Mixing;
 using osu.Framework.Bindables;
@@ -44,7 +45,7 @@ namespace osu.Game.Audio.Effects
                     break;
             }
 
-            Cutoff = new BindableNumber<int>
+            Cutoff = new BindableNumber<int>(initialCutoff)
             {
                 MinValue = 1,
                 MaxValue = MaxCutoff
@@ -57,14 +58,24 @@ namespace osu.Game.Audio.Effects
                 fQ = 0.7f // This allows fCenter to go up to 22049hz (nyquist - 1hz) without overflowing and causing weird filter behaviour (see: https://www.un4seen.com/forum/?topic=19542.0)
             };
 
-            attachFilter();
+            // Don't start attached if this is low-pass or high-pass filter (as they have special auto-attach/detach logic)
+            if (type != BQFType.LowPass && type != BQFType.HighPass)
+                attachFilter();
+
             Cutoff.ValueChanged += updateFilter;
-            Cutoff.Value = initialCutoff;
         }
 
-        private void attachFilter() => mixer.Effects.Add(filter);
+        private void attachFilter()
+        {
+            Debug.Assert(!mixer.Effects.Contains(filter));
+            mixer.Effects.Add(filter);
+        }
 
-        private void detachFilter() => mixer.Effects.Remove(filter);
+        private void detachFilter()
+        {
+            Debug.Assert(mixer.Effects.Contains(filter));
+            mixer.Effects.Remove(filter);
+        }
 
         private void updateFilter(ValueChangedEvent<int> cutoff)
         {
