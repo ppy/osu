@@ -193,9 +193,10 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         private class TaikoMutliplierAppliedDifficulty : BeatmapDifficulty
         {
-            public TaikoMutliplierAppliedDifficulty(BeatmapDifficulty difficulty)
+            public TaikoMutliplierAppliedDifficulty(IBeatmapDifficultyInfo difficulty)
             {
-                difficulty.CopyTo(this);
+                CopyFrom(difficulty);
+
                 SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
         }

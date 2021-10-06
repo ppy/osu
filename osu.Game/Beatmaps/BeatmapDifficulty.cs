@@ -20,6 +20,15 @@ namespace osu.Game.Beatmaps
 
         private float? approachRate;
 
+        public BeatmapDifficulty()
+        {
+        }
+
+        public BeatmapDifficulty(IBeatmapDifficultyInfo source)
+        {
+            CopyFrom(source);
+        }
+
         public float ApproachRate
         {
             get => approachRate ?? OverallDifficulty;
@@ -37,6 +46,17 @@ namespace osu.Game.Beatmaps
             var diff = new BeatmapDifficulty();
             CopyTo(diff);
             return diff;
+        }
+
+        public void CopyFrom(IBeatmapDifficultyInfo difficulty)
+        {
+            ApproachRate = difficulty.ApproachRate;
+            DrainRate = difficulty.DrainRate;
+            CircleSize = difficulty.CircleSize;
+            OverallDifficulty = difficulty.OverallDifficulty;
+
+            SliderMultiplier = difficulty.SliderMultiplier;
+            SliderTickRate = difficulty.SliderTickRate;
         }
 
         public void CopyTo(BeatmapDifficulty difficulty)

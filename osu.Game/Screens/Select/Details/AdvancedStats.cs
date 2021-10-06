@@ -106,12 +106,12 @@ namespace osu.Game.Screens.Select.Details
 
         private void updateStatistics()
         {
-            BeatmapDifficulty baseDifficulty = BeatmapInfo?.BaseDifficulty;
+            IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.BaseDifficulty;
             BeatmapDifficulty adjustedDifficulty = null;
 
             if (baseDifficulty != null && mods.Value.Any(m => m is IApplicableToDifficulty))
             {
-                adjustedDifficulty = baseDifficulty.Clone();
+                adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
 
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(adjustedDifficulty);
