@@ -283,7 +283,7 @@ namespace Mvis.Plugin.CollectionSupport
                 {
                     var subEntry = new SimpleEntry
                     {
-                        Label = item.BeatmapSet.Metadata.ToRomanisableString().GetPreferred(true),
+                        Label = item.BeatmapSet.Metadata.GetDisplayTitleRomanisable().GetPreferred(true),
                         OnActive = () =>
                         {
                             Schedule(() => Play(beatmaps.GetWorkingBeatmap(item)));
@@ -314,7 +314,7 @@ namespace Mvis.Plugin.CollectionSupport
                     currentSubEntry.ToggleState = 0;
 
                 var targetEntry = trayEntry.Children.FirstOrDefault(s =>
-                    s.Label == b.Value.BeatmapSetInfo.Metadata.ToRomanisableString().GetPreferred(true));
+                    s.Label == b.Value.BeatmapSetInfo.Metadata.GetDisplayTitleRomanisable().GetPreferred(true));
 
                 if (targetEntry != null)
                     targetEntry.ToggleState = 1;

@@ -254,9 +254,9 @@ namespace osu.Game.Beatmaps
 
         public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
 
-        public bool Download(BeatmapSetInfo model, bool minimiseDownloadSize = false)
+        public bool Download(BeatmapSetInfo model, bool minimiseDownloadSize = false, bool useSayobot = false, bool noVideo = false)
         {
-            return beatmapModelDownloader.Download(model, minimiseDownloadSize);
+            return beatmapModelDownloader.Download(model, minimiseDownloadSize, useSayobot, noVideo);
         }
 
         public ArchiveDownloadRequest<BeatmapSetInfo> GetExistingDownload(BeatmapSetInfo model)

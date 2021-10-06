@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         private void updateBeatmapTooltip() =>
-            TooltipSub = $"你共有{beatmapManager.QueryBeatmapsMinimal(_ => true).ToList().Count}张谱面!";
+            TooltipSub = $"你共有{beatmapManager.QueryBeatmaps(_ => true).ToList().Count}张谱面!";
 
         protected override bool OnClick(ClickEvent e)
         {

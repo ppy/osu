@@ -216,7 +216,7 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.BeatmapInfo = b.NewValue;
-                externalLink.Link = SelectServer(b.NewValue);;
+                externalLink.Link = SelectServer(b.NewValue);
             };
         }
 
@@ -228,7 +228,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     return $@"https:/osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
 
                 case false:
-                    return $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
+                    return $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
             }
         }
 
@@ -241,7 +241,7 @@ namespace osu.Game.Overlays.BeatmapSet
             mfconfig.BindWith(MSetting.UseSayobot, useSayobot);
             useSayobot.ValueChanged += _ =>
             {
-                externalLink.Link = SelectServer(Details.Beatmap);
+                externalLink.Link = SelectServer(Details.BeatmapInfo);
             };
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
             onlineStatusPill.BackgroundColour = colourProvider.Background6;

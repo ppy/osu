@@ -34,15 +34,15 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 RelativeSizeAxes = Axes.Both,
                 Child = button = new DownloadButton
                 {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                    RelativeSizeAxes = Axes.Both
+                }
             };
 
             button.Add(new DownloadProgressBar(beatmapSet)
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Depth = -1,
+                Depth = -1
             });
         }
 
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
 
                     default:
-                        beatmaps.Download(BeatmapSet.Value, mfconfig.Get<bool>(MSetting.UseSayobot), noVideoSetting.Value);
+                        beatmaps.Download(BeatmapSet.Value, false, mfconfig.Get<bool>(MSetting.UseSayobot), noVideoSetting.Value);
                         break;
                 }
             };

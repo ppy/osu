@@ -140,9 +140,9 @@ namespace osu.Desktop
             switch (activity)
             {
                 case UserActivity.InMvis mvis:
-                    return (mvis.Beatmap.Metadata.ArtistUnicode ?? mvis.Beatmap.Metadata.Artist)
+                    return (mvis.BeatmapInfo.Metadata.ArtistUnicode ?? mvis.BeatmapInfo.Metadata.Artist)
                            + " - "
-                           + (mvis.Beatmap.Metadata.TitleUnicode ?? mvis.Beatmap.Metadata.Title);
+                           + (mvis.BeatmapInfo.Metadata.TitleUnicode ?? mvis.BeatmapInfo.Metadata.Title);
 
                 case UserActivity.InGame game:
                     return game.BeatmapInfo.ToString();

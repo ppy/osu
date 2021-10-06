@@ -9,15 +9,15 @@ namespace osu.Game.Online.API.Requests
     public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<BeatmapSetInfo>
     {
         private readonly bool noVideo;
-        private readonly bool isMini;
+        private readonly bool minimiseDownloadSize;
 
         private readonly bool useSayobot;
 
-        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool useSayobot, bool noVideo, bool isMini = false)
+        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool useSayobot, bool noVideo, bool minimiseDownloadSize = false)
             : base(set)
         {
             this.noVideo = noVideo;
-            this.isMini = isMini;
+            this.minimiseDownloadSize = minimiseDownloadSize;
             this.useSayobot = useSayobot;
         }
 
@@ -27,7 +27,7 @@ namespace osu.Game.Online.API.Requests
             {
                 var idFull = Model.OnlineBeatmapSetID.ToString();
 
-                var target = $@"{(isMini ? "mini" : (noVideo ? "novideo" : "full"))}/{idFull}";
+                var target = $@"{(minimiseDownloadSize ? "mini" : (noVideo ? "novideo" : "full"))}/{idFull}";
                 return target;
             }
 
@@ -42,9 +42,9 @@ namespace osu.Game.Online.API.Requests
             return $@"{API.WebsiteRootUrl}/api/v2/{Target}";
         }
 
-        protected override string Target => $@"{getTarget()}";
+        protected override string Target => getTarget();
 
-        protected override string Uri => $@"{selectUri()}";
+        protected override string Uri => selectUri();
 
         protected override WebRequest CreateWebRequest()
         {

@@ -42,29 +42,29 @@ namespace osu.Game.Database
         /// Creates the download request for this <typeparamref name="TModel"/>.
         /// </summary>
         /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
-        /// <param name="UseSayobot">Decides whether to use sayobot to download.</param>
+        /// <param name="useSayobot">Decides whether to use sayobot to download.</param>
         /// <param name="noVideo">Whether this download should be optimised for slow connections. Generally means Videos are not included in the download bundle.</param>
-        /// <param name="IsMini">Whether this downlaod should be optimised for very slow connections. Generally means any extra files are not included in the download bundle.</param>
+        /// <param name="isMini">Whether this downlaod should be optimised for very slow connections. Generally means any extra files are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
-        protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool UseSayobot, bool noVideo, bool IsMini);
+        protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool isMini, bool useSayobot, bool noVideo);
 
         /// <summary>
         /// Begin a download for the requested <typeparamref name="TModel"/>.
         /// </summary>
         /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
-        /// <param name="UseSayobot">Decides whether to use sayobot to download.</param>
+        /// <param name="minimiseDownloadSize">Upstream arg</param>
+        /// <param name="useSayobot">Decides whether to use sayobot to download.</param>
         /// <param name="noVideo">Whether this download should be optimised for slow connections. Generally means Videos are not included in the download bundle.</param>
-        /// <param name="IsMini">Whether this downlaod should be optimised for very slow connections. Generally means any extra files are not included in the download bundle.</param>
         /// <returns>Whether the download was started.</returns>
-        public bool Download(TModel model, bool minimiseDownloadSize = false, bool UseSayobot = true, bool noVideo = false, bool IsMini = false)
+        public bool Download(TModel model, bool minimiseDownloadSize, bool useSayobot, bool noVideo)
         {
             if (!canDownload(model)) return false;
 
-            var request = CreateDownloadRequest(model, UseSayobot, noVideo, IsMini);
+            var request = CreateDownloadRequest(model, minimiseDownloadSize, useSayobot, noVideo);
 
             DownloadNotification notification = new DownloadNotification
             {
-                Text = $"正在下载 {request.Model}",
+                Text = $"正在下载 {request.Model}"
             };
 
             request.DownloadProgressed += progress =>
@@ -111,7 +111,7 @@ namespace osu.Game.Database
                 downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
 
                 downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
-                
+
                 notification.State = ProgressNotificationState.Cancelled;
 
                 if (!(error is OperationCanceledException))

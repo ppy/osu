@@ -30,11 +30,11 @@ namespace osu.Game.Database
         /// Begin a download for the requested <typeparamref name="TModel"/>.
         /// </summary>
         /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
-        /// <param name="UseSayobot">Decides whether to use sayobot to download</param>
+        /// <param name="minimiseDownloadSize">Upstream arg</param>
+        /// <param name="useSayobot">Decides whether to use sayobot to download</param>
         /// <param name="noVideo">Whether this download should be optimised for slow connections. Generally means Videos are not included in the download bundle.</param>
-        /// <param name="IsMini">Whether this downlaod should be optimised for very slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>Whether the download was started.</returns>
-        bool Download(TModel model, bool UseSayobot, bool noVideo, bool IsMini);
+        bool Download(TModel model, bool minimiseDownloadSize, bool useSayobot, bool noVideo);
 
         /// <summary>
         /// Gets an existing <typeparamref name="TModel"/> download request if it exists.

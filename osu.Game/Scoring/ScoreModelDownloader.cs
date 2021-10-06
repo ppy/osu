@@ -15,6 +15,7 @@ namespace osu.Game.Scoring
         {
         }
 
-        protected override ArchiveDownloadRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, bool minimiseDownload) => new DownloadReplayRequest(score);
+        protected override ArchiveDownloadRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, bool useSayobot, bool noVideo, bool minimiseDownload)
+            => new DownloadReplayRequest(score);
     }
 }

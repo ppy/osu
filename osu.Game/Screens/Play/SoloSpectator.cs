@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Play
             if (beatmaps.IsAvailableLocally(onlineBeatmap))
                 return;
 
-            beatmaps.Download(onlineBeatmap, useSayobot.Value);
+            beatmaps.Download(onlineBeatmap, false, useSayobot.Value);
         }
 
         public override bool OnExiting(IScreen next)
