@@ -60,6 +60,8 @@ namespace osu.Game.Screens.Play.HUD
             Current.Value = DisplayedCount = 0;
         }
 
+        private Mod[] clonedMods;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache)
         {
@@ -67,8 +69,10 @@ namespace osu.Game.Screens.Play.HUD
 
             if (gameplayState != null)
             {
+                clonedMods = gameplayState.Mods.Select(m => m.DeepClone()).ToArray();
+
                 var gameplayWorkingBeatmap = new GameplayWorkingBeatmap(gameplayState.Beatmap);
-                difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, gameplayState.Mods.ToArray(), loadCancellationSource.Token)
+                difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, clonedMods, loadCancellationSource.Token)
                                .ContinueWith(r => Schedule(() =>
                                {
                                    timedAttributes = r.Result;
@@ -116,7 +120,11 @@ namespace osu.Game.Screens.Play.HUD
                 return;
             }
 
-            var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(attrib, gameplayState.Score.ScoreInfo);
+            // awkward but we need to make sure the true mods are not passed to PerformanceCalculator as it makes a mess of track applications.
+            var scoreInfo = gameplayState.Score.ScoreInfo.DeepClone();
+            scoreInfo.Mods = clonedMods;
+
+            var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(attrib, scoreInfo);
 
             Current.Value = (int)Math.Round(calculator?.Calculate() ?? 0, MidpointRounding.AwayFromZero);
             IsValid = true;
