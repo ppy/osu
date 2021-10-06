@@ -81,7 +81,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
+        public virtual IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
         {
             using (var cancellationSource = createCancellationTokenSource(timeout))
             {
