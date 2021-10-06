@@ -110,10 +110,11 @@ namespace osu.Game.Rulesets.Difficulty
         private void preProcess(Mod[] mods)
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
+
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, playableMods);
 
             var track = new TrackVirtual(10000);
-            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             clockRate = track.Rate;
         }
 
