@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (match)
             {
-                var terms = BeatmapInfo.SearchableTerms;
+                var terms = BeatmapInfo.GetSearchableTerms();
 
                 foreach (var criteriaTerm in criteria.SearchTerms)
                     match &= terms.Any(term => term.Contains(criteriaTerm, StringComparison.InvariantCultureIgnoreCase));

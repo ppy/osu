@@ -10,7 +10,7 @@ using osu.Framework.Testing;
 namespace osu.Game.Rulesets
 {
     [ExcludeFromDynamicCompile]
-    public class RulesetInfo : IEquatable<RulesetInfo>
+    public class RulesetInfo : IEquatable<RulesetInfo>, IRulesetInfo
     {
         public int? ID { get; set; }
 
@@ -54,5 +54,11 @@ namespace osu.Game.Rulesets
         }
 
         public override string ToString() => Name ?? $"{Name} ({ShortName}) ID: {ID}";
+
+        #region Implementation of IHasOnlineID
+
+        public int? OnlineID => ID;
+
+        #endregion
     }
 }
