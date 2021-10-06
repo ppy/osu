@@ -714,10 +714,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             FilterableDifficultyIcon difficultyIcon = null;
-            AddStep("Find an icon for different ruleset", () =>
+            AddUntilStep("Find an icon for different ruleset", () =>
             {
                 difficultyIcon = set.ChildrenOfType<FilterableDifficultyIcon>()
-                                    .First(icon => icon.Item.BeatmapInfo.Ruleset.ID == 3);
+                                    .FirstOrDefault(icon => icon.Item.BeatmapInfo.Ruleset.ID == 3);
+                return difficultyIcon != null;
             });
 
             AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
