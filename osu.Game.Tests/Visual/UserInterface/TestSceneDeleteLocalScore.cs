@@ -37,7 +37,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private ScoreManager scoreManager;
 
         private readonly List<ScoreInfo> importedScores = new List<ScoreInfo>();
-        private BeatmapInfo beatmap;
+
+        private BeatmapInfo beatmapInfo;
 
         [Cached]
         private readonly DialogOverlay dialogOverlay;
@@ -55,7 +56,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Anchor = Anchor.Centre,
                         Size = new Vector2(550f, 450f),
                         Scope = BeatmapLeaderboardScope.Local,
-                        Beatmap = new BeatmapInfo
+                        BeatmapInfo = new BeatmapInfo
                         {
                             ID = 1,
                             Metadata = new BeatmapMetadata
@@ -84,15 +85,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, null, ContextFactory, Scheduler));
 
-            beatmap = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).Result.Beatmaps[0];
+            beatmapInfo = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).Result.Value.Beatmaps[0];
 
             for (int i = 0; i < 50; i++)
             {
                 var score = new ScoreInfo
                 {
                     OnlineScoreID = i,
-                    Beatmap = beatmap,
-                    BeatmapInfoID = beatmap.ID,
+                    BeatmapInfo = beatmapInfo,
+                    BeatmapInfoID = beatmapInfo.ID,
                     Accuracy = RNG.NextDouble(),
                     TotalScore = RNG.Next(1, 1000000),
                     MaxCombo = RNG.Next(1, 1000),
@@ -100,7 +101,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     User = new User { Username = "TestUser" },
                 };
 
-                importedScores.Add(scoreManager.Import(score).Result);
+                importedScores.Add(scoreManager.Import(score).Result.Value);
             }
 
             return dependencies;
@@ -115,7 +116,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             leaderboard.Scores = null;
             leaderboard.FinishTransforms(true); // After setting scores, we may be waiting for transforms to expire drawables
 
-            leaderboard.Beatmap = beatmap;
+            leaderboard.BeatmapInfo = beatmapInfo;
             leaderboard.RefreshScores(); // Required in the case that the beatmap hasn't changed
         });
 
@@ -160,6 +161,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(dialogOverlay.ChildrenOfType<DialogButton>().First());
                 InputManager.Click(MouseButton.Left);
             });
+
+            AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
 
             AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scoreBeingDeleted.OnlineScoreID));
         }

@@ -215,8 +215,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Picker.Beatmap.ValueChanged += b =>
             {
-                Details.Beatmap = b.NewValue;
-                externalLink.Link = SelectServer(b.NewValue);
+                Details.BeatmapInfo = b.NewValue;
+                externalLink.Link = SelectServer(b.NewValue);;
             };
         }
 
@@ -228,7 +228,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     return $@"https:/osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
 
                 case false:
-                    return $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
+                    return $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
             }
         }
 

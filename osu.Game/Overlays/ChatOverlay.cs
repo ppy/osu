@@ -284,6 +284,10 @@ namespace osu.Game.Overlays
                     if (currentChannel.Value != e.NewValue)
                         return;
 
+                    // check once more to ensure the channel hasn't since been removed from the loaded channels list (may have been left by some automated means).
+                    if (!loadedChannels.Contains(loaded))
+                        return;
+
                     loading.Hide();
 
                     currentChannelContainer.Clear(false);
@@ -443,10 +447,9 @@ namespace osu.Game.Overlays
 
                         if (loaded != null)
                         {
-                            loadedChannels.Remove(loaded);
-
                             // Because the container is only cleared in the async load callback of a new channel, it is forcefully cleared
                             // to ensure that the previous channel doesn't get updated after it's disposed
+                            loadedChannels.Remove(loaded);
                             currentChannelContainer.Remove(loaded);
                             loaded.Dispose();
                         }

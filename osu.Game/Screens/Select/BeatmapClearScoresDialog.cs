@@ -17,9 +17,9 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
-        public BeatmapClearScoresDialog(BeatmapInfo beatmap, Action onCompletion)
+        public BeatmapClearScoresDialog(BeatmapInfo beatmapInfo, Action onCompletion)
         {
-            BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
+            BodyText = $@"{beatmapInfo.Metadata?.Artist} - {beatmapInfo.Metadata?.Title}";
             Icon = FontAwesome.Solid.Eraser;
             HeaderText = @"是否要清理所有本地成绩?";
             Buttons = new PopupDialogButton[]
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
                     Text = @"是的,抹除这些黑历史",
                     Action = () =>
                     {
-                        Task.Run(() => scoreManager.Delete(scoreManager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == beatmap.ID).ToList()))
+                        Task.Run(() => scoreManager.Delete(scoreManager.QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == beatmapInfo.ID).ToList()))
                             .ContinueWith(_ => onCompletion);
                     }
                 },

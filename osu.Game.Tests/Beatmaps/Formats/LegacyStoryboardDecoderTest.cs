@@ -149,5 +149,32 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[5]).LoopType);
             }
         }
+
+        [Test]
+        public void TestDecodeLoopCount()
+        {
+            // all loop sequences in loop-count.osb have a total duration of 2000ms (fade in 0->1000ms, fade out 1000->2000ms).
+            const double loop_duration = 2000;
+
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("loop-count.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+
+                // stable ensures that any loop command executes at least once, even if the loop count specified in the .osb is zero or negative.
+                StoryboardSprite zeroTimes = background.Elements.OfType<StoryboardSprite>().Single(s => s.Path == "zero-times.png");
+                Assert.That(zeroTimes.EndTime, Is.EqualTo(1000 + loop_duration));
+
+                StoryboardSprite oneTime = background.Elements.OfType<StoryboardSprite>().Single(s => s.Path == "one-time.png");
+                Assert.That(oneTime.EndTime, Is.EqualTo(4000 + loop_duration));
+
+                StoryboardSprite manyTimes = background.Elements.OfType<StoryboardSprite>().Single(s => s.Path == "many-times.png");
+                Assert.That(manyTimes.EndTime, Is.EqualTo(9000 + 40 * loop_duration));
+            }
+        }
     }
 }

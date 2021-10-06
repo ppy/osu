@@ -70,7 +70,7 @@ namespace osu.Game.Scoring.Legacy
                     scoreInfo.Mods = scoreInfo.Mods.Append(currentRuleset.CreateMod<ModClassic>()).ToArray();
 
                 currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
-                scoreInfo.Beatmap = currentBeatmap.BeatmapInfo;
+                scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
                 /* score.HpGraphString = */
                 sr.ReadString();
@@ -119,7 +119,7 @@ namespace osu.Game.Scoring.Legacy
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
-            score.ScoreInfo.Beatmap = workingBeatmap.BeatmapInfo;
+            score.ScoreInfo.BeatmapInfo = workingBeatmap.BeatmapInfo;
 
             return score;
         }

@@ -221,6 +221,8 @@ namespace osu.Game.Tests.Visual.Ranking
                 list.SelectedScore.Value = middleScore;
             });
 
+            AddUntilStep("wait for all scores to be visible", () => list.ChildrenOfType<ScorePanelTrackingContainer>().All(t => t.IsPresent));
+
             assertScoreState(highestScore, false);
             assertScoreState(middleScore, true);
             assertScoreState(lowestScore, false);

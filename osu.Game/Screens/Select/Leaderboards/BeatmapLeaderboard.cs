@@ -25,17 +25,17 @@ namespace osu.Game.Screens.Select.Leaderboards
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private BeatmapInfo beatmap;
+        private BeatmapInfo beatmapInfo;
 
-        public BeatmapInfo Beatmap
+        public BeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (beatmap == value)
+                if (beatmapInfo == value)
                     return;
 
-                beatmap = value;
+                beatmapInfo = value;
                 Scores = null;
 
                 UpdateScores();
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (score.NewValue.TryGetTarget(out var scoreInfo))
             {
-                if (Beatmap?.ID != scoreInfo.BeatmapInfoID)
+                if (BeatmapInfo?.ID != scoreInfo.BeatmapInfoID)
                     return;
             }
 
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             loadCancellationSource?.Cancel();
             loadCancellationSource = new CancellationTokenSource();
 
-            if (Beatmap == null)
+            if (BeatmapInfo == null)
             {
                 PlaceholderState = PlaceholderState.NoneSelected;
                 return null;
@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (Scope == BeatmapLeaderboardScope.Local)
             {
                 var scores = scoreManager
-                    .QueryScores(s => !s.DeletePending && s.Beatmap.ID == Beatmap.ID && s.Ruleset.ID == ruleset.Value.ID);
+                    .QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == BeatmapInfo.ID && s.Ruleset.ID == ruleset.Value.ID);
 
                 if (filterMods && !mods.Value.Any())
                 {
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (Beatmap.OnlineBeatmapID == null || Beatmap?.Status <= BeatmapSetOnlineStatus.Pending)
+            if (BeatmapInfo.OnlineBeatmapID == null || BeatmapInfo?.Status <= BeatmapSetOnlineStatus.Pending)
             {
                 PlaceholderState = PlaceholderState.Unavailable;
                 return null;
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            var req = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope, requestMods);
+            var req = new GetScoresRequest(BeatmapInfo, ruleset.Value ?? BeatmapInfo.Ruleset, Scope, requestMods);
 
             req.Success += r =>
             {

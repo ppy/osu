@@ -25,40 +25,40 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Hide a <see cref="BeatmapInfo"/> in the database.
         /// </summary>
-        /// <param name="beatmap">The beatmap to hide.</param>
+        /// <param name="beatmapInfo">The beatmap to hide.</param>
         /// <returns>Whether the beatmap's <see cref="BeatmapInfo.Hidden"/> was changed.</returns>
-        public bool Hide(BeatmapInfo beatmap)
+        public bool Hide(BeatmapInfo beatmapInfo)
         {
             using (ContextFactory.GetForWrite())
             {
-                Refresh(ref beatmap, Beatmaps);
+                Refresh(ref beatmapInfo, Beatmaps);
 
-                if (beatmap.Hidden) return false;
+                if (beatmapInfo.Hidden) return false;
 
-                beatmap.Hidden = true;
+                beatmapInfo.Hidden = true;
             }
 
-            BeatmapHidden?.Invoke(beatmap);
+            BeatmapHidden?.Invoke(beatmapInfo);
             return true;
         }
 
         /// <summary>
         /// Restore a previously hidden <see cref="BeatmapInfo"/>.
         /// </summary>
-        /// <param name="beatmap">The beatmap to restore.</param>
+        /// <param name="beatmapInfo">The beatmap to restore.</param>
         /// <returns>Whether the beatmap's <see cref="BeatmapInfo.Hidden"/> was changed.</returns>
-        public bool Restore(BeatmapInfo beatmap)
+        public bool Restore(BeatmapInfo beatmapInfo)
         {
             using (ContextFactory.GetForWrite())
             {
-                Refresh(ref beatmap, Beatmaps);
+                Refresh(ref beatmapInfo, Beatmaps);
 
-                if (!beatmap.Hidden) return false;
+                if (!beatmapInfo.Hidden) return false;
 
-                beatmap.Hidden = false;
+                beatmapInfo.Hidden = false;
             }
 
-            BeatmapRestored?.Invoke(beatmap);
+            BeatmapRestored?.Invoke(beatmapInfo);
             return true;
         }
 

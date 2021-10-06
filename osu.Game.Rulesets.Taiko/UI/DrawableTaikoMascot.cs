@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(TextureStore textures, GameplayBeatmap gameplayBeatmap)
+        private void load(TextureStore textures, GameplayState gameplayState)
         {
             InternalChildren = new[]
             {
@@ -49,8 +49,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                 animations[TaikoMascotAnimationState.Fail] = new TaikoMascotAnimation(TaikoMascotAnimationState.Fail),
             };
 
-            if (gameplayBeatmap != null)
-                ((IBindable<JudgementResult>)LastResult).BindTo(gameplayBeatmap.LastJudgementResult);
+            if (gameplayState != null)
+                ((IBindable<JudgementResult>)LastResult).BindTo(gameplayState.LastJudgementResult);
         }
 
         protected override void LoadComplete()
