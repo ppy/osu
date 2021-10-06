@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Utils;
 using System.Threading;
+using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -49,7 +50,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             if (!(original.Difficulty is TaikoMutliplierAppliedDifficulty))
             {
                 // Rewrite the beatmap info to add the slider velocity multiplier
-                original.BeatmapInfo = original.BeatmapInfo.Clone();
                 original.Difficulty = new TaikoMutliplierAppliedDifficulty(original.Difficulty);
             }
 
@@ -196,9 +196,30 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             public TaikoMutliplierAppliedDifficulty(IBeatmapDifficultyInfo difficulty)
             {
                 CopyFrom(difficulty);
-
-                SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
+
+            [UsedImplicitly]
+            public TaikoMutliplierAppliedDifficulty()
+            {
+            }
+
+            #region Overrides of BeatmapDifficulty
+
+            public override void CopyTo(BeatmapDifficulty other)
+            {
+                base.CopyTo(other);
+                if (!(other is TaikoMutliplierAppliedDifficulty))
+                    SliderMultiplier /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            }
+
+            public override void CopyFrom(IBeatmapDifficultyInfo other)
+            {
+                base.CopyFrom(other);
+                if (!(other is TaikoMutliplierAppliedDifficulty))
+                    SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            }
+
+            #endregion
         }
     }
 }
