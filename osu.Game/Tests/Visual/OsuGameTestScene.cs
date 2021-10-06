@@ -83,8 +83,17 @@ namespace osu.Game.Tests.Visual
         protected void PushAndConfirm(Func<Screen> newScreen)
         {
             Screen screen = null;
-            AddStep("Push new screen", () => Game.ScreenStack.Push(screen = newScreen()));
-            AddUntilStep("Wait for new screen", () => Game.ScreenStack.CurrentScreen == screen && screen.IsLoaded);
+            IScreen previousScreen = null;
+
+            AddStep("Push new screen", () =>
+            {
+                previousScreen = Game.ScreenStack.CurrentScreen;
+                Game.ScreenStack.Push(screen = newScreen());
+            });
+
+            AddUntilStep("Wait for new screen", () => screen.IsLoaded
+                                                      && Game.ScreenStack.CurrentScreen != previousScreen
+                                                      && previousScreen.GetChildScreen() == screen);
         }
 
         protected void ConfirmAtMainMenu() => AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu menu && menu.IsLoaded);
