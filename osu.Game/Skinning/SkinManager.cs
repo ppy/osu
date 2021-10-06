@@ -131,7 +131,7 @@ namespace osu.Game.Skinning
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
 
         private const string unknown_creator_string = "Unknown";
-        protected override string HumanisedModelName => "皮肤";
+        public override string HumanisedModelName => "皮肤";
 
         protected override bool HasCustomHashFunction => true;
 
@@ -208,7 +208,7 @@ namespace osu.Game.Skinning
                 Name = skin.SkinInfo.Name + " (modified)",
                 Creator = skin.SkinInfo.Creator,
                 InstantiationInfo = skin.SkinInfo.InstantiationInfo,
-            }).Result;
+            }).Result.Value;
         }
 
         public void Save(Skin skin)

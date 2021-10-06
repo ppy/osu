@@ -255,6 +255,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         private APIRequest getScoresRequest;
+        private ScheduledDelegate getScoresRequestCallback;
 
         protected abstract bool IsOnlineScope { get; }
 
@@ -282,13 +283,16 @@ namespace osu.Game.Online.Leaderboards
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
+            getScoresRequestCallback?.Cancel();
+            getScoresRequestCallback = null;
+
             pendingUpdateScores?.Cancel();
             pendingUpdateScores = Schedule(() =>
             {
                 PlaceholderState = PlaceholderState.Retrieving;
                 loading.Show();
 
-                getScoresRequest = FetchScores(scores => Schedule(() =>
+                getScoresRequest = FetchScores(scores => getScoresRequestCallback = Schedule(() =>
                 {
                     Scores = scores.ToArray();
                     PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
@@ -297,7 +301,7 @@ namespace osu.Game.Online.Leaderboards
                 if (getScoresRequest == null)
                     return;
 
-                getScoresRequest.Failure += e => Schedule(() =>
+                getScoresRequest.Failure += e => getScoresRequestCallback = Schedule(() =>
                 {
                     if (e is OperationCanceledException)
                         return;

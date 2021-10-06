@@ -215,7 +215,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Picker.Beatmap.ValueChanged += b =>
             {
-                Details.Beatmap = b.NewValue;
+                Details.BeatmapInfo = b.NewValue;
                 externalLink.Link = SelectServer(b.NewValue);
             };
         }
@@ -241,7 +241,7 @@ namespace osu.Game.Overlays.BeatmapSet
             mfconfig.BindWith(MSetting.UseSayobot, useSayobot);
             useSayobot.ValueChanged += _ =>
             {
-                externalLink.Link = SelectServer(Details.Beatmap);
+                externalLink.Link = SelectServer(Details.BeatmapInfo);
             };
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
             onlineStatusPill.BackgroundColour = colourProvider.Background6;

@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Legacy;
 using osu.Game.Overlays.Notifications;
@@ -27,7 +28,7 @@ namespace osu.Game.Collections
     /// This is currently reading and writing from the osu-stable file format. This is a temporary arrangement until we refactor the
     /// database backing the game. Going forward writing should be done in a similar way to other model stores.
     /// </remarks>
-    public class CollectionManager : Component
+    public class CollectionManager : Component, IPostNotifications
     {
         /// <summary>
         /// Database version in stable-compatible YYYYMMDD format.
@@ -106,9 +107,6 @@ namespace osu.Game.Collections
             backgroundSave();
         });
 
-        /// <summary>
-        /// Set an endpoint for notifications to be posted to.
-        /// </summary>
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>

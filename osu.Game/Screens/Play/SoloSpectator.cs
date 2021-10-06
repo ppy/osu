@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
         /// The player's immediate online gameplay state.
         /// This doesn't always reflect the gameplay state being watched.
         /// </summary>
-        private GameplayState immediateGameplayState;
+        private SpectatorGameplayState immediateSpectatorGameplayState;
 
         private GetBeatmapSetRequest onlineBeatmapRequest;
 
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Play
                                 Width = 250,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Action = () => scheduleStart(immediateGameplayState),
+                                Action = () => scheduleStart(immediateSpectatorGameplayState),
                                 Enabled = { Value = false }
                             }
                         }
@@ -171,18 +171,18 @@ namespace osu.Game.Screens.Play
             showBeatmapPanel(spectatorState);
         }
 
-        protected override void StartGameplay(int userId, GameplayState gameplayState)
+        protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState)
         {
-            immediateGameplayState = gameplayState;
+            immediateSpectatorGameplayState = spectatorGameplayState;
             watchButton.Enabled.Value = true;
 
-            scheduleStart(gameplayState);
+            scheduleStart(spectatorGameplayState);
         }
 
         protected override void EndGameplay(int userId)
         {
             scheduledStart?.Cancel();
-            immediateGameplayState = null;
+            immediateSpectatorGameplayState = null;
             watchButton.Enabled.Value = false;
 
             clearDisplay();
@@ -198,7 +198,7 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate scheduledStart;
 
-        private void scheduleStart(GameplayState gameplayState)
+        private void scheduleStart(SpectatorGameplayState spectatorGameplayState)
         {
             // This function may be called multiple times in quick succession once the screen becomes current again.
             scheduledStart?.Cancel();
@@ -207,15 +207,15 @@ namespace osu.Game.Screens.Play
                 if (this.IsCurrentScreen())
                     start();
                 else
-                    scheduleStart(gameplayState);
+                    scheduleStart(spectatorGameplayState);
             });
 
             void start()
             {
-                Beatmap.Value = gameplayState.Beatmap;
-                Ruleset.Value = gameplayState.Ruleset.RulesetInfo;
+                Beatmap.Value = spectatorGameplayState.Beatmap;
+                Ruleset.Value = spectatorGameplayState.Ruleset.RulesetInfo;
 
-                this.Push(new SpectatorPlayerLoader(gameplayState.Score, () => new SoloSpectatorPlayer(gameplayState.Score)));
+                this.Push(new SpectatorPlayerLoader(spectatorGameplayState.Score, () => new SoloSpectatorPlayer(spectatorGameplayState.Score)));
             }
         }
 
@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Play
             if (beatmaps.IsAvailableLocally(onlineBeatmap))
                 return;
 
-            beatmaps.Download(onlineBeatmap, useSayobot.Value);
+            beatmaps.Download(onlineBeatmap, false, useSayobot.Value);
         }
 
         public override bool OnExiting(IScreen next)

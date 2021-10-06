@@ -140,15 +140,15 @@ namespace osu.Desktop
             switch (activity)
             {
                 case UserActivity.InMvis mvis:
-                    return (mvis.Beatmap.Metadata.ArtistUnicode ?? mvis.Beatmap.Metadata.Artist)
+                    return (mvis.BeatmapInfo.Metadata.ArtistUnicode ?? mvis.BeatmapInfo.Metadata.Artist)
                            + " - "
-                           + (mvis.Beatmap.Metadata.TitleUnicode ?? mvis.Beatmap.Metadata.Title);
+                           + (mvis.BeatmapInfo.Metadata.TitleUnicode ?? mvis.BeatmapInfo.Metadata.Title);
 
                 case UserActivity.InGame game:
-                    return game.Beatmap.ToString();
+                    return game.BeatmapInfo.ToString();
 
                 case UserActivity.Editing edit:
-                    return edit.Beatmap.ToString();
+                    return edit.BeatmapInfo.ToString();
 
                 case UserActivity.InLobby lobby:
                     return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;

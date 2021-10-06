@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "在各方面都难一点...";
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModDifficultyAdjust) };
 
-        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
+        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
         {
         }
 

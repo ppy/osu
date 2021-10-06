@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 accuracyColumn.Text = value.DisplayAccuracy;
                 maxComboColumn.Text = value.MaxCombo.ToLocalisableString(@"0\x");
 
-                ppColumn.Alpha = value.Beatmap?.Status.GrantsPerformancePoints() == true ? 1 : 0;
+                ppColumn.Alpha = value.BeatmapInfo?.Status.GrantsPerformancePoints() == true ? 1 : 0;
                 ppColumn.Text = value.PP?.ToLocalisableString(@"N0");
 
                 statisticsColumns.ChildrenEnumerable = value.GetStatisticsForDisplay().Select(createStatisticsColumn);
