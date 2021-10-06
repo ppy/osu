@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play.HUD
                 clonedMods = gameplayState.Mods.Select(m => m.DeepClone()).ToArray();
 
                 var gameplayWorkingBeatmap = new GameplayWorkingBeatmap(gameplayState.Beatmap);
-                difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, gameplayState.Mods.Select(m => m.DeepClone()).ToArray(), loadCancellationSource.Token)
+                difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, clonedMods, loadCancellationSource.Token)
                                .ContinueWith(r => Schedule(() =>
                                {
                                    timedAttributes = r.Result;
