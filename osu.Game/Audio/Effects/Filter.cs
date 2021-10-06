@@ -118,7 +118,9 @@ namespace osu.Game.Audio.Effects
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            detachFilter();
+
+            if (mixer.Effects.Contains(filter))
+                detachFilter();
         }
     }
 }
