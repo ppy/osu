@@ -19,6 +19,11 @@ namespace osu.Game.Rulesets.Scoring
         public event Action<JudgementResult> NewJudgement;
 
         /// <summary>
+        /// Invoked when a judgement is reverted, usually due to rewinding gameplay.
+        /// </summary>
+        public event Action<JudgementResult> JudgementReverted;
+
+        /// <summary>
         /// The maximum number of hits that can be judged.
         /// </summary>
         protected int MaxHits { get; private set; }
@@ -71,6 +76,8 @@ namespace osu.Game.Rulesets.Scoring
             JudgedHits--;
 
             RevertResultInternal(result);
+
+            JudgementReverted?.Invoke(result);
         }
 
         /// <summary>
