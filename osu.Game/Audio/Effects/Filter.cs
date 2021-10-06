@@ -10,7 +10,7 @@ namespace osu.Game.Audio.Effects
 {
     public class Filter : Component, ITransformableFilter
     {
-        public readonly int MaxCutoff;
+        public readonly int MaxCutoff = 22049; // nyquist - 1hz
         private readonly AudioMixer mixer;
         private readonly BQFParameters filter;
         private readonly BQFType type;
@@ -18,36 +18,29 @@ namespace osu.Game.Audio.Effects
         public BindableNumber<int> Cutoff { get; }
 
         /// <summary>
-        /// A BiQuad filter that performs a filter-sweep when toggled on or off.
+        /// A Component that implements a BASS FX BiQuad Filter Effect.
         /// </summary>
-        /// <param name="mixer">The mixer this effect should be attached to.</param>
+        /// <param name="mixer">The mixer this effect should be applied to.</param>
         /// <param name="type">The type of filter (e.g. LowPass, HighPass, etc)</param>
         public Filter(AudioMixer mixer, BQFType type = BQFType.LowPass)
         {
             this.mixer = mixer;
             this.type = type;
 
-            var initialCutoff = 1;
+            int initialCutoff;
 
-            // These max cutoff values are a work-around for BASS' BiQuad filters behaving weirdly when approaching nyquist.
-            // Note that these values assume a sample rate of 44100 (as per BassAudioMixer in osu.Framework)
-            // See also https://www.un4seen.com/forum/?topic=19542.0 for more information.
             switch (type)
             {
                 case BQFType.HighPass:
-                    MaxCutoff = 21968; // beyond this value, the high-pass cuts out
+                    initialCutoff = 1;
                     break;
 
                 case BQFType.LowPass:
-                    MaxCutoff = initialCutoff = 14000; // beyond (roughly) this value, the low-pass filter audibly wraps/reflects
-                    break;
-
-                case BQFType.BandPass:
-                    MaxCutoff = 16000; // beyond (roughly) this value, the band-pass filter audibly wraps/reflects
+                    initialCutoff = MaxCutoff;
                     break;
 
                 default:
-                    MaxCutoff = 22050; // default to nyquist for other filter types, TODO: handle quirks of other filter types
+                    initialCutoff = 500; // A default that should ensure audio remains audible for other filters.
                     break;
             }
 
@@ -59,11 +52,12 @@ namespace osu.Game.Audio.Effects
             filter = new BQFParameters
             {
                 lFilter = type,
-                fCenter = initialCutoff
+                fCenter = initialCutoff,
+                fBandwidth = 0,
+                fQ = 0.7f // This allows fCenter to go up to 22049hz (nyquist - 1hz) without overflowing and causing weird filter behaviour (see: https://www.un4seen.com/forum/?topic=19542.0)
             };
 
             attachFilter();
-
             Cutoff.ValueChanged += updateFilter;
             Cutoff.Value = initialCutoff;
         }
@@ -74,9 +68,7 @@ namespace osu.Game.Audio.Effects
 
         private void updateFilter(ValueChangedEvent<int> cutoff)
         {
-            // This is another workaround for quirks in BASS' BiQuad filters.
-            // Because the cutoff can't be set above ~14khz (i.e. outside of human hearing range) without the aforementioned wrapping/reflecting quirk occuring, we instead
-            // remove the effect from the mixer when the cutoff is at maximum so that a LowPass filter isn't always attenuating high frequencies just by existing.
+            // Workaround for weird behaviour when rapidly setting fCenter of a low-pass filter to nyquist - 1hz.
             if (type == BQFType.LowPass)
             {
                 if (cutoff.NewValue >= MaxCutoff)
@@ -86,6 +78,19 @@ namespace osu.Game.Audio.Effects
                 }
 
                 if (cutoff.OldValue >= MaxCutoff && cutoff.NewValue < MaxCutoff)
+                    attachFilter();
+            }
+
+            // Workaround for weird behaviour when rapidly setting fCenter of a high-pass filter to 1hz.
+            if (type == BQFType.HighPass)
+            {
+                if (cutoff.NewValue <= 1)
+                {
+                    detachFilter();
+                    return;
+                }
+
+                if (cutoff.OldValue <= 1 && cutoff.NewValue > 1)
                     attachFilter();
             }
 
