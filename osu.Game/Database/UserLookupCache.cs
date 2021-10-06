@@ -115,7 +115,7 @@ namespace osu.Game.Database
                     createNewTask();
             }
 
-            List<User> foundUsers = request.Result?.Users;
+            List<User> foundUsers = request.Response?.Users;
 
             if (foundUsers != null)
             {
