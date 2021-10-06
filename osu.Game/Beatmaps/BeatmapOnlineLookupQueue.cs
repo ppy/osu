@@ -78,7 +78,7 @@ namespace osu.Game.Beatmaps
                 // intentionally blocking to limit web request concurrency
                 api.Perform(req);
 
-                var res = req.Result;
+                var res = req.Response;
 
                 if (res != null)
                 {
