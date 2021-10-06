@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps
                 difficulty = value;
 
                 if (beatmapInfo != null)
-                    beatmapInfo.BaseDifficulty = new BeatmapDifficulty(difficulty);
+                    beatmapInfo.BaseDifficulty = difficulty.Clone();
             }
         }
 
@@ -41,8 +41,8 @@ namespace osu.Game.Beatmaps
             {
                 beatmapInfo = value;
 
-                if (beatmapInfo != null)
-                    Difficulty = new BeatmapDifficulty(beatmapInfo.BaseDifficulty);
+                if (beatmapInfo?.BaseDifficulty != null)
+                    Difficulty = beatmapInfo.BaseDifficulty.Clone();
             }
         }
 
