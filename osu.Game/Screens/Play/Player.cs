@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -61,6 +62,8 @@ namespace osu.Game.Screens.Play
         private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
 
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
+        private Filter lpFilter;
 
         /// <summary>
         /// Whether gameplay should pause when the game window focus is lost.
@@ -227,6 +230,7 @@ namespace osu.Game.Screens.Play
 
             AddInternal(GameplayBeatmap = new GameplayBeatmap(playableBeatmap));
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
+            AddInternal(lpFilter = new Filter(audio.TrackMixer));
 
             dependencies.CacheAs(GameplayBeatmap);
 
@@ -788,6 +792,7 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
+            lpFilter.CutoffTo(300, 2500, Easing.OutCubic);
             failAnimation.Start();
 
             if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
@@ -800,6 +805,7 @@ namespace osu.Game.Screens.Play
         private void onFailComplete()
         {
             GameplayClockContainer.Stop();
+            lpFilter.CutoffTo(lpFilter.MaxCutoff);
 
             FailOverlay.Retries = RestartCount;
             FailOverlay.Show();
