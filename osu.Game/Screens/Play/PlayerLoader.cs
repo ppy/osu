@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Audio.Effects;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -62,6 +63,8 @@ namespace osu.Game.Screens.Play
         private bool backgroundBrightnessReduction;
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
+
+        private Filter lpFilter;
 
         protected bool BackgroundBrightnessReduction
         {
@@ -127,7 +130,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics)
+        private void load(SessionStatics sessionStatics, AudioManager audio)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
@@ -159,7 +162,8 @@ namespace osu.Game.Screens.Play
                         new InputSettings()
                     }
                 },
-                idleTracker = new IdleTracker(750)
+                idleTracker = new IdleTracker(750),
+                lpFilter = new Filter(audio.TrackMixer)
             });
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
@@ -191,6 +195,7 @@ namespace osu.Game.Screens.Play
                     epilepsyWarning.DimmableBackground = b;
             });
 
+            lpFilter.CutoffTo(500, 100, Easing.OutCubic);
             Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             content.ScaleTo(0.7f);
@@ -229,6 +234,7 @@ namespace osu.Game.Screens.Play
             // stop the track before removing adjustment to avoid a volume spike.
             Beatmap.Value.Track.Stop();
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
+            lpFilter.CutoffTo(lpFilter.MaxCutoff);
         }
 
         public override bool OnExiting(IScreen next)
@@ -242,6 +248,7 @@ namespace osu.Game.Screens.Play
 
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
+            lpFilter.CutoffTo(lpFilter.MaxCutoff, 100, Easing.InCubic);
 
             return base.OnExiting(next);
         }
