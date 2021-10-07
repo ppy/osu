@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Menus
         }
 
         [Test]
-        public void TestPlayIntro()
+        public virtual void TestPlayIntro()
         {
             AddStep("restart sequence", () =>
             {
