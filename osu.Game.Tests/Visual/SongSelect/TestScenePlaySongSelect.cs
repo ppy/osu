@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select next and enter", () =>
             {
                 InputManager.MoveMouseTo(songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
-                                                   .First(b => ((CarouselBeatmap)b.Item).Beatmap != songSelect.Carousel.SelectedBeatmap));
+                                                   .First(b => ((CarouselBeatmap)b.Item).BeatmapInfo != songSelect.Carousel.SelectedBeatmapInfo));
 
                 InputManager.Click(MouseButton.Left);
 
@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select next and enter", () =>
             {
                 InputManager.MoveMouseTo(songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
-                                                   .First(b => ((CarouselBeatmap)b.Item).Beatmap != songSelect.Carousel.SelectedBeatmap));
+                                                   .First(b => ((CarouselBeatmap)b.Item).BeatmapInfo != songSelect.Carousel.SelectedBeatmapInfo));
 
                 InputManager.PressButton(MouseButton.Left);
 
@@ -312,7 +312,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
             addRulesetImportStep(2);
-            AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmap == null);
+            AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmapInfo == null);
         }
 
         [Test]
@@ -322,13 +322,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             changeRuleset(2);
             addRulesetImportStep(2);
             addRulesetImportStep(1);
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.RulesetID == 2);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.RulesetID == 2);
 
             changeRuleset(1);
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.RulesetID == 1);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.RulesetID == 1);
 
             changeRuleset(0);
-            AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmap == null);
+            AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmapInfo == null);
         }
 
         [Test]
@@ -338,7 +338,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             changeRuleset(2);
 
             addRulesetImportStep(2);
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.RulesetID == 2);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.RulesetID == 2);
 
             addRulesetImportStep(0);
             addRulesetImportStep(0);
@@ -355,7 +355,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
             });
 
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.Equals(target));
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.Equals(target));
 
             // this is an important check, to make sure updateComponentFromBeatmap() was actually run
             AddUntilStep("selection shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap.BeatmapInfo.Equals(target));
@@ -368,7 +368,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             changeRuleset(2);
 
             addRulesetImportStep(2);
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.RulesetID == 2);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.RulesetID == 2);
 
             addRulesetImportStep(0);
             addRulesetImportStep(0);
@@ -385,7 +385,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == 0);
             });
 
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.Equals(target));
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.Equals(target));
 
             AddUntilStep("has correct ruleset", () => Ruleset.Value.ID == 0);
 
@@ -444,7 +444,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
             addManyTestMaps();
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo != null);
 
             bool startRequested = false;
 
@@ -473,13 +473,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             // used for filter check below
             AddStep("allow convert display", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
 
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo != null);
 
             AddStep("set filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
 
             AddUntilStep("dummy selected", () => Beatmap.Value is DummyWorkingBeatmap);
 
-            AddUntilStep("has no selection", () => songSelect.Carousel.SelectedBeatmap == null);
+            AddUntilStep("has no selection", () => songSelect.Carousel.SelectedBeatmapInfo == null);
 
             BeatmapInfo target = null;
 
@@ -494,7 +494,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
             });
 
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo != null);
 
             AddAssert("selected only shows expected ruleset (plus converts)", () =>
             {
@@ -502,16 +502,16 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 // special case for converts checked here.
                 return selectedPanel.ChildrenOfType<FilterableDifficultyIcon>().All(i =>
-                    i.IsFiltered || i.Item.Beatmap.Ruleset.ID == targetRuleset || i.Item.Beatmap.Ruleset.ID == 0);
+                    i.IsFiltered || i.Item.BeatmapInfo.Ruleset.ID == targetRuleset || i.Item.BeatmapInfo.Ruleset.ID == 0);
             });
 
-            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmap?.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmapInfo?.OnlineBeatmapID == target.OnlineBeatmapID);
             AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
 
             AddStep("reset filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = string.Empty);
 
             AddAssert("game still correct", () => Beatmap.Value?.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
-            AddAssert("carousel still correct", () => songSelect.Carousel.SelectedBeatmap.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddAssert("carousel still correct", () => songSelect.Carousel.SelectedBeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
         }
 
         [Test]
@@ -522,13 +522,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             changeRuleset(0);
 
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo != null);
 
             AddStep("set filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
 
             AddUntilStep("dummy selected", () => Beatmap.Value is DummyWorkingBeatmap);
 
-            AddUntilStep("has no selection", () => songSelect.Carousel.SelectedBeatmap == null);
+            AddUntilStep("has no selection", () => songSelect.Carousel.SelectedBeatmapInfo == null);
 
             BeatmapInfo target = null;
 
@@ -540,15 +540,15 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
             });
 
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo != null);
 
-            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmap?.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmapInfo?.OnlineBeatmapID == target.OnlineBeatmapID);
             AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
 
             AddStep("set filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nononoo");
 
             AddUntilStep("game lost selection", () => Beatmap.Value is DummyWorkingBeatmap);
-            AddAssert("carousel lost selection", () => songSelect.Carousel.SelectedBeatmap == null);
+            AddAssert("carousel lost selection", () => songSelect.Carousel.SelectedBeatmapInfo == null);
         }
 
         [Test]
@@ -581,9 +581,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             createSongSelect();
             addRulesetImportStep(0);
             AddStep("Move to last difficulty", () => songSelect.Carousel.SelectBeatmap(songSelect.Carousel.BeatmapSets.First().Beatmaps.Last()));
-            AddStep("Store current ID", () => previousID = songSelect.Carousel.SelectedBeatmap.ID);
+            AddStep("Store current ID", () => previousID = songSelect.Carousel.SelectedBeatmapInfo.ID);
             AddStep("Hide first beatmap", () => manager.Hide(songSelect.Carousel.SelectedBeatmapSet.Beatmaps.First()));
-            AddAssert("Selected beatmap has not changed", () => songSelect.Carousel.SelectedBeatmap.ID == previousID);
+            AddAssert("Selected beatmap has not changed", () => songSelect.Carousel.SelectedBeatmapInfo.ID == previousID);
         }
 
         [Test]
@@ -641,7 +641,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("Selected beatmap correct", () => songSelect.Carousel.SelectedBeatmap == filteredBeatmap);
+            AddAssert("Selected beatmap correct", () => songSelect.Carousel.SelectedBeatmapInfo == filteredBeatmap);
         }
 
         [Test]
@@ -714,10 +714,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             FilterableDifficultyIcon difficultyIcon = null;
-            AddStep("Find an icon for different ruleset", () =>
+            AddUntilStep("Find an icon for different ruleset", () =>
             {
                 difficultyIcon = set.ChildrenOfType<FilterableDifficultyIcon>()
-                                    .First(icon => icon.Item.Beatmap.Ruleset.ID == 3);
+                                    .FirstOrDefault(icon => icon.Item.BeatmapInfo.Ruleset.ID == 3);
+                return difficultyIcon != null;
             });
 
             AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
@@ -735,7 +736,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
 
-            AddAssert("Selected beatmap still same set", () => songSelect.Carousel.SelectedBeatmap.BeatmapSet.ID == previousSetID);
+            AddAssert("Selected beatmap still same set", () => songSelect.Carousel.SelectedBeatmapInfo.BeatmapSet.ID == previousSetID);
             AddAssert("Selected beatmap is mania", () => Beatmap.Value.BeatmapInfo.Ruleset.ID == 3);
         }
 
@@ -751,7 +752,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("import huge difficulty count map", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
-                imported = manager.Import(createTestBeatmapSet(usableRulesets, 50)).Result;
+                imported = manager.Import(createTestBeatmapSet(usableRulesets, 50)).Result.Value;
             });
 
             AddStep("select the first beatmap of import", () => Beatmap.Value = manager.GetWorkingBeatmap(imported.Beatmaps.First()));
@@ -767,7 +768,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Find group icon for different ruleset", () =>
             {
                 groupIcon = set.ChildrenOfType<FilterableGroupedDifficultyIcon>()
-                               .First(icon => icon.Items.First().Beatmap.Ruleset.ID == 3);
+                               .First(icon => icon.Items.First().BeatmapInfo.Ruleset.ID == 3);
             });
 
             AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
@@ -781,7 +782,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
 
-            AddAssert("Check first item in group selected", () => Beatmap.Value.BeatmapInfo.Equals(groupIcon.Items.First().Beatmap));
+            AddAssert("Check first item in group selected", () => Beatmap.Value.BeatmapInfo.Equals(groupIcon.Items.First().BeatmapInfo));
         }
 
         [Test]
@@ -805,7 +806,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 songSelect.PresentScore(new ScoreInfo
                 {
                     User = new User { Username = "woo" },
-                    Beatmap = getPresentBeatmap(),
+                    BeatmapInfo = getPresentBeatmap(),
                     Ruleset = getPresentBeatmap().Ruleset
                 });
             });
@@ -837,7 +838,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 songSelect.PresentScore(new ScoreInfo
                 {
                     User = new User { Username = "woo" },
-                    Beatmap = getPresentBeatmap(),
+                    BeatmapInfo = getPresentBeatmap(),
                     Ruleset = getPresentBeatmap().Ruleset
                 });
             });
@@ -856,7 +857,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private int getBeatmapIndex(BeatmapSetInfo set, BeatmapInfo info) => set.Beatmaps.FindIndex(b => b == info);
 
-        private int getCurrentBeatmapIndex() => getBeatmapIndex(songSelect.Carousel.SelectedBeatmapSet, songSelect.Carousel.SelectedBeatmap);
+        private int getCurrentBeatmapIndex() => getBeatmapIndex(songSelect.Carousel.SelectedBeatmapSet, songSelect.Carousel.SelectedBeatmapInfo);
 
         private int getDifficultyIconIndex(DrawableCarouselBeatmapSet set, FilterableDifficultyIcon icon)
         {

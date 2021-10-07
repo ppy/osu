@@ -11,7 +11,7 @@ namespace osu.Game.Database
     /// Represents a <see cref="IModelManager{TModel}"/> that can download new models from an external source.
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
-    public interface IModelDownloader<TModel> : IModelManager<TModel>
+    public interface IModelDownloader<TModel> : IPostNotifications
         where TModel : class
     {
         /// <summary>
@@ -25,13 +25,6 @@ namespace osu.Game.Database
         /// This is NOT run on the update thread and should be scheduled.
         /// </summary>
         IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadFailed { get; }
-
-        /// <summary>
-        /// Checks whether a given <typeparamref name="TModel"/> is already available in the local store.
-        /// </summary>
-        /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
-        /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
-        bool IsAvailableLocally(TModel model);
 
         /// <summary>
         /// Begin a download for the requested <typeparamref name="TModel"/>.

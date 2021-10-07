@@ -81,7 +81,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
+        public virtual IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
         {
             using (var cancellationSource = createCancellationTokenSource(timeout))
             {
@@ -119,15 +119,12 @@ namespace osu.Game.Beatmaps
                 // Apply difficulty mods
                 if (mods.Any(m => m is IApplicableToDifficulty))
                 {
-                    converted.BeatmapInfo = converted.BeatmapInfo.Clone();
-                    converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
-
                     foreach (var mod in mods.OfType<IApplicableToDifficulty>())
                     {
                         if (cancellationSource.IsCancellationRequested)
                             throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
-                        mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+                        mod.ApplyToDifficulty(converted.Difficulty);
                     }
                 }
 
@@ -146,7 +143,7 @@ namespace osu.Game.Beatmaps
                         if (cancellationSource.IsCancellationRequested)
                             throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
-                        obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty, cancellationSource.Token);
+                        obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, cancellationSource.Token);
                     }
                 }
                 catch (OperationCanceledException)

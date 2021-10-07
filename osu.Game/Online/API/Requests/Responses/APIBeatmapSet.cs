@@ -116,7 +116,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             beatmapSet.Beatmaps = beatmaps?.Select(b =>
             {
-                var beatmap = b.ToBeatmap(rulesets);
+                var beatmap = b.ToBeatmapInfo(rulesets);
                 beatmap.BeatmapSet = beatmapSet;
                 beatmap.Metadata = beatmapSet.Metadata;
                 return beatmap;

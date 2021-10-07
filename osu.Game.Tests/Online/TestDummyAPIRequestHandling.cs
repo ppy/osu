@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Online
 
             AddAssert("response event fired", () => response != null);
 
-            AddAssert("request has response", () => request.Result == response);
+            AddAssert("request has response", () => request.Response == response);
         }
 
         [Test]

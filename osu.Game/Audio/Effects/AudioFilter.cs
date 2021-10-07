@@ -9,13 +9,21 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Audio.Effects
 {
-    public class Filter : Component, ITransformableFilter
+    public class AudioFilter : Component, ITransformableFilter
     {
-        public readonly int MaxCutoff = 22049; // nyquist - 1hz
+        /// <summary>
+        /// The maximum cutoff frequency that can be used with a low-pass filter.
+        /// This is equal to nyquist - 1hz.
+        /// </summary>
+        public const int MAX_LOWPASS_CUTOFF = 22049; // nyquist - 1hz
+
         private readonly AudioMixer mixer;
         private readonly BQFParameters filter;
         private readonly BQFType type;
 
+        /// <summary>
+        /// The current cutoff of this filter.
+        /// </summary>
         public BindableNumber<int> Cutoff { get; }
 
         /// <summary>
@@ -23,7 +31,7 @@ namespace osu.Game.Audio.Effects
         /// </summary>
         /// <param name="mixer">The mixer this effect should be applied to.</param>
         /// <param name="type">The type of filter (e.g. LowPass, HighPass, etc)</param>
-        public Filter(AudioMixer mixer, BQFType type = BQFType.LowPass)
+        public AudioFilter(AudioMixer mixer, BQFType type = BQFType.LowPass)
         {
             this.mixer = mixer;
             this.type = type;
@@ -37,7 +45,7 @@ namespace osu.Game.Audio.Effects
                     break;
 
                 case BQFType.LowPass:
-                    initialCutoff = MaxCutoff;
+                    initialCutoff = MAX_LOWPASS_CUTOFF;
                     break;
 
                 default:
@@ -48,8 +56,9 @@ namespace osu.Game.Audio.Effects
             Cutoff = new BindableNumber<int>(initialCutoff)
             {
                 MinValue = 1,
-                MaxValue = MaxCutoff
+                MaxValue = MAX_LOWPASS_CUTOFF
             };
+
             filter = new BQFParameters
             {
                 lFilter = type,
@@ -82,13 +91,13 @@ namespace osu.Game.Audio.Effects
             // Workaround for weird behaviour when rapidly setting fCenter of a low-pass filter to nyquist - 1hz.
             if (type == BQFType.LowPass)
             {
-                if (cutoff.NewValue >= MaxCutoff)
+                if (cutoff.NewValue >= MAX_LOWPASS_CUTOFF)
                 {
                     detachFilter();
                     return;
                 }
 
-                if (cutoff.OldValue >= MaxCutoff && cutoff.NewValue < MaxCutoff)
+                if (cutoff.OldValue >= MAX_LOWPASS_CUTOFF && cutoff.NewValue < MAX_LOWPASS_CUTOFF)
                     attachFilter();
             }
 
@@ -108,11 +117,13 @@ namespace osu.Game.Audio.Effects
             var filterIndex = mixer.Effects.IndexOf(filter);
             if (filterIndex < 0) return;
 
-            var existingFilter = mixer.Effects[filterIndex] as BQFParameters;
-            if (existingFilter == null) return;
+            if (mixer.Effects[filterIndex] is BQFParameters existingFilter)
+            {
+                existingFilter.fCenter = cutoff.NewValue;
 
-            existingFilter.fCenter = cutoff.NewValue;
-            mixer.Effects[filterIndex] = existingFilter;
+                // required to update effect with new parameters.
+                mixer.Effects[filterIndex] = existingFilter;
+            }
         }
 
         protected override void Dispose(bool isDisposing)
