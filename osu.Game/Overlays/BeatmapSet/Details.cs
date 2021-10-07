@@ -37,16 +37,16 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private BeatmapInfo beatmap;
+        private BeatmapInfo beatmapInfo;
 
-        public BeatmapInfo Beatmap
+        public BeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (value == beatmap) return;
+                if (value == beatmapInfo) return;
 
-                basic.Beatmap = advanced.Beatmap = beatmap = value;
+                basic.BeatmapInfo = advanced.BeatmapInfo = beatmapInfo = value;
             }
         }
 

@@ -58,10 +58,10 @@ namespace osu.Game.Tests.Visual.Online
             var firstBeatmap = createBeatmap();
             var secondBeatmap = createBeatmap();
 
-            AddStep("set first set", () => successRate.Beatmap = firstBeatmap);
+            AddStep("set first set", () => successRate.BeatmapInfo = firstBeatmap);
             AddAssert("ratings set", () => successRate.Graph.Metrics == firstBeatmap.Metrics);
 
-            AddStep("set second set", () => successRate.Beatmap = secondBeatmap);
+            AddStep("set second set", () => successRate.BeatmapInfo = secondBeatmap);
             AddAssert("ratings set", () => successRate.Graph.Metrics == secondBeatmap.Metrics);
 
             static BeatmapInfo createBeatmap() => new BeatmapInfo
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOnlyFailMetrics()
         {
-            AddStep("set beatmap", () => successRate.Beatmap = new BeatmapInfo
+            AddStep("set beatmap", () => successRate.BeatmapInfo = new BeatmapInfo
             {
                 Metrics = new BeatmapMetrics
                 {
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestEmptyMetrics()
         {
-            AddStep("set beatmap", () => successRate.Beatmap = new BeatmapInfo
+            AddStep("set beatmap", () => successRate.BeatmapInfo = new BeatmapInfo
             {
                 Metrics = new BeatmapMetrics()
             });

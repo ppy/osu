@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Users;
@@ -54,6 +55,11 @@ namespace osu.Game.Online.API
         /// The root URL of of the website, excluding the trailing slash.
         /// </summary>
         string WebsiteRootUrl { get; }
+
+        /// <summary>
+        /// The last login error that occurred, if any.
+        /// </summary>
+        Exception? LastLoginError { get; }
 
         /// <summary>
         /// The current connection state of the API.

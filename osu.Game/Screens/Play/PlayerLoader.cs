@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
 
-        private Filter lpFilter;
+        private AudioFilter lowPassFilter;
 
         protected bool BackgroundBrightnessReduction
         {
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 idleTracker = new IdleTracker(750),
-                lpFilter = new Filter(audio.TrackMixer)
+                lowPassFilter = new AudioFilter(audio.TrackMixer)
             });
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
@@ -195,7 +195,7 @@ namespace osu.Game.Screens.Play
                     epilepsyWarning.DimmableBackground = b;
             });
 
-            lpFilter.CutoffTo(500, 100, Easing.OutCubic);
+            lowPassFilter.CutoffTo(500, 100, Easing.OutCubic);
             Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             content.ScaleTo(0.7f);
@@ -234,7 +234,7 @@ namespace osu.Game.Screens.Play
             // stop the track before removing adjustment to avoid a volume spike.
             Beatmap.Value.Track.Stop();
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
-            lpFilter.CutoffTo(lpFilter.MaxCutoff);
+            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
         }
 
         public override bool OnExiting(IScreen next)
@@ -248,7 +248,7 @@ namespace osu.Game.Screens.Play
 
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
-            lpFilter.CutoffTo(lpFilter.MaxCutoff, 100, Easing.InCubic);
+            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
 
             return base.OnExiting(next);
         }

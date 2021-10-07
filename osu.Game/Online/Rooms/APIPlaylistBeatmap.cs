@@ -13,9 +13,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("checksum")]
         public string Checksum { get; set; }
 
-        public override BeatmapInfo ToBeatmap(RulesetStore rulesets)
+        public override BeatmapInfo ToBeatmapInfo(RulesetStore rulesets)
         {
-            var b = base.ToBeatmap(rulesets);
+            var b = base.ToBeatmapInfo(rulesets);
             b.MD5Hash = Checksum;
             return b;
         }
