@@ -22,10 +22,8 @@ using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.IO;
 
 namespace osu.Desktop
@@ -34,7 +32,6 @@ namespace osu.Desktop
     {
         private readonly bool noVersionOverlay;
         private VersionManager versionManager;
-        private TextEditIndicator textEditIndicator;
         private DBusManagerContainer dBusManagerContainer;
 
         public OsuGameDesktop(string[] args = null)
@@ -119,8 +116,6 @@ namespace osu.Desktop
             if (!noVersionOverlay)
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
-            LoadComponentAsync(textEditIndicator = new TextEditIndicator { Depth = int.MinValue }, Add);
-
             LoadComponentAsync(new DiscordRichPresence(), Add);
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
@@ -167,33 +162,7 @@ namespace osu.Desktop
             desktopWindow.Title = Name;
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
 
-            desktopWindow.MinimumSize = new Size(600, 600);
-
-            desktopWindow.OnTextEdit += s =>
-            {
-                if (textEditIndicator != null)
-                {
-                    textEditIndicator.Text = s;
-
-                    if (textEditIndicator.State.Value != Visibility.Visible)
-                        Schedule(() => textEditIndicator.Show());
-                }
-            };
-
-            desktopWindow.OnTextInput += () =>
-            {
-                if (textEditIndicator != null)
-                {
-                    if (textEditIndicator.State.Value != Visibility.Hidden)
-                    {
-                        Schedule(() =>
-                        {
-                            textEditIndicator.Flash();
-                            textEditIndicator.Hide();
-                        });
-                    }
-                }
-            };
+            desktopWindow.MinimumSize = new Size(800, 600);
         }
 
         private readonly List<string> importableFiles = new List<string>();
