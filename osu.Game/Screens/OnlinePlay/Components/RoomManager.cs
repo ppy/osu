@@ -66,7 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             req.Failure += exception =>
             {
-                onError?.Invoke(req.Result?.Error ?? exception.Message);
+                onError?.Invoke(req.Response?.Error ?? exception.Message);
             };
 
             api.Queue(req);

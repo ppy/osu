@@ -38,8 +38,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             List<RealmKeyBinding> bindings;
 
-            using (var usage = realmFactory.GetForRead())
-                bindings = usage.Realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
+            using (var realm = realmFactory.CreateContext())
+                bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
@@ -75,5 +75,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             Content.CornerRadius = 5;
         }
+
+        // Empty FilterTerms so that the ResetButton is visible only when the whole subsection is visible.
+        public override IEnumerable<string> FilterTerms => Enumerable.Empty<string>();
     }
 }
