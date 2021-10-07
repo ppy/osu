@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// A function that can extract the current value of this setting from a beatmap difficulty for display purposes.
         /// </summary>
-        public Func<BeatmapDifficulty, float> ReadCurrentFromDifficulty;
+        public Func<IBeatmapDifficultyInfo, float> ReadCurrentFromDifficulty;
 
         public float Precision
         {

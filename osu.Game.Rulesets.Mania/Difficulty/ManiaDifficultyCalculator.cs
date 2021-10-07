@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return new ManiaDifficultyAttributes { Mods = mods, Skills = skills };
 
             HitWindows hitWindows = new ManiaHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             return new ManiaDifficultyAttributes
             {

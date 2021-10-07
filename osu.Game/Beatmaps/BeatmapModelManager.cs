@@ -202,6 +202,8 @@ namespace osu.Game.Beatmaps
                 using (ContextFactory.GetForWrite())
                 {
                     beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == beatmapInfo.ID);
+                    beatmapInfo.BaseDifficulty.CopyFrom(beatmapContent.Difficulty);
+
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 
                     // grab the original file (or create a new one if not found).
