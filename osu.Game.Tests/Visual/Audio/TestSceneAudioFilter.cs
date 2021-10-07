@@ -5,11 +5,12 @@ using ManagedBass.Fx;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Audio.Effects;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
@@ -17,18 +18,22 @@ namespace osu.Game.Tests.Visual.Audio
 {
     public class TestSceneAudioFilter : OsuTestScene
     {
-        private WorkingBeatmap testBeatmap;
-
         private OsuSpriteText lowpassText;
+        private AudioFilter lowpassFilter;
+
+        private OsuSpriteText highpassText;
         private AudioFilter highpassFilter;
 
-        private AudioFilter lowpassFilter;
-        private OsuSpriteText highpassText;
+        private Track track;
+
+        private WaveformTestBeatmap beatmap;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            testBeatmap = new WaveformTestBeatmap(audio);
+            beatmap = new WaveformTestBeatmap(audio);
+            track = beatmap.LoadTrack();
+
             Add(new FillFlowContainer
             {
                 Children = new Drawable[]
@@ -67,30 +72,56 @@ namespace osu.Game.Tests.Visual.Audio
             highpassFilter.Cutoff.ValueChanged += e => highpassText.Text = $"High Pass: {e.NewValue}hz";
         }
 
-        [Test]
-        public void TestLowPass() => testFilter(lowpassFilter, AudioFilter.MAX_LOWPASS_CUTOFF, 0);
-
-        [Test]
-        public void TestHighPass() => testFilter(highpassFilter, 0, AudioFilter.MAX_LOWPASS_CUTOFF);
-
-        private void testFilter(AudioFilter filter, int cutoffFrom, int cutoffTo)
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            AddStep("Load Track", () => testBeatmap.LoadTrack());
-            AddStep("Play Track", () => testBeatmap.Track.Start());
-            AddWaitStep("Let track play", 10);
+            AddStep("Play Track", () => track.Start());
+            waitTrackPlay();
+        }
+
+        [Test]
+        public void TestLowPass()
+        {
             AddStep("Filter Sweep", () =>
             {
-                filter.CutoffTo(cutoffFrom).Then()
-                      .CutoffTo(cutoffTo, 2000, cutoffFrom > cutoffTo ? Easing.OutCubic : Easing.InCubic);
+                lowpassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF).Then()
+                             .CutoffTo(0, 2000, Easing.OutCubic);
             });
-            AddWaitStep("Let track play", 10);
+
+            waitTrackPlay();
+
             AddStep("Filter Sweep (reverse)", () =>
             {
-                filter.CutoffTo(cutoffTo).Then()
-                      .CutoffTo(cutoffFrom, 2000, cutoffTo > cutoffFrom ? Easing.OutCubic : Easing.InCubic);
+                lowpassFilter.CutoffTo(0).Then()
+                             .CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 2000, Easing.InCubic);
             });
-            AddWaitStep("Let track play", 10);
-            AddStep("Stop track", () => testBeatmap.Track.Stop());
+
+            waitTrackPlay();
+            AddStep("Stop track", () => track.Stop());
         }
+
+        [Test]
+        public void TestHighPass()
+        {
+            AddStep("Filter Sweep", () =>
+            {
+                highpassFilter.CutoffTo(0).Then()
+                              .CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 2000, Easing.InCubic);
+            });
+
+            waitTrackPlay();
+
+            AddStep("Filter Sweep (reverse)", () =>
+            {
+                highpassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF).Then()
+                              .CutoffTo(0, 2000, Easing.OutCubic);
+            });
+
+            waitTrackPlay();
+
+            AddStep("Stop track", () => track.Stop());
+        }
+
+        private void waitTrackPlay() => AddWaitStep("Let track play", 10);
     }
 }
