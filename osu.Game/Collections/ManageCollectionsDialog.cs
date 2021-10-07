@@ -21,7 +21,8 @@ namespace osu.Game.Collections
     {
         private const double enter_duration = 500;
         private const double exit_duration = 200;
-        private Filter lpFilter;
+
+        private AudioFilter lowPassFilter;
 
         [Resolved(CanBeNull = true)]
         private CollectionManager collectionManager { get; set; }
@@ -112,7 +113,7 @@ namespace osu.Game.Collections
                         }
                     }
                 },
-                lpFilter = new Filter(audio.TrackMixer)
+                lowPassFilter = new AudioFilter(audio.TrackMixer)
             };
         }
 
@@ -120,7 +121,7 @@ namespace osu.Game.Collections
         {
             base.PopIn();
 
-            lpFilter.CutoffTo(300, 100, Easing.OutCubic);
+            lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
             this.FadeIn(enter_duration, Easing.OutQuint);
             this.ScaleTo(0.9f).Then().ScaleTo(1f, enter_duration, Easing.OutQuint);
         }
@@ -129,7 +130,8 @@ namespace osu.Game.Collections
         {
             base.PopOut();
 
-            lpFilter.CutoffTo(lpFilter.MaxCutoff, 100, Easing.InCubic);
+            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
+
             this.FadeOut(exit_duration, Easing.OutQuint);
             this.ScaleTo(0.9f, exit_duration);
 
