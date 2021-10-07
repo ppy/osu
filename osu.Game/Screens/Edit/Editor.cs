@@ -332,8 +332,6 @@ namespace osu.Game.Screens.Edit
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
 
-            playableBeatmap.BeatmapInfo.BaseDifficulty.CopyFrom(playableBeatmap.Difficulty);
-
             // apply any set-level metadata changes.
             beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
 
