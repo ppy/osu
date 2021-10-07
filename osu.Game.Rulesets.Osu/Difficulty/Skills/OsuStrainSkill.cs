@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
-
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Framework.Utils;
@@ -30,8 +29,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => 1.06;
 
- 
-
         protected OsuStrainSkill(Mod[] mods, double strainDecayBase, int sectionLength = 400)
             : base(mods, strainDecayBase, sectionLength)
         {
@@ -39,9 +36,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
-            double difficulty = 0;
-            double weight = 1;
-
             List<double> strains = GetCurrentStrainPeaks().OrderByDescending(d => d).ToList();
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
@@ -51,15 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strains[i] *= Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale);
             }
 
-            // Difficulty is the weighted sum of the highest strains from every section.
-            // We're sorting from highest to lowest strain.
-            foreach (double strain in strains.OrderByDescending(d => d))
-            {
-                difficulty += strain * weight;
-                weight *= DecayWeight;
-            }
-
-            return difficulty * DifficultyMultiplier;
+            return strains.SortedExponentialWeightedSum(DifficultySumWeight) * DifficultyMultiplier;
         }
     }
 }

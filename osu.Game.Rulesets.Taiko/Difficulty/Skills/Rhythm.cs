@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -45,15 +44,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// </summary>
         private int notesSinceRhythmChange;
 
-
         public Rhythm(Mod[] mods)
             : base(mods)
         {
-        }
-
-        public override double DifficultyValue()
-        {
-            return sections.ExponentialWeightedSum();
         }
 
         protected override double StrainAtTime(double time)

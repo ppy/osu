@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
@@ -40,8 +39,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
-
-
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastLastObject, HitObject lastObject, double clockRate)
             : base(hitObject, lastObject, clockRate)

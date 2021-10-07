@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         protected override double SkillMultiplier => 0.15;
-        protected override double DecayWeight => 1.0;
+        protected override double DifficultySumWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
 
         protected override double StrainValueOf(DifficultyHitObject current)

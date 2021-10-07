@@ -16,9 +16,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private const double direction_change_bonus = 21.0;
 
         protected override double SkillMultiplier => 900;
-
-        protected override double DecayWeight => 0.94;
-
+        protected override double DifficultySumWeight => 0.94;
 
         protected readonly float HalfCatcherWidth;
 

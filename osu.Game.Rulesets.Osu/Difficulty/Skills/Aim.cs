@@ -24,7 +24,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double SkillMultiplier => 26.25;
 
-
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
