@@ -12,8 +12,10 @@ namespace osu.Game.Tests.Visual.Menus
     {
         protected override IntroScreen CreateScreen() => new IntroWelcome();
 
-        public TestSceneIntroWelcome()
+        public override void TestPlayIntro()
         {
+            base.TestPlayIntro();
+
             AddUntilStep("wait for load", () => MusicController.TrackLoaded);
             AddAssert("correct track", () => Precision.AlmostEquals(MusicController.CurrentTrack.Length, 48000, 1));
             AddAssert("check if menu music loops", () => MusicController.CurrentTrack.Looping);
