@@ -42,8 +42,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
 
-            var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
-            var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            var roundedCircleSize = Math.Round(beatmap.Difficulty.CircleSize);
+            var roundedOverallDifficulty = Math.Round(beatmap.Difficulty.OverallDifficulty);
 
             if (IsForCurrentRuleset)
             {
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
-            IBeatmapDifficultyInfo difficulty = original.BeatmapInfo.BaseDifficulty;
+            IBeatmapDifficultyInfo difficulty = original.Difficulty;
 
             int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new FastRandom(seed);

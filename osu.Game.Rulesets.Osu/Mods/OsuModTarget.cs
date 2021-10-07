@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                              .Select(beat =>
                              {
                                  var newCircle = new HitCircle();
-                                 newCircle.ApplyDefaults(controlPointInfo, osuBeatmap.BeatmapInfo.BaseDifficulty);
+                                 newCircle.ApplyDefaults(controlPointInfo, osuBeatmap.Difficulty);
                                  newCircle.StartTime = beat;
                                  return (OsuHitObject)newCircle;
                              }).ToList();
