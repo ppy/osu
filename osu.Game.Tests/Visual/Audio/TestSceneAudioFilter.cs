@@ -15,13 +15,15 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tests.Visual.Audio
 {
-    public class TestSceneFilter : OsuTestScene
+    public class TestSceneAudioFilter : OsuTestScene
     {
         private WorkingBeatmap testBeatmap;
+
         private OsuSpriteText lowpassText;
+        private AudioFilter highpassFilter;
+
+        private AudioFilter lowpassFilter;
         private OsuSpriteText highpassText;
-        private Filter lowpassFilter;
-        private Filter highpassFilter;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -31,8 +33,8 @@ namespace osu.Game.Tests.Visual.Audio
             {
                 Children = new Drawable[]
                 {
-                    lowpassFilter = new Filter(audio.TrackMixer),
-                    highpassFilter = new Filter(audio.TrackMixer, BQFType.HighPass),
+                    lowpassFilter = new AudioFilter(audio.TrackMixer),
+                    highpassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
                     lowpassText = new OsuSpriteText
                     {
                         Padding = new MarginPadding(20),
@@ -71,7 +73,7 @@ namespace osu.Game.Tests.Visual.Audio
         [Test]
         public void TestHighPass() => testFilter(highpassFilter, 0, AudioFilter.MAX_LOWPASS_CUTOFF);
 
-        private void testFilter(Filter filter, int cutoffFrom, int cutoffTo)
+        private void testFilter(AudioFilter filter, int cutoffFrom, int cutoffTo)
         {
             AddStep("Load Track", () => testBeatmap.LoadTrack());
             AddStep("Play Track", () => testBeatmap.Track.Start());
