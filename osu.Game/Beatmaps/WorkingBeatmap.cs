@@ -119,9 +119,6 @@ namespace osu.Game.Beatmaps
                 // Apply difficulty mods
                 if (mods.Any(m => m is IApplicableToDifficulty))
                 {
-                    converted.BeatmapInfo = converted.BeatmapInfo.Clone();
-                    converted.Difficulty = converted.Difficulty.Clone();
-
                     foreach (var mod in mods.OfType<IApplicableToDifficulty>())
                     {
                         if (cancellationSource.IsCancellationRequested)
