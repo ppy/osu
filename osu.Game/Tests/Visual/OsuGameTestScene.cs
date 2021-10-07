@@ -127,9 +127,8 @@ namespace osu.Game.Tests.Visual
 
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
+            // if we don't apply these changes, when running under nUnit the version that gets populated is that of nUnit.
             public override Version AssemblyVersion => new Version(0, 0);
-
-            // if we don't do this, when running under nUnit the version that gets populated is that of nUnit.
             public override string Version => "test game";
 
             protected override Loader CreateLoader() => new TestLoader();
