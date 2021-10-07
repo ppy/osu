@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             starRating = rescale(starRating);
 
             HitWindows hitWindows = new TaikoHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             return new TaikoDifficultyAttributes
             {
