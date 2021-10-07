@@ -43,11 +43,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
-                        createDrawableRoom(new Room
+                        createLoungeRoom(new Room
                         {
-                            Name = { Value = "Flyte's Trash Playlist" },
+                            Name = { Value = "Multiplayer room" },
                             Status = { Value = new RoomStatusOpen() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                            Type = { Value = MatchType.HeadToHead },
                             Playlist =
                             {
                                 new PlaylistItem
@@ -65,9 +66,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                 }
                             }
                         }),
-                        createDrawableRoom(new Room
+                        createLoungeRoom(new Room
                         {
-                            Name = { Value = "Room 2" },
+                            Name = { Value = "Playlist room with multiple beatmaps" },
                             Status = { Value = new RoomStatusPlaying() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Playlist =
@@ -100,15 +101,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                 }
                             }
                         }),
-                        createDrawableRoom(new Room
+                        createLoungeRoom(new Room
                         {
-                            Name = { Value = "Room 3" },
+                            Name = { Value = "Finished room" },
                             Status = { Value = new RoomStatusEnded() },
                             EndDate = { Value = DateTimeOffset.Now },
                         }),
-                        createDrawableRoom(new Room
+                        createLoungeRoom(new Room
                         {
-                            Name = { Value = "Room 4 (spotlight)" },
+                            Name = { Value = "Spotlight room" },
                             Status = { Value = new RoomStatusOpen() },
                             Category = { Value = RoomCategory.Spotlight },
                         }),
@@ -123,14 +124,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             DrawableRoom drawableRoom = null;
             Room room = null;
 
-            AddStep("create room", () => Child = drawableRoom = createDrawableRoom(room = new Room
+            AddStep("create room", () => Child = drawableRoom = createLoungeRoom(room = new Room
             {
                 Name = { Value = "Room with password" },
                 Status = { Value = new RoomStatusOpen() },
                 Type = { Value = MatchType.HeadToHead },
             }));
 
-            AddUntilStep("wait for panel load", () => drawableRoom.ChildrenOfType<RecentParticipantsList>().Any());
+            AddUntilStep("wait for panel load", () => drawableRoom.ChildrenOfType<DrawableRoomParticipantsList>().Any());
 
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
 
@@ -141,7 +142,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
         }
 
-        private DrawableRoom createDrawableRoom(Room room)
+        private DrawableRoom createLoungeRoom(Room room)
         {
             room.Host.Value ??= new User { Username = "peppy", Id = 2 };
 

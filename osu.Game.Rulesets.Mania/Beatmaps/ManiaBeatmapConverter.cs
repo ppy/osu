@@ -71,9 +71,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             originalTargetColumns = TargetColumns;
         }
 
-        public static int GetColumnCountForNonConvert(BeatmapInfo beatmap)
+        public static int GetColumnCountForNonConvert(BeatmapInfo beatmapInfo)
         {
-            var roundedCircleSize = Math.Round(beatmap.BaseDifficulty.CircleSize);
+            var roundedCircleSize = Math.Round(beatmapInfo.BaseDifficulty.CircleSize);
             return (int)Math.Max(1, roundedCircleSize);
         }
 
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
-            BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
+            IBeatmapDifficultyInfo difficulty = original.BeatmapInfo.BaseDifficulty;
 
             int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new FastRandom(seed);

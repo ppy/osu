@@ -290,7 +290,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 
-            public TestCatcher(DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty)
+            public TestCatcher(DroppedObjectContainer droppedObjectTarget, IBeatmapDifficultyInfo difficulty)
                 : base(droppedObjectTarget, difficulty)
             {
             }
@@ -298,7 +298,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public class TestKiaiFruit : Fruit
         {
-            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
             {
                 controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
                 base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
