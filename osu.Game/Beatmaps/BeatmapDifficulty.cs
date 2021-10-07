@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
@@ -43,31 +44,31 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public BeatmapDifficulty Clone()
         {
-            var diff = new BeatmapDifficulty();
+            var diff = (BeatmapDifficulty)Activator.CreateInstance(GetType());
             CopyTo(diff);
             return diff;
         }
 
-        public void CopyFrom(IBeatmapDifficultyInfo difficulty)
+        public virtual void CopyFrom(IBeatmapDifficultyInfo other)
         {
-            ApproachRate = difficulty.ApproachRate;
-            DrainRate = difficulty.DrainRate;
-            CircleSize = difficulty.CircleSize;
-            OverallDifficulty = difficulty.OverallDifficulty;
+            ApproachRate = other.ApproachRate;
+            DrainRate = other.DrainRate;
+            CircleSize = other.CircleSize;
+            OverallDifficulty = other.OverallDifficulty;
 
-            SliderMultiplier = difficulty.SliderMultiplier;
-            SliderTickRate = difficulty.SliderTickRate;
+            SliderMultiplier = other.SliderMultiplier;
+            SliderTickRate = other.SliderTickRate;
         }
 
-        public void CopyTo(BeatmapDifficulty difficulty)
+        public virtual void CopyTo(BeatmapDifficulty other)
         {
-            difficulty.ApproachRate = ApproachRate;
-            difficulty.DrainRate = DrainRate;
-            difficulty.CircleSize = CircleSize;
-            difficulty.OverallDifficulty = OverallDifficulty;
+            other.ApproachRate = ApproachRate;
+            other.DrainRate = DrainRate;
+            other.CircleSize = CircleSize;
+            other.OverallDifficulty = OverallDifficulty;
 
-            difficulty.SliderMultiplier = SliderMultiplier;
-            difficulty.SliderTickRate = SliderTickRate;
+            other.SliderMultiplier = SliderMultiplier;
+            other.SliderTickRate = SliderTickRate;
         }
     }
 }
