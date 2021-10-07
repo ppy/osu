@@ -111,8 +111,6 @@ namespace osu.Game.Tests.Beatmaps
 
             var converterResult = new Dictionary<HitObject, IEnumerable<HitObject>>();
 
-            beatmap.BeatmapInfo.BaseDifficulty = beatmap.Difficulty;
-
             var working = new ConversionWorkingBeatmap(beatmap)
             {
                 ConversionGenerated = (o, r, c) =>
