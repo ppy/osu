@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         private bool checkSomeHit() => Player.ScoreProcessor.JudgedHits >= 4;
 
         private bool objectWithIncreasedVisibilityHasIndex(int index)
-            => Player.Mods.Value.OfType<TestOsuModHidden>().Single().FirstObject == Player.GameplayState.Beatmap.HitObjects[index];
+            => Player.GameplayState.Mods.OfType<TestOsuModHidden>().Single().FirstObject == Player.GameplayState.Beatmap.HitObjects[index];
 
         private class TestOsuModHidden : OsuModHidden
         {
