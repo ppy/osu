@@ -66,10 +66,10 @@ namespace osu.Game.Tests.Visual.Audio
         }
 
         [Test]
-        public void TestLowPass() => testFilter(lowpassFilter, lowpassFilter.MaxCutoff, 0);
+        public void TestLowPass() => testFilter(lowpassFilter, AudioFilter.MAX_LOWPASS_CUTOFF, 0);
 
         [Test]
-        public void TestHighPass() => testFilter(highpassFilter, 0, highpassFilter.MaxCutoff);
+        public void TestHighPass() => testFilter(highpassFilter, 0, AudioFilter.MAX_LOWPASS_CUTOFF);
 
         private void testFilter(Filter filter, int cutoffFrom, int cutoffTo)
         {

@@ -89,7 +89,7 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            lpFilter.CutoffTo(lpFilter.MaxCutoff, 100, Easing.InCubic);
+            lpFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
 
             if (CurrentDialog?.State.Value == Visibility.Visible)
             {
