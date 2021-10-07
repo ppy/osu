@@ -7,11 +7,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -29,7 +26,6 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
