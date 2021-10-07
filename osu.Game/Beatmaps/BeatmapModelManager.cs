@@ -192,6 +192,8 @@ namespace osu.Game.Beatmaps
         {
             var setInfo = beatmapInfo.BeatmapSet;
 
+            beatmapInfo.BaseDifficulty.CopyFrom(beatmapContent.Difficulty);
+
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
