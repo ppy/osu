@@ -61,7 +61,7 @@ namespace osu.Game.Overlays
 
             Header.HeaderContent.Picker.Beatmap.ValueChanged += b =>
             {
-                info.Beatmap = b.NewValue;
+                info.BeatmapInfo = b.NewValue;
                 ScrollFlow.ScrollToStart();
             };
         }

@@ -75,5 +75,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             Content.CornerRadius = 5;
         }
+
+        // Empty FilterTerms so that the ResetButton is visible only when the whole subsection is visible.
+        public override IEnumerable<string> FilterTerms => Enumerable.Empty<string>();
     }
 }

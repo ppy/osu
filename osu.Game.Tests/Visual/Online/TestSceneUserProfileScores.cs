@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 PP = 1047.21,
                 Rank = ScoreRank.SH,
-                Beatmap = new BeatmapInfo
+                BeatmapInfo = new BeatmapInfo
                 {
                     Metadata = new BeatmapMetadata
                     {
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 PP = 134.32,
                 Rank = ScoreRank.A,
-                Beatmap = new BeatmapInfo
+                BeatmapInfo = new BeatmapInfo
                 {
                     Metadata = new BeatmapMetadata
                     {
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 PP = 96.83,
                 Rank = ScoreRank.S,
-                Beatmap = new BeatmapInfo
+                BeatmapInfo = new BeatmapInfo
                 {
                     Metadata = new BeatmapMetadata
                     {
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Online
             var noPPScore = new ScoreInfo
             {
                 Rank = ScoreRank.B,
-                Beatmap = new BeatmapInfo
+                BeatmapInfo = new BeatmapInfo
                 {
                     Metadata = new BeatmapMetadata
                     {

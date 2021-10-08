@@ -176,8 +176,8 @@ namespace osu.Game.Beatmaps.Formats
                     case "L":
                     {
                         var startTime = Parsing.ParseDouble(split[1]);
-                        var loopCount = Parsing.ParseInt(split[2]);
-                        timelineGroup = storyboardSprite?.AddLoop(startTime, loopCount);
+                        var repeatCount = Parsing.ParseInt(split[2]);
+                        timelineGroup = storyboardSprite?.AddLoop(startTime, Math.Max(0, repeatCount - 1));
                         break;
                     }
 
