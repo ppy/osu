@@ -111,8 +111,8 @@ namespace osu.Game.Tests.Beatmaps
 
             public static readonly Color4 HYPER_DASH_FRUIT_COLOUR = Color4.DarkGoldenrod;
 
-            public TestBeatmapSkin(BeatmapInfo beatmap, bool hasColours)
-                : base(beatmap, new ResourceStore<byte[]>(), null)
+            public TestBeatmapSkin(BeatmapInfo beatmapInfo, bool hasColours)
+                : base(beatmapInfo, new ResourceStore<byte[]>(), null)
             {
                 if (hasColours)
                 {

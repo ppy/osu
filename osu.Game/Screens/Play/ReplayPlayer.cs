@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play
             DrawableRuleset?.SetReplayScore(Score);
         }
 
-        protected override Score CreateScore() => createScore(GameplayBeatmap.PlayableBeatmap, Mods.Value);
+        protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap, Mods.Value);
 
         // Don't re-import replay scores as they're already present in the database.
         protected override Task ImportScore(Score score) => Task.CompletedTask;
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play
 
             void keyboardSeek(int direction)
             {
-                double target = Math.Clamp(GameplayClockContainer.CurrentTime + direction * keyboard_seek_amount, 0, GameplayBeatmap.HitObjects.Last().GetEndTime());
+                double target = Math.Clamp(GameplayClockContainer.CurrentTime + direction * keyboard_seek_amount, 0, GameplayState.Beatmap.HitObjects.Last().GetEndTime());
 
                 Seek(target);
             }

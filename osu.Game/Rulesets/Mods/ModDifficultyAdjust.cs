@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
+        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
         {
         }
 

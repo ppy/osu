@@ -5,7 +5,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Screens;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK;
@@ -20,6 +19,8 @@ namespace osu.Game.Tests.Visual.Menus
         private OsuLogo logo;
 
         protected OsuScreenStack IntroStack;
+
+        private IntroScreen intro;
 
         protected IntroTestScene()
         {
@@ -39,7 +40,11 @@ namespace osu.Game.Tests.Visual.Menus
                     Position = new Vector2(0.5f),
                 }
             };
+        }
 
+        [Test]
+        public virtual void TestPlayIntro()
+        {
             AddStep("restart sequence", () =>
             {
                 logo.FinishTransforms();
@@ -52,12 +57,12 @@ namespace osu.Game.Tests.Visual.Menus
                     RelativeSizeAxes = Axes.Both,
                 });
 
-                IntroStack.Push(CreateScreen());
+                IntroStack.Push(intro = CreateScreen());
             });
 
-            AddUntilStep("wait for menu", () => IntroStack.CurrentScreen is MainMenu);
+            AddUntilStep("wait for menu", () => intro.DidLoadMenu);
         }
 
-        protected abstract IScreen CreateScreen();
+        protected abstract IntroScreen CreateScreen();
     }
 }
