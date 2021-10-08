@@ -246,7 +246,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                             req.Success += res =>
                             {
-                                Model.BeatmapInfo = res.ToBeatmap(rulesets);
+                                Model.BeatmapInfo = res.ToBeatmapInfo(rulesets);
                                 updatePanel();
                             };
 

@@ -508,6 +508,7 @@ namespace osu.Game.Screens.Edit
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
+                    samplePlaybackDisabled.Value = true;
                     dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave, cancelExit));
                     return true;
                 }
@@ -756,7 +757,11 @@ namespace osu.Game.Screens.Edit
             ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? clipboard.Value : string.Empty
         });
 
-        private void cancelExit() => loader?.CancelPendingDifficultySwitch();
+        private void cancelExit()
+        {
+            samplePlaybackDisabled.Value = false;
+            loader?.CancelPendingDifficultySwitch();
+        }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 

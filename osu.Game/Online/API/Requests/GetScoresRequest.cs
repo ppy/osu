@@ -15,20 +15,20 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetScoresRequest : APIRequest<APILegacyScores>
     {
-        private readonly BeatmapInfo beatmap;
+        private readonly BeatmapInfo beatmapInfo;
         private readonly BeatmapLeaderboardScope scope;
         private readonly RulesetInfo ruleset;
         private readonly IEnumerable<IMod> mods;
 
-        public GetScoresRequest(BeatmapInfo beatmap, RulesetInfo ruleset, BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<IMod> mods = null)
+        public GetScoresRequest(BeatmapInfo beatmapInfo, RulesetInfo ruleset, BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<IMod> mods = null)
         {
-            if (!beatmap.OnlineBeatmapID.HasValue)
+            if (!beatmapInfo.OnlineBeatmapID.HasValue)
                 throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
 
             if (scope == BeatmapLeaderboardScope.Local)
                 throw new InvalidOperationException("Should not attempt to request online scores for a local scoped leaderboard");
 
-            this.beatmap = beatmap;
+            this.beatmapInfo = beatmapInfo;
             this.scope = scope;
             this.ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
             this.mods = mods ?? Array.Empty<IMod>();
@@ -42,7 +42,7 @@ namespace osu.Game.Online.API.Requests
 
             foreach (APILegacyScoreInfo score in r.Scores)
             {
-                score.Beatmap = beatmap;
+                score.BeatmapInfo = beatmapInfo;
                 score.OnlineRulesetID = ruleset.ID.Value;
             }
 
@@ -50,12 +50,12 @@ namespace osu.Game.Online.API.Requests
 
             if (userScore != null)
             {
-                userScore.Score.Beatmap = beatmap;
+                userScore.Score.BeatmapInfo = beatmapInfo;
                 userScore.Score.OnlineRulesetID = ruleset.ID.Value;
             }
         }
 
-        protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores{createQueryParameters()}";
+        protected override string Target => $@"beatmaps/{beatmapInfo.OnlineBeatmapID}/scores{createQueryParameters()}";
 
         private string createQueryParameters()
         {

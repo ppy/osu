@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeDifficulty()
         {
             var beatmap = decodeAsJson(normal);
-            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            var difficulty = beatmap.Difficulty;
             Assert.AreEqual(6.5f, difficulty.DrainRate);
             Assert.AreEqual(4, difficulty.CircleSize);
             Assert.AreEqual(8, difficulty.OverallDifficulty);
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             processor.PreProcess();
             foreach (var o in converted.HitObjects)
-                o.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
+                o.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty);
             processor.PostProcess();
 
             var beatmap = converted.Serialize().Deserialize<Beatmap>();

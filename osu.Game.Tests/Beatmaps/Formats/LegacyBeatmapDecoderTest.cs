@@ -129,7 +129,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var difficulty = decoder.Decode(stream).BeatmapInfo.BaseDifficulty;
+                var difficulty = decoder.Decode(stream).Difficulty;
 
                 Assert.AreEqual(6.5f, difficulty.DrainRate);
                 Assert.AreEqual(4, difficulty.CircleSize);

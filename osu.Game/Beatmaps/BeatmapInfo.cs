@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -17,7 +16,7 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo
     {
         public int ID { get; set; }
 
@@ -152,18 +151,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
 
-        public string[] SearchableTerms => new[]
-        {
-            Version
-        }.Concat(Metadata?.SearchableTerms ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
-
-        public override string ToString() => $"{Metadata ?? BeatmapSet?.Metadata} {versionString}".Trim();
-
-        public RomanisableString ToRomanisableString()
-        {
-            var metadata = (Metadata ?? BeatmapSet?.Metadata)?.ToRomanisableString() ?? new RomanisableString(null, null);
-            return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
-        }
+        public override string ToString() => this.GetDisplayTitle();
 
         public bool Equals(BeatmapInfo other)
         {
@@ -187,5 +175,22 @@ namespace osu.Game.Beatmaps
         /// Returns a shallow-clone of this <see cref="BeatmapInfo"/>.
         /// </summary>
         public BeatmapInfo Clone() => (BeatmapInfo)MemberwiseClone();
+
+        #region Implementation of IHasOnlineID
+
+        public int? OnlineID => OnlineBeatmapID;
+
+        #endregion
+
+        #region Implementation of IBeatmapInfo
+
+        string IBeatmapInfo.DifficultyName => Version;
+        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
+        IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
+        IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
+        IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+        double IBeatmapInfo.StarRating => StarDifficulty;
+
+        #endregion
     }
 }
