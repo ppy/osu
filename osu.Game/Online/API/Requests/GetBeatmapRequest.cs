@@ -8,13 +8,13 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetBeatmapRequest : APIRequest<APIBeatmap>
     {
-        private readonly BeatmapInfo beatmap;
+        private readonly BeatmapInfo beatmapInfo;
 
-        public GetBeatmapRequest(BeatmapInfo beatmap)
+        public GetBeatmapRequest(BeatmapInfo beatmapInfo)
         {
-            this.beatmap = beatmap;
+            this.beatmapInfo = beatmapInfo;
         }
 
-        protected override string Target => $@"beatmaps/lookup?id={beatmap.OnlineBeatmapID}&checksum={beatmap.MD5Hash}&filename={System.Uri.EscapeUriString(beatmap.Path ?? string.Empty)}";
+        protected override string Target => $@"beatmaps/lookup?id={beatmapInfo.OnlineBeatmapID}&checksum={beatmapInfo.MD5Hash}&filename={System.Uri.EscapeUriString(beatmapInfo.Path ?? string.Empty)}";
     }
 }

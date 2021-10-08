@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Localisation
                 Title = "Romanised title",
                 TitleUnicode = "Unicode Title"
             };
-            var romanisableString = metadata.ToRomanisableString();
+            var romanisableString = metadata.GetDisplayTitleRomanisable();
 
             Assert.AreEqual(metadata.ToString(), romanisableString.Romanised);
             Assert.AreEqual($"{metadata.ArtistUnicode} - {metadata.TitleUnicode}", romanisableString.Original);
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Localisation
                 Artist = "Romanised Artist",
                 Title = "Romanised title"
             };
-            var romanisableString = metadata.ToRomanisableString();
+            var romanisableString = metadata.GetDisplayTitleRomanisable();
 
             Assert.AreEqual(romanisableString.Romanised, romanisableString.Original);
         }

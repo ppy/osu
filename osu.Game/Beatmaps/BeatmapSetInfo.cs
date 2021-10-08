@@ -12,7 +12,7 @@ using osu.Game.Database;
 namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
-    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>
+    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
     {
         public int ID { get; set; }
 
@@ -61,8 +61,6 @@ namespace osu.Game.Beatmaps
 
         public string Hash { get; set; }
 
-        public string StoryboardFile => Files.Find(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
-
         /// <summary>
         /// Returns the storage path for the file in this beatmapset with the given filename, if any exists, otherwise null.
         /// The path returned is relative to the user file storage.
@@ -90,5 +88,19 @@ namespace osu.Game.Beatmaps
 
             return ReferenceEquals(this, other);
         }
+
+        #region Implementation of IHasOnlineID
+
+        public int? OnlineID => OnlineBeatmapSetID;
+
+        #endregion
+
+        #region Implementation of IBeatmapSetInfo
+
+        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata;
+        IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
+        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
+
+        #endregion
     }
 }
