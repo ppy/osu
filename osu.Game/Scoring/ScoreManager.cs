@@ -72,9 +72,12 @@ namespace osu.Game.Scoring
                 }
             }
 
-            // We're calling .Result, but this should not be a blocking call due to the above GetDifficultyAsync() calls.
-            return scores.OrderByDescending(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken).Result)
-                         .ThenBy(s => s.OnlineScoreID)
+            var totalScores = await Task.WhenAll(scores.Select(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken))).ConfigureAwait(false);
+
+            return scores.Select((s, i) => (index: i, score: s))
+                         .OrderByDescending(key => totalScores[key.index])
+                         .ThenBy(key => key.score.OnlineScoreID)
+                         .Select(key => key.score)
                          .ToArray();
         }
 
