@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override void Process(DifficultyHitObject current)
         {
             var osuCurrent = (OsuDifficultyHitObject)current;
-            osuCurrent.aim = new HitObjectAttributes(current, this);
+            osuCurrent.Aim = new HitObjectAttributes(current, this);
         }
 
         public struct HitObjectAttributes
@@ -38,7 +38,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             public double Strain;
             public double CumulativeStrain;
 
-            public HitObjectAttributes(DifficultyHitObject current, Aim state) : this()
+            public HitObjectAttributes(DifficultyHitObject current, Aim state)
+                : this()
             {
                 if (current.BaseObject is Spinner)
                     return;

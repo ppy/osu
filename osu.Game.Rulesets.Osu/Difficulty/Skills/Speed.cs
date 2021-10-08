@@ -35,11 +35,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             greatWindow = hitWindowGreat;
         }
+
         protected override void Process(DifficultyHitObject current)
         {
             var osuCurrent = (OsuDifficultyHitObject)current;
 
-            osuCurrent.speed = new HitObjectAttributes(current, this);
+            osuCurrent.Speed = new HitObjectAttributes(current, this);
         }
 
         public struct HitObjectAttributes
@@ -50,7 +51,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             public double Strain;
             public double CumulativeStrain;
-            public HitObjectAttributes(DifficultyHitObject current, Speed state) : this()
+
+            public HitObjectAttributes(DifficultyHitObject current, Speed state)
+                : this()
             {
                 if (current.BaseObject is Spinner)
                     return;
@@ -85,17 +88,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     if (osuCurrent.Angle.Value < pi_over_2)
                     {
                         AngleBonus = 1.28;
+
                         if (distance < 90 && osuCurrent.Angle.Value < pi_over_4)
                             AngleBonus += (1 - AngleBonus) * Math.Min((90 - distance) / 10, 1);
                         else if (distance < 90)
-                            AngleBonus += (1 - AngleBonus) * Math.Min((90 - distance) / 10, 1) * Math.Sin((pi_over_2 - osuCurrent.Angle.Value) / pi_over_4);
+                        {
+                            AngleBonus += (1 - AngleBonus)
+                                          * Math.Min((90 - distance) / 10, 1)
+                                          * Math.Sin((pi_over_2 - osuCurrent.Angle.Value) / pi_over_4);
+                        }
                     }
                 }
 
                 Strain = skill_multiplier * (1 + (SpeedBonus - 1) * 0.75)
-                       * AngleBonus
-                       * (0.95 + SpeedBonus * Math.Pow(distance / single_spacing_threshold, 3.5))
-                       / CappedStrainTime;
+                                          * AngleBonus
+                                          * (0.95 + SpeedBonus * Math.Pow(distance / single_spacing_threshold, 3.5))
+                         / CappedStrainTime;
 
                 CumulativeStrain = state.IncrementStrainAtTime(current.StartTime, Strain);
             }

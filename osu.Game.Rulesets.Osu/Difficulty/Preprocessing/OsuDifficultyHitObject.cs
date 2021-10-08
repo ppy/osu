@@ -48,11 +48,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuHitObject lastObject;
 
         [JsonProperty]
-        public Aim.HitObjectAttributes aim;
+        public Aim.HitObjectAttributes Aim;
+
         [JsonProperty]
-        public Speed.HitObjectAttributes speed;
+        public Speed.HitObjectAttributes Speed;
+
         [JsonProperty]
-        public Flashlight.HitObjectAttributes flashlight;
+        public Flashlight.HitObjectAttributes Flashlight;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastLastObject, HitObject lastObject, double clockRate)
             : base(hitObject, lastObject, clockRate)
