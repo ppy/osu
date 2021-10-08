@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 if (drainTime == 0)
                     drainTime = 10000;
 
-                BeatmapDifficulty difficulty = OriginalBeatmap.BeatmapInfo.BaseDifficulty;
+                IBeatmapDifficultyInfo difficulty = OriginalBeatmap.Difficulty;
                 conversionDifficulty = ((difficulty.DrainRate + Math.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + (double)OriginalBeatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
                 conversionDifficulty = Math.Min(conversionDifficulty.Value, 12);
 
@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         {
             lowerBound ??= RandomStart;
             upperBound ??= TotalColumns;
-            nextColumn ??= (_ => GetRandomColumn(lowerBound, upperBound));
+            nextColumn ??= _ => GetRandomColumn(lowerBound, upperBound);
 
             // Check for the initial column
             if (isValid(initialColumn))
@@ -176,7 +176,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             return initialColumn;
 
-            bool isValid(int column) => validation?.Invoke(column) != false && !patterns.Any(p => p.ColumnHasObject(column));
+            bool isValid(int column)
+            {
+                if (validation?.Invoke(column) == false)
+                    return false;
+
+                foreach (var p in patterns)
+                {
+                    if (p.ColumnHasObject(column))
+                        return false;
+                }
+
+                return true;
+            }
         }
 
         /// <summary>

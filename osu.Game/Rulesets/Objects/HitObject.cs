@@ -3,11 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ListExtensions;
+using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -83,7 +84,7 @@ namespace osu.Game.Rulesets.Objects
         private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
 
         [JsonIgnore]
-        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
+        public SlimReadOnlyListWrapper<HitObject> NestedHitObjects => nestedHitObjects.AsSlimReadOnly();
 
         public HitObject()
         {
@@ -91,7 +92,7 @@ namespace osu.Game.Rulesets.Objects
             {
                 double offset = time.NewValue - time.OldValue;
 
-                foreach (var nested in NestedHitObjects)
+                foreach (var nested in nestedHitObjects)
                     nested.StartTime += offset;
             };
         }
@@ -102,7 +103,7 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="controlPointInfo">The control points.</param>
         /// <param name="difficulty">The difficulty settings to use.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty, CancellationToken cancellationToken = default)
+        public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
@@ -122,11 +123,14 @@ namespace osu.Game.Rulesets.Objects
 
             if (this is IHasComboInformation hasCombo)
             {
-                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                foreach (HitObject hitObject in nestedHitObjects)
                 {
-                    n.ComboIndexBindable.BindTo(hasCombo.ComboIndexBindable);
-                    n.ComboIndexWithOffsetsBindable.BindTo(hasCombo.ComboIndexWithOffsetsBindable);
-                    n.IndexInCurrentComboBindable.BindTo(hasCombo.IndexInCurrentComboBindable);
+                    if (hitObject is IHasComboInformation n)
+                    {
+                        n.ComboIndexBindable.BindTo(hasCombo.ComboIndexBindable);
+                        n.ComboIndexWithOffsetsBindable.BindTo(hasCombo.ComboIndexWithOffsetsBindable);
+                        n.IndexInCurrentComboBindable.BindTo(hasCombo.IndexInCurrentComboBindable);
+                    }
                 }
             }
 
@@ -138,7 +142,7 @@ namespace osu.Game.Rulesets.Objects
             DefaultsApplied?.Invoke(this);
         }
 
-        protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 

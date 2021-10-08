@@ -207,7 +207,7 @@ namespace osu.Game.Skinning
                 Name = skin.SkinInfo.Name + " (modified)",
                 Creator = skin.SkinInfo.Creator,
                 InstantiationInfo = skin.SkinInfo.InstantiationInfo,
-            }).Result;
+            }).Result.Value;
         }
 
         public void Save(Skin skin)

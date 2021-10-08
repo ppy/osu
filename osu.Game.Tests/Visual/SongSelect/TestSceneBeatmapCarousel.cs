@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private readonly Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
         private readonly HashSet<int> eagerSelectedIDs = new HashSet<int>();
 
-        private BeatmapInfo currentSelection => carousel.SelectedBeatmap;
+        private BeatmapInfo currentSelection => carousel.SelectedBeatmapInfo;
 
         private const int set_count = 5;
 
@@ -75,11 +75,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    AddStep("store selection", () => selection = carousel.SelectedBeatmap);
+                    AddStep("store selection", () => selection = carousel.SelectedBeatmapInfo);
                     if (isIterating)
-                        AddUntilStep("selection changed", () => carousel.SelectedBeatmap != selection);
+                        AddUntilStep("selection changed", () => carousel.SelectedBeatmapInfo != selection);
                     else
-                        AddUntilStep("selection not changed", () => carousel.SelectedBeatmap == selection);
+                        AddUntilStep("selection not changed", () => carousel.SelectedBeatmapInfo == selection);
                 }
             }
         }
@@ -387,7 +387,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Set non-empty mode filter", () =>
                 carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(1) }, false));
 
-            AddAssert("Something is selected", () => carousel.SelectedBeatmap != null);
+            AddAssert("Something is selected", () => carousel.SelectedBeatmapInfo != null);
         }
 
         /// <summary>
@@ -562,7 +562,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("filter to ruleset 0", () =>
                 carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
-            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmap.RulesetID == 0);
+            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmapInfo.RulesetID == 0);
 
             AddStep("remove mixed set", () =>
             {
@@ -653,7 +653,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     carousel.Filter(new FilterCriteria { SearchText = Guid.NewGuid().ToString() }, false);
                 });
 
-                AddAssert("selection lost", () => carousel.SelectedBeatmap == null);
+                AddAssert("selection lost", () => carousel.SelectedBeatmapInfo == null);
 
                 AddStep("Restore different ruleset filter", () =>
                 {
@@ -661,7 +661,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
                 });
 
-                AddAssert("selection changed", () => carousel.SelectedBeatmap != manySets.First().Beatmaps.First());
+                AddAssert("selection changed", () => carousel.SelectedBeatmapInfo != manySets.First().Beatmaps.First());
             }
 
             AddAssert("Selection was random", () => eagerSelectedIDs.Count > 2);
@@ -763,9 +763,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
             {
                 if (diff != null)
-                    return carousel.SelectedBeatmap == carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff.Value - 1).First();
+                    return carousel.SelectedBeatmapInfo == carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff.Value - 1).First();
 
-                return carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Contains(carousel.SelectedBeatmap);
+                return carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Contains(carousel.SelectedBeatmapInfo);
             });
 
         private void setSelected(int set, int diff) =>
@@ -800,7 +800,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 carousel.RandomAlgorithm.Value = RandomSelectAlgorithm.RandomPermutation;
 
-                if (!selectedSets.Any() && carousel.SelectedBeatmap != null)
+                if (!selectedSets.Any() && carousel.SelectedBeatmapInfo != null)
                     selectedSets.Push(carousel.SelectedBeatmapSet);
 
                 carousel.SelectNextRandom();

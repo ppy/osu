@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class BeatmapSelectionControl : RoomSubScreenComposite
+    public class BeatmapSelectionControl : OnlinePlayComposite
     {
         [Resolved]
         private MultiplayerMatchSubScreen matchSubScreen { get; set; }

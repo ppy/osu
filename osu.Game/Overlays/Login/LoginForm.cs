@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -42,6 +43,9 @@ namespace osu.Game.Overlays.Login
             Spacing = new Vector2(0, 5);
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
+
+            ErrorTextFlowContainer errorText;
+
             Children = new Drawable[]
             {
                 username = new OsuTextBox
@@ -56,6 +60,11 @@ namespace osu.Game.Overlays.Login
                     PlaceholderText = "password",
                     RelativeSizeAxes = Axes.X,
                     TabbableContentContainer = this,
+                },
+                errorText = new ErrorTextFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                 },
                 new SettingsCheckbox
                 {
@@ -97,6 +106,9 @@ namespace osu.Game.Overlays.Login
             };
 
             password.OnCommit += (sender, newText) => performLogin();
+
+            if (api?.LastLoginError?.Message is string error)
+                errorText.AddErrors(new[] { error });
         }
 
         public override bool AcceptsFocus => true;

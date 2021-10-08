@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private readonly Bindable<RoomCategory> roomCategory = new Bindable<RoomCategory>();
         private readonly Bindable<bool> hasPassword = new Bindable<bool>();
 
-        private RecentParticipantsList recentParticipantsList;
+        private DrawableRoomParticipantsList drawableRoomParticipantsList;
         private RoomSpecialCategoryPill specialCategoryPill;
         private PasswordProtectedIcon passwordIcon;
         private EndDateInfo endDateInfo;
@@ -136,7 +137,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     {
                                         new FillFlowContainer
                                         {
-                                            AutoSizeAxes = Axes.Both,
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
                                             Children = new Drawable[]
                                             {
@@ -166,13 +168,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                 },
                                                 new FillFlowContainer
                                                 {
-                                                    AutoSizeAxes = Axes.Both,
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
                                                     Padding = new MarginPadding { Top = 3 },
                                                     Direction = FillDirection.Vertical,
                                                     Children = new Drawable[]
                                                     {
                                                         new RoomNameText(),
-                                                        new RoomHostText(),
+                                                        new RoomStatusText()
                                                     }
                                                 }
                                             },
@@ -217,7 +220,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     Children = new Drawable[]
                                     {
                                         ButtonsContainer,
-                                        recentParticipantsList = new RecentParticipantsList
+                                        drawableRoomParticipantsList = new DrawableRoomParticipantsList
                                         {
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
@@ -280,8 +283,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 numberOfAvatars = value;
 
-                if (recentParticipantsList != null)
-                    recentParticipantsList.NumberOfCircles = value;
+                if (drawableRoomParticipantsList != null)
+                    drawableRoomParticipantsList.NumberOfCircles = value;
             }
         }
 
@@ -304,38 +307,87 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private class RoomHostText : OnlinePlayComposite
+        private class RoomStatusText : OnlinePlayComposite
         {
-            private LinkFlowContainer hostText;
+            [Resolved]
+            private OsuColour colours { get; set; }
 
-            public RoomHostText()
+            private SpriteText statusText;
+            private LinkFlowContainer beatmapText;
+
+            public RoomStatusText()
             {
-                AutoSizeAxes = Axes.Both;
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Width = 0.5f;
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = hostText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 16))
+                InternalChild = new GridContainer
                 {
-                    AutoSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            statusText = new OsuSpriteText
+                            {
+                                Font = OsuFont.Default.With(size: 16),
+                                Colour = colours.Lime1
+                            },
+                            beatmapText = new LinkFlowContainer(s =>
+                            {
+                                s.Font = OsuFont.Default.With(size: 16);
+                                s.Colour = colours.Lime1;
+                            })
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y
+                            }
+                        }
+                    }
                 };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+                SelectedItem.BindValueChanged(onSelectedItemChanged, true);
+            }
 
-                Host.BindValueChanged(host =>
+            private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
+            {
+                beatmapText.Clear();
+
+                if (Type.Value == MatchType.Playlists)
                 {
-                    hostText.Clear();
+                    statusText.Text = "Ready to play";
+                    return;
+                }
 
-                    if (host.NewValue != null)
-                    {
-                        hostText.AddText("hosted by ");
-                        hostText.AddUserLink(host.NewValue);
-                    }
-                }, true);
+                if (item.NewValue?.Beatmap.Value != null)
+                {
+                    statusText.Text = "Currently playing ";
+                    beatmapText.AddLink(item.NewValue.Beatmap.Value.GetDisplayTitleRomanisable(),
+                        LinkAction.OpenBeatmap,
+                        item.NewValue.Beatmap.Value.OnlineBeatmapID.ToString(),
+                        creationParameters: s =>
+                        {
+                            s.Truncate = true;
+                            s.RelativeSizeAxes = Axes.X;
+                        });
+                }
             }
         }
 

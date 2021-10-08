@@ -70,7 +70,7 @@ namespace osu.Game.Online.Rooms
 
         public void MapObjects(BeatmapManager beatmaps, RulesetStore rulesets)
         {
-            Beatmap.Value ??= apiBeatmap.ToBeatmap(rulesets);
+            Beatmap.Value ??= apiBeatmap.ToBeatmapInfo(rulesets);
             Ruleset.Value ??= rulesets.GetRuleset(RulesetID);
 
             Ruleset rulesetInstance = Ruleset.Value.CreateInstance();

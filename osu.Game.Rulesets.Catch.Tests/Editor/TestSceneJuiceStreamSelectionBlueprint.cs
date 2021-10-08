@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
                 X = x,
                 Path = sliderPath,
             };
-            EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = velocity;
+            EditorBeatmap.Difficulty.SliderMultiplier = velocity;
             EditorBeatmap.Add(hitObject);
             EditorBeatmap.Update(hitObject);
             Assert.That(hitObject.Velocity, Is.EqualTo(velocity));

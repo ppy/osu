@@ -274,21 +274,40 @@ namespace osu.Game.Graphics.UserInterface
                 CornerRadius = corner_radius;
                 Height = 40;
 
-                Foreground.Children = new Drawable[]
+                Foreground.Child = new GridContainer
                 {
-                    Text = new OsuSpriteText
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    RowDimensions = new[]
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
+                        new Dimension(GridSizeMode.AutoSize),
                     },
-                    Icon = new SpriteIcon
+                    ColumnDimensions = new[]
                     {
-                        Icon = FontAwesome.Solid.ChevronDown,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Margin = new MarginPadding { Right = 5 },
-                        Size = new Vector2(12),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
                     },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            Text = new OsuSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
+                            },
+                            Icon = new SpriteIcon
+                            {
+                                Icon = FontAwesome.Solid.ChevronDown,
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Margin = new MarginPadding { Horizontal = 5 },
+                                Size = new Vector2(12),
+                            },
+                        }
+                    }
                 };
 
                 AddInternal(new HoverClickSounds());

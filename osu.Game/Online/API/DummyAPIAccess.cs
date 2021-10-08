@@ -32,6 +32,8 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl => "http://localhost";
 
+        public Exception LastLoginError { get; private set; }
+
         /// <summary>
         /// Provide handling logic for an arbitrary API request.
         /// Should return true is a request was handled. If null or false return, the request will be failed with a <see cref="NotSupportedException"/>.
@@ -39,6 +41,8 @@ namespace osu.Game.Online.API
         public Func<APIRequest, bool> HandleRequest;
 
         private readonly Bindable<APIState> state = new Bindable<APIState>(APIState.Online);
+
+        private bool shouldFailNextLogin;
 
         /// <summary>
         /// The current connectivity state of the API.
@@ -74,6 +78,18 @@ namespace osu.Game.Online.API
 
         public void Login(string username, string password)
         {
+            state.Value = APIState.Connecting;
+
+            if (shouldFailNextLogin)
+            {
+                LastLoginError = new APIException("Not powerful enough to login.", new ArgumentException(nameof(shouldFailNextLogin)));
+
+                state.Value = APIState.Offline;
+                shouldFailNextLogin = false;
+                return;
+            }
+
+            LastLoginError = null;
             LocalUser.Value = new User
             {
                 Username = username,
@@ -102,5 +118,7 @@ namespace osu.Game.Online.API
         IBindable<User> IAPIProvider.LocalUser => LocalUser;
         IBindableList<User> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
+
+        public void FailNextLogin() => shouldFailNextLogin = true;
     }
 }
