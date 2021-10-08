@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -213,6 +214,9 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
+            AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
+            AddInternal(failLowPassFilter = new AudioFilter(audio.TrackMixer));
+
             Score = CreateScore(playableBeatmap);
 
             // ensure the score is in a consistent state with the current player.
@@ -221,8 +225,6 @@ namespace osu.Game.Screens.Play
             Score.ScoreInfo.Mods = gameplayMods;
 
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score));
-
-            AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
             var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
 
@@ -768,6 +770,8 @@ namespace osu.Game.Screens.Play
 
         private FailAnimation failAnimation;
 
+        private AudioFilter failLowPassFilter;
+
         private bool onFail()
         {
             if (!CheckModsAllowFailure())
@@ -782,6 +786,7 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
+            failLowPassFilter.CutoffTo(300, 2500, Easing.OutCubic);
             failAnimation.Start();
 
             if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
@@ -794,6 +799,7 @@ namespace osu.Game.Screens.Play
         private void onFailComplete()
         {
             GameplayClockContainer.Stop();
+            failLowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
 
             FailOverlay.Retries = RestartCount;
             FailOverlay.Show();
