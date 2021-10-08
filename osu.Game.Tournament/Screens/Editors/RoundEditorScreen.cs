@@ -149,7 +149,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private readonly Bindable<int?> beatmapId = new Bindable<int?>();
 
-                    private readonly Bindable<string> mods = new Bindable<string>();
+                    private readonly Bindable<string> mods = new Bindable<string>(string.Empty);
 
                     private readonly Container drawableContainer;
 
