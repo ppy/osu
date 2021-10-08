@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
-
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Framework.Utils;
@@ -30,28 +29,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => 1.06;
 
-        protected virtual double DecayWeight => 0.9;
+        protected virtual double DifficultySumWeight => 0.9;
 
-        protected DecayingStrainSections strainSections;
+        protected DecayingStrainPeaks Strain;
 
         protected OsuStrainSkill(Mod[] mods, double strainDecayBase, int sectionLength = 400)
             : base(mods)
         {
-            strainSections = new DecayingStrainSections(strainDecayBase, sectionLength);
+            Strain = new DecayingStrainPeaks(strainDecayBase, sectionLength);
         }
 
-
-        protected double AddStrain(double time, double value)
+        protected double IncrementStrainAtTime(double time, double strainIncrement)
         {
-            return strainSections.AddStrain(time, value);
+            return Strain.IncrementStrainAtTime(time, strainIncrement);
         }
 
         public override double DifficultyValue()
         {
-            double difficulty = 0;
-            double weight = 1;
-
-            List<double> strains = strainSections.sections.GetCurrentStrainPeaks().OrderByDescending(d => d).ToList();
+            List<double> strains = Strain.StrainPeaks.OrderByDescending(d => d).ToList();
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)
@@ -60,15 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strains[i] *= Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale);
             }
 
-            // Difficulty is the weighted sum of the highest strains from every section.
-            // We're sorting from highest to lowest strain.
-            foreach (double strain in strains.OrderByDescending(d => d))
-            {
-                difficulty += strain * weight;
-                weight *= DecayWeight;
-            }
-
-            return difficulty * DifficultyMultiplier;
+            return strains.SortedExponentialWeightedSum(DifficultySumWeight) * DifficultyMultiplier;
         }
     }
 }

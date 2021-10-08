@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     AngleBonus + TotalDistance / Math.Max(osuCurrent.StrainTime, timing_threshold),
                     TotalDistance / osuCurrent.StrainTime
                 );
-                CumulativeStrain = state.AddStrain(osuCurrent.StartTime, Strain);
+                CumulativeStrain = state.IncrementStrainAtTime(osuCurrent.StartTime, Strain);
             }
         }
 

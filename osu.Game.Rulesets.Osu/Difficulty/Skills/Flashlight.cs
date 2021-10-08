@@ -20,8 +20,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private const double skill_multiplier = 0.15;
-        protected override double DecayWeight => 1.0;
+        protected override double DifficultySumWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
+
         protected override void Process(DifficultyHitObject current)
         {
             var osuCurrent = (OsuDifficultyHitObject)current;
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
 
                 Strain = skill_multiplier * Math.Pow(SmallDistNerf * Result, 2.0);
-                CumulativeStrain = state.AddStrain(current.StartTime, Strain);
+                CumulativeStrain = state.IncrementStrainAtTime(current.StartTime, Strain);
             }
         }
     }

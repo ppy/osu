@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                        * (0.95 + SpeedBonus * Math.Pow(distance / single_spacing_threshold, 3.5))
                        / CappedStrainTime;
 
-                CumulativeStrain = state.AddStrain(current.StartTime, Strain);
+                CumulativeStrain = state.IncrementStrainAtTime(current.StartTime, Strain);
             }
         }
     }
