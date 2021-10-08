@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.AccountCreation
+namespace osu.Game.Graphics
 {
     public class ErrorTextFlowContainer : OsuTextFlowContainer
     {

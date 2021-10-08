@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         [BackgroundDependencyLoader]
         private void load(BeatmapDifficultyCache beatmapDifficultyCache)
         {
-            var beatmap = score.Beatmap;
+            var beatmap = score.BeatmapInfo;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             var creator = metadata.Author?.Username;
 
