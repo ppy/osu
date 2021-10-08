@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
     public class CheckTooShortSpinnersTest
     {
         private CheckTooShortSpinners check;
-        private BeatmapDifficulty difficulty;
+        private IBeatmapDifficultyInfo difficulty;
 
         [SetUp]
         public void Setup()
@@ -81,12 +81,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
             assertTooShort(new List<HitObject> { spinnerHighOd }, difficultyHighOd);
         }
 
-        private void assertOk(List<HitObject> hitObjects, BeatmapDifficulty beatmapDifficulty)
+        private void assertOk(List<HitObject> hitObjects, IBeatmapDifficultyInfo beatmapDifficulty)
         {
             Assert.That(check.Run(getContext(hitObjects, beatmapDifficulty)), Is.Empty);
         }
 
-        private void assertVeryShort(List<HitObject> hitObjects, BeatmapDifficulty beatmapDifficulty)
+        private void assertVeryShort(List<HitObject> hitObjects, IBeatmapDifficultyInfo beatmapDifficulty)
         {
             var issues = check.Run(getContext(hitObjects, beatmapDifficulty)).ToList();
 
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
             Assert.That(issues.First().Template is CheckTooShortSpinners.IssueTemplateVeryShort);
         }
 
-        private void assertTooShort(List<HitObject> hitObjects, BeatmapDifficulty beatmapDifficulty)
+        private void assertTooShort(List<HitObject> hitObjects, IBeatmapDifficultyInfo beatmapDifficulty)
         {
             var issues = check.Run(getContext(hitObjects, beatmapDifficulty)).ToList();
 
@@ -102,12 +102,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
             Assert.That(issues.First().Template is CheckTooShortSpinners.IssueTemplateTooShort);
         }
 
-        private BeatmapVerifierContext getContext(List<HitObject> hitObjects, BeatmapDifficulty beatmapDifficulty)
+        private BeatmapVerifierContext getContext(List<HitObject> hitObjects, IBeatmapDifficultyInfo beatmapDifficulty)
         {
             var beatmap = new Beatmap<HitObject>
             {
                 HitObjects = hitObjects,
-                BeatmapInfo = new BeatmapInfo { BaseDifficulty = beatmapDifficulty }
+                BeatmapInfo = new BeatmapInfo { BaseDifficulty = new BeatmapDifficulty(beatmapDifficulty) }
             };
 
             return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));

@@ -17,6 +17,7 @@ using osu.Framework.Testing.Input;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestSceneGameplayCursor : OsuSkinnableTestScene
     {
         [Cached]
-        private GameplayBeatmap gameplayBeatmap;
+        private GameplayState gameplayState;
 
         private OsuCursorContainer lastContainer;
 
@@ -40,7 +41,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public TestSceneGameplayCursor()
         {
-            gameplayBeatmap = new GameplayBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
+            var ruleset = new OsuRuleset();
+            gameplayState = new GameplayState(CreateBeatmap(ruleset.RulesetInfo), ruleset, Array.Empty<Mod>());
 
             AddStep("change background colour", () =>
             {
@@ -57,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddSliderStep("circle size", 0f, 10f, 0f, val =>
             {
                 config.SetValue(OsuSetting.AutoCursorSize, true);
-                gameplayBeatmap.BeatmapInfo.BaseDifficulty.CircleSize = val;
+                gameplayState.Beatmap.Difficulty.CircleSize = val;
                 Scheduler.AddOnce(() => loadContent(false));
             });
 
@@ -73,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestSizing(int circleSize, float userScale)
         {
             AddStep($"set user scale to {userScale}", () => config.SetValue(OsuSetting.GameplayCursorSize, userScale));
-            AddStep($"adjust cs to {circleSize}", () => gameplayBeatmap.BeatmapInfo.BaseDifficulty.CircleSize = circleSize);
+            AddStep($"adjust cs to {circleSize}", () => gameplayState.Beatmap.Difficulty.CircleSize = circleSize);
             AddStep("turn on autosizing", () => config.SetValue(OsuSetting.AutoCursorSize, true));
 
             AddStep("load content", () => loadContent());

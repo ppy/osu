@@ -49,6 +49,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModSpunOut))
                 multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
 
+            if (mods.Any(h => h is OsuModRelax))
+            {
+                countMiss += countOk + countMeh;
+                multiplier *= 0.6;
+            }
+
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
             double accuracyValue = computeAccuracyValue();
@@ -165,6 +171,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAccuracyValue()
         {
+            if (mods.Any(h => h is OsuModRelax))
+                return 0.0;
+
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
             double betterAccuracyPercentage;
             int amountHitObjectsWithAccuracy = Attributes.HitCircleCount;

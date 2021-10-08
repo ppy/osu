@@ -35,8 +35,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private Drawable hitCircleSprite;
 
-        protected Drawable HitCircleOverlay { get; private set; }
+        protected Container OverlayLayer { get; private set; }
 
+        private Drawable hitCircleOverlay;
         private SkinnableSpriteText hitCircleText;
 
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
@@ -78,17 +79,22 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                HitCircleOverlay = new KiaiFlashingSprite
+                OverlayLayer = new Container
                 {
-                    Texture = overlayTexture,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                },
+                    Child = hitCircleOverlay = new KiaiFlashingSprite
+                    {
+                        Texture = overlayTexture,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                }
             };
 
             if (hasNumber)
             {
-                AddInternal(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
+                OverlayLayer.Add(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
@@ -102,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
 
             if (overlayAboveNumber)
-                ChangeInternalChildDepth(HitCircleOverlay, float.MinValue);
+                OverlayLayer.ChangeChildDepth(hitCircleOverlay, float.MinValue);
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
@@ -147,8 +153,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         hitCircleSprite.FadeOut(legacy_fade_duration, Easing.Out);
                         hitCircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
-                        HitCircleOverlay.FadeOut(legacy_fade_duration, Easing.Out);
-                        HitCircleOverlay.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        hitCircleOverlay.FadeOut(legacy_fade_duration, Easing.Out);
+                        hitCircleOverlay.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
                         if (hasNumber)
                         {
