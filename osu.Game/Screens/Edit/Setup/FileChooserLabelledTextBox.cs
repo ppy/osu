@@ -89,6 +89,13 @@ namespace osu.Game.Screens.Edit.Setup
         {
             public Action OnFocused;
 
+            protected override bool OnDragStart(DragStartEvent e)
+            {
+                // This text box is intended to be "read only" without actually specifying that.
+                // As such we don't want to allow the user to select its content with a drag.
+                return false;
+            }
+
             protected override void OnFocus(FocusEvent e)
             {
                 OnFocused?.Invoke();

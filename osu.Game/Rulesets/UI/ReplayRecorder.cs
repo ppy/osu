@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.UI
         private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
-        private GameplayBeatmap gameplayBeatmap { get; set; }
+        private GameplayState gameplayState { get; set; }
 
         protected ReplayRecorder(Score target)
         {
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.UI
 
             inputManager = GetContainingInputManager();
 
-            spectatorClient?.BeginPlaying(gameplayBeatmap, target);
+            spectatorClient?.BeginPlaying(gameplayState, target);
         }
 
         protected override void Dispose(bool isDisposing)

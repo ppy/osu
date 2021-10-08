@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps
     /// Handles ef-core storage of beatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapModelManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
+    public class BeatmapModelManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IBeatmapModelManager
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The game working beatmap cache, used to invalidate entries on changes.
         /// </summary>
-        public WorkingBeatmapCache WorkingBeatmapCache { private get; set; }
+        public IWorkingBeatmapCache WorkingBeatmapCache { private get; set; }
 
         private readonly Bindable<WeakReference<BeatmapInfo>> beatmapRestored = new Bindable<WeakReference<BeatmapInfo>>();
 
@@ -173,24 +173,24 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Delete a beatmap difficulty.
         /// </summary>
-        /// <param name="beatmap">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmap) => beatmaps.Hide(beatmap);
+        /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
+        public void Hide(BeatmapInfo beatmapInfo) => beatmaps.Hide(beatmapInfo);
 
         /// <summary>
         /// Restore a beatmap difficulty.
         /// </summary>
-        /// <param name="beatmap">The beatmap difficulty to restore.</param>
-        public void Restore(BeatmapInfo beatmap) => beatmaps.Restore(beatmap);
+        /// <param name="beatmapInfo">The beatmap difficulty to restore.</param>
+        public void Restore(BeatmapInfo beatmapInfo) => beatmaps.Restore(beatmapInfo);
 
         /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
         /// </summary>
-        /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
+        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin beatmapSkin = null)
         {
-            var setInfo = info.BeatmapSet;
+            var setInfo = beatmapInfo.BeatmapSet;
 
             using (var stream = new MemoryStream())
             {
@@ -201,7 +201,9 @@ namespace osu.Game.Beatmaps
 
                 using (ContextFactory.GetForWrite())
                 {
-                    var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
+                    beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == beatmapInfo.ID);
+                    beatmapInfo.BaseDifficulty.CopyFrom(beatmapContent.Difficulty);
+
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 
                     // grab the original file (or create a new one if not found).
@@ -219,7 +221,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            WorkingBeatmapCache?.Invalidate(info);
+            WorkingBeatmapCache?.Invalidate(beatmapInfo);
         }
 
         /// <summary>
