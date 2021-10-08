@@ -10,7 +10,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
+using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
@@ -22,7 +24,7 @@ namespace osu.Game.Screens.Play
     /// Manage the animation to be applied when a player fails.
     /// Single file; automatically disposed after use.
     /// </summary>
-    public class FailAnimation : Component
+    public class FailAnimation : CompositeDrawable
     {
         public Action OnComplete;
 
@@ -31,6 +33,8 @@ namespace osu.Game.Screens.Play
         private readonly BindableDouble trackFreq = new BindableDouble(1);
 
         private Track track;
+
+        private AudioFilter failLowPassFilter;
 
         private const float duration = 2500;
 
@@ -46,6 +50,8 @@ namespace osu.Game.Screens.Play
         {
             track = beatmap.Value.Track;
             failSample = audio.Samples.Get(@"Gameplay/failsound");
+
+            AddInternal(failLowPassFilter = new AudioFilter(audio.TrackMixer));
         }
 
         private bool started;
@@ -67,6 +73,8 @@ namespace osu.Game.Screens.Play
                 OnComplete?.Invoke();
                 Expire();
             });
+
+            failLowPassFilter.CutoffTo(300, duration, Easing.OutCubic);
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
 
