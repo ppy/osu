@@ -9,10 +9,13 @@ using osu.Game.Rulesets.Mods;
 namespace osu.Game.Rulesets.Difficulty.Skills
 {
     /// <summary>
-    /// Convenience base class for a<see cref="Skill"/> making use of <see cref="SectionPeaks"/>
+    /// Convenience base class for a <see cref="Skill"/> making use of <see cref="SectionPeaks"/>
     /// </summary>
     public abstract class StrainSkill : Skill
     {
+        /// <summary>
+        /// The weight for the exponential sum of strains which produces the final difficulty value
+        /// </summary>
         protected virtual double DifficultySumWeight => 0.9;
 
         protected readonly SectionPeaks StrainPeaks;
@@ -23,13 +26,20 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             StrainPeaks = new SectionPeaks(StrainAtTime, sectionLength);
         }
 
+        /// <summary>
+        /// Calculates the total strain value at the time of the <see cref="DifficultyHitObject"/>
+        /// </summary>
         protected abstract double StrainValueAt(DifficultyHitObject hitObject);
+
+        /// <summary>
+        /// Calculates the total strain value at section boundaries.
+        /// </summary>
         protected abstract double StrainAtTime(double time);
 
         protected override void Process(DifficultyHitObject hitObject)
         {
             StrainPeaks.AdvanceTime(hitObject.StartTime);
-            StrainPeaks.UpdateValue(StrainValueAt(hitObject));
+            StrainPeaks.SetValueAtCurrentTime(StrainValueAt(hitObject));
         }
 
         public override double DifficultyValue()

@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// </summary>
         private readonly Func<double, double> valueAtTime;
 
-        private double currentSectionPeak; // Why was this 1?
+        private double currentSectionPeak;
         private double currentSectionEnd;
         private readonly List<double> strainPeaks = new List<double>();
 
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <summary>
         /// Update current value, setting <see cref="currentSectionPeak"/> if necessary
         /// </summary>
-        public void UpdateValue(double value)
+        public void SetValueAtCurrentTime(double value)
         {
             currentSectionPeak = Math.Max(value, currentSectionPeak);
         }

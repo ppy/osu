@@ -49,10 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
         }
 
-        protected override double StrainAtTime(double time)
-        {
-            return 0;
-        }
+        protected override double StrainAtTime(double time) => 0;
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {

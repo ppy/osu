@@ -8,8 +8,8 @@ namespace osu.Game.Rulesets.Difficulty.Utils
     /// </summary>
     public class DecayingStrainPeaks
     {
-        public DecayingValue CurrentStrain;
-        public SectionPeaks StrainPeaks;
+        public readonly DecayingValue CurrentStrain;
+        public readonly SectionPeaks StrainPeaks;
 
         public DecayingStrainPeaks(double strainDecayBase, int sectionLength = 400)
         {
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         {
             StrainPeaks.AdvanceTime(time);
             CurrentStrain.IncrementValueAtTime(time, strainIncrease);
-            StrainPeaks.UpdateValue(CurrentStrain.Value);
+            StrainPeaks.SetValueAtCurrentTime(CurrentStrain.Value);
             return CurrentStrain.Value;
         }
     }

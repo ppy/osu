@@ -13,8 +13,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     /// </summary>
     public abstract class StrainDecaySkill : Skill
     {
+        /// <summary>
+        /// The weight for the exponential sum of strains which produces the final difficulty value
+        /// </summary>
         protected virtual double DifficultySumWeight => 0.9;
 
+        /// <summary>
+        /// Scales the value of <see cref="StrainValueOf(DifficultyHitObject)"/> to produce a final strain.
+        /// </summary>
         protected abstract double SkillMultiplier { get; }
 
         protected readonly DecayingStrainPeaks Strain;
@@ -30,6 +36,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             Strain.IncrementStrainAtTime(hitObject.StartTime, SkillMultiplier * StrainValueOf(hitObject));
         }
 
+        /// <summary>
+        /// Returns a strain increment representing the difficulty of the <see cref="DifficultyHitObject"/>.
+        /// This will be scaled by <see cref="SkillMultiplier"/> and added onto the current strain.
+        /// </summary>
         protected abstract double StrainValueOf(DifficultyHitObject hitObject);
 
         public override double DifficultyValue()
