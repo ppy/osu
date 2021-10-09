@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Screens;
@@ -32,6 +33,9 @@ namespace osu.Game.Tests.Visual
                 content = new Container { RelativeSizeAxes = Axes.Both },
                 DialogOverlay = new DialogOverlay()
             });
+
+            Stack.ScreenPushed += (lastScreen, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");
+            Stack.ScreenExited += (lastScreen, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed ← {newScreen}");
         }
 
         protected void LoadScreen(OsuScreen screen) => Stack.Push(screen);
