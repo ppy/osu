@@ -54,6 +54,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private void setDistances()
         {
+            // We don't need to calculate neither angle nor distance when one of the last->curr objects is a spinner
+            if (BaseObject is Spinner || lastObject is Spinner)
+                return;
+
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = normalized_radius / (float)BaseObject.Radius;
 
@@ -69,26 +73,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
             }
 
-            if (!(lastObject is Spinner))
+            Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
+
+            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+
+            if (lastLastObject != null && !(lastLastObject is Spinner))
             {
-                Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
+                Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastObject);
 
-                // Don't need to jump to reach spinners
-                if (!(BaseObject is Spinner))
-                    JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+                Vector2 v1 = lastLastCursorPosition - lastObject.StackedPosition;
+                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
 
-                if (lastLastObject != null)
-                {
-                    Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastObject);
+                float dot = Vector2.Dot(v1, v2);
+                float det = v1.X * v2.Y - v1.Y * v2.X;
 
-                    Vector2 v1 = lastLastCursorPosition - lastObject.StackedPosition;
-                    Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
-
-                    float dot = Vector2.Dot(v1, v2);
-                    float det = v1.X * v2.Y - v1.Y * v2.X;
-
-                    Angle = Math.Abs(Math.Atan2(det, dot));
-                }
+                Angle = Math.Abs(Math.Atan2(det, dot));
             }
         }
 
