@@ -23,7 +23,7 @@ namespace osu.Game.Overlays
     [Cached]
     public abstract class SettingsPanel : OsuFocusedOverlayContainer
     {
-        public const float CONTENT_MARGINS = 15;
+        public const float CONTENT_MARGINS = 20;
 
         public const float TRANSITION_LENGTH = 600;
 
@@ -106,17 +106,23 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = CreateHeader(),
                 SelectedSection = { BindTarget = CurrentSection },
-                FixedHeader = searchTextBox = new SeekLimitedSearchTextBox
+                FixedHeader = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    Width = 0.95f,
-                    Margin = new MarginPadding
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding
                     {
-                        Top = 20,
-                        Bottom = 20
+                        Vertical = 20,
+                        Horizontal = CONTENT_MARGINS
                     },
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Child = searchTextBox = new SeekLimitedSearchTextBox
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                    }
                 },
                 Footer = CreateFooter().With(f => f.Alpha = 0)
             });
