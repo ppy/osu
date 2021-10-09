@@ -67,7 +67,7 @@ namespace osu.Game.Beatmaps.Formats
             this.beatmap.HitObjects = this.beatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
 
             foreach (var hitObject in this.beatmap.HitObjects)
-                hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
+                hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
         }
 
         protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(' ') || line.StartsWith('_');
@@ -276,7 +276,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = SplitKeyVal(line);
 
-            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            var difficulty = beatmap.Difficulty;
 
             switch (pair.Key)
             {
@@ -444,7 +444,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (obj != null)
             {
-                obj.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
+                obj.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
 
                 beatmap.HitObjects.Add(obj);
             }

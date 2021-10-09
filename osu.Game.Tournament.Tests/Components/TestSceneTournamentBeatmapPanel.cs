@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Tests.Components
 
         private void success(APIBeatmap apiBeatmap)
         {
-            var beatmap = apiBeatmap.ToBeatmap(rulesets);
+            var beatmap = apiBeatmap.ToBeatmapInfo(rulesets);
             Add(new TournamentBeatmapPanel(beatmap)
             {
                 Anchor = Anchor.Centre,
