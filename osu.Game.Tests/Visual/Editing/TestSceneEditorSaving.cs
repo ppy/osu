@@ -32,6 +32,8 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("wait for editor load", () => editor != null);
 
+            AddStep("Set overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty = 7);
+
             AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
 
             AddStep("Enter compose mode", () => InputManager.Key(Key.F1));
@@ -57,6 +59,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("Wait for editor load", () => editor != null);
             AddAssert("Beatmap contains single hitcircle", () => editorBeatmap.HitObjects.Count == 1);
+            AddAssert("Beatmap has correct overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty == 7);
         }
     }
 }
