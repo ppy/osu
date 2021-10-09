@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
         protected override Container<Drawable> Content => ContentContainer;
 
         protected Sidebar Sidebar;
-        private SidebarButton selectedSidebarButton;
+        private SidebarIconButton selectedSidebarButton;
 
         public SettingsSectionsContainer SectionsContainer { get; private set; }
 
@@ -252,11 +252,11 @@ namespace osu.Game.Overlays
             });
         }
 
-        private IEnumerable<SidebarButton> createSidebarButtons()
+        private IEnumerable<SidebarIconButton> createSidebarButtons()
         {
             foreach (var section in SectionsContainer)
             {
-                yield return new SidebarButton
+                yield return new SidebarIconButton
                 {
                     Section = section,
                     Action = () =>

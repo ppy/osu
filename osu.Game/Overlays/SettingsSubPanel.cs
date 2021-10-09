@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osuTK;
 
@@ -33,22 +32,20 @@ namespace osu.Game.Overlays
 
         protected override bool DimMainContent => false; // dimming is handled by main overlay
 
-        private class BackButton : OsuButton
+        private class BackButton : SidebarButton
         {
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; }
+            private Container content;
+
+            protected override Drawable HoverTarget => content;
 
             [BackgroundDependencyLoader]
             private void load()
             {
                 Size = new Vector2(Sidebar.DEFAULT_WIDTH);
 
-                BackgroundColour = colourProvider.Background5;
-                Hover.Colour = Colour4.Transparent;
-
                 AddRange(new Drawable[]
                 {
-                    new Container
+                    content = new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

@@ -16,16 +16,16 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>
+    public class Sidebar : Container<SidebarIconButton>, IStateful<ExpandedState>
     {
         private readonly Box background;
-        private readonly FillFlowContainer<SidebarButton> content;
+        private readonly FillFlowContainer<SidebarIconButton> content;
         public const float DEFAULT_WIDTH = 70;
         public const int EXPANDED_WIDTH = 200;
 
         public event Action<ExpandedState> StateChanged;
 
-        protected override Container<SidebarButton> Content => content;
+        protected override Container<SidebarIconButton> Content => content;
 
         public Sidebar()
         {
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     Children = new[]
                     {
-                        content = new FillFlowContainer<SidebarButton>
+                        content = new FillFlowContainer<SidebarIconButton>
                         {
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
