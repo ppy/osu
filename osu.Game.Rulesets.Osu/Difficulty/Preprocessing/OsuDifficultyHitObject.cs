@@ -69,23 +69,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
             }
 
-            Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
-
-            // Don't need to jump to reach spinners
-            if (!(BaseObject is Spinner))
-                JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-
-            if (lastLastObject != null)
+            if (!(lastObject is Spinner))
             {
-                Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastObject);
+                Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
-                Vector2 v1 = lastLastCursorPosition - lastObject.StackedPosition;
-                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+                // Don't need to jump to reach spinners
+                if (!(BaseObject is Spinner))
+                    JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
 
-                float dot = Vector2.Dot(v1, v2);
-                float det = v1.X * v2.Y - v1.Y * v2.X;
+                if (lastLastObject != null)
+                {
+                    Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastObject);
 
-                Angle = Math.Abs(Math.Atan2(det, dot));
+                    Vector2 v1 = lastLastCursorPosition - lastObject.StackedPosition;
+                    Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+
+                    float dot = Vector2.Dot(v1, v2);
+                    float det = v1.X * v2.Y - v1.Y * v2.X;
+
+                    Angle = Math.Abs(Math.Atan2(det, dot));
+                }
             }
         }
 
