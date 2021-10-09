@@ -10,7 +10,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -36,12 +35,16 @@ namespace osu.Game.Overlays
 
         private class BackButton : OsuButton
         {
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; }
+
             [BackgroundDependencyLoader]
             private void load()
             {
                 Size = new Vector2(Sidebar.DEFAULT_WIDTH);
 
-                BackgroundColour = Color4.Black;
+                BackgroundColour = colourProvider.Background5;
+                Hover.Colour = Colour4.Transparent;
 
                 AddRange(new Drawable[]
                 {
