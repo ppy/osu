@@ -15,8 +15,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     {
         protected virtual double DifficultySumWeight => 0.9;
 
-        protected abstract double SkillMultiplier { get; }
-
         protected readonly SectionPeaks StrainPeaks;
 
         protected StrainSkill(Mod[] mods, int sectionLength = 400)
@@ -31,12 +29,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected override void Process(DifficultyHitObject hitObject)
         {
             StrainPeaks.AdvanceTime(hitObject.StartTime);
-            StrainPeaks.UpdateValue(SkillMultiplier * StrainValueAt(hitObject));
+            StrainPeaks.UpdateValue(StrainValueAt(hitObject));
         }
 
         public override double DifficultyValue()
         {
-            return StrainPeaks.ExponentialWeightedSum(DifficultySumWeight);
+            return StrainPeaks.SortedExponentialWeightedSum(DifficultySumWeight);
         }
 
         public IEnumerable<double> GetCurrentStrainPeaks() => StrainPeaks;

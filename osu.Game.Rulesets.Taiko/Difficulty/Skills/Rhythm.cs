@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// </summary>
     public class Rhythm : StrainSkill
     {
-        protected override double SkillMultiplier => 10;
+        private const double skill_multiplier = 10;
 
         /// <summary>
         /// The note-based decay for rhythm strain.
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             notesSinceRhythmChange = 0;
 
             currentStrain += objectStrain;
-            return currentStrain;
+            return skill_multiplier * currentStrain;
         }
 
         /// <summary>
