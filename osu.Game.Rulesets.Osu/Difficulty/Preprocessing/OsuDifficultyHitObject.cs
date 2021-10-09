@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private void setDistances()
         {
-            // We don't need to calculate neither angle nor distance when one of the last->curr objects is a spinner
+            // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
             if (BaseObject is Spinner || lastObject is Spinner)
                 return;
 
