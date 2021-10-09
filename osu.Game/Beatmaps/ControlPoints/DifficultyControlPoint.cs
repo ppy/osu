@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             Precision = 0.01,
             Default = 1,
-            MinValue = 0.1,
+            MinValue = 0.01,
             MaxValue = 10
         };
 
