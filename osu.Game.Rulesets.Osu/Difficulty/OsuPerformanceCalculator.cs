@@ -40,9 +40,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMeh = Score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = Score.Statistics.GetValueOrDefault(HitResult.Miss);
 
-            // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
+            // Custom multipliers for NoFail and SpunOut.
             if (mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * countMiss);
 
@@ -114,11 +114,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateBonus = 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
 
-            // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * countMiss)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * Attributes.DrainRate * Attributes.DrainRate);
             else if (mods.Any(h => h is OsuModHidden))
+            {
+                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
+            }
 
             aimValue *= approachRateBonus;
 
@@ -155,14 +157,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             speedValue *= 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
 
-            // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (mods.Any(m => m is OsuModBlinds))
+            {
+                // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
                 speedValue *= 1.12;
+            }
             else if (mods.Any(m => m is OsuModHidden))
+            {
+                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
+            }
 
             // Scale the speed value with accuracy and OD.
             speedValue *= (0.95 + Math.Pow(Attributes.OverallDifficulty, 2) / 750) * Math.Pow(accuracy, (14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
+
             // Scale the speed value with # of 50s to punish doubletapping.
             speedValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
 
@@ -199,6 +207,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 accuracyValue *= 1.14;
             else if (mods.Any(m => m is OsuModHidden))
                 accuracyValue *= 1.08;
+
             if (mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
 
