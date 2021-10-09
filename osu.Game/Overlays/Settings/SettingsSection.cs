@@ -12,6 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -29,6 +30,8 @@ namespace osu.Game.Overlays.Settings
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
         public virtual IEnumerable<string> FilterTerms => new[] { Header.ToString() };
+
+        public const int ITEM_SPACING = 14;
 
         private const int header_size = 24;
         private const int border_size = 4;
@@ -52,8 +55,9 @@ namespace osu.Game.Overlays.Settings
             {
                 Margin = new MarginPadding
                 {
-                    Top = header_size
+                    Top = 36
                 },
+                Spacing = new Vector2(0, ITEM_SPACING),
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
