@@ -285,7 +285,7 @@ namespace osu.Game.Overlays
                         return;
 
                     // check once more to ensure the channel hasn't since been removed from the loaded channels list (may have been left by some automated means).
-                    if (loadedChannels.Contains(loaded))
+                    if (!loadedChannels.Contains(loaded))
                         return;
 
                     loading.Hide();

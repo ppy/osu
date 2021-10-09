@@ -137,11 +137,11 @@ namespace osu.Game.Tests.Visual.Playlists
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("match has altered beatmap", () => match.Beatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty.CircleSize == 1);
+            AddAssert("match has altered beatmap", () => match.Beatmap.Value.Beatmap.Difficulty.CircleSize == 1);
 
             AddStep("re-import original beatmap", () => manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait());
 
-            AddAssert("match has original beatmap", () => match.Beatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty.CircleSize != 1);
+            AddAssert("match has original beatmap", () => match.Beatmap.Value.Beatmap.Difficulty.CircleSize != 1);
         }
 
         private class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen

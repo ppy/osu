@@ -38,6 +38,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double flashlightRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
 
+            if (mods.Any(h => h is OsuModRelax))
+                speedRating = 0.0;
+
             double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
             double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating / 0.0675) - 4, 3) / 100000;
             double baseFlashlightPerformance = 0.0;
@@ -53,6 +56,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 );
 
             double starRating = basePerformance > 0.00001 ? Math.Cbrt(1.12) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
+
+            double drainRate = beatmap.Difficulty.DrainRate;
 
             int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
@@ -70,6 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 FlashlightRating = flashlightRating,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
+                DrainRate = drainRate,
                 MaxCombo = maxCombo,
                 HitCircleCount = hitCirclesCount,
                 SpinnerCount = spinnerCount,
@@ -94,14 +100,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, ClockWithMods clock)
         {
             HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             // For the time being, we will use the average clockrate for OD and AR attributes
             double baseClockRate = clock.GetAverageRate();
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
             hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / baseClockRate;
-            preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / baseClockRate;
+            preempt = (int)IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / baseClockRate;
 
             return new Skill[]
             {

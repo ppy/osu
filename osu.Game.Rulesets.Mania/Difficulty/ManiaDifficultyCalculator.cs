@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return new ManiaDifficultyAttributes { Mods = mods, Skills = skills };
 
             HitWindows hitWindows = new ManiaHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             // For the time being, we will use the average clockrate for OD and AR attributes
             double baseClockRate = clock.GetAverageRate();

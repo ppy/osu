@@ -109,8 +109,7 @@ namespace osu.Game.Rulesets.Difficulty
         private void preProcess(Mod[] mods)
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
-
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, playableMods);
             clock = new ClockWithMods(mods);
         }
 
@@ -254,6 +253,13 @@ namespace osu.Game.Rulesets.Difficulty
             }
 
             public BeatmapMetadata Metadata => baseBeatmap.Metadata;
+
+            public BeatmapDifficulty Difficulty
+            {
+                get => baseBeatmap.Difficulty;
+                set => baseBeatmap.Difficulty = value;
+            }
+
             public List<BreakPeriod> Breaks => baseBeatmap.Breaks;
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
             public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();

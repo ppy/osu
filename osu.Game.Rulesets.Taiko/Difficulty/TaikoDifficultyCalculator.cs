@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double baseClockRate = clock.GetAverageRate();
 
             HitWindows hitWindows = new TaikoHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             return new TaikoDifficultyAttributes
             {

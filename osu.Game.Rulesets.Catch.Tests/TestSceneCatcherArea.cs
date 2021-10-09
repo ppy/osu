@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private ScheduledDelegate addManyFruit;
 
-        private BeatmapDifficulty beatmapDifficulty;
+        private IBeatmapDifficultyInfo beatmapDifficulty;
 
         public TestSceneCatcherArea()
         {
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(BeatmapDifficulty beatmapDifficulty)
+            public TestCatcherArea(IBeatmapDifficultyInfo beatmapDifficulty)
             {
                 var droppedObjectContainer = new DroppedObjectContainer();
                 Add(droppedObjectContainer);

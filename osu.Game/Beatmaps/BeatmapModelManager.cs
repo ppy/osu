@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps
     /// Handles ef-core storage of beatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapModelManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
+    public class BeatmapModelManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IBeatmapModelManager
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The game working beatmap cache, used to invalidate entries on changes.
         /// </summary>
-        public WorkingBeatmapCache WorkingBeatmapCache { private get; set; }
+        public IWorkingBeatmapCache WorkingBeatmapCache { private get; set; }
 
         private readonly Bindable<WeakReference<BeatmapInfo>> beatmapRestored = new Bindable<WeakReference<BeatmapInfo>>();
 
@@ -202,6 +202,8 @@ namespace osu.Game.Beatmaps
                 using (ContextFactory.GetForWrite())
                 {
                     beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == beatmapInfo.ID);
+                    beatmapInfo.BaseDifficulty.CopyFrom(beatmapContent.Difficulty);
+
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 
                     // grab the original file (or create a new one if not found).

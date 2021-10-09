@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -43,6 +44,11 @@ namespace osu.Game.Screens.Menu
 
         private DecoupleableInterpolatingFramedClock decoupledClock;
         private TrianglesIntroSequence intro;
+
+        public IntroTriangles([CanBeNull] Func<MainMenu> createNextScreen = null)
+            : base(createNextScreen)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load()

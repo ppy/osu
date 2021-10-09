@@ -45,6 +45,7 @@ namespace osu.Game.Beatmaps
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, resources, new FileStore(contextFactory, storage).Store, defaultBeatmap, host);
 
             workingBeatmapCache.BeatmapManager = beatmapModelManager;
+            beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
 
             if (performOnlineLookups)
             {
@@ -304,6 +305,9 @@ namespace osu.Game.Beatmaps
         #region Implementation of IWorkingBeatmapCache
 
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo importedBeatmap) => workingBeatmapCache.GetWorkingBeatmap(importedBeatmap);
+
+        void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
+        void IWorkingBeatmapCache.Invalidate(BeatmapInfo beatmapInfo) => workingBeatmapCache.Invalidate(beatmapInfo);
 
         #endregion
 
