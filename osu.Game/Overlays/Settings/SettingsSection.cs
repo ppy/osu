@@ -30,8 +30,7 @@ namespace osu.Game.Overlays.Settings
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
         public virtual IEnumerable<string> FilterTerms => new[] { Header.ToString() };
 
-        private const int header_size = 26;
-        private const int margin = 20;
+        private const int header_size = 24;
         private const int border_size = 4;
 
         public bool MatchingFilter
@@ -77,8 +76,8 @@ namespace osu.Game.Overlays.Settings
                 {
                     Padding = new MarginPadding
                     {
-                        Top = margin + border_size,
-                        Bottom = margin + 10,
+                        Top = 28,
+                        Bottom = 40,
                     },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -86,13 +85,11 @@ namespace osu.Game.Overlays.Settings
                     {
                         header = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: header_size),
+                            Font = OsuFont.TorusAlternate.With(size: header_size),
                             Text = Header,
-                            Colour = colours.Yellow,
                             Margin = new MarginPadding
                             {
-                                Left = SettingsPanel.CONTENT_MARGINS,
-                                Right = SettingsPanel.CONTENT_MARGINS
+                                Horizontal = SettingsPanel.CONTENT_MARGINS
                             }
                         },
                         FlowContent
