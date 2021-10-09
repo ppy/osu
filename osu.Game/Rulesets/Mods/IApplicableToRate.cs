@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Returns the average rate that this mod applies.
         /// </summary>
-        /// <returns>The average rate after applying this mod.</returns>
+        /// <returns>The average rate after applying this mod over the entire duration of the track.</returns>
         double GetAverageRate();
 
         /// <summary>
