@@ -96,6 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             foreach (var current in hitObjects.Skip(1))
             {
                 yield return new OsuDifficultyHitObject(current, lastLast, last, clockRate);
+
                 lastLast = last;
                 last = current;
             }
