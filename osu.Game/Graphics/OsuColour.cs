@@ -226,6 +226,11 @@ namespace osu.Game.Graphics
         public readonly Color4 GrayF = Color4Extensions.FromHex(@"fff");
 
         /// <summary>
+        /// Equivalent to <see cref="OverlayColourProvider.Pink"/>'s <see cref="OverlayColourProvider.Colour3"/>.
+        /// </summary>
+        public readonly Color4 Pink3 = Color4Extensions.FromHex(@"cc3378");
+
+        /// <summary>
         /// Equivalent to <see cref="OverlayColourProvider.Blue"/>'s <see cref="OverlayColourProvider.Colour3"/>.
         /// </summary>
         public readonly Color4 Blue3 = Color4Extensions.FromHex(@"3399cc");
