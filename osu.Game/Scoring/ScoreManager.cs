@@ -74,10 +74,9 @@ namespace osu.Game.Scoring
 
             var totalScores = await Task.WhenAll(scores.Select(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken))).ConfigureAwait(false);
 
-            return scores.Select((s, i) => (index: i, score: s))
-                         .OrderByDescending(key => totalScores[key.index])
-                         .ThenBy(key => key.score.OnlineScoreID)
-                         .Select(key => key.score)
+            return scores.Select((score, index) => (score: score, totalScore: totalScores[index]))
+                         .OrderByDescending(g => g.totalScore)
+                         .Select(g => g.score)
                          .ToArray();
         }
 
