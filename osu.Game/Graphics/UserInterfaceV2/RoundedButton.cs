@@ -1,15 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class RoundedButton : OsuButton
+    public class RoundedButton : OsuButton, IFilterable
     {
         public override float Height
         {
@@ -44,5 +46,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         private void updateCornerRadius() => Content.CornerRadius = DrawHeight / 2;
+
+        public virtual IEnumerable<string> FilterTerms => new[] { Text.ToString() };
+
+        public bool MatchingFilter
+        {
+            set => this.FadeTo(value ? 1 : 0);
+        }
+
+        public bool FilteringActive { get; set; }
     }
 }
