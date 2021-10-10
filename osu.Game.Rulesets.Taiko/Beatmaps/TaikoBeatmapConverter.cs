@@ -47,10 +47,10 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override Beatmap<TaikoHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
-            if (!(original.Difficulty is TaikoMutliplierAppliedDifficulty))
+            if (!(original.Difficulty is TaikoMultiplierAppliedDifficulty))
             {
                 // Rewrite the beatmap info to add the slider velocity multiplier
-                original.Difficulty = new TaikoMutliplierAppliedDifficulty(original.Difficulty);
+                original.Difficulty = new TaikoMultiplierAppliedDifficulty(original.Difficulty);
             }
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original, cancellationToken);
@@ -191,15 +191,15 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override Beatmap<TaikoHitObject> CreateBeatmap() => new TaikoBeatmap();
 
-        private class TaikoMutliplierAppliedDifficulty : BeatmapDifficulty
+        private class TaikoMultiplierAppliedDifficulty : BeatmapDifficulty
         {
-            public TaikoMutliplierAppliedDifficulty(IBeatmapDifficultyInfo difficulty)
+            public TaikoMultiplierAppliedDifficulty(IBeatmapDifficultyInfo difficulty)
             {
                 CopyFrom(difficulty);
             }
 
             [UsedImplicitly]
-            public TaikoMutliplierAppliedDifficulty()
+            public TaikoMultiplierAppliedDifficulty()
             {
             }
 
@@ -208,14 +208,14 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             public override void CopyTo(BeatmapDifficulty other)
             {
                 base.CopyTo(other);
-                if (!(other is TaikoMutliplierAppliedDifficulty))
+                if (!(other is TaikoMultiplierAppliedDifficulty))
                     SliderMultiplier /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
 
             public override void CopyFrom(IBeatmapDifficultyInfo other)
             {
                 base.CopyFrom(other);
-                if (!(other is TaikoMutliplierAppliedDifficulty))
+                if (!(other is TaikoMultiplierAppliedDifficulty))
                     SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
 
