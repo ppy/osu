@@ -986,6 +986,31 @@ namespace osu.Game
             return false;
         }
 
+        public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+        {
+            switch (e.Action)
+            {
+                case PlatformAction.ZoomIn:
+                    adjustUIScaling(1);
+                    return true;
+
+                case PlatformAction.ZoomOut:
+                    adjustUIScaling(-1);
+                    return true;
+
+                case PlatformAction.ZoomDefault:
+                    LocalConfig.GetBindable<float>(OsuSetting.UIScale).SetDefault();
+                    return true;
+            }
+
+            void adjustUIScaling(int amount)
+            {
+                LocalConfig.SetValue(OsuSetting.UIScale, LocalConfig.Get<float>(OsuSetting.UIScale) + (0.05f * amount));
+            }
+
+            return base.OnPressed(e);
+        }
+
         #region Inactive audio dimming
 
         private readonly BindableDouble inactiveVolumeFade = new BindableDouble();
