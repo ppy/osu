@@ -94,8 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 StaminaStrain = staminaRating,
                 RhythmStrain = rhythmRating,
                 ColourStrain = colourRating,
-                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)hitWindows.WindowFor(HitResult.Great) / clockRate,
+                GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
                 Skills = skills
             };
