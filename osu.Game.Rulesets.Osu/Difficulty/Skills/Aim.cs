@@ -29,9 +29,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainValueOf(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
-                return 0;
-
             var osuCurrent = (OsuDifficultyHitObject)current;
 
             double aimStrain = 0;

@@ -44,9 +44,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         private double calculateRhythmBonus(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
-                return 0;
-
             int previousIslandSize = 0;
 
             double rhythmComplexitySum = 0;
@@ -129,9 +126,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainValueOf(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
-                return 0;
-
             // derive strainTime for calculation
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = Previous.Count > 0 ? (OsuDifficultyHitObject)Previous[0] : null;

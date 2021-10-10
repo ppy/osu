@@ -71,9 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
-            // Don't need to jump to reach spinners
-            if (!(BaseObject is Spinner))
-                JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
 
             if (lastLastObject != null)
             {
