@@ -132,6 +132,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             private OsuSpriteText displayedSpriteText;
 
             public MatchScoreCounter()
+                : base(useCommaSeparator: true)
             {
                 Margin = new MarginPadding { Top = bar_height, Horizontal = 10 };
             }
