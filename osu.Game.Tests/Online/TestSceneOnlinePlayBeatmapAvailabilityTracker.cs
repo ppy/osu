@@ -156,20 +156,49 @@ namespace osu.Game.Tests.Online
         {
             public TaskCompletionSource<bool> AllowImport = new TaskCompletionSource<bool>();
 
-            public Task<BeatmapSetInfo> CurrentImportTask { get; private set; }
+            public Task<ILive<BeatmapSetInfo>> CurrentImportTask { get; private set; }
 
-            protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
-                => new TestDownloadRequest(set);
-
-            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
-                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap, performOnlineLookups)
+            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
+                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
             {
             }
 
-            public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host)
             {
-                await AllowImport.Task.ConfigureAwait(false);
-                return await (CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken)).ConfigureAwait(false);
+                return new TestBeatmapModelManager(this, storage, contextFactory, rulesets, api, host);
+            }
+
+            protected override BeatmapModelDownloader CreateBeatmapModelDownloader(BeatmapModelManager modelManager, IAPIProvider api, GameHost host)
+            {
+                return new TestBeatmapModelDownloader(modelManager, api, host);
+            }
+
+            internal class TestBeatmapModelDownloader : BeatmapModelDownloader
+            {
+                public TestBeatmapModelDownloader(BeatmapModelManager modelManager, IAPIProvider apiProvider, GameHost gameHost)
+                    : base(modelManager, apiProvider, gameHost)
+                {
+                }
+
+                protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
+                    => new TestDownloadRequest(set);
+            }
+
+            internal class TestBeatmapModelManager : BeatmapModelManager
+            {
+                private readonly TestBeatmapManager testBeatmapManager;
+
+                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, IDatabaseContextFactory databaseContextFactory, RulesetStore rulesetStore, IAPIProvider apiProvider, GameHost gameHost)
+                    : base(storage, databaseContextFactory, rulesetStore, gameHost)
+                {
+                    this.testBeatmapManager = testBeatmapManager;
+                }
+
+                public override async Task<ILive<BeatmapSetInfo>> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+                {
+                    await testBeatmapManager.AllowImport.Task.ConfigureAwait(false);
+                    return await (testBeatmapManager.CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken)).ConfigureAwait(false);
+                }
             }
         }
 

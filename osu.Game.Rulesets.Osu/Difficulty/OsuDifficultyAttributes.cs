@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double FlashlightRating { get; set; }
         public double ApproachRate { get; set; }
         public double OverallDifficulty { get; set; }
+        public double DrainRate { get; set; }
         public int HitCircleCount { get; set; }
         public int SpinnerCount { get; set; }
     }

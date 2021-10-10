@@ -182,7 +182,7 @@ namespace osu.Game.Tournament
                     {
                         var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
                         API.Perform(req);
-                        b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+                        b.BeatmapInfo = req.Response?.ToBeatmapInfo(RulesetStore);
 
                         addedInfo = true;
                     }
@@ -203,7 +203,7 @@ namespace osu.Game.Tournament
                         {
                             var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
                             req.Perform(API);
-                            b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+                            b.BeatmapInfo = req.Response?.ToBeatmapInfo(RulesetStore);
 
                             addedInfo = true;
                         }

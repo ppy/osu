@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
@@ -10,80 +9,117 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using osu.Game.Input.Bindings;
 using Realms;
+
+#nullable enable
 
 namespace osu.Game.Database
 {
+    /// <summary>
+    /// A factory which provides both the main (update thread bound) realm context and creates contexts for async usage.
+    /// </summary>
     public class RealmContextFactory : Component, IRealmFactory
     {
         private readonly Storage storage;
 
-        private const string database_name = @"client";
+        /// <summary>
+        /// The filename of this realm.
+        /// </summary>
+        public readonly string Filename;
 
         private const int schema_version = 6;
 
         /// <summary>
-        /// Lock object which is held for the duration of a write operation (via <see cref="GetForWrite"/>).
+        /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
         /// </summary>
-        private readonly object writeLock = new object();
+        private readonly SemaphoreSlim contextCreationLock = new SemaphoreSlim(1);
 
-        /// <summary>
-        /// Lock object which is held during <see cref="BlockAllOperations"/> sections.
-        /// </summary>
-        private readonly SemaphoreSlim blockingLock = new SemaphoreSlim(1);
-
-        private static readonly GlobalStatistic<int> reads = GlobalStatistics.Get<int>("Realm", "Get (Read)");
-        private static readonly GlobalStatistic<int> writes = GlobalStatistics.Get<int>("Realm", "Get (Write)");
         private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>("Realm", "Dirty Refreshes");
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>("Realm", "Contexts (Created)");
-        private static readonly GlobalStatistic<int> pending_writes = GlobalStatistics.Get<int>("Realm", "Pending writes");
-        private static readonly GlobalStatistic<int> active_usages = GlobalStatistics.Get<int>("Realm", "Active usages");
 
-        private readonly object updateContextLock = new object();
-
-        private Realm context;
+        private readonly object contextLock = new object();
+        private Realm? context;
 
         public Realm Context
         {
             get
             {
                 if (!ThreadSafety.IsUpdateThread)
-                    throw new InvalidOperationException($"Use {nameof(GetForRead)} or {nameof(GetForWrite)} when performing realm operations from a non-update thread");
+                    throw new InvalidOperationException($"Use {nameof(CreateContext)} when performing realm operations from a non-update thread");
 
-                lock (updateContextLock)
+                lock (contextLock)
                 {
                     if (context == null)
                     {
-                        context = createContext();
+                        context = CreateContext();
                         Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
                     }
 
                     // creating a context will ensure our schema is up-to-date and migrated.
-
                     return context;
                 }
             }
         }
 
-        public RealmContextFactory(Storage storage)
+        public RealmContextFactory(Storage storage, string filename)
         {
             this.storage = storage;
+
+            Filename = filename;
+
+            const string realm_extension = ".realm";
+
+            if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
+                Filename += realm_extension;
         }
 
-        public RealmUsage GetForRead()
+        /// <summary>
+        /// Compact this realm.
+        /// </summary>
+        /// <returns></returns>
+        public bool Compact() => Realm.Compact(getConfiguration());
+
+        protected override void Update()
         {
-            reads.Value++;
-            return new RealmUsage(createContext());
+            base.Update();
+
+            lock (contextLock)
+            {
+                if (context?.Refresh() == true)
+                    refreshes.Value++;
+            }
         }
 
-        public RealmWriteUsage GetForWrite()
+        public Realm CreateContext()
         {
-            writes.Value++;
-            pending_writes.Value++;
+            if (IsDisposed)
+                throw new ObjectDisposedException(nameof(RealmContextFactory));
 
-            Monitor.Enter(writeLock);
-            return new RealmWriteUsage(createContext(), writeComplete);
+            try
+            {
+                contextCreationLock.Wait();
+
+                contexts_created.Value++;
+
+                return Realm.GetInstance(getConfiguration());
+            }
+            finally
+            {
+                contextCreationLock.Release();
+            }
+        }
+
+        private RealmConfiguration getConfiguration()
+        {
+            return new RealmConfiguration(storage.GetFullPath(Filename, true))
+            {
+                SchemaVersion = schema_version,
+                MigrationCallback = onMigration,
+            };
+        }
+
+        private void onMigration(Migration migration, ulong lastSchemaVersion)
+        {
         }
 
         /// <summary>
@@ -99,165 +135,63 @@ namespace osu.Game.Database
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
+            // TODO: this can be added for safety once we figure how to bypass in test
+            // if (!ThreadSafety.IsUpdateThread)
+            //     throw new InvalidOperationException($"{nameof(BlockAllOperations)} must be called from the update thread.");
+
             Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
-            blockingLock.Wait();
-            flushContexts();
-
-            return new InvokeOnDisposal<RealmContextFactory>(this, endBlockingSection);
-
-            static void endBlockingSection(RealmContextFactory factory)
-            {
-                factory.blockingLock.Release();
-                Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
-            }
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            lock (updateContextLock)
-            {
-                if (context?.Refresh() == true)
-                    refreshes.Value++;
-            }
-        }
-
-        private Realm createContext()
-        {
             try
             {
-                if (IsDisposed)
-                    throw new ObjectDisposedException(nameof(RealmContextFactory));
+                contextCreationLock.Wait();
 
-                blockingLock.Wait();
-
-                contexts_created.Value++;
-
-                return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
+                lock (contextLock)
                 {
-                    SchemaVersion = schema_version,
-                    MigrationCallback = onMigration,
-                });
+                    context?.Dispose();
+                    context = null;
+                }
+
+                const int sleep_length = 200;
+                int timeout = 5000;
+
+                // see https://github.com/realm/realm-dotnet/discussions/2657
+                while (!Compact())
+                {
+                    Thread.Sleep(sleep_length);
+                    timeout -= sleep_length;
+
+                    if (timeout < 0)
+                        throw new TimeoutException("Took too long to acquire lock");
+                }
             }
-            finally
+            catch
             {
-                blockingLock.Release();
+                contextCreationLock.Release();
+                throw;
             }
-        }
 
-        private void writeComplete()
-        {
-            Monitor.Exit(writeLock);
-            pending_writes.Value--;
-        }
-
-        private void onMigration(Migration migration, ulong lastSchemaVersion)
-        {
-            switch (lastSchemaVersion)
+            return new InvokeOnDisposal<RealmContextFactory>(this, factory =>
             {
-                case 5:
-                    // let's keep things simple. changing the type of the primary key is a bit involved.
-                    migration.NewRealm.RemoveAll<RealmKeyBinding>();
-                    break;
-            }
-        }
-
-        private void flushContexts()
-        {
-            Logger.Log(@"Flushing realm contexts...", LoggingTarget.Database);
-            Debug.Assert(blockingLock.CurrentCount == 0);
-
-            Realm previousContext;
-
-            lock (updateContextLock)
-            {
-                previousContext = context;
-                context = null;
-            }
-
-            // wait for all threaded usages to finish
-            while (active_usages.Value > 0)
-                Thread.Sleep(50);
-
-            previousContext?.Dispose();
-
-            Logger.Log(@"Realm contexts flushed.", LoggingTarget.Database);
+                factory.contextCreationLock.Release();
+                Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
+            });
         }
 
         protected override void Dispose(bool isDisposing)
         {
+            lock (contextLock)
+            {
+                context?.Dispose();
+            }
+
             if (!IsDisposed)
             {
-                // intentionally block all operations indefinitely. this ensures that nothing can start consuming a new context after disposal.
-                BlockAllOperations();
-                blockingLock?.Dispose();
+                // intentionally block context creation indefinitely. this ensures that nothing can start consuming a new context after disposal.
+                contextCreationLock.Wait();
+                contextCreationLock.Dispose();
             }
 
             base.Dispose(isDisposing);
-        }
-
-        /// <summary>
-        /// A usage of realm from an arbitrary thread.
-        /// </summary>
-        public class RealmUsage : IDisposable
-        {
-            public readonly Realm Realm;
-
-            internal RealmUsage(Realm context)
-            {
-                active_usages.Value++;
-                Realm = context;
-            }
-
-            /// <summary>
-            /// Disposes this instance, calling the initially captured action.
-            /// </summary>
-            public virtual void Dispose()
-            {
-                Realm?.Dispose();
-                active_usages.Value--;
-            }
-        }
-
-        /// <summary>
-        /// A transaction used for making changes to realm data.
-        /// </summary>
-        public class RealmWriteUsage : RealmUsage
-        {
-            private readonly Action onWriteComplete;
-            private readonly Transaction transaction;
-
-            internal RealmWriteUsage(Realm context, Action onWriteComplete)
-                : base(context)
-            {
-                this.onWriteComplete = onWriteComplete;
-                transaction = Realm.BeginWrite();
-            }
-
-            /// <summary>
-            /// Commit all changes made in this transaction.
-            /// </summary>
-            public void Commit() => transaction.Commit();
-
-            /// <summary>
-            /// Revert all changes made in this transaction.
-            /// </summary>
-            public void Rollback() => transaction.Rollback();
-
-            /// <summary>
-            /// Disposes this instance, calling the initially captured action.
-            /// </summary>
-            public override void Dispose()
-            {
-                // rollback if not explicitly committed.
-                transaction?.Dispose();
-
-                base.Dispose();
-
-                onWriteComplete();
-            }
         }
     }
 }

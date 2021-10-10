@@ -23,14 +23,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override int HistoryLength => 2;
 
-        protected override double SkillMultiplier => 24.75;
-        protected override double StrainDecayBase => 0.15;
-
         private const double wide_angle_multiplier = 1.0;
         private const double acute_angle_multiplier = 1.0;
         private const double rhythm_variance_multiplier = 1.0;
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        private double currentStrain = 1;
+
+        private double skillMultiplier => 26.25;
+        private double strainDecayBase => 0.15;
+
+        private double strainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || Previous.Count <= 1)
                 return 0;
@@ -107,6 +109,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return Math.Pow(Math.Sin(1.5 * (2 * Math.PI / 3 - angle)), 2);
 
             return 0;
+        }
+
+        private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
+
+        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+
+        protected override double CalculateInitialStrain(double time) => currentStrain * strainDecay(time - Previous[0].StartTime);
+
+        protected override double StrainValueAt(DifficultyHitObject current)
+        {
+            currentStrain *= strainDecay(current.DeltaTime);
+            currentStrain += strainValueOf(current) * skillMultiplier;
+
+            return currentStrain;
         }
     }
 }

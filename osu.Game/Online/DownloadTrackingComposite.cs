@@ -16,7 +16,7 @@ namespace osu.Game.Online
     /// </summary>
     public abstract class DownloadTrackingComposite<TModel, TModelManager> : CompositeDrawable
         where TModel : class, IEquatable<TModel>
-        where TModelManager : class, IModelDownloader<TModel>
+        where TModelManager : class, IModelDownloader<TModel>, IModelManager<TModel>
     {
         protected readonly Bindable<TModel> Model = new Bindable<TModel>();
 
@@ -35,7 +35,7 @@ namespace osu.Game.Online
             Model.Value = model;
         }
 
-        private IBindable<WeakReference<TModel>> managedUpdated;
+        private IBindable<WeakReference<TModel>> managerUpdated;
         private IBindable<WeakReference<TModel>> managerRemoved;
         private IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> managerDownloadBegan;
         private IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> managerDownloadFailed;
@@ -60,8 +60,8 @@ namespace osu.Game.Online
             managerDownloadBegan.BindValueChanged(downloadBegan);
             managerDownloadFailed = Manager.DownloadFailed.GetBoundCopy();
             managerDownloadFailed.BindValueChanged(downloadFailed);
-            managedUpdated = Manager.ItemUpdated.GetBoundCopy();
-            managedUpdated.BindValueChanged(itemUpdated);
+            managerUpdated = Manager.ItemUpdated.GetBoundCopy();
+            managerUpdated.BindValueChanged(itemUpdated);
             managerRemoved = Manager.ItemRemoved.GetBoundCopy();
             managerRemoved.BindValueChanged(itemRemoved);
         }
@@ -77,7 +77,7 @@ namespace osu.Game.Online
 
         /// <summary>
         /// Whether the given model is available in the database.
-        /// By default, this calls <see cref="IModelDownloader{TModel}.IsAvailableLocally"/>,
+        /// By default, this calls <see cref="IModelManager{TModel}.IsAvailableLocally"/>,
         /// but can be overriden to add additional checks for verifying the model in database.
         /// </summary>
         protected virtual bool IsModelAvailableLocally() => Manager?.IsAvailableLocally(Model.Value) == true;

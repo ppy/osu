@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -68,6 +69,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 LoadScreen(dependenciesScreen = new DependenciesScreen(client));
             });
 
+            AddUntilStep("wait for dependencies screen", () => Stack.CurrentScreen is DependenciesScreen);
+            AddUntilStep("wait for dependencies to start load", () => dependenciesScreen.LoadState > LoadState.NotLoaded);
             AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
 
             AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
