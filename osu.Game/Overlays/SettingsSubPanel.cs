@@ -36,8 +36,6 @@ namespace osu.Game.Overlays
         {
             private Container content;
 
-            protected override Drawable HoverTarget => content;
-
             [BackgroundDependencyLoader]
             private void load()
             {
@@ -70,6 +68,11 @@ namespace osu.Game.Overlays
                         }
                     }
                 });
+            }
+
+            protected override void UpdateState()
+            {
+                content.FadeColour(IsHovered ? ColourProvider.Light1 : ColourProvider.Light3, FADE_DURATION, Easing.OutQuint);
             }
         }
     }
