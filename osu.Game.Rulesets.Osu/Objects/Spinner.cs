@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public int MaximumBonusSpins { get; protected set; } = 1;
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             double secondsDuration = Duration / 1000;
 
-            double minimumRotationsPerSecond = stable_matching_fudge * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
+            double minimumRotationsPerSecond = stable_matching_fudge * IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
 
             SpinsRequired = (int)(secondsDuration * minimumRotationsPerSecond);
             MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration);

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Settings
                         new OsuSpriteText
                         {
                             Text = heading,
-                            Font = OsuFont.GetFont(size: 40),
+                            Font = OsuFont.TorusAlternate.With(size: 40),
                             Margin = new MarginPadding
                             {
                                 Left = SettingsPanel.CONTENT_MARGINS,
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Settings
                         },
                         new OsuSpriteText
                         {
-                            Colour = colours.Pink,
+                            Colour = colourProvider.Content2,
                             Text = subheading,
                             Font = OsuFont.GetFont(size: 18),
                             Margin = new MarginPadding

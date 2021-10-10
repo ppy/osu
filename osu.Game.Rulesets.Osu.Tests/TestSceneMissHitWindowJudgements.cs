@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             var hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             CreateModTest(new ModTestData
             {
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             var hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             CreateModTest(new ModTestData
             {
