@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -29,6 +30,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             UseCommaSeparator = useCommaSeparator;
 
+            if (useCommaSeparator && leading > 0)
+                throw new ArgumentException("Should not mix leading zeroes and comma separators as it doesn't make sense");
+
             RequiredDisplayDigits.Value = leading;
             RequiredDisplayDigits.BindValueChanged(_ => UpdateDisplay());
         }
@@ -41,14 +45,15 @@ namespace osu.Game.Graphics.UserInterface
         protected override LocalisableString FormatCount(double count)
         {
             string format = new string('0', RequiredDisplayDigits.Value);
+            var output = ((long)count).ToString(format);
 
             if (UseCommaSeparator)
             {
-                for (int i = format.Length - 3; i > 0; i -= 3)
-                    format = format.Insert(i, @",");
+                for (int i = output.Length - 3; i > 0; i -= 3)
+                    output = output.Insert(i, @",");
             }
 
-            return ((long)count).ToString(format);
+            return output;
         }
 
         protected override OsuSpriteText CreateSpriteText()
