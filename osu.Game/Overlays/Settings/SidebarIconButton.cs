@@ -15,7 +15,10 @@ namespace osu.Game.Overlays.Settings
 {
     public class SidebarIconButton : SidebarButton
     {
-        private const double fade_duration = 50;
+        private const double fade_duration = 500;
+
+        private const float selection_indicator_height_active = 18;
+        private const float selection_indicator_height_inactive = 4;
 
         private readonly ConstrainedIconContainer iconContainer;
         private readonly SpriteText headerText;
@@ -85,8 +88,8 @@ namespace osu.Game.Overlays.Settings
                 selectionIndicator = new CircularContainer
                 {
                     Alpha = 0,
-                    Width = 3,
-                    Height = 18,
+                    Width = 4,
+                    Height = selection_indicator_height_inactive,
                     Masking = true,
                     CornerRadius = 1.5f,
                     Anchor = Anchor.CentreLeft,
@@ -116,10 +119,12 @@ namespace osu.Game.Overlays.Settings
             {
                 text.FadeColour(ColourProvider.Content1, fade_duration, Easing.OutQuint);
                 selectionIndicator.FadeIn(fade_duration, Easing.OutQuint);
+                selectionIndicator.ResizeHeightTo(selection_indicator_height_active, fade_duration, Easing.OutElasticHalf);
                 return;
             }
 
             selectionIndicator.FadeOut(fade_duration, Easing.OutQuint);
+            selectionIndicator.ResizeHeightTo(selection_indicator_height_inactive, fade_duration, Easing.OutQuint);
             base.UpdateState();
         }
     }
