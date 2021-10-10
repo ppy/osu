@@ -15,17 +15,13 @@ namespace osu.Game.Overlays.Settings
 {
     public class SidebarIconButton : SidebarButton
     {
-        private const double fade_duration = 500;
-
         private const float selection_indicator_height_active = 18;
         private const float selection_indicator_height_inactive = 4;
 
         private readonly ConstrainedIconContainer iconContainer;
         private readonly SpriteText headerText;
         private readonly CircularContainer selectionIndicator;
-        private readonly Container text;
-
-        protected override Drawable HoverTarget => text;
+        private readonly Container textIconContent;
 
         // always consider as part of flow, even when not visible (for the sake of the initial animation).
         public override bool IsPresent => true;
@@ -64,7 +60,7 @@ namespace osu.Game.Overlays.Settings
 
             AddRange(new Drawable[]
             {
-                text = new Container
+                textIconContent = new Container
                 {
                     Width = Sidebar.DEFAULT_WIDTH,
                     RelativeSizeAxes = Axes.Y,
@@ -117,15 +113,18 @@ namespace osu.Game.Overlays.Settings
         {
             if (Selected)
             {
-                text.FadeColour(ColourProvider.Content1, fade_duration, Easing.OutQuint);
-                selectionIndicator.FadeIn(fade_duration, Easing.OutQuint);
-                selectionIndicator.ResizeHeightTo(selection_indicator_height_active, fade_duration, Easing.OutElasticHalf);
-                return;
-            }
+                textIconContent.FadeColour(ColourProvider.Content1, FADE_DURATION, Easing.OutQuint);
 
-            selectionIndicator.FadeOut(fade_duration, Easing.OutQuint);
-            selectionIndicator.ResizeHeightTo(selection_indicator_height_inactive, fade_duration, Easing.OutQuint);
-            base.UpdateState();
+                selectionIndicator.FadeIn(FADE_DURATION, Easing.OutQuint);
+                selectionIndicator.ResizeHeightTo(selection_indicator_height_active, FADE_DURATION, Easing.OutElasticHalf);
+            }
+            else
+            {
+                textIconContent.FadeColour(IsHovered ? ColourProvider.Light1 : ColourProvider.Light3, FADE_DURATION, Easing.OutQuint);
+
+                selectionIndicator.FadeOut(FADE_DURATION, Easing.OutQuint);
+                selectionIndicator.ResizeHeightTo(selection_indicator_height_inactive, FADE_DURATION, Easing.OutQuint);
+            }
         }
     }
 }
