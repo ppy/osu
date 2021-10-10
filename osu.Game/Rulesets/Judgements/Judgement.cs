@@ -23,9 +23,9 @@ namespace osu.Game.Rulesets.Judgements
 
         /// <summary>
         /// The default health increase for a maximum judgement, as a proportion of total health.
-        /// By default, each maximum judgement restores 5% of total health.
+        /// By default, each maximum judgement restores 3.5% of total health.
         /// </summary>
-        protected const double DEFAULT_MAX_HEALTH_INCREASE = 0.05;
+        protected const double DEFAULT_MAX_HEALTH_INCREASE = 0.035;
 
         /// <summary>
         /// The maximum <see cref="HitResult"/> that can be achieved.
@@ -91,16 +91,16 @@ namespace osu.Game.Rulesets.Judgements
                     return DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 
                 case HitResult.SmallTickMiss:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.5;
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 2;
 
                 case HitResult.LargeTickHit:
                     return DEFAULT_MAX_HEALTH_INCREASE;
 
                 case HitResult.LargeTickMiss:
-                    return -DEFAULT_MAX_HEALTH_INCREASE;
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 3;
 
                 case HitResult.Miss:
-                    return -DEFAULT_MAX_HEALTH_INCREASE;
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 4;
 
                 case HitResult.Meh:
                     return -DEFAULT_MAX_HEALTH_INCREASE * 0.05;

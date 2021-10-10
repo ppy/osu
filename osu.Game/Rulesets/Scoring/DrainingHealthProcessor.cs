@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Scoring
                     // Apply health adjustments
                     currentHealth -= (healthIncreases[i].time - lastTime) * result;
                     lowestHealth = Math.Min(lowestHealth, currentHealth);
-                    currentHealth = Math.Min(1, currentHealth + healthIncreases[i].health);
+                    currentHealth = Math.Min(1, currentHealth + healthIncreases[i].health * 0.5f);
 
                     // Common scenario for when the drain rate is definitely too harsh
                     if (lowestHealth < 0)
