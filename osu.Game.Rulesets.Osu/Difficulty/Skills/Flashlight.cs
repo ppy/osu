@@ -15,15 +15,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Flashlight : OsuStrainSkill
     {
         public Flashlight(Mod[] mods)
-            : base(mods, strainDecayBase: 0.15)
+            : base(mods)
         {
         }
 
-        protected override double SkillMultiplier => 0.15;
+        private double skillMultiplier => 0.15;
+        private double strainDecayBase => 0.15;
         protected override double DifficultySumWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
+        private double currentStrain = 1;
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        private double strainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -60,6 +62,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return Math.Pow(smallDistNerf * result, 2.0);
+        }
+
+        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+
+        protected override double StrainAtTime(double time) => currentStrain * strainDecay(time - Previous[0].StartTime);
+
+        protected override double StrainValueAt(DifficultyHitObject current)
+        {
+            currentStrain *= strainDecay(current.DeltaTime);
+            currentStrain += strainValueOf(current) * skillMultiplier;
+
+            return currentStrain;
         }
     }
 }

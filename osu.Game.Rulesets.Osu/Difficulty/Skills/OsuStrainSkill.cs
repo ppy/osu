@@ -11,7 +11,7 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public abstract class OsuStrainSkill : StrainDecaySkill
+    public abstract class OsuStrainSkill : StrainSkill
     {
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => 1.06;
 
-        protected OsuStrainSkill(Mod[] mods, double strainDecayBase, int sectionLength = 400)
-            : base(mods, strainDecayBase, sectionLength)
+        protected OsuStrainSkill(Mod[] mods, int sectionLength = 400)
+            : base(mods, sectionLength)
         {
         }
 

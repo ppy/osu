@@ -16,7 +16,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
-using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -63,8 +62,6 @@ namespace osu.Game.Overlays.Settings.Sections
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
         {
-            FlowContent.Spacing = new Vector2(0, 5);
-
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown(),
