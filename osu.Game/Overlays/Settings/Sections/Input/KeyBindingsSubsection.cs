@@ -27,8 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             this.variant = variant;
 
-            FlowContent.Spacing = new Vector2(0, 1);
-            FlowContent.Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS };
+            FlowContent.Spacing = new Vector2(0, 3);
         }
 
         [BackgroundDependencyLoader]
