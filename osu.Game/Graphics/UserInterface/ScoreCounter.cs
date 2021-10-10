@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
@@ -14,12 +15,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
 
-        /// <summary>
-        /// Whether comma separators should be displayed.
-        /// </summary>
-        public bool UseCommaSeparator { get; }
-
         public Bindable<int> RequiredDisplayDigits { get; } = new Bindable<int>();
+
+        private string formatString = string.Empty;
 
         /// <summary>
         /// Displays score.
@@ -28,13 +26,22 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="useCommaSeparator">Whether comma separators should be displayed.</param>
         protected ScoreCounter(int leading = 0, bool useCommaSeparator = false)
         {
-            UseCommaSeparator = useCommaSeparator;
+            if (useCommaSeparator)
+            {
+                if (leading > 0)
+                    throw new ArgumentException("Should not mix leading zeroes and comma separators as it doesn't make sense");
 
-            if (useCommaSeparator && leading > 0)
-                throw new ArgumentException("Should not mix leading zeroes and comma separators as it doesn't make sense");
+                formatString = @"N0";
+            }
 
             RequiredDisplayDigits.Value = leading;
-            RequiredDisplayDigits.BindValueChanged(_ => UpdateDisplay());
+            RequiredDisplayDigits.BindValueChanged(displayDigitsChanged, true);
+        }
+
+        private void displayDigitsChanged(ValueChangedEvent<int> _)
+        {
+            formatString = new string('0', RequiredDisplayDigits.Value);
+            UpdateDisplay();
         }
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
@@ -42,19 +49,7 @@ namespace osu.Game.Graphics.UserInterface
             return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
         }
 
-        protected override LocalisableString FormatCount(double count)
-        {
-            string format = new string('0', RequiredDisplayDigits.Value);
-            var output = ((long)count).ToString(format);
-
-            if (UseCommaSeparator)
-            {
-                for (int i = output.Length - 3; i > 0; i -= 3)
-                    output = output.Insert(i, @",");
-            }
-
-            return output;
-        }
+        protected override LocalisableString FormatCount(double count) => ((long)count).ToLocalisableString(formatString);
 
         protected override OsuSpriteText CreateSpriteText()
             => base.CreateSpriteText().With(s => s.Font = s.Font.With(fixedWidth: true));
