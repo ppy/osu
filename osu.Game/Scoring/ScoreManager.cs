@@ -76,6 +76,7 @@ namespace osu.Game.Scoring
 
             return scores.Select((score, index) => (score: score, totalScore: totalScores[index]))
                          .OrderByDescending(g => g.totalScore)
+                         .ThenBy(g => g.score.OnlineScoreID)
                          .Select(g => g.score)
                          .ToArray();
         }
