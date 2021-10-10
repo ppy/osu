@@ -146,12 +146,11 @@ namespace osu.Game.Screens.Play.HUD
             Score2Text.X = Math.Max(5 + Score2Text.DrawWidth / 2, score2Bar.DrawWidth);
         }
 
-        protected class MatchScoreCounter : ScoreCounter
+        protected class MatchScoreCounter : CommaSeparatedScoreCounter
         {
             private OsuSpriteText displayedSpriteText;
 
             public MatchScoreCounter()
-                : base(useCommaSeparator: true)
             {
                 Margin = new MarginPadding { Top = bar_height, Horizontal = 10 };
             }
