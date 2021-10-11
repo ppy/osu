@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using ManagedBass.Fx;
 using osu.Framework.Audio.Mixing;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 
 namespace osu.Game.Audio.Effects
 {
@@ -130,8 +132,15 @@ namespace osu.Game.Audio.Effects
         {
             base.Dispose(isDisposing);
 
-            if (mixer.Effects.Contains(filter))
-                detachFilter();
+            try
+            {
+                if (mixer.Effects.Contains(filter))
+                    detachFilter();
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Exception in audio filter disposal: {e}");
+            }
         }
     }
 }
