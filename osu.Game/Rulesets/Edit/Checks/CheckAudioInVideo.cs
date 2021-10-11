@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
+            var videoPaths = new List<string>();
 
             foreach (var layer in context.WorkingBeatmap.Storyboard.Layers)
             {
@@ -32,25 +33,31 @@ namespace osu.Game.Rulesets.Edit.Checks
                     if (!(element is StoryboardVideo video))
                         continue;
 
-                    string filename = video.Path;
-                    string storagePath = beatmapSet.GetPathForFile(filename);
-
-                    if (storagePath == null)
-                    {
-                        // There's an element in the storyboard that requires this resource, so it being missing is worth warning about.
-                        yield return new IssueTemplateMissingFile(this).Create(filename);
-
-                        continue;
-                    }
-
-                    Stream data = context.WorkingBeatmap.GetStream(storagePath);
-                    var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
-                    int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode, fileCallbacks.Callbacks, fileCallbacks.Handle);
-                    if (decodeStream == 0)
-                        continue;
-
-                    yield return new IssueTemplateHasAudioTrack(this).Create(filename);
+                    // Ensures we don't check the same video file multiple times in case of multiple elements using it.
+                    if (!videoPaths.Contains(video.Path))
+                        videoPaths.Add(video.Path);
                 }
+            }
+
+            foreach (var filename in videoPaths)
+            {
+                string storagePath = beatmapSet.GetPathForFile(filename);
+
+                if (storagePath == null)
+                {
+                    // There's an element in the storyboard that requires this resource, so it being missing is worth warning about.
+                    yield return new IssueTemplateMissingFile(this).Create(filename);
+
+                    continue;
+                }
+
+                Stream data = context.WorkingBeatmap.GetStream(storagePath);
+                var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
+                int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode, fileCallbacks.Callbacks, fileCallbacks.Handle);
+                if (decodeStream == 0)
+                    continue;
+
+                yield return new IssueTemplateHasAudioTrack(this).Create(filename);
             }
         }
 
