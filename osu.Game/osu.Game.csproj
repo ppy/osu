@@ -42,5 +42,6 @@
     <PackageReference Include="SharpCompress" Version="0.28.3" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="TagLibSharp" Version="2.2.0" />
   </ItemGroup>
 </Project>
