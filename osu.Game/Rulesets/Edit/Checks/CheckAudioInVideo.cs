@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateHasAudioTrack(this),
-            new IssueTemplateBadFormat(this),
-            new IssueTemplateMissingFile(this)
+            new IssueTemplateMissingFile(this),
+            new IssueTemplateFileError(this)
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -64,14 +64,14 @@ namespace osu.Game.Rulesets.Edit.Checks
             public Issue Create(string filename) => new Issue(this, filename);
         }
 
-        public class IssueTemplateBadFormat : IssueTemplate
+        public class IssueTemplateFileError : IssueTemplate
         {
-            public IssueTemplateBadFormat(ICheck check)
-                : base(check, IssueType.Error, "Could not check whether \"{0}\" has an audio track (code \"{1}\").")
+            public IssueTemplateFileError(ICheck check)
+                : base(check, IssueType.Error, "Could not check whether \"{0}\" has an audio track ({1}).")
             {
             }
 
-            public Issue Create(string filename) => new Issue(this, filename, Bass.LastError);
+            public Issue Create(string filename, string errorReason) => new Issue(this, filename, errorReason);
         }
 
         public class IssueTemplateMissingFile : IssueTemplate
