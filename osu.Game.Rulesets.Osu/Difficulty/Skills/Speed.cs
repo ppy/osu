@@ -7,6 +7,8 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Framework.Utils;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -32,6 +34,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override int HistoryLength => 32;
 
         private readonly double greatWindow;
+
+        private List<double> objectStrains = new List<double>();
 
         public Speed(Mod[] mods, double hitWindowGreat)
             : base(mods)
@@ -170,7 +174,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             currentRhythm = calculateRhythmBonus(current);
 
-            return currentStrain * currentRhythm;
+            double totalStrain = currentStrain * currentRhythm;
+
+            objectStrains.Add(totalStrain);
+
+            return totalStrain;
+        }
+
+        public double RelevantNoteCount()
+        {
+            double maxStrain = objectStrains.Max();
+            return objectStrains.Aggregate((total, next) => total + (1.0 / (1.0 + Math.Pow(Math.E, -(next/maxStrain * 12.0 - 6.0)))));
         }
     }
 }

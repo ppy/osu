@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double flashlightRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
+            double speedNotes = (skills[1] as Speed).RelevantNoteCount();
 
             if (mods.Any(h => h is OsuModRelax))
                 speedRating = 0.0;
@@ -72,6 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Mods = mods,
                 AimStrain = aimRating,
                 SpeedStrain = speedRating,
+                SpeedNoteCount = speedNotes,
                 FlashlightRating = flashlightRating,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
