@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected virtual BeatmapModelDownloader CreateBeatmapModelDownloader(BeatmapModelManager modelManager, IAPIProvider api, GameHost host)
+        protected virtual BeatmapModelDownloader CreateBeatmapModelDownloader(IBeatmapModelManager modelManager, IAPIProvider api, GameHost host)
         {
             return new BeatmapModelDownloader(modelManager, api, host);
         }
