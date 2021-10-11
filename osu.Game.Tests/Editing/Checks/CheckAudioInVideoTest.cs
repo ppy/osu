@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext getContext(string resourceName, bool allowMissing = false)
         {
-            using Stream resourceStream = string.IsNullOrEmpty(resourceName) ? null : TestResources.OpenResource(resourceName);
+            Stream resourceStream = string.IsNullOrEmpty(resourceName) ? null : TestResources.OpenResource(resourceName);
             if (!allowMissing && resourceStream == null)
                 throw new FileNotFoundException($"The requested test resource \"{resourceName}\" does not exist.");
 
