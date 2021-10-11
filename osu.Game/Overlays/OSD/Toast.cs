@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -23,7 +25,7 @@ namespace osu.Game.Overlays.OSD
 
         protected readonly OsuSpriteText ShortcutText;
 
-        protected Toast(string description, string value, string shortcut)
+        protected Toast(LocalisableString description, LocalisableString value, LocalisableString shortcut)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -60,7 +62,7 @@ namespace osu.Game.Overlays.OSD
                     Spacing = new Vector2(1, 0),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = description.ToUpperInvariant()
+                    Text = description.ToUpper()
                 },
                 ValueText = new OsuSpriteText
                 {
@@ -79,7 +81,7 @@ namespace osu.Game.Overlays.OSD
                     Alpha = 0.3f,
                     Margin = new MarginPadding { Bottom = 15 },
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                    Text = string.IsNullOrEmpty(shortcut) ? "NO KEY BOUND" : shortcut.ToUpperInvariant()
+                    Text = string.IsNullOrEmpty(shortcut.ToString()) ? (LocalisableString)"NO KEY BOUND" : shortcut.ToUpper()
                 },
             };
         }

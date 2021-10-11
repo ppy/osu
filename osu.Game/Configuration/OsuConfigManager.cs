@@ -6,10 +6,12 @@ using System.Diagnostics;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
@@ -185,13 +187,13 @@ namespace osu.Game.Configuration
 
             return new TrackedSettings
             {
-                new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled", LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))),
-                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription(), $"cycle: {LookupKeyBindings(GlobalAction.ToggleInGameInterface)} quick view: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
-                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
+                new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons, v ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(), LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))),
+                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, GameplaySettingsStrings.HUDVisibilityMode, m.GetLocalisableDescription(), $"{GlobalActionKeyBindingStrings.ToggleInGameInterface}: {LookupKeyBindings(GlobalAction.ToggleInGameInterface)} {GlobalActionKeyBindingStrings.HoldForHUD}: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
+                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, GraphicsSettingsStrings.ScreenScaling, m.GetLocalisableDescription())),
                 new TrackedSetting<int>(OsuSetting.Skin, m =>
                 {
                     string skinName = LookupSkinName(m) ?? string.Empty;
-                    return new SettingDescription(skinName, "skin", skinName, $"random: {LookupKeyBindings(GlobalAction.RandomSkin)}");
+                    return new SettingDescription(skinName, SkinSettingsStrings.SkinSectionHeader, skinName, $"{GlobalActionKeyBindingStrings.RandomSkin}: {LookupKeyBindings(GlobalAction.RandomSkin)}");
                 })
             };
         }
