@@ -640,7 +640,7 @@ namespace osu.Game
                 if (combinations.Count == 0)
                     return ToastStrings.NoKeyBound;
 
-                return string.Join(" or ", combinations);
+                return string.Join(" / ", combinations);
             };
 
             Container logoContainer;
