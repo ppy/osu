@@ -638,7 +638,7 @@ namespace osu.Game
                 var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l);
 
                 if (combinations.Count == 0)
-                    return "none";
+                    return ToastStrings.NoKeyBound;
 
                 return string.Join(" or ", combinations);
             };

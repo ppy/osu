@@ -7,6 +7,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Input;
@@ -201,7 +202,7 @@ namespace osu.Game.Configuration
 
         public Func<int, string> LookupSkinName { private get; set; }
 
-        public Func<GlobalAction, string> LookupKeyBindings { get; set; }
+        public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; }
     }
 
     // IMPORTANT: These are used in user configuration files.

@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.OSD
 {
@@ -81,7 +82,7 @@ namespace osu.Game.Overlays.OSD
                     Alpha = 0.3f,
                     Margin = new MarginPadding { Bottom = 15, Horizontal = 10 },
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                    Text = string.IsNullOrEmpty(shortcut.ToString()) ? (LocalisableString)"NO KEY BOUND" : shortcut.ToUpper()
+                    Text = string.IsNullOrEmpty(shortcut.ToString()) ? ToastStrings.NoKeyBound.ToUpper() : shortcut.ToUpper()
                 },
             };
         }
