@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.OSD
                 ValueText = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
-                    Padding = new MarginPadding { Left = 10, Right = 10 },
+                    Padding = new MarginPadding { Horizontal = 10 },
                     Name = "Value",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.OSD
                     Origin = Anchor.BottomCentre,
                     Name = "Shortcut",
                     Alpha = 0.3f,
-                    Margin = new MarginPadding { Bottom = 15 },
+                    Margin = new MarginPadding { Bottom = 15, Horizontal = 10 },
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                     Text = string.IsNullOrEmpty(shortcut.ToString()) ? (LocalisableString)"NO KEY BOUND" : shortcut.ToUpper()
                 },
