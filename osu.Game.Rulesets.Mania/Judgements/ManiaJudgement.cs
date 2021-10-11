@@ -12,26 +12,35 @@ namespace osu.Game.Rulesets.Mania.Judgements
         {
             switch (result)
             {
+                case HitResult.SmallTickHit:
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.5;
+
                 case HitResult.LargeTickHit:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.1;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.9;
+
+                case HitResult.SmallTickMiss:
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.02;
 
                 case HitResult.LargeTickMiss:
                     return -DEFAULT_MAX_HEALTH_INCREASE * 0.1;
 
+                case HitResult.Miss:
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.8;
+
                 case HitResult.Meh:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.5;
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.05;
 
                 case HitResult.Ok:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.3;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.7;
 
                 case HitResult.Good:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.1;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 1.1;
 
                 case HitResult.Great:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.8;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 1.5;
 
                 case HitResult.Perfect:
-                    return DEFAULT_MAX_HEALTH_INCREASE;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 1.55;
 
                 default:
                     return base.HealthIncreaseFor(result);
