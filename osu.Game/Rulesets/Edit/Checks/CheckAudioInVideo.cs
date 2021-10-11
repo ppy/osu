@@ -3,8 +3,7 @@
 
 using System.Collections.Generic;
 using System.IO;
-using ManagedBass;
-using osu.Framework.Audio.Callbacks;
+using osu.Game.IO.FileAbstraction;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Storyboards;
 
@@ -52,9 +51,27 @@ namespace osu.Game.Rulesets.Edit.Checks
                 }
 
                 Stream data = context.WorkingBeatmap.GetStream(storagePath);
-                var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
-                int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode, fileCallbacks.Callbacks, fileCallbacks.Handle);
-                if (decodeStream == 0)
+                StreamFileAbstraction fileAbstraction = new StreamFileAbstraction(filename, data);
+
+                // We use TagLib here for platform invariance; BASS cannot detect audio presence on Linux.
+                TagLib.File tagFile = null;
+                string errorReason = null;
+
+                try
+                {
+                    tagFile = TagLib.File.Create(fileAbstraction);
+                }
+                catch (TagLib.CorruptFileException) { errorReason = "Corrupt file"; }
+                catch (TagLib.UnsupportedFormatException) { errorReason = "Unsupported format"; }
+
+                if (errorReason != null)
+                {
+                    yield return new IssueTemplateFileError(this).Create(filename, errorReason);
+
+                    continue;
+                }
+
+                if (tagFile.Properties.AudioChannels == 0)
                     continue;
 
                 yield return new IssueTemplateHasAudioTrack(this).Create(filename);
