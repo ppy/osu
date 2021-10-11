@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                     continue;
 
                 var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
-                int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode, fileCallbacks.Callbacks, fileCallbacks.Handle);
+                int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode | BassFlags.Prescan, fileCallbacks.Callbacks, fileCallbacks.Handle);
 
                 if (decodeStream == 0)
                 {
