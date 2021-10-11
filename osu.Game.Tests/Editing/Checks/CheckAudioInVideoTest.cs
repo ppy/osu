@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ManagedBass;
 using Moq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -14,7 +13,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
-using osuTK.Audio;
 using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Tests.Editing.Checks
@@ -46,10 +44,6 @@ namespace osu.Game.Tests.Editing.Checks
                     }
                 }
             };
-
-            // 0 = No output device. This still allows decoding.
-            if (!Bass.Init(0) && Bass.LastError != Errors.Already)
-                throw new AudioException("Could not initialize Bass.");
         }
 
         [Test]
