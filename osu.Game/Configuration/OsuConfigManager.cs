@@ -194,7 +194,8 @@ namespace osu.Game.Configuration
                 {
                     string skinName = LookupSkinName(m) ?? string.Empty;
                     return new SettingDescription(skinName, SkinSettingsStrings.SkinSectionHeader, skinName, $"{GlobalActionKeyBindingStrings.RandomSkin}: {LookupKeyBindings(GlobalAction.RandomSkin)}");
-                })
+                }),
+                new TrackedSetting<float>(OsuSetting.UIScale, m => new SettingDescription(m, GraphicsSettingsStrings.UIScaling, $"{m.ToString("N2")}x")), // TODO: implement lookup for framework platform key bindings
             };
         }
 
