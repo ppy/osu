@@ -50,8 +50,12 @@ namespace osu.Game.Rulesets.Edit.Checks
                     continue;
                 }
 
-                Stream data = context.WorkingBeatmap.GetStream(storagePath);
-                StreamFileAbstraction fileAbstraction = new StreamFileAbstraction(filename, data);
+                StreamFileAbstraction fileAbstraction;
+
+                using (Stream data = context.WorkingBeatmap.GetStream(storagePath))
+                {
+                    fileAbstraction = new StreamFileAbstraction(filename, data);
+                }
 
                 // We use TagLib here for platform invariance; BASS cannot detect audio presence on Linux.
                 TagLib.File tagFile = null;
