@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
@@ -13,43 +14,30 @@ namespace osu.Game.Graphics.UserInterface
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
 
-        /// <summary>
-        /// Whether comma separators should be displayed.
-        /// </summary>
-        public bool UseCommaSeparator { get; }
-
         public Bindable<int> RequiredDisplayDigits { get; } = new Bindable<int>();
+
+        private string formatString;
 
         /// <summary>
         /// Displays score.
         /// </summary>
         /// <param name="leading">How many leading zeroes the counter will have.</param>
-        /// <param name="useCommaSeparator">Whether comma separators should be displayed.</param>
-        protected ScoreCounter(int leading = 0, bool useCommaSeparator = false)
+        protected ScoreCounter(int leading = 0)
         {
-            UseCommaSeparator = useCommaSeparator;
-
             RequiredDisplayDigits.Value = leading;
-            RequiredDisplayDigits.BindValueChanged(_ => UpdateDisplay());
+            RequiredDisplayDigits.BindValueChanged(displayDigitsChanged, true);
         }
 
-        protected override double GetProportionalDuration(double currentValue, double newValue)
+        private void displayDigitsChanged(ValueChangedEvent<int> _)
         {
-            return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
+            formatString = new string('0', RequiredDisplayDigits.Value);
+            UpdateDisplay();
         }
 
-        protected override LocalisableString FormatCount(double count)
-        {
-            string format = new string('0', RequiredDisplayDigits.Value);
+        protected override double GetProportionalDuration(double currentValue, double newValue) =>
+            currentValue > newValue ? currentValue - newValue : newValue - currentValue;
 
-            if (UseCommaSeparator)
-            {
-                for (int i = format.Length - 3; i > 0; i -= 3)
-                    format = format.Insert(i, @",");
-            }
-
-            return ((long)count).ToString(format);
-        }
+        protected override LocalisableString FormatCount(double count) => ((long)count).ToLocalisableString(formatString);
 
         protected override OsuSpriteText CreateSpriteText()
             => base.CreateSpriteText().With(s => s.Font = s.Font.With(fixedWidth: true));
