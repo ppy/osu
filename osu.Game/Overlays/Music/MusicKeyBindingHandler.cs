@@ -6,9 +6,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays.OSD;
 
 namespace osu.Game.Overlays.Music
@@ -43,7 +45,7 @@ namespace osu.Game.Overlays.Music
                     return true;
 
                 case GlobalAction.MusicNext:
-                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast("Next track", e.Action)));
+                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast(GlobalActionKeyBindingStrings.MusicNext, e.Action)));
 
                     return true;
 
@@ -57,7 +59,7 @@ namespace osu.Game.Overlays.Music
                                 break;
 
                             case PreviousTrackResult.Previous:
-                                onScreenDisplay?.Display(new MusicActionToast("Previous track", e.Action));
+                                onScreenDisplay?.Display(new MusicActionToast(GlobalActionKeyBindingStrings.MusicPrev, e.Action));
                                 break;
                         }
                     });
@@ -76,7 +78,7 @@ namespace osu.Game.Overlays.Music
         {
             private readonly GlobalAction action;
 
-            public MusicActionToast(string value, GlobalAction action)
+            public MusicActionToast(LocalisableString value, GlobalAction action)
                 : base("Music Playback", value, string.Empty)
             {
                 this.action = action;
