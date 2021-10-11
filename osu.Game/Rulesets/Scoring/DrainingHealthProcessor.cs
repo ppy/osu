@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         private const double max_health_target = 0.30;
 
+        /// <summary>
+        /// Multiplier for the health drain amount
+        /// </summary>
+        private const double overall_health_drain = 0.5;
+
         private IBeatmap beatmap;
 
         private double gameplayEndTime;
@@ -166,7 +171,7 @@ namespace osu.Game.Rulesets.Scoring
                     // Apply health adjustments
                     currentHealth -= (healthIncreases[i].time - lastTime) * result;
                     lowestHealth = Math.Min(lowestHealth, currentHealth);
-                    currentHealth = Math.Min(1, currentHealth + healthIncreases[i].health * 0.5f);
+                    currentHealth = Math.Min(1, currentHealth + healthIncreases[i].health);
 
                     // Common scenario for when the drain rate is definitely too harsh
                     if (lowestHealth < 0)
@@ -182,7 +187,7 @@ namespace osu.Game.Rulesets.Scoring
                 result += 1.0 / adjustment * Math.Sign(lowestHealth - targetMinimumHealth);
             }
 
-            return result;
+            return result * overall_health_drain;
         }
     }
 }
