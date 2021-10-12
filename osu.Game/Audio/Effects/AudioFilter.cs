@@ -140,6 +140,7 @@ namespace osu.Game.Audio.Effects
             catch (Exception e)
             {
                 Logger.Log($"Exception in audio filter disposal: {e}");
+                throw;
             }
         }
     }
