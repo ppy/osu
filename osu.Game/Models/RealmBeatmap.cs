@@ -97,11 +97,6 @@ namespace osu.Game.Models
 
         #endregion
 
-        /// <summary>
-        /// Returns a shallow-clone of this <see cref="RealmBeatmap"/>.
-        /// </summary>
-        public RealmBeatmap Clone() => (RealmBeatmap)MemberwiseClone();
-
         public bool AudioEquals(RealmBeatmap? other) => other != null
                                                         && BeatmapSet != null
                                                         && other.BeatmapSet != null
