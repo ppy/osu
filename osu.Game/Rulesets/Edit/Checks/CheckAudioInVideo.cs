@@ -6,6 +6,8 @@ using System.IO;
 using osu.Game.IO.FileAbstraction;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Storyboards;
+using TagLib;
+using File = TagLib.File;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
@@ -50,31 +52,30 @@ namespace osu.Game.Rulesets.Edit.Checks
                     continue;
                 }
 
-                using Stream data = context.WorkingBeatmap.GetStream(storagePath);
-                var fileAbstraction = new StreamFileAbstraction(filename, data);
-
-                // We use TagLib here for platform invariance; BASS cannot detect audio presence on Linux.
-                TagLib.File tagFile = null;
-                string errorReason = null;
+                Issue issue;
 
                 try
                 {
-                    tagFile = TagLib.File.Create(fileAbstraction);
-                }
-                catch (TagLib.CorruptFileException) { errorReason = "Corrupt file"; }
-                catch (TagLib.UnsupportedFormatException) { errorReason = "Unsupported format"; }
+                    // We use TagLib here for platform invariance; BASS cannot detect audio presence on Linux.
+                    using (Stream data = context.WorkingBeatmap.GetStream(storagePath))
+                    using (File tagFile = File.Create(new StreamFileAbstraction(filename, data)))
+                    {
+                        if (tagFile.Properties.AudioChannels == 0)
+                            continue;
+                    }
 
-                if (errorReason != null)
+                    issue = new IssueTemplateHasAudioTrack(this).Create(filename);
+                }
+                catch (CorruptFileException)
                 {
-                    yield return new IssueTemplateFileError(this).Create(filename, errorReason);
-
-                    continue;
+                    issue = new IssueTemplateFileError(this).Create(filename, "Corrupt file");
+                }
+                catch (UnsupportedFormatException)
+                {
+                    issue = new IssueTemplateFileError(this).Create(filename, "Unsupported format");
                 }
 
-                if (tagFile.Properties.AudioChannels == 0)
-                    continue;
-
-                yield return new IssueTemplateHasAudioTrack(this).Create(filename);
+                yield return issue;
             }
         }
 
