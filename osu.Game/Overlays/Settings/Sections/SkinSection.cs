@@ -64,7 +64,10 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                skinDropdown = new SkinSettingsDropdown(),
+                skinDropdown = new SkinSettingsDropdown
+                {
+                    LabelText = SkinSettingsStrings.CurrentSkin
+                },
                 new SettingsButton
                 {
                     Text = SkinSettingsStrings.SkinLayoutEditor,
