@@ -6,7 +6,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
@@ -67,8 +66,7 @@ namespace osu.Game.Tests.Skins
 
             protected override void OnSourceChanged()
             {
-                ResetSources();
-                sources.ForEach(AddSource);
+                SetSources(sources);
             }
         }
 
