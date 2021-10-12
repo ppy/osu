@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -29,14 +27,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void load(OsuColour colours)
         {
             BackgroundColour = colours.Blue3;
-
-            Content.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(0, 2),
-                Radius = 4,
-                Colour = Colour4.Black.Opacity(0.15f)
-            };
         }
 
         protected override void LoadComplete()
