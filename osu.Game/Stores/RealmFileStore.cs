@@ -17,14 +17,15 @@ using Realms;
 namespace osu.Game.Stores
 {
     /// <summary>
-    /// Handles the Store and retrieval of Files/FileSets to the database backing
+    /// Handles the storing of files to the file system (and database) backing.
     /// </summary>
     public class RealmFileStore
     {
         private readonly RealmContextFactory realmFactory;
+
         public readonly IResourceStore<byte[]> Store;
 
-        public Storage Storage;
+        public readonly Storage Storage;
 
         public RealmFileStore(RealmContextFactory realmFactory, Storage storage)
         {
