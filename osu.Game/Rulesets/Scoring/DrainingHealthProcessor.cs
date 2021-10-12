@@ -27,22 +27,18 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The minimum health target at an HP drain rate of 0.
         /// </summary>
-        private const double min_health_target = 0.95;
+        private const double min_health_target = 0.985;
 
         /// <summary>
         /// The minimum health target at an HP drain rate of 5.
         /// </summary>
-        private const double mid_health_target = 0.70;
+        private const double mid_health_target = 0.9699;
 
         /// <summary>
         /// The minimum health target at an HP drain rate of 10.
         /// </summary>
-        private const double max_health_target = 0.30;
+        private const double max_health_target = 0.005;
 
-        /// <summary>
-        /// Multiplier for the health drain amount
-        /// </summary>
-        private const double overall_health_drain = 0.5;
 
         private IBeatmap beatmap;
 
@@ -187,7 +183,7 @@ namespace osu.Game.Rulesets.Scoring
                 result += 1.0 / adjustment * Math.Sign(lowestHealth - targetMinimumHealth);
             }
 
-            return result * overall_health_drain;
+            return result;
         }
     }
 }
