@@ -29,6 +29,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void load(OverlayColourProvider colourProvider)
             {
                 BackgroundColour = colourProvider.Background5;
+                ((IHasAccentColour)ContentContainer).AccentColour = colourProvider.Highlight1;
             }
         }
 
