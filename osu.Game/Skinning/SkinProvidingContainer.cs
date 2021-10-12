@@ -41,6 +41,8 @@ namespace osu.Game.Skinning
 
         protected virtual bool AllowColourLookup => true;
 
+        private readonly object sourceSetLock = new object();
+
         /// <summary>
         /// A dictionary mapping each <see cref="ISkin"/> source to a wrapper which handles lookup allowances.
         /// </summary>
@@ -174,18 +176,21 @@ namespace osu.Game.Skinning
         /// <param name="sources">The new sources.</param>
         protected void SetSources(IEnumerable<ISkin> sources)
         {
-            foreach (var skin in skinSources)
+            lock (sourceSetLock)
             {
-                if (skin.skin is ISkinSource source)
-                    source.SourceChanged -= TriggerSourceChanged;
-            }
+                foreach (var skin in skinSources)
+                {
+                    if (skin.skin is ISkinSource source)
+                        source.SourceChanged -= TriggerSourceChanged;
+                }
 
-            skinSources = sources.Select(skin => (skin, new DisableableSkinSource(skin, this))).ToArray();
+                skinSources = sources.Select(skin => (skin, new DisableableSkinSource(skin, this))).ToArray();
 
-            foreach (var skin in skinSources)
-            {
-                if (skin.skin is ISkinSource source)
-                    source.SourceChanged += TriggerSourceChanged;
+                foreach (var skin in skinSources)
+                {
+                    if (skin.skin is ISkinSource source)
+                        source.SourceChanged += TriggerSourceChanged;
+                }
             }
         }
 
