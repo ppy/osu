@@ -41,11 +41,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
             AddStep("Place single hitcircle", () => InputManager.Click(MouseButton.Left));
 
-            AddStep("Save and exit", () =>
-            {
-                InputManager.Keys(PlatformAction.Save);
-                InputManager.Key(Key.Escape);
-            });
+            AddAssert("Beatmap contains single hitcircle", () => editorBeatmap.HitObjects.Count == 1);
+
+            AddStep("Save", () => InputManager.Keys(PlatformAction.Save));
+
+            AddStep("Exit", () => InputManager.Key(Key.Escape));
 
             AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
 
