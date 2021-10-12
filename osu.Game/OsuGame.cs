@@ -90,6 +90,8 @@ namespace osu.Game
 
         private WikiOverlay wikiOverlay;
 
+        private ChangelogOverlay changelogOverlay;
+
         private SkinEditorOverlay skinEditor;
 
         private Container overlayContent;
@@ -769,7 +771,7 @@ namespace osu.Game
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
-            var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
