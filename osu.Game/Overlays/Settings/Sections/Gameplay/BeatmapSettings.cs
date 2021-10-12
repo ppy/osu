@@ -33,6 +33,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = SkinSettingsStrings.BeatmapHitsounds,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GraphicsSettingsStrings.StoryboardVideo,
+                    Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
+                },
             };
         }
     }
