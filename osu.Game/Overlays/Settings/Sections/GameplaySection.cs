@@ -27,7 +27,11 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                new GeneralSettings(),
+                new AudioSettings(),
+                new BeatmapSettings(),
+                new BackgroundSettings(),
+                new HUDSettings(),
+                new InputSettings(),
                 new ModsSettings(),
             };
         }

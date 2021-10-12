@@ -71,21 +71,6 @@ namespace osu.Game.Overlays.Settings.Sections
                     Action = () => skinEditor?.Toggle(),
                 },
                 new ExportSkinButton(),
-                new SettingsCheckbox
-                {
-                    LabelText = SkinSettingsStrings.BeatmapSkins,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = SkinSettingsStrings.BeatmapColours,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = SkinSettingsStrings.BeatmapHitsounds,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
-                },
             };
 
             managerUpdated = skins.ItemUpdated.GetBoundCopy();
