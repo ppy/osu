@@ -58,7 +58,7 @@ namespace osu.Game.Skinning
             return base.CreateChildDependencies(parent);
         }
 
-        protected override void OnSourceChanged()
+        protected override void RefreshSources()
         {
             // Populate a local list first so we can adjust the returned order as we go.
             var sources = new List<ISkin>();

@@ -173,6 +173,9 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Replace the sources used for lookups in this container.
         /// </summary>
+        /// <remarks>
+        /// This does not implicitly fire a <see cref="SourceChanged"/> event. Consider calling <see cref="TriggerSourceChanged"/> if required.
+        /// </remarks>
         /// <param name="sources">The new sources.</param>
         protected void SetSources(IEnumerable<ISkin> sources)
         {
@@ -195,15 +198,15 @@ namespace osu.Game.Skinning
         }
 
         /// <summary>
-        /// Invoked when any source has changed (either <see cref="ParentSource"/> or sources replaced via <see cref="SetSources"/>).
+        /// Invoked after any consumed source change, before the external <see cref="SourceChanged"/> event is fired.
         /// This is also invoked once initially during <see cref="CreateChildDependencies"/> to ensure sources are ready for children consumption.
         /// </summary>
-        protected virtual void OnSourceChanged() { }
+        protected virtual void RefreshSources() { }
 
         protected void TriggerSourceChanged()
         {
             // Expose to implementations, giving them a chance to react before notifying external consumers.
-            OnSourceChanged();
+            RefreshSources();
 
             SourceChanged?.Invoke();
         }
