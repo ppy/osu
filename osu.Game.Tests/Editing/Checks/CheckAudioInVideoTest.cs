@@ -49,25 +49,32 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestRegularVideoFile()
         {
-            Assert.IsEmpty(check.Run(getContext("Videos/test-video.mp4")));
+            using (var resourceStream = TestResources.OpenResource("Videos/test-video.mp4"))
+                Assert.IsEmpty(check.Run(getContext(resourceStream)));
         }
 
         [Test]
         public void TestVideoFileWithAudio()
         {
-            var issues = check.Run(getContext("Videos/test-video-with-audio.mp4")).ToList();
+            using (var resourceStream = TestResources.OpenResource("Videos/test-video-with-audio.mp4"))
+            {
+                var issues = check.Run(getContext(resourceStream)).ToList();
 
-            Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckAudioInVideo.IssueTemplateHasAudioTrack);
+                Assert.That(issues, Has.Count.EqualTo(1));
+                Assert.That(issues.Single().Template is CheckAudioInVideo.IssueTemplateHasAudioTrack);
+            }
         }
 
         [Test]
         public void TestVideoFileWithTrackButNoAudio()
         {
-            var issues = check.Run(getContext("Videos/test-video-with-track-but-no-audio.mp4")).ToList();
+            using (var resourceStream = TestResources.OpenResource("Videos/test-video-with-track-but-no-audio.mp4"))
+            {
+                var issues = check.Run(getContext(resourceStream)).ToList();
 
-            Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckAudioInVideo.IssueTemplateHasAudioTrack);
+                Assert.That(issues, Has.Count.EqualTo(1));
+                Assert.That(issues.Single().Template is CheckAudioInVideo.IssueTemplateHasAudioTrack);
+            }
         }
 
         [Test]
@@ -75,18 +82,14 @@ namespace osu.Game.Tests.Editing.Checks
         {
             beatmap.BeatmapInfo.BeatmapSet.Files.Clear();
 
-            var issues = check.Run(getContext("Videos/missing.mp4", allowMissing: true)).ToList();
+            var issues = check.Run(getContext(null)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckAudioInVideo.IssueTemplateMissingFile);
         }
 
-        private BeatmapVerifierContext getContext(string resourceName, bool allowMissing = false)
+        private BeatmapVerifierContext getContext(Stream resourceStream)
         {
-            Stream resourceStream = string.IsNullOrEmpty(resourceName) ? null : TestResources.OpenResource(resourceName);
-            if (!allowMissing && resourceStream == null)
-                throw new FileNotFoundException($"The requested test resource \"{resourceName}\" does not exist.");
-
             var storyboard = new Storyboard();
             var layer = storyboard.GetLayer("Video");
             layer.Add(new StoryboardVideo("abc123.mp4", 0));
