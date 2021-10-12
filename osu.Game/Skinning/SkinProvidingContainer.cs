@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -43,7 +44,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A dictionary mapping each <see cref="ISkin"/> source to a wrapper which handles lookup allowances.
         /// </summary>
-        private readonly List<(ISkin skin, DisableableSkinSource wrapped)> skinSources = new List<(ISkin, DisableableSkinSource)>();
+        private (ISkin skin, DisableableSkinSource wrapped)[] skinSources = Array.Empty<(ISkin skin, DisableableSkinSource wrapped)>();
 
         /// <summary>
         /// Constructs a new <see cref="SkinProvidingContainer"/> initialised with a single skin source.
@@ -173,23 +174,10 @@ namespace osu.Game.Skinning
         /// <param name="skin">The skin to add.</param>
         protected void AddSource(ISkin skin)
         {
-            skinSources.Add((skin, new DisableableSkinSource(skin, this)));
+            skinSources = skinSources.Append((skin, new DisableableSkinSource(skin, this))).ToArray();
 
             if (skin is ISkinSource source)
                 source.SourceChanged += TriggerSourceChanged;
-        }
-
-        /// <summary>
-        /// Remove a skin from this provider.
-        /// </summary>
-        /// <param name="skin">The skin to remove.</param>
-        protected void RemoveSource(ISkin skin)
-        {
-            if (skinSources.RemoveAll(s => s.skin == skin) == 0)
-                return;
-
-            if (skin is ISkinSource source)
-                source.SourceChanged -= TriggerSourceChanged;
         }
 
         /// <summary>
@@ -197,8 +185,13 @@ namespace osu.Game.Skinning
         /// </summary>
         protected void ResetSources()
         {
-            foreach (var i in skinSources.ToArray())
-                RemoveSource(i.skin);
+            foreach (var skin in skinSources)
+            {
+                if (skin.skin is ISkinSource source)
+                    source.SourceChanged -= TriggerSourceChanged;
+            }
+
+            skinSources = Array.Empty<(ISkin skin, DisableableSkinSource wrapped)>();
         }
 
         /// <summary>
