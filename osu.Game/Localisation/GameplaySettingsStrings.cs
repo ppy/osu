@@ -15,9 +15,34 @@ namespace osu.Game.Localisation
         public static LocalisableString GameplaySectionHeader => new TranslatableString(getKey(@"gameplay_section_header"), @"Gameplay");
 
         /// <summary>
+        /// "Beatmap"
+        /// </summary>
+        public static LocalisableString BeatmapHeader => new TranslatableString(getKey(@"beatmap_header"), @"Beatmap");
+
+        /// <summary>
         /// "General"
         /// </summary>
         public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"General");
+
+        /// <summary>
+        /// "Audio"
+        /// </summary>
+        public static LocalisableString AudioHeader => new TranslatableString(getKey(@"audio"), @"Audio");
+
+        /// <summary>
+        /// "HUD"
+        /// </summary>
+        public static LocalisableString HUDHeader => new TranslatableString(getKey(@"h_u_d"), @"HUD");
+
+        /// <summary>
+        /// "Input"
+        /// </summary>
+        public static LocalisableString InputHeader => new TranslatableString(getKey(@"input"), @"Input");
+
+        /// <summary>
+        /// "Background"
+        /// </summary>
+        public static LocalisableString BackgroundHeader => new TranslatableString(getKey(@"background"), @"Background");
 
         /// <summary>
         /// "Background dim"
