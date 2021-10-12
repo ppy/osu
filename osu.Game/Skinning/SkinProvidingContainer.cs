@@ -53,7 +53,7 @@ namespace osu.Game.Skinning
             : this()
         {
             if (skin != null)
-                AddSource(skin);
+                SetSources(new[] { skin });
         }
 
         /// <summary>
@@ -169,21 +169,10 @@ namespace osu.Game.Skinning
         }
 
         /// <summary>
-        /// Add a new skin to this provider. Will be added to the end of the lookup order precedence.
+        /// Replace the sources used for lookups in this container.
         /// </summary>
-        /// <param name="skin">The skin to add.</param>
-        protected void AddSource(ISkin skin)
-        {
-            skinSources = skinSources.Append((skin, new DisableableSkinSource(skin, this))).ToArray();
-
-            if (skin is ISkinSource source)
-                source.SourceChanged += TriggerSourceChanged;
-        }
-
-        /// <summary>
-        /// Clears all skin sources.
-        /// </summary>
-        protected void ResetSources()
+        /// <param name="sources">The new sources.</param>
+        protected void SetSources(IEnumerable<ISkin> sources)
         {
             foreach (var skin in skinSources)
             {
@@ -191,11 +180,17 @@ namespace osu.Game.Skinning
                     source.SourceChanged -= TriggerSourceChanged;
             }
 
-            skinSources = Array.Empty<(ISkin skin, DisableableSkinSource wrapped)>();
+            skinSources = sources.Select(skin => (skin, new DisableableSkinSource(skin, this))).ToArray();
+
+            foreach (var skin in skinSources)
+            {
+                if (skin.skin is ISkinSource source)
+                    source.SourceChanged += TriggerSourceChanged;
+            }
         }
 
         /// <summary>
-        /// Invoked when any source has changed (either <see cref="ParentSource"/> or a source registered via <see cref="AddSource"/>).
+        /// Invoked when any source has changed (either <see cref="ParentSource"/> or sources replaced via <see cref="SetSources"/>).
         /// This is also invoked once initially during <see cref="CreateChildDependencies"/> to ensure sources are ready for children consumption.
         /// </summary>
         protected virtual void OnSourceChanged() { }

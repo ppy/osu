@@ -60,8 +60,6 @@ namespace osu.Game.Skinning
 
         protected override void OnSourceChanged()
         {
-            ResetSources();
-
             // Populate a local list first so we can adjust the returned order as we go.
             var sources = new List<ISkin>();
 
@@ -91,8 +89,7 @@ namespace osu.Game.Skinning
             else
                 sources.Add(rulesetResourcesSkin);
 
-            foreach (var skin in sources)
-                AddSource(skin);
+            SetSources(sources);
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
