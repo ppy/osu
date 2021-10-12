@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestSeekToSameTimePreservesRate()
+        public void TestRatePreservedWhenTimeNotProgressing()
         {
             AddStep("set manual clock rate", () => manualClock.Rate = 1);
             seekManualTo(5000);
@@ -114,13 +114,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             seekManualTo(10000);
             checkRate(1);
 
-            seekManualTo(10000);
+            AddWaitStep("wait some", 3);
             checkRate(1);
 
             seekManualTo(5000);
             checkRate(-1);
 
-            seekManualTo(5000);
+            AddWaitStep("wait some", 3);
             checkRate(-1);
 
             seekManualTo(10000);
