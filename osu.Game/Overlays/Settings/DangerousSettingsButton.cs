@@ -14,10 +14,7 @@ namespace osu.Game.Overlays.Settings
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BackgroundColour = colours.Pink;
-
-            Triangles.ColourDark = colours.PinkDark;
-            Triangles.ColourLight = colours.PinkLight;
+            BackgroundColour = colours.Pink3;
         }
     }
 }
