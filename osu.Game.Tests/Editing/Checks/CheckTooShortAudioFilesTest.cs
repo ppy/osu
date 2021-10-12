@@ -68,46 +68,57 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestRegularAudioFile()
         {
-            Assert.IsEmpty(check.Run(getContext("Samples/test-sample.mp3")));
+            using (var resourceStream = TestResources.OpenResource("Samples/test-sample.mp3"))
+            {
+                Assert.IsEmpty(check.Run(getContext(resourceStream)));
+            }
         }
 
         [Test]
         public void TestBlankAudioFile()
         {
-            // This is a 0 ms duration audio file, commonly used to silence sliderslides/ticks, and so should be fine.
-            Assert.IsEmpty(check.Run(getContext("Samples/blank.wav")));
+            using (var resourceStream = TestResources.OpenResource("Samples/blank.wav"))
+            {
+                // This is a 0 ms duration audio file, commonly used to silence sliderslides/ticks, and so should be fine.
+                Assert.IsEmpty(check.Run(getContext(resourceStream)));
+            }
         }
 
         [Test]
         public void TestTooShortAudioFile()
         {
-            var issues = check.Run(getContext("Samples/test-sample-cut.mp3")).ToList();
+            using (var resourceStream = TestResources.OpenResource("Samples/test-sample-cut.mp3"))
+            {
+                var issues = check.Run(getContext(resourceStream)).ToList();
 
-            Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckTooShortAudioFiles.IssueTemplateTooShort);
+                Assert.That(issues, Has.Count.EqualTo(1));
+                Assert.That(issues.Single().Template is CheckTooShortAudioFiles.IssueTemplateTooShort);
+            }
         }
 
         [Test]
         public void TestMissingAudioFile()
         {
-            Assert.IsEmpty(check.Run(getContext("Samples/missing.mp3", allowMissing: true)));
+            using (var resourceStream = TestResources.OpenResource("Samples/missing.mp3"))
+            {
+                Assert.IsEmpty(check.Run(getContext(resourceStream, allowMissing: true)));
+            }
         }
 
         [Test]
         public void TestCorruptAudioFile()
         {
-            var issues = check.Run(getContext("Samples/corrupt.wav")).ToList();
+            using (var resourceStream = TestResources.OpenResource("Samples/corrupt.wav"))
+            {
+                var issues = check.Run(getContext(resourceStream)).ToList();
 
-            Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckTooShortAudioFiles.IssueTemplateBadFormat);
+                Assert.That(issues, Has.Count.EqualTo(1));
+                Assert.That(issues.Single().Template is CheckTooShortAudioFiles.IssueTemplateBadFormat);
+            }
         }
 
-        private BeatmapVerifierContext getContext(string resourceName, bool allowMissing = false)
+        private BeatmapVerifierContext getContext(Stream resourceStream, bool allowMissing = false)
         {
-            Stream resourceStream = string.IsNullOrEmpty(resourceName) ? null : TestResources.OpenResource(resourceName);
-            if (!allowMissing && resourceStream == null)
-                throw new FileNotFoundException($"The requested test resource \"{resourceName}\" does not exist.");
-
             var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null, null);
             mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);
 
