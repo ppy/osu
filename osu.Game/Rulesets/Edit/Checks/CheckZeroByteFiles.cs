@@ -22,9 +22,11 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             foreach (var file in beatmapSet.Files)
             {
-                using Stream data = context.WorkingBeatmap.GetStream(file.FileInfo.StoragePath);
-                if (data?.Length == 0)
-                    yield return new IssueTemplateZeroBytes(this).Create(file.Filename);
+                using (Stream data = context.WorkingBeatmap.GetStream(file.FileInfo.StoragePath))
+                {
+                    if (data?.Length == 0)
+                        yield return new IssueTemplateZeroBytes(this).Create(file.Filename);
+                }
             }
         }
 
