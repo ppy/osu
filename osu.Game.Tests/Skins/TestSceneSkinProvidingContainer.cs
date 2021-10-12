@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Skins
 
             public new void TriggerSourceChanged() => base.TriggerSourceChanged();
 
-            protected override void OnSourceChanged()
+            protected override void RefreshSources()
             {
                 SetSources(sources);
             }
