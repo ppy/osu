@@ -13,34 +13,34 @@ namespace osu.Game.Rulesets.Mania.Judgements
             switch (result)
             {
                 case HitResult.SmallTickHit:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.5;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.25;
 
                 case HitResult.LargeTickHit:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.9;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.45;
 
                 case HitResult.SmallTickMiss:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.02;
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.015;
 
                 case HitResult.LargeTickMiss:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.1;
-
-                case HitResult.Miss:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.8;
-
-                case HitResult.Meh:
                     return -DEFAULT_MAX_HEALTH_INCREASE * 0.05;
 
+                case HitResult.Miss:
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.4;
+
+                case HitResult.Meh:
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.025;
+
                 case HitResult.Ok:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.7;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.45;
 
                 case HitResult.Good:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 1.1;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.55;
 
                 case HitResult.Great:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 1.5;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.75;
 
                 case HitResult.Perfect:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 1.55;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.775;
 
                 default:
                     return base.HealthIncreaseFor(result);
