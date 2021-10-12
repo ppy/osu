@@ -4,7 +4,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Nito.AsyncEx;
 using NUnit.Framework;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -28,42 +27,69 @@ namespace osu.Game.Tests.Database
 
         protected void RunTestWithRealm(Action<RealmContextFactory, Storage> testAction, [CallerMemberName] string caller = "")
         {
-            AsyncContext.Run(() =>
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(caller))
             {
-                var testStorage = storage.GetStorageForDirectory(caller);
-
-                using (var realmFactory = new RealmContextFactory(testStorage, caller))
+                host.Run(new RealmTestGame(() =>
                 {
-                    Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
-                    testAction(realmFactory, testStorage);
+                    var testStorage = storage.GetStorageForDirectory(caller);
 
-                    realmFactory.Dispose();
+                    using (var realmFactory = new RealmContextFactory(testStorage, caller))
+                    {
+                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
+                        testAction(realmFactory, testStorage);
 
-                    Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
-                    realmFactory.Compact();
-                    Logger.Log($"Final database size after compact: {getFileSize(testStorage, realmFactory)}");
-                }
-            });
+                        realmFactory.Dispose();
+
+                        Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
+                        realmFactory.Compact();
+                        Logger.Log($"Final database size after compact: {getFileSize(testStorage, realmFactory)}");
+                    }
+                }));
+            }
         }
 
         protected void RunTestWithRealmAsync(Func<RealmContextFactory, Storage, Task> testAction, [CallerMemberName] string caller = "")
         {
-            AsyncContext.Run(async () =>
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(caller))
             {
-                var testStorage = storage.GetStorageForDirectory(caller);
-
-                using (var realmFactory = new RealmContextFactory(testStorage, caller))
+                host.Run(new RealmTestGame(async () =>
                 {
-                    Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
-                    await testAction(realmFactory, testStorage);
+                    var testStorage = storage.GetStorageForDirectory(caller);
 
-                    realmFactory.Dispose();
+                    using (var realmFactory = new RealmContextFactory(testStorage, caller))
+                    {
+                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
+                        await testAction(realmFactory, testStorage);
 
-                    Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
-                    realmFactory.Compact();
-                    Logger.Log($"Final database size after compact: {getFileSize(testStorage, realmFactory)}");
-                }
-            });
+                        realmFactory.Dispose();
+
+                        Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
+                        realmFactory.Compact();
+                    }
+                }));
+            }
+        }
+
+        private class RealmTestGame : Framework.Game
+        {
+            public RealmTestGame(Func<Task> work)
+            {
+                // ReSharper disable once AsyncVoidLambda
+                Scheduler.Add(async () =>
+                {
+                    await work().ConfigureAwait(true);
+                    Exit();
+                });
+            }
+
+            public RealmTestGame(Action work)
+            {
+                Scheduler.Add(() =>
+                {
+                    work();
+                    Exit();
+                });
+            }
         }
 
         private static long getFileSize(Storage testStorage, RealmContextFactory realmFactory)
