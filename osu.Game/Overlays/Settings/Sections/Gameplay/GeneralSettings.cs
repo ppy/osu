@@ -81,6 +81,17 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
                     Keywords = new[] { "scoring" }
                 },
+                new SettingsSlider<float, SizeSlider>
+                {
+                    LabelText = SkinSettingsStrings.GameplayCursorSize,
+                    Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
+                    KeyboardStep = 0.01f
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = SkinSettingsStrings.AutoCursorSize,
+                    Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
+                },
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)

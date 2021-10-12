@@ -71,17 +71,6 @@ namespace osu.Game.Overlays.Settings.Sections
                     Action = () => skinEditor?.Toggle(),
                 },
                 new ExportSkinButton(),
-                new SettingsSlider<float, SizeSlider>
-                {
-                    LabelText = SkinSettingsStrings.GameplayCursorSize,
-                    Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
-                    KeyboardStep = 0.01f
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = SkinSettingsStrings.AutoCursorSize,
-                    Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
-                },
                 new SettingsCheckbox
                 {
                     LabelText = SkinSettingsStrings.BeatmapSkins,
