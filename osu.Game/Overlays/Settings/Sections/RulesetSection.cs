@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Regular.Square
+            Icon = FontAwesome.Solid.Chess
         };
 
         [BackgroundDependencyLoader]
