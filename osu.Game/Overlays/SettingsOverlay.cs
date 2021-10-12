@@ -28,6 +28,7 @@ namespace osu.Game.Overlays
             new InputSection(createSubPanel(new KeyBindingPanel())),
             new UserInterfaceSection(),
             new GameplaySection(),
+            new RulesetSection(),
             new AudioSection(),
             new GraphicsSection(),
             new OnlineSection(),
