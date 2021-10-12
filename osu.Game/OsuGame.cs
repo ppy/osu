@@ -338,6 +338,17 @@ namespace osu.Game
                     ShowWiki(link.Argument);
                     break;
 
+                case LinkAction.OpenChangelog:
+                    if (string.IsNullOrEmpty(link.Argument))
+                        ShowChangelogListing();
+                    else
+                    {
+                        var changelogArgs = link.Argument.Split("/");
+                        ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
+                    }
+
+                    break;
+
                 default:
                     throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
             }
