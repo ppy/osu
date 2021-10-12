@@ -132,16 +132,8 @@ namespace osu.Game.Audio.Effects
         {
             base.Dispose(isDisposing);
 
-            try
-            {
-                if (mixer.Effects.Contains(filter))
-                    detachFilter();
-            }
-            catch (Exception e)
-            {
-                Logger.Log($"Exception in audio filter disposal: {e}");
-                throw;
-            }
+            if (mixer.Effects.Contains(filter))
+                detachFilter();
         }
     }
 }
