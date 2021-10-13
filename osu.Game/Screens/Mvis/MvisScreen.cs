@@ -914,9 +914,10 @@ namespace osu.Game.Screens.Mvis
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> action)
         {
             //查找本体按键绑定
-            keyBindings.FirstOrDefault(b => b.Key == action.Action).Value?.Invoke();
+            var target = keyBindings.FirstOrDefault(b => b.Key == action.Action).Value;
+            target?.Invoke();
 
-            return false;
+            return target != null;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> action) { }
@@ -932,9 +933,10 @@ namespace osu.Game.Screens.Mvis
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             //查找插件按键绑定并执行
-            pluginKeyBindings.FirstOrDefault(b => b.Key.Key == e.Key).Key?.Action?.Invoke();
+            var target = pluginKeyBindings.FirstOrDefault(b => b.Key.Key == e.Key).Key;
+            target?.Action?.Invoke();
 
-            return base.OnKeyDown(e);
+            return target != null;
         }
 
         //当有弹窗或游戏失去焦点时要进行的动作
