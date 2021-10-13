@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
+using osu.Framework.Testing;
 using osu.Game.IO;
 using Realms;
 
@@ -9,6 +10,7 @@ using Realms;
 
 namespace osu.Game.Models
 {
+    [ExcludeFromDynamicCompile]
     [MapTo("File")]
     public class RealmFile : RealmObject, IFileInfo
     {

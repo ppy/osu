@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play
 {
     /// <summary>
     /// Manage the animation to be applied when a player fails.
-    /// Single file; automatically disposed after use.
+    /// Single use and automatically disposed after use.
     /// </summary>
     public class FailAnimation : CompositeDrawable
     {

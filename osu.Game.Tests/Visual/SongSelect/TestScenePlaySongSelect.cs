@@ -142,6 +142,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("store selected beatmap", () => selected = Beatmap.Value);
 
+            AddUntilStep("wait for beatmaps to load", () => songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmap>().Any());
+
             AddStep("select next and enter", () =>
             {
                 InputManager.MoveMouseTo(songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
@@ -599,10 +601,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             FilterableDifficultyIcon difficultyIcon = null;
-            AddStep("Find an icon", () =>
+            AddUntilStep("Find an icon", () =>
             {
-                difficultyIcon = set.ChildrenOfType<FilterableDifficultyIcon>()
-                                    .First(icon => getDifficultyIconIndex(set, icon) != getCurrentBeatmapIndex());
+                return (difficultyIcon = set.ChildrenOfType<FilterableDifficultyIcon>()
+                                            .FirstOrDefault(icon => getDifficultyIconIndex(set, icon) != getCurrentBeatmapIndex())) != null;
             });
 
             AddStep("Click on a difficulty", () =>
@@ -765,10 +767,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             FilterableGroupedDifficultyIcon groupIcon = null;
-            AddStep("Find group icon for different ruleset", () =>
+            AddUntilStep("Find group icon for different ruleset", () =>
             {
-                groupIcon = set.ChildrenOfType<FilterableGroupedDifficultyIcon>()
-                               .First(icon => icon.Items.First().BeatmapInfo.Ruleset.ID == 3);
+                return (groupIcon = set.ChildrenOfType<FilterableGroupedDifficultyIcon>()
+                                       .FirstOrDefault(icon => icon.Items.First().BeatmapInfo.Ruleset.ID == 3)) != null;
             });
 
             AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
