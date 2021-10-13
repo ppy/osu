@@ -61,6 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             double angleBonus = 0;
+            double sliderBonus = 0;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
