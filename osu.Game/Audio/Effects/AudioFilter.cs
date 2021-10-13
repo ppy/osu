@@ -4,7 +4,6 @@
 using System.Diagnostics;
 using ManagedBass.Fx;
 using osu.Framework.Audio.Mixing;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
 namespace osu.Game.Audio.Effects
@@ -21,10 +20,25 @@ namespace osu.Game.Audio.Effects
         private readonly BQFParameters filter;
         private readonly BQFType type;
 
+        private int cutoff;
+
         /// <summary>
-        /// The current cutoff of this filter.
+        /// The cutoff frequency of this filter.
         /// </summary>
-        public BindableNumber<int> Cutoff { get; }
+        public int Cutoff
+        {
+            get => cutoff;
+            set
+            {
+                if (value == cutoff)
+                    return;
+
+                int oldValue = cutoff;
+                cutoff = value;
+
+                updateFilter(oldValue, cutoff);
+            }
+        }
 
         /// <summary>
         /// A Component that implements a BASS FX BiQuad Filter Effect.
@@ -36,33 +50,25 @@ namespace osu.Game.Audio.Effects
             this.mixer = mixer;
             this.type = type;
 
-            int initialCutoff;
-
             switch (type)
             {
                 case BQFType.HighPass:
-                    initialCutoff = 1;
+                    cutoff = 1;
                     break;
 
                 case BQFType.LowPass:
-                    initialCutoff = MAX_LOWPASS_CUTOFF;
+                    cutoff = MAX_LOWPASS_CUTOFF;
                     break;
 
                 default:
-                    initialCutoff = 500; // A default that should ensure audio remains audible for other filters.
+                    cutoff = 500; // A default that should ensure audio remains audible for other filters.
                     break;
             }
-
-            Cutoff = new BindableNumber<int>(initialCutoff)
-            {
-                MinValue = 1,
-                MaxValue = MAX_LOWPASS_CUTOFF
-            };
 
             filter = new BQFParameters
             {
                 lFilter = type,
-                fCenter = initialCutoff,
+                fCenter = cutoff,
                 fBandwidth = 0,
                 fQ = 0.7f // This allows fCenter to go up to 22049hz (nyquist - 1hz) without overflowing and causing weird filter behaviour (see: https://www.un4seen.com/forum/?topic=19542.0)
             };
@@ -70,8 +76,6 @@ namespace osu.Game.Audio.Effects
             // Don't start attached if this is low-pass or high-pass filter (as they have special auto-attach/detach logic)
             if (type != BQFType.LowPass && type != BQFType.HighPass)
                 attachFilter();
-
-            Cutoff.ValueChanged += updateFilter;
         }
 
         private void attachFilter()
@@ -86,40 +90,41 @@ namespace osu.Game.Audio.Effects
             mixer.Effects.Remove(filter);
         }
 
-        private void updateFilter(ValueChangedEvent<int> cutoff)
+        private void updateFilter(int oldValue, int newValue)
         {
             // Workaround for weird behaviour when rapidly setting fCenter of a low-pass filter to nyquist - 1hz.
             if (type == BQFType.LowPass)
             {
-                if (cutoff.NewValue >= MAX_LOWPASS_CUTOFF)
+                if (newValue >= MAX_LOWPASS_CUTOFF)
                 {
                     detachFilter();
                     return;
                 }
 
-                if (cutoff.OldValue >= MAX_LOWPASS_CUTOFF && cutoff.NewValue < MAX_LOWPASS_CUTOFF)
+                if (oldValue >= MAX_LOWPASS_CUTOFF)
                     attachFilter();
             }
 
             // Workaround for weird behaviour when rapidly setting fCenter of a high-pass filter to 1hz.
             if (type == BQFType.HighPass)
             {
-                if (cutoff.NewValue <= 1)
+                if (newValue <= 1)
                 {
                     detachFilter();
                     return;
                 }
 
-                if (cutoff.OldValue <= 1 && cutoff.NewValue > 1)
+                if (oldValue <= 1)
                     attachFilter();
             }
 
             var filterIndex = mixer.Effects.IndexOf(filter);
+
             if (filterIndex < 0) return;
 
             if (mixer.Effects[filterIndex] is BQFParameters existingFilter)
             {
-                existingFilter.fCenter = cutoff.NewValue;
+                existingFilter.fCenter = newValue;
 
                 // required to update effect with new parameters.
                 mixer.Effects[filterIndex] = existingFilter;
