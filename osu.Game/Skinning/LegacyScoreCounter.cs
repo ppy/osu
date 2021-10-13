@@ -16,7 +16,6 @@ namespace osu.Game.Skinning
         public bool UsesFixedAnchor { get; set; }
 
         public LegacyScoreCounter()
-            : base(6)
         {
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;

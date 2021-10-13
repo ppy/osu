@@ -32,6 +32,8 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("wait for editor load", () => editor != null);
 
+            AddStep("Set overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty = 7);
+
             AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
 
             AddStep("Enter compose mode", () => InputManager.Key(Key.F1));
@@ -41,11 +43,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
             AddStep("Place single hitcircle", () => InputManager.Click(MouseButton.Left));
 
-            AddStep("Save and exit", () =>
-            {
-                InputManager.Keys(PlatformAction.Save);
-                InputManager.Key(Key.Escape);
-            });
+            AddAssert("Beatmap contains single hitcircle", () => editorBeatmap.HitObjects.Count == 1);
+
+            AddStep("Save", () => InputManager.Keys(PlatformAction.Save));
+
+            AddStep("Exit", () => InputManager.Key(Key.Escape));
 
             AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
 
@@ -57,6 +59,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("Wait for editor load", () => editor != null);
             AddAssert("Beatmap contains single hitcircle", () => editorBeatmap.HitObjects.Count == 1);
+            AddAssert("Beatmap has correct overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty == 7);
         }
     }
 }
