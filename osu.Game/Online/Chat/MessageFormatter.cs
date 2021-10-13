@@ -177,6 +177,24 @@ namespace osu.Game.Online.Chat
 
                             case "wiki":
                                 return new LinkDetails(LinkAction.OpenWiki, string.Join('/', args.Skip(3)));
+
+                            case "home":
+                                if (mainArg != "changelog")
+                                    // handle link other than changelog as external for now
+                                    return new LinkDetails(LinkAction.External, url);
+
+                                switch (args.Length)
+                                {
+                                    case 4:
+                                        // https://osu.ppy.sh/home/changelog
+                                        return new LinkDetails(LinkAction.OpenChangelog, string.Empty);
+
+                                    case 6:
+                                        // https://osu.ppy.sh/home/changelog/lazer/2021.1006
+                                        return new LinkDetails(LinkAction.OpenChangelog, $"{args[4]}/{args[5]}");
+                                }
+
+                                break;
                         }
                     }
 
@@ -324,6 +342,7 @@ namespace osu.Game.Online.Chat
         SearchBeatmapSet,
         OpenWiki,
         Custom,
+        OpenChangelog,
     }
 
     public class Link : IComparable<Link>
