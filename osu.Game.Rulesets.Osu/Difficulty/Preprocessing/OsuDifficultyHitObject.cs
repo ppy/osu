@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
                 TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, 0);
                 MovementTime = Math.Max(StrainTime - TravelTime, 0);
-                MovementDistance = Math.Max(0, Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length - 0) * scalingFactor;
+                MovementDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
