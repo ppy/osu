@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Linq;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -14,6 +16,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
@@ -34,11 +37,11 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? colourProvider, OsuColour colours)
         {
             if (accentColour == default)
-                accentColour = colours.PinkDarker;
+                accentColour = colourProvider?.Light4 ?? colours.PinkDarker;
             updateAccentColour();
         }
 
@@ -59,14 +62,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
-            private Sample sampleOpen;
-            private Sample sampleClose;
+            private Sample? sampleOpen;
+            private Sample? sampleClose;
 
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             public OsuDropdownMenu()
             {
                 CornerRadius = corner_radius;
-                BackgroundColour = Color4.Black.Opacity(0.5f);
 
                 MaskingContainer.CornerRadius = corner_radius;
                 Alpha = 0;
@@ -75,9 +77,11 @@ namespace osu.Game.Graphics.UserInterface
                 ItemsContainer.Padding = new MarginPadding(5);
             }
 
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
+            [BackgroundDependencyLoader(true)]
+            private void load(OverlayColourProvider? colourProvider, AudioManager audio)
             {
+                BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+
                 sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
                 sampleClose = audio.Samples.Get(@"UI/dropdown-close");
             }
@@ -312,11 +316,11 @@ namespace osu.Game.Graphics.UserInterface
                 AddInternal(new HoverClickSounds());
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            [BackgroundDependencyLoader(true)]
+            private void load(OverlayColourProvider? colourProvider, OsuColour colours)
             {
-                BackgroundColour = Color4.Black.Opacity(0.5f);
-                BackgroundColourHover = colours.PinkDarker;
+                BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+                BackgroundColourHover = colourProvider?.Light4 ?? colours.PinkDarker;
             }
         }
     }
