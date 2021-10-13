@@ -56,7 +56,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double starRating = basePerformance > 0.00001 ? Math.Cbrt(1.12) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
 
-            double preempt = (int)IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            double drainRate = beatmap.Difficulty.DrainRate;
 
             int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
@@ -74,6 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 FlashlightRating = flashlightRating,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
+                DrainRate = drainRate,
                 MaxCombo = maxCombo,
                 HitCircleCount = hitCirclesCount,
                 SpinnerCount = spinnerCount,
@@ -100,8 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
-            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
+            hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
             return new Skill[]
             {
