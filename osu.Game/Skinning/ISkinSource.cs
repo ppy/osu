@@ -12,6 +12,9 @@ namespace osu.Game.Skinning
     /// </summary>
     public interface ISkinSource : ISkin
     {
+        /// <summary>
+        /// Fired whenever a source change occurs, signalling that consumers should re-query as required.
+        /// </summary>
         event Action SourceChanged;
 
         /// <summary>

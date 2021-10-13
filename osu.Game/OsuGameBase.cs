@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -13,24 +14,23 @@ using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.IO.Stores;
-using osu.Framework.Platform;
-using osu.Game.Beatmaps;
-using osu.Game.Configuration;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Cursor;
-using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
+using osu.Framework.Platform;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
@@ -160,8 +160,6 @@ namespace osu.Game
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
 
-        private IBindable<GameThreadState> updateThreadState;
-
         public OsuGameBase()
         {
             UseDevelopmentServer = DebugUtils.IsDebugBuild;
@@ -187,10 +185,7 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
-
-            updateThreadState = Host.UpdateThread.State.GetBoundCopy();
-            updateThreadState.BindValueChanged(updateThreadStateChanged);
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client"));
 
             AddInternal(realmFactory);
 
@@ -242,7 +237,7 @@ namespace osu.Game
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, true));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
@@ -250,7 +245,7 @@ namespace osu.Game
             List<ScoreInfo> getBeatmapScores(BeatmapSetInfo set)
             {
                 var beatmapIds = BeatmapManager.QueryBeatmaps(b => b.BeatmapSetInfoID == set.ID).Select(b => b.ID).ToList();
-                return ScoreManager.QueryScores(s => beatmapIds.Contains(s.Beatmap.ID)).ToList();
+                return ScoreManager.QueryScores(s => beatmapIds.Contains(s.BeatmapInfo.ID)).ToList();
             }
 
             BeatmapManager.ItemRemoved.BindValueChanged(i =>
@@ -347,6 +342,11 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Torus/Torus-SemiBold");
             AddFont(Resources, @"Fonts/Torus/Torus-Bold");
 
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Regular");
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Light");
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-SemiBold");
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Bold");
+
             AddFont(Resources, @"Fonts/Inter/Inter-Regular");
             AddFont(Resources, @"Fonts/Inter/Inter-RegularItalic");
             AddFont(Resources, @"Fonts/Inter/Inter-Light");
@@ -365,23 +365,6 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Light");
             AddFont(Resources, @"Fonts/Venera/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
-        }
-
-        private IDisposable blocking;
-
-        private void updateThreadStateChanged(ValueChangedEvent<GameThreadState> state)
-        {
-            switch (state.NewValue)
-            {
-                case GameThreadState.Running:
-                    blocking?.Dispose();
-                    blocking = null;
-                    break;
-
-                case GameThreadState.Paused:
-                    blocking = realmFactory.BlockAllOperations();
-                    break;
-            }
         }
 
         protected override void LoadComplete()
@@ -428,10 +411,27 @@ namespace osu.Game
         {
             Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
 
-            using (realmFactory.BlockAllOperations())
+            IDisposable realmBlocker = null;
+
+            try
             {
-                contextFactory.FlushConnections();
+                ManualResetEventSlim readyToRun = new ManualResetEventSlim();
+
+                Scheduler.Add(() =>
+                {
+                    realmBlocker = realmFactory.BlockAllOperations();
+                    contextFactory.FlushConnections();
+
+                    readyToRun.Set();
+                }, false);
+
+                readyToRun.Wait();
+
                 (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+            }
+            finally
+            {
+                realmBlocker?.Dispose();
             }
 
             Logger.Log(@"Migration complete!");
@@ -448,19 +448,20 @@ namespace osu.Game
         private void migrateDataToRealm()
         {
             using (var db = contextFactory.GetForWrite())
-            using (var usage = realmFactory.GetForWrite())
+            using (var realm = realmFactory.CreateContext())
+            using (var transaction = realm.BeginWrite())
             {
                 // migrate ruleset settings. can be removed 20220315.
                 var existingSettings = db.Context.DatabasedSetting;
 
                 // only migrate data if the realm database is empty.
-                if (!usage.Realm.All<RealmRulesetSetting>().Any())
+                if (!realm.All<RealmRulesetSetting>().Any())
                 {
                     foreach (var dkb in existingSettings)
                     {
                         if (dkb.RulesetID == null) continue;
 
-                        usage.Realm.Add(new RealmRulesetSetting
+                        realm.Add(new RealmRulesetSetting
                         {
                             Key = dkb.Key,
                             Value = dkb.StringValue,
@@ -472,7 +473,7 @@ namespace osu.Game
 
                 db.Context.RemoveRange(existingSettings);
 
-                usage.Commit();
+                transaction.Commit();
             }
         }
 

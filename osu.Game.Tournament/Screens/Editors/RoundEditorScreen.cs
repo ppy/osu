@@ -149,7 +149,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private readonly Bindable<int?> beatmapId = new Bindable<int?>();
 
-                    private readonly Bindable<string> mods = new Bindable<string>();
+                    private readonly Bindable<string> mods = new Bindable<string>(string.Empty);
 
                     private readonly Container drawableContainer;
 
@@ -238,7 +238,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                             req.Success += res =>
                             {
-                                Model.BeatmapInfo = res.ToBeatmap(rulesets);
+                                Model.BeatmapInfo = res.ToBeatmapInfo(rulesets);
                                 updatePanel();
                             };
 

@@ -38,16 +38,16 @@ namespace osu.Game.Screens.Select.Details
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
 
-        private BeatmapInfo beatmap;
+        private BeatmapInfo beatmapInfo;
 
-        public BeatmapInfo Beatmap
+        public BeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (value == beatmap) return;
+                if (value == beatmapInfo) return;
 
-                beatmap = value;
+                beatmapInfo = value;
 
                 updateStatistics();
             }
@@ -106,18 +106,18 @@ namespace osu.Game.Screens.Select.Details
 
         private void updateStatistics()
         {
-            BeatmapDifficulty baseDifficulty = Beatmap?.BaseDifficulty;
+            IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.BaseDifficulty;
             BeatmapDifficulty adjustedDifficulty = null;
 
             if (baseDifficulty != null && mods.Value.Any(m => m is IApplicableToDifficulty))
             {
-                adjustedDifficulty = baseDifficulty.Clone();
+                adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
 
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(adjustedDifficulty);
             }
 
-            switch (Beatmap?.Ruleset?.ID ?? 0)
+            switch (BeatmapInfo?.Ruleset?.ID ?? 0)
             {
                 case 3:
                     // Account for mania differences locally for now
@@ -145,13 +145,13 @@ namespace osu.Game.Screens.Select.Details
         {
             starDifficultyCancellationSource?.Cancel();
 
-            if (Beatmap == null)
+            if (BeatmapInfo == null)
                 return;
 
             starDifficultyCancellationSource = new CancellationTokenSource();
 
-            var normalStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
-            var moddedStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+            var normalStarDifficulty = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            var moddedStarDifficulty = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
 
             Task.WhenAll(normalStarDifficulty, moddedStarDifficulty).ContinueWith(_ => Schedule(() =>
             {

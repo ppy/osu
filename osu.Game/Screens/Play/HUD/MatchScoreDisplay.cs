@@ -4,11 +4,9 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -148,7 +146,7 @@ namespace osu.Game.Screens.Play.HUD
             Score2Text.X = Math.Max(5 + Score2Text.DrawWidth / 2, score2Bar.DrawWidth);
         }
 
-        protected class MatchScoreCounter : ScoreCounter
+        protected class MatchScoreCounter : CommaSeparatedScoreCounter
         {
             private OsuSpriteText displayedSpriteText;
 
@@ -173,8 +171,6 @@ namespace osu.Game.Screens.Play.HUD
                 => displayedSpriteText.Font = winning
                     ? OsuFont.Torus.With(weight: FontWeight.Bold, size: font_size, fixedWidth: true)
                     : OsuFont.Torus.With(weight: FontWeight.Regular, size: font_size * 0.8f, fixedWidth: true);
-
-            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(@"N0");
         }
     }
 }
