@@ -102,7 +102,7 @@ namespace osu.Game.Database
             }
         }
 
-        private bool originalDataValid => isCorrectThread && data.IsValid && !data.Realm.IsClosed;
+        private bool originalDataValid => isCorrectThread && data.IsValid;
 
         // this matches realm's internal thread validation (see https://github.com/realm/realm-dotnet/blob/903b4d0b304f887e37e2d905384fb572a6496e70/Realm/Realm/Native/SynchronizationContextScheduler.cs#L72)
         private bool isCorrectThread
