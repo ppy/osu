@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using osu.Game.Input.Bindings;
 using Realms;
@@ -46,6 +47,18 @@ namespace osu.Game.Database
                 return item;
 
             return mapper.Map<T>(item);
+        }
+
+        public static List<RealmLive<T>> ToLive<T>(this IEnumerable<T> realmList)
+            where T : RealmObject, IHasGuidPrimaryKey
+        {
+            return realmList.Select(l => new RealmLive<T>(l)).ToList();
+        }
+
+        public static RealmLive<T> ToLive<T>(this T realmObject)
+            where T : RealmObject, IHasGuidPrimaryKey
+        {
+            return new RealmLive<T>(realmObject);
         }
     }
 }
