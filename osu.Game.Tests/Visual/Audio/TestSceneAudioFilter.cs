@@ -34,6 +34,9 @@ namespace osu.Game.Tests.Visual.Audio
             beatmap = new WaveformTestBeatmap(audio);
             track = beatmap.LoadTrack();
 
+            OsuSliderBar<int> lowPassCutoff;
+            OsuSliderBar<int> highPassCutoff;
+
             Add(new FillFlowContainer
             {
                 Children = new Drawable[]
@@ -43,33 +46,41 @@ namespace osu.Game.Tests.Visual.Audio
                     lowpassText = new OsuSpriteText
                     {
                         Padding = new MarginPadding(20),
-                        Text = $"Low Pass: {lowpassFilter.Cutoff.Value}hz",
+                        Text = $"Low Pass: {lowpassFilter.Cutoff}hz",
                         Font = new FontUsage(size: 40)
                     },
-                    new OsuSliderBar<int>
+                    lowPassCutoff = new OsuSliderBar<int>
                     {
                         Width = 500,
                         Height = 50,
                         Padding = new MarginPadding(20),
-                        Current = { BindTarget = lowpassFilter.Cutoff }
                     },
                     highpassText = new OsuSpriteText
                     {
                         Padding = new MarginPadding(20),
-                        Text = $"High Pass: {highpassFilter.Cutoff.Value}hz",
+                        Text = $"High Pass: {highpassFilter.Cutoff}hz",
                         Font = new FontUsage(size: 40)
                     },
-                    new OsuSliderBar<int>
+                    highPassCutoff = new OsuSliderBar<int>
                     {
                         Width = 500,
                         Height = 50,
                         Padding = new MarginPadding(20),
-                        Current = { BindTarget = highpassFilter.Cutoff }
                     }
                 }
             });
-            lowpassFilter.Cutoff.ValueChanged += e => lowpassText.Text = $"Low Pass: {e.NewValue}hz";
-            highpassFilter.Cutoff.ValueChanged += e => highpassText.Text = $"High Pass: {e.NewValue}hz";
+
+            lowPassCutoff.Current.ValueChanged += e =>
+            {
+                lowpassText.Text = $"Low Pass: {e.NewValue}hz";
+                lowpassFilter.Cutoff = e.NewValue;
+            };
+
+            highPassCutoff.Current.ValueChanged += e =>
+            {
+                highpassText.Text = $"High Pass: {e.NewValue}hz";
+                highpassFilter.Cutoff = e.NewValue;
+            };
         }
 
         [SetUpSteps]
