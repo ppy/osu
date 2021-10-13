@@ -6,9 +6,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osuTK.Graphics;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
@@ -24,18 +24,21 @@ namespace osu.Game.Overlays
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {
             new GeneralSection(),
-            new GraphicsSection(),
-            new AudioSection(),
+            new SkinSection(),
             new InputSection(createSubPanel(new KeyBindingPanel())),
             new UserInterfaceSection(),
             new GameplaySection(),
-            new SkinSection(),
+            new RulesetSection(),
+            new AudioSection(),
+            new GraphicsSection(),
             new OnlineSection(),
             new MaintenanceSection(),
             new DebugSection(),
         };
 
         private readonly List<SettingsSubPanel> subPanels = new List<SettingsSubPanel>();
+
+        private SettingsSubPanel lastOpenedSubPanel;
 
         protected override Drawable CreateHeader() => new SettingsHeader(Title, Description);
         protected override Drawable CreateFooter() => new SettingsFooter();
@@ -45,21 +48,21 @@ namespace osu.Game.Overlays
         {
         }
 
-        public override bool AcceptsFocus => subPanels.All(s => s.State.Value != Visibility.Visible);
+        public override bool AcceptsFocus => lastOpenedSubPanel == null || lastOpenedSubPanel.State.Value == Visibility.Hidden;
 
         private T createSubPanel<T>(T subPanel)
             where T : SettingsSubPanel
         {
             subPanel.Depth = 1;
             subPanel.Anchor = Anchor.TopRight;
-            subPanel.State.ValueChanged += subPanelStateChanged;
+            subPanel.State.ValueChanged += e => subPanelStateChanged(subPanel, e);
 
             subPanels.Add(subPanel);
 
             return subPanel;
         }
 
-        private void subPanelStateChanged(ValueChangedEvent<Visibility> state)
+        private void subPanelStateChanged(SettingsSubPanel panel, ValueChangedEvent<Visibility> state)
         {
             switch (state.NewValue)
             {
@@ -67,7 +70,9 @@ namespace osu.Game.Overlays
                     Sidebar?.FadeColour(Color4.DarkGray, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeOut(300, Easing.OutQuint);
-                    ContentContainer.MoveToX(-WIDTH, 500, Easing.OutQuint);
+                    ContentContainer.MoveToX(-PANEL_WIDTH, 500, Easing.OutQuint);
+
+                    lastOpenedSubPanel = panel;
                     break;
 
                 case Visibility.Hidden:
@@ -79,7 +84,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected override float ExpandedPosition => subPanels.Any(s => s.State.Value == Visibility.Visible) ? -WIDTH : base.ExpandedPosition;
+        protected override float ExpandedPosition => lastOpenedSubPanel?.State.Value == Visibility.Visible ? -PANEL_WIDTH : base.ExpandedPosition;
 
         [BackgroundDependencyLoader]
         private void load()

@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Menu
             {
                 if (buttonsTopLevel.Any(b => e.Key == b.TriggerKey))
                 {
-                    logo?.Click();
+                    logo?.TriggerClick();
                     return true;
                 }
             }
@@ -218,15 +218,15 @@ namespace osu.Game.Screens.Menu
             return base.OnKeyDown(e);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Back:
                     return goBack();
 
                 case GlobalAction.Select:
-                    logo?.Click();
+                    logo?.TriggerClick();
                     return true;
 
                 default:
@@ -234,7 +234,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
@@ -248,7 +248,7 @@ namespace osu.Game.Screens.Menu
                     return true;
 
                 case ButtonSystemState.Play:
-                    backButton.Click();
+                    backButton.TriggerClick();
                     return true;
 
                 default:
@@ -268,11 +268,11 @@ namespace osu.Game.Screens.Menu
                     return true;
 
                 case ButtonSystemState.TopLevel:
-                    buttonsTopLevel.First().Click();
+                    buttonsTopLevel.First().TriggerClick();
                     return false;
 
                 case ButtonSystemState.Play:
-                    buttonsPlay.First().Click();
+                    buttonsPlay.First().TriggerClick();
                     return false;
             }
         }
@@ -297,7 +297,7 @@ namespace osu.Game.Screens.Menu
 
                 Logger.Log($"{nameof(ButtonSystem)}'s state changed from {lastState} to {state}");
 
-                using (buttonArea.BeginDelayedSequence(lastState == ButtonSystemState.Initial ? 150 : 0, true))
+                using (buttonArea.BeginDelayedSequence(lastState == ButtonSystemState.Initial ? 150 : 0))
                 {
                     buttonArea.ButtonSystemState = state;
 

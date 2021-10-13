@@ -3,10 +3,12 @@
 
 using System;
 using System.Globalization;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,13 +21,14 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
+    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>, IStateful<SelectionState>
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
@@ -38,8 +41,32 @@ namespace osu.Game.Overlays.Volume
         private OsuSpriteText text;
         private BufferedContainer maxGlow;
 
-        private Sample sample;
+        private Container selectedGlowContainer;
+
+        private Sample hoverSample;
+        private Sample notchSample;
         private double sampleLastPlaybackTime;
+
+        public event Action<SelectionState> StateChanged;
+
+        private SelectionState state;
+
+        public SelectionState State
+        {
+            get => state;
+            set
+            {
+                if (state == value)
+                    return;
+
+                state = value;
+                StateChanged?.Invoke(value);
+
+                updateSelectedState();
+            }
+        }
+
+        private const float transition_length = 500;
 
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
         {
@@ -53,7 +80,8 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            sample = audio.Samples.Get(@"UI/notch-tick");
+            hoverSample = audio.Samples.Get($"UI/{HoverSampleSet.Button.GetDescription()}-hover");
+            notchSample = audio.Samples.Get(@"UI/notch-tick");
             sampleLastPlaybackTime = Time.Current;
 
             Color4 backgroundColour = colours.Gray1;
@@ -75,7 +103,6 @@ namespace osu.Game.Overlays.Volume
                     {
                         new BufferedContainer
                         {
-                            Alpha = 0.9f,
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
@@ -147,6 +174,24 @@ namespace osu.Game.Overlays.Volume
                                 },
                             },
                         },
+                        selectedGlowContainer = new CircularContainer
+                        {
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                            },
+                            EdgeEffect = new EdgeEffectParameters
+                            {
+                                Type = EdgeEffectType.Glow,
+                                Colour = meterColour.Opacity(0.1f),
+                                Radius = 10,
+                            }
+                        },
                         maxGlow = (text = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
@@ -171,7 +216,6 @@ namespace osu.Game.Overlays.Volume
                     {
                         new Box
                         {
-                            Alpha = 0.9f,
                             RelativeSizeAxes = Axes.Both,
                             Colour = backgroundColour,
                         },
@@ -233,7 +277,7 @@ namespace osu.Game.Overlays.Volume
             if (Time.Current - sampleLastPlaybackTime <= tick_debounce_time)
                 return;
 
-            var channel = sample.GetChannel();
+            var channel = notchSample.GetChannel();
 
             channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + displayVolume * 0.1f;
 
@@ -305,31 +349,36 @@ namespace osu.Game.Overlays.Volume
             return true;
         }
 
-        private const float transition_length = 500;
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            State = SelectionState.Selected;
+            return base.OnMouseMove(e);
+        }
 
         protected override bool OnHover(HoverEvent e)
         {
-            this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
+            State = SelectionState.Selected;
             return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            this.ScaleTo(1f, transition_length, Easing.OutExpo);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (!IsHovered)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.SelectPrevious:
+                    State = SelectionState.Selected;
                     adjust(1, false);
                     return true;
 
                 case GlobalAction.SelectNext:
+                    State = SelectionState.Selected;
                     adjust(-1, false);
                     return true;
             }
@@ -337,8 +386,25 @@ namespace osu.Game.Overlays.Volume
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        private void updateSelectedState()
+        {
+            switch (state)
+            {
+                case SelectionState.Selected:
+                    this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
+                    selectedGlowContainer.FadeIn(transition_length, Easing.OutExpo);
+                    hoverSample?.Play();
+                    break;
+
+                case SelectionState.NotSelected:
+                    this.ScaleTo(1f, transition_length, Easing.OutExpo);
+                    selectedGlowContainer.FadeOut(transition_length, Easing.OutExpo);
+                    break;
+            }
         }
     }
 }

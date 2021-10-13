@@ -4,14 +4,16 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class RendererSettings : SettingsSubsection
     {
-        protected override string Header => "Renderer";
+        protected override LocalisableString Header => GraphicsSettingsStrings.RendererHeader;
 
         private SettingsEnumDropdown<FrameSync> frameLimiterDropdown;
 
@@ -24,17 +26,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 // TODO: this needs to be a custom dropdown at some point
                 frameLimiterDropdown = new SettingsEnumDropdown<FrameSync>
                 {
-                    LabelText = "Frame limiter",
+                    LabelText = GraphicsSettingsStrings.FrameLimiter,
                     Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync)
                 },
                 new SettingsEnumDropdown<ExecutionMode>
                 {
-                    LabelText = "Threading mode",
+                    LabelText = GraphicsSettingsStrings.ThreadingMode,
                     Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show FPS",
+                    LabelText = GraphicsSettingsStrings.ShowFPS,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };
@@ -46,9 +48,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             frameLimiterDropdown.Current.BindValueChanged(limit =>
             {
-                const string unlimited_frames_note = "Using unlimited frame limiter can lead to stutters, bad performance and overheating. It will not improve perceived latency. \"2x refresh rate\" is recommended.";
-
-                frameLimiterDropdown.WarningText = limit.NewValue == FrameSync.Unlimited ? unlimited_frames_note : string.Empty;
+                frameLimiterDropdown.WarningText = limit.NewValue == FrameSync.Unlimited ? GraphicsSettingsStrings.UnlimitedFramesNote : default;
             }, true);
         }
     }

@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -61,9 +62,9 @@ namespace osu.Game.Rulesets.Pippidon.UI
             }
         }
 
-        public bool OnPressed(PippidonAction action)
+        public bool OnPressed(KeyBindingPressEvent<PippidonAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case PippidonAction.MoveUp:
                     changeLane(-1);
@@ -78,7 +79,7 @@ namespace osu.Game.Rulesets.Pippidon.UI
             }
         }
 
-        public void OnReleased(PippidonAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PippidonAction> e)
         {
         }
 

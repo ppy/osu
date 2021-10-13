@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -31,6 +32,9 @@ namespace osu.Game.Rulesets.Judgements
 
         private readonly Container aboveHitObjectsContent;
 
+        private readonly Lazy<Drawable> proxiedAboveHitObjectsContent;
+        public Drawable ProxiedAboveHitObjectsContent => proxiedAboveHitObjectsContent.Value;
+
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
@@ -52,6 +56,8 @@ namespace osu.Game.Rulesets.Judgements
                 Depth = float.MinValue,
                 RelativeSizeAxes = Axes.Both
             });
+
+            proxiedAboveHitObjectsContent = new Lazy<Drawable>(() => aboveHitObjectsContent.CreateProxy());
         }
 
         [BackgroundDependencyLoader]
@@ -59,8 +65,6 @@ namespace osu.Game.Rulesets.Judgements
         {
             prepareDrawables();
         }
-
-        public Drawable GetProxyAboveHitObjectsContent() => aboveHitObjectsContent.CreateProxy();
 
         /// <summary>
         /// Apply top-level animations to the current judgement when successfully hit.
@@ -117,7 +121,7 @@ namespace osu.Game.Rulesets.Judgements
 
             LifetimeStart = Result.TimeAbsolute;
 
-            using (BeginAbsoluteSequence(Result.TimeAbsolute, true))
+            using (BeginAbsoluteSequence(Result.TimeAbsolute))
             {
                 // not sure if this should remain going forward.
                 JudgementBody.ResetAnimation();

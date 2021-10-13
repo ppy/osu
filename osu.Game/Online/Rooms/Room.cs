@@ -7,13 +7,13 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.IO.Serialization.Converters;
-using osu.Game.Online.Rooms.GameTypes;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Users;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
 {
-    public class Room
+    public class Room : IDeepCloneable<Room>
     {
         [Cached]
         [JsonProperty("id")]
@@ -50,10 +50,6 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         [JsonIgnore]
-        public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
-
-        [Cached]
-        [JsonIgnore]
         public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
 
         [Cached]
@@ -66,7 +62,16 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         [JsonIgnore]
-        public readonly Bindable<GameType> Type = new Bindable<GameType>(new GameTypePlaylists());
+        public readonly Bindable<MatchType> Type = new Bindable<MatchType>();
+
+        // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("type")]
+        private MatchType type
+        {
+            get => Type.Value;
+            set => Type.Value = value;
+        }
 
         [Cached]
         [JsonIgnore]
@@ -76,6 +81,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("current_user_score")]
         public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
 
+        [JsonProperty("has_password")]
+        public readonly BindableBool HasPassword = new BindableBool();
+
         [Cached]
         [JsonProperty("recent_participants")]
         public readonly BindableList<User> RecentParticipants = new BindableList<User>();
@@ -83,6 +91,16 @@ namespace osu.Game.Online.Rooms
         [Cached]
         [JsonProperty("participant_count")]
         public readonly Bindable<int> ParticipantCount = new Bindable<int>();
+
+        #region Properties only used for room creation request
+
+        [Cached(Name = nameof(Password))]
+        [JsonProperty("password")]
+        public readonly Bindable<string> Password = new Bindable<string>();
+
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
 
         [JsonProperty("duration")]
         private int? duration
@@ -97,6 +115,8 @@ namespace osu.Game.Online.Rooms
             }
         }
 
+        #endregion
+
         // Only supports retrieval for now
         [Cached]
         [JsonProperty("ends_at")]
@@ -110,17 +130,16 @@ namespace osu.Game.Online.Rooms
             set => MaxAttempts.Value = value;
         }
 
-        /// <summary>
-        /// The position of this <see cref="Room"/> in the list. This is not read from or written to the API.
-        /// </summary>
-        [JsonIgnore]
-        public readonly Bindable<int> Position = new Bindable<int>(-1);
+        public Room()
+        {
+            Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
+        }
 
         /// <summary>
         /// Create a copy of this room without online information.
         /// Should be used to create a local copy of a room for submitting in the future.
         /// </summary>
-        public Room CreateCopy()
+        public Room DeepClone()
         {
             var copy = new Room();
 
@@ -144,6 +163,7 @@ namespace osu.Game.Online.Rooms
             ChannelId.Value = other.ChannelId.Value;
             Status.Value = other.Status.Value;
             Availability.Value = other.Availability.Value;
+            HasPassword.Value = other.HasPassword.Value;
             Type.Value = other.Type.Value;
             MaxParticipants.Value = other.MaxParticipants.Value;
             ParticipantCount.Value = other.ParticipantCount.Value;
@@ -153,11 +173,7 @@ namespace osu.Game.Online.Rooms
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
 
-            // Todo: This is not the best way/place to do this, but the intention is to display all playlist items when the room has ended,
-            // and display only the non-expired playlist items while the room is still active. In order to achieve this, all expired items are removed from the source Room.
-            // More refactoring is required before this can be done locally instead - DrawableRoomPlaylist is currently directly bound to the playlist to display items in the room.
-            if (!(Status.Value is RoomStatusEnded))
-                other.Playlist.RemoveAll(i => i.Expired);
+            other.RemoveExpiredPlaylistItems();
 
             if (!Playlist.SequenceEqual(other.Playlist))
             {
@@ -170,8 +186,15 @@ namespace osu.Game.Online.Rooms
                 RecentParticipants.Clear();
                 RecentParticipants.AddRange(other.RecentParticipants);
             }
+        }
 
-            Position.Value = other.Position.Value;
+        public void RemoveExpiredPlaylistItems()
+        {
+            // Todo: This is not the best way/place to do this, but the intention is to display all playlist items when the room has ended,
+            // and display only the non-expired playlist items while the room is still active. In order to achieve this, all expired items are removed from the source Room.
+            // More refactoring is required before this can be done locally instead - DrawableRoomPlaylist is currently directly bound to the playlist to display items in the room.
+            if (!(Status.Value is RoomStatusEnded))
+                Playlist.RemoveAll(i => i.Expired);
         }
 
         public bool ShouldSerializeRoomID() => false;

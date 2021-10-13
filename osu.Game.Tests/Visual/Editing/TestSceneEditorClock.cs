@@ -78,6 +78,24 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
         }
 
+        [Test]
+        public void TestClampWhenSeekOutsideBeatmapBounds()
+        {
+            AddStep("stop clock", Clock.Stop);
+
+            AddStep("seek before start time", () => Clock.Seek(-1000));
+            AddAssert("time is clamped to 0", () => Clock.CurrentTime == 0);
+
+            AddStep("seek beyond track length", () => Clock.Seek(Clock.TrackLength + 1000));
+            AddAssert("time is clamped to track length", () => Clock.CurrentTime == Clock.TrackLength);
+
+            AddStep("seek smoothly before start time", () => Clock.SeekSmoothlyTo(-1000));
+            AddAssert("time is clamped to 0", () => Clock.CurrentTime == 0);
+
+            AddStep("seek smoothly beyond track length", () => Clock.SeekSmoothlyTo(Clock.TrackLength + 1000));
+            AddAssert("time is clamped to track length", () => Clock.CurrentTime == Clock.TrackLength);
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             Beatmap.Disabled = false;

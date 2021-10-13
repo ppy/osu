@@ -158,10 +158,10 @@ namespace osu.Game.Screens.Play
         {
             // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
             // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            platformOffsetClock = new HardwareCorrectionOffsetClock(source) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+            platformOffsetClock = new HardwareCorrectionOffsetClock(source, pauseFreqAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
             // the final usable gameplay clock with user-set offsets applied.
-            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock);
+            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock, pauseFreqAdjust);
 
             return masterGameplayClock = new MasterGameplayClock(userOffsetClock);
         }
@@ -216,11 +216,25 @@ namespace osu.Game.Screens.Play
         {
             // we always want to apply the same real-time offset, so it should be adjusted by the difference in playback rate (from realtime) to achieve this.
             // base implementation already adds offset at 1.0 rate, so we only add the difference from that here.
-            public override double CurrentTime => base.CurrentTime + Offset * (Rate - 1);
+            public override double CurrentTime => base.CurrentTime + offsetAdjust;
 
-            public HardwareCorrectionOffsetClock(IClock source, bool processSource = true)
-                : base(source, processSource)
+            private readonly BindableDouble pauseRateAdjust;
+
+            private double offsetAdjust;
+
+            public HardwareCorrectionOffsetClock(IClock source, BindableDouble pauseRateAdjust)
+                : base(source)
             {
+                this.pauseRateAdjust = pauseRateAdjust;
+            }
+
+            public override void ProcessFrame()
+            {
+                base.ProcessFrame();
+
+                // changing this during the pause transform effect will cause a potentially large offset to be suddenly applied as we approach zero rate.
+                if (pauseRateAdjust.Value == 1)
+                    offsetAdjust = Offset * (Rate - 1);
             }
         }
 

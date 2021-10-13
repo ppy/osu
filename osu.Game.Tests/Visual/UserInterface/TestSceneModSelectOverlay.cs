@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Mods;
@@ -50,6 +51,38 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("show", () => modSelect.Show());
         }
 
+        /// <summary>
+        /// Ensure that two mod overlays are not cross polluting via central settings instances.
+        /// </summary>
+        [Test]
+        public void TestSettingsNotCrossPolluting()
+        {
+            Bindable<IReadOnlyList<Mod>> selectedMods2 = null;
+
+            AddStep("select diff adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
+
+            AddStep("set setting", () => modSelect.ChildrenOfType<SettingsSlider<float>>().First().Current.Value = 8);
+
+            AddAssert("ensure setting is propagated", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 8);
+
+            AddStep("create second bindable", () => selectedMods2 = new Bindable<IReadOnlyList<Mod>>(new Mod[] { new OsuModDifficultyAdjust() }));
+
+            AddStep("create second overlay", () =>
+            {
+                Add(modSelect = new TestModSelectOverlay().With(d =>
+                {
+                    d.Origin = Anchor.TopCentre;
+                    d.Anchor = Anchor.TopCentre;
+                    d.SelectedMods.BindTarget = selectedMods2;
+                }));
+            });
+
+            AddStep("show", () => modSelect.Show());
+
+            AddAssert("ensure first is unchanged", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 8);
+            AddAssert("ensure second is default", () => selectedMods2.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == null);
+        }
+
         [Test]
         public void TestSettingsResetOnDeselection()
         {
@@ -61,10 +94,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddAssert("selected mod matches", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.Value == 1.2);
 
-            AddStep("deselect", () => modSelect.DeselectAllButton.Click());
+            AddStep("deselect", () => modSelect.DeselectAllButton.TriggerClick());
             AddAssert("selected mods empty", () => SelectedMods.Value.Count == 0);
 
-            AddStep("reselect", () => modSelect.GetModButton(osuModDoubleTime).Click());
+            AddStep("reselect", () => modSelect.GetModButton(osuModDoubleTime).TriggerClick());
             AddAssert("selected mod has default value", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.IsDefault == true);
         }
 
@@ -103,13 +136,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var easierMods = osu.GetModsFor(ModType.DifficultyReduction);
             var harderMods = osu.GetModsFor(ModType.DifficultyIncrease);
-            var conversionMods = osu.GetModsFor(ModType.Conversion);
 
             var noFailMod = osu.GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
 
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
-
-            var targetMod = conversionMods.FirstOrDefault(m => m is OsuModTarget);
 
             var easy = easierMods.FirstOrDefault(m => m is OsuModEasy);
             var hardRock = harderMods.FirstOrDefault(m => m is OsuModHardRock);
@@ -118,8 +148,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             testMultiMod(doubleTimeMod);
             testIncompatibleMods(easy, hardRock);
             testDeselectAll(easierMods.Where(m => !(m is MultiMod)));
-
-            testUnimplementedMod(targetMod);
         }
 
         [Test]
@@ -130,8 +158,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             var mania = new ManiaRuleset();
 
             testModsWithSameBaseType(
-                mania.GetAllMods().Single(m => m.GetType() == typeof(ManiaModFadeIn)),
-                mania.GetAllMods().Single(m => m.GetType() == typeof(ManiaModHidden)));
+                mania.CreateMod<ManiaModFadeIn>(),
+                mania.CreateMod<ManiaModHidden>());
         }
 
         [Test]
@@ -249,6 +277,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("DT + HD still selected", () => modSelect.ChildrenOfType<ModButton>().Count(b => b.Selected) == 2);
         }
 
+        [Test]
+        public void TestUnimplementedModIsUnselectable()
+        {
+            var testRuleset = new TestUnimplementedModOsuRuleset();
+            changeTestRuleset(testRuleset.RulesetInfo);
+
+            var conversionMods = testRuleset.GetModsFor(ModType.Conversion);
+
+            var unimplementedMod = conversionMods.FirstOrDefault(m => m is TestUnimplementedMod);
+
+            testUnimplementedMod(unimplementedMod);
+        }
+
         private void testSingleMod(Mod mod)
         {
             selectNext(mod);
@@ -343,6 +384,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             waitForLoad();
         }
 
+        private void changeTestRuleset(RulesetInfo rulesetInfo)
+        {
+            AddStep($"change ruleset to {rulesetInfo.Name}", () => { Ruleset.Value = rulesetInfo; });
+            waitForLoad();
+        }
+
         private void waitForLoad() =>
             AddUntilStep("wait for icons to load", () => modSelect.AllLoaded);
 
@@ -369,14 +416,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.Both,
                     Position = new Vector2(-5, 25),
                     Current = { BindTarget = modSelect.SelectedMods }
                 }
             };
         }
 
-        private class TestModSelectOverlay : LocalPlayerModSelectOverlay
+        private class TestModSelectOverlay : UserModSelectOverlay
         {
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
@@ -400,6 +446,25 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class TestNonStackedModSelectOverlay : TestModSelectOverlay
         {
             protected override bool Stacked => false;
+        }
+
+        private class TestUnimplementedMod : Mod
+        {
+            public override string Name => "Unimplemented mod";
+            public override string Acronym => "UM";
+            public override string Description => "A mod that is not implemented.";
+            public override double ScoreMultiplier => 1;
+            public override ModType Type => ModType.Conversion;
+        }
+
+        private class TestUnimplementedModOsuRuleset : OsuRuleset
+        {
+            public override IEnumerable<Mod> GetModsFor(ModType type)
+            {
+                if (type == ModType.Conversion) return base.GetModsFor(type).Concat(new[] { new TestUnimplementedMod() });
+
+                return base.GetModsFor(type);
+            }
         }
     }
 }

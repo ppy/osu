@@ -172,17 +172,17 @@ namespace osu.Game.Screens.Select
             return base.OnClick(e);
         }
 
-        public virtual bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (action == Hotkey)
+            if (e.Action == Hotkey)
             {
-                Click();
+                TriggerClick();
                 return true;
             }
 
             return false;
         }
 
-        public virtual void OnReleased(GlobalAction action) { }
+        public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
     }
 }

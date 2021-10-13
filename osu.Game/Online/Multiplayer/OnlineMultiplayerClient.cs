@@ -37,6 +37,8 @@ namespace osu.Game.Online.Multiplayer
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
+            // Importantly, we are intentionally not using MessagePack here to correctly support derived class serialization.
+            // More information on the limitations / reasoning can be found in osu-server-spectator's initialisation code.
             connector = api.GetHubConnector(nameof(OnlineMultiplayerClient), endpoint);
 
             if (connector != null)
@@ -48,6 +50,7 @@ namespace osu.Game.Online.Multiplayer
                     connection.On<MultiplayerRoomState>(nameof(IMultiplayerClient.RoomStateChanged), ((IMultiplayerClient)this).RoomStateChanged);
                     connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserJoined), ((IMultiplayerClient)this).UserJoined);
                     connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserLeft), ((IMultiplayerClient)this).UserLeft);
+                    connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserKicked), ((IMultiplayerClient)this).UserKicked);
                     connection.On<int>(nameof(IMultiplayerClient.HostChanged), ((IMultiplayerClient)this).HostChanged);
                     connection.On<MultiplayerRoomSettings>(nameof(IMultiplayerClient.SettingsChanged), ((IMultiplayerClient)this).SettingsChanged);
                     connection.On<int, MultiplayerUserState>(nameof(IMultiplayerClient.UserStateChanged), ((IMultiplayerClient)this).UserStateChanged);
@@ -56,18 +59,21 @@ namespace osu.Game.Online.Multiplayer
                     connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
                     connection.On<int, IEnumerable<APIMod>>(nameof(IMultiplayerClient.UserModsChanged), ((IMultiplayerClient)this).UserModsChanged);
                     connection.On<int, BeatmapAvailability>(nameof(IMultiplayerClient.UserBeatmapAvailabilityChanged), ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged);
+                    connection.On<MatchRoomState>(nameof(IMultiplayerClient.MatchRoomStateChanged), ((IMultiplayerClient)this).MatchRoomStateChanged);
+                    connection.On<int, MatchUserState>(nameof(IMultiplayerClient.MatchUserStateChanged), ((IMultiplayerClient)this).MatchUserStateChanged);
+                    connection.On<MatchServerEvent>(nameof(IMultiplayerClient.MatchEvent), ((IMultiplayerClient)this).MatchEvent);
                 };
 
                 IsConnected.BindTo(connector.IsConnected);
             }
         }
 
-        protected override Task<MultiplayerRoom> JoinRoom(long roomId)
+        protected override Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
         {
             if (!IsConnected.Value)
                 return Task.FromCanceled<MultiplayerRoom>(new CancellationToken(true));
 
-            return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoom), roomId);
+            return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty);
         }
 
         protected override Task LeaveRoomInternal()
@@ -84,6 +90,14 @@ namespace osu.Game.Online.Multiplayer
                 return Task.CompletedTask;
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.TransferHost), userId);
+        }
+
+        public override Task KickUser(int userId)
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.KickUser), userId);
         }
 
         public override Task ChangeSettings(MultiplayerRoomSettings settings)
@@ -116,6 +130,14 @@ namespace osu.Game.Online.Multiplayer
                 return Task.CompletedTask;
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeUserMods), newMods);
+        }
+
+        public override Task SendMatchRequest(MatchUserRequest request)
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.SendMatchRequest), request);
         }
 
         public override Task StartMatch()

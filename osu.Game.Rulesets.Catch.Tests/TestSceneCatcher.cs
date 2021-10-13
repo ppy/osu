@@ -31,22 +31,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        [Cached]
-        private readonly DroppedObjectContainer droppedObjectContainer;
-
-        private readonly Container trailContainer;
+        private DroppedObjectContainer droppedObjectContainer;
 
         private TestCatcher catcher;
-
-        public TestSceneCatcher()
-        {
-            Add(trailContainer = new Container
-            {
-                Anchor = Anchor.Centre,
-                Depth = -1
-            });
-            Add(droppedObjectContainer = new DroppedObjectContainer());
-        }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -56,13 +43,17 @@ namespace osu.Game.Rulesets.Catch.Tests
                 CircleSize = 0,
             };
 
-            if (catcher != null)
-                Remove(catcher);
+            droppedObjectContainer = new DroppedObjectContainer();
 
-            Add(catcher = new TestCatcher(trailContainer, difficulty)
+            Child = new Container
             {
-                Anchor = Anchor.Centre
-            });
+                Anchor = Anchor.Centre,
+                Children = new Drawable[]
+                {
+                    droppedObjectContainer,
+                    catcher = new TestCatcher(droppedObjectContainer, difficulty),
+                }
+            };
         });
 
         [Test]
@@ -299,15 +290,15 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 
-            public TestCatcher(Container trailsTarget, BeatmapDifficulty difficulty)
-                : base(trailsTarget, difficulty)
+            public TestCatcher(DroppedObjectContainer droppedObjectTarget, IBeatmapDifficultyInfo difficulty)
+                : base(droppedObjectTarget, difficulty)
             {
             }
         }
 
         public class TestKiaiFruit : Fruit
         {
-            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
             {
                 controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
                 base.ApplyDefaultsToSelf(controlPointInfo, difficulty);

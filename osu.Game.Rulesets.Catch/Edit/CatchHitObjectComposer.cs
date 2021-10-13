@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
@@ -20,12 +22,23 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            LayerBelowRuleset.Add(new PlayfieldBorder
+            {
+                RelativeSizeAxes = Axes.Both,
+                PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Corners }
+            });
+        }
+
         protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null) =>
             new DrawableCatchEditorRuleset(ruleset, beatmap, mods);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
             new FruitCompositionTool(),
+            new JuiceStreamCompositionTool(),
             new BananaShowerCompositionTool()
         };
 

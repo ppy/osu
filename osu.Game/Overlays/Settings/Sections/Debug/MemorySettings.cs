@@ -4,13 +4,15 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Debug
 {
     public class MemorySettings : SettingsSubsection
     {
-        protected override string Header => "Memory";
+        protected override LocalisableString Header => DebugSettingsStrings.MemoryHeader;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, GameHost host)
@@ -19,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
             {
                 new SettingsButton
                 {
-                    Text = "Clear all caches",
+                    Text = DebugSettingsStrings.ClearAllCaches,
                     Action = host.Collect
                 },
             };

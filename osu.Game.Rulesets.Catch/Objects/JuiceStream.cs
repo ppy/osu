@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -25,7 +26,10 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int RepeatCount { get; set; }
 
+        [JsonIgnore]
         public double Velocity { get; private set; }
+
+        [JsonIgnore]
         public double TickDistance { get; private set; }
 
         /// <summary>
@@ -33,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public double SpanDuration => Duration / this.SpanCount();
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
@@ -113,6 +117,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public float EndX => OriginalX + this.CurvePositionAt(1).X;
 
+        [JsonIgnore]
         public double Duration
         {
             get => this.SpanCount() * Path.Distance / Velocity;
@@ -133,7 +138,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                 if (value != null)
                 {
-                    path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position.Value, c.Type.Value)));
+                    path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position, c.Type)));
                     path.ExpectedDistance.Value = value.ExpectedDistance.Value;
                 }
             }

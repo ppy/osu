@@ -10,12 +10,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Ranking.Expanded;
 using osuTK;
 
 namespace osu.Game.Screens.Play
@@ -172,7 +172,6 @@ namespace osu.Game.Screens.Play
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding { Top = 20 },
                             Current = mods
                         },

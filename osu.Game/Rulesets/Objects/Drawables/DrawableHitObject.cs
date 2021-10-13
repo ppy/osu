@@ -124,7 +124,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
         private readonly BindableList<HitSampleInfo> samplesBindable = new BindableList<HitSampleInfo>();
         private readonly Bindable<bool> userPositionalHitSounds = new Bindable<bool>();
+
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
+        private readonly Bindable<int> comboIndexWithOffsetsBindable = new Bindable<int>();
 
         protected override bool RequiresChildrenUpdate => true;
 
@@ -185,9 +187,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            comboIndexBindable.BindValueChanged(_ => UpdateComboColour(), true);
+            comboIndexBindable.BindValueChanged(_ => UpdateComboColour());
+            comboIndexWithOffsetsBindable.BindValueChanged(_ => UpdateComboColour(), true);
 
-            updateState(ArmedState.Idle, true);
+            // Apply transforms
+            updateState(State.Value, true);
         }
 
         /// <summary>
@@ -250,7 +254,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             StartTimeBindable.BindValueChanged(onStartTimeChanged);
 
             if (HitObject is IHasComboInformation combo)
+            {
                 comboIndexBindable.BindTo(combo.ComboIndexBindable);
+                comboIndexWithOffsetsBindable.BindTo(combo.ComboIndexWithOffsetsBindable);
+            }
 
             samplesBindable.BindTo(HitObject.SamplesBindable);
             samplesBindable.BindCollectionChanged(onSamplesChanged, true);
@@ -275,8 +282,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected sealed override void OnFree(HitObjectLifetimeEntry entry)
         {
             StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
+
             if (HitObject is IHasComboInformation combo)
+            {
                 comboIndexBindable.UnbindFrom(combo.ComboIndexBindable);
+                comboIndexWithOffsetsBindable.UnbindFrom(combo.ComboIndexWithOffsetsBindable);
+            }
+
             samplesBindable.UnbindFrom(HitObject.SamplesBindable);
 
             // Changes in start time trigger state updates. When a new hitobject is applied, OnApply() automatically performs a state update anyway.
@@ -404,13 +416,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             clearExistingStateTransforms();
 
-            using (BeginAbsoluteSequence(transformTime, true))
+            using (BeginAbsoluteSequence(transformTime))
                 UpdateInitialTransforms();
 
-            using (BeginAbsoluteSequence(StateUpdateTime, true))
+            using (BeginAbsoluteSequence(StateUpdateTime))
                 UpdateStartTimeStateTransforms();
 
-            using (BeginAbsoluteSequence(HitStateUpdateTime, true))
+            using (BeginAbsoluteSequence(HitStateUpdateTime))
                 UpdateHitStateTransforms(newState);
 
             state.Value = newState;
@@ -502,8 +514,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (!(HitObject is IHasComboInformation combo)) return;
 
-            var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
-            AccentColour.Value = combo.GetComboColour(comboColours);
+            AccentColour.Value = combo.GetComboColour(CurrentSkin);
         }
 
         /// <summary>

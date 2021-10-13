@@ -24,8 +24,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
     {
         private readonly BindableBool warmup = new BindableBool();
 
-        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
-
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private OsuButton warmupButton;
         private MatchIPCInfo ipc;
@@ -88,7 +86,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         },
                     }
                 },
-                scoreDisplay = new MatchScoreDisplay
+                scoreDisplay = new TournamentMatchScoreDisplay
                 {
                     Y = -147,
                     Anchor = Anchor.BottomCentre,
@@ -126,18 +124,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 }
             });
 
-            State.BindTo(ipc.State);
-            State.BindValueChanged(stateChanged, true);
-
             ladder.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
-
-            currentMatch.BindValueChanged(m =>
-            {
-                warmup.Value = m.NewValue.Team1Score.Value + m.NewValue.Team2Score.Value == 0;
-                scheduledOperation?.Cancel();
-            });
-
-            currentMatch.BindTo(ladder.CurrentMatch);
 
             warmup.BindValueChanged(w =>
             {
@@ -146,8 +133,27 @@ namespace osu.Game.Tournament.Screens.Gameplay
             }, true);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            State.BindTo(ipc.State);
+            State.BindValueChanged(stateChanged, true);
+        }
+
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
+        {
+            base.CurrentMatchChanged(match);
+
+            if (match.NewValue == null)
+                return;
+
+            warmup.Value = match.NewValue.Team1Score.Value + match.NewValue.Team2Score.Value == 0;
+            scheduledOperation?.Cancel();
+        }
+
         private ScheduledDelegate scheduledOperation;
-        private MatchScoreDisplay scoreDisplay;
+        private TournamentMatchScoreDisplay scoreDisplay;
 
         private TourneyState lastState;
         private MatchHeader header;
@@ -158,12 +164,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
             {
                 if (state.NewValue == TourneyState.Ranking)
                 {
-                    if (warmup.Value) return;
+                    if (warmup.Value || CurrentMatch.Value == null) return;
 
                     if (ipc.Score1.Value > ipc.Score2.Value)
-                        currentMatch.Value.Team1Score.Value++;
+                        CurrentMatch.Value.Team1Score.Value++;
                     else
-                        currentMatch.Value.Team2Score.Value++;
+                        CurrentMatch.Value.Team2Score.Value++;
                 }
 
                 scheduledOperation?.Cancel();
@@ -172,7 +178,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 {
                     chat?.Contract();
 
-                    using (BeginDelayedSequence(300, true))
+                    using (BeginDelayedSequence(300))
                     {
                         scoreDisplay.FadeIn(100);
                         SongBar.Expanded = true;
@@ -198,9 +204,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         // we should automatically proceed after a short delay
                         if (lastState == TourneyState.Ranking && !warmup.Value)
                         {
-                            if (currentMatch.Value?.Completed.Value == true)
+                            if (CurrentMatch.Value?.Completed.Value == true)
                                 scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, delay_before_progression);
-                            else if (currentMatch.Value?.Completed.Value == false)
+                            else if (CurrentMatch.Value?.Completed.Value == false)
                                 scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, delay_before_progression);
                         }
 

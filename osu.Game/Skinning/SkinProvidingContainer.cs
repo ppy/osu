@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -24,19 +23,8 @@ namespace osu.Game.Skinning
     {
         public event Action SourceChanged;
 
-        /// <summary>
-        /// Skins which should be exposed by this container, in order of lookup precedence.
-        /// </summary>
-        protected readonly BindableList<ISkin> SkinSources = new BindableList<ISkin>();
-
-        /// <summary>
-        /// A dictionary mapping each <see cref="ISkin"/> from the <see cref="SkinSources"/>
-        /// to one that performs the "allow lookup" checks before proceeding with a lookup.
-        /// </summary>
-        private readonly Dictionary<ISkin, DisableableSkinSource> disableableSkinSources = new Dictionary<ISkin, DisableableSkinSource>();
-
         [CanBeNull]
-        private ISkinSource fallbackSource;
+        protected ISkinSource ParentSource { get; private set; }
 
         /// <summary>
         /// Whether falling back to parent <see cref="ISkinSource"/>s is allowed in this container.
@@ -53,6 +41,13 @@ namespace osu.Game.Skinning
 
         protected virtual bool AllowColourLookup => true;
 
+        private readonly object sourceSetLock = new object();
+
+        /// <summary>
+        /// A dictionary mapping each <see cref="ISkin"/> source to a wrapper which handles lookup allowances.
+        /// </summary>
+        private (ISkin skin, DisableableSkinSource wrapped)[] skinSources = Array.Empty<(ISkin skin, DisableableSkinSource wrapped)>();
+
         /// <summary>
         /// Constructs a new <see cref="SkinProvidingContainer"/> initialised with a single skin source.
         /// </summary>
@@ -60,87 +55,56 @@ namespace osu.Game.Skinning
             : this()
         {
             if (skin != null)
-                SkinSources.Add(skin);
+                SetSources(new[] { skin });
         }
 
         /// <summary>
         /// Constructs a new <see cref="SkinProvidingContainer"/> with no sources.
-        /// Implementations can add or change sources through the <see cref="SkinSources"/> list.
         /// </summary>
         protected SkinProvidingContainer()
         {
             RelativeSizeAxes = Axes.Both;
+        }
 
-            SkinSources.BindCollectionChanged(((_, args) =>
-            {
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        foreach (var skin in args.NewItems.Cast<ISkin>())
-                        {
-                            disableableSkinSources.Add(skin, new DisableableSkinSource(skin, this));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-                            if (skin is ISkinSource source)
-                                source.SourceChanged += OnSourceChanged;
-                        }
+            ParentSource = dependencies.Get<ISkinSource>();
+            if (ParentSource != null)
+                ParentSource.SourceChanged += TriggerSourceChanged;
 
-                        break;
+            dependencies.CacheAs<ISkinSource>(this);
 
-                    case NotifyCollectionChangedAction.Reset:
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (var skin in args.OldItems.Cast<ISkin>())
-                        {
-                            disableableSkinSources.Remove(skin);
+            TriggerSourceChanged();
 
-                            if (skin is ISkinSource source)
-                                source.SourceChanged -= OnSourceChanged;
-                        }
-
-                        break;
-
-                    case NotifyCollectionChangedAction.Replace:
-                        foreach (var skin in args.OldItems.Cast<ISkin>())
-                        {
-                            disableableSkinSources.Remove(skin);
-
-                            if (skin is ISkinSource source)
-                                source.SourceChanged -= OnSourceChanged;
-                        }
-
-                        foreach (var skin in args.NewItems.Cast<ISkin>())
-                        {
-                            disableableSkinSources.Add(skin, new DisableableSkinSource(skin, this));
-
-                            if (skin is ISkinSource source)
-                                source.SourceChanged += OnSourceChanged;
-                        }
-
-                        break;
-                }
-            }), true);
+            return dependencies;
         }
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
-            foreach (var skin in SkinSources)
+            foreach (var (skin, lookupWrapper) in skinSources)
             {
-                if (lookupFunction(disableableSkinSources[skin]))
+                if (lookupFunction(lookupWrapper))
                     return skin;
             }
 
-            return fallbackSource?.FindProvider(lookupFunction);
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.FindProvider(lookupFunction);
         }
 
         public IEnumerable<ISkin> AllSources
         {
             get
             {
-                foreach (var skin in SkinSources)
-                    yield return skin;
+                foreach (var i in skinSources)
+                    yield return i.skin;
 
-                if (fallbackSource != null)
+                if (AllowFallingBackToParent && ParentSource != null)
                 {
-                    foreach (var skin in fallbackSource.AllSources)
+                    foreach (var skin in ParentSource.AllSources)
                         yield return skin;
                 }
             }
@@ -148,68 +112,103 @@ namespace osu.Game.Skinning
 
         public Drawable GetDrawableComponent(ISkinComponent component)
         {
-            foreach (var skin in SkinSources)
+            foreach (var (_, lookupWrapper) in skinSources)
             {
                 Drawable sourceDrawable;
-                if ((sourceDrawable = disableableSkinSources[skin]?.GetDrawableComponent(component)) != null)
+                if ((sourceDrawable = lookupWrapper.GetDrawableComponent(component)) != null)
                     return sourceDrawable;
             }
 
-            return fallbackSource?.GetDrawableComponent(component);
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.GetDrawableComponent(component);
         }
 
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
-            foreach (var skin in SkinSources)
+            foreach (var (_, lookupWrapper) in skinSources)
             {
                 Texture sourceTexture;
-                if ((sourceTexture = disableableSkinSources[skin]?.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
+                if ((sourceTexture = lookupWrapper.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
                     return sourceTexture;
             }
 
-            return fallbackSource?.GetTexture(componentName, wrapModeS, wrapModeT);
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.GetTexture(componentName, wrapModeS, wrapModeT);
         }
 
         public ISample GetSample(ISampleInfo sampleInfo)
         {
-            foreach (var skin in SkinSources)
+            foreach (var (_, lookupWrapper) in skinSources)
             {
                 ISample sourceSample;
-                if ((sourceSample = disableableSkinSources[skin]?.GetSample(sampleInfo)) != null)
+                if ((sourceSample = lookupWrapper.GetSample(sampleInfo)) != null)
                     return sourceSample;
             }
 
-            return fallbackSource?.GetSample(sampleInfo);
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.GetSample(sampleInfo);
         }
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
-            foreach (var skin in SkinSources)
+            foreach (var (_, lookupWrapper) in skinSources)
             {
                 IBindable<TValue> bindable;
-                if ((bindable = disableableSkinSources[skin]?.GetConfig<TLookup, TValue>(lookup)) != null)
+                if ((bindable = lookupWrapper.GetConfig<TLookup, TValue>(lookup)) != null)
                     return bindable;
             }
 
-            return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.GetConfig<TLookup, TValue>(lookup);
         }
 
-        protected virtual void OnSourceChanged() => SourceChanged?.Invoke();
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        /// <summary>
+        /// Replace the sources used for lookups in this container.
+        /// </summary>
+        /// <remarks>
+        /// This does not implicitly fire a <see cref="SourceChanged"/> event. Consider calling <see cref="TriggerSourceChanged"/> if required.
+        /// </remarks>
+        /// <param name="sources">The new sources.</param>
+        protected void SetSources(IEnumerable<ISkin> sources)
         {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-            if (AllowFallingBackToParent)
+            lock (sourceSetLock)
             {
-                fallbackSource = dependencies.Get<ISkinSource>();
-                if (fallbackSource != null)
-                    fallbackSource.SourceChanged += OnSourceChanged;
+                foreach (var skin in skinSources)
+                {
+                    if (skin.skin is ISkinSource source)
+                        source.SourceChanged -= TriggerSourceChanged;
+                }
+
+                skinSources = sources.Select(skin => (skin, new DisableableSkinSource(skin, this))).ToArray();
+
+                foreach (var skin in skinSources)
+                {
+                    if (skin.skin is ISkinSource source)
+                        source.SourceChanged += TriggerSourceChanged;
+                }
             }
+        }
 
-            dependencies.CacheAs<ISkinSource>(this);
+        /// <summary>
+        /// Invoked after any consumed source change, before the external <see cref="SourceChanged"/> event is fired.
+        /// This is also invoked once initially during <see cref="CreateChildDependencies"/> to ensure sources are ready for children consumption.
+        /// </summary>
+        protected virtual void RefreshSources() { }
 
-            return dependencies;
+        protected void TriggerSourceChanged()
+        {
+            // Expose to implementations, giving them a chance to react before notifying external consumers.
+            RefreshSources();
+
+            SourceChanged?.Invoke();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -219,11 +218,14 @@ namespace osu.Game.Skinning
 
             base.Dispose(isDisposing);
 
-            if (fallbackSource != null)
-                fallbackSource.SourceChanged -= OnSourceChanged;
+            if (ParentSource != null)
+                ParentSource.SourceChanged -= TriggerSourceChanged;
 
-            foreach (var source in SkinSources.OfType<ISkinSource>())
-                source.SourceChanged -= OnSourceChanged;
+            foreach (var i in skinSources)
+            {
+                if (i.skin is ISkinSource source)
+                    source.SourceChanged -= TriggerSourceChanged;
+            }
         }
 
         private class DisableableSkinSource : ISkin
@@ -266,6 +268,7 @@ namespace osu.Game.Skinning
                 switch (lookup)
                 {
                     case GlobalSkinColours _:
+                    case SkinComboColourLookup _:
                     case SkinCustomColourLookup _:
                         if (provider.AllowColourLookup)
                             return skin.GetConfig<TLookup, TValue>(lookup);

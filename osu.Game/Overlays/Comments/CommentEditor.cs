@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Comments
                 if (commitButton.IsBlocked.Value)
                     return;
 
-                commitButton.Click();
+                commitButton.TriggerClick();
             };
         }
 

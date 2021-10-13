@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
@@ -20,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Size = TwoLayerButton.SIZE_EXTENDED;
 
-            Child = button = new TwoLayerButton
+            Child = button = new TwoLayerButton(HoverSampleSet.Submit)
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
@@ -35,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
                 Add(receptor = new Receptor());
             }
 
-            receptor.OnBackPressed = () => button.Click();
+            receptor.OnBackPressed = () => button.TriggerClick();
         }
 
         [BackgroundDependencyLoader]
@@ -61,9 +62,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             public Action OnBackPressed;
 
-            public bool OnPressed(GlobalAction action)
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                switch (action)
+                switch (e.Action)
                 {
                     case GlobalAction.Back:
                         OnBackPressed?.Invoke();
@@ -73,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
                 return false;
             }
 
-            public void OnReleased(GlobalAction action)
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
             {
             }
         }

@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Skinning.Default;
-using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
@@ -18,7 +17,6 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         {
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.Centre;
-            Size = new Vector2(2 * CatchHitObject.OBJECT_RADIUS);
             InternalChild = new BorderPiece();
         }
 
@@ -28,10 +26,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             Colour = osuColour.Yellow;
         }
 
-        public void UpdateFrom(ScrollingHitObjectContainer hitObjectContainer, CatchHitObject hitObject)
+        public void UpdateFrom(CatchHitObject hitObject)
         {
-            X = hitObject.EffectiveX;
-            Y = hitObjectContainer.PositionAtTime(hitObject.StartTime);
             Scale = new Vector2(hitObject.Scale);
         }
     }

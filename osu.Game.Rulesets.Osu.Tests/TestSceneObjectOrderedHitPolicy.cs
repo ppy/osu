@@ -400,9 +400,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Beatmap.Value = CreateWorkingBeatmap(new Beatmap<OsuHitObject>
                 {
                     HitObjects = hitObjects,
+                    Difficulty = new BeatmapDifficulty { SliderTickRate = 3 },
                     BeatmapInfo =
                     {
-                        BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
                         Ruleset = new OsuRuleset().RulesetInfo
                     },
                 });
@@ -452,7 +452,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestSpinner : Spinner
         {
-            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
             {
                 base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
                 SpinsRequired = 1;

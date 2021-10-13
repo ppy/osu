@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public const int PLAYER_2_ID = 56;
 
         public TestMultiplayerClient Client => OnlinePlayDependencies.Client;
-        public new TestMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
+        public new TestRequestHandlingMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
         public TestUserLookupCache LookupCache => OnlinePlayDependencies?.LookupCache;
         public TestSpectatorClient SpectatorClient => OnlinePlayDependencies?.SpectatorClient;
 
@@ -36,23 +36,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             if (joinRoom)
             {
-                var room = new Room
-                {
-                    Name = { Value = "test name" },
-                    Playlist =
-                    {
-                        new PlaylistItem
-                        {
-                            Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                            Ruleset = { Value = Ruleset.Value }
-                        }
-                    }
-                };
+                var room = CreateRoom();
 
                 RoomManager.CreateRoom(room);
                 SelectedRoom.Value = room;
             }
         });
+
+        protected virtual Room CreateRoom()
+        {
+            return new Room
+            {
+                Name = { Value = "test name" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
+                        Ruleset = { Value = Ruleset.Value }
+                    }
+                }
+            };
+        }
 
         public override void SetUpSteps()
         {

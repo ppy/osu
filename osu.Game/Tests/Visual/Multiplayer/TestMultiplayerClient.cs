@@ -14,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
@@ -28,7 +29,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override IBindable<bool> IsConnected => isConnected;
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);
 
-        public Room? APIRoom { get; private set; }
+        public new Room? APIRoom => base.APIRoom;
 
         public Action<MultiplayerRoom>? RoomSetupAction;
 
@@ -38,9 +39,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        private readonly TestMultiplayerRoomManager roomManager;
+        private readonly TestRequestHandlingMultiplayerRoomManager roomManager;
 
-        public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
+        public TestMultiplayerClient(TestRequestHandlingMultiplayerRoomManager roomManager)
         {
             this.roomManager = roomManager;
         }
@@ -49,9 +50,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public void Disconnect() => isConnected.Value = false;
 
-        public void AddUser(User user) => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(user.Id) { User = user });
+        public MultiplayerRoomUser AddUser(User user, bool markAsPlaying = false)
+        {
+            var roomUser = new MultiplayerRoomUser(user.Id) { User = user };
+            ((IMultiplayerClient)this).UserJoined(roomUser);
 
-        public void AddNullUser(int userId) => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(userId));
+            if (markAsPlaying)
+                PlayingUserIds.Add(user.Id);
+
+            return roomUser;
+        }
+
+        public void AddNullUser() => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(TestUserLookupCache.NULL_USER_ID));
 
         public void RemoveUser(User user)
         {
@@ -115,9 +125,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged(userId, newBeatmapAvailability);
         }
 
-        protected override Task<MultiplayerRoom> JoinRoom(long roomId)
+        protected override Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
         {
-            var apiRoom = roomManager.Rooms.Single(r => r.RoomID.Value == roomId);
+            var apiRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == roomId);
+
+            if (password != apiRoom.Password.Value)
+                throw new InvalidOperationException("Invalid password.");
 
             var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
@@ -129,12 +142,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Settings =
                 {
                     Name = apiRoom.Name.Value,
+                    MatchType = apiRoom.Type.Value,
                     BeatmapID = apiRoom.Playlist.Last().BeatmapID,
                     RulesetID = apiRoom.Playlist.Last().RulesetID,
                     BeatmapChecksum = apiRoom.Playlist.Last().Beatmap.Value.MD5Hash,
                     RequiredMods = apiRoom.Playlist.Last().RequiredMods.Select(m => new APIMod(m)).ToArray(),
                     AllowedMods = apiRoom.Playlist.Last().AllowedMods.Select(m => new APIMod(m)).ToArray(),
-                    PlaylistItemId = apiRoom.Playlist.Last().ID
+                    PlaylistItemId = apiRoom.Playlist.Last().ID,
+                    // ReSharper disable once ConstantNullCoalescingCondition Incorrect inspection due to lack of nullable in Room.cs.
+                    Password = password ?? string.Empty,
                 },
                 Users = { localUser },
                 Host = localUser
@@ -143,18 +159,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
             RoomSetupAction?.Invoke(room);
             RoomSetupAction = null;
 
-            APIRoom = apiRoom;
-
             return Task.FromResult(room);
         }
 
-        protected override Task LeaveRoomInternal()
+        protected override void OnRoomJoined()
         {
-            APIRoom = null;
-            return Task.CompletedTask;
+            Debug.Assert(Room != null);
+
+            // emulate the server sending this after the join room. scheduler required to make sure the join room event is fired first (in Join).
+            changeMatchType(Room.Settings.MatchType).Wait();
         }
 
+        protected override Task LeaveRoomInternal() => Task.CompletedTask;
+
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
+
+        public override Task KickUser(int userId)
+        {
+            Debug.Assert(Room != null);
+
+            return ((IMultiplayerClient)this).UserKicked(Room.Users.Single(u => u.UserID == userId));
+        }
 
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
         {
@@ -164,6 +189,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.Idle);
+
+            await changeMatchType(settings.MatchType).ConfigureAwait(false);
         }
 
         public override Task ChangeState(MultiplayerUserState newState)
@@ -193,6 +220,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
+        public override async Task SendMatchRequest(MatchUserRequest request)
+        {
+            Debug.Assert(Room != null);
+            Debug.Assert(LocalUser != null);
+
+            switch (request)
+            {
+                case ChangeTeamRequest changeTeam:
+
+                    TeamVersusRoomState roomState = (TeamVersusRoomState)Room.MatchState!;
+                    TeamVersusUserState userState = (TeamVersusUserState)LocalUser.MatchState!;
+
+                    var targetTeam = roomState.Teams.FirstOrDefault(t => t.ID == changeTeam.TeamID);
+
+                    if (targetTeam != null)
+                    {
+                        userState.TeamID = targetTeam.ID;
+
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(LocalUser.UserID, userState).ConfigureAwait(false);
+                    }
+
+                    break;
+            }
+        }
+
         public override Task StartMatch()
         {
             Debug.Assert(Room != null);
@@ -208,7 +260,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Debug.Assert(Room != null);
 
-            var apiRoom = roomManager.Rooms.Single(r => r.RoomID.Value == Room.RoomID);
+            var apiRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == Room.RoomID);
             var set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
                       ?? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId)?.BeatmapSet;
 
@@ -216,6 +268,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 throw new InvalidOperationException("Beatmap not found.");
 
             return Task.FromResult(set);
+        }
+
+        private async Task changeMatchType(MatchType type)
+        {
+            Debug.Assert(Room != null);
+
+            switch (type)
+            {
+                case MatchType.HeadToHead:
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(null).ConfigureAwait(false);
+
+                    foreach (var user in Room.Users)
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, null).ConfigureAwait(false);
+                    break;
+
+                case MatchType.TeamVersus:
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(TeamVersusRoomState.CreateDefault()).ConfigureAwait(false);
+
+                    foreach (var user in Room.Users)
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, new TeamVersusUserState()).ConfigureAwait(false);
+                    break;
+            }
         }
     }
 }

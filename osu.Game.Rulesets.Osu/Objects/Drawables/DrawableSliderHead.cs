@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [CanBeNull]
         public Slider Slider => DrawableSlider?.HitObject;
 
-        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
+        public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         public override bool DisplayResult => HitObject?.JudgeAsNormalHitCircle ?? base.DisplayResult;
 

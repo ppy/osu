@@ -10,7 +10,7 @@ namespace osu.Game.Configuration
         [Description("Never repeat")]
         RandomPermutation,
 
-        [Description("Random")]
+        [Description("True Random")]
         Random
     }
 }

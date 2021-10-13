@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Catch.Edit
     public class CatchEditorPlayfield : CatchPlayfield
     {
         // TODO fixme: the size of the catcher is not changed when circle size is changed in setup screen.
-        public CatchEditorPlayfield(BeatmapDifficulty difficulty)
+        public CatchEditorPlayfield(IBeatmapDifficultyInfo difficulty)
             : base(difficulty)
         {
         }
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             base.LoadComplete();
 
             // TODO: honor "hit animation" setting?
-            CatcherArea.MovableCatcher.CatchFruitOnPlate = false;
+            Catcher.CatchFruitOnPlate = false;
 
             // TODO: disable hit lighting as well
         }

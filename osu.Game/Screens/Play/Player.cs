@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +37,7 @@ namespace osu.Game.Screens.Play
 {
     [Cached]
     [Cached(typeof(ISamplePlaybackDisabler))]
-    public abstract class Player : ScreenWithBeatmapBackground, ISamplePlaybackDisabler
+    public abstract class Player : ScreenWithBeatmapBackground, ISamplePlaybackDisabler, ILocalUserPlayInfo
     {
         /// <summary>
         /// The delay upon completion of the beatmap before displaying the results screen.
@@ -47,7 +46,7 @@ namespace osu.Game.Screens.Play
 
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
-        protected override UserActivity InitialActivity => new UserActivity.SoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
+        protected override UserActivity InitialActivity => new UserActivity.InSoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -56,7 +55,7 @@ namespace osu.Game.Screens.Play
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         // We are managing our own adjustments (see OnEntering/OnExiting).
-        public override bool AllowRateAdjustments => false;
+        public override bool? AllowTrackAdjustments => false;
 
         private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
 
@@ -75,7 +74,9 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
-        protected readonly Bindable<bool> LocalUserPlaying = new Bindable<bool>();
+        public IBindable<bool> LocalUserPlaying => localUserPlaying;
+
+        private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
 
         public int RestartCount;
 
@@ -91,9 +92,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
-        protected Ruleset GameplayRuleset { get; private set; }
+        public GameplayState GameplayState { get; private set; }
 
-        protected GameplayBeatmap GameplayBeatmap { get; private set; }
+        private Ruleset ruleset;
 
         private Sample sampleRestart;
 
@@ -123,15 +124,11 @@ namespace osu.Game.Screens.Play
 
         public DimmableStoryboard DimmableStoryboard { get; private set; }
 
-        [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
         /// <summary>
         /// Whether failing should be allowed.
         /// By default, this checks whether all selected mods allow failing.
         /// </summary>
-        protected virtual bool CheckModsAllowFailure() => Mods.Value.OfType<IApplicableFailOverride>().All(m => m.PerformFail());
+        protected virtual bool CheckModsAllowFailure() => GameplayState.Mods.OfType<IApplicableFailOverride>().All(m => m.PerformFail());
 
         public readonly PlayerConfiguration Configuration;
 
@@ -159,13 +156,6 @@ namespace osu.Game.Screens.Play
             if (!LoadedBeatmapSuccessfully)
                 return;
 
-            Score = CreateScore();
-
-            // ensure the score is in a consistent state with the current player.
-            Score.ScoreInfo.Beatmap = Beatmap.Value.BeatmapInfo;
-            Score.ScoreInfo.Ruleset = GameplayRuleset.RulesetInfo;
-            Score.ScoreInfo.Mods = Mods.Value.ToArray();
-
             PrepareReplay();
 
             ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(Score.ScoreInfo);
@@ -184,12 +174,12 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuConfigManager config, OsuGameBase game)
         {
-            Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
+            var gameplayMods = Mods.Value.Select(m => m.DeepClone()).ToArray();
 
             if (Beatmap.Value is DummyWorkingBeatmap)
                 return;
 
-            IBeatmap playableBeatmap = loadPlayableBeatmap();
+            IBeatmap playableBeatmap = loadPlayableBeatmap(gameplayMods);
 
             if (playableBeatmap == null)
                 return;
@@ -204,16 +194,16 @@ namespace osu.Game.Screens.Play
             if (game is OsuGame osuGame)
                 LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
-            DrawableRuleset = GameplayRuleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
+            DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, gameplayMods);
             dependencies.CacheAs(DrawableRuleset);
 
-            ScoreProcessor = GameplayRuleset.CreateScoreProcessor();
+            ScoreProcessor = ruleset.CreateScoreProcessor();
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
-            ScoreProcessor.Mods.BindTo(Mods);
+            ScoreProcessor.Mods.Value = gameplayMods;
 
             dependencies.CacheAs(ScoreProcessor);
 
-            HealthProcessor = GameplayRuleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(HealthProcessor);
@@ -223,12 +213,18 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
-            AddInternal(GameplayBeatmap = new GameplayBeatmap(playableBeatmap));
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
-            dependencies.CacheAs(GameplayBeatmap);
+            Score = CreateScore(playableBeatmap);
 
-            var rulesetSkinProvider = new RulesetSkinProvidingContainer(GameplayRuleset, playableBeatmap, Beatmap.Value.Skin);
+            // ensure the score is in a consistent state with the current player.
+            Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
+            Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
+            Score.ScoreInfo.Mods = gameplayMods;
+
+            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score));
+
+            var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
@@ -278,7 +274,7 @@ namespace osu.Game.Screens.Play
             {
                 HealthProcessor.ApplyResult(r);
                 ScoreProcessor.ApplyResult(r);
-                GameplayBeatmap.ApplyResult(r);
+                GameplayState.ApplyResult(r);
             };
 
             DrawableRuleset.RevertResult += r =>
@@ -297,11 +293,19 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.HasCompleted.BindValueChanged(scoreCompletionChanged);
             HealthProcessor.Failed += onFail;
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                mod.ApplyToScoreProcessor(ScoreProcessor);
+            // Provide judgement processors to mods after they're loaded so that they're on the gameplay clock,
+            // this is required for mods that apply transforms to these processors.
+            ScoreProcessor.OnLoadComplete += _ =>
+            {
+                foreach (var mod in gameplayMods.OfType<IApplicableToScoreProcessor>())
+                    mod.ApplyToScoreProcessor(ScoreProcessor);
+            };
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToHealthProcessor>())
-                mod.ApplyToHealthProcessor(HealthProcessor);
+            HealthProcessor.OnLoadComplete += _ =>
+            {
+                foreach (var mod in gameplayMods.OfType<IApplicableToHealthProcessor>())
+                    mod.ApplyToHealthProcessor(HealthProcessor);
+            };
 
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
@@ -347,7 +351,7 @@ namespace osu.Game.Screens.Play
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                     DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                    HUDOverlay = new HUDOverlay(DrawableRuleset, Mods.Value)
+                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods)
                     {
                         HoldToQuit =
                         {
@@ -434,7 +438,7 @@ namespace osu.Game.Screens.Play
         {
             bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value;
             OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
-            LocalUserPlaying.Value = inGameplay;
+            localUserPlaying.Value = inGameplay;
         }
 
         private void updateSampleDisabledState()
@@ -458,7 +462,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private IBeatmap loadPlayableBeatmap()
+        private IBeatmap loadPlayableBeatmap(Mod[] gameplayMods)
         {
             IBeatmap playable;
 
@@ -468,19 +472,19 @@ namespace osu.Game.Screens.Play
                     throw new InvalidOperationException("Beatmap was not loaded");
 
                 var rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
-                GameplayRuleset = rulesetInfo.CreateInstance();
+                ruleset = rulesetInfo.CreateInstance();
 
                 try
                 {
-                    playable = Beatmap.Value.GetPlayableBeatmap(GameplayRuleset.RulesetInfo, Mods.Value);
+                    playable = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, gameplayMods);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
                     // A playable beatmap may not be creatable with the user's preferred ruleset, so try using the beatmap's default ruleset
                     rulesetInfo = Beatmap.Value.BeatmapInfo.Ruleset;
-                    GameplayRuleset = rulesetInfo.CreateInstance();
+                    ruleset = rulesetInfo.CreateInstance();
 
-                    playable = Beatmap.Value.GetPlayableBeatmap(rulesetInfo, Mods.Value);
+                    playable = Beatmap.Value.GetPlayableBeatmap(rulesetInfo, gameplayMods);
                 }
 
                 if (playable.HitObjects.Count == 0)
@@ -694,9 +698,11 @@ namespace osu.Game.Screens.Play
         /// <returns>The final score.</returns>
         private async Task<ScoreInfo> prepareScoreForResults()
         {
+            var scoreCopy = Score.DeepClone();
+
             try
             {
-                await PrepareScoreForResultsAsync(Score).ConfigureAwait(false);
+                await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -705,14 +711,14 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                await ImportScore(Score).ConfigureAwait(false);
+                await ImportScore(scoreCopy).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, @"Score import failed!");
             }
 
-            return Score.ScoreInfo;
+            return scoreCopy.ScoreInfo;
         }
 
         /// <summary>
@@ -778,7 +784,7 @@ namespace osu.Game.Screens.Play
 
             failAnimation.Start();
 
-            if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+            if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
                 Restart();
 
             return true;
@@ -908,17 +914,17 @@ namespace osu.Game.Screens.Play
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToPlayer>())
+            foreach (var mod in GameplayState.Mods.OfType<IApplicableToPlayer>())
                 mod.ApplyToPlayer(this);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
+            foreach (var mod in GameplayState.Mods.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
 
             // Our mods are local copies of the global mods so they need to be re-applied to the track.
             // This is done through the music controller (for now), because resetting speed adjustments on the beatmap track also removes adjustments provided by DrawableTrack.
             // Todo: In the future, player will receive in a track and will probably not have to worry about this...
             musicController.ResetTrackAdjustments();
-            foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
+            foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(musicController.CurrentTrack);
 
             updateGameplayState();
@@ -941,7 +947,7 @@ namespace osu.Game.Screens.Play
 
         public override void OnSuspending(IScreen next)
         {
-            screenSuspension?.Expire();
+            screenSuspension?.RemoveAndDisposeImmediately();
 
             fadeOut();
             base.OnSuspending(next);
@@ -949,11 +955,16 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            screenSuspension?.Expire();
+            screenSuspension?.RemoveAndDisposeImmediately();
+            failAnimation?.RemoveAndDisposeImmediately();
 
             // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
             if (prepareScoreForDisplayTask == null)
+            {
                 Score.ScoreInfo.Passed = false;
+                // potentially should be ScoreRank.F instead? this is the best alternative for now.
+                Score.ScoreInfo.Rank = ScoreRank.D;
+            }
 
             // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
             // To resolve test failures, forcefully end playing synchronously when this screen exits.
@@ -973,8 +984,9 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Creates the player's <see cref="Scoring.Score"/>.
         /// </summary>
+        /// <param name="beatmap"></param>
         /// <returns>The <see cref="Scoring.Score"/>.</returns>
-        protected virtual Score CreateScore() => new Score
+        protected virtual Score CreateScore(IBeatmap beatmap) => new Score
         {
             ScoreInfo = new ScoreInfo { User = api.LocalUser.Value },
         };
@@ -994,7 +1006,7 @@ namespace osu.Game.Screens.Play
 
             using (var stream = new MemoryStream())
             {
-                new LegacyScoreEncoder(score, GameplayBeatmap.PlayableBeatmap).Encode(stream);
+                new LegacyScoreEncoder(score, GameplayState.Beatmap).Encode(stream);
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
@@ -1017,13 +1029,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="Scoring.Score"/> to prepare.</param>
         /// <returns>A task that prepares the provided score. On completion, the score is assumed to be ready for display.</returns>
-        protected virtual Task PrepareScoreForResultsAsync(Score score)
-        {
-            // perform one final population to ensure everything is up-to-date.
-            ScoreProcessor.PopulateScore(score.ScoreInfo);
-
-            return Task.CompletedTask;
-        }
+        protected virtual Task PrepareScoreForResultsAsync(Score score) => Task.CompletedTask;
 
         /// <summary>
         /// Creates the <see cref="ResultsScreen"/> for a <see cref="ScoreInfo"/>.
@@ -1044,5 +1050,7 @@ namespace osu.Game.Screens.Play
         #endregion
 
         IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
+
+        IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
     }
 }

@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 Beatmap.Value.Track.Start();
             });
 
-            AddStep("Load playfield", () => SetContents(_ => new TaikoPlayfield(new ControlPointInfo())
+            AddStep("Load playfield", () => SetContents(_ => new TaikoPlayfield
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,

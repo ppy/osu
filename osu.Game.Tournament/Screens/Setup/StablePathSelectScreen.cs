@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Screens.Setup
         [Resolved]
         private MatchIPCInfo ipc { get; set; }
 
-        private DirectorySelector directorySelector;
+        private OsuDirectorySelector directorySelector;
         private DialogOverlay overlay;
 
         [BackgroundDependencyLoader(true)]
@@ -79,7 +79,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                 },
                                 new Drawable[]
                                 {
-                                    directorySelector = new DirectorySelector(initialPath)
+                                    directorySelector = new OsuDirectorySelector(initialPath)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                     }

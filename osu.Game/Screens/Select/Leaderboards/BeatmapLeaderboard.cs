@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -23,17 +25,17 @@ namespace osu.Game.Screens.Select.Leaderboards
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private BeatmapInfo beatmap;
+        private BeatmapInfo beatmapInfo;
 
-        public BeatmapInfo Beatmap
+        public BeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (beatmap == value)
+                if (beatmapInfo == value)
                     return;
 
-                beatmap = value;
+                beatmapInfo = value;
                 Scores = null;
 
                 UpdateScores();
@@ -65,6 +67,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
@@ -111,7 +116,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (score.NewValue.TryGetTarget(out var scoreInfo))
             {
-                if (Beatmap?.ID != scoreInfo.BeatmapInfoID)
+                if (BeatmapInfo?.ID != scoreInfo.BeatmapInfoID)
                     return;
             }
 
@@ -120,9 +125,14 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
+        private CancellationTokenSource loadCancellationSource;
+
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
-            if (Beatmap == null)
+            loadCancellationSource?.Cancel();
+            loadCancellationSource = new CancellationTokenSource();
+
+            if (BeatmapInfo == null)
             {
                 PlaceholderState = PlaceholderState.NoneSelected;
                 return null;
@@ -131,7 +141,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (Scope == BeatmapLeaderboardScope.Local)
             {
                 var scores = scoreManager
-                    .QueryScores(s => !s.DeletePending && s.Beatmap.ID == Beatmap.ID && s.Ruleset.ID == ruleset.Value.ID);
+                    .QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == BeatmapInfo.ID && s.Ruleset.ID == ruleset.Value.ID);
 
                 if (filterMods && !mods.Value.Any())
                 {
@@ -146,8 +156,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
                 }
 
-                Scores = scores.OrderByDescending(s => s.TotalScore).ToArray();
-                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
+                scoreManager.OrderByTotalScoreAsync(scores.ToArray(), loadCancellationSource.Token)
+                            .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
 
                 return null;
             }
@@ -158,7 +168,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (Beatmap.OnlineBeatmapID == null || Beatmap?.Status <= BeatmapSetOnlineStatus.Pending)
+            if (BeatmapInfo.OnlineBeatmapID == null || BeatmapInfo?.Status <= BeatmapSetOnlineStatus.Pending)
             {
                 PlaceholderState = PlaceholderState.Unavailable;
                 return null;
@@ -178,12 +188,19 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            var req = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope, requestMods);
+            var req = new GetScoresRequest(BeatmapInfo, ruleset.Value ?? BeatmapInfo.Ruleset, Scope, requestMods);
 
             req.Success += r =>
             {
-                scoresCallback?.Invoke(r.Scores.Select(s => s.CreateScoreInfo(rulesets)));
-                TopScore = r.UserScore?.CreateScoreInfo(rulesets);
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
+                            .ContinueWith(ordered => Schedule(() =>
+                            {
+                                if (loadCancellationSource.IsCancellationRequested)
+                                    return;
+
+                                scoresCallback?.Invoke(ordered.Result);
+                                TopScore = r.UserScore?.CreateScoreInfo(rulesets);
+                            }), TaskContinuationOptions.OnlyOnRanToCompletion);
             };
 
             return req;
