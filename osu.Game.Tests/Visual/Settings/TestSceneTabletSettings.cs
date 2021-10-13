@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Handlers.Tablet;
@@ -20,6 +21,9 @@ namespace osu.Game.Tests.Visual.Settings
     {
         private TestTabletHandler tabletHandler;
         private TabletSettings settings;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         [SetUpSteps]
         public void SetUpSteps()

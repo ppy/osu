@@ -26,7 +26,7 @@ namespace osu.Game.Models
         [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; } = string.Empty;
 
-        public string Author { get; set; } = string.Empty; // eventually should be linked to a persisted User. = string.Empty;
+        public string Author { get; set; } = string.Empty; // eventually should be linked to a persisted User.
 
         public string Source { get; set; } = string.Empty;
 

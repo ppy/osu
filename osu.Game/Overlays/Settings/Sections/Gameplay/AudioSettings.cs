@@ -6,29 +6,27 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
-    public class GeneralSettings : SettingsSubsection
+    public class AudioSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => GameplaySettingsStrings.GeneralHeader;
+        protected override LocalisableString Header => GameplaySettingsStrings.AudioHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
-                new SettingsEnumDropdown<ScoringMode>
+                new SettingsCheckbox
                 {
-                    LabelText = GameplaySettingsStrings.ScoreDisplayMode,
-                    Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
-                    Keywords = new[] { "scoring" }
+                    LabelText = GameplaySettingsStrings.PositionalHitsounds,
+                    Current = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = GraphicsSettingsStrings.HitLighting,
-                    Current = config.GetBindable<bool>(OsuSetting.HitLighting)
+                    LabelText = GameplaySettingsStrings.AlwaysPlayFirstComboBreak,
+                    Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
                 },
             };
         }

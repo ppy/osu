@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO;
 using Realms;
@@ -10,6 +11,7 @@ using Realms;
 
 namespace osu.Game.Models
 {
+    [ExcludeFromDynamicCompile]
     public class RealmNamedFileUsage : EmbeddedObject, INamedFile, INamedFileUsage
     {
         public RealmFile File { get; set; } = null!;
