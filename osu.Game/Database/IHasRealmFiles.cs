@@ -4,6 +4,8 @@
 using System.Collections.Generic;
 using osu.Game.Models;
 
+#nullable enable
+
 namespace osu.Game.Database
 {
     /// <summary>
