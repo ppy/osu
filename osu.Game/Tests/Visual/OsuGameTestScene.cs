@@ -78,8 +78,10 @@ namespace osu.Game.Tests.Visual
 
         protected void CreateGame()
         {
-            AddGame(Game = new TestOsuGame(LocalStorage, API));
+            AddGame(Game = CreateTestGame());
         }
+
+        protected virtual TestOsuGame CreateTestGame() => new TestOsuGame(LocalStorage, API);
 
         protected void PushAndConfirm(Func<Screen> newScreen)
         {
@@ -135,7 +137,8 @@ namespace osu.Game.Tests.Visual
 
             public new void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null) => base.PerformFromScreen(action, validScreens);
 
-            public TestOsuGame(Storage storage, IAPIProvider api)
+            public TestOsuGame(Storage storage, IAPIProvider api, string[] args = null)
+                : base(args)
             {
                 Storage = storage;
                 API = api;
