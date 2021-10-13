@@ -22,11 +22,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double JumpDistance { get; private set; }
 
         /// <summary>
-        /// Normalized Vector from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
+        /// Minimum distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        public Vector2 JumpVector { get; private set; }
+        public double MovementDistance { get; private set; }
 
-        /// <summary>
+        /// <summary>JumpTravel
         /// Normalized distance between the start and end position of the previous <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double TravelDistance { get; private set; }
@@ -36,6 +36,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
         public double? Angle { get; private set; }
+
+        /// <summary>
+        /// Milliseconds elapsed since the end time of the Previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// </summary>
+        public double MovementTime { get; private set; }
+
+        /// <summary>
+        /// Milliseconds elapsed since from the start time of the Previous <see cref="OsuDifficultyHitObject"/> to the end time of the same Previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// </summary>
+        public double TravelTime { get; private set; }
 
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
@@ -51,13 +61,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastLastObject = (OsuHitObject)lastLastObject;
             this.lastObject = (OsuHitObject)lastObject;
 
-            setDistances();
-
             // Capped to 25ms to prevent difficulty calculation breaking from simulatenous objects.
             StrainTime = Math.Max(DeltaTime, 25);
+
+            setDistances(clockRate);
         }
 
-        private void setDistances()
+        private void setDistances(double clockRate)
         {
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = normalized_radius / (float)BaseObject.Radius;
@@ -72,6 +82,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 computeSliderCursorPosition(lastSlider);
                 TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
+                TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, 0);
+                MovementTime = Math.Max(StrainTime - TravelTime, 0);
+                MovementDistance = Math.Max(0, Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length - 0) * scalingFactor;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
@@ -79,8 +92,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // Don't need to jump to reach spinners
             if (!(BaseObject is Spinner))
             {
-                JumpVector = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor);
-                JumpDistance = JumpVector.Length;
+                JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+                MovementDistance = Math.Min(JumpDistance, MovementDistance);
             }
 
             if (lastLastObject != null)
@@ -104,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             slider.LazyEndPosition = slider.StackedPosition;
 
-            float approxFollowCircleRadius = (float)(slider.Radius * 3);
+            float approxFollowCircleRadius = (float)(slider.Radius * 2.4);
             var computeVertex = new Action<double>(t =>
             {
                 double progress = (t - slider.StartTime) / slider.SpanDuration;
@@ -116,6 +129,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // ReSharper disable once PossibleInvalidOperationException (bugged in current r# version)
                 var diff = slider.StackedPosition + slider.Path.PositionAt(progress) - slider.LazyEndPosition.Value;
                 float dist = diff.Length;
+
+                slider.LazyTravelTime = t - slider.StartTime;
 
                 if (dist > approxFollowCircleRadius)
                 {
