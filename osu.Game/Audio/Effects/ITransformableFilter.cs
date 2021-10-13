@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 
@@ -12,7 +11,7 @@ namespace osu.Game.Audio.Effects
         /// <summary>
         /// The filter cutoff.
         /// </summary>
-        BindableNumber<int> Cutoff { get; }
+        int Cutoff { get; set; }
     }
 
     public static class FilterableAudioComponentExtensions
@@ -40,7 +39,7 @@ namespace osu.Game.Audio.Effects
         public static TransformSequence<T> CutoffTo<T, TEasing>(this T component, int newCutoff, double duration, TEasing easing)
             where T : class, ITransformableFilter, IDrawable
             where TEasing : IEasingFunction
-            => component.TransformBindableTo(component.Cutoff, newCutoff, duration, easing);
+            => component.TransformTo(nameof(component.Cutoff), newCutoff, duration, easing);
 
         /// <summary>
         /// Smoothly adjusts filter cutoff over time.
@@ -49,6 +48,6 @@ namespace osu.Game.Audio.Effects
         public static TransformSequence<T> CutoffTo<T, TEasing>(this TransformSequence<T> sequence, int newCutoff, double duration, TEasing easing)
             where T : class, ITransformableFilter, IDrawable
             where TEasing : IEasingFunction
-            => sequence.Append(o => o.TransformBindableTo(o.Cutoff, newCutoff, duration, easing));
+            => sequence.Append(o => o.TransformTo(nameof(o.Cutoff), newCutoff, duration, easing));
     }
 }
