@@ -223,7 +223,6 @@ namespace osu.Game.Graphics.UserInterface
                             {
                                 AlwaysPresent = true,
                                 Icon = FontAwesome.Solid.ChevronRight,
-                                Colour = Color4.Black,
                                 Alpha = 0.5f,
                                 Size = new Vector2(8),
                                 Margin = new MarginPadding { Left = 3, Right = 3 },
@@ -236,6 +235,12 @@ namespace osu.Game.Graphics.UserInterface
                                 Anchor = Anchor.CentreLeft,
                             },
                         };
+                    }
+
+                    [BackgroundDependencyLoader(true)]
+                    private void load(OverlayColourProvider? colourProvider)
+                    {
+                        Chevron.Colour = colourProvider?.Background5 ?? Color4.Black;
                     }
                 }
             }
