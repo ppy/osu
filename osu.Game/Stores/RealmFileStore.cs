@@ -8,6 +8,7 @@ using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Models;
 using Realms;
@@ -17,14 +18,16 @@ using Realms;
 namespace osu.Game.Stores
 {
     /// <summary>
-    /// Handles the Store and retrieval of Files/FileSets to the database backing
+    /// Handles the storing of files to the file system (and database) backing.
     /// </summary>
+    [ExcludeFromDynamicCompile]
     public class RealmFileStore
     {
         private readonly RealmContextFactory realmFactory;
+
         public readonly IResourceStore<byte[]> Store;
 
-        public Storage Storage;
+        public readonly Storage Storage;
 
         public RealmFileStore(RealmContextFactory realmFactory, Storage storage)
         {
