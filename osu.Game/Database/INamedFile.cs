@@ -3,15 +3,17 @@
 
 using osu.Game.Models;
 
+#nullable enable
+
 namespace osu.Game.Database
 {
     /// <summary>
-    /// Represent a join model which gives a filename and scope to a <see cref="File"/>.
+    /// Represents a join model which gives a filename and scope to a <see cref="File"/>.
     /// </summary>
     public interface INamedFile
     {
-        public string Filename { get; set; }
+        string Filename { get; set; }
 
-        public RealmFile File { get; set; }
+        RealmFile File { get; set; }
     }
 }
