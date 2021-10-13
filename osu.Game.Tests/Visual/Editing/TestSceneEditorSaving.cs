@@ -33,6 +33,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("wait for editor load", () => editor != null);
 
             AddStep("Set overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty = 7);
+            AddStep("Set difficulty name", () => editorBeatmap.BeatmapInfo.Version = "diffname");
 
             AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
 
@@ -60,6 +61,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("Wait for editor load", () => editor != null);
             AddAssert("Beatmap contains single hitcircle", () => editorBeatmap.HitObjects.Count == 1);
             AddAssert("Beatmap has correct overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty == 7);
+            AddAssert("Beatmap has correct difficulty name", () => editorBeatmap.BeatmapInfo.Version == "diffname");
         }
     }
 }
