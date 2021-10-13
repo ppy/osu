@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -13,7 +12,7 @@ namespace osu.Game.Overlays.Settings
     {
         protected override OsuDropdown<T> CreateDropdown() => new DropdownControl();
 
-        protected new class DropdownControl : ThemedEnumDropdown<T>
+        protected new class DropdownControl : OsuEnumDropdown<T>
         {
             public DropdownControl()
             {

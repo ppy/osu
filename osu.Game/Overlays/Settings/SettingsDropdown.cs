@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings
@@ -38,7 +37,7 @@ namespace osu.Game.Overlays.Settings
 
         protected virtual OsuDropdown<T> CreateDropdown() => new DropdownControl();
 
-        protected class DropdownControl : ThemedDropdown<T>
+        protected class DropdownControl : OsuDropdown<T>
         {
             public DropdownControl()
             {

@@ -24,25 +24,10 @@ namespace osu.Game.Graphics.Containers
         }
     }
 
-    public class OsuScrollContainer<T> : ScrollContainer<T>, IHasAccentColour
-        where T : Drawable
+    public class OsuScrollContainer<T> : ScrollContainer<T> where T : Drawable
     {
         public const float SCROLL_BAR_HEIGHT = 10;
         public const float SCROLL_BAR_PADDING = 3;
-
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                accentColour = value;
-
-                if (Scrollbar is IHasAccentColour accentedScrollbar)
-                    accentedScrollbar.AccentColour = value;
-            }
-        }
 
         /// <summary>
         /// Allows controlling the scroll bar from any position in the container using the right mouse button.
@@ -124,27 +109,11 @@ namespace osu.Game.Graphics.Containers
 
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
 
-        protected class OsuScrollbar : ScrollbarContainer, IHasAccentColour
+        protected class OsuScrollbar : ScrollbarContainer
         {
-            private Color4 accentColour;
-
-            public Color4 AccentColour
-            {
-                get => accentColour;
-                set
-                {
-                    accentColour = value;
-
-                    if (IsLoaded)
-                        updateMouseDownState();
-                }
-            }
-
             private Color4 hoverColour;
             private Color4 defaultColour;
-
-            private bool mouseDown;
-            private const int fade_duration = 100;
+            private Color4 highlightColour;
 
             private readonly Box box;
 
@@ -177,15 +146,7 @@ namespace osu.Game.Graphics.Containers
             {
                 Colour = defaultColour = colours.Gray8;
                 hoverColour = colours.GrayF;
-                AccentColour = colours.Green;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                updateHoverState();
-                updateMouseDownState();
+                highlightColour = colours.Green;
             }
 
             public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
@@ -199,24 +160,21 @@ namespace osu.Game.Graphics.Containers
 
             protected override bool OnHover(HoverEvent e)
             {
-                updateHoverState(fade_duration);
+                this.FadeColour(hoverColour, 100);
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                updateHoverState(fade_duration);
+                this.FadeColour(defaultColour, 100);
             }
-
-            private void updateHoverState(double duration = 0) => this.FadeColour(IsHovered ? hoverColour : defaultColour, duration);
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 if (!base.OnMouseDown(e)) return false;
 
-                mouseDown = true;
-                updateMouseDownState(fade_duration);
-
+                // note that we are changing the colour of the box here as to not interfere with the hover effect.
+                box.FadeColour(highlightColour, 100);
                 return true;
             }
 
@@ -224,16 +182,9 @@ namespace osu.Game.Graphics.Containers
             {
                 if (e.Button != MouseButton.Left) return;
 
-                mouseDown = false;
-                updateMouseDownState(fade_duration);
+                box.FadeColour(Color4.White, 100);
 
                 base.OnMouseUp(e);
-            }
-
-            private void updateMouseDownState(double duration = 0)
-            {
-                // note that we are changing the colour of the box here as to not interfere with the hover effect.
-                box.FadeColour(mouseDown ? AccentColour : Color4.White, duration);
             }
         }
     }
