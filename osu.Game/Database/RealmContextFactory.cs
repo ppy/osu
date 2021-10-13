@@ -135,9 +135,8 @@ namespace osu.Game.Database
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
-            // TODO: this can be added for safety once we figure how to bypass in test
-            // if (!ThreadSafety.IsUpdateThread)
-            //     throw new InvalidOperationException($"{nameof(BlockAllOperations)} must be called from the update thread.");
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException($"{nameof(BlockAllOperations)} must be called from the update thread.");
 
             Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
