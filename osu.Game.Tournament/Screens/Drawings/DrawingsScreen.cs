@@ -9,11 +9,13 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
@@ -51,6 +53,29 @@ namespace osu.Game.Tournament.Screens.Drawings
 
             if (!TeamList.Teams.Any())
             {
+                LinkFlowContainer links;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = Color4.Black,
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Height = 0.3f,
+                    },
+                    new WarningBox("No drawings.txt file found. Please create one and restart the client."),
+                    links = new LinkFlowContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Y = 60,
+                        AutoSizeAxes = Axes.Both
+                    }
+                };
+
+                links.AddLink("Click for details on the file format", "https://osu.ppy.sh/wiki/en/Tournament_Drawings", t => t.Colour = Color4.White);
                 return;
             }
 

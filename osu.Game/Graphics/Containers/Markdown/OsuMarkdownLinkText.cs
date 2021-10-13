@@ -26,6 +26,12 @@ namespace osu.Game.Graphics.Containers.Markdown
             title = linkInline.Title;
         }
 
+        public OsuMarkdownLinkText(AutolinkInline autolinkInline)
+            : base(autolinkInline)
+        {
+            text = autolinkInline.Url;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {

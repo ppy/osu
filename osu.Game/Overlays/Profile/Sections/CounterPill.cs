@@ -8,6 +8,7 @@ using osu.Game.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -48,7 +49,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void onCurrentChanged(ValueChangedEvent<int> value)
         {
-            counter.Text = value.NewValue.ToString("N0");
+            counter.Text = value.NewValue.ToLocalisableString("N0");
         }
     }
 }

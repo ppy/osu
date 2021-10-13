@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaSettingsSubsection : RulesetSettingsSubsection
     {
-        protected override string Header => "osu!mania";
+        protected override LocalisableString Header => "osu!mania";
 
         public ManiaSettingsSubsection(ManiaRuleset ruleset)
             : base(ruleset)

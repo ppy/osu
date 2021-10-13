@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -24,7 +25,9 @@ namespace osu.Game.Graphics.UserInterface
             set => current.Current = value;
         }
 
-        private SpriteText displayedCountSpriteText;
+        private IHasText displayedCountText;
+
+        public Drawable DrawableCount { get; private set; }
 
         /// <summary>
         /// If true, the roll-up duration will be proportional to change in value.
@@ -71,16 +74,16 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load()
         {
-            displayedCountSpriteText = CreateSpriteText();
+            displayedCountText = CreateText();
 
             UpdateDisplay();
-            Child = displayedCountSpriteText;
+            Child = DrawableCount = (Drawable)displayedCountText;
         }
 
         protected void UpdateDisplay()
         {
-            if (displayedCountSpriteText != null)
-                displayedCountSpriteText.Text = FormatCount(DisplayedCount);
+            if (displayedCountText != null)
+                displayedCountText.Text = FormatCount(DisplayedCount);
         }
 
         protected override void LoadComplete()
@@ -137,8 +140,8 @@ namespace osu.Game.Graphics.UserInterface
         /// Used to format counts.
         /// </summary>
         /// <param name="count">Count to format.</param>
-        /// <returns>Count formatted as a string.</returns>
-        protected virtual string FormatCount(T count)
+        /// <returns>Count formatted as a localisable string.</returns>
+        protected virtual LocalisableString FormatCount(T count)
         {
             return count.ToString();
         }
@@ -159,6 +162,15 @@ namespace osu.Game.Graphics.UserInterface
             this.TransformTo(nameof(DisplayedCount), newValue, rollingTotalDuration, RollingEasing);
         }
 
+        /// <summary>
+        /// Creates the text. Delegates to <see cref="CreateSpriteText"/> by default.
+        /// </summary>
+        protected virtual IHasText CreateText() => CreateSpriteText();
+
+        /// <summary>
+        /// Creates an <see cref="OsuSpriteText"/> which may be used to display this counter's text.
+        /// May not be called if <see cref="CreateText"/> is overridden.
+        /// </summary>
         protected virtual OsuSpriteText CreateSpriteText() => new OsuSpriteText
         {
             Font = OsuFont.Numeric.With(size: 40f),

@@ -1,15 +1,16 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using osu.Game.Users;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Game.Graphics.Containers;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -20,14 +21,14 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
         }
 
-        protected override TableColumn[] CreateAdditionalHeaders() => new[]
+        protected override RankingsTableColumn[] CreateAdditionalHeaders() => new[]
         {
-            new TableColumn("Active Users", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Avg. Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Avg. Perf.", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn(RankingsStrings.StatActiveUsers, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn(RankingsStrings.StatPlayCount, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn(RankingsStrings.StatRankedScore, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn(RankingsStrings.StatAverageScore, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn(RankingsStrings.StatPerformance, Anchor.Centre, new Dimension(GridSizeMode.AutoSize), true),
+            new RankingsTableColumn(RankingsStrings.StatAveragePerformance, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
         protected override Country GetCountry(CountryStatistics item) => item.Country;
@@ -36,61 +37,46 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override Drawable[] CreateAdditionalContent(CountryStatistics item) => new Drawable[]
         {
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = $@"{item.ActiveUsers:N0}",
+                Text = item.ActiveUsers.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = $@"{item.PlayCount:N0}",
+                Text = item.PlayCount.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = $@"{item.RankedScore:N0}",
+                Text = item.RankedScore.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = $@"{item.RankedScore / Math.Max(item.ActiveUsers, 1):N0}",
+                Text = (item.RankedScore / Math.Max(item.ActiveUsers, 1)).ToLocalisableString(@"N0")
             },
             new RowText
             {
-                Text = $@"{item.Performance:N0}",
+                Text = item.Performance.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = $@"{item.Performance / Math.Max(item.ActiveUsers, 1):N0}",
+                Text = (item.Performance / Math.Max(item.ActiveUsers, 1)).ToLocalisableString(@"N0")
             }
         };
 
-        private class CountryName : OsuHoverContainer
+        private class CountryName : LinkFlowContainer
         {
-            protected override IEnumerable<Drawable> EffectTargets => new[] { text };
-
             [Resolved(canBeNull: true)]
             private RankingsOverlay rankings { get; set; }
 
-            private readonly OsuSpriteText text;
-            private readonly Country country;
-
             public CountryName(Country country)
+                : base(t => t.Font = OsuFont.GetFont(size: 12))
             {
-                this.country = country;
+                AutoSizeAxes = Axes.X;
+                RelativeSizeAxes = Axes.Y;
+                TextAnchor = Anchor.CentreLeft;
 
-                AutoSizeAxes = Axes.Both;
-                Add(text = new OsuSpriteText
-                {
-                    Font = OsuFont.GetFont(size: 12),
-                    Text = country.FullName ?? string.Empty,
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                IdleColour = colourProvider.Light2;
-                HoverColour = colourProvider.Content2;
-
-                Action = () => rankings?.ShowCountry(country);
+                if (!string.IsNullOrEmpty(country.FullName))
+                    AddLink(country.FullName, () => rankings?.ShowCountry(country));
             }
         }
     }

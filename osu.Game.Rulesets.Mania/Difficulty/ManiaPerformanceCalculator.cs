@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -37,12 +36,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             mods = Score.Mods;
             scaledScore = Score.TotalScore;
-            countPerfect = Score.Statistics.GetOrDefault(HitResult.Perfect);
-            countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
-            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
-            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
-            countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
-            countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
+            countPerfect = Score.Statistics.GetValueOrDefault(HitResult.Perfect);
+            countGreat = Score.Statistics.GetValueOrDefault(HitResult.Great);
+            countGood = Score.Statistics.GetValueOrDefault(HitResult.Good);
+            countOk = Score.Statistics.GetValueOrDefault(HitResult.Ok);
+            countMeh = Score.Statistics.GetValueOrDefault(HitResult.Meh);
+            countMiss = Score.Statistics.GetValueOrDefault(HitResult.Miss);
 
             IEnumerable<Mod> scoreIncreaseMods = Ruleset.GetModsFor(ModType.DifficultyIncrease);
 

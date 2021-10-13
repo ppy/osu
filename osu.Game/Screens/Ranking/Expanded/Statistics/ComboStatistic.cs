@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
             if (isPerfect)
             {
-                using (BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DURATION / 2, true))
+                using (BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DURATION / 2))
                     perfectText.FadeIn(50);
             }
         }

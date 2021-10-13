@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
@@ -61,10 +62,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             ));
             AddStep("scroll up", () => triggerUserScroll(1));
             AddStep("scroll down", () => triggerUserScroll(-1));
+            AddStep("scroll up a bit", () => triggerUserScroll(0.1f));
+            AddStep("scroll down a bit", () => triggerUserScroll(-0.1f));
         }
 
         [Test]
-        public void TestCorrectSectionSelected()
+        public void TestCorrectSelectionAndVisibleTop()
         {
             const int sections_count = 11;
             float[] alternating = { 0.07f, 0.33f, 0.16f, 0.33f };
@@ -79,6 +82,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 AddStep($"scroll to section {scrollIndex + 1}", () => container.ScrollTo(container.Children[scrollIndex]));
                 AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children[scrollIndex]);
+                AddUntilStep("section top is visible", () =>
+                {
+                    float scrollPosition = container.ChildrenOfType<UserTrackingScrollContainer>().First().Current;
+                    float sectionTop = container.Children[scrollIndex].BoundingBox.Top;
+                    return scrollPosition < sectionTop;
+                });
             }
 
             for (int i = 1; i < sections_count; i++)

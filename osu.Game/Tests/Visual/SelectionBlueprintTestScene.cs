@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -23,7 +24,7 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        protected void AddBlueprint(HitObjectSelectionBlueprint blueprint, DrawableHitObject drawableObject)
+        protected void AddBlueprint(HitObjectSelectionBlueprint blueprint, [CanBeNull] DrawableHitObject drawableObject = null)
         {
             Add(blueprint.With(d =>
             {

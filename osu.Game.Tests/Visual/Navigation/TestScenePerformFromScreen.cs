@@ -58,8 +58,7 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestPerformAtSongSelectFromPlayerLoader()
         {
-            AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
-            PushAndConfirm(() => new TestPlaySongSelect());
+            importAndWaitForSongSelect();
 
             AddStep("Press enter", () => InputManager.Key(Key.Enter));
             AddUntilStep("Wait for new screen", () => Game.ScreenStack.CurrentScreen is PlayerLoader);
@@ -72,8 +71,7 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestPerformAtMenuFromPlayerLoader()
         {
-            AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
-            PushAndConfirm(() => new TestPlaySongSelect());
+            importAndWaitForSongSelect();
 
             AddStep("Press enter", () => InputManager.Key(Key.Enter));
             AddUntilStep("Wait for new screen", () => Game.ScreenStack.CurrentScreen is PlayerLoader);
@@ -170,6 +168,13 @@ namespace osu.Game.Tests.Visual.Navigation
                 AddAssert("screen didn't change", () => Game.ScreenStack.CurrentScreen == blocker);
                 AddAssert("did not perform", () => !actionPerformed);
             }
+        }
+
+        private void importAndWaitForSongSelect()
+        {
+            AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
+            PushAndConfirm(() => new TestPlaySongSelect());
+            AddUntilStep("beatmap updated", () => Game.Beatmap.Value.BeatmapSetInfo.OnlineBeatmapSetID == 241526);
         }
 
         public class DialogBlockingScreen : OsuScreen

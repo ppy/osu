@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
     public class WikiMarkdownImageBlock : FillFlowContainer
     {
         [Resolved]
-        private IMarkdownTextComponent parentTextComponent { get; set; }
+        private IMarkdownTextFlowComponent parentFlowComponent { get; set; }
 
         private readonly LinkInline linkInline;
 
@@ -31,16 +31,20 @@ namespace osu.Game.Overlays.Wiki.Markdown
         [BackgroundDependencyLoader]
         private void load()
         {
+            MarkdownTextFlowContainer textFlow;
+
             Children = new Drawable[]
             {
                 new BlockMarkdownImage(linkInline),
-                parentTextComponent.CreateSpriteText().With(t =>
+                textFlow = parentFlowComponent.CreateTextFlow().With(t =>
                 {
-                    t.Text = linkInline.Title;
                     t.Anchor = Anchor.TopCentre;
                     t.Origin = Anchor.TopCentre;
+                    t.TextAnchor = Anchor.TopCentre;
                 }),
             };
+
+            textFlow.AddText(linkInline.Title);
         }
 
         private class BlockMarkdownImage : WikiMarkdownImage

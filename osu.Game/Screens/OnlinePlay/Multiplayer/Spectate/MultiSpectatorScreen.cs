@@ -8,9 +8,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Spectate;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -24,12 +26,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         // We are managing our own adjustments. For now, this happens inside the Player instances themselves.
-        public override bool AllowRateAdjustments => false;
+        public override bool? AllowTrackAdjustments => false;
 
         /// <summary>
         /// Whether all spectating players have finished loading.
         /// </summary>
         public bool AllPlayersLoaded => instances.All(p => p?.PlayerLoaded == true);
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
@@ -45,20 +50,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private PlayerArea currentAudioSource;
         private bool canStartMasterClock;
 
+        private readonly MultiplayerRoomUser[] users;
+
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorScreen"/>.
         /// </summary>
-        /// <param name="userIds">The players to spectate.</param>
-        public MultiSpectatorScreen(int[] userIds)
-            : base(userIds.Take(PlayerGrid.MAX_PLAYERS).ToArray())
+        /// <param name="users">The players to spectate.</param>
+        public MultiSpectatorScreen(MultiplayerRoomUser[] users)
+            : base(users.Select(u => u.UserID).ToArray())
         {
-            instances = new PlayerArea[UserIds.Count];
+            this.users = users;
+
+            instances = new PlayerArea[Users.Count];
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Container leaderboardContainer;
+            Container scoreDisplayContainer;
+
             masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0);
 
             InternalChildren = new[]
@@ -67,28 +78,44 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 masterClockContainer.WithChild(new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.AutoSize)
-                    },
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                     Content = new[]
                     {
                         new Drawable[]
                         {
-                            leaderboardContainer = new Container
+                            scoreDisplayContainer = new Container
                             {
-                                RelativeSizeAxes = Axes.Y,
-                                AutoSizeAxes = Axes.X
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y
                             },
-                            grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                        },
+                        new Drawable[]
+                        {
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        leaderboardContainer = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Y,
+                                            AutoSizeAxes = Axes.X
+                                        },
+                                        grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                                    }
+                                }
+                            }
                         }
                     }
                 })
             };
 
-            for (int i = 0; i < UserIds.Count; i++)
+            for (int i = 0; i < Users.Count; i++)
             {
-                grid.Add(instances[i] = new PlayerArea(UserIds[i], masterClockContainer.GameplayClock));
+                grid.Add(instances[i] = new PlayerArea(Users[i], masterClockContainer.GameplayClock));
                 syncManager.AddPlayerClock(instances[i].GameplayClock);
             }
 
@@ -97,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
             scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, UserIds.ToArray())
+            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, users)
             {
                 Expanded = { Value = true },
                 Anchor = Anchor.CentreLeft,
@@ -108,6 +135,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                     leaderboard.AddClock(instance.UserId, instance.GameplayClock);
 
                 leaderboardContainer.Add(leaderboard);
+
+                if (leaderboard.TeamScores.Count == 2)
+                {
+                    LoadComponentAsync(new MatchScoreDisplay
+                    {
+                        Team1Score = { BindTarget = leaderboard.TeamScores.First().Value },
+                        Team2Score = { BindTarget = leaderboard.TeamScores.Last().Value },
+                    }, scoreDisplayContainer.Add);
+                }
             });
         }
 
@@ -177,12 +213,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
-        protected override void StartGameplay(int userId, GameplayState gameplayState)
-            => instances.Single(i => i.UserId == userId).LoadScore(gameplayState.Score);
+        protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState)
+            => instances.Single(i => i.UserId == userId).LoadScore(spectatorGameplayState.Score);
 
         protected override void EndGameplay(int userId)
         {
             RemoveUser(userId);
+
+            var instance = instances.Single(i => i.UserId == userId);
+
+            instance.FadeColour(colours.Gray4, 400, Easing.OutQuint);
+            syncManager.RemovePlayerClock(instance.GameplayClock);
             leaderboard.RemoveClock(userId);
         }
 

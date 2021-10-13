@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Utils;
@@ -63,7 +64,7 @@ namespace osu.Game.Screens.Play.Break
             valueText.Text = newText;
         }
 
-        protected virtual string Format(T count)
+        protected virtual LocalisableString Format(T count)
         {
             if (count is Enum countEnum)
                 return countEnum.GetDescription();
@@ -86,6 +87,6 @@ namespace osu.Game.Screens.Play.Break
         {
         }
 
-        protected override string Format(double count) => count.FormatAccuracy();
+        protected override LocalisableString Format(double count) => count.FormatAccuracy();
     }
 }

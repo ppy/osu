@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -83,10 +84,10 @@ namespace osu.Game.Skinning
         private static Color4 getFillColour(double hp)
         {
             if (hp < 0.2)
-                return Interpolation.ValueAt(0.2 - hp, Color4.Black, Color4.Red, 0, 0.2);
+                return LegacyUtils.InterpolateNonLinear(0.2 - hp, Color4.Black, Color4.Red, 0, 0.2);
 
             if (hp < epic_cutoff)
-                return Interpolation.ValueAt(0.5 - hp, Color4.White, Color4.Black, 0, 0.5);
+                return LegacyUtils.InterpolateNonLinear(0.5 - hp, Color4.White, Color4.Black, 0, 0.5);
 
             return Color4.White;
         }

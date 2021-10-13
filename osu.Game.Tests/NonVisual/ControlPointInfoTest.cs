@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Tests.NonVisual
 {
@@ -64,7 +65,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestAddRedundantSample()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             cpi.Add(0, new SampleControlPoint()); // is *not* redundant, special exception for first sample point
             cpi.Add(1000, new SampleControlPoint()); // is redundant
@@ -142,7 +143,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestRemoveGroupAlsoRemovedControlPoints()
         {
-            var cpi = new ControlPointInfo();
+            var cpi = new LegacyControlPointInfo();
 
             var group = cpi.GroupAt(1000, true);
 
@@ -248,13 +249,13 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [Test]
-        public void TestCreateCopyIsDeepClone()
+        public void TestDeepClone()
         {
             var cpi = new ControlPointInfo();
 
             cpi.Add(1000, new TimingControlPoint { BeatLength = 500 });
 
-            var cpiCopy = cpi.CreateCopy();
+            var cpiCopy = cpi.DeepClone();
 
             cpiCopy.Add(2000, new TimingControlPoint { BeatLength = 500 });
 

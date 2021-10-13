@@ -10,13 +10,14 @@ using osu.Game.Online.API;
 using System.Collections.Generic;
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class PaginatedRecentActivityContainer : PaginatedProfileSubsection<APIRecentActivity>
     {
         public PaginatedRecentActivityContainer(Bindable<User> user)
-            : base(user, missingText: "This user hasn't done anything notable recently!")
+            : base(user, missingText: EventsStrings.Empty)
         {
             ItemsPerPage = 10;
         }

@@ -117,6 +117,7 @@ namespace osu.Game.Rulesets.Catch
                     {
                         new CatchModDifficultyAdjust(),
                         new CatchModClassic(),
+                        new CatchModMirror(),
                     };
 
                 case ModType.Automation:
@@ -130,7 +131,8 @@ namespace osu.Game.Rulesets.Catch
                     return new Mod[]
                     {
                         new MultiMod(new ModWindUp(), new ModWindDown()),
-                        new CatchModFloatingFruits()
+                        new CatchModFloatingFruits(),
+                        new CatchModMuted(),
                     };
 
                 default:

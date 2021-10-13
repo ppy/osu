@@ -3,15 +3,12 @@
 
 using System;
 using System.IO;
-using NUnit.Framework;
-using osuTK;
-using osuTK.Graphics;
-using osu.Game.Tests.Resources;
 using System.Linq;
+using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
 using osu.Game.Rulesets.Catch;
@@ -19,9 +16,13 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Skinning;
+using osu.Game.Tests.Resources;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -58,12 +59,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", metadata.AudioFile);
                 Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
                 Assert.AreEqual(164471, metadata.PreviewTime);
-                Assert.IsFalse(beatmapInfo.Countdown);
                 Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
                 Assert.IsTrue(beatmapInfo.RulesetID == 0);
                 Assert.IsFalse(beatmapInfo.LetterboxInBreaks);
                 Assert.IsFalse(beatmapInfo.SpecialStyle);
                 Assert.IsFalse(beatmapInfo.WidescreenStoryboard);
+                Assert.IsFalse(beatmapInfo.SamplesMatchPlaybackRate);
+                Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);
+                Assert.AreEqual(0, beatmapInfo.CountdownOffset);
             }
         }
 
@@ -126,7 +129,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var difficulty = decoder.Decode(stream).BeatmapInfo.BaseDifficulty;
+                var difficulty = decoder.Decode(stream).Difficulty;
 
                 Assert.AreEqual(6.5f, difficulty.DrainRate);
                 Assert.AreEqual(4, difficulty.CircleSize);
@@ -165,7 +168,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = new LineBufferedReader(resStream))
             {
                 var beatmap = decoder.Decode(stream);
-                var controlPoints = beatmap.ControlPointInfo;
+                var controlPoints = (LegacyControlPointInfo)beatmap.ControlPointInfo;
 
                 Assert.AreEqual(4, controlPoints.TimingPoints.Count);
                 Assert.AreEqual(5, controlPoints.DifficultyPoints.Count);
@@ -239,7 +242,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("overlapping-control-points.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var controlPoints = decoder.Decode(stream).ControlPointInfo;
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
 
                 Assert.That(controlPoints.TimingPoints.Count, Is.EqualTo(4));
                 Assert.That(controlPoints.DifficultyPoints.Count, Is.EqualTo(3));
@@ -323,12 +326,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new OsuBeatmapProcessor(converted).PreProcess();
                 new OsuBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndex);
-                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndex);
-                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndex);
-                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndex);
+                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
+                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
+                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
+                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
             }
         }
 
@@ -346,12 +349,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new CatchBeatmapProcessor(converted).PreProcess();
                 new CatchBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndex);
-                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndex);
-                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndex);
-                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndex);
+                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
+                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
+                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
+                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
             }
         }
 
@@ -665,111 +668,111 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 // Multi-segment
                 var first = ((IHasPath)decoded.HitObjects[0]).Path;
 
-                Assert.That(first.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
-                Assert.That(first.ControlPoints[0].Type.Value, Is.EqualTo(PathType.PerfectCurve));
-                Assert.That(first.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(161, -244)));
-                Assert.That(first.ControlPoints[1].Type.Value, Is.EqualTo(null));
+                Assert.That(first.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
+                Assert.That(first.ControlPoints[0].Type, Is.EqualTo(PathType.PerfectCurve));
+                Assert.That(first.ControlPoints[1].Position, Is.EqualTo(new Vector2(161, -244)));
+                Assert.That(first.ControlPoints[1].Type, Is.EqualTo(null));
 
-                Assert.That(first.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(376, -3)));
-                Assert.That(first.ControlPoints[2].Type.Value, Is.EqualTo(PathType.Bezier));
-                Assert.That(first.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(68, 15)));
-                Assert.That(first.ControlPoints[3].Type.Value, Is.EqualTo(null));
-                Assert.That(first.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(259, -132)));
-                Assert.That(first.ControlPoints[4].Type.Value, Is.EqualTo(null));
-                Assert.That(first.ControlPoints[5].Position.Value, Is.EqualTo(new Vector2(92, -107)));
-                Assert.That(first.ControlPoints[5].Type.Value, Is.EqualTo(null));
+                Assert.That(first.ControlPoints[2].Position, Is.EqualTo(new Vector2(376, -3)));
+                Assert.That(first.ControlPoints[2].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(first.ControlPoints[3].Position, Is.EqualTo(new Vector2(68, 15)));
+                Assert.That(first.ControlPoints[3].Type, Is.EqualTo(null));
+                Assert.That(first.ControlPoints[4].Position, Is.EqualTo(new Vector2(259, -132)));
+                Assert.That(first.ControlPoints[4].Type, Is.EqualTo(null));
+                Assert.That(first.ControlPoints[5].Position, Is.EqualTo(new Vector2(92, -107)));
+                Assert.That(first.ControlPoints[5].Type, Is.EqualTo(null));
 
                 // Single-segment
                 var second = ((IHasPath)decoded.HitObjects[1]).Path;
 
-                Assert.That(second.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
-                Assert.That(second.ControlPoints[0].Type.Value, Is.EqualTo(PathType.PerfectCurve));
-                Assert.That(second.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(161, -244)));
-                Assert.That(second.ControlPoints[1].Type.Value, Is.EqualTo(null));
-                Assert.That(second.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(376, -3)));
-                Assert.That(second.ControlPoints[2].Type.Value, Is.EqualTo(null));
+                Assert.That(second.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
+                Assert.That(second.ControlPoints[0].Type, Is.EqualTo(PathType.PerfectCurve));
+                Assert.That(second.ControlPoints[1].Position, Is.EqualTo(new Vector2(161, -244)));
+                Assert.That(second.ControlPoints[1].Type, Is.EqualTo(null));
+                Assert.That(second.ControlPoints[2].Position, Is.EqualTo(new Vector2(376, -3)));
+                Assert.That(second.ControlPoints[2].Type, Is.EqualTo(null));
 
                 // Implicit multi-segment
                 var third = ((IHasPath)decoded.HitObjects[2]).Path;
 
-                Assert.That(third.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
-                Assert.That(third.ControlPoints[0].Type.Value, Is.EqualTo(PathType.Bezier));
-                Assert.That(third.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(0, 192)));
-                Assert.That(third.ControlPoints[1].Type.Value, Is.EqualTo(null));
-                Assert.That(third.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(224, 192)));
-                Assert.That(third.ControlPoints[2].Type.Value, Is.EqualTo(null));
+                Assert.That(third.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
+                Assert.That(third.ControlPoints[0].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(third.ControlPoints[1].Position, Is.EqualTo(new Vector2(0, 192)));
+                Assert.That(third.ControlPoints[1].Type, Is.EqualTo(null));
+                Assert.That(third.ControlPoints[2].Position, Is.EqualTo(new Vector2(224, 192)));
+                Assert.That(third.ControlPoints[2].Type, Is.EqualTo(null));
 
-                Assert.That(third.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(224, 0)));
-                Assert.That(third.ControlPoints[3].Type.Value, Is.EqualTo(PathType.Bezier));
-                Assert.That(third.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(224, -192)));
-                Assert.That(third.ControlPoints[4].Type.Value, Is.EqualTo(null));
-                Assert.That(third.ControlPoints[5].Position.Value, Is.EqualTo(new Vector2(480, -192)));
-                Assert.That(third.ControlPoints[5].Type.Value, Is.EqualTo(null));
-                Assert.That(third.ControlPoints[6].Position.Value, Is.EqualTo(new Vector2(480, 0)));
-                Assert.That(third.ControlPoints[6].Type.Value, Is.EqualTo(null));
+                Assert.That(third.ControlPoints[3].Position, Is.EqualTo(new Vector2(224, 0)));
+                Assert.That(third.ControlPoints[3].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(third.ControlPoints[4].Position, Is.EqualTo(new Vector2(224, -192)));
+                Assert.That(third.ControlPoints[4].Type, Is.EqualTo(null));
+                Assert.That(third.ControlPoints[5].Position, Is.EqualTo(new Vector2(480, -192)));
+                Assert.That(third.ControlPoints[5].Type, Is.EqualTo(null));
+                Assert.That(third.ControlPoints[6].Position, Is.EqualTo(new Vector2(480, 0)));
+                Assert.That(third.ControlPoints[6].Type, Is.EqualTo(null));
 
                 // Last control point duplicated
                 var fourth = ((IHasPath)decoded.HitObjects[3]).Path;
 
-                Assert.That(fourth.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
-                Assert.That(fourth.ControlPoints[0].Type.Value, Is.EqualTo(PathType.Bezier));
-                Assert.That(fourth.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(1, 1)));
-                Assert.That(fourth.ControlPoints[1].Type.Value, Is.EqualTo(null));
-                Assert.That(fourth.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(2, 2)));
-                Assert.That(fourth.ControlPoints[2].Type.Value, Is.EqualTo(null));
-                Assert.That(fourth.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(3, 3)));
-                Assert.That(fourth.ControlPoints[3].Type.Value, Is.EqualTo(null));
-                Assert.That(fourth.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(3, 3)));
-                Assert.That(fourth.ControlPoints[4].Type.Value, Is.EqualTo(null));
+                Assert.That(fourth.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
+                Assert.That(fourth.ControlPoints[0].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(fourth.ControlPoints[1].Position, Is.EqualTo(new Vector2(1, 1)));
+                Assert.That(fourth.ControlPoints[1].Type, Is.EqualTo(null));
+                Assert.That(fourth.ControlPoints[2].Position, Is.EqualTo(new Vector2(2, 2)));
+                Assert.That(fourth.ControlPoints[2].Type, Is.EqualTo(null));
+                Assert.That(fourth.ControlPoints[3].Position, Is.EqualTo(new Vector2(3, 3)));
+                Assert.That(fourth.ControlPoints[3].Type, Is.EqualTo(null));
+                Assert.That(fourth.ControlPoints[4].Position, Is.EqualTo(new Vector2(3, 3)));
+                Assert.That(fourth.ControlPoints[4].Type, Is.EqualTo(null));
 
                 // Last control point in segment duplicated
                 var fifth = ((IHasPath)decoded.HitObjects[4]).Path;
 
-                Assert.That(fifth.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
-                Assert.That(fifth.ControlPoints[0].Type.Value, Is.EqualTo(PathType.Bezier));
-                Assert.That(fifth.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(1, 1)));
-                Assert.That(fifth.ControlPoints[1].Type.Value, Is.EqualTo(null));
-                Assert.That(fifth.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(2, 2)));
-                Assert.That(fifth.ControlPoints[2].Type.Value, Is.EqualTo(null));
-                Assert.That(fifth.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(3, 3)));
-                Assert.That(fifth.ControlPoints[3].Type.Value, Is.EqualTo(null));
-                Assert.That(fifth.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(3, 3)));
-                Assert.That(fifth.ControlPoints[4].Type.Value, Is.EqualTo(null));
+                Assert.That(fifth.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
+                Assert.That(fifth.ControlPoints[0].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(fifth.ControlPoints[1].Position, Is.EqualTo(new Vector2(1, 1)));
+                Assert.That(fifth.ControlPoints[1].Type, Is.EqualTo(null));
+                Assert.That(fifth.ControlPoints[2].Position, Is.EqualTo(new Vector2(2, 2)));
+                Assert.That(fifth.ControlPoints[2].Type, Is.EqualTo(null));
+                Assert.That(fifth.ControlPoints[3].Position, Is.EqualTo(new Vector2(3, 3)));
+                Assert.That(fifth.ControlPoints[3].Type, Is.EqualTo(null));
+                Assert.That(fifth.ControlPoints[4].Position, Is.EqualTo(new Vector2(3, 3)));
+                Assert.That(fifth.ControlPoints[4].Type, Is.EqualTo(null));
 
-                Assert.That(fifth.ControlPoints[5].Position.Value, Is.EqualTo(new Vector2(4, 4)));
-                Assert.That(fifth.ControlPoints[5].Type.Value, Is.EqualTo(PathType.Bezier));
-                Assert.That(fifth.ControlPoints[6].Position.Value, Is.EqualTo(new Vector2(5, 5)));
-                Assert.That(fifth.ControlPoints[6].Type.Value, Is.EqualTo(null));
+                Assert.That(fifth.ControlPoints[5].Position, Is.EqualTo(new Vector2(4, 4)));
+                Assert.That(fifth.ControlPoints[5].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(fifth.ControlPoints[6].Position, Is.EqualTo(new Vector2(5, 5)));
+                Assert.That(fifth.ControlPoints[6].Type, Is.EqualTo(null));
 
                 // Implicit perfect-curve multi-segment(Should convert to bezier to match stable)
                 var sixth = ((IHasPath)decoded.HitObjects[5]).Path;
 
-                Assert.That(sixth.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
-                Assert.That(sixth.ControlPoints[0].Type.Value == PathType.Bezier);
-                Assert.That(sixth.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(75, 145)));
-                Assert.That(sixth.ControlPoints[1].Type.Value == null);
-                Assert.That(sixth.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(170, 75)));
+                Assert.That(sixth.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
+                Assert.That(sixth.ControlPoints[0].Type == PathType.Bezier);
+                Assert.That(sixth.ControlPoints[1].Position, Is.EqualTo(new Vector2(75, 145)));
+                Assert.That(sixth.ControlPoints[1].Type == null);
+                Assert.That(sixth.ControlPoints[2].Position, Is.EqualTo(new Vector2(170, 75)));
 
-                Assert.That(sixth.ControlPoints[2].Type.Value == PathType.Bezier);
-                Assert.That(sixth.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(300, 145)));
-                Assert.That(sixth.ControlPoints[3].Type.Value == null);
-                Assert.That(sixth.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(410, 20)));
-                Assert.That(sixth.ControlPoints[4].Type.Value == null);
+                Assert.That(sixth.ControlPoints[2].Type == PathType.Bezier);
+                Assert.That(sixth.ControlPoints[3].Position, Is.EqualTo(new Vector2(300, 145)));
+                Assert.That(sixth.ControlPoints[3].Type == null);
+                Assert.That(sixth.ControlPoints[4].Position, Is.EqualTo(new Vector2(410, 20)));
+                Assert.That(sixth.ControlPoints[4].Type == null);
 
                 // Explicit perfect-curve multi-segment(Should not convert to bezier)
                 var seventh = ((IHasPath)decoded.HitObjects[6]).Path;
 
-                Assert.That(seventh.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
-                Assert.That(seventh.ControlPoints[0].Type.Value == PathType.PerfectCurve);
-                Assert.That(seventh.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(75, 145)));
-                Assert.That(seventh.ControlPoints[1].Type.Value == null);
-                Assert.That(seventh.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(170, 75)));
+                Assert.That(seventh.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
+                Assert.That(seventh.ControlPoints[0].Type == PathType.PerfectCurve);
+                Assert.That(seventh.ControlPoints[1].Position, Is.EqualTo(new Vector2(75, 145)));
+                Assert.That(seventh.ControlPoints[1].Type == null);
+                Assert.That(seventh.ControlPoints[2].Position, Is.EqualTo(new Vector2(170, 75)));
 
-                Assert.That(seventh.ControlPoints[2].Type.Value == PathType.PerfectCurve);
-                Assert.That(seventh.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(300, 145)));
-                Assert.That(seventh.ControlPoints[3].Type.Value == null);
-                Assert.That(seventh.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(410, 20)));
-                Assert.That(seventh.ControlPoints[4].Type.Value == null);
+                Assert.That(seventh.ControlPoints[2].Type == PathType.PerfectCurve);
+                Assert.That(seventh.ControlPoints[3].Position, Is.EqualTo(new Vector2(300, 145)));
+                Assert.That(seventh.ControlPoints[3].Type == null);
+                Assert.That(seventh.ControlPoints[4].Position, Is.EqualTo(new Vector2(410, 20)));
+                Assert.That(seventh.ControlPoints[4].Type == null);
             }
         }
     }

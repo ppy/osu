@@ -100,6 +100,14 @@ namespace osu.Game.Tests.Gameplay
                 set => ComboIndexBindable.Value = value;
             }
 
+            public Bindable<int> ComboIndexWithOffsetsBindable { get; } = new Bindable<int>();
+
+            public int ComboIndexWithOffsets
+            {
+                get => ComboIndexWithOffsetsBindable.Value;
+                set => ComboIndexWithOffsetsBindable.Value = value;
+            }
+
             public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
 
             public bool LastInCombo
@@ -129,14 +137,8 @@ namespace osu.Game.Tests.Gameplay
             {
                 switch (lookup)
                 {
-                    case GlobalSkinColours global:
-                        switch (global)
-                        {
-                            case GlobalSkinColours.ComboColours:
-                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(ComboColours));
-                        }
-
-                        break;
+                    case SkinComboColourLookup comboColour:
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(ComboColours[comboColour.ColourIndex % ComboColours.Count]));
                 }
 
                 throw new NotImplementedException();

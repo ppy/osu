@@ -49,14 +49,16 @@ namespace osu.Game.Screens
             switch (introSequence)
             {
                 case IntroSequence.Circles:
-                    return new IntroCircles();
+                    return new IntroCircles(createMainMenu);
 
                 case IntroSequence.Welcome:
-                    return new IntroWelcome();
+                    return new IntroWelcome(createMainMenu);
 
                 default:
-                    return new IntroTriangles();
+                    return new IntroTriangles(createMainMenu);
             }
+
+            MainMenu createMainMenu() => new MainMenu();
         }
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();

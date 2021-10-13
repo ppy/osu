@@ -2,19 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Humanizer;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -22,51 +18,29 @@ namespace osu.Game.Screens.OnlinePlay
     {
         public const float HEIGHT = 80;
 
+        private readonly ScreenStack stack;
+        private readonly MultiHeaderTitle title;
+
         public Header(string mainTitle, ScreenStack stack)
         {
+            this.stack = stack;
+
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
+            Padding = new MarginPadding { Left = WaveOverlayContainer.WIDTH_PADDING };
 
-            HeaderBreadcrumbControl breadcrumbs;
-            MultiHeaderTitle title;
-
-            Children = new Drawable[]
+            Child = title = new MultiHeaderTitle(mainTitle)
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex(@"#1f1921"),
-                },
-                new Container
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = WaveOverlayContainer.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
-                    Children = new Drawable[]
-                    {
-                        title = new MultiHeaderTitle(mainTitle)
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.BottomLeft,
-                        },
-                        breadcrumbs = new HeaderBreadcrumbControl(stack)
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft
-                        }
-                    },
-                },
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
             };
 
-            breadcrumbs.Current.ValueChanged += screen =>
-            {
-                if (screen.NewValue is IOnlinePlaySubScreen onlineSubScreen)
-                    title.Screen = onlineSubScreen;
-            };
-
-            breadcrumbs.Current.TriggerChange();
+            // unnecessary to unbind these as this header has the same lifetime as the screen stack we are attaching to.
+            stack.ScreenPushed += (_, __) => updateSubScreenTitle();
+            stack.ScreenExited += (_, __) => updateSubScreenTitle();
         }
+
+        private void updateSubScreenTitle() => title.Screen = stack.CurrentScreen as IOnlinePlaySubScreen;
 
         private class MultiHeaderTitle : CompositeDrawable
         {
@@ -75,9 +49,10 @@ namespace osu.Game.Screens.OnlinePlay
             private readonly OsuSpriteText dot;
             private readonly OsuSpriteText pageTitle;
 
+            [CanBeNull]
             public IOnlinePlaySubScreen Screen
             {
-                set => pageTitle.Text = value.ShortTitle.Titleize();
+                set => pageTitle.Text = value?.ShortTitle.Titleize() ?? string.Empty;
             }
 
             public MultiHeaderTitle(string mainTitle)
@@ -97,21 +72,21 @@ namespace osu.Game.Screens.OnlinePlay
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.GetFont(size: 24),
+                                Font = OsuFont.TorusAlternate.With(size: 24),
                                 Text = mainTitle
                             },
                             dot = new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.GetFont(size: 24),
+                                Font = OsuFont.TorusAlternate.With(size: 24),
                                 Text = "·"
                             },
                             pageTitle = new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.GetFont(size: 24),
+                                Font = OsuFont.TorusAlternate.With(size: 24),
                                 Text = "Lounge"
                             }
                         }
@@ -123,36 +98,6 @@ namespace osu.Game.Screens.OnlinePlay
             private void load(OsuColour colours)
             {
                 pageTitle.Colour = dot.Colour = colours.Yellow;
-            }
-        }
-
-        private class HeaderBreadcrumbControl : ScreenBreadcrumbControl
-        {
-            public HeaderBreadcrumbControl(ScreenStack stack)
-                : base(stack)
-            {
-                RelativeSizeAxes = Axes.X;
-                StripColour = Color4.Transparent;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                AccentColour = Color4Extensions.FromHex("#e35c99");
-            }
-
-            protected override TabItem<IScreen> CreateTabItem(IScreen value) => new HeaderBreadcrumbTabItem(value)
-            {
-                AccentColour = AccentColour
-            };
-
-            private class HeaderBreadcrumbTabItem : BreadcrumbTabItem
-            {
-                public HeaderBreadcrumbTabItem(IScreen value)
-                    : base(value)
-                {
-                    Bar.Colour = Color4.Transparent;
-                }
             }
         }
     }

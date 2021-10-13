@@ -11,11 +11,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
-using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
-using osu.Game.Users;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Menu;
+using osu.Game.Users;
 
 namespace osu.Game.Screens
 {
@@ -81,7 +81,10 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
-        public virtual bool AllowRateAdjustments => true;
+        [Resolved]
+        private MusicController musicController { get; set; }
+
+        public virtual bool? AllowTrackAdjustments => null;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
@@ -90,6 +93,8 @@ namespace osu.Game.Screens
         public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
 
         private OsuScreenDependencies screenDependencies;
+
+        private bool? trackAdjustmentStateAtSuspend;
 
         internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
 
@@ -170,7 +175,13 @@ namespace osu.Game.Screens
         {
             if (PlayResumeSound)
                 sampleExit?.Play();
+
             applyArrivingDefaults(true);
+
+            // it's feasible to resume to a screen if the target screen never loaded successfully.
+            // in such a case there's no need to restore this value.
+            if (trackAdjustmentStateAtSuspend != null)
+                musicController.AllowTrackAdjustments = trackAdjustmentStateAtSuspend.Value;
 
             base.OnResuming(last);
         }
@@ -179,6 +190,8 @@ namespace osu.Game.Screens
         {
             base.OnSuspending(next);
 
+            trackAdjustmentStateAtSuspend = musicController.AllowTrackAdjustments;
+
             onSuspendingLogo();
         }
 
@@ -186,17 +199,17 @@ namespace osu.Game.Screens
         {
             applyArrivingDefaults(false);
 
-            backgroundStack?.Push(ownedBackground = CreateBackground());
+            if (AllowTrackAdjustments != null)
+                musicController.AllowTrackAdjustments = AllowTrackAdjustments.Value;
 
-            background = backgroundStack?.CurrentScreen as BackgroundScreen;
-
-            if (background != ownedBackground)
+            if (backgroundStack?.Push(ownedBackground = CreateBackground()) != true)
             {
-                // background may have not been replaced, at which point we don't want to track the background lifetime.
+                // If the constructed instance was not actually pushed to the background stack, we don't want to track it unnecessarily.
                 ownedBackground?.Dispose();
                 ownedBackground = null;
             }
 
+            background = backgroundStack?.CurrentScreen as BackgroundScreen;
             base.OnEntering(last);
         }
 
@@ -242,7 +255,6 @@ namespace osu.Game.Screens
             logo.Anchor = Anchor.TopLeft;
             logo.Origin = Anchor.Centre;
             logo.RelativePositionAxes = Axes.Both;
-            logo.BeatMatching = true;
             logo.Triangles = true;
             logo.Ripple = true;
         }

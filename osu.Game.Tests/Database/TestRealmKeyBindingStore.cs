@@ -11,6 +11,7 @@ using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets;
 using Realms;
 
 namespace osu.Game.Tests.Database
@@ -31,53 +32,63 @@ namespace osu.Game.Tests.Database
 
             storage = new NativeStorage(directory.FullName);
 
-            realmContextFactory = new RealmContextFactory(storage);
+            realmContextFactory = new RealmContextFactory(storage, "test");
             keyBindingStore = new RealmKeyBindingStore(realmContextFactory);
         }
 
         [Test]
         public void TestDefaultsPopulationAndQuery()
         {
-            Assert.That(query().Count, Is.EqualTo(0));
+            Assert.That(queryCount(), Is.EqualTo(0));
 
             KeyBindingContainer testContainer = new TestKeyBindingContainer();
 
-            keyBindingStore.Register(testContainer);
+            keyBindingStore.Register(testContainer, Enumerable.Empty<RulesetInfo>());
 
-            Assert.That(query().Count, Is.EqualTo(3));
+            Assert.That(queryCount(), Is.EqualTo(3));
 
-            Assert.That(query().Where(k => k.ActionInt == (int)GlobalAction.Back).Count, Is.EqualTo(1));
-            Assert.That(query().Where(k => k.ActionInt == (int)GlobalAction.Select).Count, Is.EqualTo(2));
+            Assert.That(queryCount(GlobalAction.Back), Is.EqualTo(1));
+            Assert.That(queryCount(GlobalAction.Select), Is.EqualTo(2));
         }
 
-        private IQueryable<RealmKeyBinding> query() => realmContextFactory.Context.All<RealmKeyBinding>();
+        private int queryCount(GlobalAction? match = null)
+        {
+            using (var realm = realmContextFactory.CreateContext())
+            {
+                var results = realm.All<RealmKeyBinding>();
+                if (match.HasValue)
+                    results = results.Where(k => k.ActionInt == (int)match.Value);
+                return results.Count();
+            }
+        }
 
         [Test]
         public void TestUpdateViaQueriedReference()
         {
             KeyBindingContainer testContainer = new TestKeyBindingContainer();
 
-            keyBindingStore.Register(testContainer);
+            keyBindingStore.Register(testContainer, Enumerable.Empty<RulesetInfo>());
 
-            var backBinding = query().Single(k => k.ActionInt == (int)GlobalAction.Back);
-
-            Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.Escape }));
-
-            var tsr = ThreadSafeReference.Create(backBinding);
-
-            using (var usage = realmContextFactory.GetForWrite())
+            using (var primaryRealm = realmContextFactory.CreateContext())
             {
-                var binding = usage.Realm.ResolveReference(tsr);
-                binding.KeyCombination = new KeyCombination(InputKey.BackSpace);
+                var backBinding = primaryRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
 
-                usage.Commit();
+                Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.Escape }));
+
+                var tsr = ThreadSafeReference.Create(backBinding);
+
+                using (var threadedContext = realmContextFactory.CreateContext())
+                {
+                    var binding = threadedContext.ResolveReference(tsr);
+                    threadedContext.Write(() => binding.KeyCombination = new KeyCombination(InputKey.BackSpace));
+                }
+
+                Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
+
+                // check still correct after re-query.
+                backBinding = primaryRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
+                Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
             }
-
-            Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
-
-            // check still correct after re-query.
-            backBinding = query().Single(k => k.ActionInt == (int)GlobalAction.Back);
-            Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
         }
 
         [TearDown]

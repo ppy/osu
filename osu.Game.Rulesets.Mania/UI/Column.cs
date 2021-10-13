@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -19,6 +19,7 @@ using osuTK;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -27,12 +28,6 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public const float COLUMN_WIDTH = 80;
         public const float SPECIAL_COLUMN_WIDTH = 70;
-
-        /// <summary>
-        /// For hitsounds played by this <see cref="Column"/> (i.e. not as a result of hitting a hitobject),
-        /// a certain number of samples are allowed to be played concurrently so that it feels better when spam-pressing the key.
-        /// </summary>
-        private const int max_concurrent_hitsounds = OsuGameBase.SAMPLE_CONCURRENCY;
 
         /// <summary>
         /// The index of this column as part of the whole playfield.
@@ -45,9 +40,9 @@ namespace osu.Game.Rulesets.Mania.UI
         internal readonly Container TopLevelContainer;
         private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
         private readonly OrderedHitPolicy hitPolicy;
-        private readonly Container<SkinnableSound> hitSounds;
-
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
+
+        private readonly GameplaySampleTriggerSource sampleTriggerSource;
 
         public Column(int index)
         {
@@ -64,6 +59,7 @@ namespace osu.Game.Rulesets.Mania.UI
             InternalChildren = new[]
             {
                 hitExplosionPool = new DrawablePool<PoolableHitExplosion>(5),
+                sampleTriggerSource = new GameplaySampleTriggerSource(HitObjectContainer),
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
                 HitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
@@ -72,12 +68,6 @@ namespace osu.Game.Rulesets.Mania.UI
                     RelativeSizeAxes = Axes.Both
                 },
                 background,
-                hitSounds = new Container<SkinnableSound>
-                {
-                    Name = "Column samples pool",
-                    RelativeSizeAxes = Axes.Both,
-                    Children = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound()).ToArray()
-                },
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
@@ -133,33 +123,16 @@ namespace osu.Game.Rulesets.Mania.UI
             HitObjectArea.Explosions.Add(hitExplosionPool.Get(e => e.Apply(result)));
         }
 
-        private int nextHitSoundIndex;
-
-        public bool OnPressed(ManiaAction action)
+        public bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action != Action.Value)
+            if (e.Action != Action.Value)
                 return false;
 
-            var nextObject =
-                HitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ??
-                // fallback to non-alive objects to find next off-screen object
-                HitObjectContainer.Objects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ??
-                HitObjectContainer.Objects.LastOrDefault();
-
-            if (nextObject is DrawableManiaHitObject maniaObject)
-            {
-                var hitSound = hitSounds[nextHitSoundIndex];
-
-                hitSound.Samples = maniaObject.GetGameplaySamples();
-                hitSound.Play();
-
-                nextHitSoundIndex = (nextHitSoundIndex + 1) % max_concurrent_hitsounds;
-            }
-
+            sampleTriggerSource.Play();
             return true;
         }
 
-        public void OnReleased(ManiaAction action)
+        public void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
         }
 

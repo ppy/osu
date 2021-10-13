@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
@@ -30,6 +31,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             nestedStrongHit.Result.Type = hitBoth ? Type : HitResult.Miss;
         }
 
-        public override bool OnPressed(TaikoAction action) => false;
+        public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
     }
 }

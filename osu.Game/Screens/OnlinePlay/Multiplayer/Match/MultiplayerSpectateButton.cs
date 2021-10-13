@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -57,14 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void updateState()
         {
-            var localUser = Client.LocalUser;
-
-            if (localUser == null)
-                return;
-
-            Debug.Assert(Room != null);
-
-            switch (localUser.State)
+            switch (Client.LocalUser?.State)
             {
                 default:
                     button.Text = "Spectate";
@@ -81,7 +73,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            button.Enabled.Value = Client.Room?.State != MultiplayerRoomState.Closed && !operationInProgress.Value;
+            button.Enabled.Value = Client.Room != null
+                                   && Client.Room.State != MultiplayerRoomState.Closed
+                                   && !operationInProgress.Value;
         }
 
         private class ButtonWithTrianglesExposed : TriangleButton

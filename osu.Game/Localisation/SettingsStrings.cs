@@ -7,7 +7,7 @@ namespace osu.Game.Localisation
 {
     public static class SettingsStrings
     {
-        private const string prefix = @"osu.Game.Localisation.Settings";
+        private const string prefix = @"osu.Game.Resources.Localisation.Settings";
 
         /// <summary>
         /// "settings"

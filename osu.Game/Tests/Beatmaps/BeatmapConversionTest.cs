@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
+using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -109,6 +110,8 @@ namespace osu.Game.Tests.Beatmaps
         {
             var beatmap = GetBeatmap(name);
 
+            string beforeConversion = beatmap.Serialize();
+
             var converterResult = new Dictionary<HitObject, IEnumerable<HitObject>>();
 
             var working = new ConversionWorkingBeatmap(beatmap)
@@ -121,6 +124,10 @@ namespace osu.Game.Tests.Beatmaps
             };
 
             working.GetPlayableBeatmap(CreateRuleset().RulesetInfo, mods);
+
+            string afterConversion = beatmap.Serialize();
+
+            Assert.AreEqual(beforeConversion, afterConversion, "Conversion altered original beatmap");
 
             return new ConvertResult
             {
@@ -217,7 +224,7 @@ namespace osu.Game.Tests.Beatmaps
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 
-            protected override ISkin GetSkin() => throw new NotImplementedException();
+            protected internal override ISkin GetSkin() => throw new NotImplementedException();
 
             public override Stream GetStream(string storagePath) => throw new NotImplementedException();
 

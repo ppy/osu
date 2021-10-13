@@ -69,6 +69,7 @@ namespace osu.Game.Graphics.UserInterface
                 BackgroundColour = Color4.Black.Opacity(0.5f);
 
                 MaskingContainer.CornerRadius = corner_radius;
+                Alpha = 0;
 
                 // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
                 ItemsContainer.Padding = new MarginPadding(5);
@@ -94,9 +95,11 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override void AnimateClose()
             {
-                this.FadeOut(300, Easing.OutQuint);
                 if (wasOpened)
+                {
+                    this.FadeOut(300, Easing.OutQuint);
                     sampleClose?.Play();
+                }
             }
 
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
@@ -271,24 +274,43 @@ namespace osu.Game.Graphics.UserInterface
                 CornerRadius = corner_radius;
                 Height = 40;
 
-                Foreground.Children = new Drawable[]
+                Foreground.Child = new GridContainer
                 {
-                    Text = new OsuSpriteText
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    RowDimensions = new[]
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
+                        new Dimension(GridSizeMode.AutoSize),
                     },
-                    Icon = new SpriteIcon
+                    ColumnDimensions = new[]
                     {
-                        Icon = FontAwesome.Solid.ChevronDown,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Margin = new MarginPadding { Right = 5 },
-                        Size = new Vector2(12),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
                     },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            Text = new OsuSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
+                            },
+                            Icon = new SpriteIcon
+                            {
+                                Icon = FontAwesome.Solid.ChevronDown,
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Margin = new MarginPadding { Horizontal = 5 },
+                                Size = new Vector2(12),
+                            },
+                        }
+                    }
                 };
 
-                AddInternal(new HoverSounds());
+                AddInternal(new HoverClickSounds());
             }
 
             [BackgroundDependencyLoader]

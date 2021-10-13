@@ -8,13 +8,14 @@ using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.API;
 using System.Collections.Generic;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public class PaginatedKudosuHistoryContainer : PaginatedProfileSubsection<APIKudosuHistory>
     {
         public PaginatedKudosuHistoryContainer(Bindable<User> user)
-            : base(user, missingText: "This user hasn't received any kudosu!")
+            : base(user, missingText: UsersStrings.ShowExtraKudosuEntryEmpty)
         {
             ItemsPerPage = 5;
         }

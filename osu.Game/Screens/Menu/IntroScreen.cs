@@ -1,14 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IO.Archives;
@@ -54,7 +57,7 @@ namespace osu.Game.Screens.Menu
 
         private LeasedBindable<WorkingBeatmap> beatmap;
 
-        private MainMenu mainMenu;
+        private OsuScreen nextScreen;
 
         [Resolved]
         private AudioManager audio { get; set; }
@@ -62,11 +65,19 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private MusicController musicController { get; set; }
 
+        [CanBeNull]
+        private readonly Func<OsuScreen> createNextScreen;
+
         /// <summary>
         /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
         /// Only valid during or after <see cref="LogoArriving"/>.
         /// </summary>
         protected bool UsingThemedIntro { get; private set; }
+
+        protected IntroScreen([CanBeNull] Func<MainMenu> createNextScreen = null)
+        {
+            this.createNextScreen = createNextScreen;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
@@ -100,8 +111,12 @@ namespace osu.Game.Screens.Menu
                     // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
                     // this could happen if a user has nuked their files store. for now, reimport to repair this.
                     var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).Result;
-                    import.Protected = true;
-                    beatmaps.Update(import);
+
+                    import.PerformWrite(b =>
+                    {
+                        b.Protected = true;
+                        beatmaps.Update(b);
+                    });
 
                     loadThemedIntro();
                 }
@@ -109,12 +124,14 @@ namespace osu.Game.Screens.Menu
 
             bool loadThemedIntro()
             {
-                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
+                setInfo = beatmaps.QueryBeatmapSets(b => b.Hash == BeatmapHash, IncludedDetails.AllButRuleset).FirstOrDefault();
 
                 if (setInfo == null)
                     return false;
 
-                return (initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0])) != null;
+                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+
+                return UsingThemedIntro = initialBeatmap != null;
             }
         }
 
@@ -164,7 +181,7 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
-        protected void StartTrack()
+        protected virtual void StartTrack()
         {
             // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
             if (UsingThemedIntro)
@@ -183,7 +200,6 @@ namespace osu.Game.Screens.Menu
             {
                 beatmap.Value = initialBeatmap;
                 Track = initialBeatmap.Track;
-                UsingThemedIntro = !initialBeatmap.Track.IsDummyDevice;
 
                 // ensure the track starts at maximum volume
                 musicController.CurrentTrack.FinishTransforms();
@@ -208,14 +224,21 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        protected void PrepareMenuLoad() => LoadComponentAsync(mainMenu = new MainMenu());
+        protected void PrepareMenuLoad()
+        {
+            nextScreen = createNextScreen?.Invoke();
+
+            if (nextScreen != null)
+                LoadComponentAsync(nextScreen);
+        }
 
         protected void LoadMenu()
         {
             beatmap.Return();
 
             DidLoadMenu = true;
-            this.Push(mainMenu);
+            if (nextScreen != null)
+                this.Push(nextScreen);
         }
     }
 }

@@ -15,8 +15,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Replays.Legacy;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
@@ -46,14 +44,7 @@ namespace osu.Game.Online.Spectator
         private readonly BindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
 
         private IBeatmap? currentBeatmap;
-
         private Score? currentScore;
-
-        [Resolved]
-        private IBindable<RulesetInfo> currentRuleset { get; set; } = null!;
-
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> currentMods { get; set; } = null!;
 
         private readonly SpectatorState currentState = new SpectatorState();
 
@@ -143,7 +134,7 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
-        public void BeginPlaying(GameplayBeatmap beatmap, Score score)
+        public void BeginPlaying(GameplayState state, Score score)
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
@@ -153,11 +144,11 @@ namespace osu.Game.Online.Spectator
             IsPlaying = true;
 
             // transfer state at point of beginning play
-            currentState.BeatmapID = beatmap.BeatmapInfo.OnlineBeatmapID;
-            currentState.RulesetID = currentRuleset.Value.ID;
-            currentState.Mods = currentMods.Value.Select(m => new APIMod(m));
+            currentState.BeatmapID = score.ScoreInfo.BeatmapInfo.OnlineBeatmapID;
+            currentState.RulesetID = score.ScoreInfo.RulesetID;
+            currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
 
-            currentBeatmap = beatmap.PlayableBeatmap;
+            currentBeatmap = state.Beatmap;
             currentScore = score;
 
             BeginPlayingInternal(currentState);

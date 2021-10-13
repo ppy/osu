@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
             if (particles != null)
             {
                 // start the particles already some way into their animation to break cluster away from centre.
-                using (particles.BeginDelayedSequence(-100, true))
+                using (particles.BeginDelayedSequence(-100))
                     particles.Restart();
             }
 

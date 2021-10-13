@@ -89,8 +89,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 SelectionArea.CornerRadius = corner_radius;
                 SelectionArea.Masking = true;
-                // purposefully use hard non-AA'd masking to avoid edge artifacts.
-                SelectionArea.MaskingSmoothness = 0;
             }
 
             protected override Marker CreateMarker() => new OsuMarker();

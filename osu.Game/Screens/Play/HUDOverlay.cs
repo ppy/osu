@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -57,8 +58,6 @@ namespace osu.Game.Screens.Play
 
         private Bindable<HUDVisibilityMode> configVisibilityMode;
 
-        private readonly Container visibilityContainer;
-
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
@@ -72,7 +71,7 @@ namespace osu.Game.Screens.Play
 
         private readonly SkinnableTargetContainer mainComponents;
 
-        private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter, topRightElements };
+        private IEnumerable<Drawable> hideTargets => new Drawable[] { mainComponents, KeyCounter, topRightElements };
 
         public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
@@ -84,13 +83,9 @@ namespace osu.Game.Screens.Play
             Children = new Drawable[]
             {
                 CreateFailingLayer(),
-                visibilityContainer = new Container
+                mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
                 },
                 topRightElements = new FillFlowContainer
                 {
@@ -282,14 +277,13 @@ namespace osu.Game.Screens.Play
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
-            AutoSizeAxes = Axes.Both,
         };
 
         protected PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.HoldForHUD:
                     holdingForHUD = true;
@@ -318,9 +312,9 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.HoldForHUD:
                     holdingForHUD = false;

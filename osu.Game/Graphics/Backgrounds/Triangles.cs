@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Batches;
+using osu.Framework.Graphics.OpenGL.Buffers;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Lists;
 
@@ -153,7 +154,7 @@ namespace osu.Game.Graphics.Backgrounds
                 TriangleParticle newParticle = parts[i];
 
                 // Scale moved distance by the size of the triangle. Smaller triangles should move more slowly.
-                newParticle.Position.Y += parts[i].Scale * movedDistance;
+                newParticle.Position.Y += Math.Max(0.5f, parts[i].Scale) * movedDistance;
                 newParticle.Colour.A = adjustedAlpha;
 
                 parts[i] = newParticle;
@@ -181,7 +182,10 @@ namespace osu.Game.Graphics.Backgrounds
 
         private void addTriangles(bool randomY)
         {
-            AimCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
+            // limited by the maximum size of QuadVertexBuffer for safety.
+            const int max_triangles = QuadVertexBuffer<TexturedVertex2D>.MAX_QUADS;
+
+            AimCount = (int)Math.Min(max_triangles, (DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio));
 
             for (int i = 0; i < AimCount - parts.Count; i++)
                 parts.Add(createTriangle(randomY));

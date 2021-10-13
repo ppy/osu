@@ -30,25 +30,20 @@ namespace osu.Game.Graphics.UserInterface
             PlaceholderText = "type to search";
         }
 
-        public override bool OnPressed(PlatformAction action)
+        public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            switch (action.ActionType)
+            switch (e.Action)
             {
-                case PlatformActionType.LineEnd:
-                case PlatformActionType.LineStart:
-                    return false;
-
+                case PlatformAction.MoveBackwardLine:
+                case PlatformAction.MoveForwardLine:
                 // Shift+delete is handled via PlatformAction on macOS. this is not so useful in the context of a SearchTextBox
                 // as we do not allow arrow key navigation in the first place (ie. the caret should always be at the end of text)
                 // Avoid handling it here to allow other components to potentially consume the shortcut.
-                case PlatformActionType.CharNext:
-                    if (action.ActionMethod == PlatformActionMethod.Delete)
-                        return false;
-
-                    break;
+                case PlatformAction.DeleteForwardChar:
+                    return false;
             }
 
-            return base.OnPressed(action);
+            return base.OnPressed(e);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

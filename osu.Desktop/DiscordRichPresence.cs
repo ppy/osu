@@ -139,11 +139,11 @@ namespace osu.Desktop
         {
             switch (activity)
             {
-                case UserActivity.SoloGame solo:
-                    return solo.Beatmap.ToString();
+                case UserActivity.InGame game:
+                    return game.BeatmapInfo.ToString();
 
                 case UserActivity.Editing edit:
-                    return edit.Beatmap.ToString();
+                    return edit.BeatmapInfo.ToString();
 
                 case UserActivity.InLobby lobby:
                     return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;

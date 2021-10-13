@@ -57,7 +57,9 @@ namespace osu.Game.Tests.Visual
 
         protected void LoadPlayer()
         {
-            var ruleset = Ruleset.Value.CreateInstance();
+            var ruleset = CreatePlayerRuleset();
+            Ruleset.Value = ruleset.RulesetInfo;
+
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
@@ -65,7 +67,7 @@ namespace osu.Game.Tests.Visual
 
             if (!AllowFail)
             {
-                var noFailMod = ruleset.GetAllMods().FirstOrDefault(m => m is ModNoFail);
+                var noFailMod = ruleset.CreateMod<ModNoFail>();
                 if (noFailMod != null)
                     SelectedMods.Value = new[] { noFailMod };
             }

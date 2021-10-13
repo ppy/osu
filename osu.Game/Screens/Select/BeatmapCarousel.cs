@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// The currently selected beatmap.
         /// </summary>
-        public BeatmapInfo SelectedBeatmap => selectedBeatmap?.Beatmap;
+        public BeatmapInfo SelectedBeatmapInfo => selectedBeatmap?.BeatmapInfo;
 
         private CarouselBeatmap selectedBeatmap => selectedBeatmapSet?.Beatmaps.FirstOrDefault(s => s.State.Value == CarouselItemState.Selected);
 
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Select
         private CarouselBeatmapSet selectedBeatmapSet;
 
         /// <summary>
-        /// Raised when the <see cref="SelectedBeatmap"/> is changed.
+        /// Raised when the <see cref="SelectedBeatmapInfo"/> is changed.
         /// </summary>
         public Action<BeatmapInfo> SelectionChanged;
 
@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Select
 
             // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
             if (existingSet?.State?.Value == CarouselItemState.Selected)
-                previouslySelectedID = selectedBeatmap?.Beatmap.ID;
+                previouslySelectedID = selectedBeatmap?.BeatmapInfo.ID;
 
             var newSet = createCarouselSet(beatmapSet);
 
@@ -233,7 +233,7 @@ namespace osu.Game.Screens.Select
 
             // check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
-                select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == previouslySelectedID) ?? newSet);
+                select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.BeatmapInfo.ID == previouslySelectedID) ?? newSet);
 
             itemsCache.Invalidate();
             Schedule(() => BeatmapSetsChanged?.Invoke());
@@ -242,15 +242,15 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Selects a given beatmap on the carousel.
         /// </summary>
-        /// <param name="beatmap">The beatmap to select.</param>
+        /// <param name="beatmapInfo">The beatmap to select.</param>
         /// <param name="bypassFilters">Whether to select the beatmap even if it is filtered (i.e., not visible on carousel).</param>
         /// <returns>True if a selection was made, False if it wasn't.</returns>
-        public bool SelectBeatmap(BeatmapInfo beatmap, bool bypassFilters = true)
+        public bool SelectBeatmap(BeatmapInfo beatmapInfo, bool bypassFilters = true)
         {
             // ensure that any pending events from BeatmapManager have been run before attempting a selection.
             Scheduler.Update();
 
-            if (beatmap?.Hidden != false)
+            if (beatmapInfo?.Hidden != false)
                 return false;
 
             foreach (CarouselBeatmapSet set in beatmapSets)
@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Select
                 if (!bypassFilters && set.Filtered.Value)
                     continue;
 
-                var item = set.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
+                var item = set.Beatmaps.FirstOrDefault(p => p.BeatmapInfo.Equals(beatmapInfo));
 
                 if (item == null)
                     // The beatmap that needs to be selected doesn't exist in this set
@@ -472,7 +472,7 @@ namespace osu.Game.Screens.Select
         private float? scrollTarget;
 
         /// <summary>
-        /// Scroll to the current <see cref="SelectedBeatmap"/>.
+        /// Scroll to the current <see cref="SelectedBeatmapInfo"/>.
         /// </summary>
         /// <param name="immediate">
         /// Whether the scroll position should immediately be shifted to the target, delegating animation to visible panels.
@@ -514,29 +514,29 @@ namespace osu.Game.Screens.Select
             base.OnKeyUp(e);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.SelectNext:
-                    beginRepeatSelection(() => SelectNext(1, false), action);
+                    beginRepeatSelection(() => SelectNext(1, false), e.Action);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                    beginRepeatSelection(() => SelectNext(-1, false), action);
+                    beginRepeatSelection(() => SelectNext(-1, false), e.Action);
                     return true;
             }
 
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.SelectNext:
                 case GlobalAction.SelectPrevious:
-                    endRepeatSelection(action);
+                    endRepeatSelection(e.Action);
                     break;
             }
         }
@@ -720,7 +720,7 @@ namespace osu.Game.Screens.Select
                     if (state.NewValue == CarouselItemState.Selected)
                     {
                         selectedBeatmapSet = set;
-                        SelectionChanged?.Invoke(c.Beatmap);
+                        SelectionChanged?.Invoke(c.BeatmapInfo);
 
                         itemsCache.Invalidate();
                         ScrollToSelected();

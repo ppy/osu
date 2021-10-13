@@ -1,29 +1,30 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Handlers;
 using osu.Game.Overlays;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -99,6 +100,14 @@ namespace osu.Game.Rulesets.UI
         private DrawableRulesetDependencies dependencies;
 
         /// <summary>
+        /// Audio adjustments which are applied to the playfield.
+        /// </summary>
+        /// <remarks>
+        /// Does not affect <see cref="Overlays"/>.
+        /// </remarks>
+        public IAdjustableAudioComponent Audio { get; private set; }
+
+        /// <summary>
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
@@ -155,22 +164,27 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(CancellationToken? cancellationToken)
         {
-            InternalChildren = new Drawable[]
+            AudioContainer audioContainer;
+
+            InternalChild = frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
             {
-                frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
+                FrameStablePlayback = FrameStablePlayback,
+                Children = new Drawable[]
                 {
-                    FrameStablePlayback = FrameStablePlayback,
-                    Children = new Drawable[]
+                    FrameStableComponents,
+                    audioContainer = new AudioContainer
                     {
-                        FrameStableComponents,
-                        KeyBindingInputManager
+                        RelativeSizeAxes = Axes.Both,
+                        Child = KeyBindingInputManager
                             .WithChild(CreatePlayfieldAdjustmentContainer()
                                 .WithChild(Playfield)
                             ),
-                        Overlays,
-                    }
-                },
+                    },
+                    Overlays,
+                }
             };
+
+            Audio = audioContainer;
 
             if ((ResumeOverlay = CreateResumeOverlay()) != null)
             {
@@ -489,15 +503,15 @@ namespace osu.Game.Rulesets.UI
         {
             get
             {
-                foreach (var h in Objects)
+                foreach (var hitObject in Objects)
                 {
-                    if (h.HitWindows.WindowFor(HitResult.Miss) > 0)
-                        return h.HitWindows;
+                    if (hitObject.HitWindows.WindowFor(HitResult.Miss) > 0)
+                        return hitObject.HitWindows;
 
-                    foreach (var n in h.NestedHitObjects)
+                    foreach (var nested in hitObject.NestedHitObjects)
                     {
-                        if (h.HitWindows.WindowFor(HitResult.Miss) > 0)
-                            return n.HitWindows;
+                        if (nested.HitWindows.WindowFor(HitResult.Miss) > 0)
+                            return nested.HitWindows;
                     }
                 }
 

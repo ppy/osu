@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Updater;
@@ -19,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [Resolved(CanBeNull = true)]
         private UpdateManager updateManager { get; set; }
 
-        protected override string Header => "Updates";
+        protected override LocalisableString Header => GeneralSettingsStrings.UpdateHeader;
 
         private SettingsButton checkForUpdatesButton;
 
@@ -31,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
-                LabelText = "Release stream",
+                LabelText = GeneralSettingsStrings.ReleaseStream,
                 Current = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
             });
 
@@ -39,7 +41,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 Add(checkForUpdatesButton = new SettingsButton
                 {
-                    Text = "Check for updates",
+                    Text = GeneralSettingsStrings.CheckUpdate,
                     Action = () =>
                     {
                         checkForUpdatesButton.Enabled.Value = false;
@@ -64,13 +66,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 Add(new SettingsButton
                 {
-                    Text = "Open osu! folder",
+                    Text = GeneralSettingsStrings.OpenOsuFolder,
                     Action = storage.OpenInNativeExplorer,
                 });
 
                 Add(new SettingsButton
                 {
-                    Text = "Change folder location...",
+                    Text = GeneralSettingsStrings.ChangeFolderLocation,
                     Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
                 });
             }

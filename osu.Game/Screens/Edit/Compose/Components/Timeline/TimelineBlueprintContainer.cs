@@ -13,11 +13,9 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
-using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -31,22 +29,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved(CanBeNull = true)]
         private Timeline timeline { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private DragEvent lastDragEvent;
         private Bindable<HitObject> placement;
         private SelectionBlueprint<HitObject> placementBlueprint;
 
-        private SelectableAreaBackground backgroundBox;
-
-        // we only care about checking vertical validity.
-        // this allows selecting and dragging selections before time=0.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
-        {
-            float localY = ToLocalSpace(screenSpacePos).Y;
-            return DrawRectangle.Top <= localY && DrawRectangle.Bottom >= localY;
-        }
+        // We want children within the timeline to be interactable
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => timeline.ScreenSpaceDrawQuad.Contains(screenSpacePos);
 
         public TimelineBlueprintContainer(HitObjectComposer composer)
             : base(composer)
@@ -61,7 +49,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(backgroundBox = new SelectableAreaBackground
+            AddInternal(new SelectableAreaBackground
             {
                 Colour = Color4.Black,
                 Depth = float.MaxValue,
@@ -99,18 +87,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            backgroundBox.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            backgroundBox.FadeColour(Color4.Black, 600, Easing.OutQuint);
-            base.OnHoverLost(e);
-        }
 
         protected override void OnDrag(DragEvent e)
         {
@@ -184,7 +160,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             return new TimelineHitObjectBlueprint(item)
             {
-                OnDragHandled = handleScrollViaDrag
+                OnDragHandled = handleScrollViaDrag,
             };
         }
 
@@ -212,6 +188,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private class SelectableAreaBackground : CompositeDrawable
         {
+            [Resolved]
+            private OsuColour colours { get; set; }
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+            {
+                float localY = ToLocalSpace(screenSpacePos).Y;
+                return DrawRectangle.Top <= localY && DrawRectangle.Bottom >= localY;
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
@@ -235,114 +220,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     }
                 });
             }
-        }
 
-        internal class TimelineSelectionHandler : EditorSelectionHandler, IKeyBindingHandler<GlobalAction>
-        {
-            // for now we always allow movement. snapping is provided by the Timeline's "distance" snap implementation
-            public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent) => true;
-
-            public bool OnPressed(GlobalAction action)
+            protected override bool OnHover(HoverEvent e)
             {
-                switch (action)
-                {
-                    case GlobalAction.EditorNudgeLeft:
-                        nudgeSelection(-1);
-                        return true;
-
-                    case GlobalAction.EditorNudgeRight:
-                        nudgeSelection(1);
-                        return true;
-                }
-
-                return false;
+                this.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
+                return base.OnHover(e);
             }
 
-            public void OnReleased(GlobalAction action)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
-            }
-
-            /// <summary>
-            /// Nudge the current selection by the specified multiple of beat divisor lengths,
-            /// based on the timing at the first object in the selection.
-            /// </summary>
-            /// <param name="amount">The direction and count of beat divisor lengths to adjust.</param>
-            private void nudgeSelection(int amount)
-            {
-                var selected = EditorBeatmap.SelectedHitObjects;
-
-                if (selected.Count == 0)
-                    return;
-
-                var timingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(selected.First().StartTime);
-                double adjustment = timingPoint.BeatLength / EditorBeatmap.BeatDivisor * amount;
-
-                EditorBeatmap.PerformOnSelection(h =>
-                {
-                    h.StartTime += adjustment;
-                    EditorBeatmap.Update(h);
-                });
-            }
-        }
-
-        private class TimelineDragBox : DragBox
-        {
-            // the following values hold the start and end X positions of the drag box in the timeline's local space,
-            // but with zoom unapplied in order to be able to compensate for positional changes
-            // while the timeline is being zoomed in/out.
-            private float? selectionStart;
-            private float selectionEnd;
-
-            [Resolved]
-            private Timeline timeline { get; set; }
-
-            public TimelineDragBox(Action<RectangleF> performSelect)
-                : base(performSelect)
-            {
-            }
-
-            protected override Drawable CreateBox() => new Box
-            {
-                RelativeSizeAxes = Axes.Y,
-                Alpha = 0.3f
-            };
-
-            public override bool HandleDrag(MouseButtonEvent e)
-            {
-                selectionStart ??= e.MouseDownPosition.X / timeline.CurrentZoom;
-
-                // only calculate end when a transition is not in progress to avoid bouncing.
-                if (Precision.AlmostEquals(timeline.CurrentZoom, timeline.Zoom))
-                    selectionEnd = e.MousePosition.X / timeline.CurrentZoom;
-
-                updateDragBoxPosition();
-                return true;
-            }
-
-            private void updateDragBoxPosition()
-            {
-                if (selectionStart == null)
-                    return;
-
-                float rescaledStart = selectionStart.Value * timeline.CurrentZoom;
-                float rescaledEnd = selectionEnd * timeline.CurrentZoom;
-
-                Box.X = Math.Min(rescaledStart, rescaledEnd);
-                Box.Width = Math.Abs(rescaledStart - rescaledEnd);
-
-                var boxScreenRect = Box.ScreenSpaceDrawQuad.AABBFloat;
-
-                // we don't care about where the hitobjects are vertically. in cases like stacking display, they may be outside the box without this adjustment.
-                boxScreenRect.Y -= boxScreenRect.Height;
-                boxScreenRect.Height *= 2;
-
-                PerformSelection?.Invoke(boxScreenRect);
-            }
-
-            public override void Hide()
-            {
-                base.Hide();
-                selectionStart = null;
+                this.FadeColour(Color4.Black, 600, Easing.OutQuint);
+                base.OnHoverLost(e);
             }
         }
 

@@ -102,8 +102,15 @@ namespace osu.Game.IO
 
         protected override void ChangeTargetStorage(Storage newStorage)
         {
+            var lastStorage = UnderlyingStorage;
             base.ChangeTargetStorage(newStorage);
-            Logger.Storage = UnderlyingStorage.GetStorageForDirectory("logs");
+
+            if (lastStorage != null)
+            {
+                // for now we assume that if there was a previous storage, this is a migration operation.
+                // the logger shouldn't be set during initialisation as it can cause cross-talk in tests (due to being static).
+                Logger.Storage = UnderlyingStorage.GetStorageForDirectory("logs");
+            }
         }
 
         public override void Migrate(Storage newStorage)

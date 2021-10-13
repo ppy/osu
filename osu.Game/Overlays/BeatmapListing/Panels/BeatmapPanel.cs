@@ -50,6 +50,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         protected Action ViewBeatmap;
 
         protected BeatmapPanel(BeatmapSetInfo setInfo)
+            : base(HoverSampleSet.Submit)
         {
             Debug.Assert(setInfo.OnlineBeatmapSetID != null);
 

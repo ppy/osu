@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Users;
@@ -56,6 +57,11 @@ namespace osu.Game.Online.API
         string WebsiteRootUrl { get; }
 
         /// <summary>
+        /// The last login error that occurred, if any.
+        /// </summary>
+        Exception? LastLoginError { get; }
+
+        /// <summary>
         /// The current connection state of the API.
         /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
@@ -102,7 +108,8 @@ namespace osu.Game.Online.API
         /// </summary>
         /// <param name="clientName">The name of the client this connector connects for, used for logging.</param>
         /// <param name="endpoint">The endpoint to the hub.</param>
-        IHubClientConnector? GetHubConnector(string clientName, string endpoint);
+        /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
+        IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack = true);
 
         /// <summary>
         /// Create a new user account. This is a blocking operation.

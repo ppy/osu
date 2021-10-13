@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Users.Drawables
 {
@@ -70,6 +71,11 @@ namespace osu.Game.Users.Drawables
         private class ClickableArea : OsuClickableContainer
         {
             private LocalisableString tooltip = default_tooltip_text;
+
+            public ClickableArea()
+                : base(HoverSampleSet.Submit)
+            {
+            }
 
             public override LocalisableString TooltipText
             {

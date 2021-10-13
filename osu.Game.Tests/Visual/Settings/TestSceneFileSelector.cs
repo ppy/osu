@@ -12,13 +12,13 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestAllFiles()
         {
-            AddStep("create", () => Child = new FileSelector { RelativeSizeAxes = Axes.Both });
+            AddStep("create", () => Child = new OsuFileSelector { RelativeSizeAxes = Axes.Both });
         }
 
         [Test]
         public void TestJpgFilesOnly()
         {
-            AddStep("create", () => Child = new FileSelector(validFileExtensions: new[] { ".jpg" }) { RelativeSizeAxes = Axes.Both });
+            AddStep("create", () => Child = new OsuFileSelector(validFileExtensions: new[] { ".jpg" }) { RelativeSizeAxes = Axes.Both });
         }
     }
 }

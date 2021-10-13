@@ -96,6 +96,15 @@ _**italic with underscore, bold with asterisk**_";
         }
 
         [Test]
+        public void TestAutoLink()
+        {
+            AddStep("Add autolink", () =>
+            {
+                markdownContainer.Text = "<https://discord.gg/ppy>";
+            });
+        }
+
+        [Test]
         public void TestInlineCode()
         {
             AddStep("Add inline code", () =>

@@ -7,8 +7,11 @@ using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Types;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -17,8 +20,8 @@ namespace osu.Game.Skinning
         protected override bool AllowManiaSkin => false;
         protected override bool UseCustomSampleBanks => true;
 
-        public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(createSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), resources, beatmap.Path)
+        public LegacyBeatmapSkin(BeatmapInfo beatmapInfo, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
+            : base(createSkinInfo(beatmapInfo), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmapInfo.BeatmapSet, storage), resources, beatmapInfo.Path)
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
@@ -59,6 +62,9 @@ namespace osu.Game.Skinning
             return base.GetConfig<TLookup, TValue>(lookup);
         }
 
+        protected override IBindable<Color4> GetComboColour(IHasComboColours source, int comboIndex, IHasComboInformation combo)
+            => base.GetComboColour(source, combo.ComboIndexWithOffsets, combo);
+
         public override ISample GetSample(ISampleInfo sampleInfo)
         {
             if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
@@ -70,7 +76,7 @@ namespace osu.Game.Skinning
             return base.GetSample(sampleInfo);
         }
 
-        private static SkinInfo createSkinInfo(BeatmapInfo beatmap) =>
-            new SkinInfo { Name = beatmap.ToString(), Creator = beatmap.Metadata?.AuthorString };
+        private static SkinInfo createSkinInfo(BeatmapInfo beatmapInfo) =>
+            new SkinInfo { Name = beatmapInfo.ToString(), Creator = beatmapInfo.Metadata?.AuthorString };
     }
 }

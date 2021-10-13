@@ -33,10 +33,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
 
-        private Container circleSprites;
         private Drawable hitCircleSprite;
-        private Drawable hitCircleOverlay;
 
+        protected Container OverlayLayer { get; private set; }
+
+        private Drawable hitCircleOverlay;
         private SkinnableSpriteText hitCircleText;
 
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
@@ -70,34 +71,30 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png (potentially from the default/fall-through skin).
             Texture overlayTexture = getTextureWithFallback("overlay");
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                circleSprites = new Container
+                hitCircleSprite = new KiaiFlashingSprite
+                {
+                    Texture = baseTexture,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                OverlayLayer = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
+                    Child = hitCircleOverlay = new KiaiFlashingSprite
                     {
-                        hitCircleSprite = new KiaiFlashingSprite
-                        {
-                            Texture = baseTexture,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        hitCircleOverlay = new KiaiFlashingSprite
-                        {
-                            Texture = overlayTexture,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }
-                    }
-                },
+                        Texture = overlayTexture,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                }
             };
 
             if (hasNumber)
             {
-                AddInternal(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
+                OverlayLayer.Add(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
@@ -111,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
 
             if (overlayAboveNumber)
-                AddInternal(hitCircleOverlay.CreateProxy());
+                OverlayLayer.ChangeChildDepth(hitCircleOverlay, float.MinValue);
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
@@ -153,8 +150,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        circleSprites.FadeOut(legacy_fade_duration, Easing.Out);
-                        circleSprites.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        hitCircleSprite.FadeOut(legacy_fade_duration, Easing.Out);
+                        hitCircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+
+                        hitCircleOverlay.FadeOut(legacy_fade_duration, Easing.Out);
+                        hitCircleOverlay.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
                         if (hasNumber)
                         {

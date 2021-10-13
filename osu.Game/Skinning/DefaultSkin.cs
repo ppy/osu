@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Play;
@@ -67,6 +68,7 @@ namespace osu.Game.Skinning
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
                                 var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
+                                var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -79,6 +81,13 @@ namespace osu.Game.Skinning
                                     const float horizontal_padding = 20;
 
                                     score.Position = new Vector2(0, vertical_offset);
+
+                                    if (ppCounter != null)
+                                    {
+                                        ppCounter.Y = score.Position.Y + ppCounter.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).Y - 4;
+                                        ppCounter.Origin = Anchor.TopCentre;
+                                        ppCounter.Anchor = Anchor.TopCentre;
+                                    }
 
                                     if (accuracy != null)
                                     {
@@ -122,6 +131,7 @@ namespace osu.Game.Skinning
                                     new SongProgress(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
+                                    new PerformancePointsCounter()
                                 }
                             };
 
@@ -136,10 +146,10 @@ namespace osu.Game.Skinning
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
+            // todo: this code is pulled from LegacySkin and should not exist.
+            // will likely change based on how databased storage of skin configuration goes.
             switch (lookup)
             {
-                // todo: this code is pulled from LegacySkin and should not exist.
-                // will likely change based on how databased storage of skin configuration goes.
                 case GlobalSkinColours global:
                     switch (global)
                     {
@@ -148,9 +158,15 @@ namespace osu.Game.Skinning
                     }
 
                     break;
+
+                case SkinComboColourLookup comboColour:
+                    return SkinUtils.As<TValue>(new Bindable<Color4>(getComboColour(Configuration, comboColour.ColourIndex)));
             }
 
             return null;
         }
+
+        private static Color4 getComboColour(IHasComboColours source, int colourIndex)
+            => source.ComboColours[colourIndex % source.ComboColours.Count];
     }
 }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MessagePack;
 using osu.Game.Online.API;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -36,20 +37,30 @@ namespace osu.Game.Online.Multiplayer
         [Key(6)]
         public long PlaylistItemId { get; set; }
 
+        [Key(7)]
+        public string Password { get; set; } = string.Empty;
+
+        [Key(8)]
+        public MatchType MatchType { get; set; } = MatchType.HeadToHead;
+
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
                && BeatmapChecksum == other.BeatmapChecksum
                && RequiredMods.SequenceEqual(other.RequiredMods)
                && AllowedMods.SequenceEqual(other.AllowedMods)
                && RulesetID == other.RulesetID
+               && Password.Equals(other.Password, StringComparison.Ordinal)
                && Name.Equals(other.Name, StringComparison.Ordinal)
-               && PlaylistItemId == other.PlaylistItemId;
+               && PlaylistItemId == other.PlaylistItemId
+               && MatchType == other.MatchType;
 
         public override string ToString() => $"Name:{Name}"
                                              + $" Beatmap:{BeatmapID} ({BeatmapChecksum})"
                                              + $" RequiredMods:{string.Join(',', RequiredMods)}"
                                              + $" AllowedMods:{string.Join(',', AllowedMods)}"
+                                             + $" Password:{(string.IsNullOrEmpty(Password) ? "no" : "yes")}"
                                              + $" Ruleset:{RulesetID}"
+                                             + $" Type:{MatchType}"
                                              + $" Item:{PlaylistItemId}";
     }
 }

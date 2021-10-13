@@ -12,6 +12,9 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Game.Resources.Localisation.Web;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
@@ -37,7 +40,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         private class CountTotal : CountSection
         {
             public CountTotal()
-                : base("Total Kudosu Earned")
+                : base(UsersStrings.ShowExtraKudosuTotal)
             {
                 DescriptionText.AddText("Based on how much of a contribution the user has made to beatmap moderation. See ");
                 DescriptionText.AddLink("this page", "https://osu.ppy.sh/wiki/Kudosu");
@@ -53,10 +56,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
             public new int Count
             {
-                set => valueText.Text = value.ToString("N0");
+                set => valueText.Text = value.ToLocalisableString("N0");
             }
 
-            public CountSection(string header)
+            public CountSection(LocalisableString header)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;

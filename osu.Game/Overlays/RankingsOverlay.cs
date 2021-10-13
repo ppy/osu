@@ -23,7 +23,10 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> parentRuleset { get; set; }
+
+        [Cached]
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public RankingsOverlay()
             : base(OverlayColourScheme.Green)
@@ -52,6 +55,19 @@ namespace osu.Game.Overlays
 
                 Scheduler.AddOnce(triggerTabChanged);
             });
+        }
+
+        private bool requiresRulesetUpdate = true;
+
+        protected override void PopIn()
+        {
+            if (requiresRulesetUpdate)
+            {
+                ruleset.Value = parentRuleset.Value;
+                requiresRulesetUpdate = false;
+            }
+
+            base.PopIn();
         }
 
         protected override void OnTabChanged(RankingsScope tab)
@@ -127,19 +143,27 @@ namespace osu.Game.Overlays
             switch (request)
             {
                 case GetUserRankingsRequest userRequest:
+                    if (userRequest.Response == null)
+                        return null;
+
                     switch (userRequest.Type)
                     {
                         case UserRankingsType.Performance:
-                            return new PerformanceTable(1, userRequest.Result.Users);
+                            return new PerformanceTable(1, userRequest.Response.Users);
 
                         case UserRankingsType.Score:
-                            return new ScoresTable(1, userRequest.Result.Users);
+                            return new ScoresTable(1, userRequest.Response.Users);
                     }
 
                     return null;
 
                 case GetCountryRankingsRequest countryRequest:
-                    return new CountriesTable(1, countryRequest.Result.Countries);
+                {
+                    if (countryRequest.Response == null)
+                        return null;
+
+                    return new CountriesTable(1, countryRequest.Response.Countries);
+                }
             }
 
             return null;

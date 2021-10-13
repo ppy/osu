@@ -7,7 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Taiko.Audio;
+using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -111,7 +113,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             public readonly Sprite Centre;
 
             [Resolved]
-            private DrumSampleContainer sampleContainer { get; set; }
+            private DrumSampleTriggerSource sampleTriggerSource { get; set; }
 
             public LegacyHalfDrum(bool flipped)
             {
@@ -140,20 +142,19 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 Centre.Texture = skin.GetTexture(@"taiko-drum-inner");
             }
 
-            public bool OnPressed(TaikoAction action)
+            public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
                 Drawable target = null;
-                var drumSample = sampleContainer.SampleAt(Time.Current);
 
-                if (action == CentreAction)
+                if (e.Action == CentreAction)
                 {
                     target = Centre;
-                    drumSample.Centre?.Play();
+                    sampleTriggerSource.Play(HitType.Centre);
                 }
-                else if (action == RimAction)
+                else if (e.Action == RimAction)
                 {
                     target = Rim;
-                    drumSample.Rim?.Play();
+                    sampleTriggerSource.Play(HitType.Rim);
                 }
 
                 if (target != null)
@@ -173,7 +174,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 return false;
             }
 
-            public void OnReleased(TaikoAction action)
+            public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
             {
             }
         }

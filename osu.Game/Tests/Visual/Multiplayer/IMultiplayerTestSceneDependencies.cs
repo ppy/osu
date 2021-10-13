@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         /// <summary>
         /// The cached <see cref="IRoomManager"/>.
         /// </summary>
-        new TestMultiplayerRoomManager RoomManager { get; }
+        new TestRequestHandlingMultiplayerRoomManager RoomManager { get; }
 
         /// <summary>
         /// The cached <see cref="UserLookupCache"/>.
