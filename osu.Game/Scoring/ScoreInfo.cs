@@ -150,7 +150,8 @@ namespace osu.Game.Scoring
         public int BeatmapInfoID { get; set; }
 
         [JsonIgnore]
-        public virtual BeatmapInfo Beatmap { get; set; }
+        [Column("Beatmap")]
+        public virtual BeatmapInfo BeatmapInfo { get; set; }
 
         [JsonIgnore]
         public long? OnlineScoreID { get; set; }
@@ -252,7 +253,7 @@ namespace osu.Game.Scoring
             return clone;
         }
 
-        public override string ToString() => $"{User} playing {Beatmap}";
+        public override string ToString() => $"{User} playing {BeatmapInfo}";
 
         public bool Equals(ScoreInfo other)
         {

@@ -10,7 +10,7 @@ namespace osu.Game.Tournament.Models
     {
         public List<SeedingBeatmap> Beatmaps = new List<SeedingBeatmap>();
 
-        public Bindable<string> Mod = new Bindable<string>();
+        public Bindable<string> Mod = new Bindable<string>(string.Empty);
 
         public Bindable<int> Seed = new BindableInt
         {
