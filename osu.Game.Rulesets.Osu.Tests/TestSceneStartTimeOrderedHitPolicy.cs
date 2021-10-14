@@ -369,8 +369,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     },
                 });
 
-                Beatmap.Value.Beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
-
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 
                 p.OnLoadComplete += _ =>
@@ -399,6 +397,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public TestSlider()
             {
+                DifficultyControlPoint = new DifficultyControlPoint { SliderVelocity = 0.1f };
+
                 DefaultsApplied += _ =>
                 {
                     HeadCircle.HitWindows = new TestHitWindows();
