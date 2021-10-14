@@ -554,6 +554,7 @@ namespace osu.Game
         {
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
+            Logger.Log($"Game-wide working beatmap updated to {beatmap.NewValue}");
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
