@@ -189,11 +189,14 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public void CancelAsyncLoad()
         {
-            loadCancellation?.Cancel();
-            loadCancellation = new CancellationTokenSource();
+            lock (beatmapFetchLock)
+            {
+                loadCancellation?.Cancel();
+                loadCancellation = new CancellationTokenSource();
 
-            if (beatmapLoadTask?.IsCompleted != true)
-                beatmapLoadTask = null;
+                if (beatmapLoadTask?.IsCompleted != true)
+                    beatmapLoadTask = null;
+            }
         }
 
         private CancellationTokenSource createCancellationTokenSource(TimeSpan? timeout)
