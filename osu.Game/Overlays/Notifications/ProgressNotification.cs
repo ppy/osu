@@ -31,9 +31,11 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 progress = value;
-                Scheduler.AddOnce(() => progressBar.Progress = progress);
+                Scheduler.AddOnce(updateProgress, progress);
             }
         }
+
+        private void updateProgress(float progress) => progressBar.Progress = progress;
 
         protected override void LoadComplete()
         {
