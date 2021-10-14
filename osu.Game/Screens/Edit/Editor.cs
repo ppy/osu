@@ -523,7 +523,10 @@ namespace osu.Game.Screens.Edit
             var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
 
             if (!(refetchedBeatmap is DummyWorkingBeatmap))
+            {
+                Logger.Log("Editor providing re-fetched beatmap post edit session");
                 Beatmap.Value = refetchedBeatmap;
+            }
 
             return base.OnExiting(next);
         }
