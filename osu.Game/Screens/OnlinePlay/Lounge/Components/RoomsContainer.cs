@@ -129,7 +129,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void updateSorting()
         {
             foreach (var room in roomFlow)
-                roomFlow.SetLayoutPosition(room, room.Room.Position.Value);
+                roomFlow.SetLayoutPosition(room, -(room.Room.RoomID.Value ?? 0));
         }
 
         protected override bool OnClick(ClickEvent e)
