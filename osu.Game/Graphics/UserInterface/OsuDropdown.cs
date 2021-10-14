@@ -4,7 +4,6 @@
 #nullable enable
 
 using System.Linq;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -18,6 +17,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -163,6 +163,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     BackgroundColourHover = accentColour ?? nonAccentHoverColour;
                     BackgroundColourSelected = accentColour ?? nonAccentSelectedColour;
+                    BackgroundColour = BackgroundColourHover.Opacity(0);
+
                     UpdateBackgroundColour();
                     UpdateForegroundColour();
                 }
@@ -182,8 +184,6 @@ namespace osu.Game.Graphics.UserInterface
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
-                    BackgroundColour = Color4.Transparent;
-
                     nonAccentHoverColour = colours.PinkDarker;
                     nonAccentSelectedColour = Color4.Black.Opacity(0.5f);
                     updateColours();
@@ -191,16 +191,29 @@ namespace osu.Game.Graphics.UserInterface
                     AddInternal(new HoverSounds());
                 }
 
+                protected override void UpdateBackgroundColour()
+                {
+                    if (!IsPreSelected && !IsSelected)
+                    {
+                        Background.FadeOut(600, Easing.OutQuint);
+                        return;
+                    }
+
+                    Background.FadeIn(100, Easing.OutQuint);
+                    Background.FadeColour(IsPreSelected ? BackgroundColourHover : BackgroundColourSelected, 100, Easing.OutQuint);
+                }
+
                 protected override void UpdateForegroundColour()
                 {
                     base.UpdateForegroundColour();
 
-                    if (Foreground.Children.FirstOrDefault() is Content content) content.Chevron.Alpha = IsHovered ? 1 : 0;
+                    if (Foreground.Children.FirstOrDefault() is Content content)
+                        content.Hovering = IsHovered;
                 }
 
                 protected override Drawable CreateContent() => new Content();
 
-                protected new class Content : FillFlowContainer, IHasText
+                protected new class Content : CompositeDrawable, IHasText
                 {
                     public LocalisableString Text
                     {
@@ -211,26 +224,28 @@ namespace osu.Game.Graphics.UserInterface
                     public readonly OsuSpriteText Label;
                     public readonly SpriteIcon Chevron;
 
+                    private const float chevron_offset = -3;
+
                     public Content()
                     {
                         RelativeSizeAxes = Axes.X;
                         AutoSizeAxes = Axes.Y;
-                        Direction = FillDirection.Horizontal;
 
-                        Children = new Drawable[]
+                        InternalChildren = new Drawable[]
                         {
                             Chevron = new SpriteIcon
                             {
-                                AlwaysPresent = true,
                                 Icon = FontAwesome.Solid.ChevronRight,
-                                Alpha = 0.5f,
                                 Size = new Vector2(8),
+                                Alpha = 0,
+                                X = chevron_offset,
                                 Margin = new MarginPadding { Left = 3, Right = 3 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
                             Label = new OsuSpriteText
                             {
+                                X = 15,
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
@@ -241,6 +256,31 @@ namespace osu.Game.Graphics.UserInterface
                     private void load(OverlayColourProvider? colourProvider)
                     {
                         Chevron.Colour = colourProvider?.Background5 ?? Color4.Black;
+                    }
+
+                    private bool hovering;
+
+                    public bool Hovering
+                    {
+                        get => hovering;
+                        set
+                        {
+                            if (value == hovering)
+                                return;
+
+                            hovering = value;
+
+                            if (hovering)
+                            {
+                                Chevron.FadeIn(400, Easing.OutQuint);
+                                Chevron.MoveToX(0, 400, Easing.OutQuint);
+                            }
+                            else
+                            {
+                                Chevron.FadeOut(200);
+                                Chevron.MoveToX(chevron_offset, 200, Easing.In);
+                            }
+                        }
                     }
                 }
             }
