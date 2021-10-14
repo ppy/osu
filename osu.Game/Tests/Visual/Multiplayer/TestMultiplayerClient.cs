@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             ((IMultiplayerClient)this).UserJoined(user).Wait();
 
-            // We want the user to be immediately available for testing, so force a scheduler update.
+            // We want the user to be immediately available for testing, so force a scheduler update to run the update-bound continuation.
             Scheduler.Update();
         }
 
