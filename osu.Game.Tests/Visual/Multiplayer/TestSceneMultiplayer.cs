@@ -564,7 +564,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddUntilStep("wait for ready button clickable", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+            AddUntilStep("wait for ready button to be enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
 
             AddStep("click ready button", () =>
             {
@@ -572,7 +572,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for start match available", () => readyButton.ChildrenOfType<OsuButton>().Single().Text.ToString().Contains("Start match"));
+            AddUntilStep("wait for player to be ready", () => client.Room?.Users[0].State == MultiplayerUserState.Ready);
+            AddUntilStep("wait for ready button to be enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
 
             AddStep("click start button", () => InputManager.Click(MouseButton.Left));
 
