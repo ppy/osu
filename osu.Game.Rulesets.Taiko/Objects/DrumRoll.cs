@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 

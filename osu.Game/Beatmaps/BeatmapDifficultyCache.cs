@@ -17,6 +17,7 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 
@@ -147,6 +148,14 @@ namespace osu.Game.Beatmaps
             }, token, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
+        public Task<List<TimedDifficultyAttributes>> GetTimedDifficultyAttributesAsync(WorkingBeatmap beatmap, Ruleset ruleset, Mod[] mods, CancellationToken token = default)
+        {
+            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods),
+                token,
+                TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
+                updateScheduler);
+        }
+
         /// <summary>
         /// Retrieves the <see cref="DifficultyRating"/> that describes a star rating.
         /// </summary>
@@ -242,7 +251,7 @@ namespace osu.Game.Beatmaps
         {
             // GetDifficultyAsync will fall back to existing data from BeatmapInfo if not locally available
             // (contrary to GetAsync)
-            GetDifficultyAsync(bindable.Beatmap, rulesetInfo, mods, cancellationToken)
+            GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, mods, cancellationToken)
                 .ContinueWith(t =>
                 {
                     // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
@@ -262,7 +271,7 @@ namespace osu.Game.Beatmaps
         private StarDifficulty computeDifficulty(in DifficultyCacheLookup key)
         {
             // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
-            var beatmapInfo = key.Beatmap;
+            var beatmapInfo = key.BeatmapInfo;
             var rulesetInfo = key.Ruleset;
 
             try
@@ -270,7 +279,7 @@ namespace osu.Game.Beatmaps
                 var ruleset = rulesetInfo.CreateInstance();
                 Debug.Assert(ruleset != null);
 
-                var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(key.Beatmap));
+                var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
                 var attributes = calculator.Calculate(key.OrderedMods);
 
                 return new StarDifficulty(attributes);
@@ -300,21 +309,21 @@ namespace osu.Game.Beatmaps
 
         public readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
         {
-            public readonly BeatmapInfo Beatmap;
+            public readonly BeatmapInfo BeatmapInfo;
             public readonly RulesetInfo Ruleset;
 
             public readonly Mod[] OrderedMods;
 
-            public DifficultyCacheLookup([NotNull] BeatmapInfo beatmap, [CanBeNull] RulesetInfo ruleset, IEnumerable<Mod> mods)
+            public DifficultyCacheLookup([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo ruleset, IEnumerable<Mod> mods)
             {
-                Beatmap = beatmap;
+                BeatmapInfo = beatmapInfo;
                 // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
-                Ruleset = ruleset ?? Beatmap.Ruleset;
+                Ruleset = ruleset ?? BeatmapInfo.Ruleset;
                 OrderedMods = mods?.OrderBy(m => m.Acronym).Select(mod => mod.DeepClone()).ToArray() ?? Array.Empty<Mod>();
             }
 
             public bool Equals(DifficultyCacheLookup other)
-                => Beatmap.ID == other.Beatmap.ID
+                => BeatmapInfo.ID == other.BeatmapInfo.ID
                    && Ruleset.ID == other.Ruleset.ID
                    && OrderedMods.SequenceEqual(other.OrderedMods);
 
@@ -322,7 +331,7 @@ namespace osu.Game.Beatmaps
             {
                 var hashCode = new HashCode();
 
-                hashCode.Add(Beatmap.ID);
+                hashCode.Add(BeatmapInfo.ID);
                 hashCode.Add(Ruleset.ID);
 
                 foreach (var mod in OrderedMods)
@@ -334,12 +343,12 @@ namespace osu.Game.Beatmaps
 
         private class BindableStarDifficulty : Bindable<StarDifficulty?>
         {
-            public readonly BeatmapInfo Beatmap;
+            public readonly BeatmapInfo BeatmapInfo;
             public readonly CancellationToken CancellationToken;
 
-            public BindableStarDifficulty(BeatmapInfo beatmap, CancellationToken cancellationToken)
+            public BindableStarDifficulty(BeatmapInfo beatmapInfo, CancellationToken cancellationToken)
             {
-                Beatmap = beatmap;
+                BeatmapInfo = beatmapInfo;
                 CancellationToken = cancellationToken;
             }
         }

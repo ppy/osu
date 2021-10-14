@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     Position = new Vector2(100, 300),
                 },
-                accuracyHeatmap = new TestAccuracyHeatmap(new ScoreInfo { Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo })
+                accuracyHeatmap = new TestAccuracyHeatmap(new ScoreInfo { BeatmapInfo = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

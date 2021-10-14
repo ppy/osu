@@ -32,12 +32,14 @@ namespace osu.Game.Tests.Visual.Playlists
         private TestResultsScreen resultsScreen;
         private int currentScoreId;
         private bool requestComplete;
+        private int totalCount;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
             currentScoreId = 0;
             requestComplete = false;
+            totalCount = 0;
             bindHandler();
         });
 
@@ -53,7 +55,6 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             createResults(() => userScore);
-            waitForDisplay();
 
             AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineScoreID == userScore.OnlineScoreID).State == PanelState.Expanded);
         }
@@ -62,7 +63,6 @@ namespace osu.Game.Tests.Visual.Playlists
         public void TestShowNullUserScore()
         {
             createResults();
-            waitForDisplay();
 
             AddAssert("top score selected", () => this.ChildrenOfType<ScorePanel>().OrderByDescending(p => p.Score.TotalScore).First().State == PanelState.Expanded);
         }
@@ -79,7 +79,6 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             createResults(() => userScore);
-            waitForDisplay();
 
             AddAssert("more than 1 panel displayed", () => this.ChildrenOfType<ScorePanel>().Count() > 1);
             AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineScoreID == userScore.OnlineScoreID).State == PanelState.Expanded);
@@ -91,7 +90,6 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind delayed handler", () => bindHandler(true));
 
             createResults();
-            waitForDisplay();
 
             AddAssert("top score selected", () => this.ChildrenOfType<ScorePanel>().OrderByDescending(p => p.Score.TotalScore).First().State == PanelState.Expanded);
         }
@@ -100,7 +98,6 @@ namespace osu.Game.Tests.Visual.Playlists
         public void TestFetchWhenScrolledToTheRight()
         {
             createResults();
-            waitForDisplay();
 
             AddStep("bind delayed handler", () => bindHandler(true));
 
@@ -131,7 +128,6 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             createResults(() => userScore);
-            waitForDisplay();
 
             AddStep("bind delayed handler", () => bindHandler(true));
 
@@ -161,13 +157,15 @@ namespace osu.Game.Tests.Visual.Playlists
                 }));
             });
 
-            AddUntilStep("wait for load", () => resultsScreen.ChildrenOfType<ScorePanelList>().FirstOrDefault()?.AllPanelsVisible == true);
+            waitForDisplay();
         }
 
         private void waitForDisplay()
         {
-            AddUntilStep("wait for request to complete", () => requestComplete);
-            AddUntilStep("wait for panels to be visible", () => resultsScreen.ChildrenOfType<ScorePanelList>().FirstOrDefault()?.AllPanelsVisible == true);
+            AddUntilStep("wait for load to complete", () =>
+                requestComplete
+                && resultsScreen.ScorePanelList.GetScorePanels().Count() == totalCount
+                && resultsScreen.ScorePanelList.AllPanelsVisible);
             AddWaitStep("wait for display", 5);
         }
 
@@ -203,6 +201,7 @@ namespace osu.Game.Tests.Visual.Playlists
                             triggerFail(s);
                         else
                             triggerSuccess(s, createUserResponse(userScore));
+
                         break;
 
                     case IndexPlaylistScoresRequest i:
@@ -248,6 +247,8 @@ namespace osu.Game.Tests.Visual.Playlists
                 }
             };
 
+            totalCount++;
+
             for (int i = 1; i <= scores_per_result; i++)
             {
                 multiplayerUserScore.ScoresAround.Lower.Scores.Add(new MultiplayerScore
@@ -285,6 +286,8 @@ namespace osu.Game.Tests.Visual.Playlists
                     },
                     Statistics = userScore.Statistics
                 });
+
+                totalCount += 2;
             }
 
             addCursor(multiplayerUserScore.ScoresAround.Lower);
@@ -325,6 +328,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         { HitResult.Great, 300 }
                     }
                 });
+
+                totalCount++;
             }
 
             addCursor(result);

@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         protected override void AddHitObject(DrawableHitObject hitObject)
         {
             // Create nested bananas (but positions are not randomized because beatmap processing is not done).
-            hitObject.HitObject.ApplyDefaults(new ControlPointInfo(), Beatmap.Value.BeatmapInfo.BaseDifficulty);
+            hitObject.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             base.AddHitObject(hitObject);
         }

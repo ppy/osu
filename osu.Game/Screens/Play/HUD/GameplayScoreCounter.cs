@@ -14,8 +14,8 @@ namespace osu.Game.Screens.Play.HUD
     {
         private Bindable<ScoringMode> scoreDisplayMode;
 
-        protected GameplayScoreCounter(int leading = 0, bool useCommaSeparator = false)
-            : base(leading, useCommaSeparator)
+        protected GameplayScoreCounter()
+            : base(6)
         {
         }
 

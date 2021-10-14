@@ -123,11 +123,40 @@ namespace osu.Game.Tests.Visual
                 this.testBeatmap = testBeatmap;
             }
 
-            protected override string ComputeHash(BeatmapSetInfo item, ArchiveReader reader = null)
-                => string.Empty;
+            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host)
+            {
+                return new TestBeatmapModelManager(storage, contextFactory, rulesets, api, host);
+            }
 
-            public override WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
-                => testBeatmap;
+            protected override WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host)
+            {
+                return new TestWorkingBeatmapCache(this, audioManager, resources, storage, defaultBeatmap, host);
+            }
+
+            private class TestWorkingBeatmapCache : WorkingBeatmapCache
+            {
+                private readonly TestBeatmapManager testBeatmapManager;
+
+                public TestWorkingBeatmapCache(TestBeatmapManager testBeatmapManager, AudioManager audioManager, IResourceStore<byte[]> resourceStore, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost gameHost)
+                    : base(audioManager, resourceStore, storage, defaultBeatmap, gameHost)
+                {
+                    this.testBeatmapManager = testBeatmapManager;
+                }
+
+                public override WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
+                    => testBeatmapManager.testBeatmap;
+            }
+
+            internal class TestBeatmapModelManager : BeatmapModelManager
+            {
+                public TestBeatmapModelManager(Storage storage, IDatabaseContextFactory databaseContextFactory, RulesetStore rulesetStore, IAPIProvider apiProvider, GameHost gameHost)
+                    : base(storage, databaseContextFactory, rulesetStore, gameHost)
+                {
+                }
+
+                protected override string ComputeHash(BeatmapSetInfo item, ArchiveReader reader = null)
+                    => string.Empty;
+            }
 
             public override void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
             {

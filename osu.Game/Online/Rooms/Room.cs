@@ -130,12 +130,6 @@ namespace osu.Game.Online.Rooms
             set => MaxAttempts.Value = value;
         }
 
-        /// <summary>
-        /// The position of this <see cref="Room"/> in the list. This is not read from or written to the API.
-        /// </summary>
-        [JsonIgnore]
-        public readonly Bindable<long> Position = new Bindable<long>(-1); // Todo: This does not need to exist.
-
         public Room()
         {
             Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
@@ -192,8 +186,6 @@ namespace osu.Game.Online.Rooms
                 RecentParticipants.Clear();
                 RecentParticipants.AddRange(other.RecentParticipants);
             }
-
-            Position.Value = other.Position.Value;
         }
 
         public void RemoveExpiredPlaylistItems()

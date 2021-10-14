@@ -9,25 +9,15 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
-    public class DetailSettings : SettingsSubsection
+    public class ScreenshotSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => GraphicsSettingsStrings.DetailSettingsHeader;
+        protected override LocalisableString Header => GraphicsSettingsStrings.Screenshots;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
-                new SettingsCheckbox
-                {
-                    LabelText = GraphicsSettingsStrings.StoryboardVideo,
-                    Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = GraphicsSettingsStrings.HitLighting,
-                    Current = config.GetBindable<bool>(OsuSetting.HitLighting)
-                },
                 new SettingsEnumDropdown<ScreenshotFormat>
                 {
                     LabelText = GraphicsSettingsStrings.ScreenshotFormat,
