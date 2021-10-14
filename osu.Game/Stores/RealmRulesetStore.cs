@@ -147,12 +147,12 @@ namespace osu.Game.Stores
                         var type = Type.GetType(r.InstantiationInfo);
 
                         if (type == null)
-                            continue;
+                            throw new InvalidOperationException(@"Type resolution failure.");
 
                         var rInstance = (Activator.CreateInstance(type) as Ruleset)?.RulesetInfo;
 
                         if (rInstance == null)
-                            continue;
+                            throw new InvalidOperationException(@"Instantiation failure.");
 
                         r.Name = rInstance.Name;
                         r.ShortName = rInstance.ShortName;
@@ -161,9 +161,10 @@ namespace osu.Game.Stores
 
                         detachedRulesets.Add(r.Clone());
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         r.Available = false;
+                        Logger.Log($"Could not load ruleset {r}: {ex.Message}");
                     }
                 }
 
