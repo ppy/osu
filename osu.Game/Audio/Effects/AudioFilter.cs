@@ -4,7 +4,6 @@
 using System.Diagnostics;
 using ManagedBass.Fx;
 using osu.Framework.Audio.Mixing;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
 namespace osu.Game.Audio.Effects
@@ -21,10 +20,25 @@ namespace osu.Game.Audio.Effects
         private readonly BQFParameters filter;
         private readonly BQFType type;
 
+        private bool isAttached;
+
+        private int cutoff;
+
         /// <summary>
-        /// The current cutoff of this filter.
+        /// The cutoff frequency of this filter.
         /// </summary>
-        public BindableNumber<int> Cutoff { get; }
+        public int Cutoff
+        {
+            get => cutoff;
+            set
+            {
+                if (value == cutoff)
+                    return;
+
+                cutoff = value;
+                updateFilter(cutoff);
+            }
+        }
 
         /// <summary>
         /// A Component that implements a BASS FX BiQuad Filter Effect.
@@ -36,102 +50,96 @@ namespace osu.Game.Audio.Effects
             this.mixer = mixer;
             this.type = type;
 
-            int initialCutoff;
-
-            switch (type)
-            {
-                case BQFType.HighPass:
-                    initialCutoff = 1;
-                    break;
-
-                case BQFType.LowPass:
-                    initialCutoff = MAX_LOWPASS_CUTOFF;
-                    break;
-
-                default:
-                    initialCutoff = 500; // A default that should ensure audio remains audible for other filters.
-                    break;
-            }
-
-            Cutoff = new BindableNumber<int>(initialCutoff)
-            {
-                MinValue = 1,
-                MaxValue = MAX_LOWPASS_CUTOFF
-            };
-
             filter = new BQFParameters
             {
                 lFilter = type,
-                fCenter = initialCutoff,
                 fBandwidth = 0,
-                fQ = 0.7f // This allows fCenter to go up to 22049hz (nyquist - 1hz) without overflowing and causing weird filter behaviour (see: https://www.un4seen.com/forum/?topic=19542.0)
+                // This allows fCenter to go up to 22049hz (nyquist - 1hz) without overflowing and causing weird filter behaviour (see: https://www.un4seen.com/forum/?topic=19542.0)
+                fQ = 0.7f
             };
 
-            // Don't start attached if this is low-pass or high-pass filter (as they have special auto-attach/detach logic)
-            if (type != BQFType.LowPass && type != BQFType.HighPass)
-                attachFilter();
-
-            Cutoff.ValueChanged += updateFilter;
+            Cutoff = getInitialCutoff(type);
         }
 
-        private void attachFilter()
+        private int getInitialCutoff(BQFType type)
         {
-            Debug.Assert(!mixer.Effects.Contains(filter));
-            mixer.Effects.Add(filter);
-        }
-
-        private void detachFilter()
-        {
-            Debug.Assert(mixer.Effects.Contains(filter));
-            mixer.Effects.Remove(filter);
-        }
-
-        private void updateFilter(ValueChangedEvent<int> cutoff)
-        {
-            // Workaround for weird behaviour when rapidly setting fCenter of a low-pass filter to nyquist - 1hz.
-            if (type == BQFType.LowPass)
+            switch (type)
             {
-                if (cutoff.NewValue >= MAX_LOWPASS_CUTOFF)
-                {
-                    detachFilter();
-                    return;
-                }
+                case BQFType.HighPass:
+                    return 1;
 
-                if (cutoff.OldValue >= MAX_LOWPASS_CUTOFF && cutoff.NewValue < MAX_LOWPASS_CUTOFF)
-                    attachFilter();
+                case BQFType.LowPass:
+                    return MAX_LOWPASS_CUTOFF;
+
+                default:
+                    return 500; // A default that should ensure audio remains audible for other filters.
+            }
+        }
+
+        private void updateFilter(int newValue)
+        {
+            switch (type)
+            {
+                case BQFType.LowPass:
+                    // Workaround for weird behaviour when rapidly setting fCenter of a low-pass filter to nyquist - 1hz.
+                    if (newValue >= MAX_LOWPASS_CUTOFF)
+                    {
+                        ensureDetached();
+                        return;
+                    }
+
+                    break;
+
+                // Workaround for weird behaviour when rapidly setting fCenter of a high-pass filter to 1hz.
+                case BQFType.HighPass:
+                    if (newValue <= 1)
+                    {
+                        ensureDetached();
+                        return;
+                    }
+
+                    break;
             }
 
-            // Workaround for weird behaviour when rapidly setting fCenter of a high-pass filter to 1hz.
-            if (type == BQFType.HighPass)
-            {
-                if (cutoff.NewValue <= 1)
-                {
-                    detachFilter();
-                    return;
-                }
-
-                if (cutoff.OldValue <= 1 && cutoff.NewValue > 1)
-                    attachFilter();
-            }
+            ensureAttached();
 
             var filterIndex = mixer.Effects.IndexOf(filter);
+
             if (filterIndex < 0) return;
 
             if (mixer.Effects[filterIndex] is BQFParameters existingFilter)
             {
-                existingFilter.fCenter = cutoff.NewValue;
+                existingFilter.fCenter = newValue;
 
                 // required to update effect with new parameters.
                 mixer.Effects[filterIndex] = existingFilter;
             }
         }
 
+        private void ensureAttached()
+        {
+            if (isAttached)
+                return;
+
+            Debug.Assert(!mixer.Effects.Contains(filter));
+            mixer.Effects.Add(filter);
+            isAttached = true;
+        }
+
+        private void ensureDetached()
+        {
+            if (!isAttached)
+                return;
+
+            Debug.Assert(mixer.Effects.Contains(filter));
+            mixer.Effects.Remove(filter);
+            isAttached = false;
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
-            if (mixer.Effects.Contains(filter))
-                detachFilter();
+            ensureDetached();
         }
     }
 }
