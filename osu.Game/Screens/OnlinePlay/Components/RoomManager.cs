@@ -116,8 +116,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
             if (ignoredRooms.Contains(room.RoomID.Value.Value))
                 return;
 
-            room.Position.Value = -room.RoomID.Value.Value;
-
             try
             {
                 foreach (var pi in room.Playlist)
