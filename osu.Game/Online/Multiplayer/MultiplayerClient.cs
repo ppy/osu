@@ -359,22 +359,25 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return;
 
-            await PopulateUser(user).ConfigureAwait(false);
-
-            Scheduler.Add(() =>
+            await Task.Run(async () =>
             {
-                if (Room == null)
-                    return;
+                await PopulateUser(user).ConfigureAwait(false);
 
-                // for sanity, ensure that there can be no duplicate users in the room user list.
-                if (Room.Users.Any(existing => existing.UserID == user.UserID))
-                    return;
+                Scheduler.Add(() =>
+                {
+                    if (Room == null)
+                        return;
 
-                Room.Users.Add(user);
+                    // for sanity, ensure that there can be no duplicate users in the room user list.
+                    if (Room.Users.Any(existing => existing.UserID == user.UserID))
+                        return;
 
-                UserJoined?.Invoke(user);
-                RoomUpdated?.Invoke();
-            }, false);
+                    Room.Users.Add(user);
+
+                    UserJoined?.Invoke(user);
+                    RoomUpdated?.Invoke();
+                });
+            }).ConfigureAwait(false);
         }
 
         Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user) =>
