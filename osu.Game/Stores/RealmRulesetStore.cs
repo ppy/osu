@@ -21,7 +21,7 @@ namespace osu.Game.Stores
     {
         private readonly RealmContextFactory realmFactory;
 
-        private const string ruleset_library_prefix = "osu.Game.Rulesets";
+        private const string ruleset_library_prefix = @"osu.Game.Rulesets";
 
         private readonly Dictionary<Assembly, Type> loadedAssemblies = new Dictionary<Assembly, Type>();
 
@@ -51,7 +51,7 @@ namespace osu.Game.Stores
             // to load as unable to locate the game core assembly.
             AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetDependencyAssembly;
 
-            var rulesetStorage = storage?.GetStorageForDirectory("rulesets");
+            var rulesetStorage = storage?.GetStorageForDirectory(@"rulesets");
             if (rulesetStorage != null)
                 loadUserRulesets(rulesetStorage);
 
@@ -176,7 +176,7 @@ namespace osu.Game.Stores
                 if (rulesetName == null)
                     continue;
 
-                if (!rulesetName.StartsWith(ruleset_library_prefix, StringComparison.InvariantCultureIgnoreCase) || rulesetName.Contains("Tests"))
+                if (!rulesetName.StartsWith(ruleset_library_prefix, StringComparison.InvariantCultureIgnoreCase) || rulesetName.Contains(@"Tests"))
                     continue;
 
                 addRuleset(ruleset);
@@ -185,9 +185,9 @@ namespace osu.Game.Stores
 
         private void loadUserRulesets(Storage rulesetStorage)
         {
-            var rulesets = rulesetStorage.GetFiles(".", $"{ruleset_library_prefix}.*.dll");
+            var rulesets = rulesetStorage.GetFiles(@".", @$"{ruleset_library_prefix}.*.dll");
 
-            foreach (var ruleset in rulesets.Where(f => !f.Contains("Tests")))
+            foreach (var ruleset in rulesets.Where(f => !f.Contains(@"Tests")))
                 loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
         }
 
@@ -195,7 +195,7 @@ namespace osu.Game.Stores
         {
             try
             {
-                var files = Directory.GetFiles(RuntimeInfo.StartupDirectory, $"{ruleset_library_prefix}.*.dll");
+                var files = Directory.GetFiles(RuntimeInfo.StartupDirectory, @$"{ruleset_library_prefix}.*.dll");
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
