@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Skins
         private void load()
         {
             var imported = skins.Import(new ZipArchiveReader(TestResources.OpenResource("Archives/ogg-skin.osk"))).Result;
-            skin = skins.GetSkin(imported);
+            skin = skins.GetSkin(imported.Value);
         }
 
         [Test]

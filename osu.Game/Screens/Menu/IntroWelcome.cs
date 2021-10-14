@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using JetBrains.Annotations;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -31,6 +33,11 @@ namespace osu.Game.Screens.Menu
         };
 
         private BackgroundScreenDefault background;
+
+        public IntroWelcome([CanBeNull] Func<MainMenu> createNextScreen = null)
+            : base(createNextScreen)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)

@@ -390,7 +390,7 @@ namespace osu.Game.Rulesets.Edit
 
         public override float GetBeatSnapDistanceAt(HitObject referenceObject)
         {
-            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * referenceObject.DifficultyControlPoint.SliderVelocity / BeatSnapProvider.BeatDivisor);
+            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * referenceObject.DifficultyControlPoint.SliderVelocity / BeatSnapProvider.BeatDivisor);
         }
 
         public override float DurationToDistance(HitObject referenceObject, double duration)

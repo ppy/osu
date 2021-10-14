@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="controlPointInfo">The control points.</param>
         /// <param name="difficulty">The difficulty settings to use.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty, CancellationToken cancellationToken = default)
+        public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
             var legacyInfo = controlPointInfo as LegacyControlPointInfo;
 
@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Objects
             DefaultsApplied?.Invoke(this);
         }
 
-        protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 

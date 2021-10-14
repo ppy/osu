@@ -66,7 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             req.Failure += exception =>
             {
-                onError?.Invoke(req.Result?.Error ?? exception.Message);
+                onError?.Invoke(req.Response?.Error ?? exception.Message);
             };
 
             api.Queue(req);
@@ -115,8 +115,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             if (ignoredRooms.Contains(room.RoomID.Value.Value))
                 return;
-
-            room.Position.Value = -room.RoomID.Value.Value;
 
             try
             {

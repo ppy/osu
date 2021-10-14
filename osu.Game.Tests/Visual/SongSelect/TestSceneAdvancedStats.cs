@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestNoMod()
         {
-            AddStep("set beatmap", () => advancedStats.Beatmap = exampleBeatmapInfo);
+            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
 
             AddStep("no mods selected", () => SelectedMods.Value = Array.Empty<Mod>());
 
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestManiaFirstBarText()
         {
-            AddStep("set beatmap", () => advancedStats.Beatmap = new BeatmapInfo
+            AddStep("set beatmap", () => advancedStats.BeatmapInfo = new BeatmapInfo
             {
                 Ruleset = rulesets.GetRuleset(3),
                 BaseDifficulty = new BeatmapDifficulty
@@ -84,11 +84,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestEasyMod()
         {
-            AddStep("set beatmap", () => advancedStats.Beatmap = exampleBeatmapInfo);
+            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
 
             AddStep("select EZ mod", () =>
             {
-                var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
+                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance();
                 SelectedMods.Value = new[] { ruleset.CreateMod<ModEasy>() };
             });
 
@@ -101,11 +101,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestHardRockMod()
         {
-            AddStep("set beatmap", () => advancedStats.Beatmap = exampleBeatmapInfo);
+            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
 
             AddStep("select HR mod", () =>
             {
-                var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
+                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance();
                 SelectedMods.Value = new[] { ruleset.CreateMod<ModHardRock>() };
             });
 
@@ -118,13 +118,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestUnchangedDifficultyAdjustMod()
         {
-            AddStep("set beatmap", () => advancedStats.Beatmap = exampleBeatmapInfo);
+            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
 
             AddStep("select unchanged Difficulty Adjust mod", () =>
             {
-                var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
+                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance();
                 var difficultyAdjustMod = ruleset.CreateMod<ModDifficultyAdjust>();
-                difficultyAdjustMod.ReadFromDifficulty(advancedStats.Beatmap.BaseDifficulty);
+                difficultyAdjustMod.ReadFromDifficulty(advancedStats.BeatmapInfo.BaseDifficulty);
                 SelectedMods.Value = new[] { difficultyAdjustMod };
             });
 
@@ -137,13 +137,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestChangedDifficultyAdjustMod()
         {
-            AddStep("set beatmap", () => advancedStats.Beatmap = exampleBeatmapInfo);
+            AddStep("set beatmap", () => advancedStats.BeatmapInfo = exampleBeatmapInfo);
 
             AddStep("select changed Difficulty Adjust mod", () =>
             {
-                var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
+                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance();
                 var difficultyAdjustMod = ruleset.CreateMod<OsuModDifficultyAdjust>();
-                var originalDifficulty = advancedStats.Beatmap.BaseDifficulty;
+                var originalDifficulty = advancedStats.BeatmapInfo.BaseDifficulty;
 
                 difficultyAdjustMod.ReadFromDifficulty(originalDifficulty);
                 difficultyAdjustMod.DrainRate.Value = originalDifficulty.DrainRate - 0.5f;

@@ -113,6 +113,12 @@ namespace osu.Game.Screens.Edit
 
         public BeatmapMetadata Metadata => PlayableBeatmap.Metadata;
 
+        public BeatmapDifficulty Difficulty
+        {
+            get => PlayableBeatmap.Difficulty;
+            set => PlayableBeatmap.Difficulty = value;
+        }
+
         public ControlPointInfo ControlPointInfo
         {
             get => PlayableBeatmap.ControlPointInfo;
@@ -313,7 +319,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public void Clear() => RemoveRange(HitObjects.ToArray());
 
-        private void processHitObject(HitObject hitObject) => hitObject.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
+        private void processHitObject(HitObject hitObject) => hitObject.ApplyDefaults(ControlPointInfo, PlayableBeatmap.Difficulty);
 
         private void trackStartTime(HitObject hitObject)
         {
