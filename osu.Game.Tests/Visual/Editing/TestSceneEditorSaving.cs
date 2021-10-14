@@ -30,10 +30,15 @@ namespace osu.Game.Tests.Visual.Editing
 
             PushAndConfirm(() => new EditorLoader());
 
-            AddUntilStep("wait for editor load", () => editor != null);
+            AddUntilStep("wait for editor load", () => editor?.IsLoaded == true);
 
             AddStep("Set overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty = 7);
-            AddStep("Set difficulty name", () => editorBeatmap.BeatmapInfo.Version = "diffname");
+            AddStep("Set artist and title", () =>
+            {
+                editorBeatmap.BeatmapInfo.Metadata.Artist = "artist";
+                editorBeatmap.BeatmapInfo.Metadata.Title = "title";
+            });
+            AddStep("Set difficulty name", () => editorBeatmap.BeatmapInfo.Version = "difficulty");
 
             AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
 
@@ -44,9 +49,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
             AddStep("Place single hitcircle", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("Beatmap contains single hitcircle", () => editorBeatmap.HitObjects.Count == 1);
+            checkMutations();
 
             AddStep("Save", () => InputManager.Keys(PlatformAction.Save));
+
+            checkMutations();
 
             AddStep("Exit", () => InputManager.Key(Key.Escape));
 
@@ -59,9 +66,16 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Enter editor", () => InputManager.Key(Key.Number5));
 
             AddUntilStep("Wait for editor load", () => editor != null);
+
+            checkMutations();
+        }
+
+        private void checkMutations()
+        {
             AddAssert("Beatmap contains single hitcircle", () => editorBeatmap.HitObjects.Count == 1);
             AddAssert("Beatmap has correct overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty == 7);
-            AddAssert("Beatmap has correct difficulty name", () => editorBeatmap.BeatmapInfo.Version == "diffname");
+            AddAssert("Beatmap has correct metadata", () => editorBeatmap.BeatmapInfo.Metadata.Artist == "artist" && editorBeatmap.BeatmapInfo.Metadata.Title == "title");
+            AddAssert("Beatmap has correct difficulty name", () => editorBeatmap.BeatmapInfo.Version == "difficulty");
         }
     }
 }
