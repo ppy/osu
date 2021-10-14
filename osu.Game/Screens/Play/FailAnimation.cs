@@ -71,7 +71,6 @@ namespace osu.Game.Screens.Play
             this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
             {
                 OnComplete?.Invoke();
-                Expire();
             });
 
             failLowPassFilter.CutoffTo(300, duration, Easing.OutCubic);
