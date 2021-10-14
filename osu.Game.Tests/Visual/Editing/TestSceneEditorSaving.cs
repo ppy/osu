@@ -8,6 +8,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
 using osuTK.Input;
@@ -31,6 +32,8 @@ namespace osu.Game.Tests.Visual.Editing
             PushAndConfirm(() => new EditorLoader());
 
             AddUntilStep("wait for editor load", () => editor?.IsLoaded == true);
+
+            AddUntilStep("wait for metadata screen load", () => editor.ChildrenOfType<MetadataSection>().FirstOrDefault()?.IsLoaded == true);
 
             AddStep("Set overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty = 7);
             AddStep("Set artist and title", () =>
