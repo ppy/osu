@@ -4,7 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Game.Database;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Navigation
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestImportCreatedNotification()
         {
-            AddUntilStep("Import notification was presented", () => Game.Notifications.ChildrenOfType<ImportProgressNotification>().Count() == 1);
+            AddUntilStep("Import notification was presented", () => Game.Notifications.ChildrenOfType<ProgressCompletionNotification>().Count() == 1);
         }
     }
 }
