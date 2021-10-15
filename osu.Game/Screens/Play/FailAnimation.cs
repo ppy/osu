@@ -117,8 +117,9 @@ namespace osu.Game.Screens.Play
                 Depth = float.MaxValue
             });
 
-            Content.ScaleTo(0.85f, duration, Easing.OutQuint);
-            Content.RotateTo(1, duration, Easing.OutQuint);
+            Content.ScaleTo(0.85f, duration, Easing.OutQuart);
+            Content.RotateTo(1, duration, Easing.OutQuart);
+            Content.FadeColour(Color4.Gray, duration);
         }
 
         protected override void Update()
