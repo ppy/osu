@@ -12,6 +12,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
@@ -25,13 +26,16 @@ namespace osu.Game.Screens.Play
     /// Manage the animation to be applied when a player fails.
     /// Single use and automatically disposed after use.
     /// </summary>
-    public class FailAnimation : CompositeDrawable
+    public class FailAnimation : Container
     {
         public Action OnComplete;
 
         private readonly DrawableRuleset drawableRuleset;
-
         private readonly BindableDouble trackFreq = new BindableDouble(1);
+
+        private Container filters;
+
+        private Box failFlash;
 
         private Track track;
 
@@ -42,9 +46,18 @@ namespace osu.Game.Screens.Play
 
         private Sample failSample;
 
+        protected override Container<Drawable> Content { get; } = new Container
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            RelativeSizeAxes = Axes.Both,
+        };
+
         public FailAnimation(DrawableRuleset drawableRuleset)
         {
             this.drawableRuleset = drawableRuleset;
+
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
@@ -53,8 +66,26 @@ namespace osu.Game.Screens.Play
             track = beatmap.Value.Track;
             failSample = audio.Samples.Get(@"Gameplay/failsound");
 
-            AddInternal(failLowPassFilter = new AudioFilter(audio.TrackMixer));
-            AddInternal(failHighPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass));
+            AddRangeInternal(new Drawable[]
+            {
+                filters = new Container
+                {
+                    Children = new Drawable[]
+                    {
+                        failLowPassFilter = new AudioFilter(audio.TrackMixer),
+                        failHighPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
+                    },
+                },
+                Content,
+                failFlash = new Box
+                {
+                    Colour = Color4.Red,
+                    RelativeSizeAxes = Axes.Both,
+                    Blending = BlendingParameters.Additive,
+                    Depth = float.MinValue,
+                    Alpha = 0
+                },
+            });
         }
 
         private bool started;
@@ -81,8 +112,30 @@ namespace osu.Game.Screens.Play
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
 
             applyToPlayfield(drawableRuleset.Playfield);
-            drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
             drawableRuleset.Playfield.HitObjectContainer.FadeOut(duration / 2);
+
+            failFlash.FadeOutFromOne(1000);
+
+            Content.Masking = true;
+
+            Content.Add(new Box
+            {
+                Colour = Color4.Black,
+                RelativeSizeAxes = Axes.Both,
+                Depth = float.MaxValue
+            });
+
+            Content.ScaleTo(0.85f, duration, Easing.OutQuart);
+            Content.RotateTo(1, duration, Easing.OutQuart);
+            Content.FadeColour(Color4.Gray, duration);
+        }
+
+        public void RemoveFilters()
+        {
+            RemoveInternal(filters);
+            filters.Dispose();
+
+            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
         }
 
         protected override void Update()
@@ -130,12 +183,6 @@ namespace osu.Game.Screens.Play
                 obj.ScaleTo(originalScale * 0.5f, duration);
                 obj.MoveTo(originalPosition + new Vector2(0, 400), duration);
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
         }
     }
 }
