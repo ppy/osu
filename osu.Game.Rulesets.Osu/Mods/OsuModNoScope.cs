@@ -19,7 +19,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModNoScope : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor
     {
-        public const float CURSOR_ALPHA_TRANSITION_DURATION = 100;
+        /// <summary>
+        /// Slightly higher than the cutoff for <see cref="Drawable.IsPresent"/>.
+        /// </summary>
+        private const float min_alpha = 0.0002f;
+
+        private const float transition_duration = 100;
 
         public override string Name => "No Scope";
         public override string Acronym => "NS";
@@ -47,11 +52,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
-        /// <summary>
-        /// Slightly higher than the cutoff for <see cref="Drawable.IsPresent"/>.
-        /// </summary>
-        private const float min_alpha = 0.0002f;
-
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             if (HiddenComboCount.Value == 0) return;
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetAlpha, Math.Clamp(playfield.Time.Elapsed / CURSOR_ALPHA_TRANSITION_DURATION, 0, 1));
+            playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetAlpha, Math.Clamp(playfield.Time.Elapsed / transition_duration, 0, 1));
         }
     }
 
