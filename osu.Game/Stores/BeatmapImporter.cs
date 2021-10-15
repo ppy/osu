@@ -34,7 +34,7 @@ namespace osu.Game.Stores
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapImporter : ArchiveModelImporter<RealmBeatmapSet>, IDisposable
+    public class BeatmapImporter : RealmArchiveModelImporter<RealmBeatmapSet>, IDisposable
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
