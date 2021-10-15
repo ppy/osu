@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -70,6 +71,31 @@ namespace osu.Game.Screens.Edit
         public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
         {
             PlayableBeatmap = playableBeatmap;
+
+            // ensure we are not working with legacy control points.
+            // if we leave the legacy points around they will be applied over any local changes on
+            // ApplyDefaults calls. this should eventually be removed once the default logic is moved to the decoder/converter.
+            if (PlayableBeatmap.ControlPointInfo is LegacyControlPointInfo)
+            {
+                var newControlPoints = new ControlPointInfo();
+
+                foreach (var controlPoint in PlayableBeatmap.ControlPointInfo.AllControlPoints)
+                {
+                    switch (controlPoint)
+                    {
+                        case DifficultyControlPoint _:
+                        case SampleControlPoint _:
+                            // skip legacy types.
+                            continue;
+
+                        default:
+                            newControlPoints.Add(controlPoint.Time, controlPoint);
+                            break;
+                    }
+                }
+
+                playableBeatmap.ControlPointInfo = newControlPoints;
+            }
 
             this.beatmapInfo = beatmapInfo ?? playableBeatmap.BeatmapInfo;
 
