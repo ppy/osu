@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -81,7 +82,7 @@ namespace osu.Game.Tests.Visual.Editing
             public new float DistanceSpacing => base.DistanceSpacing;
 
             public TestDistanceSnapGrid(double? endTime = null)
-                : base(grid_position, 0, endTime)
+                : base(new HitObject(), grid_position, 0, endTime)
             {
             }
 
@@ -158,15 +159,15 @@ namespace osu.Game.Tests.Visual.Editing
 
             public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
 
-            public float GetBeatSnapDistanceAt(double referenceTime) => 10;
+            public float GetBeatSnapDistanceAt(HitObject referenceObject) => 10;
 
-            public float DurationToDistance(double referenceTime, double duration) => (float)duration;
+            public float DurationToDistance(HitObject referenceObject, double duration) => (float)duration;
 
-            public double DistanceToDuration(double referenceTime, float distance) => distance;
+            public double DistanceToDuration(HitObject referenceObject, float distance) => distance;
 
-            public double GetSnappedDurationFromDistance(double referenceTime, float distance) => 0;
+            public double GetSnappedDurationFromDistance(HitObject referenceObject, float distance) => 0;
 
-            public float GetSnappedDistanceFromDistance(double referenceTime, float distance) => 0;
+            public float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance) => 0;
         }
     }
 }
