@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,6 +15,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -30,6 +32,10 @@ namespace osu.Game.Overlays.Settings
         protected readonly FillFlowContainer FlowContent;
 
         private SpriteText labelText;
+        private readonly GridContainer gridContainer;
+
+        [CanBeNull]
+        private RestoreDefaultValueButton<T> defaultValueButton;
 
         private OsuTextFlowContainer warningText;
 
@@ -48,12 +54,13 @@ namespace osu.Game.Overlays.Settings
                 if (labelText == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    FlowContent.Insert(-1, labelText = new OsuSpriteText());
+                    gridContainer.Content[0][1] = labelText = new OsuSpriteText();
 
                     updateDisabled();
                 }
 
                 labelText.Text = value;
+                updateLayout();
             }
         }
 
@@ -106,18 +113,33 @@ namespace osu.Game.Overlays.Settings
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
-            InternalChildren = new Drawable[]
+            FlowContent = new FillFlowContainer
             {
-                FlowContent = new FillFlowContainer
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(0, 10),
+                Child = Control = CreateControl(),
+            };
+
+            InternalChild = gridContainer = new GridContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                RowDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
-                    Children = new[]
-                    {
-                        Control = CreateControl(),
-                    },
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension(GridSizeMode.AutoSize)
                 },
+                ColumnDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.Absolute, SettingsPanel.CONTENT_MARGINS),
+                    new Dimension()
+                },
+                Content = new[]
+                {
+                    new Drawable[2],
+                    new Drawable[] { null, FlowContent }
+                }
             };
 
             // IMPORTANT: all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
@@ -135,11 +157,26 @@ namespace osu.Game.Overlays.Settings
             // intentionally done before LoadComplete to avoid overhead.
             if (ShowsDefaultIndicator)
             {
-                AddInternal(new RestoreDefaultValueButton<T>
+                defaultValueButton = new RestoreDefaultValueButton<T>
                 {
                     Current = controlWithCurrent.Current,
-                });
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                };
+                updateLayout();
             }
+        }
+
+        private void updateLayout()
+        {
+            bool hasLabel = !string.IsNullOrEmpty(labelText?.Text.ToString());
+
+            gridContainer.Content[0][0] = null;
+            gridContainer.Content[1][0] = null;
+
+            gridContainer.Content[hasLabel ? 0 : 1][0] = defaultValueButton;
+
+            FlowContent.Margin = new MarginPadding { Top = hasLabel ? 10 : 0 };
         }
 
         private void updateDisabled()
