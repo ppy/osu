@@ -35,6 +35,11 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("wait for metadata screen load", () => editor.ChildrenOfType<MetadataSection>().FirstOrDefault()?.IsLoaded == true);
 
+            // We intentionally switch away from the metadata screen, else there is a feedback loop with the textbox handling which causes metadata changes below to get overwritten.
+
+            AddStep("Enter compose mode", () => InputManager.Key(Key.F1));
+            AddUntilStep("Wait for compose mode load", () => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true);
+
             AddStep("Set overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty = 7);
             AddStep("Set artist and title", () =>
             {
@@ -44,9 +49,6 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Set difficulty name", () => editorBeatmap.BeatmapInfo.Version = "difficulty");
 
             AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
-
-            AddStep("Enter compose mode", () => InputManager.Key(Key.F1));
-            AddUntilStep("Wait for compose mode load", () => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true);
 
             AddStep("Change to placement mode", () => InputManager.Key(Key.Number2));
             AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
