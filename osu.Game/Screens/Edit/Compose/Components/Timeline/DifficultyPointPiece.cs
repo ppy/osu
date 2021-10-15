@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public DifficultyPointPiece(DifficultyControlPoint point)
             : base(point)
         {
-            speedMultiplier = point.SpeedMultiplierBindable.GetBoundCopy();
+            speedMultiplier = point.SliderVelocityBindable.GetBoundCopy();
 
             Y = Height;
         }

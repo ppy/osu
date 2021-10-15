@@ -46,8 +46,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             sort(decoded.beatmap);
             sort(decodedAfterEncode.beatmap);
 
-            Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
-            Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
+            compareBeatmaps(decoded, decodedAfterEncode);
         }
 
         [TestCaseSource(nameof(allBeatmaps))]
@@ -62,8 +61,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             sort(decoded.beatmap);
             sort(decodedAfterEncode.beatmap);
 
-            Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
-            Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
+            compareBeatmaps(decoded, decodedAfterEncode);
         }
 
         [TestCaseSource(nameof(allBeatmaps))]
@@ -77,12 +75,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded), name);
 
-            // in this process, we may lose some detail in the control points section.
-            // let's focus on only the hitobjects.
-            var originalHitObjects = decoded.beatmap.HitObjects.Serialize();
-            var newHitObjects = decodedAfterEncode.beatmap.HitObjects.Serialize();
-
-            Assert.That(newHitObjects, Is.EqualTo(originalHitObjects));
+            compareBeatmaps(decoded, decodedAfterEncode);
 
             ControlPointInfo removeLegacyControlPointTypes(ControlPointInfo controlPointInfo)
             {
@@ -97,7 +90,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     // completely ignore "legacy" types, which have been moved to HitObjects.
                     // even though these would mostly be ignored by the Add call, they will still be available in groups,
                     // which isn't what we want to be testing here.
-                    if (point is SampleControlPoint)
+                    if (point is SampleControlPoint || point is DifficultyControlPoint)
                         continue;
 
                     newControlPoints.Add(point.Time, point.DeepClone());
@@ -105,6 +98,19 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 return newControlPoints;
             }
+        }
+
+        private void compareBeatmaps((IBeatmap beatmap, TestLegacySkin skin) expected, (IBeatmap beatmap, TestLegacySkin skin) actual)
+        {
+            // Check all control points that are still considered to be at a global level.
+            Assert.That(expected.beatmap.ControlPointInfo.TimingPoints.Serialize(), Is.EqualTo(actual.beatmap.ControlPointInfo.TimingPoints.Serialize()));
+            Assert.That(expected.beatmap.ControlPointInfo.EffectPoints.Serialize(), Is.EqualTo(actual.beatmap.ControlPointInfo.EffectPoints.Serialize()));
+
+            // Check all hitobjects.
+            Assert.That(expected.beatmap.HitObjects.Serialize(), Is.EqualTo(actual.beatmap.HitObjects.Serialize()));
+
+            // Check skin.
+            Assert.IsTrue(areComboColoursEqual(expected.skin.Configuration, actual.skin.Configuration));
         }
 
         [Test]
@@ -156,7 +162,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private (IBeatmap beatmap, TestLegacySkin beatmapSkin) decodeFromLegacy(Stream stream, string name)
+        private (IBeatmap beatmap, TestLegacySkin skin) decodeFromLegacy(Stream stream, string name)
         {
             using (var reader = new LineBufferedReader(stream))
             {
@@ -174,7 +180,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private MemoryStream encodeToLegacy((IBeatmap beatmap, ISkin beatmapSkin) fullBeatmap)
+        private MemoryStream encodeToLegacy((IBeatmap beatmap, ISkin skin) fullBeatmap)
         {
             var (beatmap, beatmapSkin) = fullBeatmap;
             var stream = new MemoryStream();

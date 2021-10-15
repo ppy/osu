@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -42,6 +43,15 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        protected override SampleControlPoint CreatePoint() => new SampleControlPoint(); // TODO: remove
+        protected override SampleControlPoint CreatePoint()
+        {
+            var reference = (Beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(SelectedGroup.Value.Time) ?? SampleControlPoint.DEFAULT;
+
+            return new SampleControlPoint
+            {
+                SampleBank = reference.SampleBank,
+                SampleVolume = reference.SampleVolume,
+            };
+        }
     }
 }
