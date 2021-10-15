@@ -965,7 +965,7 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(IScreen next)
         {
             screenSuspension?.RemoveAndDisposeImmediately();
-            failAnimationLayer?.RemoveAndDisposeImmediately();
+            failAnimationLayer?.RemoveFilters();
 
             // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
             if (prepareScoreForDisplayTask == null)

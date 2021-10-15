@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Play
         private readonly DrawableRuleset drawableRuleset;
         private readonly BindableDouble trackFreq = new BindableDouble(1);
 
+        private Container filters;
+
         private Box failFlash;
 
         private Track track;
@@ -66,8 +68,14 @@ namespace osu.Game.Screens.Play
 
             AddRangeInternal(new Drawable[]
             {
-                failLowPassFilter = new AudioFilter(audio.TrackMixer),
-                failHighPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
+                filters = new Container
+                {
+                    Children = new Drawable[]
+                    {
+                        failLowPassFilter = new AudioFilter(audio.TrackMixer),
+                        failHighPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
+                    },
+                },
                 Content,
                 failFlash = new Box
                 {
@@ -122,6 +130,14 @@ namespace osu.Game.Screens.Play
             Content.FadeColour(Color4.Gray, duration);
         }
 
+        public void RemoveFilters()
+        {
+            RemoveInternal(filters);
+            filters.Dispose();
+
+            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -172,7 +188,7 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+            RemoveFilters();
         }
     }
 }
