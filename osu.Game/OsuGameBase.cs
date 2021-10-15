@@ -40,6 +40,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Stores;
 using osu.Game.Utils;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
@@ -236,6 +237,11 @@ namespace osu.Game
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
+
+            // the following realm components are not actively used yet, but initialised and kept up to date for initial testing.
+            var realmRulesetStore = new RealmRulesetStore(realmFactory, Storage);
+
+            dependencies.Cache(realmRulesetStore);
 
             // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
