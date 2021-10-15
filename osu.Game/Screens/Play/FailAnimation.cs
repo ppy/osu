@@ -184,11 +184,5 @@ namespace osu.Game.Screens.Play
                 obj.MoveTo(originalPosition + new Vector2(0, 400), duration);
             }
         }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            RemoveFilters();
-        }
     }
 }
