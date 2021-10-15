@@ -3,10 +3,10 @@
 
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Mods;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
@@ -17,14 +17,18 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModGhost : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor
     {
+        public const float CURSOR_ALPHA_TRANSITION_DURATION = 100;
         public override string Name => "Ghost";
-        public override string Acronym => "G";
+        public override string Acronym => "GS";
         public override ModType Type => ModType.Fun;
         public override IconUsage? Icon => FontAwesome.Solid.Ghost;
         public override string Description => "Where's the cursor?";
         public override double ScoreMultiplier => 1;
-        
-        private readonly BindableNumber<float> ghostAlpha = new BindableFloat(0);
+        private double transitionProgress = 0;
+        private float currentCursorAlpha = 1;
+        private float startCursorAlpha = 1;
+        private float targetCursorAlpha = 0;
+
         private BindableNumber<int> currentCombo;
 
         [SettingSource(
@@ -43,21 +47,25 @@ namespace osu.Game.Rulesets.Osu.Mods
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            currentCombo = scoreProcessor.Combo.GetBoundCopy();
-            currentCombo.BindValueChanged(combo =>
-            {
-                float dimFactor = HiddenComboCount.Value == 0 ? 1 : (float)combo.NewValue / HiddenComboCount.Value;
-
-                scoreProcessor.TransformBindableTo(ghostAlpha, 1-dimFactor, 100, Easing.OutQuint);
-            }, true);
+            if (HiddenComboCount.Value != 0) {
+                currentCombo = scoreProcessor.Combo.GetBoundCopy();
+                currentCombo.BindValueChanged(combo =>
+                {
+                    targetCursorAlpha = 1 - (float)combo.NewValue / HiddenComboCount.Value;
+                    startCursorAlpha = currentCursorAlpha;
+                    transitionProgress = 0;
+                }, true);
+            }
         }
-
 
         public virtual void Update(Playfield playfield)
         {
-            playfield.Cursor.Alpha = ghostAlpha.Value;
+            if (transitionProgress < CURSOR_ALPHA_TRANSITION_DURATION) {
+                transitionProgress += playfield.Time.Elapsed;
+                currentCursorAlpha = (float)Interpolation.Lerp(startCursorAlpha, targetCursorAlpha, transitionProgress/CURSOR_ALPHA_TRANSITION_DURATION);
+                playfield.Cursor.Alpha = currentCursorAlpha;
+            }
         }
-        
     }
 
     public class HiddenComboSlider : OsuSliderBar<int>
