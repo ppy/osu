@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -108,7 +109,7 @@ namespace osu.Game.Stores
                 List<Ruleset> instances = loadedAssemblies.Values
                                                           .Select(r => Activator.CreateInstance(r) as Ruleset)
                                                           .Where(r => r != null)
-                                                          .Cast<Ruleset>()
+                                                          .Select(r => r.AsNonNull())
                                                           .ToList();
 
                 // add all legacy rulesets first to ensure they have exclusive choice of primary key.
