@@ -389,7 +389,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 if (hitObject.DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
                                     hitObject.DifficultyControlPoint = new DifficultyControlPoint();
 
-                                hitObject.DifficultyControlPoint.SliderVelocity *= (repeatHitObject.Duration / proposedDuration);
+                                var newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
+
+                                if (Precision.AlmostEquals(newVelocity, hitObject.DifficultyControlPoint.SliderVelocity))
+                                    return;
+
+                                hitObject.DifficultyControlPoint.SliderVelocity = newVelocity;
                                 beatmap.Update(hitObject);
                             }
                             else
