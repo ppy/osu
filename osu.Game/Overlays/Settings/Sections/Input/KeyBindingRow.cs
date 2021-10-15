@@ -82,64 +82,82 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS };
 
-            InternalChildren = new Drawable[]
+            InternalChild = new GridContainer
             {
-                new RestoreDefaultValueButton<bool>
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                ColumnDimensions = new[]
                 {
-                    Current = isDefault,
-                    Action = RestoreDefaults,
-                    Origin = Anchor.TopRight,
+                    new Dimension(GridSizeMode.Absolute, SettingsPanel.CONTENT_MARGINS),
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, SettingsPanel.CONTENT_MARGINS),
                 },
-                content = new Container
+                RowDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Masking = true,
-                    CornerRadius = padding,
-                    EdgeEffect = new EdgeEffectParameters
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        Radius = 2,
-                        Colour = colourProvider.Highlight1.Opacity(0),
-                        Type = EdgeEffectType.Shadow,
-                        Hollow = true,
-                    },
-                    Children = new Drawable[]
-                    {
-                        new Box
+                        new RestoreDefaultValueButton<bool>
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background5,
+                            Current = isDefault,
+                            Action = RestoreDefaults,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre
                         },
-                        text = new OsuSpriteText
+                        content = new Container
                         {
-                            Text = action.GetLocalisableDescription(),
-                            Margin = new MarginPadding(1.5f * padding),
-                        },
-                        buttons = new FillFlowContainer<KeyButton>
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight
-                        },
-                        cancelAndClearButtons = new FillFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Padding = new MarginPadding(padding) { Top = height + padding * 2 },
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Alpha = 0,
-                            Spacing = new Vector2(5),
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Masking = true,
+                            CornerRadius = padding,
+                            EdgeEffect = new EdgeEffectParameters
+                            {
+                                Radius = 2,
+                                Colour = colourProvider.Highlight1.Opacity(0),
+                                Type = EdgeEffectType.Shadow,
+                                Hollow = true,
+                            },
                             Children = new Drawable[]
                             {
-                                new CancelButton { Action = finalise },
-                                new ClearButton { Action = clear },
-                            },
-                        }
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background5,
+                                },
+                                text = new OsuSpriteText
+                                {
+                                    Text = action.GetLocalisableDescription(),
+                                    Margin = new MarginPadding(1.5f * padding),
+                                },
+                                buttons = new FillFlowContainer<KeyButton>
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight
+                                },
+                                cancelAndClearButtons = new FillFlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding(padding) { Top = height + padding * 2 },
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Alpha = 0,
+                                    Spacing = new Vector2(5),
+                                    Children = new Drawable[]
+                                    {
+                                        new CancelButton { Action = finalise },
+                                        new ClearButton { Action = clear },
+                                    },
+                                }
+                            }
+                        },
+                        new HoverClickSounds()
                     }
-                },
-                new HoverClickSounds()
+                }
             };
 
             foreach (var b in bindings)
