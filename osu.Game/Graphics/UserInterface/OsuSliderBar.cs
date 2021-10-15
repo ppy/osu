@@ -120,7 +120,6 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
-                        Expanded = true,
                         Current = { Value = true }
                     },
                 },
