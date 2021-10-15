@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float border_width = 3;
 
-        private const double animate_in_duration = 150;
+        private const double animate_in_duration = 200;
         private const double animate_out_duration = 500;
 
         public Nub()
@@ -62,14 +62,14 @@ namespace osu.Game.Graphics.UserInterface
         {
             AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
             GlowingAccentColour = colourProvider?.Highlight1.Lighten(0.2f) ?? colours.PinkLighter;
-            GlowColour = colourProvider?.Dark3 ?? colours.PinkDarker;
+            GlowColour = colourProvider?.Light4 ?? colours.PinkDarker;
 
             EdgeEffect = new EdgeEffectParameters
             {
                 Colour = GlowColour.Opacity(0),
                 Type = EdgeEffectType.Glow,
                 Radius = 10,
-                Roundness = 8,
+                Roundness = 10,
             };
         }
 
@@ -85,7 +85,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (value)
                 {
                     this.FadeColour(GlowingAccentColour, animate_in_duration, Easing.OutQuint);
-                    FadeEdgeEffectTo(1, animate_in_duration, Easing.OutQuint);
+                    FadeEdgeEffectTo(0.6f, animate_in_duration, Easing.OutQuint);
                 }
                 else
                 {
