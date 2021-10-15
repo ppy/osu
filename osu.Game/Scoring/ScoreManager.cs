@@ -25,7 +25,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : IModelManager<ScoreInfo>, IModelFileManager<ScoreInfo, ScoreFileInfo>, IModelDownloader<ScoreInfo>, ICanAcceptFiles, IPostImports<ScoreInfo>
+    public class ScoreManager : IModelManager<ScoreInfo>, IModelFileManager<ScoreInfo, ScoreFileInfo>, IModelDownloader<ScoreInfo>, ICanAcceptFiles
     {
         private readonly Scheduler scheduler;
         private readonly Func<BeatmapDifficultyCache> difficulties;
@@ -72,9 +72,12 @@ namespace osu.Game.Scoring
                 }
             }
 
-            // We're calling .Result, but this should not be a blocking call due to the above GetDifficultyAsync() calls.
-            return scores.OrderByDescending(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken).Result)
-                         .ThenBy(s => s.OnlineScoreID)
+            var totalScores = await Task.WhenAll(scores.Select(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken))).ConfigureAwait(false);
+
+            return scores.Select((score, index) => (score, totalScore: totalScores[index]))
+                         .OrderByDescending(g => g.totalScore)
+                         .ThenBy(g => g.score.OnlineScoreID)
+                         .Select(g => g.score)
                          .ToArray();
         }
 

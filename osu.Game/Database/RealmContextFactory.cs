@@ -5,7 +5,6 @@ using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
@@ -18,7 +17,7 @@ namespace osu.Game.Database
     /// <summary>
     /// A factory which provides both the main (update thread bound) realm context and creates contexts for async usage.
     /// </summary>
-    public class RealmContextFactory : Component, IRealmFactory
+    public class RealmContextFactory : IDisposable, IRealmFactory
     {
         private readonly Storage storage;
 
@@ -79,10 +78,11 @@ namespace osu.Game.Database
         /// <returns></returns>
         public bool Compact() => Realm.Compact(getConfiguration());
 
-        protected override void Update()
+        /// <summary>
+        /// Perform a blocking refresh on the main realm context.
+        /// </summary>
+        public void Refresh()
         {
-            base.Update();
-
             lock (contextLock)
             {
                 if (context?.Refresh() == true)
@@ -92,7 +92,7 @@ namespace osu.Game.Database
 
         public Realm CreateContext()
         {
-            if (IsDisposed)
+            if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
             try
@@ -132,12 +132,11 @@ namespace osu.Game.Database
         /// <returns>An <see cref="IDisposable"/> which should be disposed to end the blocking section.</returns>
         public IDisposable BlockAllOperations()
         {
-            if (IsDisposed)
+            if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
-            // TODO: this can be added for safety once we figure how to bypass in test
-            // if (!ThreadSafety.IsUpdateThread)
-            //     throw new InvalidOperationException($"{nameof(BlockAllOperations)} must be called from the update thread.");
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException($"{nameof(BlockAllOperations)} must be called from the update thread.");
 
             Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
@@ -177,21 +176,23 @@ namespace osu.Game.Database
             });
         }
 
-        protected override void Dispose(bool isDisposing)
+        private bool isDisposed;
+
+        public void Dispose()
         {
             lock (contextLock)
             {
                 context?.Dispose();
             }
 
-            if (!IsDisposed)
+            if (!isDisposed)
             {
                 // intentionally block context creation indefinitely. this ensures that nothing can start consuming a new context after disposal.
                 contextCreationLock.Wait();
                 contextCreationLock.Dispose();
-            }
 
-            base.Dispose(isDisposing);
+                isDisposed = true;
+            }
         }
     }
 }

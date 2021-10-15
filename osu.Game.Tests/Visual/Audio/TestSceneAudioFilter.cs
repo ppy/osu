@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -18,15 +19,18 @@ namespace osu.Game.Tests.Visual.Audio
 {
     public class TestSceneAudioFilter : OsuTestScene
     {
-        private OsuSpriteText lowpassText;
-        private AudioFilter lowpassFilter;
+        private OsuSpriteText lowPassText;
+        private AudioFilter lowPassFilter;
 
-        private OsuSpriteText highpassText;
-        private AudioFilter highpassFilter;
+        private OsuSpriteText highPassText;
+        private AudioFilter highPassFilter;
 
         private Track track;
 
         private WaveformTestBeatmap beatmap;
+
+        private OsuSliderBar<int> lowPassSlider;
+        private OsuSliderBar<int> highPassSlider;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -38,53 +42,89 @@ namespace osu.Game.Tests.Visual.Audio
             {
                 Children = new Drawable[]
                 {
-                    lowpassFilter = new AudioFilter(audio.TrackMixer),
-                    highpassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
-                    lowpassText = new OsuSpriteText
+                    lowPassFilter = new AudioFilter(audio.TrackMixer),
+                    highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
+                    lowPassText = new OsuSpriteText
                     {
                         Padding = new MarginPadding(20),
-                        Text = $"Low Pass: {lowpassFilter.Cutoff.Value}hz",
+                        Text = $"Low Pass: {lowPassFilter.Cutoff}hz",
                         Font = new FontUsage(size: 40)
                     },
-                    new OsuSliderBar<int>
+                    lowPassSlider = new OsuSliderBar<int>
                     {
                         Width = 500,
                         Height = 50,
                         Padding = new MarginPadding(20),
-                        Current = { BindTarget = lowpassFilter.Cutoff }
+                        Current = new BindableInt
+                        {
+                            MinValue = 0,
+                            MaxValue = AudioFilter.MAX_LOWPASS_CUTOFF,
+                        }
                     },
-                    highpassText = new OsuSpriteText
+                    highPassText = new OsuSpriteText
                     {
                         Padding = new MarginPadding(20),
-                        Text = $"High Pass: {highpassFilter.Cutoff.Value}hz",
+                        Text = $"High Pass: {highPassFilter.Cutoff}hz",
                         Font = new FontUsage(size: 40)
                     },
-                    new OsuSliderBar<int>
+                    highPassSlider = new OsuSliderBar<int>
                     {
                         Width = 500,
                         Height = 50,
                         Padding = new MarginPadding(20),
-                        Current = { BindTarget = highpassFilter.Cutoff }
+                        Current = new BindableInt
+                        {
+                            MinValue = 0,
+                            MaxValue = AudioFilter.MAX_LOWPASS_CUTOFF,
+                        }
                     }
                 }
             });
-            lowpassFilter.Cutoff.ValueChanged += e => lowpassText.Text = $"Low Pass: {e.NewValue}hz";
-            highpassFilter.Cutoff.ValueChanged += e => highpassText.Text = $"High Pass: {e.NewValue}hz";
+
+            lowPassSlider.Current.ValueChanged += e =>
+            {
+                lowPassText.Text = $"Low Pass: {e.NewValue}hz";
+                lowPassFilter.Cutoff = e.NewValue;
+            };
+
+            highPassSlider.Current.ValueChanged += e =>
+            {
+                highPassText.Text = $"High Pass: {e.NewValue}hz";
+                highPassFilter.Cutoff = e.NewValue;
+            };
         }
+
+        #region Overrides of Drawable
+
+        protected override void Update()
+        {
+            base.Update();
+            highPassSlider.Current.Value = highPassFilter.Cutoff;
+            lowPassSlider.Current.Value = lowPassFilter.Cutoff;
+        }
+
+        #endregion
 
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("Play Track", () => track.Start());
+
+            AddStep("Reset filters", () =>
+            {
+                lowPassFilter.Cutoff = AudioFilter.MAX_LOWPASS_CUTOFF;
+                highPassFilter.Cutoff = 0;
+            });
+
             waitTrackPlay();
         }
 
         [Test]
-        public void TestLowPass()
+        public void TestLowPassSweep()
         {
             AddStep("Filter Sweep", () =>
             {
-                lowpassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF).Then()
+                lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF).Then()
                              .CutoffTo(0, 2000, Easing.OutCubic);
             });
 
@@ -92,7 +132,7 @@ namespace osu.Game.Tests.Visual.Audio
 
             AddStep("Filter Sweep (reverse)", () =>
             {
-                lowpassFilter.CutoffTo(0).Then()
+                lowPassFilter.CutoffTo(0).Then()
                              .CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 2000, Easing.InCubic);
             });
 
@@ -101,11 +141,11 @@ namespace osu.Game.Tests.Visual.Audio
         }
 
         [Test]
-        public void TestHighPass()
+        public void TestHighPassSweep()
         {
             AddStep("Filter Sweep", () =>
             {
-                highpassFilter.CutoffTo(0).Then()
+                highPassFilter.CutoffTo(0).Then()
                               .CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 2000, Easing.InCubic);
             });
 
@@ -113,7 +153,7 @@ namespace osu.Game.Tests.Visual.Audio
 
             AddStep("Filter Sweep (reverse)", () =>
             {
-                highpassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF).Then()
+                highPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF).Then()
                               .CutoffTo(0, 2000, Easing.OutCubic);
             });
 
@@ -123,5 +163,11 @@ namespace osu.Game.Tests.Visual.Audio
         }
 
         private void waitTrackPlay() => AddWaitStep("Let track play", 10);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            track?.Dispose();
+        }
     }
 }
