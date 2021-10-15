@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -27,11 +26,6 @@ namespace osu.Game.Overlays.Settings
         }
 
         public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(Control.Items.Select(i => i.ToString()));
-
-        public SettingsDropdown()
-        {
-            FlowContent.Spacing = new Vector2(0, 10);
-        }
 
         protected sealed override Drawable CreateControl() => CreateDropdown();
 

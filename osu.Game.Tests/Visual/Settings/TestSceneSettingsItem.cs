@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays;
@@ -29,9 +30,10 @@ namespace osu.Game.Tests.Visual.Settings
                         Value = "test"
                     }
                 };
-
-                restoreDefaultValueButton = textBox.ChildrenOfType<RestoreDefaultValueButton<string>>().Single();
             });
+            AddUntilStep("wait for loaded", () => textBox.IsLoaded);
+            AddStep("retrieve restore default button", () => restoreDefaultValueButton = textBox.ChildrenOfType<RestoreDefaultValueButton<string>>().Single());
+
             AddAssert("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
 
             AddStep("change value from default", () => textBox.Current.Value = "non-default");
@@ -39,6 +41,41 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("restore default", () => textBox.Current.SetDefault());
             AddUntilStep("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
+        }
+
+        [Test]
+        public void TestSetAndClearLabelText()
+        {
+            SettingsTextBox textBox = null;
+            GridContainer settingsItemGrid = null;
+            RestoreDefaultValueButton<string> restoreDefaultValueButton = null;
+
+            AddStep("create settings item", () =>
+            {
+                Child = textBox = new SettingsTextBox
+                {
+                    Current = new Bindable<string>
+                    {
+                        Default = "test",
+                        Value = "test"
+                    }
+                };
+            });
+            AddUntilStep("wait for loaded", () => textBox.IsLoaded);
+            AddStep("retrieve components", () =>
+            {
+                settingsItemGrid = textBox.ChildrenOfType<GridContainer>().Single();
+                restoreDefaultValueButton = textBox.ChildrenOfType<RestoreDefaultValueButton<string>>().Single();
+            });
+
+            AddStep("set non-default value", () => restoreDefaultValueButton.Current.Value = "non-default");
+            AddAssert("default value button next to control", () => settingsItemGrid.Content[1][0] == restoreDefaultValueButton);
+
+            AddStep("set label", () => textBox.LabelText = "label text");
+            AddAssert("default value button next to label", () => settingsItemGrid.Content[0][0] == restoreDefaultValueButton);
+
+            AddStep("clear label", () => textBox.LabelText = default);
+            AddAssert("default value button next to control", () => settingsItemGrid.Content[1][0] == restoreDefaultValueButton);
         }
 
         /// <summary>
@@ -64,9 +101,9 @@ namespace osu.Game.Tests.Visual.Settings
                         Precision = 0.1f,
                     }
                 };
-
-                restoreDefaultValueButton = sliderBar.ChildrenOfType<RestoreDefaultValueButton<float>>().Single();
             });
+            AddUntilStep("wait for loaded", () => sliderBar.IsLoaded);
+            AddStep("retrieve restore default button", () => restoreDefaultValueButton = sliderBar.ChildrenOfType<RestoreDefaultValueButton<float>>().Single());
 
             AddAssert("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
 
