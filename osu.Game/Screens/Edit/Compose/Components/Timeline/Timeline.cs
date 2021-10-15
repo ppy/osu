@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Track track;
 
         private const float timeline_height = 72;
-        private const float timeline_expanded_height = 156;
+        private const float timeline_expanded_height = 94;
 
         public Timeline(Drawable userContent)
         {
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (visible.NewValue)
                 {
                     this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
-                    mainContent.MoveToY(36, 200, Easing.OutQuint);
+                    mainContent.MoveToY(20, 200, Easing.OutQuint);
 
                     // delay the fade in else masking looks weird.
                     controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
