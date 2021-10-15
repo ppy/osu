@@ -153,14 +153,25 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            Nub.Glowing = true;
+            updateGlow();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            Nub.Glowing = false;
+            updateGlow();
             base.OnHoverLost(e);
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            updateGlow();
+            base.OnDragEnd(e);
+        }
+
+        private void updateGlow()
+        {
+            Nub.Glowing = IsHovered || IsDragged;
         }
 
         protected override void OnUserChange(T value)
