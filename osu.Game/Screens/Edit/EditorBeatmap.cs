@@ -45,6 +45,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public readonly Bindable<HitObject> PlacementObject = new Bindable<HitObject>();
 
+        private readonly BeatmapInfo beatmapInfo;
         public readonly IBeatmap PlayableBeatmap;
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null)
+        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
         {
             PlayableBeatmap = playableBeatmap;
 
@@ -96,6 +97,8 @@ namespace osu.Game.Screens.Edit
                 playableBeatmap.ControlPointInfo = newControlPoints;
             }
 
+            this.beatmapInfo = beatmapInfo ?? playableBeatmap.BeatmapInfo;
+
             if (beatmapSkin is Skin skin)
                 BeatmapSkin = new EditorBeatmapSkin(skin);
 
@@ -107,11 +110,11 @@ namespace osu.Game.Screens.Edit
 
         public BeatmapInfo BeatmapInfo
         {
-            get => PlayableBeatmap.BeatmapInfo;
-            set => PlayableBeatmap.BeatmapInfo = value;
+            get => beatmapInfo;
+            set => throw new InvalidOperationException();
         }
 
-        public BeatmapMetadata Metadata => PlayableBeatmap.Metadata;
+        public BeatmapMetadata Metadata => beatmapInfo.Metadata;
 
         public BeatmapDifficulty Difficulty
         {
