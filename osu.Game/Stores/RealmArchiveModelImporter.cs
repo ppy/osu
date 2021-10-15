@@ -29,7 +29,7 @@ namespace osu.Game.Stores
     /// Adds cross-functionality with <see cref="RealmFileStore"/> to give access to the central file store for the provided model.
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
-    public abstract class ArchiveModelImporter<TModel> : IModelImporter<TModel>
+    public abstract class RealmArchiveModelImporter<TModel> : IModelImporter<TModel>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
         private const int import_queue_request_concurrency = 1;
@@ -40,20 +40,20 @@ namespace osu.Game.Stores
         private const int low_priority_import_batch_size = 1;
 
         /// <summary>
-        /// A singleton scheduler shared by all <see cref="ArchiveModelImporter{TModel}"/>.
+        /// A singleton scheduler shared by all <see cref="RealmArchiveModelImporter{TModel}"/>.
         /// </summary>
         /// <remarks>
         /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
         /// It is mainly being used as a queue mechanism for large imports.
         /// </remarks>
-        private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelImporter<TModel>));
+        private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
         /// <summary>
         /// A second scheduler for lower priority imports.
         /// For simplicity, these will just run in parallel with normal priority imports, but a future refactor would see this implemented via a custom scheduler/queue.
         /// See https://gist.github.com/peppy/f0e118a14751fc832ca30dd48ba3876b for an incomplete version of this.
         /// </summary>
-        private static readonly ThreadedTaskScheduler import_scheduler_low_priority = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelImporter<TModel>));
+        private static readonly ThreadedTaskScheduler import_scheduler_low_priority = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
 
         public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
 
@@ -71,7 +71,7 @@ namespace osu.Game.Stores
         /// </summary>
         public Action<Notification>? PostNotification { protected get; set; }
 
-        protected ArchiveModelImporter(Storage storage, RealmContextFactory contextFactory)
+        protected RealmArchiveModelImporter(Storage storage, RealmContextFactory contextFactory)
         {
             ContextFactory = contextFactory;
 
