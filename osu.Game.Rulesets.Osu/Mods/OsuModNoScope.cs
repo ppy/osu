@@ -16,13 +16,13 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModGhost : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor
+    public class OsuModNoScope : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor
     {
         public const float CURSOR_ALPHA_TRANSITION_DURATION = 100;
-        public override string Name => "Ghost";
-        public override string Acronym => "GS";
+        public override string Name => "No Scope";
+        public override string Acronym => "NS";
         public override ModType Type => ModType.Fun;
-        public override IconUsage? Icon => FontAwesome.Solid.Ghost;
+        public override IconUsage? Icon => FontAwesome.Solid.EyeSlash;
         public override string Description => "Where's the cursor?";
         public override double ScoreMultiplier => 1;
         private readonly BindableFloat cursorAlpha = new BindableFloat();

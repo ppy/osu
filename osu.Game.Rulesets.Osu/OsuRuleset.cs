@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModBarrelRoll(),
                         new OsuModApproachDifferent(),
                         new OsuModMuted(),
-                        new OsuModGhost(),
+                        new OsuModNoScope(),
                     };
 
                 case ModType.System:
