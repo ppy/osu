@@ -246,16 +246,37 @@ namespace osu.Game.Screens.Play
                 {
                     OnRetry = Restart,
                     OnQuit = () => PerformExit(true),
-                }
+                },
+                new HotkeyExitOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        fadeOut(true);
+                        PerformExit(false);
+                    },
+                },
             });
+
+            if (Configuration.AllowRestart)
+            {
+                rulesetSkinProvider.Add(new HotkeyRetryOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        fadeOut(true);
+                        Restart();
+                    },
+                });
+            }
 
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
-            failAnimationLayer.AddRange(new[]
-            {
-                createOverlayComponents(Beatmap.Value),
-            });
+            failAnimationLayer.Add(createOverlayComponents(Beatmap.Value));
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -356,16 +377,6 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    new HotkeyExitOverlay
-                    {
-                        Action = () =>
-                        {
-                            if (!this.IsCurrentScreen()) return;
-
-                            fadeOut(true);
-                            PerformExit(false);
-                        },
-                    },
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
                     BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                     {
@@ -418,20 +429,6 @@ namespace osu.Game.Screens.Play
 
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
-
-            if (Configuration.AllowRestart)
-            {
-                container.Add(new HotkeyRetryOverlay
-                {
-                    Action = () =>
-                    {
-                        if (!this.IsCurrentScreen()) return;
-
-                        fadeOut(true);
-                        Restart();
-                    },
-                });
-            }
 
             return container;
         }
