@@ -1,12 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Mods;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
@@ -24,11 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Ghost;
         public override string Description => "Where's the cursor?";
         public override double ScoreMultiplier => 1;
-        private double transitionProgress = 0;
-        private float currentCursorAlpha = 1;
-        private float startCursorAlpha = 1;
-        private float targetCursorAlpha = 0;
-
+        private readonly BindableFloat cursorAlpha = new BindableFloat();
         private BindableNumber<int> currentCombo;
 
         [SettingSource(
@@ -45,26 +42,23 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            if (HiddenComboCount.Value != 0) {
+            if (HiddenComboCount.Value != 0)
+            {
                 currentCombo = scoreProcessor.Combo.GetBoundCopy();
                 currentCombo.BindValueChanged(combo =>
                 {
-                    targetCursorAlpha = 1 - (float)combo.NewValue / HiddenComboCount.Value;
-                    startCursorAlpha = currentCursorAlpha;
-                    transitionProgress = 0;
+                    float targetCursorAlpha = (float)Math.Max(1e-3, 1 - (float)combo.NewValue / HiddenComboCount.Value);
+                    scoreProcessor.TransformBindableTo(cursorAlpha, targetCursorAlpha, CURSOR_ALPHA_TRANSITION_DURATION, Easing.OutQuint);
                 }, true);
             }
         }
 
         public virtual void Update(Playfield playfield)
         {
-            if (transitionProgress < CURSOR_ALPHA_TRANSITION_DURATION) {
-                transitionProgress += playfield.Time.Elapsed;
-                currentCursorAlpha = (float)Interpolation.Lerp(startCursorAlpha, targetCursorAlpha, transitionProgress/CURSOR_ALPHA_TRANSITION_DURATION);
-                playfield.Cursor.Alpha = currentCursorAlpha;
-            }
+            playfield.Cursor.Alpha = cursorAlpha.Value;
         }
     }
 
