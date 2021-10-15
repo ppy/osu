@@ -89,15 +89,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 RelativeSizeAxes = Axes.Both,
                 ColumnDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 400),
                     new Dimension(),
-                    new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 600),
+                    new Dimension(GridSizeMode.Absolute, 10),
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 10),
+                    new Dimension(),
                 },
                 Content = new[]
                 {
                     new Drawable[]
                     {
-                        // Main left column
+                        // Participants column
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -119,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         },
                         // Spacer
                         null,
-                        // Main right column
+                        // Beatmap column
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -165,14 +167,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                         }
                                     },
                                 },
-                                new Drawable[] { new OverlinedHeader("Chat") { Margin = new MarginPadding { Vertical = 5 }, }, },
-                                new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
                             },
                             RowDimensions = new[]
                             {
                                 new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(GridSizeMode.AutoSize),
+                            }
+                        },
+                        // Spacer
+                        null,
+                        // Main right column
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Content = new[]
+                            {
+                                new Drawable[] { new OverlinedHeader("Chat") },
+                                new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
+                            },
+                            RowDimensions = new[]
+                            {
                                 new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(),
                             }
