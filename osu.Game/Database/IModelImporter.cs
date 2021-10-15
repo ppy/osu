@@ -13,7 +13,7 @@ namespace osu.Game.Database
     /// A class which handles importing of associated models to the game store.
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
-    public interface IModelImporter<TModel> : IPostNotifications
+    public interface IModelImporter<TModel> : IPostNotifications, IPostImports<TModel>
         where TModel : class
     {
         /// <summary>
