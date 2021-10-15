@@ -150,6 +150,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
             notifyRoomsUpdated();
         }
 
-        private void notifyRoomsUpdated() => Scheduler.AddOnce(() => RoomsUpdated?.Invoke());
+        private void notifyRoomsUpdated()
+        {
+            Scheduler.AddOnce(invokeRoomsUpdated);
+
+            void invokeRoomsUpdated() => RoomsUpdated?.Invoke();
+        }
     }
 }
