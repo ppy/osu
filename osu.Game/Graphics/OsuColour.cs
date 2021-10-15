@@ -235,10 +235,17 @@ namespace osu.Game.Graphics
         /// </summary>
         public readonly Color4 Blue3 = Color4Extensions.FromHex(@"3399cc");
 
+        public readonly Color4 Lime0 = Color4Extensions.FromHex(@"ccff99");
+
         /// <summary>
         /// Equivalent to <see cref="OverlayColourProvider.Lime"/>'s <see cref="OverlayColourProvider.Colour1"/>.
         /// </summary>
         public readonly Color4 Lime1 = Color4Extensions.FromHex(@"b2ff66");
+
+        /// <summary>
+        /// Equivalent to <see cref="OverlayColourProvider.Lime"/>'s <see cref="OverlayColourProvider.Colour3"/>.
+        /// </summary>
+        public readonly Color4 Lime3 = Color4Extensions.FromHex(@"7fcc33");
 
         /// <summary>
         /// Equivalent to <see cref="OverlayColourProvider.Orange"/>'s <see cref="OverlayColourProvider.Colour1"/>.
