@@ -410,7 +410,7 @@ namespace osu.Game.Screens.Select
         {
             if (e.NewValue is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
-            Logger.Log($"working beatmap updated to {e.NewValue}");
+            Logger.Log($"Song select working beatmap updated to {e.NewValue}");
 
             if (!Carousel.SelectBeatmap(e.NewValue.BeatmapInfo, false))
             {
