@@ -262,9 +262,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 double fullComboThreshold = Attributes.MaxCombo - 0.1 * Attributes.SliderCount;
                 if (scoreMaxCombo < fullComboThreshold)
-                    comboBasedMissCount = fullComboThreshold / scoreMaxCombo;
-                else
-                    comboBasedMissCount = Math.Pow((Attributes.MaxCombo - scoreMaxCombo) / (0.1 * Attributes.SliderCount), 3);
+                    comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
             }
 
             return Math.Max(countMiss, (int)Math.Floor(comboBasedMissCount));
