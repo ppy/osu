@@ -339,54 +339,8 @@ namespace osu.Game.Screens.Play
             var container = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new[]
+                Children = new Drawable[]
                 {
-                    DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
-                    BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
-                    {
-                        Clock = DrawableRuleset.FrameStableClock,
-                        ProcessCustomClock = false,
-                        Breaks = working.Beatmap.Breaks
-                    },
-                    // display the cursor above some HUD elements.
-                    DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
-                    DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods)
-                    {
-                        HoldToQuit =
-                        {
-                            Action = () => PerformExit(true),
-                            IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
-                        },
-                        KeyCounter =
-                        {
-                            AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
-                            IsCounting = false
-                        },
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    },
-                    skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
-                    {
-                        RequestSkip = performUserRequestedSkip
-                    },
-                    skipOutroOverlay = new SkipOverlay(Beatmap.Value.Storyboard.LatestEventTime ?? 0)
-                    {
-                        RequestSkip = () => progressToResults(false),
-                        Alpha = 0
-                    },
-                    FailOverlay = new FailOverlay
-                    {
-                        OnRetry = Restart,
-                        OnQuit = () => PerformExit(true),
-                    },
-                    PauseOverlay = new PauseOverlay
-                    {
-                        OnResume = Resume,
-                        Retries = RestartCount,
-                        OnRetry = Restart,
-                        OnQuit = () => PerformExit(true),
-                    },
                     new HotkeyExitOverlay
                     {
                         Action = () =>
@@ -397,7 +351,59 @@ namespace osu.Game.Screens.Play
                             PerformExit(false);
                         },
                     },
-                    failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
+                    failAnimation = new FailAnimation(DrawableRuleset)
+                    {
+                        OnComplete = onFailComplete,
+                        Children = new[]
+                        {
+                            DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
+                            BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                            {
+                                Clock = DrawableRuleset.FrameStableClock,
+                                ProcessCustomClock = false,
+                                Breaks = working.Beatmap.Breaks
+                            },
+                            // display the cursor above some HUD elements.
+                            DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
+                            DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
+                            HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods)
+                            {
+                                HoldToQuit =
+                                {
+                                    Action = () => PerformExit(true),
+                                    IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
+                                },
+                                KeyCounter =
+                                {
+                                    AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
+                                    IsCounting = false
+                                },
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre
+                            },
+                            skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
+                            {
+                                RequestSkip = performUserRequestedSkip
+                            },
+                            skipOutroOverlay = new SkipOverlay(Beatmap.Value.Storyboard.LatestEventTime ?? 0)
+                            {
+                                RequestSkip = () => progressToResults(false),
+                                Alpha = 0
+                            },
+                            PauseOverlay = new PauseOverlay
+                            {
+                                OnResume = Resume,
+                                Retries = RestartCount,
+                                OnRetry = Restart,
+                                OnQuit = () => PerformExit(true),
+                            },
+                        }
+                    },
+                    FailOverlay = new FailOverlay
+                    {
+                        OnRetry = Restart,
+                        OnQuit = () => PerformExit(true),
+                    }
                 }
             };
 
