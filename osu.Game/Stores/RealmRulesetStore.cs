@@ -106,8 +106,9 @@ namespace osu.Game.Stores
                 var rulesets = realm.All<RealmRuleset>();
 
                 List<Ruleset> instances = loadedAssemblies.Values
-                                                          .Select(Activator.CreateInstance)
-                                                          .OfType<Ruleset>()
+                                                          .Select(r => Activator.CreateInstance(r) as Ruleset)
+                                                          .Where(r => r != null)
+                                                          .Cast<Ruleset>()
                                                           .ToList();
 
                 // add all legacy rulesets first to ensure they have exclusive choice of primary key.
