@@ -63,14 +63,14 @@ namespace osu.Game.Graphics.UserInterface
         {
             AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
             GlowingAccentColour = colourProvider?.Highlight1.Lighten(0.2f) ?? colours.PinkLighter;
-            GlowColour = colourProvider?.Light4 ?? colours.PinkDarker;
+            GlowColour = colourProvider?.Highlight1 ?? colours.PinkLighter;
 
             main.EdgeEffect = new EdgeEffectParameters
             {
                 Colour = GlowColour.Opacity(0),
                 Type = EdgeEffectType.Glow,
-                Radius = 10,
-                Roundness = 10,
+                Radius = 8,
+                Roundness = 5,
             };
         }
 
@@ -93,12 +93,12 @@ namespace osu.Game.Graphics.UserInterface
                 if (value)
                 {
                     main.FadeColour(GlowingAccentColour, animate_in_duration, Easing.OutQuint);
-                    main.FadeEdgeEffectTo(0.6f, animate_in_duration, Easing.OutQuint);
+                    main.FadeEdgeEffectTo(0.2f, animate_in_duration, Easing.OutQuint);
                 }
                 else
                 {
-                    main.FadeEdgeEffectTo(0, animate_out_duration);
-                    main.FadeColour(AccentColour, animate_out_duration);
+                    main.FadeEdgeEffectTo(0, animate_out_duration, Easing.OutQuint);
+                    main.FadeColour(AccentColour, animate_out_duration, Easing.OutQuint);
                 }
             }
         }
@@ -153,7 +153,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 glowColour = value;
 
-                var effect = EdgeEffect;
+                var effect = main.EdgeEffect;
                 effect.Colour = Glowing ? value : value.Opacity(0);
                 main.EdgeEffect = effect;
             }
