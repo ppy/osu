@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 // For non-mania beatmap, speed changes should only happen through timing points
                 if (!isForCurrentRuleset)
-                    p.DifficultyPoint = new DifficultyControlPoint();
+                    p.EffectPoint = new EffectControlPoint();
             }
 
             BarLines.ForEach(Playfield.Add);

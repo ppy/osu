@@ -8,6 +8,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
 using osuTK.Input;
@@ -30,22 +31,36 @@ namespace osu.Game.Tests.Visual.Editing
 
             PushAndConfirm(() => new EditorLoader());
 
-            AddUntilStep("wait for editor load", () => editor != null);
+            AddUntilStep("wait for editor load", () => editor?.IsLoaded == true);
 
-            AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
+            AddUntilStep("wait for metadata screen load", () => editor.ChildrenOfType<MetadataSection>().FirstOrDefault()?.IsLoaded == true);
+
+            // We intentionally switch away from the metadata screen, else there is a feedback loop with the textbox handling which causes metadata changes below to get overwritten.
 
             AddStep("Enter compose mode", () => InputManager.Key(Key.F1));
             AddUntilStep("Wait for compose mode load", () => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true);
+
+            AddStep("Set overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty = 7);
+            AddStep("Set artist and title", () =>
+            {
+                editorBeatmap.BeatmapInfo.Metadata.Artist = "artist";
+                editorBeatmap.BeatmapInfo.Metadata.Title = "title";
+            });
+            AddStep("Set difficulty name", () => editorBeatmap.BeatmapInfo.Version = "difficulty");
+
+            AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
 
             AddStep("Change to placement mode", () => InputManager.Key(Key.Number2));
             AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
             AddStep("Place single hitcircle", () => InputManager.Click(MouseButton.Left));
 
-            AddStep("Save and exit", () =>
-            {
-                InputManager.Keys(PlatformAction.Save);
-                InputManager.Key(Key.Escape);
-            });
+            checkMutations();
+
+            AddStep("Save", () => InputManager.Keys(PlatformAction.Save));
+
+            checkMutations();
+
+            AddStep("Exit", () => InputManager.Key(Key.Escape));
 
             AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
 
@@ -56,7 +71,16 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Enter editor", () => InputManager.Key(Key.Number5));
 
             AddUntilStep("Wait for editor load", () => editor != null);
+
+            checkMutations();
+        }
+
+        private void checkMutations()
+        {
             AddAssert("Beatmap contains single hitcircle", () => editorBeatmap.HitObjects.Count == 1);
+            AddAssert("Beatmap has correct overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty == 7);
+            AddAssert("Beatmap has correct metadata", () => editorBeatmap.BeatmapInfo.Metadata.Artist == "artist" && editorBeatmap.BeatmapInfo.Metadata.Title == "title");
+            AddAssert("Beatmap has correct difficulty name", () => editorBeatmap.BeatmapInfo.Version == "difficulty");
         }
     }
 }

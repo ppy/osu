@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -15,7 +14,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -25,7 +23,7 @@ namespace osu.Game.Overlays
     [Cached]
     public abstract class SettingsPanel : OsuFocusedOverlayContainer
     {
-        public const float CONTENT_MARGINS = 15;
+        public const float CONTENT_MARGINS = 20;
 
         public const float TRANSITION_LENGTH = 600;
 
@@ -46,7 +44,7 @@ namespace osu.Game.Overlays
         protected override Container<Drawable> Content => ContentContainer;
 
         protected Sidebar Sidebar;
-        private SidebarButton selectedSidebarButton;
+        private SidebarIconButton selectedSidebarButton;
 
         public SettingsSectionsContainer SectionsContainer { get; private set; }
 
@@ -63,6 +61,9 @@ namespace osu.Game.Overlays
         private Task sectionsLoadingTask;
 
         public IBindable<SettingsSection> CurrentSection = new Bindable<SettingsSection>();
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         protected SettingsPanel(bool showSidebar)
         {
@@ -89,7 +90,7 @@ namespace osu.Game.Overlays
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(2, 1), // over-extend to the left for transitions
                         RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.Gray(0.05f),
+                        Colour = colourProvider.Background4,
                         Alpha = 1,
                     },
                     loading = new LoadingLayer
@@ -105,17 +106,23 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = CreateHeader(),
                 SelectedSection = { BindTarget = CurrentSection },
-                FixedHeader = searchTextBox = new SeekLimitedSearchTextBox
+                FixedHeader = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    Width = 0.95f,
-                    Margin = new MarginPadding
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding
                     {
-                        Top = 20,
-                        Bottom = 20
+                        Vertical = 20,
+                        Horizontal = CONTENT_MARGINS
                     },
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Child = searchTextBox = new SeekLimitedSearchTextBox
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                    }
                 },
                 Footer = CreateFooter().With(f => f.Alpha = 0)
             });
@@ -245,11 +252,11 @@ namespace osu.Game.Overlays
             });
         }
 
-        private IEnumerable<SidebarButton> createSidebarButtons()
+        private IEnumerable<SidebarIconButton> createSidebarButtons()
         {
             foreach (var section in SectionsContainer)
             {
-                yield return new SidebarButton
+                yield return new SidebarIconButton
                 {
                     Section = section,
                     Action = () =>
@@ -292,11 +299,12 @@ namespace osu.Game.Overlays
                     Direction = FillDirection.Vertical,
                 };
 
-            public SettingsSectionsContainer()
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
             {
                 HeaderBackground = new Box
                 {
-                    Colour = Color4.Black,
+                    Colour = colourProvider.Background4,
                     RelativeSizeAxes = Axes.Both
                 };
             }

@@ -55,7 +55,10 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The current direction of playback to be exposed to frame stable children.
         /// </summary>
-        private int direction;
+        /// <remarks>
+        /// Initially it is presumed that playback will proceed in the forward direction.
+        /// </remarks>
+        private int direction = 1;
 
         [BackgroundDependencyLoader(true)]
         private void load(GameplayClock clock, ISamplePlaybackDisabler sampleDisabler)
@@ -139,7 +142,9 @@ namespace osu.Game.Rulesets.UI
                     state = PlaybackState.NotValid;
             }
 
-            if (state == PlaybackState.Valid)
+            // if the proposed time is the same as the current time, assume that the clock will continue progressing in the same direction as previously.
+            // this avoids spurious flips in direction from -1 to 1 during rewinds.
+            if (state == PlaybackState.Valid && proposedTime != manualClock.CurrentTime)
                 direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
 
             double timeBehind = Math.Abs(proposedTime - parentGameplayClock.CurrentTime);

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -12,61 +13,72 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class Nub : CircularContainer, IHasCurrentValue<bool>, IHasAccentColour
+    public class Nub : CompositeDrawable, IHasCurrentValue<bool>, IHasAccentColour
     {
-        public const float COLLAPSED_SIZE = 20;
-        public const float EXPANDED_SIZE = 40;
+        public const float HEIGHT = 15;
+
+        public const float EXPANDED_SIZE = 50;
 
         private const float border_width = 3;
 
-        private const double animate_in_duration = 150;
+        private const double animate_in_duration = 200;
         private const double animate_out_duration = 500;
+
+        private readonly Box fill;
+        private readonly Container main;
 
         public Nub()
         {
-            Box fill;
+            Size = new Vector2(EXPANDED_SIZE, HEIGHT);
 
-            Size = new Vector2(COLLAPSED_SIZE, 12);
-
-            BorderColour = Color4.White;
-            BorderThickness = border_width;
-
-            Masking = true;
-
-            Children = new[]
+            InternalChildren = new[]
             {
-                fill = new Box
+                main = new CircularContainer
                 {
+                    BorderColour = Color4.White,
+                    BorderThickness = border_width,
+                    Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    AlwaysPresent = true,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Children = new Drawable[]
+                    {
+                        fill = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            AlwaysPresent = true,
+                        },
+                    }
                 },
-            };
-
-            Current.ValueChanged += filled =>
-            {
-                fill.FadeTo(filled.NewValue ? 1 : 0, 200, Easing.OutQuint);
-                this.TransformTo(nameof(BorderThickness), filled.NewValue ? 8.5f : border_width, 200, Easing.OutQuint);
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
         {
-            AccentColour = colours.Pink;
-            GlowingAccentColour = colours.PinkLighter;
-            GlowColour = colours.PinkDarker;
+            AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
+            GlowingAccentColour = colourProvider?.Highlight1.Lighten(0.2f) ?? colours.PinkLighter;
+            GlowColour = colourProvider?.Highlight1 ?? colours.PinkLighter;
 
-            EdgeEffect = new EdgeEffectParameters
+            main.EdgeEffect = new EdgeEffectParameters
             {
                 Colour = GlowColour.Opacity(0),
                 Type = EdgeEffectType.Glow,
-                Radius = 10,
-                Roundness = 8,
+                Radius = 8,
+                Roundness = 5,
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(onCurrentValueChanged, true);
         }
 
         private bool glowing;
@@ -80,25 +92,14 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (value)
                 {
-                    this.FadeColour(GlowingAccentColour, animate_in_duration, Easing.OutQuint);
-                    FadeEdgeEffectTo(1, animate_in_duration, Easing.OutQuint);
+                    main.FadeColour(GlowingAccentColour, animate_in_duration, Easing.OutQuint);
+                    main.FadeEdgeEffectTo(0.2f, animate_in_duration, Easing.OutQuint);
                 }
                 else
                 {
-                    FadeEdgeEffectTo(0, animate_out_duration);
-                    this.FadeColour(AccentColour, animate_out_duration);
+                    main.FadeEdgeEffectTo(0, animate_out_duration, Easing.OutQuint);
+                    main.FadeColour(AccentColour, animate_out_duration, Easing.OutQuint);
                 }
-            }
-        }
-
-        public bool Expanded
-        {
-            set
-            {
-                if (value)
-                    this.ResizeTo(new Vector2(EXPANDED_SIZE, 12), animate_in_duration, Easing.OutQuint);
-                else
-                    this.ResizeTo(new Vector2(COLLAPSED_SIZE, 12), animate_out_duration, Easing.OutQuint);
             }
         }
 
@@ -126,7 +127,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
                 if (!Glowing)
-                    Colour = value;
+                    main.Colour = value;
             }
         }
 
@@ -139,7 +140,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 glowingAccentColour = value;
                 if (Glowing)
-                    Colour = value;
+                    main.Colour = value;
             }
         }
 
@@ -152,10 +153,22 @@ namespace osu.Game.Graphics.UserInterface
             {
                 glowColour = value;
 
-                var effect = EdgeEffect;
+                var effect = main.EdgeEffect;
                 effect.Colour = Glowing ? value : value.Opacity(0);
-                EdgeEffect = effect;
+                main.EdgeEffect = effect;
             }
+        }
+
+        private void onCurrentValueChanged(ValueChangedEvent<bool> filled)
+        {
+            fill.FadeTo(filled.NewValue ? 1 : 0, 200, Easing.OutQuint);
+
+            if (filled.NewValue)
+                main.ResizeWidthTo(1, animate_in_duration, Easing.OutElasticHalf);
+            else
+                main.ResizeWidthTo(0.9f, animate_out_duration, Easing.OutElastic);
+
+            main.TransformTo(nameof(BorderThickness), filled.NewValue ? 8.5f : border_width, 200, Easing.OutQuint);
         }
     }
 }

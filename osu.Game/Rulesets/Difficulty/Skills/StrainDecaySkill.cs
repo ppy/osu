@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// The current strain level.
         /// </summary>
-        protected double CurrentStrain { get; private set; } = 1;
+        protected double CurrentStrain { get; private set; }
 
         protected StrainDecaySkill(Mod[] mods)
             : base(mods)
