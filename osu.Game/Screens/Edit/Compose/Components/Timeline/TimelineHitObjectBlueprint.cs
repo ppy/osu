@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -371,58 +372,66 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 return true;
             }
 
+            private ScheduledDelegate dragOperation;
+
             protected override void OnDrag(DragEvent e)
             {
                 base.OnDrag(e);
 
-                OnDragHandled?.Invoke(e);
-
-                if (timeline.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition).Time is double time)
+                // schedule is temporary to ensure we don't process multiple times on a single update frame. we need to find a better method of doing this.
+                // without it, a hitobject's endtime may not always be in a valid state (ie. sliders, which needs to recompute their path).
+                dragOperation?.Cancel();
+                dragOperation = Scheduler.Add(() =>
                 {
-                    switch (hitObject)
+                    OnDragHandled?.Invoke(e);
+
+                    if (timeline.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition).Time is double time)
                     {
-                        case IHasRepeats repeatHitObject:
-                            double proposedDuration = time - hitObject.StartTime;
+                        switch (hitObject)
+                        {
+                            case IHasRepeats repeatHitObject:
+                                double proposedDuration = time - hitObject.StartTime;
 
-                            if (e.CurrentState.Keyboard.ShiftPressed)
-                            {
-                                if (hitObject.DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
-                                    hitObject.DifficultyControlPoint = new DifficultyControlPoint();
+                                if (e.CurrentState.Keyboard.ShiftPressed)
+                                {
+                                    if (hitObject.DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                                        hitObject.DifficultyControlPoint = new DifficultyControlPoint();
 
-                                var newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
+                                    var newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
 
-                                if (Precision.AlmostEquals(newVelocity, hitObject.DifficultyControlPoint.SliderVelocity))
+                                    if (Precision.AlmostEquals(newVelocity, hitObject.DifficultyControlPoint.SliderVelocity))
+                                        return;
+
+                                    hitObject.DifficultyControlPoint.SliderVelocity = newVelocity;
+                                    beatmap.Update(hitObject);
+                                }
+                                else
+                                {
+                                    // find the number of repeats which can fit in the requested time.
+                                    var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
+                                    var proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
+
+                                    if (proposedCount == repeatHitObject.RepeatCount)
+                                        return;
+
+                                    repeatHitObject.RepeatCount = proposedCount;
+                                    beatmap.Update(hitObject);
+                                }
+
+                                break;
+
+                            case IHasDuration endTimeHitObject:
+                                var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
+
+                                if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
                                     return;
 
-                                hitObject.DifficultyControlPoint.SliderVelocity = newVelocity;
+                                endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
                                 beatmap.Update(hitObject);
-                            }
-                            else
-                            {
-                                // find the number of repeats which can fit in the requested time.
-                                var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
-                                var proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
-
-                                if (proposedCount == repeatHitObject.RepeatCount)
-                                    return;
-
-                                repeatHitObject.RepeatCount = proposedCount;
-                                beatmap.Update(hitObject);
-                            }
-
-                            break;
-
-                        case IHasDuration endTimeHitObject:
-                            var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
-
-                            if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
-                                return;
-
-                            endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
-                            beatmap.Update(hitObject);
-                            break;
+                                break;
+                        }
                     }
-                }
+                });
             }
 
             protected override void OnDragEnd(DragEndEvent e)
