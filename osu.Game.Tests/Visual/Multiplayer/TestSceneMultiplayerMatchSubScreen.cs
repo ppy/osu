@@ -62,19 +62,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestCreatedRoom()
         {
-            AddStep("set playlist", () =>
+            AddStep("create room", () =>
             {
                 SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo },
                 });
-            });
 
-            AddStep("click create button", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single());
-                InputManager.Click(MouseButton.Left);
+                // Needs to run after components update with the playlist item.
+                Schedule(() =>
+                {
+                    InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single());
+                    InputManager.Click(MouseButton.Left);
+                });
             });
 
             AddUntilStep("wait for join", () => Client.Room != null);
