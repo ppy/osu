@@ -5,21 +5,18 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLabelledSliderBar : OsuTestScene
+    public class TestSceneSettingsCheckbox : OsuTestScene
     {
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestSliderBar(bool hasDescription) => createSliderBar(hasDescription);
-
-        private void createSliderBar(bool hasDescription = false)
+        [TestCase]
+        public void TestCheckbox()
         {
             AddStep("create component", () =>
             {
@@ -31,39 +28,26 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     Width = 500,
                     AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(5),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new LabelledSliderBar<double>
+                        new SettingsCheckbox
                         {
-                            Current = new BindableDouble(5)
-                            {
-                                MinValue = 0,
-                                MaxValue = 10,
-                                Precision = 1,
-                            },
-                            Label = "a sample component",
-                            Description = hasDescription ? "this text describes the component" : string.Empty,
+                            LabelText = "a sample component",
                         },
                     },
                 };
 
-                foreach (var colour in Enum.GetValues(typeof(OverlayColourScheme)).OfType<OverlayColourScheme>())
+                foreach (var colour1 in Enum.GetValues(typeof(OverlayColourScheme)).OfType<OverlayColourScheme>())
                 {
-                    flow.Add(new OverlayColourContainer(colour)
+                    flow.Add(new OverlayColourContainer(colour1)
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Child = new LabelledSliderBar<double>
+                        Child = new SettingsCheckbox
                         {
-                            Current = new BindableDouble(5)
-                            {
-                                MinValue = 0,
-                                MaxValue = 10,
-                                Precision = 1,
-                            },
-                            Label = "a sample component",
-                            Description = hasDescription ? "this text describes the component" : string.Empty,
+                            LabelText = "a sample component",
                         }
                     });
                 }
