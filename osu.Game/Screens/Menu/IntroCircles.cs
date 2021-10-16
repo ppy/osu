@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -24,7 +26,8 @@ namespace osu.Game.Screens.Menu
         private Sample welcome;
         private readonly bool useTranslate;
 
-        public IntroCircles(bool useTranslate = false)
+        public IntroCircles([CanBeNull] Func<MainMenu> createNextScreen = null, bool useTranslate = false)
+            : base(createNextScreen)
         {
             this.useTranslate = useTranslate;
         }

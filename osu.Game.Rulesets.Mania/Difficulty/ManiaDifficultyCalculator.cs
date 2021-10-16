@@ -41,14 +41,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return new ManiaDifficultyAttributes { Mods = mods, Skills = skills };
 
             HitWindows hitWindows = new ManiaHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             return new ManiaDifficultyAttributes
             {
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
                 Mods = mods,
-                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)Math.Ceiling(getHitWindow300(mods) / clockRate),
+                GreatHitWindow = Math.Ceiling(getHitWindow300(mods) / clockRate),
                 ScoreMultiplier = getScoreMultiplier(mods),
                 MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
                 Skills = skills

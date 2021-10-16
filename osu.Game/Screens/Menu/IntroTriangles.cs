@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -42,13 +43,14 @@ namespace osu.Game.Screens.Menu
         private Sample welcome;
         private readonly bool useTranslate;
 
-        public IntroTriangles(bool useTranslate = false)
+        private DecoupleableInterpolatingFramedClock decoupledClock;
+        private TrianglesIntroSequence intro;
+
+        public IntroTriangles([CanBeNull] Func<MainMenu> createNextScreen = null, bool useTranslate = false)
+            : base(createNextScreen)
         {
             this.useTranslate = useTranslate;
         }
-
-        private DecoupleableInterpolatingFramedClock decoupledClock;
-        private TrianglesIntroSequence intro;
 
         [BackgroundDependencyLoader]
         private void load()

@@ -8,12 +8,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
+using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Input;
 
@@ -67,6 +69,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             inputManager = GetContainingInputManager();
         }
 
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; }
+
         public override void UpdateTimeAndPosition(SnapResult result)
         {
             base.UpdateTimeAndPosition(result);
@@ -75,6 +80,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 case SliderPlacementState.Initial:
                     BeginPlacement();
+
+                    var nearestDifficultyPoint = editorBeatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < HitObject.StartTime)?.DifficultyControlPoint?.DeepClone() as DifficultyControlPoint;
+
+                    HitObject.DifficultyControlPoint = nearestDifficultyPoint ?? new DifficultyControlPoint();
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
                     break;
 
@@ -212,7 +221,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateSlider()
         {
-            HitObject.Path.ExpectedDistance.Value = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
+            HitObject.Path.ExpectedDistance.Value = composer?.GetSnappedDistanceFromDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);

@@ -165,7 +165,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             LabelText = TabletSettingsStrings.Rotation,
                             Current = rotation
                         },
-                        new RotationPresetButtons(tabletHandler),
+                        new RotationPresetButtons(tabletHandler)
+                        {
+                            Padding = new MarginPadding
+                            {
+                                Horizontal = SettingsPanel.CONTENT_MARGINS
+                            }
+                        },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,

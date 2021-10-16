@@ -34,7 +34,6 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.OptUI, true);
             SetDefault(MSetting.TrianglesEnabled, true);
             SetDefault(MSetting.SongSelectBgBlur, 0.2f, 0f, 1f);
-            SetDefault(MSetting.AlwaysHideTextIndicator, false);
 
             //Intro Settings
             SetDefault(MSetting.IntroLoadDirectToSongSelect, false);
@@ -128,7 +127,6 @@ namespace osu.Game.Configuration
         FadeInWindowWhenEntering,
         UseSystemCursor,
         PreferredFont,
-        AlwaysHideTextIndicator,
         MvisCurrentAudioProvider,
         Gamemode,
         DoNotShowDisclaimer,

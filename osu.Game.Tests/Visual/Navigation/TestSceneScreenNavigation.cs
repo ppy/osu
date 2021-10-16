@@ -350,13 +350,13 @@ namespace osu.Game.Tests.Visual.Navigation
             // since most overlays use a scroll container that absorbs on mouse down
             NowPlayingOverlay nowPlayingOverlay = null;
 
-            AddStep("enter menu", () => InputManager.Key(Key.Enter));
+            AddUntilStep("Wait for now playing load", () => (nowPlayingOverlay = Game.ChildrenOfType<NowPlayingOverlay>().FirstOrDefault()) != null);
 
-            AddStep("get and press now playing hotkey", () =>
-            {
-                nowPlayingOverlay = Game.ChildrenOfType<NowPlayingOverlay>().Single();
-                InputManager.Key(Key.F6);
-            });
+            AddStep("enter menu", () => InputManager.Key(Key.Enter));
+            AddUntilStep("toolbar displayed", () => Game.Toolbar.State.Value == Visibility.Visible);
+
+            AddStep("open now playing", () => InputManager.Key(Key.F6));
+            AddUntilStep("now playing is visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
 
             // drag tests
 
@@ -417,7 +417,7 @@ namespace osu.Game.Tests.Visual.Navigation
             pushEscape(); // returns to osu! logo
 
             AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
-            AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroTriangles);
+            AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
             AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
             AddUntilStep("Wait for game exit", () => Game.ScreenStack.CurrentScreen == null);
             AddStep("test dispose doesn't crash", () => Game.Dispose());

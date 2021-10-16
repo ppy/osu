@@ -119,15 +119,12 @@ namespace osu.Game.Beatmaps
                 // Apply difficulty mods
                 if (mods.Any(m => m is IApplicableToDifficulty))
                 {
-                    converted.BeatmapInfo = converted.BeatmapInfo.Clone();
-                    converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
-
                     foreach (var mod in mods.OfType<IApplicableToDifficulty>())
                     {
                         if (cancellationSource.IsCancellationRequested)
                             throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
-                        mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+                        mod.ApplyToDifficulty(converted.Difficulty);
                     }
                 }
 
@@ -146,7 +143,7 @@ namespace osu.Game.Beatmaps
                         if (cancellationSource.IsCancellationRequested)
                             throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
-                        obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty, cancellationSource.Token);
+                        obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, cancellationSource.Token);
                     }
                 }
                 catch (OperationCanceledException)
@@ -192,11 +189,14 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public void CancelAsyncLoad()
         {
-            loadCancellation?.Cancel();
-            loadCancellation = new CancellationTokenSource();
+            lock (beatmapFetchLock)
+            {
+                loadCancellation?.Cancel();
+                loadCancellation = new CancellationTokenSource();
 
-            if (beatmapLoadTask?.IsCompleted != true)
-                beatmapLoadTask = null;
+                if (beatmapLoadTask?.IsCompleted != true)
+                    beatmapLoadTask = null;
+            }
         }
 
         private CancellationTokenSource createCancellationTokenSource(TimeSpan? timeout)
@@ -208,19 +208,27 @@ namespace osu.Game.Beatmaps
             return new CancellationTokenSource(timeout ?? TimeSpan.FromSeconds(10));
         }
 
-        private Task<IBeatmap> loadBeatmapAsync() => beatmapLoadTask ??= Task.Factory.StartNew(() =>
+        private readonly object beatmapFetchLock = new object();
+
+        private Task<IBeatmap> loadBeatmapAsync()
         {
-            // Todo: Handle cancellation during beatmap parsing
-            var b = GetBeatmap() ?? new Beatmap();
+            lock (beatmapFetchLock)
+            {
+                return beatmapLoadTask ??= Task.Factory.StartNew(() =>
+                {
+                    // Todo: Handle cancellation during beatmap parsing
+                    var b = GetBeatmap() ?? new Beatmap();
 
-            // The original beatmap version needs to be preserved as the database doesn't contain it
-            BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
+                    // The original beatmap version needs to be preserved as the database doesn't contain it
+                    BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
 
-            // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
-            b.BeatmapInfo = BeatmapInfo;
+                    // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
+                    b.BeatmapInfo = BeatmapInfo;
 
-            return b;
-        }, loadCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                    return b;
+                }, loadCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }
+        }
 
         public override string ToString() => BeatmapInfo.ToString();
 

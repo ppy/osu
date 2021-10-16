@@ -7,11 +7,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -29,12 +26,11 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
     [TestFixture]
-    public class TestSceneOsuGame : OsuTestScene
+    public class TestSceneOsuGame : OsuGameTestScene
     {
         private IReadOnlyList<Type> requiredGameDependencies => new[]
         {
@@ -84,33 +80,11 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(PreviewTrackManager),
         };
 
-        private OsuGame game;
-
         [Resolved]
         private OsuGameBase gameBase { get; set; }
 
         [Resolved]
         private GameHost host { get; set; }
-
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-            AddStep("create game", () =>
-            {
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    },
-                };
-
-                AddGame(game = new OsuGame());
-            });
-
-            AddUntilStep("wait for load", () => game.IsLoaded);
-        }
 
         [Test]
         public void TestNullRulesetHandled()
@@ -127,8 +101,8 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestSwitchThreadExecutionMode()
         {
-            AddStep("Change thread mode to multi threaded", () => { game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.ExecutionMode, ExecutionMode.MultiThreaded); });
-            AddStep("Change thread mode to single thread", () => { game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.ExecutionMode, ExecutionMode.SingleThread); });
+            AddStep("Change thread mode to multi threaded", () => { Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.ExecutionMode, ExecutionMode.MultiThreaded); });
+            AddStep("Change thread mode to single thread", () => { Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.ExecutionMode, ExecutionMode.SingleThread); });
         }
 
         [Test]
@@ -154,7 +128,7 @@ namespace osu.Game.Tests.Visual.Navigation
             {
                 foreach (var type in requiredGameDependencies)
                 {
-                    if (game.Dependencies.Get(type) == null)
+                    if (Game.Dependencies.Get(type) == null)
                         throw new InvalidOperationException($"{type} has not been cached");
                 }
 

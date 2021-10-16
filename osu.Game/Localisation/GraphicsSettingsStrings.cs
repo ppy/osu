@@ -105,6 +105,11 @@ namespace osu.Game.Localisation
         public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"击打闪光");
 
         /// <summary>
+        /// "Screenshots"
+        /// </summary>
+        public static LocalisableString Screenshots => new TranslatableString(getKey(@"screenshots"), @"Screenshots");
+
+        /// <summary>
         /// "Screenshot format"
         /// </summary>
         public static LocalisableString ScreenshotFormat => new TranslatableString(getKey(@"screenshot_format"), @"Screenshot format");

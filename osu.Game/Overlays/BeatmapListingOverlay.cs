@@ -335,5 +335,11 @@ namespace osu.Game.Overlays
             if (shouldShowMore)
                 filterControl.FetchNextPage();
         }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+            Schedule(filterControl.TakeFocus);
+        }
     }
 }

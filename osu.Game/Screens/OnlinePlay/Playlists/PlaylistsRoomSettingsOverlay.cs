@@ -5,7 +5,6 @@ using System;
 using System.Collections.Specialized;
 using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -77,14 +76,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
                 InternalChildren = new Drawable[]
                 {
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4Extensions.FromHex(@"28242d"),
+                        Colour = colourProvider.Background4
                     },
                     new GridContainer
                     {
@@ -256,7 +255,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4Extensions.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
+                                            Colour = colourProvider.Background5
                                         },
                                         new FillFlowContainer
                                         {

@@ -205,7 +205,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
-            AddStep("retrieve mods", () => playerMod1 = (TestMod)player.Mods.Value.Single());
+            AddStep("retrieve mods", () => playerMod1 = (TestMod)player.GameplayState.Mods.Single());
             AddAssert("game mods not applied", () => gameMod.Applied == false);
             AddAssert("player mods applied", () => playerMod1.Applied);
 
@@ -217,7 +217,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
-            AddStep("retrieve mods", () => playerMod2 = (TestMod)player.Mods.Value.Single());
+            AddStep("retrieve mods", () => playerMod2 = (TestMod)player.GameplayState.Mods.Single());
             AddAssert("game mods not applied", () => gameMod.Applied == false);
             AddAssert("player has different mods", () => playerMod1 != playerMod2);
             AddAssert("player mods applied", () => playerMod2.Applied);

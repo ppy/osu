@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
@@ -25,6 +26,11 @@ namespace osu.Game.Screens.Menu
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
+
+        public IntroSkipped(Func<MainMenu> createScreen)
+            : base(createScreen)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)

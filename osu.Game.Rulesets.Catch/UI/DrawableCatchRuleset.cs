@@ -27,14 +27,14 @@ namespace osu.Game.Rulesets.Catch.UI
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Down;
-            TimeRange.Value = IBeatmapDifficultyInfo.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
+            TimeRange.Value = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450);
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
         protected override ReplayRecorder CreateReplayRecorder(Score score) => new CatchReplayRecorder(score, (CatchPlayfield)Playfield);
 
-        protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty);
+        protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.Difficulty);
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new CatchPlayfieldAdjustmentContainer();
 

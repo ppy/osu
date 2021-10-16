@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = new Beatmap
             {
-                BeatmapInfo = { BaseDifficulty = { ApproachRate = 9 } },
+                Difficulty = { ApproachRate = 9 },
             };
 
             for (int i = 0; i < 15; i++)

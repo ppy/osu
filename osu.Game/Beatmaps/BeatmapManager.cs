@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected virtual BeatmapModelDownloader CreateBeatmapModelDownloader(BeatmapModelManager modelManager, IAPIProvider api, GameHost host)
+        protected virtual BeatmapModelDownloader CreateBeatmapModelDownloader(IBeatmapModelManager modelManager, IAPIProvider api, GameHost host)
         {
             return new BeatmapModelDownloader(modelManager, api, host);
         }
@@ -175,11 +175,6 @@ namespace osu.Game.Beatmaps
                 beatmapModelDownloader.PostNotification = value;
             }
         }
-
-        /// <summary>
-        /// Fired when the user requests to view the resulting import.
-        /// </summary>
-        public Action<IEnumerable<ILive<BeatmapSetInfo>>> PresentImport { set => beatmapModelManager.PostImport = value; }
 
         /// <summary>
         /// Delete a beatmap difficulty.
@@ -335,6 +330,15 @@ namespace osu.Game.Beatmaps
         public void Dispose()
         {
             onlineBeatmapLookupQueue?.Dispose();
+        }
+
+        #endregion
+
+        #region Implementation of IPostImports<out BeatmapSetInfo>
+
+        public Action<IEnumerable<ILive<BeatmapSetInfo>>> PostImport
+        {
+            set => beatmapModelManager.PostImport = value;
         }
 
         #endregion
