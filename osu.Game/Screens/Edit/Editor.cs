@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin()));
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
             dependencies.CacheAs(editorBeatmap);
             changeHandler = new EditorChangeHandler(editorBeatmap);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
@@ -333,10 +333,10 @@ namespace osu.Game.Screens.Edit
             isNewBeatmap = false;
 
             // apply any set-level metadata changes.
-            beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
+            beatmapManager.Update(editorBeatmap.BeatmapInfo.BeatmapSet);
 
             // save the loaded beatmap's data stream.
-            beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
+            beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
 
             updateLastSavedHash();
         }
@@ -508,6 +508,7 @@ namespace osu.Game.Screens.Edit
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
+                    samplePlaybackDisabled.Value = true;
                     dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave, cancelExit));
                     return true;
                 }
@@ -522,7 +523,10 @@ namespace osu.Game.Screens.Edit
             var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
 
             if (!(refetchedBeatmap is DummyWorkingBeatmap))
+            {
+                Logger.Log("Editor providing re-fetched beatmap post edit session");
                 Beatmap.Value = refetchedBeatmap;
+            }
 
             return base.OnExiting(next);
         }
@@ -756,7 +760,11 @@ namespace osu.Game.Screens.Edit
             ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? clipboard.Value : string.Empty
         });
 
-        private void cancelExit() => loader?.CancelPendingDifficultySwitch();
+        private void cancelExit()
+        {
+            samplePlaybackDisabled.Value = false;
+            loader?.CancelPendingDifficultySwitch();
+        }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 

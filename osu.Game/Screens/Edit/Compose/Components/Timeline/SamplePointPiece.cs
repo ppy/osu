@@ -3,88 +3,102 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Timing;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class SamplePointPiece : CompositeDrawable
+    public class SamplePointPiece : HitObjectPointPiece, IHasPopover
     {
-        private readonly SampleControlPoint samplePoint;
+        private readonly HitObject hitObject;
 
         private readonly Bindable<string> bank;
         private readonly BindableNumber<int> volume;
 
-        private OsuSpriteText text;
-        private Container volumeBox;
-
-        private const int max_volume_height = 22;
-
-        public SamplePointPiece(SampleControlPoint samplePoint)
+        public SamplePointPiece(HitObject hitObject)
+            : base(hitObject.SampleControlPoint)
         {
-            this.samplePoint = samplePoint;
-            volume = samplePoint.SampleVolumeBindable.GetBoundCopy();
-            bank = samplePoint.SampleBankBindable.GetBoundCopy();
+            this.hitObject = hitObject;
+            volume = hitObject.SampleControlPoint.SampleVolumeBindable.GetBoundCopy();
+            bank = hitObject.SampleControlPoint.SampleBankBindable.GetBoundCopy();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Margin = new MarginPadding { Vertical = 5 };
+            volume.BindValueChanged(volume => updateText());
+            bank.BindValueChanged(bank => updateText(), true);
+        }
 
-            Origin = Anchor.BottomCentre;
-            Anchor = Anchor.BottomCentre;
+        protected override bool OnClick(ClickEvent e)
+        {
+            this.ShowPopover();
+            return true;
+        }
 
-            AutoSizeAxes = Axes.X;
-            RelativeSizeAxes = Axes.Y;
+        private void updateText()
+        {
+            Label.Text = $"{bank.Value} {volume.Value}";
+        }
 
-            Color4 colour = samplePoint.GetRepresentingColour(colours);
+        public Popover GetPopover() => new SampleEditPopover(hitObject);
 
-            InternalChildren = new Drawable[]
+        public class SampleEditPopover : OsuPopover
+        {
+            private readonly HitObject hitObject;
+            private readonly SampleControlPoint point;
+
+            private LabelledTextBox bank;
+            private SliderWithTextBoxInput<int> volume;
+
+            [Resolved(canBeNull: true)]
+            private EditorBeatmap beatmap { get; set; }
+
+            public SampleEditPopover(HitObject hitObject)
             {
-                volumeBox = new Circle
+                this.hitObject = hitObject;
+                point = hitObject.SampleControlPoint;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Children = new Drawable[]
                 {
-                    CornerRadius = 5,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Y = -20,
-                    Width = 10,
-                    Colour = colour,
-                },
-                new Container
-                {
-                    AutoSizeAxes = Axes.X,
-                    Height = 16,
-                    Masking = true,
-                    CornerRadius = 8,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Children = new Drawable[]
+                    new FillFlowContainer
                     {
-                        new Box
+                        Width = 200,
+                        Direction = FillDirection.Vertical,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
                         {
-                            Colour = colour,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        text = new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Padding = new MarginPadding(5),
-                            Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
-                            Colour = colours.B5,
+                            bank = new LabelledTextBox
+                            {
+                                Label = "Bank Name",
+                            },
+                            volume = new SliderWithTextBoxInput<int>("Volume")
+                            {
+                                Current = new SampleControlPoint().SampleVolumeBindable,
+                            }
                         }
                     }
-                },
-            };
+                };
 
-            volume.BindValueChanged(volume => volumeBox.Height = max_volume_height * volume.NewValue / 100f, true);
-            bank.BindValueChanged(bank => text.Text = bank.NewValue, true);
+                bank.Current = point.SampleBankBindable;
+                bank.Current.BindValueChanged(_ => beatmap.Update(hitObject));
+
+                volume.Current = point.SampleVolumeBindable;
+                volume.Current.BindValueChanged(_ => beatmap.Update(hitObject));
+            }
         }
     }
 }

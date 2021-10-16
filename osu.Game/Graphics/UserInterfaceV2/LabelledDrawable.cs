@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -44,6 +47,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         protected readonly T Component;
 
+        private readonly Box background;
         private readonly GridContainer grid;
         private readonly OsuTextFlowContainer labelText;
         private readonly OsuTextFlowContainer descriptionText;
@@ -62,10 +66,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("1c2125"),
                 },
                 new FillFlowContainer
                 {
@@ -146,9 +149,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour osuColour)
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? colourProvider, OsuColour osuColour)
         {
+            background.Colour = colourProvider?.Background4 ?? Color4Extensions.FromHex(@"1c2125");
             descriptionText.Colour = osuColour.Yellow;
         }
 

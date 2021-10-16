@@ -56,14 +56,16 @@ namespace osu.Game.Screens
                     return new IntroTriangles(true);
 
                 case IntroSequence.SkippedIntro:
-                    return new IntroSkipped();
+                    return new IntroSkipped(createMainMenu);
 
                 case IntroSequence.Welcome:
-                    return new IntroWelcome();
+                    return new IntroWelcome(createMainMenu);
 
                 default:
-                    return new IntroTriangles();
+                    return new IntroTriangles(createMainMenu);
             }
+
+            MainMenu createMainMenu() => new MainMenu();
         }
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();

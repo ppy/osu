@@ -90,11 +90,11 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 // Mania doesn't care about global velocity
                 p.Velocity = 1;
-                p.BaseBeatLength *= Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
+                p.BaseBeatLength *= Beatmap.Difficulty.SliderMultiplier;
 
                 // For non-mania beatmap, speed changes should only happen through timing points
                 if (!isForCurrentRuleset)
-                    p.DifficultyPoint = new DifficultyControlPoint();
+                    p.EffectPoint = new EffectControlPoint();
             }
 
             BarLines.ForEach(Playfield.Add);

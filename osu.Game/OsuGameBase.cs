@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -189,8 +190,6 @@ namespace osu.Game
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client"));
-
-            AddInternal(realmFactory);
 
             dependencies.CacheAs(Storage);
 
@@ -429,10 +428,27 @@ namespace osu.Game
         {
             Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
 
-            using (realmFactory.BlockAllOperations())
+            IDisposable realmBlocker = null;
+
+            try
             {
-                contextFactory.FlushConnections();
+                ManualResetEventSlim readyToRun = new ManualResetEventSlim();
+
+                Scheduler.Add(() =>
+                {
+                    realmBlocker = realmFactory.BlockAllOperations();
+                    contextFactory.FlushConnections();
+
+                    readyToRun.Set();
+                }, false);
+
+                readyToRun.Wait();
+
                 (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+            }
+            finally
+            {
+                realmBlocker?.Dispose();
             }
 
             Logger.Log(@"Migration complete!");
@@ -530,6 +546,7 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             contextFactory?.FlushConnections();
+            realmFactory?.Dispose();
         }
     }
 }

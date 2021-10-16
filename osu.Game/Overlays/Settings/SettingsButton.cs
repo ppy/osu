@@ -7,11 +7,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsButton : TriangleButton, IHasTooltip
+    public class SettingsButton : RoundedButton, IHasTooltip
     {
         public SettingsButton()
         {

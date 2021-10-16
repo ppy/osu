@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class MetadataSection : SetupSection
+    public class MetadataSection : SetupSection
     {
         protected LabelledTextBox ArtistTextBox;
         protected LabelledTextBox RomanisedArtistTextBox;

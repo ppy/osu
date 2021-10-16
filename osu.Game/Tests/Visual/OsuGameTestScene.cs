@@ -22,6 +22,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK.Graphics;
+using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Tests.Visual
 {
@@ -77,8 +78,10 @@ namespace osu.Game.Tests.Visual
 
         protected void CreateGame()
         {
-            AddGame(Game = new TestOsuGame(LocalStorage, API));
+            AddGame(Game = CreateTestGame());
         }
+
+        protected virtual TestOsuGame CreateTestGame() => new TestOsuGame(LocalStorage, API);
 
         protected void PushAndConfirm(Func<Screen> newScreen)
         {
@@ -126,14 +129,16 @@ namespace osu.Game.Tests.Visual
 
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
-            // if we don't do this, when running under nUnit the version that gets populated is that of nUnit.
+            // if we don't apply these changes, when running under nUnit the version that gets populated is that of nUnit.
+            public override Version AssemblyVersion => new Version(0, 0);
             public override string Version => "test game";
 
             protected override Loader CreateLoader() => new TestLoader();
 
             public new void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null) => base.PerformFromScreen(action, validScreens);
 
-            public TestOsuGame(Storage storage, IAPIProvider api)
+            public TestOsuGame(Storage storage, IAPIProvider api, string[] args = null)
+                : base(args)
             {
                 Storage = storage;
                 API = api;
@@ -142,6 +147,9 @@ namespace osu.Game.Tests.Visual
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
+                LocalConfig.SetValue(OsuSetting.IntroSequence, IntroSequence.Circles);
+
                 API.Login("Rhythm Champion", "osu!");
 
                 Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);

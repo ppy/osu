@@ -67,7 +67,7 @@ namespace osu.Game.Beatmaps.Formats
             this.beatmap.HitObjects = this.beatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
 
             foreach (var hitObject in this.beatmap.HitObjects)
-                hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
+                hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
         }
 
         protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(' ') || line.StartsWith('_');
@@ -276,7 +276,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = SplitKeyVal(line);
 
-            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            var difficulty = beatmap.Difficulty;
 
             switch (pair.Key)
             {
@@ -384,14 +384,21 @@ namespace osu.Game.Beatmaps.Formats
             addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
 #pragma warning restore 618
             {
-                SpeedMultiplier = speedMultiplier,
+                SliderVelocity = speedMultiplier,
             }, timingChange);
 
-            addControlPoint(time, new EffectControlPoint
+            var effectPoint = new EffectControlPoint
             {
                 KiaiMode = kiaiMode,
                 OmitFirstBarLine = omitFirstBarSignature,
-            }, timingChange);
+            };
+
+            bool isOsuRuleset = beatmap.BeatmapInfo.RulesetID == 0;
+            // scrolling rulesets use effect points rather than difficulty points for scroll speed adjustments.
+            if (!isOsuRuleset)
+                effectPoint.ScrollSpeed = speedMultiplier;
+
+            addControlPoint(time, effectPoint, timingChange);
 
             addControlPoint(time, new LegacySampleControlPoint
             {
@@ -444,7 +451,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (obj != null)
             {
-                obj.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
+                obj.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
 
                 beatmap.HitObjects.Add(obj);
             }

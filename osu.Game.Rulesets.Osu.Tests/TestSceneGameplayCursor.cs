@@ -59,8 +59,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddSliderStep("circle size", 0f, 10f, 0f, val =>
             {
                 config.SetValue(OsuSetting.AutoCursorSize, true);
-                gameplayState.Beatmap.BeatmapInfo.BaseDifficulty.CircleSize = val;
-                Scheduler.AddOnce(() => loadContent(false));
+                gameplayState.Beatmap.Difficulty.CircleSize = val;
+                Scheduler.AddOnce(loadContent);
             });
 
             AddStep("test cursor container", () => loadContent(false));
@@ -75,10 +75,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestSizing(int circleSize, float userScale)
         {
             AddStep($"set user scale to {userScale}", () => config.SetValue(OsuSetting.GameplayCursorSize, userScale));
-            AddStep($"adjust cs to {circleSize}", () => gameplayState.Beatmap.BeatmapInfo.BaseDifficulty.CircleSize = circleSize);
+            AddStep($"adjust cs to {circleSize}", () => gameplayState.Beatmap.Difficulty.CircleSize = circleSize);
             AddStep("turn on autosizing", () => config.SetValue(OsuSetting.AutoCursorSize, true));
 
-            AddStep("load content", () => loadContent());
+            AddStep("load content", loadContent);
 
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == OsuCursorContainer.GetScaleForCircleSize(circleSize) * userScale);
 
@@ -98,7 +98,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("load content", () => loadContent(false, () => new SkinProvidingContainer(new TopLeftCursorSkin())));
         }
 
-        private void loadContent(bool automated = true, Func<SkinProvidingContainer> skinProvider = null)
+        private void loadContent() => loadContent(false);
+
+        private void loadContent(bool automated, Func<SkinProvidingContainer> skinProvider = null)
         {
             SetContents(_ =>
             {
