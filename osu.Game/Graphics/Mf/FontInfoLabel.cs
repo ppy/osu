@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.Mf
             {
                 bg = new Box
                 {
-                    Colour = Color4Extensions.FromHex("#111"),
+                    Colour = Color4Extensions.FromHex("#18171c"),
                     RelativeSizeAxes = Axes.Both
                 },
                 new FillFlowContainer
@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.Mf
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            bg.FadeColour(Color4Extensions.FromHex("#111"), 300);
+            bg.FadeColour(Color4Extensions.FromHex("#18171c"), 300);
             base.OnHoverLost(e);
         }
 
