@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -217,9 +218,12 @@ namespace osu.Game.Screens.Play
 
             Score = CreateScore(playableBeatmap);
 
+            Debug.Assert(ruleset.RulesetInfo.ID != null);
+
             // ensure the score is in a consistent state with the current player.
             Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
+            Score.ScoreInfo.RulesetID = ruleset.RulesetInfo.ID.Value;
             Score.ScoreInfo.Mods = gameplayMods;
 
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score));
