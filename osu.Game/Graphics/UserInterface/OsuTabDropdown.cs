@@ -11,8 +11,28 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuTabDropdown<T> : OsuDropdown<T>
+    public class OsuTabDropdown<T> : OsuDropdown<T>, IHasAccentColour
     {
+        private Color4 accentColour;
+
+        public Color4 AccentColour
+        {
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+
+                if (Menu is OsuDropdownMenu dropdownMenu)
+                {
+                    dropdownMenu.HoverColour = value;
+                    dropdownMenu.SelectionColour = value.Opacity(0.5f);
+                }
+
+                if (Header is OsuTabDropdownHeader tabDropdownHeader)
+                    tabDropdownHeader.AccentColour = value;
+            }
+        }
+
         public OsuTabDropdown()
         {
             RelativeSizeAxes = Axes.X;
@@ -37,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
                 MaxHeight = 400;
             }
 
-            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item) { AccentColour = AccentColour };
+            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item);
 
             private class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
             {
@@ -49,14 +69,17 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected class OsuTabDropdownHeader : OsuDropdownHeader
+        protected class OsuTabDropdownHeader : OsuDropdownHeader, IHasAccentColour
         {
-            public override Color4 AccentColour
+            private Color4 accentColour;
+
+            public Color4 AccentColour
             {
-                get => base.AccentColour;
+                get => accentColour;
                 set
                 {
-                    base.AccentColour = value;
+                    accentColour = value;
+                    BackgroundColourHover = value;
                     Foreground.Colour = value;
                 }
             }

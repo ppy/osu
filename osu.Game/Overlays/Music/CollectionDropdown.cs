@@ -19,12 +19,6 @@ namespace osu.Game.Overlays.Music
     {
         protected override bool ShowManageCollectionsItem => false;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            AccentColour = colours.Gray6;
-        }
-
         protected override CollectionDropdownHeader CreateCollectionHeader() => new CollectionsHeader();
 
         protected override CollectionDropdownMenu CreateCollectionMenu() => new CollectionsMenu();
@@ -41,6 +35,7 @@ namespace osu.Game.Overlays.Music
             private void load(OsuColour colours)
             {
                 BackgroundColour = colours.Gray4;
+                HoverColour = SelectionColour = colours.Gray6;
             }
         }
 
@@ -50,6 +45,7 @@ namespace osu.Game.Overlays.Music
             private void load(OsuColour colours)
             {
                 BackgroundColour = colours.Gray4;
+                BackgroundColourHover = colours.Gray6;
             }
 
             public CollectionsHeader()
