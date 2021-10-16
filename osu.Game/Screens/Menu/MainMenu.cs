@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
-        private void load(MfMenuOverlay mfoverlay, BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics, MConfigManager mConfig)
+        private void load(ReleaseNoteDialog releaseNoteDialog, MfMenuOverlay mfoverlay, BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics, MConfigManager mConfig)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
@@ -107,6 +107,7 @@ namespace osu.Game.Screens.Menu
                             },
                             OnMvisButton = onMvis,
                             OnImportButton = onImport,
+                            OnReleaseNoteButton = releaseNoteDialog.Show,
                             OnSolo = loadSoloSongSelect,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
                             OnPlaylists = () => this.Push(new Playlists()),

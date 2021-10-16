@@ -33,6 +33,9 @@ namespace osu.Game.Updater
         [Resolved]
         protected NotificationOverlay Notifications { get; private set; }
 
+        [Resolved]
+        private ReleaseNoteDialog releaseNoteDialog { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -47,7 +50,14 @@ namespace osu.Game.Updater
             {
                 // only show a notification if we've previously saved a version to the config file (ie. not the first run).
                 if (!string.IsNullOrEmpty(lastVersion))
-                    Notifications.Post(new UpdateCompleteNotification(version));
+                    Notifications.Post(new UpdateCompleteNotification(version)
+                    {
+                        Activated = () =>
+                        {
+                            releaseNoteDialog.Show();
+                            return true;
+                        }
+                    });
             }
 
             // debug / local compilations will reset to a non-release string.
@@ -90,7 +100,7 @@ namespace osu.Game.Updater
             public UpdateCompleteNotification(string version)
             {
                 this.version = version;
-                Text = $"恭喜!mfosu已更新到 {version}!";
+                Text = $"恭喜!mfosu已更新到 {version}!\n点此查看发行注记。";
             }
 
             [BackgroundDependencyLoader]

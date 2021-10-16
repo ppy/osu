@@ -870,6 +870,7 @@ namespace osu.Game
 
             // overlay elements
             loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
+            loadComponentSingleFile(new ReleaseNoteDialog(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(mfmenu = new MfMenuOverlay(), overlayContent.Add, true);
