@@ -177,11 +177,6 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Fired when the user requests to view the resulting import.
-        /// </summary>
-        public Action<IEnumerable<ILive<BeatmapSetInfo>>> PresentImport { set => beatmapModelManager.PostImport = value; }
-
-        /// <summary>
         /// Delete a beatmap difficulty.
         /// </summary>
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
@@ -335,6 +330,15 @@ namespace osu.Game.Beatmaps
         public void Dispose()
         {
             onlineBeatmapLookupQueue?.Dispose();
+        }
+
+        #endregion
+
+        #region Implementation of IPostImports<out BeatmapSetInfo>
+
+        public Action<IEnumerable<ILive<BeatmapSetInfo>>> PostImport
+        {
+            set => beatmapModelManager.PostImport = value;
         }
 
         #endregion

@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit
                     {
                         new Box
                         {
-                            Colour = ColourProvider.Dark4,
+                            Colour = ColourProvider.Background3,
                             RelativeSizeAxes = Axes.Both,
                         },
                         roundedContent = new Container
