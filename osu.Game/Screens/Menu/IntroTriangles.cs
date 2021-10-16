@@ -43,17 +43,13 @@ namespace osu.Game.Screens.Menu
         private Sample welcome;
         private readonly bool useTranslate;
 
-        public IntroTriangles(bool useTranslate = false)
-        {
-            this.useTranslate = useTranslate;
-        }
-
         private DecoupleableInterpolatingFramedClock decoupledClock;
         private TrianglesIntroSequence intro;
 
-        public IntroTriangles([CanBeNull] Func<MainMenu> createNextScreen = null)
+        public IntroTriangles([CanBeNull] Func<MainMenu> createNextScreen = null, bool useTranslate = false)
             : base(createNextScreen)
         {
+            this.useTranslate = useTranslate;
         }
 
         [BackgroundDependencyLoader]

@@ -26,14 +26,10 @@ namespace osu.Game.Screens.Menu
         private Sample welcome;
         private readonly bool useTranslate;
 
-        public IntroCircles(bool useTranslate = false)
-        {
-            this.useTranslate = useTranslate;
-        }
-
-        public IntroCircles([CanBeNull] Func<MainMenu> createNextScreen = null)
+        public IntroCircles([CanBeNull] Func<MainMenu> createNextScreen = null, bool useTranslate = false)
             : base(createNextScreen)
         {
+            this.useTranslate = useTranslate;
         }
 
         [BackgroundDependencyLoader]
