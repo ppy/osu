@@ -50,7 +50,7 @@ namespace osu.Game.Overlays
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.05f,
+                    Height = 0.1f,
                     Child = new OsuSpriteText
                     {
                         Text = "发行注记",
@@ -62,14 +62,15 @@ namespace osu.Game.Overlays
                 new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.95f,
+                    Height = 0.9f,
                     ScrollbarVisible = false,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Child = mdContainer = new ReleaseNoteMarkdownContainer
                     {
                         RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y
+                        AutoSizeAxes = Axes.Y,
+                        DocumentMargin = new MarginPadding { Bottom = 20, Left = 10, Right = 30 }
                     }
                 },
                 audiofilter = new AudioFilter(audioManager.TrackMixer)
