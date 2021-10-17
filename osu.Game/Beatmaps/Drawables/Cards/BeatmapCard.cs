@@ -279,6 +279,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private IEnumerable<BeatmapCardStatistic> createStatistics()
         {
+            if (beatmapSet.HypeStatus != null)
+                yield return new HypesStatistic(beatmapSet.HypeStatus);
+
+            if (beatmapSet.NominationStatus != null)
+                yield return new NominationsStatistic(beatmapSet.NominationStatus);
+
             yield return new FavouritesStatistic(beatmapSet);
             yield return new PlayCountStatistic(beatmapSet);
 
