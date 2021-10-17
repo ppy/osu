@@ -93,9 +93,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private IList<MultiplierControlPoint> testControlPoints => new List<MultiplierControlPoint>
         {
-            new MultiplierControlPoint(time_range) { DifficultyPoint = { SpeedMultiplier = 1.25 } },
-            new MultiplierControlPoint(1.5 * time_range) { DifficultyPoint = { SpeedMultiplier = 1 } },
-            new MultiplierControlPoint(2 * time_range) { DifficultyPoint = { SpeedMultiplier = 1.5 } }
+            new MultiplierControlPoint(time_range) { EffectPoint = { ScrollSpeed = 1.25 } },
+            new MultiplierControlPoint(1.5 * time_range) { EffectPoint = { ScrollSpeed = 1 } },
+            new MultiplierControlPoint(2 * time_range) { EffectPoint = { ScrollSpeed = 1.5 } }
         };
 
         [Test]

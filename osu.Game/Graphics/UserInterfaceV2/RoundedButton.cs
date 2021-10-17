@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -23,10 +25,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour colours)
         {
-            BackgroundColour = colours.Blue3;
+            BackgroundColour = overlayColourProvider?.Highlight1 ?? colours.Blue3;
         }
 
         protected override void LoadComplete()
