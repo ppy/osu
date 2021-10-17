@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "隐藏300s",
+                    LabelText = "隐藏300判定显示",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.NoDraw300)
                 },
                 new SettingsEnumDropdown<PlayfieldBorderStyle>
