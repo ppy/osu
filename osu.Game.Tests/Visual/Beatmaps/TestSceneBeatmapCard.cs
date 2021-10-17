@@ -36,6 +36,16 @@ namespace osu.Game.Tests.Visual.Beatmaps
             withStatistics.FavouriteCount = 284_239;
             withStatistics.PlayCount = 999_001;
             withStatistics.Ranked = DateTimeOffset.Now.AddDays(-45);
+            withStatistics.HypeStatus = new BeatmapSetHypeStatus
+            {
+                Current = 34,
+                Required = 5
+            };
+            withStatistics.NominationStatus = new BeatmapSetNominationStatus
+            {
+                Current = 1,
+                Required = 2
+            };
 
             var undownloadable = getUndownloadableBeatmapSet();
             undownloadable.LastUpdated = DateTimeOffset.Now.AddYears(-1);
