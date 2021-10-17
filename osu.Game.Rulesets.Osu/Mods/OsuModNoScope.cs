@@ -42,9 +42,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private float targetAlpha;
 
-        private bool rest;
+        private bool restPeriod;
 
-        private bool restSpinner;
+        private bool spinnerPeriod;
 
         private PeriodTracker breaksPeriods;
 
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (breaksPeriods.IsInAny(time) || spinnerPeriods.IsInAny(time))
                 {
                     targetAlpha = 1;
-                    rest = true;
+                    restPeriod = true;
                 }
                 else if (HiddenComboCount.Value == 0)
                 {
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (spinnerPeriods.IsInAny(time))
                 {
-                    restSpinner = true;
+                    spinnerPeriod = true;
                 }
             }
 
@@ -114,11 +114,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                     lastComboBeforeRest = 0;
                 }
 
-                if (rest)
+                if (restPeriod)
                 {
                     // handle combo increase after spinner
-                    lastComboBeforeRest = restSpinner ? combo.NewValue : combo.NewValue - 1;
-                    restSpinner = false;
+                    lastComboBeforeRest = spinnerPeriod ? combo.NewValue : combo.NewValue - 1;
+                    restPeriod = spinnerPeriod = false;
                 }
 
                 targetAlpha = 1 - (float)(combo.NewValue - lastComboBeforeRest) / HiddenComboCount.Value;
