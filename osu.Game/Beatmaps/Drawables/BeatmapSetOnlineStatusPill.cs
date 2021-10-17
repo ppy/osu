@@ -47,6 +47,31 @@ namespace osu.Game.Beatmaps.Drawables
             set => statusText.Padding = value;
         }
 
+        private float? fixedWidth;
+
+        /// <summary>
+        /// When set to a non-<see langword="null"/> value, the pill will be forcibly sized to the given width.
+        /// When set to a <see langword="null"/> value, the pill will autosize to its contents.
+        /// </summary>
+        public float? FixedWidth
+        {
+            get => fixedWidth;
+            set
+            {
+                fixedWidth = value;
+
+                if (fixedWidth == null)
+                {
+                    AutoSizeAxes = Axes.Both;
+                }
+                else
+                {
+                    AutoSizeAxes = Axes.Y;
+                    Width = fixedWidth.Value;
+                }
+            }
+        }
+
         private readonly OsuSpriteText statusText;
         private readonly Box background;
 
