@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.StreamRestrict, false);
             SetDefault(OsuRulesetSetting.RestrictInvert, true);
             SetDefault(OsuRulesetSetting.SkipStackAngles, false);
+            SetDefault(OsuRulesetSetting.SkipShortSlider, false);
 
             //Momentum extra
             SetDefault(OsuRulesetSetting.EqualPosBounce, 0f, 0, 100f, 0.1f);
@@ -64,6 +65,9 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.BezierAggressiveness, 60f, 1f, 180f);
             SetDefault(OsuRulesetSetting.BezierSliderAggressiveness, 3f, 1f, 20f);
 
+            //Linear mover settings
+            SetDefault(OsuRulesetSetting.WaitForPreempt, true);
+
             //Cursor
             SetDefault(OsuRulesetSetting.CursorTrailForceLong, false);
         }
@@ -77,7 +81,8 @@ namespace osu.Game.Rulesets.Osu.Configuration
         Pippi,
         AxisAligned,
         Aggresive,
-        Bezier
+        Bezier,
+        Linear
     }
 
     public enum OsuRulesetSetting
@@ -123,6 +128,10 @@ namespace osu.Game.Rulesets.Osu.Configuration
         BezierSliderAggressiveness,
 
         CursorTrailForceLong,
-        NoDraw300
+        NoDraw300,
+        SkipShortSlider,
+
+        //Linear mover settings
+        WaitForPreempt
     }
 }

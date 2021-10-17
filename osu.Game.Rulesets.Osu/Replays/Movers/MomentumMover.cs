@@ -10,7 +10,7 @@ using static osu.Game.Rulesets.Osu.Replays.Movers.MoverUtilExtensions;
 
 namespace osu.Game.Rulesets.Osu.Replays.Movers
 {
-    public class MomentumMover : DanceMover
+    public class MomentumMover : Mover
     {
         private float offset => restrictAngle * MathF.PI / 180.0f;
 

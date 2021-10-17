@@ -8,7 +8,7 @@ using static osu.Game.Rulesets.Osu.Replays.Movers.MoverUtilExtensions;
 
 namespace osu.Game.Rulesets.Osu.Replays.Movers
 {
-    public class BezierMover : DanceMover
+    public class BezierMover : Mover
     {
         private BezierCurve curve;
         private Vector2 pt = new Vector2(512f / 2f, 384 / 2f);
