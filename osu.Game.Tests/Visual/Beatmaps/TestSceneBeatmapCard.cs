@@ -4,11 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Users;
@@ -18,7 +20,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
 {
     public class TestSceneBeatmapCard : OsuTestScene
     {
-        private IBeatmapSetInfo[] testCases;
+        private APIBeatmapSet[] testCases;
 
         #region Test case generation
 
@@ -30,7 +32,13 @@ namespace osu.Game.Tests.Visual.Beatmaps
             normal.HasStoryboard = true;
 
             var undownloadable = getUndownloadableBeatmapSet();
-            var manyDifficulties = getManyDifficultiesBeatmapSet();
+
+            var someDifficulties = getManyDifficultiesBeatmapSet(11);
+            someDifficulties.Title = someDifficulties.TitleUnicode = "some difficulties";
+            someDifficulties.Status = BeatmapSetOnlineStatus.Qualified;
+
+            var manyDifficulties = getManyDifficultiesBeatmapSet(100);
+            manyDifficulties.Status = BeatmapSetOnlineStatus.Pending;
 
             var explicitMap = CreateAPIBeatmapSet(Ruleset.Value);
             explicitMap.HasExplicitContent = true;
@@ -42,14 +50,22 @@ namespace osu.Game.Tests.Visual.Beatmaps
             explicitFeaturedMap.HasExplicitContent = true;
             explicitFeaturedMap.TrackId = 2;
 
-            testCases = new IBeatmapSetInfo[]
+            var longName = CreateAPIBeatmapSet(Ruleset.Value);
+            longName.Title = longName.TitleUnicode = "this track has an incredibly and implausibly long title";
+            longName.Artist = longName.ArtistUnicode = "and this artist! who would have thunk it. it's really such a long name.";
+            longName.HasExplicitContent = true;
+            longName.TrackId = 444;
+
+            testCases = new[]
             {
                 normal,
                 undownloadable,
+                someDifficulties,
                 manyDifficulties,
                 explicitMap,
                 featuredMap,
-                explicitFeaturedMap
+                explicitFeaturedMap,
+                longName
             };
         }
 
@@ -86,11 +102,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
             }
         };
 
-        private static APIBeatmapSet getManyDifficultiesBeatmapSet()
+        private static APIBeatmapSet getManyDifficultiesBeatmapSet(int count)
         {
             var beatmaps = new List<APIBeatmap>();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < count; i++)
             {
                 beatmaps.Add(new APIBeatmap
                 {
@@ -118,7 +134,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
         #endregion
 
-        private Drawable createContent(OverlayColourScheme colourScheme, Func<IBeatmapSetInfo, Drawable> creationFunc)
+        private Drawable createContent(OverlayColourScheme colourScheme, Func<APIBeatmapSet, Drawable> creationFunc)
         {
             var colourProvider = new OverlayColourProvider(colourScheme);
 
@@ -153,10 +169,13 @@ namespace osu.Game.Tests.Visual.Beatmaps
             };
         }
 
-        private void createTestCase(Func<IBeatmapSetInfo, Drawable> creationFunc)
+        private void createTestCase(Func<APIBeatmapSet, Drawable> creationFunc)
         {
             foreach (var scheme in Enum.GetValues(typeof(OverlayColourScheme)).Cast<OverlayColourScheme>())
                 AddStep($"set {scheme} scheme", () => Child = createContent(scheme, creationFunc));
         }
+
+        [Test]
+        public void TestNormal() => createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
     }
 }
