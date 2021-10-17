@@ -18,11 +18,39 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public class DifficultySpectrumDisplay : CompositeDrawable
     {
+        private Vector2 dotSize = new Vector2(4, 8);
+
+        public Vector2 DotSize
+        {
+            get => dotSize;
+            set
+            {
+                dotSize = value;
+
+                if (IsLoaded)
+                    updateDotDimensions();
+            }
+        }
+
+        private float dotSpacing = 1;
+
+        public float DotSpacing
+        {
+            get => dotSpacing;
+            set
+            {
+                dotSpacing = value;
+
+                if (IsLoaded)
+                    updateDotDimensions();
+            }
+        }
+
+        private readonly FillFlowContainer<RulesetDifficultyGroup> flow;
+
         public DifficultySpectrumDisplay(IBeatmapSetInfo beatmapSet)
         {
             AutoSizeAxes = Axes.Both;
-
-            FillFlowContainer<RulesetDifficultyGroup> flow;
 
             InternalChild = flow = new FillFlowContainer<RulesetDifficultyGroup>
             {
@@ -40,6 +68,21 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateDotDimensions();
+        }
+
+        private void updateDotDimensions()
+        {
+            foreach (var group in flow)
+            {
+                group.DotSize = DotSize;
+                group.DotSpacing = DotSpacing;
+            }
+        }
+
         private class RulesetDifficultyGroup : FillFlowContainer
         {
             private readonly int rulesetId;
@@ -51,6 +94,20 @@ namespace osu.Game.Beatmaps.Drawables
                 this.rulesetId = rulesetId;
                 this.beatmapInfos = beatmapInfos;
                 this.collapsed = collapsed;
+            }
+
+            public Vector2 DotSize
+            {
+                set
+                {
+                    foreach (var dot in Children.OfType<DifficultyDot>())
+                        dot.Size = value;
+                }
+            }
+
+            public float DotSpacing
+            {
+                set => Spacing = new Vector2(value, 0);
             }
 
             [BackgroundDependencyLoader]
@@ -98,8 +155,6 @@ namespace osu.Game.Beatmaps.Drawables
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Width = 4;
-                Height = 8;
                 Anchor = Origin = Anchor.Centre;
                 Masking = true;
 
