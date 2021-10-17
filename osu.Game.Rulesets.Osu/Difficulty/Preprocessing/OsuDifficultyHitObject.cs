@@ -82,19 +82,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
+            double sliderAbuseIndex = 1;
+
             if (lastObject is Slider lastSlider)
             {
                 computeSliderCursorPosition(lastSlider);
-                TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
-                TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, 0);
-                MovementTime = Math.Max(StrainTime - TravelTime, 0);
+                sliderAbuseIndex = Math.Clamp(Vector2.Subtract(lastSlider.StackedPosition * scalingFactor, BaseObject.StackedPosition * scalingFactor).Length - 100, 0, 25) / 25;
+                TravelDistance = lastSlider.LazyTravelDistance * scalingFactor * sliderAbuseIndex;
+                TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, 25);
+                MovementTime = Math.Max(StrainTime - TravelTime, 25);
                 MovementDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
-            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-            MovementDistance = Math.Min(JumpDistance, MovementDistance);
+            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length * sliderAbuseIndex;
+            MovementDistance = Math.Min(JumpDistance, MovementDistance) * sliderAbuseIndex;
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
             {
