@@ -66,8 +66,12 @@ namespace osu.Game.Beatmaps
             lock (workingCache)
             {
                 var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+
                 if (working != null)
+                {
+                    Logger.Log($"Invalidating working beatmap cache for {info}");
                     workingCache.Remove(working);
+                }
             }
         }
 
@@ -86,6 +90,7 @@ namespace osu.Game.Beatmaps
             lock (workingCache)
             {
                 var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+
                 if (working != null)
                     return working;
 

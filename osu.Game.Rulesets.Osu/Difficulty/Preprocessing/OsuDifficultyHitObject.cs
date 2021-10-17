@@ -69,6 +69,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private void setDistances(double clockRate)
         {
+            // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
+            if (BaseObject is Spinner || lastObject is Spinner)
+                return;
+
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = normalized_radius / (float)BaseObject.Radius;
 
@@ -78,25 +82,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
+            double sliderAbuseIndex = 1;
+
             if (lastObject is Slider lastSlider)
             {
                 computeSliderCursorPosition(lastSlider);
-                TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
-                TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, 0);
-                MovementTime = Math.Max(StrainTime - TravelTime, 0);
-                MovementDistance = Math.Max(0, Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length - 0) * scalingFactor;
+                sliderAbuseIndex = Math.Clamp(Vector2.Subtract(lastSlider.StackedPosition * scalingFactor, BaseObject.StackedPosition * scalingFactor).Length - 100, 0, 25) / 25;
+                TravelDistance = lastSlider.LazyTravelDistance * scalingFactor * sliderAbuseIndex;
+                TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, 25);
+                MovementTime = Math.Max(StrainTime - TravelTime, 25);
+                MovementDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
-            // Don't need to jump to reach spinners
-            if (!(BaseObject is Spinner))
-            {
-                JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-                MovementDistance = Math.Min(JumpDistance, MovementDistance);
-            }
+            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length * sliderAbuseIndex;
+            MovementDistance = Math.Min(JumpDistance, MovementDistance) * sliderAbuseIndex;
 
-            if (lastLastObject != null)
+            if (lastLastObject != null && !(lastLastObject is Spinner))
             {
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastObject);
 
