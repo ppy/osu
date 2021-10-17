@@ -1,8 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Linq;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -14,13 +15,15 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuDropdown<T> : Dropdown<T>, IHasAccentColour
     {
-        private const float corner_radius = 4;
+        private const float corner_radius = 5;
 
         private Color4 accentColour;
 
@@ -34,11 +37,11 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? colourProvider, OsuColour colours)
         {
             if (accentColour == default)
-                accentColour = colours.PinkDarker;
+                accentColour = colourProvider?.Light4 ?? colours.PinkDarker;
             updateAccentColour();
         }
 
@@ -59,14 +62,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
-            private Sample sampleOpen;
-            private Sample sampleClose;
+            private Sample? sampleOpen;
+            private Sample? sampleClose;
 
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             public OsuDropdownMenu()
             {
                 CornerRadius = corner_radius;
-                BackgroundColour = Color4.Black.Opacity(0.5f);
 
                 MaskingContainer.CornerRadius = corner_radius;
                 Alpha = 0;
@@ -75,9 +77,11 @@ namespace osu.Game.Graphics.UserInterface
                 ItemsContainer.Padding = new MarginPadding(5);
             }
 
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
+            [BackgroundDependencyLoader(true)]
+            private void load(OverlayColourProvider? colourProvider, AudioManager audio)
             {
+                BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+
                 sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
                 sampleClose = audio.Samples.Get(@"UI/dropdown-close");
             }
@@ -159,6 +163,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     BackgroundColourHover = accentColour ?? nonAccentHoverColour;
                     BackgroundColourSelected = accentColour ?? nonAccentSelectedColour;
+                    BackgroundColour = BackgroundColourHover.Opacity(0);
+
                     UpdateBackgroundColour();
                     UpdateForegroundColour();
                 }
@@ -178,8 +184,6 @@ namespace osu.Game.Graphics.UserInterface
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
-                    BackgroundColour = Color4.Transparent;
-
                     nonAccentHoverColour = colours.PinkDarker;
                     nonAccentSelectedColour = Color4.Black.Opacity(0.5f);
                     updateColours();
@@ -187,16 +191,29 @@ namespace osu.Game.Graphics.UserInterface
                     AddInternal(new HoverSounds());
                 }
 
+                protected override void UpdateBackgroundColour()
+                {
+                    if (!IsPreSelected && !IsSelected)
+                    {
+                        Background.FadeOut(600, Easing.OutQuint);
+                        return;
+                    }
+
+                    Background.FadeIn(100, Easing.OutQuint);
+                    Background.FadeColour(IsPreSelected ? BackgroundColourHover : BackgroundColourSelected, 100, Easing.OutQuint);
+                }
+
                 protected override void UpdateForegroundColour()
                 {
                     base.UpdateForegroundColour();
 
-                    if (Foreground.Children.FirstOrDefault() is Content content) content.Chevron.Alpha = IsHovered ? 1 : 0;
+                    if (Foreground.Children.FirstOrDefault() is Content content)
+                        content.Hovering = IsHovered;
                 }
 
                 protected override Drawable CreateContent() => new Content();
 
-                protected new class Content : FillFlowContainer, IHasText
+                protected new class Content : CompositeDrawable, IHasText
                 {
                     public LocalisableString Text
                     {
@@ -207,31 +224,63 @@ namespace osu.Game.Graphics.UserInterface
                     public readonly OsuSpriteText Label;
                     public readonly SpriteIcon Chevron;
 
+                    private const float chevron_offset = -3;
+
                     public Content()
                     {
                         RelativeSizeAxes = Axes.X;
                         AutoSizeAxes = Axes.Y;
-                        Direction = FillDirection.Horizontal;
 
-                        Children = new Drawable[]
+                        InternalChildren = new Drawable[]
                         {
                             Chevron = new SpriteIcon
                             {
-                                AlwaysPresent = true,
                                 Icon = FontAwesome.Solid.ChevronRight,
-                                Colour = Color4.Black,
-                                Alpha = 0.5f,
                                 Size = new Vector2(8),
+                                Alpha = 0,
+                                X = chevron_offset,
                                 Margin = new MarginPadding { Left = 3, Right = 3 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
                             Label = new OsuSpriteText
                             {
+                                X = 15,
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
                         };
+                    }
+
+                    [BackgroundDependencyLoader(true)]
+                    private void load(OverlayColourProvider? colourProvider)
+                    {
+                        Chevron.Colour = colourProvider?.Background5 ?? Color4.Black;
+                    }
+
+                    private bool hovering;
+
+                    public bool Hovering
+                    {
+                        get => hovering;
+                        set
+                        {
+                            if (value == hovering)
+                                return;
+
+                            hovering = value;
+
+                            if (hovering)
+                            {
+                                Chevron.FadeIn(400, Easing.OutQuint);
+                                Chevron.MoveToX(0, 400, Easing.OutQuint);
+                            }
+                            else
+                            {
+                                Chevron.FadeOut(200);
+                                Chevron.MoveToX(chevron_offset, 200, Easing.In);
+                            }
+                        }
                     }
                 }
             }
@@ -267,7 +316,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public OsuDropdownHeader()
             {
-                Foreground.Padding = new MarginPadding(4);
+                Foreground.Padding = new MarginPadding(10);
 
                 AutoSizeAxes = Axes.None;
                 Margin = new MarginPadding { Bottom = 4 };
@@ -303,8 +352,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Icon = FontAwesome.Solid.ChevronDown,
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
-                                Margin = new MarginPadding { Horizontal = 5 },
-                                Size = new Vector2(12),
+                                Size = new Vector2(16),
                             },
                         }
                     }
@@ -313,11 +361,11 @@ namespace osu.Game.Graphics.UserInterface
                 AddInternal(new HoverClickSounds());
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            [BackgroundDependencyLoader(true)]
+            private void load(OverlayColourProvider? colourProvider, OsuColour colours)
             {
-                BackgroundColour = Color4.Black.Opacity(0.5f);
-                BackgroundColourHover = colours.PinkDarker;
+                BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+                BackgroundColourHover = colourProvider?.Light4 ?? colours.PinkDarker;
             }
         }
     }

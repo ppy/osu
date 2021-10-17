@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 AccentColour = colours.Yellow;
                 Nub.AccentColour = colours.Yellow;
                 Nub.GlowingAccentColour = colours.YellowLighter;
-                Nub.GlowColour = colours.YellowDarker;
+                Nub.GlowColour = colours.YellowDark;
             }
         }
     }

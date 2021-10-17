@@ -554,6 +554,7 @@ namespace osu.Game
         {
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
+            Logger.Log($"Game-wide working beatmap updated to {beatmap.NewValue}");
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -642,7 +643,7 @@ namespace osu.Game
             SkinManager.PostNotification = n => Notifications.Post(n);
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
-            BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
+            BeatmapManager.PostImport = items => PresentBeatmap(items.First().Value);
 
             ScoreManager.PostNotification = n => Notifications.Post(n);
             ScoreManager.PostImport = items => PresentScore(items.First().Value);

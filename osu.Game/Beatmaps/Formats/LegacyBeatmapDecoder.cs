@@ -384,14 +384,21 @@ namespace osu.Game.Beatmaps.Formats
             addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
 #pragma warning restore 618
             {
-                SpeedMultiplier = speedMultiplier,
+                SliderVelocity = speedMultiplier,
             }, timingChange);
 
-            addControlPoint(time, new EffectControlPoint
+            var effectPoint = new EffectControlPoint
             {
                 KiaiMode = kiaiMode,
                 OmitFirstBarLine = omitFirstBarSignature,
-            }, timingChange);
+            };
+
+            bool isOsuRuleset = beatmap.BeatmapInfo.RulesetID == 0;
+            // scrolling rulesets use effect points rather than difficulty points for scroll speed adjustments.
+            if (!isOsuRuleset)
+                effectPoint.ScrollSpeed = speedMultiplier;
+
+            addControlPoint(time, effectPoint, timingChange);
 
             addControlPoint(time, new LegacySampleControlPoint
             {

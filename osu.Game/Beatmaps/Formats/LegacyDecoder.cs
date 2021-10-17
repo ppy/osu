@@ -181,7 +181,7 @@ namespace osu.Game.Beatmaps.Formats
 
             public LegacyDifficultyControlPoint()
             {
-                SpeedMultiplierBindable.Precision = double.Epsilon;
+                SliderVelocityBindable.Precision = double.Epsilon;
             }
 
             public override void CopyFrom(ControlPoint other)

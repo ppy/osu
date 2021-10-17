@@ -1,11 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -141,12 +144,12 @@ namespace osu.Game.Graphics.Containers
                 Child = box = new Box { RelativeSizeAxes = Axes.Both };
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            [BackgroundDependencyLoader(true)]
+            private void load(OverlayColourProvider? colourProvider, OsuColour colours)
             {
                 Colour = defaultColour = colours.Gray8;
                 hoverColour = colours.GrayF;
-                highlightColour = colours.Green;
+                highlightColour = colourProvider?.Highlight1 ?? colours.Green;
             }
 
             public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)

@@ -388,7 +388,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     },
                 };
 
-                beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
+                beatmap.ControlPointInfo.Add(0, new EffectControlPoint { ScrollSpeed = 0.1f });
             }
 
             AddStep("load player", () =>
