@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Graphics;
@@ -17,10 +17,12 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModNoScope : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModNoScope : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToBeatmap
     {
         /// <summary>
         /// Slightly higher than the cutoff for <see cref="Drawable.IsPresent"/>.
@@ -38,15 +40,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private BindableNumber<int> currentCombo;
 
-        private readonly BindableNumber<float> targetAlpha = new BindableFloat
-        {
-            MinValue = min_alpha,
-            MaxValue = 1
-        };
+        private float targetAlpha;
 
-        private readonly BindableBool rest = new BindableBool();
+        private bool rest;
 
-        private readonly BindableBool restSpinner = new BindableBool();
+        private bool restSpinner;
+
+        private PeriodTracker breaksPeriods;
+
+        private PeriodTracker spinnerPeriods;
 
         [SettingSource(
             "Hidden at combo",
@@ -64,90 +66,38 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Show on rest", "Show cursor during breaks and spinners.")]
         public BindableBool ShowCursorDuringBreaks { get; } = new BindableBool();
 
-        public OsuModNoScope()
-        {
-            HiddenComboCount.BindValueChanged(combo =>
-            {
-                if (combo.NewValue == 0)
-                    ShowCursorDuringBreaks.Value = false;
-            });
-
-            ShowCursorDuringBreaks.BindValueChanged(show =>
-            {
-                if (show.NewValue && HiddenComboCount.Value == 0)
-                    HiddenComboCount.Value = 1;
-            });
-        }
-
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
-        public class RestInfo
+        public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            public double StartTime { get; set; }
-            public bool IsSpinner { get; set; }
-
-            public RestInfo(double startTime, bool isSpinner)
-            {
-                StartTime = startTime;
-                IsSpinner = isSpinner;
-            }
-        }
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            Beatmap<OsuHitObject> beatmap = drawableRuleset.Beatmap;
-            GameplayCursorContainer cursor = drawableRuleset.Cursor;
-            var restCollection = new List<RestInfo>();
-
-            if (HiddenComboCount.Value == 0) return;
-            if (!ShowCursorDuringBreaks.Value) return;
-
-            foreach (var hitObject in beatmap.HitObjects)
-            {
-                if (hitObject is Spinner)
-                {
-                    addRest(hitObject.StartTime, true);
-                }
-            }
-
-            foreach (var breakInfo in beatmap.Breaks)
-            {
-                if (breakInfo.HasEffect)
-                {
-                    addRest(breakInfo.StartTime, false);
-                }
-            }
-
-            restCollection.Sort((info, restInfo) => info.StartTime.CompareTo(restInfo.StartTime));
-
-            cursor.OnLoadComplete += _ =>
-            {
-                foreach (var restInfo in restCollection)
-                {
-                    showCursor(restInfo);
-                }
-            };
-
-            void addRest(double startTime, bool spinner) => restCollection.Add(new RestInfo(startTime - transition_duration, spinner));
-
-            void showCursor(RestInfo restInfo)
-            {
-                using (cursor.BeginAbsoluteSequence(restInfo.StartTime))
-                {
-                    cursor.TransformBindableTo(targetAlpha, 1, transition_duration, Easing.OutCubic)
-                          .TransformBindableTo(rest, true);
-
-                    if (restInfo.IsSpinner)
-                    {
-                        cursor.TransformBindableTo(restSpinner, true);
-                    }
-                }
-            }
+            breaksPeriods = new PeriodTracker(beatmap.Breaks.Where(b => b.HasEffect)
+                                                     .Select(b => new Period(b.StartTime - transition_duration, b.EndTime - BreakOverlay.BREAK_FADE_DURATION)));
+            spinnerPeriods = new PeriodTracker(beatmap.HitObjects.OfType<Spinner>().Select(b => new Period(b.StartTime - transition_duration, b.EndTime)));
         }
 
         public virtual void Update(Playfield playfield)
         {
-            playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetAlpha.Value, Math.Clamp(playfield.Time.Elapsed / transition_duration, 0, 1));
+            var time = playfield.Clock.CurrentTime;
+
+            if (ShowCursorDuringBreaks.Value)
+            {
+                if (breaksPeriods.IsInAny(time) || spinnerPeriods.IsInAny(time))
+                {
+                    targetAlpha = 1;
+                    rest = true;
+                }
+                else if (HiddenComboCount.Value == 0)
+                {
+                    targetAlpha = 0;
+                }
+
+                if (spinnerPeriods.IsInAny(time))
+                {
+                    restSpinner = true;
+                }
+            }
+
+            playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, Math.Max(min_alpha, targetAlpha), Math.Clamp(playfield.Time.Elapsed / transition_duration, 0, 1));
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
@@ -164,14 +114,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                     lastComboBeforeRest = 0;
                 }
 
-                if (rest.Value)
+                if (rest)
                 {
                     // handle combo increase after spinner
-                    lastComboBeforeRest = restSpinner.Value ? combo.NewValue : combo.NewValue - 1;
-                    rest.Value = restSpinner.Value = false;
+                    lastComboBeforeRest = restSpinner ? combo.NewValue : combo.NewValue - 1;
+                    restSpinner = false;
                 }
 
-                targetAlpha.Value = Math.Max(min_alpha, 1 - (float)(combo.NewValue - lastComboBeforeRest) / HiddenComboCount.Value);
+                targetAlpha = 1 - (float)(combo.NewValue - lastComboBeforeRest) / HiddenComboCount.Value;
             }, true);
         }
     }
