@@ -72,6 +72,8 @@ namespace osu.Game.IO
 
         public override void OpenPathInNativeExplorer(string path) => UnderlyingStorage.OpenPathInNativeExplorer(MutatePath(path));
 
+        public override void ShowFileInNativeExplorer(string filename) => UnderlyingStorage.ShowFileInNativeExplorer(MutatePath(filename));
+
         public override Storage GetStorageForDirectory(string path)
         {
             if (string.IsNullOrEmpty(path))
