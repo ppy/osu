@@ -913,13 +913,15 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
+                    var logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
+
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
                         Icon = FontAwesome.Solid.EllipsisH,
                         Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
-                            Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
+                            Storage.GetStorageForDirectory(@"logs").ShowFileInNativeExplorer(logFile);
                             return true;
                         }
                     }));
