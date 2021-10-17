@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps.Drawables.Cards.Statistics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -40,6 +42,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private GridContainer titleContainer;
         private GridContainer artistContainer;
+        private FillFlowContainer<BeatmapCardStatistic> statisticsContainer;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
@@ -176,6 +179,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                     d.AddText("mapped by ", t => t.Colour = colourProvider.Content2);
                                     d.AddUserLink(beatmapSet.Author);
                                 }),
+                                statisticsContainer = new FillFlowContainer<BeatmapCardStatistic>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(10, 0),
+                                    Alpha = 0,
+                                    ChildrenEnumerable = createStatistics()
+                                }
                             }
                         },
                         new FillFlowContainer
@@ -265,6 +277,16 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             return BeatmapsetsStrings.ShowDetailsByArtist(romanisableArtist);
         }
 
+        private IEnumerable<BeatmapCardStatistic> createStatistics()
+        {
+            yield return new FavouritesStatistic(beatmapSet);
+            yield return new PlayCountStatistic(beatmapSet);
+
+            var dateStatistic = BeatmapCardDateStatistic.CreateFor(beatmapSet);
+            if (dateStatistic != null)
+                yield return dateStatistic;
+        }
+
         private void updateState()
         {
             float targetWidth = width - height;
@@ -275,6 +297,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             mainContentBackground.Dimmed.Value = IsHovered;
 
             leftCover.FadeColour(IsHovered ? OsuColour.Gray(0.2f) : Color4.White, TRANSITION_DURATION, Easing.OutQuint);
+            statisticsContainer.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
