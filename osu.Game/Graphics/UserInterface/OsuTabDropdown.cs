@@ -22,20 +22,32 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
 
-                if (Menu is OsuDropdownMenu dropdownMenu)
-                {
-                    dropdownMenu.HoverColour = value;
-                    dropdownMenu.SelectionColour = value.Opacity(0.5f);
-                }
-
-                if (Header is OsuTabDropdownHeader tabDropdownHeader)
-                    tabDropdownHeader.AccentColour = value;
+                if (IsLoaded)
+                    propagateAccentColour();
             }
+        }
+
+        private void propagateAccentColour()
+        {
+            if (Menu is OsuDropdownMenu dropdownMenu)
+            {
+                dropdownMenu.HoverColour = accentColour;
+                dropdownMenu.SelectionColour = accentColour.Opacity(0.5f);
+            }
+
+            if (Header is OsuTabDropdownHeader tabDropdownHeader)
+                tabDropdownHeader.AccentColour = accentColour;
         }
 
         public OsuTabDropdown()
         {
             RelativeSizeAxes = Axes.X;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            propagateAccentColour();
         }
 
         protected override DropdownMenu CreateMenu() => new OsuTabDropdownMenu();
@@ -80,7 +92,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     accentColour = value;
                     BackgroundColourHover = value;
-                    Foreground.Colour = value;
+                    updateColour();
                 }
             }
 
@@ -116,14 +128,19 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override bool OnHover(HoverEvent e)
             {
-                Foreground.Colour = BackgroundColour;
+                updateColour();
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                Foreground.Colour = BackgroundColourHover;
+                updateColour();
                 base.OnHoverLost(e);
+            }
+
+            private void updateColour()
+            {
+                Foreground.Colour = IsHovered ? BackgroundColour : BackgroundColourHover;
             }
         }
     }
