@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -19,6 +20,7 @@ using osu.Game.Overlays.BeatmapSet;
 using osuTK;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
@@ -28,8 +30,16 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private const float height = 100;
         private const float corner_radius = 10;
 
+        private const float transition_duration = 400;
+
         private readonly APIBeatmapSet beatmapSet;
+
+        private UpdateableOnlineBeatmapSetCover leftCover;
         private FillFlowContainer iconArea;
+
+        private Container mainContent;
+        private Box foregroundGradient;
+
         private GridContainer titleContainer;
         private GridContainer artistContainer;
 
@@ -63,7 +73,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Size = new Vector2(height),
                     Children = new Drawable[]
                     {
-                        new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
+                        leftCover = new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
                         {
                             RelativeSizeAxes = Axes.Both,
                             OnlineInfo = beatmapSet
@@ -77,11 +87,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         }
                     }
                 },
-                new Container
+                mainContent = new Container
                 {
                     Name = @"Main content",
                     X = height - corner_radius,
-                    Width = width - height,
                     Height = height,
                     CornerRadius = corner_radius,
                     Masking = true,
@@ -92,10 +101,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             RelativeSizeAxes = Axes.Both,
                             OnlineInfo = beatmapSet,
                         },
-                        new Box
+                        foregroundGradient = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(colourProvider.Background2, colourProvider.Background2.Opacity(0.8f)),
                         },
                         new FillFlowContainer
                         {
@@ -239,10 +247,44 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateState();
+            FinishTransforms(true);
+        }
+
         private LocalisableString createArtistText()
         {
             var romanisableArtist = new RomanisableString(beatmapSet.ArtistUnicode, beatmapSet.Artist);
             return BeatmapsetsStrings.ShowDetailsByArtist(romanisableArtist);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateState();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateState();
+            base.OnHoverLost(e);
+        }
+
+        private void updateState()
+        {
+            float targetWidth = width - height;
+            if (IsHovered)
+                targetWidth -= 20;
+
+            mainContent.ResizeWidthTo(targetWidth, transition_duration, Easing.OutQuint);
+
+            var foregroundColour = IsHovered ? colourProvider.Background4 : colourProvider.Background2;
+            var foregroundGradientColour = ColourInfo.GradientHorizontal(foregroundColour, foregroundColour.Opacity(0.8f));
+            foregroundGradient.FadeColour(foregroundGradientColour, transition_duration, Easing.OutQuint);
+
+            leftCover.FadeColour(IsHovered ? OsuColour.Gray(0.2f) : Color4.White, transition_duration, Easing.OutQuint);
         }
     }
 }
