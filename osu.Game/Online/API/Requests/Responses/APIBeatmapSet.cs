@@ -62,6 +62,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"track_id")]
         public int? TrackId { get; set; }
 
+        [JsonProperty(@"hype")]
+        public BeatmapSetHypeStatus? HypeStatus { get; set; }
+
+        [JsonProperty(@"nominations_summary")]
+        public BeatmapSetNominationStatus? NominationStatus { get; set; }
+
         public string Title { get; set; } = string.Empty;
 
         [JsonProperty("title_unicode")]
