@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModNoScope
             {
                 HiddenComboCount = { Value = 0 },
-                ShowCursorDuringBreaks = { Value = true },
+                AlwaysHidden = { Value = false },
             },
             Autoplay = true,
             Beatmap = new Beatmap

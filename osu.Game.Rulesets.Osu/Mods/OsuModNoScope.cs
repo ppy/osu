@@ -63,8 +63,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 50,
         };
 
-        [SettingSource("Show on rest", "Show cursor during breaks and spinners.")]
-        public BindableBool ShowCursorDuringBreaks { get; } = new BindableBool();
+        [SettingSource("Always hidden", "Don't show cursor during breaks and spinners.")]
+        public BindableBool AlwaysHidden { get; } = new BindableBool();
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var time = playfield.Clock.CurrentTime;
 
-            if (ShowCursorDuringBreaks.Value)
+            if (!AlwaysHidden.Value)
             {
                 if (breaksPeriods.IsInAny(time) || spinnerPeriods.IsInAny(time))
                 {
@@ -128,6 +128,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     public class HiddenComboSlider : OsuSliderBar<int>
     {
-        public override LocalisableString TooltipText => Current.Value == 0 ? "always hidden" : base.TooltipText;
+        public override LocalisableString TooltipText => Current.Value == 0 ? "start hidden" : base.TooltipText;
     }
 }
