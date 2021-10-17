@@ -31,11 +31,20 @@ namespace osu.Game.Tests.Visual.Beatmaps
             normal.HasVideo = true;
             normal.HasStoryboard = true;
 
+            var withStatistics = CreateAPIBeatmapSet(Ruleset.Value);
+            withStatistics.Status = BeatmapSetOnlineStatus.Approved;
+            withStatistics.FavouriteCount = 284_239;
+            withStatistics.PlayCount = 999_001;
+            withStatistics.Ranked = DateTimeOffset.Now.AddDays(-45);
+
             var undownloadable = getUndownloadableBeatmapSet();
+            undownloadable.LastUpdated = DateTimeOffset.Now.AddYears(-1);
 
             var someDifficulties = getManyDifficultiesBeatmapSet(11);
             someDifficulties.Title = someDifficulties.TitleUnicode = "some difficulties";
             someDifficulties.Status = BeatmapSetOnlineStatus.Qualified;
+            someDifficulties.HasFavourited = true;
+            someDifficulties.FavouriteCount = 1;
 
             var manyDifficulties = getManyDifficultiesBeatmapSet(100);
             manyDifficulties.Status = BeatmapSetOnlineStatus.Pending;
@@ -59,6 +68,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             testCases = new[]
             {
                 normal,
+                withStatistics,
                 undownloadable,
                 someDifficulties,
                 manyDifficulties,
