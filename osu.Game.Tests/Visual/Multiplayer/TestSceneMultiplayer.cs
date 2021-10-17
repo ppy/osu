@@ -564,11 +564,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddRepeatStep("click spectate button", () =>
+            AddUntilStep("wait for ready button to be enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+
+            AddStep("click ready button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
+                InputManager.MoveMouseTo(readyButton);
                 InputManager.Click(MouseButton.Left);
-            }, 2);
+            });
+
+            AddUntilStep("wait for player to be ready", () => client.Room?.Users[0].State == MultiplayerUserState.Ready);
+            AddUntilStep("wait for ready button to be enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+
+            AddStep("click start button", () => InputManager.Click(MouseButton.Left));
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
@@ -581,6 +588,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for results", () => Stack.CurrentScreen is ResultsScreen);
         }
+
+        private MultiplayerReadyButton readyButton => this.ChildrenOfType<MultiplayerReadyButton>().Single();
 
         private void createRoom(Func<Room> room)
         {

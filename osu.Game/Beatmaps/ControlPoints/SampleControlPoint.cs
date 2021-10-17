@@ -8,6 +8,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
+    /// <remarks>
+    /// Note that going forward, this control point type should always be assigned directly to HitObjects.
+    /// </remarks>
     public class SampleControlPoint : ControlPoint
     {
         public const string DEFAULT_BANK = "normal";

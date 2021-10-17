@@ -187,8 +187,6 @@ namespace osu.Game
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client"));
 
-            AddInternal(realmFactory);
-
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
@@ -529,6 +527,7 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             contextFactory?.FlushConnections();
+            realmFactory?.Dispose();
         }
     }
 }

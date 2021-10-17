@@ -163,5 +163,11 @@ namespace osu.Game.Tests.Visual.Audio
         }
 
         private void waitTrackPlay() => AddWaitStep("Let track play", 10);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            track?.Dispose();
+        }
     }
 }

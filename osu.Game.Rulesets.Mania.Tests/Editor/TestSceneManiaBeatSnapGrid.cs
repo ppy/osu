@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -101,27 +102,27 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             throw new System.NotImplementedException();
         }
 
-        public override float GetBeatSnapDistanceAt(double referenceTime)
+        public override float GetBeatSnapDistanceAt(HitObject referenceObject)
         {
             throw new System.NotImplementedException();
         }
 
-        public override float DurationToDistance(double referenceTime, double duration)
+        public override float DurationToDistance(HitObject referenceObject, double duration)
         {
             throw new System.NotImplementedException();
         }
 
-        public override double DistanceToDuration(double referenceTime, float distance)
+        public override double DistanceToDuration(HitObject referenceObject, float distance)
         {
             throw new System.NotImplementedException();
         }
 
-        public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
+        public override double GetSnappedDurationFromDistance(HitObject referenceObject, float distance)
         {
             throw new System.NotImplementedException();
         }
 
-        public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
+        public override float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance)
         {
             throw new System.NotImplementedException();
         }

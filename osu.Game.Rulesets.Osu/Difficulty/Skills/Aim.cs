@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override int HistoryLength => 2;
 
         private const double wide_angle_multiplier = 1.5;
-        private const double acute_angle_multiplier = 2.0;
+        private const double acute_angle_multiplier = 1.5;
         private const double slider_multiplier = 2.75;
 
         private double currentStrain = 1;
