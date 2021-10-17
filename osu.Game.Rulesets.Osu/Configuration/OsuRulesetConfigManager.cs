@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.SnakingInSliders, true);
             SetDefault(OsuRulesetSetting.SnakingOutSliders, true);
             SetDefault(OsuRulesetSetting.ShowCursorTrail, true);
+            SetDefault(OsuRulesetSetting.NoDraw300, false);
             SetDefault(OsuRulesetSetting.PlayfieldBorderStyle, PlayfieldBorderStyle.None);
 
             SetDefault(OsuRulesetSetting.ReplayFramerate, 120f, 15f, 1000f, 1f);
@@ -122,5 +123,6 @@ namespace osu.Game.Rulesets.Osu.Configuration
         BezierSliderAggressiveness,
 
         CursorTrailForceLong,
+        NoDraw300
     }
 }

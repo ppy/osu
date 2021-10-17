@@ -50,6 +50,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "强制光标使用长拖尾",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.CursorTrailForceLong)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "隐藏300s",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.NoDraw300)
+                },
                 new SettingsSlider<float, FramerateSlider>
                 {
                     LabelText = "回放帧率",
