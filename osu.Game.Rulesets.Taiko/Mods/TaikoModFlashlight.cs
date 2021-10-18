@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
@@ -18,7 +19,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private const float default_flashlight_size = 250;
 
-        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield);
+        private const int max_combo_offset = 200;
+
+        private TaikoFlashlight flashlight;
+
+        public override Flashlight CreateFlashlight() => flashlight = new TaikoFlashlight(playfield);
 
         private TaikoPlayfield playfield;
 
@@ -26,12 +31,24 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             playfield = (TaikoPlayfield)drawableRuleset.Playfield;
             base.ApplyToDrawableRuleset(drawableRuleset);
+
+            flashlight.ComboOffset = ComboOffset.Value;
         }
+
+        [SettingSource("Combo offset", "Combo to start at for changing flashlight radius")]
+        public BindableNumber<int> ComboOffset { get; } = new BindableInt
+        {
+            MinValue = 0,
+            MaxValue = max_combo_offset,
+            Precision = 1,
+        };
 
         private class TaikoFlashlight : Flashlight
         {
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
             private readonly TaikoPlayfield taikoPlayfield;
+
+            public int ComboOffset { private get; set; }
 
             public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
             {
@@ -43,9 +60,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             private float getSizeFor(int combo)
             {
-                if (combo > 200)
+                int effectiveCombo = combo + ComboOffset;
+
+                if (effectiveCombo > 200)
                     return default_flashlight_size * 0.8f;
-                else if (combo > 100)
+                else if (effectiveCombo > 100)
                     return default_flashlight_size * 0.9f;
                 else
                     return default_flashlight_size;

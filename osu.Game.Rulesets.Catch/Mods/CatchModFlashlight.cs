@@ -3,6 +3,7 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
@@ -17,7 +18,11 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private const float default_flashlight_size = 350;
 
-        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield);
+        private const int max_combo_offset = 200;
+
+        private CatchFlashlight flashlight;
+
+        public override Flashlight CreateFlashlight() => flashlight = new CatchFlashlight(playfield);
 
         private CatchPlayfield playfield;
 
@@ -25,11 +30,23 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             playfield = (CatchPlayfield)drawableRuleset.Playfield;
             base.ApplyToDrawableRuleset(drawableRuleset);
+
+            flashlight.ComboOffset = ComboOffset.Value;
         }
+
+        [SettingSource("Combo offset", "Combo to start at for changing flashlight radius")]
+        public BindableNumber<int> ComboOffset { get; } = new BindableInt
+        {
+            MinValue = 0,
+            MaxValue = max_combo_offset,
+            Precision = 1,
+        };
 
         private class CatchFlashlight : Flashlight
         {
             private readonly CatchPlayfield playfield;
+
+            public int ComboOffset { private get; set; }
 
             public CatchFlashlight(CatchPlayfield playfield)
             {
@@ -46,9 +63,11 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             private float getSizeFor(int combo)
             {
-                if (combo > 200)
+                int effectiveCombo = combo + ComboOffset;
+
+                if (effectiveCombo > 200)
                     return default_flashlight_size * 0.8f;
-                else if (combo > 100)
+                else if (effectiveCombo > 100)
                     return default_flashlight_size * 0.9f;
                 else
                     return default_flashlight_size;
