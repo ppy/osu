@@ -82,32 +82,29 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
-            InternalChild = new GridContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                ColumnDimensions = new[]
+                new Container
                 {
-                    new Dimension(GridSizeMode.Absolute, SettingsPanel.CONTENT_MARGINS),
-                    new Dimension(),
-                    new Dimension(GridSizeMode.Absolute, SettingsPanel.CONTENT_MARGINS),
-                },
-                RowDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.AutoSize)
-                },
-                Content = new[]
-                {
-                    new Drawable[]
+                    RelativeSizeAxes = Axes.Y,
+                    Width = SettingsPanel.CONTENT_MARGINS,
+                    Child = new RestoreDefaultValueButton<bool>
                     {
-                        new RestoreDefaultValueButton<bool>
-                        {
-                            Current = isDefault,
-                            Action = RestoreDefaults,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
-                        },
+                        Current = isDefault,
+                        Action = RestoreDefaults,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
+                    Children = new Drawable[]
+                    {
                         content = new Container
                         {
                             RelativeSizeAxes = Axes.X,
@@ -154,10 +151,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                     },
                                 }
                             }
-                        },
-                        new HoverClickSounds()
+                        }
                     }
-                }
+                },
+                new HoverClickSounds()
             };
 
             foreach (var b in bindings)
