@@ -45,11 +45,11 @@ namespace osu.Desktop
 
         private readonly Bindable<bool> enabled = new Bindable<bool>();
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
-        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>();
+        private readonly IBindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>();
 
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
 
@@ -58,7 +58,7 @@ namespace osu.Desktop
         #endregion
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, IAPIProvider provider, Bindable<RulesetInfo> ruleset, Bindable<WorkingBeatmap> beatmap, Bindable<IReadOnlyList<Mod>> mods)
+        private void load(OsuConfigManager config, IAPIProvider provider, IBindable<RulesetInfo> ruleset, IBindable<WorkingBeatmap> beatmap, IBindable<IReadOnlyList<Mod>> mods)
         {
             this.ruleset.BindTo(ruleset);
             this.beatmap.BindTo(beatmap);
