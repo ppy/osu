@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -217,9 +218,12 @@ namespace osu.Game.Screens.Play
 
             Score = CreateScore(playableBeatmap);
 
+            Debug.Assert(ruleset.RulesetInfo.ID != null);
+
             // ensure the score is in a consistent state with the current player.
             Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
+            Score.ScoreInfo.RulesetID = ruleset.RulesetInfo.ID.Value;
             Score.ScoreInfo.Mods = gameplayMods;
 
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score));
@@ -230,17 +234,53 @@ namespace osu.Game.Screens.Play
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
             GameplayClockContainer.Add(rulesetSkinProvider);
 
-            rulesetSkinProvider.AddRange(new[]
+            rulesetSkinProvider.AddRange(new Drawable[]
             {
-                // underlay and gameplay should have access to the skinning sources.
-                createUnderlayComponents(),
-                createGameplayComponents(Beatmap.Value, playableBeatmap)
+                failAnimationLayer = new FailAnimation(DrawableRuleset)
+                {
+                    OnComplete = onFailComplete,
+                    Children = new[]
+                    {
+                        // underlay and gameplay should have access to the skinning sources.
+                        createUnderlayComponents(),
+                        createGameplayComponents(Beatmap.Value, playableBeatmap)
+                    }
+                },
+                FailOverlay = new FailOverlay
+                {
+                    OnRetry = Restart,
+                    OnQuit = () => PerformExit(true),
+                },
+                new HotkeyExitOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        fadeOut(true);
+                        PerformExit(false);
+                    },
+                },
             });
+
+            if (Configuration.AllowRestart)
+            {
+                rulesetSkinProvider.Add(new HotkeyRetryOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        fadeOut(true);
+                        Restart();
+                    },
+                });
+            }
 
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
-            rulesetSkinProvider.Add(createOverlayComponents(Beatmap.Value));
+            failAnimationLayer.Add(createOverlayComponents(Beatmap.Value));
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -375,11 +415,6 @@ namespace osu.Game.Screens.Play
                         RequestSkip = () => progressToResults(false),
                         Alpha = 0
                     },
-                    FailOverlay = new FailOverlay
-                    {
-                        OnRetry = Restart,
-                        OnQuit = () => PerformExit(true),
-                    },
                     PauseOverlay = new PauseOverlay
                     {
                         OnResume = Resume,
@@ -387,18 +422,7 @@ namespace osu.Game.Screens.Play
                         OnRetry = Restart,
                         OnQuit = () => PerformExit(true),
                     },
-                    new HotkeyExitOverlay
-                    {
-                        Action = () =>
-                        {
-                            if (!this.IsCurrentScreen()) return;
-
-                            fadeOut(true);
-                            PerformExit(false);
-                        },
-                    },
-                    failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
-                }
+                },
             };
 
             if (!Configuration.AllowSkipping || !DrawableRuleset.AllowGameplayOverlays)
@@ -409,20 +433,6 @@ namespace osu.Game.Screens.Play
 
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
-
-            if (Configuration.AllowRestart)
-            {
-                container.Add(new HotkeyRetryOverlay
-                {
-                    Action = () =>
-                    {
-                        if (!this.IsCurrentScreen()) return;
-
-                        fadeOut(true);
-                        Restart();
-                    },
-                });
-            }
 
             return container;
         }
@@ -541,7 +551,7 @@ namespace osu.Game.Screens.Play
                 // if the fail animation is currently in progress, accelerate it (it will show the pause dialog on completion).
                 if (ValidForResume && HasFailed)
                 {
-                    failAnimation.FinishTransforms(true);
+                    failAnimationLayer.FinishTransforms(true);
                     return;
                 }
 
@@ -766,7 +776,7 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
-        private FailAnimation failAnimation;
+        private FailAnimation failAnimationLayer;
 
         private bool onFail()
         {
@@ -782,7 +792,7 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
-            failAnimation.Start();
+            failAnimationLayer.Start();
 
             if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
                 Restart();
@@ -956,7 +966,7 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(IScreen next)
         {
             screenSuspension?.RemoveAndDisposeImmediately();
-            failAnimation?.RemoveAndDisposeImmediately();
+            failAnimationLayer?.RemoveFilters();
 
             // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
             if (prepareScoreForDisplayTask == null)

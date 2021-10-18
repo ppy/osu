@@ -44,7 +44,8 @@ namespace osu.Game.Models
         [MapTo(nameof(Status))]
         public int StatusInt { get; set; }
 
-        public int? OnlineID { get; set; }
+        [Indexed]
+        public int OnlineID { get; set; } = -1;
 
         public double Length { get; set; }
 
