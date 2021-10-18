@@ -40,12 +40,12 @@ namespace osu.Game.Online.API
             if (string.IsNullOrEmpty(password)) throw new ArgumentException("Missing password.");
 
             using (var req = new AccessTokenRequestPassword(username, password)
-            {
-                Url = $@"{endpoint}/oauth/token",
-                Method = HttpMethod.Post,
-                ClientId = clientId,
-                ClientSecret = clientSecret
-            })
+                {
+                    Url = $@"{endpoint}/oauth/token",
+                    Method = HttpMethod.Post,
+                    ClientId = clientId,
+                    ClientSecret = clientSecret
+                })
             {
                 try
                 {
@@ -80,12 +80,12 @@ namespace osu.Game.Online.API
             try
             {
                 using (var req = new AccessTokenRequestRefresh(refresh)
-                {
-                    Url = $@"{endpoint}/oauth/token",
-                    Method = HttpMethod.Post,
-                    ClientId = clientId,
-                    ClientSecret = clientSecret
-                })
+                    {
+                        Url = $@"{endpoint}/oauth/token",
+                        Method = HttpMethod.Post,
+                        ClientId = clientId,
+                        ClientSecret = clientSecret
+                    })
                 {
                     req.Perform();
 
