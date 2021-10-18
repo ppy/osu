@@ -227,7 +227,6 @@ namespace osu.Game.Screens.Menu
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            game?.TransformWindowOpacity(1, 300);
 
             icon.RotateTo(10);
             icon.FadeOut();

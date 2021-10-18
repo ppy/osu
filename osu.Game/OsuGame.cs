@@ -230,20 +230,6 @@ namespace osu.Game
             stream.Dispose();
         }
 
-        private BindableFloat windowOpacity;
-
-        public void TransformWindowOpacity(float final, float duration = 0, Easing easing = Easing.None) =>
-            this.TransformBindableTo(windowOpacity, final, duration, easing);
-
-        public void TransformWindowOpacity(float final, double duration = 0, Easing easing = Easing.None) =>
-            this.TransformBindableTo(windowOpacity, final, duration, easing);
-
-        public void SetWindowOpacity(float value)
-        {
-            if (host.Window is SDL2DesktopWindow sdl2DesktopWindow)
-                sdl2DesktopWindow.Opacity = value;
-        }
-
         public void AddBlockingOverlay(OverlayContainer overlay)
         {
             if (!visibleBlockingOverlays.Contains(overlay))
@@ -807,18 +793,6 @@ namespace osu.Game
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
-
-            windowOpacity = new BindableFloat();
-
-            if (host.Window is SDL2DesktopWindow sdl2DesktopWindow)
-            {
-                windowOpacity.Value = MConfig.Get<bool>(MSetting.FadeInWindowWhenEntering)
-                    ? 0
-                    : 1;
-                windowOpacity.BindValueChanged(v => SetWindowOpacity(v.NewValue), true);
-
-                sdl2DesktopWindow.Visible = true;
-            }
 
             gamemodeCondition.BindValueChanged(v => gamemodeConditionChanged(v.NewValue));
 

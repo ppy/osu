@@ -61,11 +61,14 @@ namespace osu.Game.Configuration
             //实验性功能
             SetDefault(MSetting.CustomWindowIconPath, "");
             SetDefault(MSetting.UseCustomGreetingPicture, false);
-            SetDefault(MSetting.FadeOutWindowWhenExiting, false);
-            SetDefault(MSetting.FadeInWindowWhenEntering, false);
+            SetDefault(MSetting.AllowWindowFadeEffect, false);
             SetDefault(MSetting.UseSystemCursor, false);
             SetDefault(MSetting.PreferredFont, "Torus");
             SetDefault(MSetting.LoaderBackgroundColor, "#000000");
+
+            //Deprecated
+            SetDefault(MSetting.FadeOutWindowWhenExiting, false);
+            SetDefault(MSetting.FadeInWindowWhenEntering, false);
 
             //Gamemode集成
             SetDefault(MSetting.Gamemode, GamemodeActivateCondition.InGame);
@@ -80,6 +83,9 @@ namespace osu.Game.Configuration
 
             //Mpris
             SetDefault(MSetting.MprisUseAvatarlogoAsCover, true);
+
+            if (Get<bool>(MSetting.FadeOutWindowWhenExiting) || Get<bool>(MSetting.FadeInWindowWhenEntering))
+                SetValue(MSetting.AllowWindowFadeEffect, true);
         }
 
         public Color4 GetCustomLoaderColor()
@@ -123,6 +129,7 @@ namespace osu.Game.Configuration
         IntroLoadDirectToSongSelect,
         CustomWindowIconPath,
         UseCustomGreetingPicture,
+        AllowWindowFadeEffect,
         FadeOutWindowWhenExiting,
         FadeInWindowWhenEntering,
         UseSystemCursor,

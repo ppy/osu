@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Framework;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -146,11 +145,21 @@ namespace osu.Game.Screens.Menu
             }
         }
 
+        private double fadeOutTime;
+
+        public double FadeOutTime
+        {
+            get
+            {
+                if (fadeOutTime == 0) fadeOutTime = MenuVoice.Value ? exit_delay : 500;
+
+                return fadeOutTime;
+            }
+        }
+
         public override void OnResuming(IScreen last)
         {
             this.FadeIn(300);
-
-            double fadeOutTime = exit_delay;
 
             var track = musicController.CurrentTrack;
 
@@ -168,24 +177,16 @@ namespace osu.Game.Screens.Menu
                 const double initial_fade = 200;
                 track
                     .VolumeTo(0.03f, initial_fade).Then()
-                    .VolumeTo(0, fadeOutTime - initial_fade, Easing.In);
+                    .VolumeTo(0, FadeOutTime - initial_fade, Easing.In);
             }
             else
             {
-                fadeOutTime = 500;
-
                 // if outro voice is turned off, just do a simple fade out.
-                track.VolumeTo(0, fadeOutTime, Easing.Out);
-            }
-
-            if (mConfig.Get<bool>(MSetting.FadeOutWindowWhenExiting)
-                && RuntimeInfo.IsDesktop)
-            {
-                game?.TransformWindowOpacity(0, fadeOutTime - 1);
+                track.VolumeTo(0, FadeOutTime, Easing.Out);
             }
 
             //don't want to fade out completely else we will stop running updates.
-            Game.FadeTo(0.01f, fadeOutTime).OnComplete(_ => this.Exit());
+            Game.FadeTo(0.01f, FadeOutTime).OnComplete(_ => this.Exit());
 
             base.OnResuming(last);
         }
