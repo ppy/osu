@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
             {
                 this.taikoPlayfield = taikoPlayfield;
-                FlashlightSize = new Vector2(0, getSizeFor(0));
+                FlashlightSize = getSizeFor(0);
 
                 AddLayout(flashlightProperties);
             }
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             protected override void OnComboChange(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), getSizeFor(e.NewValue), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
@@ -86,7 +86,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                 if (!flashlightProperties.IsValid)
                 {
-                    FlashlightPosition = taikoPlayfield.HitTarget.ToSpaceOfOtherDrawable(taikoPlayfield.HitTarget.OriginPosition, this);
+                    FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
+
+                    ClearTransforms(targetMember: nameof(FlashlightSize));
+                    FlashlightSize = getSizeFor(Combo.Value);
+
                     flashlightProperties.Validate();
                 }
             }

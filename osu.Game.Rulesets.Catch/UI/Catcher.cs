@@ -23,6 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
+    [Cached]
     public class Catcher : SkinReloadableDrawable
     {
         /// <summary>
@@ -106,7 +107,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
-        private readonly float catchWidth;
+        public readonly float CatchWidth;
 
         private readonly SkinnableCatcher body;
 
@@ -123,7 +124,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
         private readonly DrawablePool<CaughtDroplet> caughtDropletPool;
 
-        public Catcher([NotNull] DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] DroppedObjectContainer droppedObjectTarget, IBeatmapDifficultyInfo difficulty = null)
         {
             this.droppedObjectTarget = droppedObjectTarget;
 
@@ -133,7 +134,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (difficulty != null)
                 Scale = calculateScale(difficulty);
 
-            catchWidth = CalculateCatchWidth(Scale);
+            CatchWidth = CalculateCatchWidth(Scale);
 
             InternalChildren = new Drawable[]
             {
@@ -171,7 +172,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Calculates the scale of the catcher based off the provided beatmap difficulty.
         /// </summary>
-        private static Vector2 calculateScale(BeatmapDifficulty difficulty) => new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
+        private static Vector2 calculateScale(IBeatmapDifficultyInfo difficulty) => new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
 
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
@@ -183,7 +184,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
         /// <param name="difficulty">The beatmap difficulty.</param>
-        public static float CalculateCatchWidth(BeatmapDifficulty difficulty) => CalculateCatchWidth(calculateScale(difficulty));
+        public static float CalculateCatchWidth(IBeatmapDifficultyInfo difficulty) => CalculateCatchWidth(calculateScale(difficulty));
 
         /// <summary>
         /// Determine if this catcher can catch a <see cref="CatchHitObject"/> in the current position.
@@ -193,7 +194,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!(hitObject is PalpableCatchHitObject fruit))
                 return false;
 
-            float halfCatchWidth = catchWidth * 0.5f;
+            float halfCatchWidth = CatchWidth * 0.5f;
             return fruit.EffectiveX >= X - halfCatchWidth &&
                    fruit.EffectiveX <= X + halfCatchWidth;
         }
@@ -216,7 +217,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     placeCaughtObject(palpableObject, positionInStack);
 
                 if (hitLighting.Value)
-                    addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
+                    addLighting(result, drawableObject.AccentColour.Value, positionInStack.X);
             }
 
             // droplet doesn't affect the catcher state
@@ -365,8 +366,8 @@ namespace osu.Game.Rulesets.Catch.UI
             return position;
         }
 
-        private void addLighting(CatchHitObject hitObject, float x, Color4 colour) =>
-            hitExplosionContainer.Add(new HitExplosionEntry(Time.Current, x, hitObject.Scale, colour, hitObject.RandomSeed));
+        private void addLighting(JudgementResult judgementResult, Color4 colour, float x) =>
+            hitExplosionContainer.Add(new HitExplosionEntry(Time.Current, judgementResult, colour, x));
 
         private CaughtObject getCaughtObject(PalpableCatchHitObject source)
         {

@@ -140,12 +140,8 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             }
         }
 
-        private class Date : CompositeDrawable, IHasCustomTooltip
+        private class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
         {
-            public ITooltip GetCustomTooltip() => new DateTooltip();
-
-            public object TooltipContent => date;
-
             private readonly DateTimeOffset date;
 
             public Date(DateTimeOffset date)
@@ -190,6 +186,10 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                     }
                 };
             }
+
+            ITooltip<DateTimeOffset> IHasCustomTooltip<DateTimeOffset>.GetCustomTooltip() => new DateTooltip();
+
+            DateTimeOffset IHasCustomTooltip<DateTimeOffset>.TooltipContent => date;
         }
     }
 }

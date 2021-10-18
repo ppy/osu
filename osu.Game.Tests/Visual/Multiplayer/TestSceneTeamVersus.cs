@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -17,6 +18,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
@@ -67,6 +69,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 LoadScreen(dependenciesScreen = new DependenciesScreen(client));
             });
 
+            AddUntilStep("wait for dependencies screen", () => Stack.CurrentScreen is DependenciesScreen);
+            AddUntilStep("wait for dependencies to start load", () => dependenciesScreen.LoadState > LoadState.NotLoaded);
             AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
 
             AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
@@ -150,10 +154,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createRoom(Func<Room> room)
         {
-            AddStep("open room", () =>
-            {
-                multiplayerScreen.OpenNewRoom(room());
-            });
+            AddStep("open room", () => multiplayerScreen.ChildrenOfType<LoungeSubScreen>().Single().Open(room()));
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddWaitStep("wait for transition", 2);

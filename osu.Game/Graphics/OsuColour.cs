@@ -130,6 +130,9 @@ namespace osu.Game.Graphics
             return Gray(brightness > 0.5f ? 0.2f : 0.9f);
         }
 
+        public readonly Color4 TeamColourRed = Color4Extensions.FromHex("#AA1414");
+        public readonly Color4 TeamColourBlue = Color4Extensions.FromHex("#1462AA");
+
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
         public readonly Color4 PurpleLighter = Color4Extensions.FromHex(@"eeeeff");
         public readonly Color4 PurpleLight = Color4Extensions.FromHex(@"aa88ff");
@@ -221,6 +224,16 @@ namespace osu.Game.Graphics
         public readonly Color4 GrayD = Color4Extensions.FromHex(@"ddd");
         public readonly Color4 GrayE = Color4Extensions.FromHex(@"eee");
         public readonly Color4 GrayF = Color4Extensions.FromHex(@"fff");
+
+        /// <summary>
+        /// Equivalent to <see cref="OverlayColourProvider.Pink"/>'s <see cref="OverlayColourProvider.Colour3"/>.
+        /// </summary>
+        public readonly Color4 Pink3 = Color4Extensions.FromHex(@"cc3378");
+
+        /// <summary>
+        /// Equivalent to <see cref="OverlayColourProvider.Blue"/>'s <see cref="OverlayColourProvider.Colour3"/>.
+        /// </summary>
+        public readonly Color4 Blue3 = Color4Extensions.FromHex(@"3399cc");
 
         /// <summary>
         /// Equivalent to <see cref="OverlayColourProvider.Lime"/>'s <see cref="OverlayColourProvider.Colour1"/>.

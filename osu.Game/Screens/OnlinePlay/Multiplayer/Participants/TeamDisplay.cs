@@ -3,6 +3,8 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -19,16 +20,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
     internal class TeamDisplay : MultiplayerRoomComposite
     {
-        private readonly User user;
+        private readonly MultiplayerRoomUser user;
+
         private Drawable box;
+
+        private Sample sampleTeamSwap;
 
         [Resolved]
         private OsuColour colours { get; set; }
 
-        [Resolved]
-        private MultiplayerClient client { get; set; }
-
-        public TeamDisplay(User user)
+        public TeamDisplay(MultiplayerRoomUser user)
         {
             this.user = user;
 
@@ -42,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             box = new Container
             {
@@ -61,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 }
             };
 
-            if (user.Id == client.LocalUser?.UserID)
+            if (Client.LocalUser?.Equals(user) == true)
             {
                 InternalChild = new OsuClickableContainer
                 {
@@ -75,13 +76,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             {
                 InternalChild = box;
             }
+
+            sampleTeamSwap = audio.Samples.Get(@"Multiplayer/team-swap");
         }
 
         private void changeTeam()
         {
-            client.SendMatchRequest(new ChangeTeamRequest
+            Client.SendMatchRequest(new ChangeTeamRequest
             {
-                TeamID = ((client.LocalUser?.MatchState as TeamVersusUserState)?.TeamID + 1) % 2 ?? 0,
+                TeamID = ((Client.LocalUser?.MatchState as TeamVersusUserState)?.TeamID + 1) % 2 ?? 0,
             });
         }
 
@@ -93,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             // we don't have a way of knowing when an individual user's state has updated, so just handle on RoomUpdated for now.
 
-            var userRoomState = Room?.Users.FirstOrDefault(u => u.UserID == user.Id)?.MatchState;
+            var userRoomState = Room?.Users.FirstOrDefault(u => u.Equals(user))?.MatchState;
 
             const double duration = 400;
 
@@ -101,6 +104,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             if (newTeam == displayedTeam)
                 return;
+
+            // only play the sample if an already valid team changes to another valid team.
+            // this avoids playing a sound for each user if the match type is changed to/from a team mode.
+            if (newTeam != null && displayedTeam != null)
+                sampleTeamSwap?.Play();
 
             displayedTeam = newTeam;
 

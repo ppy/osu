@@ -8,7 +8,7 @@ using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Input;
-using osu.Game.Tests.Visual.Navigation;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Input
 {

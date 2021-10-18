@@ -20,6 +20,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -77,7 +78,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private RealmContextFactory realmFactory { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -100,7 +101,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Radius = 2,
-                        Colour = colours.YellowDark.Opacity(0),
+                        Colour = colourProvider.Highlight1.Opacity(0),
                         Type = EdgeEffectType.Shadow,
                         Hollow = true,
                     },
@@ -109,13 +110,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0.6f,
+                            Colour = colourProvider.Background5,
                         },
                         text = new OsuSpriteText
                         {
-                            Text = action.GetDescription(),
-                            Margin = new MarginPadding(padding),
+                            Text = action.GetLocalisableDescription(),
+                            Margin = new MarginPadding(1.5f * padding),
                         },
                         buttons = new FillFlowContainer<KeyButton>
                         {
@@ -367,12 +367,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateStoreFromButton(KeyButton button)
         {
-            using (var usage = realmFactory.GetForWrite())
+            using (var realm = realmFactory.CreateContext())
             {
-                var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
-                binding.KeyCombinationString = button.KeyBinding.KeyCombinationString;
-
-                usage.Commit();
+                var binding = realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
+                realm.Write(() => binding.KeyCombinationString = button.KeyBinding.KeyCombinationString);
             }
         }
 
@@ -385,7 +383,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public CancelButton()
             {
-                Text = "Cancel";
+                Text = CommonStrings.Cancel;
                 Size = new Vector2(80, 20);
             }
         }
@@ -394,7 +392,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public ClearButton()
             {
-                Text = "Clear";
+                Text = CommonStrings.Clear;
                 Size = new Vector2(80, 20);
             }
         }
@@ -406,7 +404,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             private readonly Box box;
             public readonly OsuSpriteText Text;
 
-            private Color4 hoverColour;
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; }
 
             private bool isBinding;
 
@@ -449,7 +448,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     box = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black
                     },
                     Text = new OsuSpriteText
                     {
@@ -464,9 +462,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
-                hoverColour = colours.YellowDark;
+                updateHoverState();
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -485,12 +483,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 if (isBinding)
                 {
-                    box.FadeColour(Color4.White, transition_time, Easing.OutQuint);
+                    box.FadeColour(colourProvider.Light2, transition_time, Easing.OutQuint);
                     Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
                 }
                 else
                 {
-                    box.FadeColour(IsHovered ? hoverColour : Color4.Black, transition_time, Easing.OutQuint);
+                    box.FadeColour(IsHovered ? colourProvider.Light4 : colourProvider.Background6, transition_time, Easing.OutQuint);
                     Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
                 }
             }

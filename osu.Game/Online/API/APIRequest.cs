@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
@@ -17,7 +18,11 @@ namespace osu.Game.Online.API
     {
         protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        public T Result { get; private set; }
+        /// <summary>
+        /// The deserialised response object. May be null if the request or deserialisation failed.
+        /// </summary>
+        [CanBeNull]
+        public T Response { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
@@ -27,21 +32,21 @@ namespace osu.Game.Online.API
 
         protected APIRequest()
         {
-            base.Success += () => Success?.Invoke(Result);
+            base.Success += () => Success?.Invoke(Response);
         }
 
         protected override void PostProcess()
         {
             base.PostProcess();
-            Result = ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
+            Response = ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
         }
 
         internal void TriggerSuccess(T result)
         {
-            if (Result != null)
+            if (Response != null)
                 throw new InvalidOperationException("Attempted to trigger success more than once");
 
-            Result = result;
+            Response = result;
 
             TriggerSuccess();
         }
@@ -84,7 +89,7 @@ namespace osu.Game.Online.API
         /// The state of this request, from an outside perspective.
         /// This is used to ensure correct notification events are fired.
         /// </summary>
-        private APIRequestCompletionState completionState;
+        public APIRequestCompletionState CompletionState { get; private set; }
 
         public void Perform(IAPIProvider api)
         {
@@ -127,10 +132,10 @@ namespace osu.Game.Online.API
         {
             lock (completionStateLock)
             {
-                if (completionState != APIRequestCompletionState.Waiting)
+                if (CompletionState != APIRequestCompletionState.Waiting)
                     return;
 
-                completionState = APIRequestCompletionState.Completed;
+                CompletionState = APIRequestCompletionState.Completed;
             }
 
             if (API == null)
@@ -143,10 +148,10 @@ namespace osu.Game.Online.API
         {
             lock (completionStateLock)
             {
-                if (completionState != APIRequestCompletionState.Waiting)
+                if (CompletionState != APIRequestCompletionState.Waiting)
                     return;
 
-                completionState = APIRequestCompletionState.Failed;
+                CompletionState = APIRequestCompletionState.Failed;
             }
 
             if (API == null)
@@ -161,7 +166,7 @@ namespace osu.Game.Online.API
         {
             lock (completionStateLock)
             {
-                if (completionState != APIRequestCompletionState.Waiting)
+                if (CompletionState != APIRequestCompletionState.Waiting)
                     return;
 
                 WebRequest?.Abort();
@@ -200,7 +205,7 @@ namespace osu.Game.Online.API
             get
             {
                 lock (completionStateLock)
-                    return completionState == APIRequestCompletionState.Failed;
+                    return CompletionState == APIRequestCompletionState.Failed;
             }
         }
 

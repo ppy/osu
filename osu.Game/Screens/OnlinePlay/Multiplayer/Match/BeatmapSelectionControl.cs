@@ -8,10 +8,11 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class BeatmapSelectionControl : RoomSubScreenComposite
+    public class BeatmapSelectionControl : OnlinePlayComposite
     {
         [Resolved]
         private MultiplayerMatchSubScreen matchSubScreen { get; set; }
@@ -35,6 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
+                Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
                     beatmapPanelContainer = new Container
@@ -50,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         Action = () =>
                         {
                             if (matchSubScreen.IsCurrentScreen())
-                                matchSubScreen.Push(new MultiplayerMatchSongSelect());
+                                matchSubScreen.Push(new MultiplayerMatchSongSelect(matchSubScreen.Room));
                         },
                         Alpha = 0
                     }

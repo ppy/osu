@@ -21,22 +21,22 @@ namespace osu.Game.Tournament.Components
 {
     public class SongBar : CompositeDrawable
     {
-        private BeatmapInfo beatmap;
+        private BeatmapInfo beatmapInfo;
 
         public const float HEIGHT = 145 / 2f;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        public BeatmapInfo Beatmap
+        public BeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (beatmap == value)
+                if (beatmapInfo == value)
                     return;
 
-                beatmap = value;
+                beatmapInfo = value;
                 update();
             }
         }
@@ -95,18 +95,18 @@ namespace osu.Game.Tournament.Components
 
         private void update()
         {
-            if (beatmap == null)
+            if (beatmapInfo == null)
             {
                 flow.Clear();
                 return;
             }
 
-            var bpm = beatmap.BeatmapSet.OnlineInfo.BPM;
-            var length = beatmap.Length;
+            var bpm = beatmapInfo.BeatmapSet.OnlineInfo.BPM;
+            var length = beatmapInfo.Length;
             string hardRockExtra = "";
             string srExtra = "";
 
-            var ar = beatmap.BaseDifficulty.ApproachRate;
+            var ar = beatmapInfo.BaseDifficulty.ApproachRate;
 
             if ((mods & LegacyMods.HardRock) > 0)
             {
@@ -117,7 +117,7 @@ namespace osu.Game.Tournament.Components
             if ((mods & LegacyMods.DoubleTime) > 0)
             {
                 // temporary local calculation (taken from OsuDifficultyCalculator)
-                double preempt = (int)BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / 1.5;
+                double preempt = (int)IBeatmapDifficultyInfo.DifficultyRange(ar, 1800, 1200, 450) / 1.5;
                 ar = (float)(preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5);
 
                 bpm *= 1.5f;
@@ -132,9 +132,9 @@ namespace osu.Game.Tournament.Components
                 default:
                     stats = new (string heading, string content)[]
                     {
-                        ("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
+                        ("CS", $"{beatmapInfo.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
                         ("AR", $"{ar:0.#}{hardRockExtra}"),
-                        ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                        ("OD", $"{beatmapInfo.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
                     };
                     break;
 
@@ -142,15 +142,15 @@ namespace osu.Game.Tournament.Components
                 case 3:
                     stats = new (string heading, string content)[]
                     {
-                        ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
-                        ("HP", $"{beatmap.BaseDifficulty.DrainRate:0.#}{hardRockExtra}")
+                        ("OD", $"{beatmapInfo.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                        ("HP", $"{beatmapInfo.BaseDifficulty.DrainRate:0.#}{hardRockExtra}")
                     };
                     break;
 
                 case 2:
                     stats = new (string heading, string content)[]
                     {
-                        ("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
+                        ("CS", $"{beatmapInfo.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
                         ("AR", $"{ar:0.#}"),
                     };
                     break;
@@ -186,7 +186,7 @@ namespace osu.Game.Tournament.Components
                                         Children = new Drawable[]
                                         {
                                             new DiffPiece(stats),
-                                            new DiffPiece(("Star Rating", $"{beatmap.StarDifficulty:0.#}{srExtra}"))
+                                            new DiffPiece(("Star Rating", $"{beatmapInfo.StarDifficulty:0.#}{srExtra}"))
                                         }
                                     },
                                     new FillFlowContainer
@@ -229,7 +229,7 @@ namespace osu.Game.Tournament.Components
                         }
                     }
                 },
-                new TournamentBeatmapPanel(beatmap)
+                new TournamentBeatmapPanel(beatmapInfo)
                 {
                     RelativeSizeAxes = Axes.X,
                     Width = 0.5f,

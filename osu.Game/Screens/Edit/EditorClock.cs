@@ -25,7 +25,9 @@ namespace osu.Game.Screens.Edit
 
         public double TrackLength => track.Value?.Length ?? 60000;
 
-        public ControlPointInfo ControlPointInfo;
+        public ControlPointInfo ControlPointInfo => Beatmap.ControlPointInfo;
+
+        public IBeatmap Beatmap { get; set; }
 
         private readonly BindableBeatDivisor beatDivisor;
 
@@ -42,23 +44,13 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public bool IsSeeking { get; private set; }
 
-        public EditorClock(IBeatmap beatmap, BindableBeatDivisor beatDivisor)
-            : this(beatmap.ControlPointInfo, beatDivisor)
+        public EditorClock(IBeatmap beatmap = null, BindableBeatDivisor beatDivisor = null)
         {
-        }
+            Beatmap = beatmap ?? new Beatmap();
 
-        public EditorClock(ControlPointInfo controlPointInfo, BindableBeatDivisor beatDivisor)
-        {
-            this.beatDivisor = beatDivisor;
-
-            ControlPointInfo = controlPointInfo;
+            this.beatDivisor = beatDivisor ?? new BindableBeatDivisor();
 
             underlyingClock = new DecoupleableInterpolatingFramedClock();
-        }
-
-        public EditorClock()
-            : this(new ControlPointInfo(), new BindableBeatDivisor())
-        {
         }
 
         /// <summary>
@@ -150,8 +142,6 @@ namespace osu.Game.Screens.Edit
             if (seekTime < timingPoint.Time && timingPoint != ControlPointInfo.TimingPoints.First())
                 seekTime = timingPoint.Time;
 
-            // Ensure the sought point is within the boundaries
-            seekTime = Math.Clamp(seekTime, 0, TrackLength);
             SeekSmoothlyTo(seekTime);
         }
 
@@ -190,6 +180,9 @@ namespace osu.Game.Screens.Edit
             seekingOrStopped.Value = IsSeeking = true;
 
             ClearTransforms();
+
+            // Ensure the sought point is within the boundaries
+            position = Math.Clamp(position, 0, TrackLength);
             return underlyingClock.Seek(position);
         }
 
@@ -288,7 +281,7 @@ namespace osu.Game.Screens.Edit
         }
 
         private void transformSeekTo(double seek, double duration = 0, Easing easing = Easing.None)
-            => this.TransformTo(this.PopulateTransform(new TransformSeek(), seek, duration, easing));
+            => this.TransformTo(this.PopulateTransform(new TransformSeek(), Math.Clamp(seek, 0, TrackLength), duration, easing));
 
         private double currentTime
         {

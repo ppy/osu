@@ -25,36 +25,57 @@ namespace osu.Game.Users
             public override string Status => "Choosing a beatmap";
         }
 
-        public class MultiplayerGame : UserActivity
+        public abstract class InGame : UserActivity
         {
-            public override string Status => "Playing with others";
-        }
-
-        public class Editing : UserActivity
-        {
-            public BeatmapInfo Beatmap { get; }
-
-            public Editing(BeatmapInfo info)
-            {
-                Beatmap = info;
-            }
-
-            public override string Status => @"Editing a beatmap";
-        }
-
-        public class SoloGame : UserActivity
-        {
-            public BeatmapInfo Beatmap { get; }
+            public BeatmapInfo BeatmapInfo { get; }
 
             public RulesetInfo Ruleset { get; }
 
-            public SoloGame(BeatmapInfo info, RulesetInfo ruleset)
+            protected InGame(BeatmapInfo beatmapInfo, RulesetInfo ruleset)
             {
-                Beatmap = info;
+                BeatmapInfo = beatmapInfo;
                 Ruleset = ruleset;
             }
 
             public override string Status => Ruleset.CreateInstance().PlayingVerb;
+        }
+
+        public class InMultiplayerGame : InGame
+        {
+            public InMultiplayerGame(BeatmapInfo beatmapInfo, RulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+
+            public override string Status => $@"{base.Status} with others";
+        }
+
+        public class InPlaylistGame : InGame
+        {
+            public InPlaylistGame(BeatmapInfo beatmapInfo, RulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+        }
+
+        public class InSoloGame : InGame
+        {
+            public InSoloGame(BeatmapInfo beatmapInfo, RulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+        }
+
+        public class Editing : UserActivity
+        {
+            public BeatmapInfo BeatmapInfo { get; }
+
+            public Editing(BeatmapInfo info)
+            {
+                BeatmapInfo = info;
+            }
+
+            public override string Status => @"Editing a beatmap";
         }
 
         public class Spectating : UserActivity
@@ -69,7 +90,7 @@ namespace osu.Game.Users
 
         public class InLobby : UserActivity
         {
-            public override string Status => @"In a multiplayer lobby";
+            public override string Status => @"In a lobby";
 
             public readonly Room Room;
 

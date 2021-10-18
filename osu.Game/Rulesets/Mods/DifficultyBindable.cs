@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// A function that can extract the current value of this setting from a beatmap difficulty for display purposes.
         /// </summary>
-        public Func<BeatmapDifficulty, float> ReadCurrentFromDifficulty;
+        public Func<IBeatmapDifficultyInfo, float> ReadCurrentFromDifficulty;
 
         public float Precision
         {
@@ -128,6 +128,6 @@ namespace osu.Game.Rulesets.Mods
             ExtendedLimits.UnbindFrom(otherDifficultyBindable.ExtendedLimits);
         }
 
-        public new DifficultyBindable GetBoundCopy() => new DifficultyBindable { BindTarget = this };
+        protected override Bindable<float?> CreateInstance() => new DifficultyBindable();
     }
 }

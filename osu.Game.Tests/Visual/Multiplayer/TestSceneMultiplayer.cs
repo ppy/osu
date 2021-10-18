@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -12,6 +13,7 @@ using osu.Framework.Input;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
@@ -25,9 +27,11 @@ using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK.Input;
@@ -43,6 +47,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private DependenciesScreen dependenciesScreen;
         private TestMultiplayer multiplayerScreen;
         private TestMultiplayerClient client;
+
+        private TestRequestHandlingMultiplayerRoomManager roomManager => multiplayerScreen.RoomManager;
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -68,7 +74,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("load dependencies", () =>
             {
-                client = new TestMultiplayerClient(multiplayerScreen.RoomManager);
+                client = new TestMultiplayerClient(roomManager);
 
                 // The screen gets suspended so it stops receiving updates.
                 Child = client;
@@ -87,6 +93,121 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestEmpty()
         {
             // used to test the flow of multiplayer from visual tests.
+            AddStep("empty step", () => { });
+        }
+
+        [Test]
+        public void TestLobbyEvents()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddRepeatStep("random stuff happens", performRandomAction, 30);
+
+            // ensure we have a handful of players so the ready-up sounds good :9
+            AddRepeatStep("player joins", addRandomPlayer, 5);
+
+            // all ready
+            AddUntilStep("all players ready", () =>
+            {
+                var nextUnready = client.Room?.Users.FirstOrDefault(c => c.State == MultiplayerUserState.Idle);
+                if (nextUnready != null)
+                    client.ChangeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
+
+                return client.Room?.Users.All(u => u.State == MultiplayerUserState.Ready) == true;
+            });
+
+            AddStep("unready all players at once", () =>
+            {
+                Debug.Assert(client.Room != null);
+
+                foreach (var u in client.Room.Users) client.ChangeUserState(u.UserID, MultiplayerUserState.Idle);
+            });
+
+            AddStep("ready all players at once", () =>
+            {
+                Debug.Assert(client.Room != null);
+
+                foreach (var u in client.Room.Users) client.ChangeUserState(u.UserID, MultiplayerUserState.Ready);
+            });
+        }
+
+        private void addRandomPlayer()
+        {
+            int randomUser = RNG.Next(200000, 500000);
+            client.AddUser(new User { Id = randomUser, Username = $"user {randomUser}" });
+        }
+
+        private void removeLastUser()
+        {
+            User lastUser = client.Room?.Users.Last().User;
+
+            if (lastUser == null || lastUser == client.LocalUser?.User)
+                return;
+
+            client.RemoveUser(lastUser);
+        }
+
+        private void kickLastUser()
+        {
+            User lastUser = client.Room?.Users.Last().User;
+
+            if (lastUser == null || lastUser == client.LocalUser?.User)
+                return;
+
+            client.KickUser(lastUser.Id);
+        }
+
+        private void markNextPlayerReady()
+        {
+            var nextUnready = client.Room?.Users.FirstOrDefault(c => c.State == MultiplayerUserState.Idle);
+            if (nextUnready != null)
+                client.ChangeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
+        }
+
+        private void markNextPlayerIdle()
+        {
+            var nextUnready = client.Room?.Users.FirstOrDefault(c => c.State == MultiplayerUserState.Ready);
+            if (nextUnready != null)
+                client.ChangeUserState(nextUnready.UserID, MultiplayerUserState.Idle);
+        }
+
+        private void performRandomAction()
+        {
+            int eventToPerform = RNG.Next(1, 6);
+
+            switch (eventToPerform)
+            {
+                case 1:
+                    addRandomPlayer();
+                    break;
+
+                case 2:
+                    removeLastUser();
+                    break;
+
+                case 3:
+                    kickLastUser();
+                    break;
+
+                case 4:
+                    markNextPlayerReady();
+                    break;
+
+                case 5:
+                    markNextPlayerIdle();
+                    break;
+            }
         }
 
         [Test]
@@ -131,39 +252,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestExitMidJoin()
         {
-            Room room = null;
-
             AddStep("create room", () =>
             {
-                room = new Room
-                {
-                    Name = { Value = "Test Room" },
-                    Playlist =
-                    {
-                        new PlaylistItem
-                        {
-                            Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
-                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                        }
-                    }
-                };
-            });
-
-            AddStep("refresh rooms", () => multiplayerScreen.RoomManager.Filter.Value = new FilterCriteria());
-            AddStep("select room", () => InputManager.Key(Key.Down));
-            AddStep("join room and immediately exit", () =>
-            {
-                multiplayerScreen.ChildrenOfType<LoungeSubScreen>().Single().Open(room);
-                Schedule(() => Stack.CurrentScreen.Exit());
-            });
-        }
-
-        [Test]
-        public void TestJoinRoomWithoutPassword()
-        {
-            AddStep("create room", () =>
-            {
-                multiplayerScreen.RoomManager.AddRoom(new Room
+                roomManager.AddServerSideRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Playlist =
@@ -177,7 +268,39 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             });
 
-            AddStep("refresh rooms", () => multiplayerScreen.RoomManager.Filter.Value = new FilterCriteria());
+            AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+
+            AddStep("select room", () => InputManager.Key(Key.Down));
+            AddStep("join room and immediately exit select", () =>
+            {
+                InputManager.Key(Key.Enter);
+                Schedule(() => Stack.CurrentScreen.Exit());
+            });
+        }
+
+        [Test]
+        public void TestJoinRoomWithoutPassword()
+        {
+            AddStep("create room", () =>
+            {
+                roomManager.AddServerSideRoom(new Room
+                {
+                    Name = { Value = "Test Room" },
+                    Playlist =
+                    {
+                        new PlaylistItem
+                        {
+                            Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        }
+                    }
+                });
+            });
+
+            AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("join room", () => InputManager.Key(Key.Enter));
 
@@ -210,7 +333,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                multiplayerScreen.RoomManager.AddRoom(new Room
+                roomManager.AddServerSideRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Password = { Value = "password" },
@@ -225,12 +348,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             });
 
-            AddStep("refresh rooms", () => multiplayerScreen.RoomManager.Filter.Value = new FilterCriteria());
+            AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("join room", () => InputManager.Key(Key.Enter));
 
-            DrawableRoom.PasswordEntryPopover passwordEntryPopover = null;
-            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
+            DrawableLoungeRoom.PasswordEntryPopover passwordEntryPopover = null;
+            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
             AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
             AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().TriggerClick());
 
@@ -312,6 +437,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
+            AddUntilStep("wait for spectating user state", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
+
             AddStep("start match externally", () => client.StartMatch());
 
             AddAssert("play not started", () => multiplayerScreen.IsCurrentScreen());
@@ -347,6 +474,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerSpectateButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
+
+            AddUntilStep("wait for spectating user state", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
 
             AddStep("start match externally", () => client.StartMatch());
 
@@ -396,15 +525,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddStep("open mod overlay", () => this.ChildrenOfType<PurpleTriangleButton>().ElementAt(2).TriggerClick());
+            AddStep("open mod overlay", () => this.ChildrenOfType<RoomSubScreen.UserModSelectButton>().Single().TriggerClick());
 
             AddStep("invoke on back button", () => multiplayerScreen.OnBackButton());
 
-            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<LocalPlayerModSelectOverlay>().Single().State.Value == Visibility.Hidden);
+            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<UserModSelectOverlay>().Single().State.Value == Visibility.Hidden);
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
-
-            testLeave("lounge tab item", () => this.ChildrenOfType<BreadcrumbControl<IScreen>.BreadcrumbTabItem>().First().TriggerClick());
 
             testLeave("back button", () => multiplayerScreen.OnBackButton());
 
@@ -421,12 +548,53 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
         }
 
+        [Test]
+        public void TestGameplayFlow()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddUntilStep("wait for ready button to be enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+
+            AddStep("click ready button", () =>
+            {
+                InputManager.MoveMouseTo(readyButton);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for player to be ready", () => client.Room?.Users[0].State == MultiplayerUserState.Ready);
+            AddUntilStep("wait for ready button to be enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+
+            AddStep("click start button", () => InputManager.Click(MouseButton.Left));
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+
+            // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
+            for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
+            {
+                var time = i;
+                AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.GameplayClock.CurrentTime > time);
+            }
+
+            AddUntilStep("wait for results", () => Stack.CurrentScreen is ResultsScreen);
+        }
+
+        private MultiplayerReadyButton readyButton => this.ChildrenOfType<MultiplayerReadyButton>().Single();
+
         private void createRoom(Func<Room> room)
         {
-            AddStep("open room", () =>
-            {
-                multiplayerScreen.OpenNewRoom(room());
-            });
+            AddUntilStep("wait for lounge", () => multiplayerScreen.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
+            AddStep("open room", () => multiplayerScreen.ChildrenOfType<LoungeSubScreen>().Single().Open(room()));
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddWaitStep("wait for transition", 2);

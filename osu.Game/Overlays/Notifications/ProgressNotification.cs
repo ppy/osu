@@ -31,9 +31,11 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 progress = value;
-                Scheduler.AddOnce(() => progressBar.Progress = progress);
+                Scheduler.AddOnce(updateProgress, progress);
             }
         }
+
+        private void updateProgress(float progress) => progressBar.Progress = progress;
 
         protected override void LoadComplete()
         {
@@ -150,12 +152,12 @@ namespace osu.Game.Overlays.Notifications
             colourCancelled = colours.Red;
         }
 
-        public override void Close(bool playSound = true)
+        public override void Close()
         {
             switch (State)
             {
                 case ProgressNotificationState.Cancelled:
-                    base.Close(playSound);
+                    base.Close();
                     break;
 
                 case ProgressNotificationState.Active:

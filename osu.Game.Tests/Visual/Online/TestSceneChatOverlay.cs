@@ -1,8 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,6 +19,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
@@ -39,6 +42,9 @@ namespace osu.Game.Tests.Visual.Online
         private Channel channel1 => channels[0];
         private Channel channel2 => channels[1];
         private Channel channel3 => channels[2];
+
+        [CanBeNull]
+        private Func<Channel, List<Message>> onGetMessages;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -78,12 +84,36 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("register request handling", () =>
             {
+                onGetMessages = null;
+
                 ((DummyAPIAccess)API).HandleRequest = req =>
                 {
                     switch (req)
                     {
                         case JoinChannelRequest joinChannel:
                             joinChannel.TriggerSuccess();
+                            return true;
+
+                        case GetUserRequest getUser:
+                            if (getUser.Lookup.Equals("some body", StringComparison.OrdinalIgnoreCase))
+                            {
+                                getUser.TriggerSuccess(new User
+                                {
+                                    Username = "some body",
+                                    Id = 1,
+                                });
+                            }
+                            else
+                            {
+                                getUser.TriggerFailure(new Exception());
+                            }
+
+                            return true;
+
+                        case GetMessagesRequest getMessages:
+                            var messages = onGetMessages?.Invoke(getMessages.Channel);
+                            if (messages != null)
+                                getMessages.TriggerSuccess(messages);
                             return true;
                     }
 
@@ -105,14 +135,37 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestSelectingChannelClosesSelector()
+        public void TestChannelSelection()
         {
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+            AddStep("Setup get message response", () => onGetMessages = channel =>
+            {
+                if (channel == channel1)
+                {
+                    return new List<Message>
+                    {
+                        new Message(1)
+                        {
+                            ChannelId = channel1.Id,
+                            Content = "hello from channel 1!",
+                            Sender = new User
+                            {
+                                Id = 2,
+                                Username = "test_user"
+                            }
+                        }
+                    };
+                }
+
+                return null;
+            });
 
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Switch to channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
             AddAssert("Current channel is channel 1", () => currentChannel == channel1);
+            AddUntilStep("Loading spinner hidden", () => chatOverlay.ChildrenOfType<LoadingSpinner>().All(spinner => !spinner.IsPresent));
+            AddAssert("Channel message shown", () => chatOverlay.ChildrenOfType<ChatLine>().Count() == 1);
             AddAssert("Channel selector was closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
         }
 
@@ -320,6 +373,27 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Restore tab via shortcut", pressRestoreTabKeys);
             AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
             AddAssert("Current channel is channel 1", () => currentChannel == channel1);
+        }
+
+        [Test]
+        public void TestChatCommand()
+        {
+            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
+            AddStep("Open chat with user", () => channelManager.PostCommand("chat some body"));
+            AddAssert("PM channel is selected", () =>
+                channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single().Username == "some body");
+
+            AddStep("Open chat with non-existent user", () => channelManager.PostCommand("chat nobody"));
+            AddAssert("Last message is error", () => channelManager.CurrentChannel.Value.Messages.Last() is ErrorMessage);
+
+            // Make sure no unnecessary requests are made when the PM channel is already open.
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+            AddStep("Unregister request handling", () => ((DummyAPIAccess)API).HandleRequest = null);
+            AddStep("Open chat with user", () => channelManager.PostCommand("chat some body"));
+            AddAssert("PM channel is selected", () =>
+                channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single().Username == "some body");
         }
 
         private void pressChannelHotkey(int number)

@@ -55,11 +55,6 @@ namespace osu.Game.Overlays
         protected override string PopInSampleName => "UI/now-playing-pop-in";
         protected override string PopOutSampleName => "UI/now-playing-pop-out";
 
-        /// <summary>
-        /// Provide a source for the toolbar height.
-        /// </summary>
-        public Func<float> GetToolbarHeight;
-
         [Resolved]
         private MusicController musicController { get; set; }
 
@@ -246,7 +241,6 @@ namespace osu.Game.Overlays
             base.UpdateAfterChildren();
 
             Height = dragContainer.Height;
-            dragContainer.Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
         protected override void Update()

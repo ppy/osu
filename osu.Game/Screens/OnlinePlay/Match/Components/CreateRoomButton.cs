@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
@@ -12,15 +13,16 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
+            SpriteText.Font = SpriteText.Font.With(size: 14);
             Triangles.TriangleScale = 1.5f;
         }
 
-        public bool OnPressed(PlatformAction action)
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
             if (!Enabled.Value)
                 return false;
 
-            switch (action)
+            switch (e.Action)
             {
                 case PlatformAction.DocumentNew:
                 // might as well also handle new tab. it's a bit of an undefined flow on this screen.
@@ -32,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             return false;
         }
 
-        public void OnReleased(PlatformAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
         }
     }

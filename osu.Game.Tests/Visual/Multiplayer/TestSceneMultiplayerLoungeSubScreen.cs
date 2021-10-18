@@ -3,13 +3,13 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK.Input;
@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerLoungeSubScreen : OnlinePlayTestScene
     {
-        protected new BasicTestRoomManager RoomManager => (BasicTestRoomManager)base.RoomManager;
+        protected new TestRequestHandlingRoomManager RoomManager => (TestRequestHandlingRoomManager)base.RoomManager;
 
         private LoungeSubScreen loungeScreen;
 
@@ -53,26 +53,78 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestPopoverHidesOnBackButton()
+        {
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
+            AddStep("select room", () => InputManager.Key(Key.Down));
+            AddStep("attempt join room", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("password prompt appeared", () => InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().Any());
+
+            AddAssert("textbox has focus", () => InputManager.FocusedDrawable is OsuPasswordTextBox);
+
+            AddStep("hit escape", () => InputManager.Key(Key.Escape));
+            AddAssert("textbox lost focus", () => InputManager.FocusedDrawable is SearchTextBox);
+
+            AddStep("hit escape", () => InputManager.Key(Key.Escape));
+            AddUntilStep("password prompt hidden", () => !InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().Any());
+        }
+
+        [Test]
         public void TestPopoverHidesOnLeavingScreen()
         {
             AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("attempt join room", () => InputManager.Key(Key.Enter));
 
-            AddUntilStep("password prompt appeared", () => InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().Any());
+            AddUntilStep("password prompt appeared", () => InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().Any());
             AddStep("exit screen", () => Stack.Exit());
-            AddUntilStep("password prompt hidden", () => !InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().Any());
+            AddUntilStep("password prompt hidden", () => !InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().Any());
         }
 
         [Test]
-        public void TestJoinRoomWithPassword()
+        public void TestJoinRoomWithIncorrectPasswordViaButton()
         {
-            DrawableRoom.PasswordEntryPopover passwordEntryPopover = null;
+            DrawableLoungeRoom.PasswordEntryPopover passwordEntryPopover = null;
 
             AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("attempt join room", () => InputManager.Key(Key.Enter));
-            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
+            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
+            AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "wrong");
+            AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().TriggerClick());
+
+            AddAssert("room not joined", () => loungeScreen.IsCurrentScreen());
+            AddUntilStep("password prompt still visible", () => passwordEntryPopover.State.Value == Visibility.Visible);
+            AddAssert("textbox still focused", () => InputManager.FocusedDrawable is OsuPasswordTextBox);
+        }
+
+        [Test]
+        public void TestJoinRoomWithIncorrectPasswordViaEnter()
+        {
+            DrawableLoungeRoom.PasswordEntryPopover passwordEntryPopover = null;
+
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
+            AddStep("select room", () => InputManager.Key(Key.Down));
+            AddStep("attempt join room", () => InputManager.Key(Key.Enter));
+            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
+            AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "wrong");
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddAssert("room not joined", () => loungeScreen.IsCurrentScreen());
+            AddUntilStep("password prompt still visible", () => passwordEntryPopover.State.Value == Visibility.Visible);
+            AddAssert("textbox still focused", () => InputManager.FocusedDrawable is OsuPasswordTextBox);
+        }
+
+        [Test]
+        public void TestJoinRoomWithCorrectPassword()
+        {
+            DrawableLoungeRoom.PasswordEntryPopover passwordEntryPopover = null;
+
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
+            AddStep("select room", () => InputManager.Key(Key.Down));
+            AddStep("attempt join room", () => InputManager.Key(Key.Enter));
+            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
             AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
             AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().TriggerClick());
 
@@ -83,12 +135,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestJoinRoomWithPasswordViaKeyboardOnly()
         {
-            DrawableRoom.PasswordEntryPopover passwordEntryPopover = null;
+            DrawableLoungeRoom.PasswordEntryPopover passwordEntryPopover = null;
 
             AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("attempt join room", () => InputManager.Key(Key.Enter));
-            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
+            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
             AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
             AddStep("press enter", () => InputManager.Key(Key.Enter));
 

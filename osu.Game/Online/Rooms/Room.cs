@@ -130,12 +130,6 @@ namespace osu.Game.Online.Rooms
             set => MaxAttempts.Value = value;
         }
 
-        /// <summary>
-        /// The position of this <see cref="Room"/> in the list. This is not read from or written to the API.
-        /// </summary>
-        [JsonIgnore]
-        public readonly Bindable<int> Position = new Bindable<int>(-1);
-
         public Room()
         {
             Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
@@ -179,11 +173,7 @@ namespace osu.Game.Online.Rooms
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
 
-            // Todo: This is not the best way/place to do this, but the intention is to display all playlist items when the room has ended,
-            // and display only the non-expired playlist items while the room is still active. In order to achieve this, all expired items are removed from the source Room.
-            // More refactoring is required before this can be done locally instead - DrawableRoomPlaylist is currently directly bound to the playlist to display items in the room.
-            if (!(Status.Value is RoomStatusEnded))
-                other.Playlist.RemoveAll(i => i.Expired);
+            other.RemoveExpiredPlaylistItems();
 
             if (!Playlist.SequenceEqual(other.Playlist))
             {
@@ -196,8 +186,15 @@ namespace osu.Game.Online.Rooms
                 RecentParticipants.Clear();
                 RecentParticipants.AddRange(other.RecentParticipants);
             }
+        }
 
-            Position.Value = other.Position.Value;
+        public void RemoveExpiredPlaylistItems()
+        {
+            // Todo: This is not the best way/place to do this, but the intention is to display all playlist items when the room has ended,
+            // and display only the non-expired playlist items while the room is still active. In order to achieve this, all expired items are removed from the source Room.
+            // More refactoring is required before this can be done locally instead - DrawableRoomPlaylist is currently directly bound to the playlist to display items in the room.
+            if (!(Status.Value is RoomStatusEnded))
+                Playlist.RemoveAll(i => i.Expired);
         }
 
         public bool ShouldSerializeRoomID() => false;

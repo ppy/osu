@@ -14,7 +14,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         public static TournamentGameBase LoadTournament(GameHost host, TournamentGameBase tournament = null)
         {
             tournament ??= new TournamentGameBase();
-            Task.Run(() => host.Run(tournament))
+            Task.Factory.StartNew(() => host.Run(tournament), TaskCreationOptions.LongRunning)
                 .ContinueWith(t => Assert.Fail($"Host threw exception {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
             WaitForOrAssert(() => tournament.IsLoaded, @"osu! failed to start in a reasonable amount of time");
             return tournament;

@@ -23,12 +23,12 @@ namespace osu.Game.Tests
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
             };
 
-            Beatmap = new TestBeatmap(ruleset).BeatmapInfo;
+            BeatmapInfo = new TestBeatmap(ruleset).BeatmapInfo;
             Ruleset = ruleset;
             RulesetID = ruleset.ID ?? 0;
 
             Mods = excessMods
-                ? ruleset.CreateInstance().GetAllMods().ToArray()
+                ? ruleset.CreateInstance().CreateAllMods().ToArray()
                 : new Mod[] { new TestModHardRock(), new TestModDoubleTime() };
 
             TotalScore = 2845370;

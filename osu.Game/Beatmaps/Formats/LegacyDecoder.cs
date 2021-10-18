@@ -123,7 +123,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (!(output is IHasComboColours tHasComboColours)) return;
 
-                tHasComboColours.AddComboColours(colour);
+                tHasComboColours.CustomComboColours.Add(colour);
             }
             else
             {
@@ -181,7 +181,7 @@ namespace osu.Game.Beatmaps.Formats
 
             public LegacyDifficultyControlPoint()
             {
-                SpeedMultiplierBindable.Precision = double.Epsilon;
+                SliderVelocityBindable.Precision = double.Epsilon;
             }
 
             public override void CopyFrom(ControlPoint other)

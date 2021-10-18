@@ -34,12 +34,13 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private ScheduledDelegate addManyFruit;
 
-        private BeatmapDifficulty beatmapDifficulty;
+        private IBeatmapDifficultyInfo beatmapDifficulty;
 
         public TestSceneCatcherArea()
         {
             AddSliderStep<float>("circle size", 0, 8, 5, createCatcher);
             AddToggleStep("hyper dash", t => this.ChildrenOfType<TestCatcherArea>().ForEach(area => area.ToggleHyperDash(t)));
+            AddToggleStep("toggle hit lighting", lighting => config.SetValue(OsuSetting.HitLighting, lighting));
 
             AddStep("catch centered fruit", () => attemptCatch(new Fruit()));
             AddStep("catch many random fruit", () =>
@@ -119,7 +120,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(BeatmapDifficulty beatmapDifficulty)
+            public TestCatcherArea(IBeatmapDifficultyInfo beatmapDifficulty)
             {
                 var droppedObjectContainer = new DroppedObjectContainer();
                 Add(droppedObjectContainer);

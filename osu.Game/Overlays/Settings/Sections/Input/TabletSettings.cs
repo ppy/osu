@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,15 +10,21 @@ using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Game.Localisation;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class TabletSettings : SettingsSubsection
     {
+        public TabletAreaSelection AreaSelection { get; private set; }
+
         private readonly ITabletHandler tabletHandler;
+
+        private readonly Bindable<bool> enabled = new BindableBool(true);
 
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
@@ -52,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private FillFlowContainer mainSettings;
 
-        private OsuSpriteText noTabletMessage;
+        private FillFlowContainer noTabletMessage;
 
         protected override LocalisableString Header => TabletSettingsStrings.Tablet;
 
@@ -62,7 +69,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {
@@ -71,14 +78,41 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = CommonStrings.Enabled,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Current = tabletHandler.Enabled
+                    Current = enabled,
                 },
-                noTabletMessage = new OsuSpriteText
+                noTabletMessage = new FillFlowContainer
                 {
-                    Text = TabletSettingsStrings.NoTabletDetected,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS }
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
+                    Spacing = new Vector2(5f),
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Text = TabletSettingsStrings.NoTabletDetected,
+                        },
+                        new SettingsNoticeText(colours)
+                        {
+                            TextAnchor = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }.With(t =>
+                        {
+                            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
+                            {
+                                t.NewLine();
+                                t.AddText("If your tablet is not detected, please read ");
+                                t.AddLink("this FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
+                                    ? @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Windows-FAQ"
+                                    : @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Linux-FAQ");
+                                t.AddText(" for troubleshooting steps.");
+                            }
+                        }),
+                    }
                 },
                 mainSettings = new FillFlowContainer
                 {
@@ -89,7 +123,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new TabletAreaSelection(tabletHandler)
+                        AreaSelection = new TabletAreaSelection(tabletHandler)
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 300,
@@ -131,7 +165,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             LabelText = TabletSettingsStrings.Rotation,
                             Current = rotation
                         },
-                        new RotationPresetButtons(tabletHandler),
+                        new RotationPresetButtons(tabletHandler)
+                        {
+                            Padding = new MarginPadding
+                            {
+                                Horizontal = SettingsPanel.CONTENT_MARGINS
+                            }
+                        },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
@@ -163,6 +203,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            enabled.BindTo(tabletHandler.Enabled);
+            enabled.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
 
             rotation.BindTo(tabletHandler.Rotation);
 
@@ -209,7 +252,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             tablet.BindTo(tabletHandler.Tablet);
             tablet.BindValueChanged(val =>
             {
-                Scheduler.AddOnce(toggleVisibility);
+                Scheduler.AddOnce(updateVisibility);
 
                 var tab = val.NewValue;
 
@@ -229,19 +272,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }, true);
         }
 
-        private void toggleVisibility()
+        private void updateVisibility()
         {
-            bool tabletFound = tablet.Value != null;
-
-            if (!tabletFound)
-            {
-                mainSettings.Hide();
-                noTabletMessage.Show();
-                return;
-            }
-
-            mainSettings.Show();
+            mainSettings.Hide();
             noTabletMessage.Hide();
+
+            if (!tabletHandler.Enabled.Value)
+                return;
+
+            if (tablet.Value != null)
+                mainSettings.Show();
+            else
+                noTabletMessage.Show();
         }
 
         private void applyAspectRatio(BindableNumber<float> sizeChanged)
