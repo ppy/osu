@@ -41,7 +41,7 @@ namespace osu.Game.Stores
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
         // protected override bool CheckLocalAvailability(RealmBeatmapSet model, System.Linq.IQueryable<RealmBeatmapSet> items)
-        //     => base.CheckLocalAvailability(model, items) || (model.OnlineID != null && items.Any(b => b.OnlineID == model.OnlineID));
+        //     => base.CheckLocalAvailability(model, items) || (model.OnlineID > -1));
 
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 
@@ -74,9 +74,9 @@ namespace osu.Game.Stores
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
             {
-                if (beatmapSet.OnlineID != null)
+                if (beatmapSet.OnlineID > -1)
                 {
-                    beatmapSet.OnlineID = null;
+                    beatmapSet.OnlineID = -1;
                     LogForModel(beatmapSet, "Disassociating beatmap set ID due to loss of all beatmap IDs");
                 }
             }
@@ -91,17 +91,17 @@ namespace osu.Game.Stores
             // If this is ever an issue, we can consider marking as pending delete but not resetting the IDs (but care will be required for
             // beatmaps, which don't have their own `DeletePending` state).
 
-            if (beatmapSet.OnlineID != null)
+            if (beatmapSet.OnlineID > -1)
             {
                 var existingOnlineId = realm.All<RealmBeatmapSet>().SingleOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
 
                 if (existingOnlineId != null)
                 {
                     existingOnlineId.DeletePending = true;
-                    existingOnlineId.OnlineID = null;
+                    existingOnlineId.OnlineID = -1;
 
                     foreach (var b in existingOnlineId.Beatmaps)
-                        b.OnlineID = null;
+                        b.OnlineID = -1;
 
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be deleted.");
                 }
@@ -110,7 +110,7 @@ namespace osu.Game.Stores
 
         private void validateOnlineIds(RealmBeatmapSet beatmapSet, Realm realm)
         {
-            var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineID.HasValue).Select(b => b.OnlineID).ToList();
+            var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineID > -1).Select(b => b.OnlineID).ToList();
 
             // ensure all IDs are unique
             if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
@@ -140,7 +140,7 @@ namespace osu.Game.Stores
                 }
             }
 
-            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineID = null);
+            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineID = -1);
         }
 
         protected override bool CanSkipImport(RealmBeatmapSet existing, RealmBeatmapSet import)
@@ -148,7 +148,7 @@ namespace osu.Game.Stores
             if (!base.CanSkipImport(existing, import))
                 return false;
 
-            return existing.Beatmaps.Any(b => b.OnlineID != null);
+            return existing.Beatmaps.Any(b => b.OnlineID > -1);
         }
 
         protected override bool CanReuseExisting(RealmBeatmapSet existing, RealmBeatmapSet import)
@@ -182,7 +182,7 @@ namespace osu.Game.Stores
 
             return new RealmBeatmapSet
             {
-                OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID,
+                OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID ?? -1,
                 // Metadata = beatmap.Metadata,
                 DateAdded = DateTimeOffset.UtcNow
             };
@@ -250,7 +250,7 @@ namespace osu.Game.Stores
                     {
                         Hash = hash,
                         DifficultyName = decodedInfo.Version,
-                        OnlineID = decodedInfo.OnlineBeatmapID,
+                        OnlineID = decodedInfo.OnlineBeatmapID ?? -1,
                         AudioLeadIn = decodedInfo.AudioLeadIn,
                         StackLeniency = decodedInfo.StackLeniency,
                         SpecialStyle = decodedInfo.SpecialStyle,

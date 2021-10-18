@@ -458,7 +458,7 @@ namespace osu.Game.Tests.Database
                 realmFactory.Context.Write(() =>
                 {
                     foreach (var b in imported.Beatmaps)
-                        b.OnlineID = null;
+                        b.OnlineID = -1;
                 });
 
                 deleteBeatmapSet(imported, realmFactory.Context);
@@ -509,8 +509,8 @@ namespace osu.Game.Tests.Database
                 Assert.NotNull(imported);
                 Debug.Assert(imported != null);
 
-                Assert.AreEqual(null, imported.PerformRead(s => s.Beatmaps[0].OnlineID));
-                Assert.AreEqual(null, imported.PerformRead(s => s.Beatmaps[1].OnlineID));
+                Assert.AreEqual(-1, imported.PerformRead(s => s.Beatmaps[0].OnlineID));
+                Assert.AreEqual(-1, imported.PerformRead(s => s.Beatmaps[1].OnlineID));
             });
         }
 
