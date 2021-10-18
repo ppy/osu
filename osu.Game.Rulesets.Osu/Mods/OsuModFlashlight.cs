@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private const double default_follow_delay = 120;
 
-        private const double max_combo_offset = 200;
+        private const int max_combo_offset = 200;
 
         private OsuFlashlight flashlight;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource("Combo offset", "Combo to start at for changing flashlight radius")]
-        public BindableNumber<double> ComboOffset { get; } = new BindableDouble
+        public BindableNumber<int> ComboOffset { get; } = new BindableInt
         {
             MinValue = 0,
             MaxValue = max_combo_offset,
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
             public double FollowDelay { private get; set; }
-            public double ComboOffset { private get; set; }
+            public int ComboOffset { private get; set; }
 
             public OsuFlashlight()
             {
