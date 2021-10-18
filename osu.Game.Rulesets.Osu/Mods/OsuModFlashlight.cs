@@ -90,9 +90,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             private float getSizeFor(int combo)
             {
-                if (combo + ComboOffset > 200)
+                int effectiveCombo = combo + ComboOffset;
+
+                if (effectiveCombo > 200)
                     return default_flashlight_size * 0.8f;
-                else if (combo + ComboOffset > 100)
+                else if (effectiveCombo > 100)
                     return default_flashlight_size * 0.9f;
                 else
                     return default_flashlight_size;
