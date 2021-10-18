@@ -132,7 +132,7 @@ namespace osu.Desktop
 
         private void start()
         {
-            if (IsListening)
+            if (IsListening || host != null)
                 return;
 
             host = new WebHostBuilder()
@@ -153,8 +153,12 @@ namespace osu.Desktop
 
         private void stop()
         {
+            if (host == null)
+                return;
+
             enabled.Disabled = true;
             broadcastSchedule?.Cancel();
+
             Task.Run(async () =>
             {
                 IEnumerable<Task> closeTasks;
