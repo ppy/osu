@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private const double default_follow_delay = 120;
 
+        private const double max_combo_offset = 200;
+
         private OsuFlashlight flashlight;
 
         public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight();
@@ -40,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             base.ApplyToDrawableRuleset(drawableRuleset);
 
             flashlight.FollowDelay = FollowDelay.Value;
+            flashlight.ComboOffset = ComboOffset.Value;
         }
 
         [SettingSource("Follow delay", "Milliseconds until the flashlight reaches the cursor")]
@@ -50,9 +53,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = default_follow_delay,
         };
 
+        [SettingSource("Combo offset", "Combo to start at for changing flashlight radius")]
+        public BindableNumber<double> ComboOffset { get; } = new BindableDouble(0)
+        {
+            MinValue = 0,
+            MaxValue = max_combo_offset,
+            Precision = 1,
+        };
+
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
             public double FollowDelay { private get; set; }
+            public double ComboOffset { private get; set; }
 
             public OsuFlashlight()
             {
@@ -78,9 +90,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             private float getSizeFor(int combo)
             {
-                if (combo > 200)
+                if (combo + ComboOffset > 200)
                     return default_flashlight_size * 0.8f;
-                else if (combo > 100)
+                else if (combo + ComboOffset > 100)
                     return default_flashlight_size * 0.9f;
                 else
                     return default_flashlight_size;
