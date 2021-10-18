@@ -772,7 +772,7 @@ namespace osu.Game.Tests.Database
         {
             IQueryable<RealmBeatmapSet>? resultSets = null;
 
-            waitForOrAssert(() => (resultSets = realm.All<RealmBeatmapSet>().Where(s => s.OnlineID == 241526)).Any(),
+            waitForOrAssert(() => (resultSets = realm.All<RealmBeatmapSet>().Where(s => !s.DeletePending && s.OnlineID == 241526)).Any(),
                 @"BeatmapSet did not import to the database in allocated time.", timeout);
 
             // ensure we were stored to beatmap database backing...

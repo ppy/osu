@@ -86,21 +86,24 @@ namespace osu.Game.Stores
 
         protected override void PreImport(RealmBeatmapSet beatmapSet, Realm realm)
         {
-            // check if a set already exists with the same online id, delete if it does.
+            // We are about to import a new beatmap. Before doing so, ensure that no other set shares the online IDs used by the new one.
+            // Note that this means if the previous beatmap is restored by the user, it will no longer be linked to its online IDs.
+            // If this is ever an issue, we can consider marking as pending delete but not resetting the IDs (but care will be required for
+            // beatmaps, which don't have their own `DeletePending` state).
+
             if (beatmapSet.OnlineID != null)
             {
-                var existingOnlineId = realm.All<RealmBeatmapSet>().FirstOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
+                var existingOnlineId = realm.All<RealmBeatmapSet>().SingleOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
 
                 if (existingOnlineId != null)
                 {
                     existingOnlineId.DeletePending = true;
-
-                    // in order to avoid a unique key constraint, immediately remove the online ID from the previous set.
                     existingOnlineId.OnlineID = null;
+
                     foreach (var b in existingOnlineId.Beatmaps)
                         b.OnlineID = null;
 
-                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It has been deleted.");
+                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be deleted.");
                 }
             }
         }
