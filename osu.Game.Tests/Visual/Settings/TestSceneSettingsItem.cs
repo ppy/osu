@@ -4,8 +4,10 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays;
 
@@ -47,8 +49,8 @@ namespace osu.Game.Tests.Visual.Settings
         public void TestSetAndClearLabelText()
         {
             SettingsTextBox textBox = null;
-            GridContainer settingsItemGrid = null;
             RestoreDefaultValueButton<string> restoreDefaultValueButton = null;
+            OsuTextBox control = null;
 
             AddStep("create settings item", () =>
             {
@@ -64,18 +66,25 @@ namespace osu.Game.Tests.Visual.Settings
             AddUntilStep("wait for loaded", () => textBox.IsLoaded);
             AddStep("retrieve components", () =>
             {
-                settingsItemGrid = textBox.ChildrenOfType<GridContainer>().Single();
                 restoreDefaultValueButton = textBox.ChildrenOfType<RestoreDefaultValueButton<string>>().Single();
+                control = textBox.ChildrenOfType<OsuTextBox>().Single();
             });
 
             AddStep("set non-default value", () => restoreDefaultValueButton.Current.Value = "non-default");
-            AddAssert("default value button next to control", () => settingsItemGrid.Content[1][0] == restoreDefaultValueButton);
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
 
             AddStep("set label", () => textBox.LabelText = "label text");
-            AddAssert("default value button next to label", () => settingsItemGrid.Content[0][0] == restoreDefaultValueButton);
+            AddAssert("default value button centre aligned to label size", () =>
+            {
+                var label = textBox.ChildrenOfType<OsuSpriteText>().Single(spriteText => spriteText.Text == "label text");
+                return Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, label.DrawHeight, 1);
+            });
 
             AddStep("clear label", () => textBox.LabelText = default);
-            AddAssert("default value button next to control", () => settingsItemGrid.Content[1][0] == restoreDefaultValueButton);
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
+
+            AddStep("set warning text", () => textBox.WarningText = "This is some very important warning text! Hopefully it doesn't break the alignment of the default value indicator...");
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
         }
 
         /// <summary>

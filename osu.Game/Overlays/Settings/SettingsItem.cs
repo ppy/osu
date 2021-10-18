@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -32,14 +31,11 @@ namespace osu.Game.Overlays.Settings
         protected readonly FillFlowContainer FlowContent;
 
         private SpriteText labelText;
-        private readonly GridContainer gridContainer;
-
-        [CanBeNull]
-        private RestoreDefaultValueButton<T> defaultValueButton;
 
         private OsuTextFlowContainer warningText;
 
         public bool ShowsDefaultIndicator = true;
+        private readonly Container defaultValueIndicatorContainer;
 
         public LocalisableString TooltipText { get; set; }
 
@@ -54,7 +50,7 @@ namespace osu.Game.Overlays.Settings
                 if (labelText == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    gridContainer.Content[0][1] = labelText = new OsuSpriteText();
+                    FlowContent.Insert(-1, labelText = new OsuSpriteText());
 
                     updateDisabled();
                 }
@@ -113,32 +109,19 @@ namespace osu.Game.Overlays.Settings
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
-            FlowContent = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(0, 10),
-                Child = Control = CreateControl(),
-            };
-
-            InternalChild = gridContainer = new GridContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                RowDimensions = new[]
+                defaultValueIndicatorContainer = new Container
                 {
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.AutoSize)
+                    Width = SettingsPanel.CONTENT_MARGINS,
                 },
-                ColumnDimensions = new[]
+                FlowContent = new FillFlowContainer
                 {
-                    new Dimension(GridSizeMode.Absolute, SettingsPanel.CONTENT_MARGINS),
-                    new Dimension()
-                },
-                Content = new[]
-                {
-                    new Drawable[2],
-                    new Drawable[] { null, FlowContent }
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
+                    Spacing = new Vector2(0, 10),
+                    Child = Control = CreateControl(),
                 }
             };
 
@@ -157,26 +140,23 @@ namespace osu.Game.Overlays.Settings
             // intentionally done before LoadComplete to avoid overhead.
             if (ShowsDefaultIndicator)
             {
-                defaultValueButton = new RestoreDefaultValueButton<T>
+                defaultValueIndicatorContainer.Add(new RestoreDefaultValueButton<T>
                 {
                     Current = controlWithCurrent.Current,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
-                };
+                });
                 updateLayout();
             }
         }
 
         private void updateLayout()
         {
-            bool hasLabel = !string.IsNullOrEmpty(labelText?.Text.ToString());
+            bool hasLabel = labelText != null && !string.IsNullOrEmpty(labelText.Text.ToString());
 
-            gridContainer.Content[0][0] = null;
-            gridContainer.Content[1][0] = null;
-
-            gridContainer.Content[hasLabel ? 0 : 1][0] = defaultValueButton;
-
-            FlowContent.Margin = new MarginPadding { Top = hasLabel ? 10 : 0 };
+            // if the settings item is providing a label, the default value indicator should be centred vertically to the left of the label.
+            // otherwise, it should be centred vertically to the left of the main control of the settings item.
+            defaultValueIndicatorContainer.Height = hasLabel ? labelText.DrawHeight : Control.DrawHeight;
         }
 
         private void updateDisabled()
