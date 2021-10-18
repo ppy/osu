@@ -546,12 +546,5 @@ namespace osu.Game.Stores
         }
 
         public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
-
-        private string getValidFilename(string filename)
-        {
-            foreach (char c in Path.GetInvalidFileNameChars())
-                filename = filename.Replace(c, '_');
-            return filename;
-        }
     }
 }
