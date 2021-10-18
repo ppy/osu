@@ -115,13 +115,18 @@ namespace osu.Game.Overlays.Settings
                 {
                     Width = SettingsPanel.CONTENT_MARGINS,
                 },
-                FlowContent = new FillFlowContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
-                    Spacing = new Vector2(0, 10),
-                    Child = Control = CreateControl(),
+                    Child = FlowContent = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(0, 10),
+                        Child = Control = CreateControl(),
+                    }
                 }
             };
 
