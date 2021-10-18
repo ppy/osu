@@ -91,7 +91,7 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IHasOnlineID
 
-        public int? OnlineID => OnlineBeatmapSetID;
+        public int OnlineID => OnlineBeatmapSetID ?? -1;
 
         #endregion
 
