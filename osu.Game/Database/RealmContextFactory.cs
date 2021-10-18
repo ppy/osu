@@ -147,7 +147,7 @@ namespace osu.Game.Database
                         var oldItem = oldItems.ElementAt(i);
                         var newItem = newItems.ElementAt(i);
 
-                        long? nullableOnlineID = oldItem.OnlineID;
+                        long? nullableOnlineID = oldItem?.OnlineID;
                         newItem.OnlineID = (int)(nullableOnlineID ?? -1);
                     }
                 }
