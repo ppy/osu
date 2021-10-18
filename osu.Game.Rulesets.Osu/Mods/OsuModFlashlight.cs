@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource("Combo offset", "Combo to start at for changing flashlight radius")]
-        public BindableNumber<double> ComboOffset { get; } = new BindableDouble(0)
+        public BindableNumber<double> ComboOffset { get; } = new BindableDouble
         {
             MinValue = 0,
             MaxValue = max_combo_offset,
