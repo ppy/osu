@@ -18,10 +18,18 @@ namespace osu.Game.Tests.Visual.Settings
         [Resolved]
         private OsuColour colours { get; set; }
 
+        private float scale = 1;
+
+        private readonly Bindable<float> current = new Bindable<float>
+        {
+            Default = default,
+            Value = 1,
+        };
+
         [Test]
         public void TestBasic()
         {
-            RestoreDefaultValueButton<bool> restoreDefaultValueButton = null;
+            RestoreDefaultValueButton<float> restoreDefaultValueButton = null;
 
             AddStep("create button", () => Child = new Container
             {
@@ -33,21 +41,23 @@ namespace osu.Game.Tests.Visual.Settings
                         RelativeSizeAxes = Axes.Both,
                         Colour = colours.GreySeafoam
                     },
-                    restoreDefaultValueButton = new RestoreDefaultValueButton<bool>
+                    restoreDefaultValueButton = new RestoreDefaultValueButton<float>
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Current = new BindableBool(),
+                        Scale = new Vector2(scale),
+                        Current = current,
                     }
                 }
             });
             AddSliderStep("set scale", 1, 4, 1, scale =>
             {
+                this.scale = scale;
                 if (restoreDefaultValueButton != null)
                     restoreDefaultValueButton.Scale = new Vector2(scale);
             });
-            AddToggleStep("toggle default state", state => restoreDefaultValueButton.Current.Value = state);
-            AddToggleStep("toggle disabled state", state => restoreDefaultValueButton.Current.Disabled = state);
+            AddToggleStep("toggle default state", state => current.Value = state ? default : 1);
+            AddToggleStep("toggle disabled state", state => current.Disabled = state);
         }
     }
 }
