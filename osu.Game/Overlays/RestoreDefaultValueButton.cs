@@ -115,7 +115,7 @@ namespace osu.Game.Overlays
                 Background.FadeColour(colours.Lime3, fade_duration, Easing.OutQuint);
                 Content.TweenEdgeEffectTo(new EdgeEffectParameters
                 {
-                    Colour = colours.Lime3.Opacity(0.4f).Opacity(0.1f),
+                    Colour = colours.Lime3.Opacity(0.1f),
                     Radius = 2,
                     Type = EdgeEffectType.Glow
                 }, fade_duration, Easing.OutQuint);
