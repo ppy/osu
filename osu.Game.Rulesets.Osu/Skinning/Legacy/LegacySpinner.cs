@@ -15,25 +15,32 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public abstract class LegacySpinner : CompositeDrawable
+    public abstract class LegacySpinner : CompositeDrawable, IHasApproachCircle
     {
+        public const float SPRITE_SCALE = 0.625f;
+
         /// <remarks>
         /// All constants are in osu!stable's gamefield space, which is shifted 16px downwards.
-        /// This offset is negated in both osu!stable and osu!lazer to bring all constants into window-space.
+        /// This offset is negated to bring all constants into window-space.
         /// Note: SPINNER_Y_CENTRE + SPINNER_TOP_OFFSET - Position.Y = 240 (=480/2, or half the window-space in osu!stable)
         /// </remarks>
         protected const float SPINNER_TOP_OFFSET = 45f - 16f;
 
         protected const float SPINNER_Y_CENTRE = SPINNER_TOP_OFFSET + 219f;
 
-        protected const float SPRITE_SCALE = 0.625f;
+        private const float spm_hide_offset = 50f;
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
+
+        public Drawable ApproachCircle { get; protected set; }
 
         private Sprite spin;
         private Sprite clear;
 
         private LegacySpriteText bonusCounter;
+
+        private Sprite spmBackground;
+        private LegacySpriteText spmCounter;
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject, ISkinSource source)
@@ -71,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Scale = new Vector2(SPRITE_SCALE),
                         Y = SPINNER_TOP_OFFSET + 115,
                     },
-                    bonusCounter = new LegacySpriteText(source, LegacyFont.Score)
+                    bonusCounter = new LegacySpriteText(LegacyFont.Score)
                     {
                         Alpha = 0f,
                         Anchor = Anchor.TopCentre,
@@ -79,11 +86,27 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Scale = new Vector2(SPRITE_SCALE),
                         Y = SPINNER_TOP_OFFSET + 299,
                     }.With(s => s.Font = s.Font.With(fixedWidth: false)),
+                    spmBackground = new Sprite
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopLeft,
+                        Texture = source.GetTexture("spinner-rpm"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Position = new Vector2(-87, 445 + spm_hide_offset),
+                    },
+                    spmCounter = new LegacySpriteText(LegacyFont.Score)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopRight,
+                        Scale = new Vector2(SPRITE_SCALE * 0.9f),
+                        Position = new Vector2(80, 448 + spm_hide_offset),
+                    }.With(s => s.Font = s.Font.With(fixedWidth: false)),
                 }
             });
         }
 
         private IBindable<double> gainedBonus;
+        private IBindable<double> spinsPerMinute;
 
         private readonly Bindable<bool> completed = new Bindable<bool>();
 
@@ -99,6 +122,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 bonusCounter.ScaleTo(SPRITE_SCALE * 2f).Then().ScaleTo(SPRITE_SCALE * 1.28f, 800, Easing.Out);
             });
 
+            spinsPerMinute = DrawableSpinner.SpinsPerMinute.GetBoundCopy();
+            spinsPerMinute.BindValueChanged(spm =>
+            {
+                spmCounter.Text = Math.Truncate(spm.NewValue).ToString(@"#0");
+            }, true);
+
             completed.BindValueChanged(onCompletedChanged, true);
 
             DrawableSpinner.ApplyCustomUpdateState += UpdateStateTransforms;
@@ -111,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 double startTime = Math.Min(Time.Current, DrawableSpinner.HitStateUpdateTime - 400);
 
-                using (BeginAbsoluteSequence(startTime, true))
+                using (BeginAbsoluteSequence(startTime))
                 {
                     clear.FadeInFromZero(400, Easing.Out);
 
@@ -121,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 }
 
                 const double fade_out_duration = 50;
-                using (BeginAbsoluteSequence(DrawableSpinner.HitStateUpdateTime - fade_out_duration, true))
+                using (BeginAbsoluteSequence(DrawableSpinner.HitStateUpdateTime - fade_out_duration))
                     clear.FadeOut(fade_out_duration);
             }
             else
@@ -142,16 +171,25 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             switch (drawableHitObject)
             {
                 case DrawableSpinner d:
-                    double fadeOutLength = Math.Min(400, d.HitObject.Duration);
+                    using (BeginAbsoluteSequence(d.HitObject.StartTime - d.HitObject.TimeFadeIn))
+                    {
+                        spmBackground.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
+                        spmCounter.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
+                    }
 
-                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime - fadeOutLength, true))
-                        spin.FadeOutFromOne(fadeOutLength);
+                    using (BeginAbsoluteSequence(d.HitObject.StartTime))
+                        ApproachCircle?.ScaleTo(SPRITE_SCALE * 0.1f, d.HitObject.Duration);
+
+                    double spinFadeOutLength = Math.Min(400, d.HitObject.Duration);
+
+                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime - spinFadeOutLength))
+                        spin.FadeOutFromOne(spinFadeOutLength);
                     break;
 
                 case DrawableSpinnerTick d:
                     if (state == ArmedState.Hit)
                     {
-                        using (BeginAbsoluteSequence(d.HitStateUpdateTime, true))
+                        using (BeginAbsoluteSequence(d.HitStateUpdateTime))
                             spin.FadeOut(300);
                     }
 

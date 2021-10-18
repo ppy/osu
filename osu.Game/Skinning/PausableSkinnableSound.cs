@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
     {
         public double Length => !DrawableSamples.Any() ? 0 : DrawableSamples.Max(sample => sample.Length);
 
-        protected bool RequestedPlaying { get; private set; }
+        public bool RequestedPlaying { get; private set; }
 
         public PausableSkinnableSound()
         {

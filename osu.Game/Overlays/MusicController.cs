@@ -252,7 +252,7 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
-                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value));
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First()));
                 restartTrack();
                 return PreviousTrackResult.Previous;
             }
@@ -283,7 +283,7 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
-                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value));
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First()));
                 restartTrack();
                 return true;
             }
@@ -400,35 +400,38 @@ namespace osu.Game.Overlays
                 NextTrack();
         }
 
-        private bool allowRateAdjustments;
+        private bool allowTrackAdjustments;
 
         /// <summary>
-        /// Whether mod rate adjustments are allowed to be applied.
+        /// Whether mod track adjustments are allowed to be applied.
         /// </summary>
-        public bool AllowRateAdjustments
+        public bool AllowTrackAdjustments
         {
-            get => allowRateAdjustments;
+            get => allowTrackAdjustments;
             set
             {
-                if (allowRateAdjustments == value)
+                if (allowTrackAdjustments == value)
                     return;
 
-                allowRateAdjustments = value;
+                allowTrackAdjustments = value;
                 ResetTrackAdjustments();
             }
         }
 
         /// <summary>
-        /// Resets the speed adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowRateAdjustments"/> is <c>true</c>.
+        /// Resets the adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowTrackAdjustments"/> is <c>true</c>.
         /// </summary>
         /// <remarks>
-        /// Does not reset speed adjustments applied directly to the beatmap track.
+        /// Does not reset any adjustments applied directly to the beatmap track.
         /// </remarks>
         public void ResetTrackAdjustments()
         {
-            CurrentTrack.ResetSpeedAdjustments();
+            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Balance);
+            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Frequency);
+            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
+            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
 
-            if (allowRateAdjustments)
+            if (allowTrackAdjustments)
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(CurrentTrack);

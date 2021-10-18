@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             : base(beatmap, mods)
         {
             defaultHitWindows = new OsuHitWindows();
-            defaultHitWindows.SetDifficulty(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            defaultHitWindows.SetDifficulty(Beatmap.Difficulty.OverallDifficulty);
         }
 
         #endregion
@@ -71,8 +71,6 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             buttonIndex = 0;
 
-            AddFrameToReplay(new OsuReplayFrame(-100000, new Vector2(256, 500)));
-            AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, new Vector2(256, 500)));
             AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, new Vector2(256, 500)));
 
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
@@ -235,35 +233,43 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             // Wait until Auto could "see and react" to the next note.
             double waitTime = h.StartTime - Math.Max(0.0, h.TimePreempt - getReactionTime(h.StartTime - h.TimePreempt));
+            bool hasWaited = false;
 
             if (waitTime > lastFrame.Time)
             {
                 lastFrame = new OsuReplayFrame(waitTime, lastFrame.Position) { Actions = lastFrame.Actions };
+                hasWaited = true;
                 AddFrameToReplay(lastFrame);
             }
 
-            Vector2 lastPosition = lastFrame.Position;
-
             double timeDifference = ApplyModsToTimeDelta(lastFrame.Time, h.StartTime);
+            OsuReplayFrame lastLastFrame = Frames.Count >= 2 ? (OsuReplayFrame)Frames[^2] : null;
 
-            // Only "snap" to hitcircles if they are far enough apart. As the time between hitcircles gets shorter the snapping threshold goes up.
-            if (timeDifference > 0 && // Sanity checks
-                ((lastPosition - targetPos).Length > h.Radius * (1.5 + 100.0 / timeDifference) || // Either the distance is big enough
-                 timeDifference >= 266)) // ... or the beats are slow enough to tap anyway.
+            if (timeDifference > 0)
             {
-                // Perform eased movement
+                // If the last frame is a key-up frame and there has been no wait period, adjust the last frame's position such that it begins eased movement instantaneously.
+                if (lastLastFrame != null && lastFrame is OsuKeyUpReplayFrame && !hasWaited)
+                {
+                    // [lastLastFrame] ... [lastFrame] ... [current frame]
+                    // We want to find the cursor position at lastFrame, so interpolate between lastLastFrame and the new target position.
+                    lastFrame.Position = Interpolation.ValueAt(lastFrame.Time, lastFrame.Position, targetPos, lastLastFrame.Time, h.StartTime, easing);
+                }
+
+                Vector2 lastPosition = lastFrame.Position;
+
+                // Perform the rest of the eased movement until the target position is reached.
                 for (double time = lastFrame.Time + GetFrameDelay(lastFrame.Time); time < h.StartTime; time += GetFrameDelay(time))
                 {
                     Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPos, lastFrame.Time, h.StartTime, easing);
                     AddFrameToReplay(new OsuReplayFrame((int)time, new Vector2(currentPosition.X, currentPosition.Y)) { Actions = lastFrame.Actions });
                 }
+            }
 
-                buttonIndex = 0;
-            }
-            else
-            {
+            // Start alternating once the time separation is too small (faster than ~225BPM).
+            if (timeDifference > 0 && timeDifference < 266)
                 buttonIndex++;
-            }
+            else
+                buttonIndex = 0;
         }
 
         /// <summary>
@@ -286,7 +292,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             // TODO: Why do we delay 1 ms if the object is a spinner? There already is KEY_UP_DELAY from hEndTime.
             double hEndTime = h.GetEndTime() + KEY_UP_DELAY;
             int endDelay = h is Spinner ? 1 : 0;
-            var endFrame = new OsuReplayFrame(hEndTime + endDelay, new Vector2(h.StackedEndPosition.X, h.StackedEndPosition.Y));
+            var endFrame = new OsuKeyUpReplayFrame(hEndTime + endDelay, new Vector2(h.StackedEndPosition.X, h.StackedEndPosition.Y));
 
             // Decrement because we want the previous frame, not the next one
             int index = FindInsertionIndex(startFrame) - 1;
@@ -383,5 +389,13 @@ namespace osu.Game.Rulesets.Osu.Replays
         }
 
         #endregion
+
+        private class OsuKeyUpReplayFrame : OsuReplayFrame
+        {
+            public OsuKeyUpReplayFrame(double time, Vector2 position)
+                : base(time, position)
+            {
+            }
+        }
     }
 }

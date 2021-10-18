@@ -3,8 +3,8 @@
 
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Mania.Edit
@@ -16,20 +16,20 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
         }
 
-        public override OverlaySelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
+        public override HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject)
         {
             switch (hitObject)
             {
-                case DrawableNote note:
+                case Note note:
                     return new NoteSelectionBlueprint(note);
 
-                case DrawableHoldNote holdNote:
+                case HoldNote holdNote:
                     return new HoldNoteSelectionBlueprint(holdNote);
             }
 
-            return base.CreateBlueprintFor(hitObject);
+            return base.CreateHitObjectBlueprintFor(hitObject);
         }
 
-        protected override SelectionHandler CreateSelectionHandler() => new ManiaSelectionHandler();
+        protected override SelectionHandler<HitObject> CreateSelectionHandler() => new ManiaSelectionHandler();
     }
 }

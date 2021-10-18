@@ -4,8 +4,10 @@
 using System.Linq;
 using Humanizer;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Users;
 
@@ -22,6 +24,8 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             AddRepeatStep("add some users", () => Client.AddUser(new User { Id = id++ }), 5);
             checkPlayingUserCount(0);
 
+            AddAssert("playlist item is available", () => Client.CurrentMatchPlayingItem.Value != null);
+
             changeState(3, MultiplayerUserState.WaitingForLoad);
             checkPlayingUserCount(3);
 
@@ -34,11 +38,42 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             changeState(6, MultiplayerUserState.WaitingForLoad);
             checkPlayingUserCount(6);
 
-            AddStep("another user left", () => Client.RemoveUser(Client.Room?.Users.Last().User));
+            AddStep("another user left", () => Client.RemoveUser((Client.Room?.Users.Last().User).AsNonNull()));
             checkPlayingUserCount(5);
 
             AddStep("leave room", () => Client.LeaveRoom());
             checkPlayingUserCount(0);
+
+            AddAssert("playlist item is null", () => Client.CurrentMatchPlayingItem.Value == null);
+        }
+
+        [Test]
+        public void TestPlayingUsersUpdatedOnJoin()
+        {
+            AddStep("leave room", () => Client.LeaveRoom());
+            AddUntilStep("wait for room part", () => Client.Room == null);
+
+            AddStep("create room initially in gameplay", () =>
+            {
+                var newRoom = new Room();
+                newRoom.CopyFrom(SelectedRoom.Value);
+
+                newRoom.RoomID.Value = null;
+                Client.RoomSetupAction = room =>
+                {
+                    room.State = MultiplayerRoomState.Playing;
+                    room.Users.Add(new MultiplayerRoomUser(PLAYER_1_ID)
+                    {
+                        User = new User { Id = PLAYER_1_ID },
+                        State = MultiplayerUserState.Playing
+                    });
+                };
+
+                RoomManager.CreateRoom(newRoom);
+            });
+
+            AddUntilStep("wait for room join", () => Client.Room != null);
+            checkPlayingUserCount(1);
         }
 
         private void checkPlayingUserCount(int expectedCount)

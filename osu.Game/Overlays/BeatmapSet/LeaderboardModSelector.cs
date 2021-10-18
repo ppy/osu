@@ -19,19 +19,21 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class LeaderboardModSelector : CompositeDrawable
     {
-        public readonly BindableList<Mod> SelectedMods = new BindableList<Mod>();
+        public readonly BindableList<IMod> SelectedMods = new BindableList<IMod>();
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private readonly FillFlowContainer<ModButton> modsContainer;
 
         public LeaderboardModSelector()
         {
-            AutoSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
             InternalChild = modsContainer = new FillFlowContainer<ModButton>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AutoSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Full,
                 Spacing = new Vector2(4),
             };
@@ -52,9 +54,14 @@ namespace osu.Game.Overlays.BeatmapSet
                 return;
 
             modsContainer.Add(new ModButton(new ModNoMod()));
-            modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
+            modsContainer.AddRange(ruleset.NewValue.CreateInstance().AllMods.Where(m => m.UserPlayable).Select(m => new ModButton(m)));
 
-            modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
+            modsContainer.ForEach(button =>
+            {
+                button.Anchor = Anchor.TopCentre;
+                button.Origin = Anchor.TopCentre;
+                button.OnSelectionChanged = selectionChanged;
+            });
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -69,7 +76,7 @@ namespace osu.Game.Overlays.BeatmapSet
             updateHighlighted();
         }
 
-        private void selectionChanged(Mod mod, bool selected)
+        private void selectionChanged(IMod mod, bool selected)
         {
             if (selected)
                 SelectedMods.Add(mod);
@@ -94,9 +101,9 @@ namespace osu.Game.Overlays.BeatmapSet
             private const int duration = 200;
 
             public readonly BindableBool Highlighted = new BindableBool();
-            public Action<Mod, bool> OnSelectionChanged;
+            public Action<IMod, bool> OnSelectionChanged;
 
-            public ModButton(Mod mod)
+            public ModButton(IMod mod)
                 : base(mod)
             {
                 Scale = new Vector2(0.4f);

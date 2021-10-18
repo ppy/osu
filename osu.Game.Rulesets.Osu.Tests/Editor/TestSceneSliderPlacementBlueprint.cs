@@ -41,9 +41,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addClickStep(MouseButton.Left);
             addClickStep(MouseButton.Right);
 
-            assertPlaced(true);
-            assertLength(0);
-            assertControlPointType(0, PathType.Linear);
+            assertPlaced(false);
         }
 
         [Test]
@@ -276,6 +274,104 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointType(0, PathType.Linear);
         }
 
+        [Test]
+        public void TestPlacePerfectCurveSegmentAlmostLinearlyExterior()
+        {
+            Vector2 startPosition = new Vector2(200);
+
+            addMovementStep(startPosition);
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(startPosition + new Vector2(300, 0));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(startPosition + new Vector2(150, 0.1f));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            assertControlPointType(0, PathType.Bezier);
+        }
+
+        [Test]
+        public void TestPlacePerfectCurveSegmentRecovery()
+        {
+            Vector2 startPosition = new Vector2(200);
+
+            addMovementStep(startPosition);
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(startPosition + new Vector2(300, 0));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(startPosition + new Vector2(150, 0.1f)); // Should convert to bezier
+            addMovementStep(startPosition + new Vector2(400.0f, 50.0f)); // Should convert back to perfect
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            assertControlPointType(0, PathType.PerfectCurve);
+        }
+
+        [Test]
+        public void TestPlacePerfectCurveSegmentLarge()
+        {
+            Vector2 startPosition = new Vector2(400);
+
+            addMovementStep(startPosition);
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(startPosition + new Vector2(220, 220));
+            addClickStep(MouseButton.Left);
+
+            // Playfield dimensions are 640 x 480.
+            // So a 440 x 440 bounding box should be ok.
+            addMovementStep(startPosition + new Vector2(-220, 220));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            assertControlPointType(0, PathType.PerfectCurve);
+        }
+
+        [Test]
+        public void TestPlacePerfectCurveSegmentTooLarge()
+        {
+            Vector2 startPosition = new Vector2(480, 200);
+
+            addMovementStep(startPosition);
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(startPosition + new Vector2(400, 400));
+            addClickStep(MouseButton.Left);
+
+            // Playfield dimensions are 640 x 480.
+            // So an 800 * 800 bounding box area should not be ok.
+            addMovementStep(startPosition + new Vector2(-400, 400));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            assertControlPointType(0, PathType.Bezier);
+        }
+
+        [Test]
+        public void TestPlacePerfectCurveSegmentCompleteArc()
+        {
+            addMovementStep(new Vector2(400));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(600, 400));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(400, 410));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            assertControlPointType(0, PathType.PerfectCurve);
+        }
+
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(position)));
 
         private void addClickStep(MouseButton button)
@@ -289,10 +385,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void assertControlPointCount(int expected) => AddAssert($"has {expected} control points", () => getSlider().Path.ControlPoints.Count == expected);
 
-        private void assertControlPointType(int index, PathType type) => AddAssert($"control point {index} is {type}", () => getSlider().Path.ControlPoints[index].Type.Value == type);
+        private void assertControlPointType(int index, PathType type) => AddAssert($"control point {index} is {type}", () => getSlider().Path.ControlPoints[index].Type == type);
 
         private void assertControlPointPosition(int index, Vector2 position) =>
-            AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, getSlider().Path.ControlPoints[index].Position.Value, 1));
+            AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, getSlider().Path.ControlPoints[index].Position, 1));
 
         private Slider getSlider() => HitObjectContainer.Count > 0 ? ((DrawableSlider)HitObjectContainer[0]).HitObject : null;
 

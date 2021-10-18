@@ -8,15 +8,22 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Menu;
+using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Tests.Visual.Multiplayer;
 using osuTK;
 using osuTK.Input;
 
@@ -33,9 +40,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitSongSelectWithEscape()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
             pushEscape();
@@ -43,12 +50,26 @@ namespace osu.Game.Tests.Visual.Navigation
             exitViaEscapeAndConfirm();
         }
 
+        /// <summary>
+        /// This tests that the F1 key will open the mod select overlay, and not be handled / blocked by the music controller (which has the same default binding
+        /// but should be handled *after* song select).
+        /// </summary>
+        [Test]
+        public void TestOpenModSelectOverlayUsingAction()
+        {
+            TestPlaySongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddStep("Show mods overlay", () => InputManager.Key(Key.F1));
+            AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
+        }
+
         [Test]
         public void TestRetryCountIncrements()
         {
             Player player = null;
 
-            PushAndConfirm(() => new TestSongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
 
@@ -56,7 +77,13 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
 
-            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+            AddUntilStep("wait for player", () =>
+            {
+                // dismiss any notifications that may appear (ie. muted notification).
+                clickMouseInCentre();
+                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
+            });
+
             AddAssert("retry count is 0", () => player.RestartCount == 0);
 
             AddStep("attempt to retry", () => player.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
@@ -74,17 +101,25 @@ namespace osu.Game.Tests.Visual.Navigation
 
             WorkingBeatmap beatmap() => Game.Beatmap.Value;
 
-            PushAndConfirm(() => new TestSongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
 
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
-            AddStep("set autoplay", () => Game.SelectedMods.Value = new[] { new OsuModAutoplay() });
+            AddStep("set mods", () => Game.SelectedMods.Value = new Mod[] { new OsuModNoFail(), new OsuModDoubleTime { SpeedChange = { Value = 2 } } });
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
-            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
-            AddStep("seek to end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Track.Length));
+
+            AddUntilStep("wait for player", () =>
+            {
+                // dismiss any notifications that may appear (ie. muted notification).
+                clickMouseInCentre();
+                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
+            });
+
+            AddUntilStep("wait for track playing", () => beatmap().Track.IsRunning);
+            AddStep("seek to near end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Beatmap.HitObjects[^1].StartTime - 1000));
             AddUntilStep("wait for pass", () => (results = Game.ScreenStack.CurrentScreen as ResultsScreen) != null && results.IsLoaded);
             AddStep("attempt to retry", () => results.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
             AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != player && Game.ScreenStack.CurrentScreen is Player);
@@ -98,7 +133,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             WorkingBeatmap beatmap() => Game.Beatmap.Value;
 
-            PushAndConfirm(() => new TestSongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(Game, virtualTrack: true).Wait());
 
@@ -109,7 +144,13 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
 
-            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+            AddUntilStep("wait for player", () =>
+            {
+                // dismiss any notifications that may appear (ie. muted notification).
+                clickMouseInCentre();
+                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
+            });
+
             AddUntilStep("wait for fail", () => player.HasFailed);
 
             AddUntilStep("wait for track stop", () => !Game.MusicController.IsPlaying);
@@ -124,9 +165,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestMenuMakesMusic()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
             AddUntilStep("wait for no track", () => Game.MusicController.CurrentTrack.IsDummyDevice);
 
@@ -136,17 +177,25 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestPushSongSelectAndPressBackButtonImmediately()
+        {
+            AddStep("push song select", () => Game.ScreenStack.Push(new TestPlaySongSelect()));
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddWaitStep("wait two frames", 2);
+        }
+
+        [Test]
         public void TestExitSongSelectWithClick()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
             AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
 
             // BackButton handles hover using its child button, so this checks whether or not any of BackButton's children are hovered.
-            AddUntilStep("Back button is hovered", () => InputManager.HoveredDrawables.Any(d => d.Parent == Game.BackButton));
+            AddUntilStep("Back button is hovered", () => Game.ChildrenOfType<BackButton>().First().Children.Any(c => c.IsHovered));
 
             AddStep("Click back button", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("Overlay was hidden", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
@@ -198,9 +247,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestModSelectInput()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
 
@@ -219,9 +268,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestBeatmapOptionsInput()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
             AddStep("Show options overlay", () => songSelect.BeatmapOptionsOverlay.Show());
 
@@ -281,6 +330,105 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("Toolbar is hidden", () => Game.Toolbar.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestPushMatchSubScreenAndPressBackButtonImmediately()
+        {
+            TestMultiplayer multiplayer = null;
+
+            PushAndConfirm(() => multiplayer = new TestMultiplayer());
+
+            AddUntilStep("wait for lounge", () => multiplayer.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
+            AddStep("open room", () => multiplayer.ChildrenOfType<LoungeSubScreen>().Single().Open());
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddWaitStep("wait two frames", 2);
+        }
+
+        [Test]
+        public void TestOverlayClosing()
+        {
+            // use now playing overlay for "overlay -> background" drag case
+            // since most overlays use a scroll container that absorbs on mouse down
+            NowPlayingOverlay nowPlayingOverlay = null;
+
+            AddUntilStep("Wait for now playing load", () => (nowPlayingOverlay = Game.ChildrenOfType<NowPlayingOverlay>().FirstOrDefault()) != null);
+
+            AddStep("enter menu", () => InputManager.Key(Key.Enter));
+            AddUntilStep("toolbar displayed", () => Game.Toolbar.State.Value == Visibility.Visible);
+
+            AddStep("open now playing", () => InputManager.Key(Key.F6));
+            AddUntilStep("now playing is visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
+
+            // drag tests
+
+            // background -> toolbar
+            AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move cursor to toolbar", () => InputManager.MoveMouseTo(Game.Toolbar.ScreenSpaceDrawQuad.Centre));
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("now playing is hidden", () => nowPlayingOverlay.State.Value == Visibility.Hidden);
+
+            AddStep("press now playing hotkey", () => InputManager.Key(Key.F6));
+
+            // toolbar -> background
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("now playing is still visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
+
+            // background -> overlay
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move cursor to now playing overlay", () => InputManager.MoveMouseTo(nowPlayingOverlay.ScreenSpaceDrawQuad.Centre));
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("now playing is still visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
+
+            // overlay -> background
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("now playing is still visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
+
+            // background -> background
+            AddStep("press left mouse button", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move cursor to left", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomLeft));
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("now playing is hidden", () => nowPlayingOverlay.State.Value == Visibility.Hidden);
+
+            AddStep("press now playing hotkey", () => InputManager.Key(Key.F6));
+
+            // click tests
+
+            // toolbar
+            AddStep("move cursor to toolbar", () => InputManager.MoveMouseTo(Game.Toolbar.ScreenSpaceDrawQuad.Centre));
+            AddStep("click left mouse button", () => InputManager.Click(MouseButton.Left));
+            AddAssert("now playing is still visible", () => nowPlayingOverlay.State.Value == Visibility.Visible);
+
+            // background
+            AddStep("move cursor to background", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.BottomRight));
+            AddStep("click left mouse button", () => InputManager.Click(MouseButton.Left));
+            AddAssert("now playing is hidden", () => nowPlayingOverlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestExitGameFromSongSelect()
+        {
+            PushAndConfirm(() => new TestPlaySongSelect());
+            exitViaEscapeAndConfirm();
+
+            pushEscape(); // returns to osu! logo
+
+            AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
+            AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
+            AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
+            AddUntilStep("Wait for game exit", () => Game.ScreenStack.CurrentScreen == null);
+            AddStep("test dispose doesn't crash", () => Game.Dispose());
+        }
+
+        private void clickMouseInCentre()
+        {
+            InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre);
+            InputManager.Click(MouseButton.Left);
+        }
+
         private void pushEscape() =>
             AddStep("Press escape", () => InputManager.Key(Key.Escape));
 
@@ -297,11 +445,26 @@ namespace osu.Game.Tests.Visual.Navigation
             ConfirmAtMainMenu();
         }
 
-        private class TestSongSelect : PlaySongSelect
+        public class TestPlaySongSelect : PlaySongSelect
         {
             public ModSelectOverlay ModSelectOverlay => ModSelect;
 
             public BeatmapOptionsOverlay BeatmapOptionsOverlay => BeatmapOptions;
+
+            protected override bool DisplayStableImportPrompt => false;
+        }
+
+        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
+        {
+            [Cached(typeof(MultiplayerClient))]
+            public readonly TestMultiplayerClient Client;
+
+            public TestMultiplayer()
+            {
+                Client = new TestMultiplayerClient((TestRequestHandlingMultiplayerRoomManager)RoomManager);
+            }
+
+            protected override RoomManager CreateRoomManager() => new TestRequestHandlingMultiplayerRoomManager();
         }
     }
 }

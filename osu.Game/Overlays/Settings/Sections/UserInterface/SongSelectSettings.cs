@@ -5,8 +5,10 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
@@ -15,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
         private Bindable<double> minStars;
         private Bindable<double> maxStars;
 
-        protected override string Header => "Song Select";
+        protected override LocalisableString Header => UserInterfaceStrings.SongSelectHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -30,31 +32,31 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Right mouse drag to absolute scroll",
+                    LabelText = UserInterfaceStrings.RightMouseScroll,
                     Current = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show converted beatmaps",
+                    LabelText = UserInterfaceStrings.ShowConvertedBeatmaps,
                     Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
                 new SettingsSlider<double, StarsSlider>
                 {
-                    LabelText = "Display beatmaps from",
+                    LabelText = UserInterfaceStrings.StarsMinimum,
                     Current = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
                 },
                 new SettingsSlider<double, MaximumStarsSlider>
                 {
-                    LabelText = "up to",
+                    LabelText = UserInterfaceStrings.StarsMaximum,
                     Current = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
-                    LabelText = "Random selection algorithm",
+                    LabelText = UserInterfaceStrings.RandomSelectionAlgorithm,
                     Current = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
                 }
             };
@@ -62,12 +64,12 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
         private class MaximumStarsSlider : StarsSlider
         {
-            public override string TooltipText => Current.IsDefault ? "no limit" : base.TooltipText;
+            public override LocalisableString TooltipText => Current.IsDefault ? UserInterfaceStrings.NoLimit : base.TooltipText;
         }
 
         private class StarsSlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Value.ToString(@"0.## stars");
+            public override LocalisableString TooltipText => Current.Value.ToString(@"0.## stars");
         }
     }
 }

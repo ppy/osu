@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -146,7 +145,7 @@ namespace osu.Game.Rulesets.Scoring
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
 
-            scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
+            scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) + 1;
 
             hitEvents.Add(CreateHitEvent(result));
             lastHitObject = result.HitObject;
@@ -181,7 +180,7 @@ namespace osu.Game.Rulesets.Scoring
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
 
-            scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
+            scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) - 1;
 
             Debug.Assert(hitEvents.Count > 0);
             lastHitObject = hitEvents[^1].LastHitObject;
@@ -223,12 +222,13 @@ namespace osu.Game.Rulesets.Scoring
                 case ScoringMode.Standardised:
                     double accuracyScore = accuracyPortion * accuracyRatio;
                     double comboScore = comboPortion * comboRatio;
-
                     return (max_score * (accuracyScore + comboScore) + getBonusScore(statistics)) * scoreMultiplier;
 
                 case ScoringMode.Classic:
-                    // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return getBonusScore(statistics) + (accuracyRatio * Math.Max(1, maxCombo) * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
+                    // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
+                    // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
+                    double scaledStandardised = GetScore(ScoringMode.Standardised, maxCombo, accuracyRatio, comboRatio, statistics) / max_score;
+                    return Math.Pow(scaledStandardised * (maxCombo + 1), 2) * 18;
             }
         }
 
@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Scoring
                 computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
             }
 
-            return GetScore(mode, maxAchievableCombo, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), scoreResultCounts);
+            return GetScore(mode, maxAchievableCombo, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), statistics);
         }
 
         /// <summary>
@@ -266,14 +266,14 @@ namespace osu.Game.Rulesets.Scoring
             if (preferRolling && rollingMaxBaseScore != 0)
                 return baseScore / rollingMaxBaseScore;
 
-            return maxBaseScore > 0 ? baseScore / maxBaseScore : 0;
+            return maxBaseScore > 0 ? baseScore / maxBaseScore : 1;
         }
 
         private double calculateComboRatio(int maxCombo) => maxAchievableCombo > 0 ? (double)maxCombo / maxAchievableCombo : 1;
 
         private double getBonusScore(Dictionary<HitResult, int> statistics)
-            => statistics.GetOrDefault(HitResult.SmallBonus) * Judgement.SMALL_BONUS_SCORE
-               + statistics.GetOrDefault(HitResult.LargeBonus) * Judgement.LARGE_BONUS_SCORE;
+            => statistics.GetValueOrDefault(HitResult.SmallBonus) * Judgement.SMALL_BONUS_SCORE
+               + statistics.GetValueOrDefault(HitResult.LargeBonus) * Judgement.LARGE_BONUS_SCORE;
 
         private ScoreRank rankFrom(double acc)
         {
@@ -291,7 +291,7 @@ namespace osu.Game.Rulesets.Scoring
             return ScoreRank.D;
         }
 
-        public int GetStatistic(HitResult result) => scoreResultCounts.GetOrDefault(result);
+        public int GetStatistic(HitResult result) => scoreResultCounts.GetValueOrDefault(result);
 
         public double GetStandardisedScore() => getScore(ScoringMode.Standardised);
 
@@ -339,19 +339,12 @@ namespace osu.Game.Rulesets.Scoring
             score.MaxCombo = HighestCombo.Value;
             score.Accuracy = Accuracy.Value;
             score.Rank = Rank.Value;
-            score.Date = DateTimeOffset.Now;
 
-            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.IsScorable()))
+            foreach (var result in HitResultExtensions.SCORABLE_TYPES)
                 score.Statistics[result] = GetStatistic(result);
 
             score.HitEvents = hitEvents;
         }
-
-        /// <summary>
-        /// Create a <see cref="HitWindows"/> for this processor.
-        /// </summary>
-        [Obsolete("Method is now unused.")] // Can be removed 20210328
-        public virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 
     public enum ScoringMode

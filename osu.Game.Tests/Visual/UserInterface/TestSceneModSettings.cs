@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait for button load", () => modSelect.ButtonsLoaded);
             AddStep("select mod", () => modSelect.SelectMod(testCustomisableMod));
             AddAssert("button enabled", () => modSelect.CustomiseButton.Enabled.Value);
-            AddStep("open Customisation", () => modSelect.CustomiseButton.Click());
+            AddStep("open Customisation", () => modSelect.CustomiseButton.TriggerClick());
             AddStep("deselect mod", () => modSelect.SelectMod(testCustomisableMod));
             AddAssert("controls hidden", () => modSelect.ModSettingsContainer.State.Value == Visibility.Hidden);
         }
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("create mods", () =>
             {
                 original = new OsuModDoubleTime();
-                copy = (OsuModDoubleTime)original.CreateCopy();
+                copy = (OsuModDoubleTime)original.DeepClone();
             });
 
             AddStep("change property", () => original.SpeedChange.Value = 2);
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("create mods", () =>
             {
                 original = new MultiMod(new OsuModDoubleTime());
-                copy = (MultiMod)original.CreateCopy();
+                copy = (MultiMod)original.DeepClone();
             });
 
             AddStep("change property", () => ((OsuModDoubleTime)original.Mods[0]).SpeedChange.Value = 2);
@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait for ready", () => modSelect.State.Value == Visibility.Visible && modSelect.ButtonsLoaded);
         }
 
-        private class TestModSelectOverlay : LocalPlayerModSelectOverlay
+        private class TestModSelectOverlay : UserModSelectOverlay
         {
             public new VisibilityContainer ModSettingsContainer => base.ModSettingsContainer;
             public new TriangleButton CustomiseButton => base.CustomiseButton;
@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 GetModButton(mod).SelectNext(1);
 
             public void SetModSettingsWidth(float newWidth) =>
-                ModSettingsContainer.Width = newWidth;
+                ModSettingsContainer.Parent.Width = newWidth;
         }
 
         public class TestRulesetInfo : RulesetInfo
@@ -225,6 +225,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private abstract class TestModCustomisable : Mod, IApplicableMod
         {
             public override double ScoreMultiplier => 1.0;
+
+            public override string Description => "This is a customisable test mod.";
 
             public override ModType Type => ModType.Conversion;
 

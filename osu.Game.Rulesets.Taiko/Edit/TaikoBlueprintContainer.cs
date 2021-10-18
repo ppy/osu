@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Edit.Blueprints;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Taiko.Edit
         {
         }
 
-        protected override SelectionHandler CreateSelectionHandler() => new TaikoSelectionHandler();
+        protected override SelectionHandler<HitObject> CreateSelectionHandler() => new TaikoSelectionHandler();
 
-        public override OverlaySelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) =>
+        public override HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject) =>
             new TaikoSelectionBlueprint(hitObject);
     }
 }

@@ -55,5 +55,10 @@ namespace osu.Game.Online.Multiplayer
         /// The user is currently viewing results. This is a reserved state, and is set by the server.
         /// </summary>
         Results,
+
+        /// <summary>
+        /// The user is currently spectating this room.
+        /// </summary>
+        Spectating
     }
 }

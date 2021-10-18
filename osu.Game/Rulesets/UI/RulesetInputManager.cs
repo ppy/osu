@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
 using osu.Game.Configuration;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
@@ -29,12 +30,14 @@ namespace osu.Game.Rulesets.UI
         {
             set
             {
-                if (recorder != null)
+                if (value != null && recorder != null)
                     throw new InvalidOperationException("Cannot attach more than one recorder");
 
+                recorder?.Expire();
                 recorder = value;
 
-                KeyBindingContainer.Add(recorder);
+                if (recorder != null)
+                    KeyBindingContainer.Add(recorder);
             }
         }
 
@@ -149,12 +152,12 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            public bool OnPressed(T action) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnPressed(action, Clock.Rate >= 0));
+            public bool OnPressed(KeyBindingPressEvent<T> e) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnPressed(e.Action, Clock.Rate >= 0));
 
-            public void OnReleased(T action)
+            public void OnReleased(KeyBindingReleaseEvent<T> e)
             {
                 foreach (var c in Target.Children.OfType<KeyCounterAction<T>>())
-                    c.OnReleased(action, Clock.Rate >= 0);
+                    c.OnReleased(e.Action, Clock.Rate >= 0);
             }
         }
 
@@ -168,6 +171,13 @@ namespace osu.Game.Rulesets.UI
             public RulesetKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
             {
+            }
+
+            protected override void ReloadMappings()
+            {
+                base.ReloadMappings();
+
+                KeyBindings = KeyBindings.Where(b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
             }
         }
     }

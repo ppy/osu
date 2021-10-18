@@ -9,7 +9,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
@@ -17,7 +16,7 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo
     {
         public int ID { get; set; }
 
@@ -82,7 +81,6 @@ namespace osu.Game.Beatmaps
 
         // General
         public double AudioLeadIn { get; set; }
-        public bool Countdown { get; set; } = true;
         public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
 
@@ -93,6 +91,19 @@ namespace osu.Game.Beatmaps
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
         public bool EpilepsyWarning { get; set; }
+
+        /// <summary>
+        /// Whether or not sound samples should change rate when playing with speed-changing mods.
+        /// TODO: only read/write supported for now, requires implementation in gameplay.
+        /// </summary>
+        public bool SamplesMatchPlaybackRate { get; set; }
+
+        public CountdownType Countdown { get; set; } = CountdownType.Normal;
+
+        /// <summary>
+        /// The number of beats to move the countdown backwards (compared to its default location).
+        /// </summary>
+        public int CountdownOffset { get; set; }
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
@@ -127,6 +138,8 @@ namespace osu.Game.Beatmaps
         // Metadata
         public string Version { get; set; }
 
+        private string versionString => string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+
         [JsonProperty("difficulty_rating")]
         public double StarDifficulty { get; set; }
 
@@ -138,17 +151,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
 
-        public string[] SearchableTerms => new[]
-        {
-            Version
-        }.Concat(Metadata?.SearchableTerms ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
-
-        public override string ToString()
-        {
-            string version = string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
-
-            return $"{Metadata ?? BeatmapSet?.Metadata} {version}".Trim();
-        }
+        public override string ToString() => this.GetDisplayTitle();
 
         public bool Equals(BeatmapInfo other)
         {
@@ -172,5 +175,22 @@ namespace osu.Game.Beatmaps
         /// Returns a shallow-clone of this <see cref="BeatmapInfo"/>.
         /// </summary>
         public BeatmapInfo Clone() => (BeatmapInfo)MemberwiseClone();
+
+        #region Implementation of IHasOnlineID
+
+        public int? OnlineID => OnlineBeatmapID;
+
+        #endregion
+
+        #region Implementation of IBeatmapInfo
+
+        string IBeatmapInfo.DifficultyName => Version;
+        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
+        IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
+        IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
+        IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+        double IBeatmapInfo.StarRating => StarDifficulty;
+
+        #endregion
     }
 }

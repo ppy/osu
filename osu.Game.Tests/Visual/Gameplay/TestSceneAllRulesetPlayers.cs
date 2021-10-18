@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
@@ -21,14 +20,15 @@ namespace osu.Game.Tests.Visual.Gameplay
     /// </summary>
     public abstract class TestSceneAllRulesetPlayers : RateAdjustedBeatmapTestScene
     {
-        protected Player Player;
+        protected Player Player { get; private set; }
+
+        protected OsuConfigManager Config { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            OsuConfigManager manager;
-            Dependencies.Cache(manager = new OsuConfigManager(LocalStorage));
-            manager.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
+            Dependencies.Cache(Config = new OsuConfigManager(LocalStorage));
+            Config.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var working = CreateWorkingBeatmap(rulesetInfo);
 
             Beatmap.Value = working;
-            SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
+            SelectedMods.Value = new[] { ruleset.CreateMod<ModNoFail>() };
 
             Player = CreatePlayer(ruleset);
 

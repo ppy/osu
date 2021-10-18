@@ -62,14 +62,14 @@ namespace osu.Game.Beatmaps
                 if (!recommendedDifficultyMapping.TryGetValue(r, out var recommendation))
                     continue;
 
-                BeatmapInfo beatmap = beatmaps.Where(b => b.Ruleset.Equals(r)).OrderBy(b =>
+                BeatmapInfo beatmapInfo = beatmaps.Where(b => b.Ruleset.Equals(r)).OrderBy(b =>
                 {
                     var difference = b.StarDifficulty - recommendation;
                     return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
                 }).FirstOrDefault();
 
-                if (beatmap != null)
-                    return beatmap;
+                if (beatmapInfo != null)
+                    return beatmapInfo;
             }
 
             return null;
@@ -101,10 +101,20 @@ namespace osu.Game.Beatmaps
         /// Rulesets ordered descending by their respective recommended difficulties.
         /// The currently selected ruleset will always be first.
         /// </returns>
-        private IEnumerable<RulesetInfo> orderedRulesets =>
-            recommendedDifficultyMapping
-                .OrderByDescending(pair => pair.Value).Select(pair => pair.Key).Where(r => !r.Equals(ruleset.Value))
-                .Prepend(ruleset.Value);
+        private IEnumerable<RulesetInfo> orderedRulesets
+        {
+            get
+            {
+                if (LoadState < LoadState.Ready || ruleset.Value == null)
+                    return Enumerable.Empty<RulesetInfo>();
+
+                return recommendedDifficultyMapping
+                       .OrderByDescending(pair => pair.Value)
+                       .Select(pair => pair.Key)
+                       .Where(r => !r.Equals(ruleset.Value))
+                       .Prepend(ruleset.Value);
+            }
+        }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {

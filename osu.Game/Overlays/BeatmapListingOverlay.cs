@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Localisation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,9 +16,12 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -32,6 +36,7 @@ namespace osu.Game.Overlays
         private Container panelTarget;
         private FillFlowContainer<BeatmapPanel> foundContent;
         private NotFoundDrawable notFoundContent;
+        private SupporterRequiredDrawable supporterRequiredContent;
         private BeatmapListingFilterControl filterControl;
 
         public BeatmapListingOverlay()
@@ -70,17 +75,25 @@ namespace osu.Game.Overlays
                             {
                                 AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
+                                Masking = true,
                                 Padding = new MarginPadding { Horizontal = 20 },
                                 Children = new Drawable[]
                                 {
                                     foundContent = new FillFlowContainer<BeatmapPanel>(),
                                     notFoundContent = new NotFoundDrawable(),
+                                    supporterRequiredContent = new SupporterRequiredDrawable(),
                                 }
                             }
                         },
                     },
                 }
             };
+        }
+
+        public void ShowWithSearch(string query)
+        {
+            filterControl.Search(query);
+            Show();
         }
 
         protected override BeatmapListingHeader CreateHeader() => new BeatmapListingHeader();
@@ -114,9 +127,16 @@ namespace osu.Game.Overlays
 
         private Task panelLoadDelegate;
 
-        private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
+        private void onSearchFinished(BeatmapListingFilterControl.SearchResult searchResult)
         {
-            var newPanels = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
+            if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilters)
+            {
+                supporterRequiredContent.UpdateText(searchResult.SupporterOnlyFiltersUsed);
+                addContentToPlaceholder(supporterRequiredContent);
+                return;
+            }
+
+            var newPanels = searchResult.Results.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
@@ -127,7 +147,7 @@ namespace osu.Game.Overlays
                 //No matches case
                 if (!newPanels.Any())
                 {
-                    LoadComponentAsync(notFoundContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                    addContentToPlaceholder(notFoundContent);
                     return;
                 }
 
@@ -167,21 +187,16 @@ namespace osu.Game.Overlays
 
             if (lastContent != null)
             {
-                var transform = lastContent.FadeOut(100, Easing.OutQuint);
+                lastContent.FadeOut(100, Easing.OutQuint);
 
-                if (lastContent == notFoundContent)
-                {
-                    // not found display may be used multiple times, so don't expire/dispose it.
-                    transform.Schedule(() => panelTarget.Remove(lastContent));
-                }
-                else
-                {
-                    // Consider the case when the new content is smaller than the last content.
-                    // If the auto-size computation is delayed until fade out completes, the background remain high for too long making the resulting transition to the smaller height look weird.
-                    // At the same time, if the last content's height is bypassed immediately, there is a period where the new content is at Alpha = 0 when the auto-sized height will be 0.
-                    // To resolve both of these issues, the bypass is delayed until a point when the content transitions (fade-in and fade-out) overlap and it looks good to do so.
-                    lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y).Then().Schedule(() => lastContent.Expire());
-                }
+                // Consider the case when the new content is smaller than the last content.
+                // If the auto-size computation is delayed until fade out completes, the background remain high for too long making the resulting transition to the smaller height look weird.
+                // At the same time, if the last content's height is bypassed immediately, there is a period where the new content is at Alpha = 0 when the auto-sized height will be 0.
+                // To resolve both of these issues, the bypass is delayed until a point when the content transitions (fade-in and fade-out) overlap and it looks good to do so.
+                var sequence = lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
+
+                if (lastContent != notFoundContent && lastContent != supporterRequiredContent)
+                    sequence.Then().Schedule(() => lastContent.Expire());
             }
 
             if (!content.IsAlive)
@@ -189,6 +204,9 @@ namespace osu.Game.Overlays
 
             content.FadeInFromZero(200, Easing.OutQuint);
             currentContent = content;
+            // currentContent may be one of the placeholders, and still have BypassAutoSizeAxes set to Y from the last fade-out.
+            // restore to the initial state.
+            currentContent.BypassAutoSizeAxes = Axes.None;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -232,10 +250,71 @@ namespace osu.Game.Overlays
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = @"... nope, nothing found.",
+                            Text = BeatmapsStrings.ListingSearchNotFoundQuote,
                         }
                     }
                 });
+            }
+        }
+
+        // TODO: localisation requires Text/LinkFlowContainer support for localising strings with links inside
+        // (https://github.com/ppy/osu-framework/issues/4530)
+        public class SupporterRequiredDrawable : CompositeDrawable
+        {
+            private LinkFlowContainer supporterRequiredText;
+
+            public SupporterRequiredDrawable()
+            {
+                RelativeSizeAxes = Axes.X;
+                Height = 225;
+                Alpha = 0;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                AddInternal(new FillFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Direction = FillDirection.Horizontal,
+                    Children = new Drawable[]
+                    {
+                        new Sprite
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fit,
+                            Texture = textures.Get(@"Online/supporter-required"),
+                        },
+                        supporterRequiredText = new LinkFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                            Margin = new MarginPadding { Bottom = 10 },
+                        },
+                    }
+                });
+            }
+
+            public void UpdateText(List<LocalisableString> filters)
+            {
+                supporterRequiredText.Clear();
+
+                supporterRequiredText.AddText(
+                    BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filters), "").ToString(),
+                    t =>
+                    {
+                        t.Font = OsuFont.GetFont(size: 16);
+                        t.Colour = Colour4.White;
+                    }
+                );
+
+                supporterRequiredText.AddLink(BeatmapsStrings.ListingSearchSupporterFilterQuoteLinkText.ToString(), @"/store/products/supporter-tag");
             }
         }
 

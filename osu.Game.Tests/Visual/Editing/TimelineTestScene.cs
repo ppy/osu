@@ -53,15 +53,19 @@ namespace osu.Game.Tests.Visual.Editing
                         new AudioVisualiser(),
                     }
                 },
-                TimelineArea = new TimelineArea
+                TimelineArea = new TimelineArea(CreateTestComponent())
                 {
-                    Child = CreateTestComponent(),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(0.8f, 100),
                 }
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Clock.Seek(2500);
         }
 
         public abstract Drawable CreateTestComponent();

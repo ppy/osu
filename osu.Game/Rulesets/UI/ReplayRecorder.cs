@@ -29,10 +29,10 @@ namespace osu.Game.Rulesets.UI
         public int RecordFrameRate = 60;
 
         [Resolved(canBeNull: true)]
-        private SpectatorStreamingClient spectatorStreaming { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
-        private GameplayBeatmap gameplayBeatmap { get; set; }
+        private GameplayState gameplayState { get; set; }
 
         protected ReplayRecorder(Score target)
         {
@@ -49,13 +49,19 @@ namespace osu.Game.Rulesets.UI
 
             inputManager = GetContainingInputManager();
 
-            spectatorStreaming?.BeginPlaying(gameplayBeatmap, target);
+            spectatorClient?.BeginPlaying(gameplayState, target);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            spectatorStreaming?.EndPlaying();
+            spectatorClient?.EndPlaying();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            recordFrame(false);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -64,16 +70,16 @@ namespace osu.Game.Rulesets.UI
             return base.OnMouseMove(e);
         }
 
-        public bool OnPressed(T action)
+        public bool OnPressed(KeyBindingPressEvent<T> e)
         {
-            pressedActions.Add(action);
+            pressedActions.Add(e.Action);
             recordFrame(true);
             return false;
         }
 
-        public void OnReleased(T action)
+        public void OnReleased(KeyBindingReleaseEvent<T> e)
         {
-            pressedActions.Remove(action);
+            pressedActions.Remove(e.Action);
             recordFrame(true);
         }
 
@@ -92,7 +98,7 @@ namespace osu.Game.Rulesets.UI
             {
                 target.Replay.Frames.Add(frame);
 
-                spectatorStreaming?.HandleFrame(frame);
+                spectatorClient?.HandleFrame(frame);
             }
         }
 

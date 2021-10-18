@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -13,12 +14,16 @@ using osu.Framework.Input.Events;
 using osuTK.Input;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarRulesetSelector : RulesetSelector
     {
         protected Drawable ModeButtonLine { get; private set; }
+
+        private readonly Dictionary<string, Sample> selectionSamples = new Dictionary<string, Sample>();
 
         public ToolbarRulesetSelector()
         {
@@ -27,7 +32,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             AddRangeInternal(new[]
             {
@@ -54,6 +59,9 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             });
+
+            foreach (var ruleset in Rulesets.AvailableRulesets)
+                selectionSamples[ruleset.ShortName] = audio.Samples.Get($"UI/ruleset-select-{ruleset.ShortName}");
         }
 
         protected override void LoadComplete()
@@ -61,20 +69,26 @@ namespace osu.Game.Overlays.Toolbar
             base.LoadComplete();
 
             Current.BindDisabledChanged(disabled => this.FadeColour(disabled ? Color4.Gray : Color4.White, 300), true);
-            Current.BindValueChanged(_ => moveLineToCurrent(), true);
+            Current.BindValueChanged(_ => moveLineToCurrent());
+
+            // Scheduled to allow the button flow layout to be computed before the line position is updated
+            ScheduleAfterChildren(moveLineToCurrent);
         }
 
         private bool hasInitialPosition;
 
-        // Scheduled to allow the flow layout to be computed before the line position is updated
-        private void moveLineToCurrent() => ScheduleAfterChildren(() =>
+        private void moveLineToCurrent()
         {
             if (SelectedTab != null)
             {
                 ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 200, Easing.OutQuint);
+
+                if (hasInitialPosition)
+                    selectionSamples[SelectedTab.Value.ShortName]?.Play();
+
                 hasInitialPosition = true;
             }
-        });
+        }
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
 

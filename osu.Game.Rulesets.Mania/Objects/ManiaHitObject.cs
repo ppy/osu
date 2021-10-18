@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Mania.Objects.Types;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;

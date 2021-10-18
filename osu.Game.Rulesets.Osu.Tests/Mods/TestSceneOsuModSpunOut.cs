@@ -47,8 +47,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 Beatmap = singleSpinnerBeatmap,
                 PassCondition = () =>
                 {
-                    var counter = Player.ChildrenOfType<SpinnerSpmCounter>().SingleOrDefault();
-                    return counter != null && Precision.AlmostEquals(counter.SpinsPerMinute, 286, 1);
+                    var counter = Player.ChildrenOfType<SpinnerSpmCalculator>().SingleOrDefault();
+                    return counter != null && Precision.AlmostEquals(counter.Result.Value, 286, 1);
                 }
             });
         }

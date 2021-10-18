@@ -6,8 +6,10 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Overlays.KeyBinding;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -28,6 +30,40 @@ namespace osu.Game.Tests.Visual.Settings
             panel.Show();
         }
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddUntilStep("wait for load", () => panel.ChildrenOfType<GlobalKeyBindingsSection>().Any());
+            AddStep("Scroll to top", () => panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollToTop());
+            AddWaitStep("wait for scroll", 5);
+        }
+
+        [Test]
+        public void TestBindingMouseWheelToNonGameplay()
+        {
+            scrollToAndStartBinding("Increase volume");
+            AddStep("press k", () => InputManager.Key(Key.K));
+            checkBinding("Increase volume", "K");
+
+            AddStep("click again", () => InputManager.Click(MouseButton.Left));
+            AddStep("scroll mouse wheel", () => InputManager.ScrollVerticalBy(1));
+
+            checkBinding("Increase volume", "Wheel Up");
+        }
+
+        [Test]
+        public void TestBindingMouseWheelToGameplay()
+        {
+            scrollToAndStartBinding("Left button");
+            AddStep("press k", () => InputManager.Key(Key.Z));
+            checkBinding("Left button", "Z");
+
+            AddStep("click again", () => InputManager.Click(MouseButton.Left));
+            AddStep("scroll mouse wheel", () => InputManager.ScrollVerticalBy(1));
+
+            checkBinding("Left button", "Z");
+        }
+
         [Test]
         public void TestClickTwiceOnClearButton()
         {
@@ -36,6 +72,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("click first row", () =>
             {
                 firstRow = panel.ChildrenOfType<KeyBindingRow>().First();
+
                 InputManager.MoveMouseTo(firstRow);
                 InputManager.Click(MouseButton.Left);
             });
@@ -105,6 +142,64 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
+        public void TestSingleBindingResetButton()
+        {
+            KeyBindingRow settingsKeyBindingRow = null;
+
+            AddStep("click first row", () =>
+            {
+                settingsKeyBindingRow = panel.ChildrenOfType<KeyBindingRow>().First();
+
+                InputManager.MoveMouseTo(settingsKeyBindingRow);
+                InputManager.Click(MouseButton.Left);
+                InputManager.PressKey(Key.P);
+                InputManager.ReleaseKey(Key.P);
+            });
+
+            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha > 0);
+
+            AddStep("click reset button for bindings", () =>
+            {
+                var resetButton = settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First();
+
+                resetButton.TriggerClick();
+            });
+
+            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
+
+            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
+        }
+
+        [Test]
+        public void TestResetAllBindingsButton()
+        {
+            KeyBindingRow settingsKeyBindingRow = null;
+
+            AddStep("click first row", () =>
+            {
+                settingsKeyBindingRow = panel.ChildrenOfType<KeyBindingRow>().First();
+
+                InputManager.MoveMouseTo(settingsKeyBindingRow);
+                InputManager.Click(MouseButton.Left);
+                InputManager.PressKey(Key.P);
+                InputManager.ReleaseKey(Key.P);
+            });
+
+            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha > 0);
+
+            AddStep("click reset button for bindings", () =>
+            {
+                var resetButton = panel.ChildrenOfType<ResetButton>().First();
+
+                resetButton.TriggerClick();
+            });
+
+            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
+
+            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
+        }
+
+        [Test]
         public void TestClickRowSelectsFirstBinding()
         {
             KeyBindingRow multiBindingRow = null;
@@ -134,6 +229,54 @@ namespace osu.Game.Tests.Visual.Settings
             });
 
             AddAssert("first binding selected", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().IsBinding);
+        }
+
+        [Test]
+        public void TestFilteringHidesResetSectionButtons()
+        {
+            SearchTextBox searchTextBox = null;
+
+            AddStep("add any search term", () =>
+            {
+                searchTextBox = panel.ChildrenOfType<SearchTextBox>().Single();
+                searchTextBox.Current.Value = "chat";
+            });
+            AddUntilStep("all reset section bindings buttons hidden", () => panel.ChildrenOfType<ResetButton>().All(button => button.Alpha == 0));
+
+            AddStep("clear search term", () => searchTextBox.Current.Value = string.Empty);
+            AddUntilStep("all reset section bindings buttons shown", () => panel.ChildrenOfType<ResetButton>().All(button => button.Alpha == 1));
+        }
+
+        private void checkBinding(string name, string keyName)
+        {
+            AddAssert($"Check {name} is bound to {keyName}", () =>
+            {
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
+                var firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
+
+                return firstButton.Text.Text == keyName;
+            });
+        }
+
+        private void scrollToAndStartBinding(string name)
+        {
+            KeyBindingRow.KeyButton firstButton = null;
+
+            AddStep($"Scroll to {name}", () =>
+            {
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
+                firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
+
+                panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollTo(firstButton);
+            });
+
+            AddWaitStep("wait for scroll", 5);
+
+            AddStep("click to bind", () =>
+            {
+                InputManager.MoveMouseTo(firstButton);
+                InputManager.Click(MouseButton.Left);
+            });
         }
     }
 }

@@ -68,11 +68,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
 
-            drawableObject.ApplyCustomUpdateState += updateState;
-            updateState(drawableObject, drawableObject.State.Value);
+            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
+            updateStateTransforms(drawableObject, drawableObject.State.Value);
         }
 
-        private void updateState(DrawableHitObject drawableObject, ArmedState state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             using (BeginAbsoluteSequence(drawableObject.StateUpdateTime))
                 glow.FadeOut(400);
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         explode.FadeIn(flash_in);
                         this.ScaleTo(1.5f, 400, Easing.OutQuad);
 
-                        using (BeginDelayedSequence(flash_in, true))
+                        using (BeginDelayedSequence(flash_in))
                         {
                             // after the flash, we can hide some elements that were behind it
                             ring.FadeOut();
@@ -105,6 +105,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         break;
                 }
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableObject != null)
+                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

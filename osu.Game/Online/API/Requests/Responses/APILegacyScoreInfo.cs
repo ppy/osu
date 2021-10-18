@@ -21,7 +21,12 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             var ruleset = rulesets.GetRuleset(OnlineRulesetID);
 
-            var mods = Mods != null ? ruleset.CreateInstance().GetAllMods().Where(mod => Mods.Contains(mod.Acronym)).ToArray() : Array.Empty<Mod>();
+            var rulesetInstance = ruleset.CreateInstance();
+
+            var mods = Mods != null ? Mods.Select(acronym => rulesetInstance.CreateModFromAcronym(acronym)).Where(m => m != null).ToArray() : Array.Empty<Mod>();
+
+            // all API scores provided by this class are considered to be legacy.
+            mods = mods.Append(rulesetInstance.CreateMod<ModClassic>()).ToArray();
 
             var scoreInfo = new ScoreInfo
             {
@@ -32,13 +37,12 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineScoreID = OnlineScoreID,
                 Date = Date,
                 PP = PP,
-                Beatmap = Beatmap,
+                BeatmapInfo = BeatmapInfo,
                 RulesetID = OnlineRulesetID,
                 Hash = Replay ? "online" : string.Empty, // todo: temporary?
                 Rank = Rank,
                 Ruleset = ruleset,
                 Mods = mods,
-                IsLegacyScore = true
             };
 
             if (Statistics != null)
@@ -96,7 +100,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset Date { get; set; }
 
         [JsonProperty(@"beatmap")]
-        public BeatmapInfo Beatmap { get; set; }
+        public BeatmapInfo BeatmapInfo { get; set; }
 
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
@@ -110,10 +114,10 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 // extract the set ID to its correct place.
-                Beatmap.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = value.ID };
+                BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = value.ID };
                 value.ID = 0;
 
-                Beatmap.Metadata = value;
+                BeatmapInfo.Metadata = value;
             }
         }
 

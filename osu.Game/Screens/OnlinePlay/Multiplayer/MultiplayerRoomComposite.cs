@@ -13,14 +13,47 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected MultiplayerRoom Room => Client.Room;
 
         [Resolved]
-        protected StatefulMultiplayerClient Client { get; private set; }
+        protected MultiplayerClient Client { get; private set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Client.RoomUpdated += OnRoomUpdated;
+            Client.RoomUpdated += invokeOnRoomUpdated;
+            Client.UserLeft += invokeUserLeft;
+            Client.UserKicked += invokeUserKicked;
+            Client.UserJoined += invokeUserJoined;
+
             OnRoomUpdated();
+        }
+
+        private void invokeOnRoomUpdated() => Scheduler.AddOnce(OnRoomUpdated);
+        private void invokeUserJoined(MultiplayerRoomUser user) => Scheduler.AddOnce(UserJoined, user);
+        private void invokeUserKicked(MultiplayerRoomUser user) => Scheduler.AddOnce(UserKicked, user);
+        private void invokeUserLeft(MultiplayerRoomUser user) => Scheduler.AddOnce(UserLeft, user);
+
+        /// <summary>
+        /// Invoked when a user has joined the room.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        protected virtual void UserJoined(MultiplayerRoomUser user)
+        {
+        }
+
+        /// <summary>
+        /// Invoked when a user has been kicked from the room (including the local user).
+        /// </summary>
+        /// <param name="user">The user.</param>
+        protected virtual void UserKicked(MultiplayerRoomUser user)
+        {
+        }
+
+        /// <summary>
+        /// Invoked when a user has left the room.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        protected virtual void UserLeft(MultiplayerRoomUser user)
+        {
         }
 
         /// <summary>
@@ -33,7 +66,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override void Dispose(bool isDisposing)
         {
             if (Client != null)
-                Client.RoomUpdated -= OnRoomUpdated;
+            {
+                Client.RoomUpdated -= invokeOnRoomUpdated;
+                Client.UserLeft -= invokeUserLeft;
+                Client.UserKicked -= invokeUserKicked;
+                Client.UserJoined -= invokeUserJoined;
+            }
 
             base.Dispose(isDisposing);
         }

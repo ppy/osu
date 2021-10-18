@@ -2,18 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
-using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Taiko.Audio;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -25,11 +26,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         private const float middle_split = 0.025f;
 
         [Cached]
-        private DrumSampleContainer sampleContainer;
+        private DrumSampleTriggerSource sampleTriggerSource;
 
-        public InputDrum(ControlPointInfo controlPoints)
+        public InputDrum(HitObjectContainer hitObjectContainer)
         {
-            sampleContainer = new DrumSampleContainer(controlPoints);
+            sampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer);
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -70,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         }
                     }
                 }),
-                sampleContainer
+                sampleTriggerSource
             };
         }
 
@@ -95,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             private readonly Sprite centreHit;
 
             [Resolved]
-            private DrumSampleContainer sampleContainer { get; set; }
+            private DrumSampleTriggerSource sampleTriggerSource { get; set; }
 
             public TaikoHalfDrum(bool flipped)
             {
@@ -151,26 +152,24 @@ namespace osu.Game.Rulesets.Taiko.UI
             [Resolved(canBeNull: true)]
             private GameplayClock gameplayClock { get; set; }
 
-            public bool OnPressed(TaikoAction action)
+            public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
                 Drawable target = null;
                 Drawable back = null;
 
-                var drumSample = sampleContainer.SampleAt(Time.Current);
-
-                if (action == CentreAction)
+                if (e.Action == CentreAction)
                 {
                     target = centreHit;
                     back = centre;
 
-                    drumSample.Centre?.Play();
+                    sampleTriggerSource.Play(HitType.Centre);
                 }
-                else if (action == RimAction)
+                else if (e.Action == RimAction)
                 {
                     target = rimHit;
                     back = rim;
 
-                    drumSample.Rim?.Play();
+                    sampleTriggerSource.Play(HitType.Rim);
                 }
 
                 if (target != null)
@@ -197,7 +196,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 return false;
             }
 
-            public void OnReleased(TaikoAction action)
+            public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
             {
             }
         }

@@ -161,15 +161,18 @@ namespace osu.Game.Tests.Visual.Background
 
         private void loadNextBackground()
         {
+            SeasonalBackground previousBackground = null;
             SeasonalBackground background = null;
 
             AddStep("create next background", () =>
             {
+                previousBackground = (SeasonalBackground)backgroundContainer.SingleOrDefault();
                 background = backgroundLoader.LoadNextBackground();
                 LoadComponentAsync(background, bg => backgroundContainer.Child = bg);
             });
 
             AddUntilStep("background loaded", () => background.IsLoaded);
+            AddAssert("background is different", () => !background.Equals(previousBackground));
         }
 
         private void assertAnyBackground()

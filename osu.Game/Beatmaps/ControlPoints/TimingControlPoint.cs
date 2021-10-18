@@ -20,7 +20,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         private const double default_beat_length = 60000.0 / 60.0;
 
-        public override Color4 GetRepresentingColour(OsuColour colours) => colours.YellowDark;
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Orange1;
 
         public static readonly TimingControlPoint DEFAULT = new TimingControlPoint
         {

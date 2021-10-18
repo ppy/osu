@@ -14,7 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
@@ -37,7 +37,6 @@ namespace osu.Game.Screens.Select
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                DisplayUnrankedText = false,
                 Scale = new Vector2(0.8f),
                 ExpansionMode = ExpansionMode.AlwaysContracted,
             });
@@ -57,7 +56,7 @@ namespace osu.Game.Screens.Select
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
             Text = @"mods";
-            Hotkey = Key.F1;
+            Hotkey = GlobalAction.ToggleModSelection;
         }
 
         protected override void LoadComplete()

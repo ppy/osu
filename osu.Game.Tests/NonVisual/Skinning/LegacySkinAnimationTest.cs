@@ -40,10 +40,10 @@ namespace osu.Game.Tests.NonVisual.Skinning
             assertPlaybackPosition(0);
 
             AddStep("set start time to 1000", () => animationTimeReference.AnimationStartTime.Value = 1000);
-            assertPlaybackPosition(-1000);
+            assertPlaybackPosition(0);
 
             AddStep("set current time to 500", () => animationTimeReference.ManualClock.CurrentTime = 500);
-            assertPlaybackPosition(-500);
+            assertPlaybackPosition(0);
         }
 
         private void assertPlaybackPosition(double expectedPosition)
@@ -61,6 +61,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
             public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotSupportedException();
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotSupportedException();
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotSupportedException();
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
         }
 
         private class TestAnimationTimeReference : IAnimationTimeReference

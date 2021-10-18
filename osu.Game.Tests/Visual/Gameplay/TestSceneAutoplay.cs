@@ -11,19 +11,18 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.Break;
 using osu.Game.Screens.Ranking;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [Description("Player instantiated with an autoplay mod.")]
     public class TestSceneAutoplay : TestSceneAllRulesetPlayers
     {
-        protected new TestPlayer Player => (TestPlayer)base.Player;
+        protected new TestReplayPlayer Player => (TestReplayPlayer)base.Player;
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
             SelectedMods.Value = new[] { ruleset.GetAutoplayMod() };
-            return new TestPlayer(false);
+            return new TestReplayPlayer(false);
         }
 
         protected override void AddCheckSteps()
@@ -35,18 +34,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
             AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
-
-            double? time = null;
-
-            AddStep("store time", () => time = Player.GameplayClockContainer.GameplayClock.CurrentTime);
-
-            // test seek via keyboard
-            AddStep("seek with right arrow key", () => InputManager.Key(Key.Right));
-            AddAssert("time seeked forward", () => Player.GameplayClockContainer.GameplayClock.CurrentTime > time + 2000);
-
-            AddStep("store time", () => time = Player.GameplayClockContainer.GameplayClock.CurrentTime);
-            AddStep("seek with left arrow key", () => InputManager.Key(Key.Left));
-            AddAssert("time seeked backward", () => Player.GameplayClockContainer.GameplayClock.CurrentTime < time);
 
             seekToBreak(0);
             seekToBreak(1);
@@ -63,7 +50,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void seekToBreak(int breakIndex)
         {
             AddStep($"seek to break {breakIndex}", () => Player.GameplayClockContainer.Seek(destBreak().StartTime));
-            AddUntilStep("wait for seek to complete", () => Player.HUDOverlay.Progress.ReferenceClock.CurrentTime >= destBreak().StartTime);
+            AddUntilStep("wait for seek to complete", () => Player.DrawableRuleset.FrameStableClock.CurrentTime >= destBreak().StartTime);
 
             BreakPeriod destBreak() => Beatmap.Value.Beatmap.Breaks.ElementAt(breakIndex);
         }

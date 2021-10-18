@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -26,7 +27,9 @@ using JetBrains.Annotations;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Filter;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets
@@ -36,13 +39,58 @@ namespace osu.Game.Rulesets
     {
         public RulesetInfo RulesetInfo { get; internal set; }
 
-        public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
-                                                    // Confine all mods of each mod type into a single IEnumerable<Mod>
-                                                    .SelectMany(GetModsFor)
-                                                    // Filter out all null mods
-                                                    .Where(mod => mod != null)
-                                                    // Resolve MultiMods as their .Mods property
-                                                    .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
+        private static readonly ConcurrentDictionary<int, IMod[]> mod_reference_cache = new ConcurrentDictionary<int, IMod[]>();
+
+        /// <summary>
+        /// A queryable source containing all available mods.
+        /// Call <see cref="IMod.CreateInstance"/> for consumption purposes.
+        /// </summary>
+        public IEnumerable<IMod> AllMods
+        {
+            get
+            {
+                if (!(RulesetInfo.ID is int id))
+                    return CreateAllMods();
+
+                if (!mod_reference_cache.TryGetValue(id, out var mods))
+                    mod_reference_cache[id] = mods = CreateAllMods().Cast<IMod>().ToArray();
+
+                return mods;
+            }
+        }
+
+        /// <summary>
+        /// Returns fresh instances of all mods.
+        /// </summary>
+        /// <remarks>
+        /// This comes with considerable allocation overhead. If only accessing for reference purposes (ie. not changing bindables / settings)
+        /// use <see cref="AllMods"/> instead.
+        /// </remarks>
+        public IEnumerable<Mod> CreateAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
+                                                       // Confine all mods of each mod type into a single IEnumerable<Mod>
+                                                       .SelectMany(GetModsFor)
+                                                       // Filter out all null mods
+                                                       .Where(mod => mod != null)
+                                                       // Resolve MultiMods as their .Mods property
+                                                       .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
+
+        /// <summary>
+        /// Returns a fresh instance of the mod matching the specified acronym.
+        /// </summary>
+        /// <param name="acronym">The acronym to query for .</param>
+        public Mod CreateModFromAcronym(string acronym)
+        {
+            return AllMods.FirstOrDefault(m => m.Acronym == acronym)?.CreateInstance();
+        }
+
+        /// <summary>
+        /// Returns a fresh instance of the mod matching the specified type.
+        /// </summary>
+        public T CreateMod<T>()
+            where T : Mod
+        {
+            return AllMods.FirstOrDefault(m => m is T)?.CreateInstance() as T;
+        }
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
@@ -124,9 +172,9 @@ namespace osu.Game.Rulesets
         }
 
         [CanBeNull]
-        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().FirstOrDefault();
+        public ModAutoplay GetAutoplayMod() => CreateMod<ModAutoplay>();
 
-        public virtual ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => null;
+        public virtual ISkin CreateLegacySkinProvider([NotNull] ISkin skin, IBeatmap beatmap) => null;
 
         protected Ruleset()
         {
@@ -135,7 +183,7 @@ namespace osu.Game.Rulesets
                 Name = Description,
                 ShortName = ShortName,
                 ID = (this as ILegacyRuleset)?.LegacyID,
-                InstantiationInfo = GetType().AssemblyQualifiedName,
+                InstantiationInfo = GetType().GetInvariantInstantiationInfo(),
                 Available = true,
             };
         }
@@ -146,7 +194,6 @@ namespace osu.Game.Rulesets
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
-        /// <returns></returns>
         public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
 
         /// <summary>
@@ -202,6 +249,8 @@ namespace osu.Game.Rulesets
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
+        public virtual IBeatmapVerifier CreateBeatmapVerifier() => null;
+
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 
         public virtual IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(new DllResourceStore(GetType().Assembly), @"Resources");
@@ -222,9 +271,9 @@ namespace osu.Game.Rulesets
         public abstract string ShortName { get; }
 
         /// <summary>
-        /// The playing verb to be shown in the <see cref="UserActivity.SoloGame.Status"/>.
+        /// The playing verb to be shown in the <see cref="UserActivity.InGame"/> activities.
         /// </summary>
-        public virtual string PlayingVerb => "Playing solo";
+        public virtual string PlayingVerb => "Playing";
 
         /// <summary>
         /// A list of available variant ids.
@@ -313,5 +362,11 @@ namespace osu.Game.Rulesets
         /// </summary>
         [CanBeNull]
         public virtual IRulesetFilterCriteria CreateRulesetFilterCriteria() => null;
+
+        /// <summary>
+        /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
+        /// </summary>
+        [CanBeNull]
+        public virtual RulesetSetupSection CreateEditorSetupSection() => null;
     }
 }

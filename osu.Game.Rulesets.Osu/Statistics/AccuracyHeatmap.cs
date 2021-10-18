@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
                     var point = new HitPoint(pointType, this)
                     {
-                        Colour = pointType == HitPointType.Hit ? new Color4(102, 255, 204, 255) : new Color4(255, 102, 102, 255)
+                        BaseColour = pointType == HitPointType.Hit ? new Color4(102, 255, 204, 255) : new Color4(255, 102, 102, 255)
                     };
 
                     points[r][c] = point;
@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 return;
 
             // Todo: This should probably not be done like this.
-            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (playableBeatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) / 2;
+            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (playableBeatmap.Difficulty.CircleSize - 5) / 5) / 2;
 
             foreach (var e in score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)))
             {
@@ -234,6 +234,11 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private class HitPoint : Circle
         {
+            /// <summary>
+            /// The base colour which will be lightened/darkened depending on the value of this <see cref="HitPoint"/>.
+            /// </summary>
+            public Color4 BaseColour;
+
             private readonly HitPointType pointType;
             private readonly AccuracyHeatmap heatmap;
 
@@ -284,7 +289,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
                 Alpha = Math.Min(amount / lighten_cutoff, 1);
                 if (pointType == HitPointType.Hit)
-                    Colour = ((Color4)Colour).Lighten(Math.Max(0, amount - lighten_cutoff));
+                    Colour = BaseColour.Lighten(Math.Max(0, amount - lighten_cutoff));
             }
         }
 

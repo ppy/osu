@@ -4,12 +4,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -18,15 +21,20 @@ namespace osu.Game.Overlays.Settings
         protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
 
+        private IBindable<SettingsSection> selectedSection;
+
+        private OsuSpriteText header;
+
         public abstract Drawable CreateIcon();
-        public abstract string Header { get; }
+        public abstract LocalisableString Header { get; }
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
-        public virtual IEnumerable<string> FilterTerms => new[] { Header };
+        public virtual IEnumerable<string> FilterTerms => new[] { Header.ToString() };
 
-        private const int header_size = 26;
-        private const int margin = 20;
-        private const int border_size = 2;
+        public const int ITEM_SPACING = 14;
+
+        private const int header_size = 24;
+        private const int border_size = 4;
 
         public bool MatchingFilter
         {
@@ -35,9 +43,11 @@ namespace osu.Game.Overlays.Settings
 
         public bool FilteringActive { get; set; }
 
+        [Resolved]
+        private SettingsPanel settingsPanel { get; set; }
+
         protected SettingsSection()
         {
-            Margin = new MarginPadding { Top = margin };
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
@@ -45,8 +55,9 @@ namespace osu.Game.Overlays.Settings
             {
                 Margin = new MarginPadding
                 {
-                    Top = header_size
+                    Top = 36
                 },
+                Spacing = new Vector2(0, ITEM_SPACING),
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
@@ -54,13 +65,14 @@ namespace osu.Game.Overlays.Settings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             AddRangeInternal(new Drawable[]
             {
                 new Box
                 {
-                    Colour = new Color4(0, 0, 0, 255),
+                    Name = "separator",
+                    Colour = colourProvider.Background6,
                     RelativeSizeAxes = Axes.X,
                     Height = border_size,
                 },
@@ -68,28 +80,71 @@ namespace osu.Game.Overlays.Settings
                 {
                     Padding = new MarginPadding
                     {
-                        Top = margin + border_size,
-                        Bottom = 10,
+                        Top = 28,
+                        Bottom = 40,
                     },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        header = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: header_size),
+                            Font = OsuFont.TorusAlternate.With(size: header_size),
                             Text = Header,
-                            Colour = colours.Yellow,
                             Margin = new MarginPadding
                             {
-                                Left = SettingsPanel.CONTENT_MARGINS,
-                                Right = SettingsPanel.CONTENT_MARGINS
+                                Horizontal = SettingsPanel.CONTENT_MARGINS
                             }
                         },
                         FlowContent
                     }
                 },
             });
+
+            selectedSection = settingsPanel.CurrentSection.GetBoundCopy();
+            selectedSection.BindValueChanged(_ => updateContentFade(), true);
+        }
+
+        private bool isCurrentSection => selectedSection.Value == this;
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateContentFade();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateContentFade();
+            base.OnHoverLost(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (!isCurrentSection)
+                settingsPanel.SectionsContainer.ScrollTo(this);
+
+            return base.OnClick(e);
+        }
+
+        protected override bool ShouldBeConsideredForInput(Drawable child) =>
+            // only the current section should accept input.
+            // this provides the behaviour of the first click scrolling the target section to the centre of the screen.
+            isCurrentSection;
+
+        private void updateContentFade()
+        {
+            float contentFade = 1;
+            float headerFade = 1;
+
+            if (!isCurrentSection)
+            {
+                contentFade = 0.25f;
+                headerFade = IsHovered ? 0.5f : 0.25f;
+            }
+
+            header.FadeTo(headerFade, 500, Easing.OutQuint);
+            FlowContent.FadeTo(contentFade, 500, Easing.OutQuint);
         }
     }
 }

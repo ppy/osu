@@ -33,7 +33,6 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             Add(cursorScaleContainer = new Container
             {
-                RelativePositionAxes = Axes.Both,
                 Child = clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume }
             });
         }
@@ -43,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.UI
             base.PopIn();
 
             GameplayCursor.ActiveCursor.Hide();
-            cursorScaleContainer.MoveTo(GameplayCursor.ActiveCursor.Position);
+            cursorScaleContainer.Position = ToLocalSpace(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre);
             clickToResumeCursor.Appear();
 
             if (localCursorContainer == null)
@@ -90,9 +89,9 @@ namespace osu.Game.Rulesets.Osu.UI
                 base.OnHoverLost(e);
             }
 
-            public bool OnPressed(OsuAction action)
+            public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
             {
-                switch (action)
+                switch (e.Action)
                 {
                     case OsuAction.LeftButton:
                     case OsuAction.RightButton:
@@ -107,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 return false;
             }
 
-            public void OnReleased(OsuAction action)
+            public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
             }
 

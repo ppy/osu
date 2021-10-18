@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
@@ -76,9 +77,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
 
-        public abstract bool OnPressed(TaikoAction action);
+        public abstract bool OnPressed(KeyBindingPressEvent<TaikoAction> e);
 
-        public virtual void OnReleased(TaikoAction action)
+        public virtual void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
         {
         }
 
@@ -137,7 +138,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             Size = BaseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
-            MainPiece?.Expire();
+            if (MainPiece != null)
+                Content.Remove(MainPiece);
+
             Content.Add(MainPiece = CreateMainPiece());
         }
 

@@ -30,9 +30,11 @@ using osu.Game.Skinning;
 using System;
 using System.Linq;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Game.Rulesets.Osu.Edit.Setup;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Osu
@@ -164,7 +166,9 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModTarget(),
                         new OsuModDifficultyAdjust(),
-                        new OsuModClassic()
+                        new OsuModClassic(),
+                        new OsuModRandom(),
+                        new OsuModMirror(),
                     };
 
                 case ModType.Automation:
@@ -185,6 +189,10 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModGrow(), new OsuModDeflate()),
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new OsuModTraceable(),
+                        new OsuModBarrelRoll(),
+                        new OsuModApproachDifferent(),
+                        new OsuModMuted(),
+                        new OsuModNoScope(),
                     };
 
                 case ModType.System:
@@ -206,6 +214,8 @@ namespace osu.Game.Rulesets.Osu
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new OsuBeatmapVerifier();
+
         public override string Description => "osu!";
 
         public override string ShortName => SHORT_NAME;
@@ -214,7 +224,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new OsuLegacySkinTransformer(source);
+        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new OsuLegacySkinTransformer(skin);
 
         public int LegacyID => 0;
 
@@ -298,5 +308,7 @@ namespace osu.Game.Rulesets.Osu
                 }
             };
         }
+
+        public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
     }
 }

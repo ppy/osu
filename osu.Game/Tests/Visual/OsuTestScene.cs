@@ -7,13 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -49,6 +49,8 @@ namespace osu.Game.Tests.Visual
 
         private Lazy<DatabaseContextFactory> contextFactory;
 
+        protected IResourceStore<byte[]> Resources;
+
         protected IAPIProvider API
         {
             get
@@ -81,6 +83,8 @@ namespace osu.Game.Tests.Visual
             if (!UseFreshStoragePerRun)
                 isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
 
+            Resources = parent.Get<OsuGameBase>().Resources;
+
             contextFactory = new Lazy<DatabaseContextFactory>(() =>
             {
                 var factory = new DatabaseContextFactory(LocalStorage);
@@ -95,7 +99,7 @@ namespace osu.Game.Tests.Visual
                 return factory;
             });
 
-            RecycleLocalStorage();
+            RecycleLocalStorage(false);
 
             var baseDependencies = base.CreateChildDependencies(parent);
 
@@ -118,7 +122,7 @@ namespace osu.Game.Tests.Visual
             {
                 dummyAPI = new DummyAPIAccess();
                 Dependencies.CacheAs<IAPIProvider>(dummyAPI);
-                Add(dummyAPI);
+                base.Content.Add(dummyAPI);
             }
 
             return Dependencies;
@@ -135,7 +139,7 @@ namespace osu.Game.Tests.Visual
 
         protected virtual bool UseFreshStoragePerRun => false;
 
-        public virtual void RecycleLocalStorage()
+        public virtual void RecycleLocalStorage(bool isDisposing)
         {
             if (localStorage?.IsValueCreated == true)
             {
@@ -150,7 +154,7 @@ namespace osu.Game.Tests.Visual
             }
 
             localStorage =
-                new Lazy<Storage>(() => isolatedHostStorage ?? new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
+                new Lazy<Storage>(() => isolatedHostStorage ?? new TemporaryNativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
         }
 
         [Resolved]
@@ -171,7 +175,7 @@ namespace osu.Game.Tests.Visual
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
         protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
-            CreateWorkingBeatmap(CreateBeatmap(ruleset), null);
+            CreateWorkingBeatmap(CreateBeatmap(ruleset));
 
         protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
             new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, Audio);
@@ -194,7 +198,7 @@ namespace osu.Game.Tests.Visual
             if (contextFactory?.IsValueCreated == true)
                 contextFactory.Value.ResetDatabase();
 
-            RecycleLocalStorage();
+            RecycleLocalStorage(true);
         }
 
         protected override ITestSceneTestRunner CreateRunner() => new OsuTestSceneTestRunner();
@@ -345,7 +349,7 @@ namespace osu.Game.Tests.Visual
                     if (CurrentTime >= Length)
                     {
                         Stop();
-                        RaiseCompleted();
+                        // `RaiseCompleted` is not called here to prevent transitioning to the next song.
                     }
                 }
             }
@@ -361,6 +365,11 @@ namespace osu.Game.Tests.Visual
                 // TestScene.cs is checking the IsLoaded state (on another thread) and expects
                 // the runner to be loaded at that point.
                 Add(runner = new TestSceneTestRunner.TestRunner());
+            }
+
+            protected override void InitialiseFonts()
+            {
+                // skip fonts load as it's not required for testing purposes.
             }
 
             public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);

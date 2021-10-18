@@ -12,11 +12,19 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineArea : Container
+    public class TimelineArea : CompositeDrawable
     {
-        public readonly Timeline Timeline = new Timeline { RelativeSizeAxes = Axes.Both };
+        public Timeline Timeline;
 
-        protected override Container<Drawable> Content => Timeline;
+        private readonly Drawable userContent;
+
+        public TimelineArea(Drawable content = null)
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
+            userContent = content ?? Drawable.Empty();
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -37,7 +45,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 },
                 new GridContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Content = new[]
                     {
                         new Drawable[]
@@ -55,11 +64,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     },
                                     new FillFlowContainer
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
                                         AutoSizeAxes = Axes.Y,
                                         Width = 160,
-                                        Padding = new MarginPadding { Horizontal = 10 },
+                                        Padding = new MarginPadding(10),
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
@@ -123,14 +130,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     }
                                 }
                             },
-                            Timeline
+                            Timeline = new Timeline(userContent),
                         },
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
                     },
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.Distributed),
+                        new Dimension(),
                     }
                 }
             };

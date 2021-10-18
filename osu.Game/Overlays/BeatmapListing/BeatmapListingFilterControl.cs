@@ -10,11 +10,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -23,9 +25,9 @@ namespace osu.Game.Overlays.BeatmapListing
     public class BeatmapListingFilterControl : CompositeDrawable
     {
         /// <summary>
-        /// Fired when a search finishes. Contains only new items in the case of pagination.
+        /// Fired when a search finishes.
         /// </summary>
-        public Action<List<BeatmapSetInfo>> SearchFinished;
+        public Action<SearchResult> SearchFinished;
 
         /// <summary>
         /// Fired when search criteria change.
@@ -120,6 +122,9 @@ namespace osu.Game.Overlays.BeatmapListing
             sortControlBackground.Colour = colourProvider.Background5;
         }
 
+        public void Search(string query)
+            => searchControl.Query.Value = query;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -203,7 +208,8 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 var sets = response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList();
 
-                if (sets.Count == 0)
+                // If the previous request returned a null cursor, the API is indicating we can't paginate further (maybe there are no more beatmaps left).
+                if (sets.Count == 0 || response.Cursor == null)
                     noMoreResults = true;
 
                 if (CurrentPage == 0)
@@ -212,7 +218,25 @@ namespace osu.Game.Overlays.BeatmapListing
                 lastResponse = response;
                 getSetsRequest = null;
 
-                SearchFinished?.Invoke(sets);
+                // check if a non-supporter used supporter-only filters
+                if (!api.LocalUser.Value.IsSupporter)
+                {
+                    List<LocalisableString> filters = new List<LocalisableString>();
+
+                    if (searchControl.Played.Value != SearchPlayed.Any)
+                        filters.Add(BeatmapsStrings.ListingSearchFiltersPlayed);
+
+                    if (searchControl.Ranks.Any())
+                        filters.Add(BeatmapsStrings.ListingSearchFiltersRank);
+
+                    if (filters.Any())
+                    {
+                        SearchFinished?.Invoke(SearchResult.SupporterOnlyFilters(filters));
+                        return;
+                    }
+                }
+
+                SearchFinished?.Invoke(SearchResult.ResultsReturned(sets));
             };
 
             api.Queue(getSetsRequest);
@@ -236,6 +260,54 @@ namespace osu.Game.Overlays.BeatmapListing
             resetSearch();
 
             base.Dispose(isDisposing);
+        }
+
+        /// <summary>
+        /// Indicates the type of result of a user-requested beatmap search.
+        /// </summary>
+        public enum SearchResultType
+        {
+            /// <summary>
+            /// Actual results have been returned from API.
+            /// </summary>
+            ResultsReturned,
+
+            /// <summary>
+            /// The user is not a supporter, but used supporter-only search filters.
+            /// </summary>
+            SupporterOnlyFilters
+        }
+
+        /// <summary>
+        /// Describes the result of a user-requested beatmap search.
+        /// </summary>
+        public struct SearchResult
+        {
+            public SearchResultType Type { get; private set; }
+
+            /// <summary>
+            /// Contains the beatmap sets returned from API.
+            /// Valid for read if and only if <see cref="Type"/> is <see cref="SearchResultType.ResultsReturned"/>.
+            /// </summary>
+            public List<BeatmapSetInfo> Results { get; private set; }
+
+            /// <summary>
+            /// Contains the names of supporter-only filters requested by the user.
+            /// Valid for read if and only if <see cref="Type"/> is <see cref="SearchResultType.SupporterOnlyFilters"/>.
+            /// </summary>
+            public List<LocalisableString> SupporterOnlyFiltersUsed { get; private set; }
+
+            public static SearchResult ResultsReturned(List<BeatmapSetInfo> results) => new SearchResult
+            {
+                Type = SearchResultType.ResultsReturned,
+                Results = results
+            };
+
+            public static SearchResult SupporterOnlyFilters(List<LocalisableString> filters) => new SearchResult
+            {
+                Type = SearchResultType.SupporterOnlyFilters,
+                SupporterOnlyFiltersUsed = filters
+            };
         }
     }
 }

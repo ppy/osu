@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(GameHost host)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, host, Beatmap.Default));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, Resources, host, Beatmap.Default));
 
             beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
 
@@ -205,7 +205,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void assertCollectionDropdownContains(string collectionName, bool shouldContain = true) =>
             AddAssert($"collection dropdown {(shouldContain ? "contains" : "does not contain")} '{collectionName}'",
                 // A bit of a roundabout way of going about this, see: https://github.com/ppy/osu-framework/issues/3871 + https://github.com/ppy/osu-framework/issues/3872
-                () => shouldContain == (getCollectionDropdownItems().Any(i => i.ChildrenOfType<FillFlowContainer>().OfType<IHasText>().First().Text == collectionName)));
+                () => shouldContain == (getCollectionDropdownItems().Any(i => i.ChildrenOfType<CompositeDrawable>().OfType<IHasText>().First().Text == collectionName)));
 
         private IconButton getAddOrRemoveButton(int index)
             => getCollectionDropdownItems().ElementAt(index).ChildrenOfType<IconButton>().Single();

@@ -66,7 +66,9 @@ namespace osu.Game.Tournament
             }
 
             ladder ??= new LadderInfo();
-            ladder.Ruleset.Value ??= RulesetStore.AvailableRulesets.First();
+
+            ladder.Ruleset.Value = RulesetStore.GetRuleset(ladder.Ruleset.Value?.ShortName)
+                                   ?? RulesetStore.AvailableRulesets.First();
 
             bool addedInfo = false;
 
@@ -141,7 +143,6 @@ namespace osu.Game.Tournament
         /// <summary>
         /// Add missing player info based on user IDs.
         /// </summary>
-        /// <returns></returns>
         private bool addPlayers()
         {
             bool addedInfo = false;
@@ -181,7 +182,7 @@ namespace osu.Game.Tournament
                     {
                         var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
                         API.Perform(req);
-                        b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+                        b.BeatmapInfo = req.Response?.ToBeatmapInfo(RulesetStore);
 
                         addedInfo = true;
                     }
@@ -202,7 +203,7 @@ namespace osu.Game.Tournament
                         {
                             var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
                             req.Perform(API);
-                            b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+                            b.BeatmapInfo = req.Response?.ToBeatmapInfo(RulesetStore);
 
                             addedInfo = true;
                         }

@@ -11,12 +11,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Statistics;
@@ -40,6 +41,8 @@ namespace osu.Game.Screens.Ranking
 
         protected ScorePanelList ScorePanelList { get; private set; }
 
+        protected VerticalScrollContainer VerticalScrollContent { get; private set; }
+
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
 
@@ -50,8 +53,7 @@ namespace osu.Game.Screens.Ranking
         private Drawable bottomPanel;
         private Container<ScorePanel> detachedPanelContainer;
 
-        private bool fetchedInitialScores;
-        private APIRequest nextPageRequest;
+        private bool lastFetchCompleted;
 
         private readonly bool allowRetry;
         private readonly bool allowWatchingReplay;
@@ -77,7 +79,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     new Drawable[]
                     {
-                        new VerticalScrollContainer
+                        VerticalScrollContent = new VerticalScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             ScrollbarVisible = false,
@@ -143,7 +145,7 @@ namespace osu.Game.Screens.Ranking
             if (Score != null)
             {
                 // only show flair / animation when arriving after watching a play that isn't autoplay.
-                bool shouldFlair = player != null && !Score.Mods.Any(m => m is ModAutoplay);
+                bool shouldFlair = player != null && Score.Mods.All(m => m.UserPlayable);
 
                 ScorePanelList.AddScore(Score, shouldFlair);
             }
@@ -189,8 +191,10 @@ namespace osu.Game.Screens.Ranking
         {
             base.Update();
 
-            if (fetchedInitialScores && nextPageRequest == null)
+            if (lastFetchCompleted)
             {
+                APIRequest nextPageRequest = null;
+
                 if (ScorePanelList.IsScrolledToStart)
                     nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
                 else if (ScorePanelList.IsScrolledToEnd)
@@ -198,10 +202,7 @@ namespace osu.Game.Screens.Ranking
 
                 if (nextPageRequest != null)
                 {
-                    // Scheduled after children to give the list a chance to update its scroll position and not potentially trigger a second request too early.
-                    nextPageRequest.Success += () => ScheduleAfterChildren(() => nextPageRequest = null);
-                    nextPageRequest.Failure += _ => ScheduleAfterChildren(() => nextPageRequest = null);
-
+                    lastFetchCompleted = false;
                     api.Queue(nextPageRequest);
                 }
             }
@@ -227,7 +228,7 @@ namespace osu.Game.Screens.Ranking
             foreach (var s in scores)
                 addScore(s);
 
-            fetchedInitialScores = true;
+            lastFetchCompleted = true;
         });
 
         public override void OnEntering(IScreen last)
@@ -237,7 +238,7 @@ namespace osu.Game.Screens.Ranking
             ApplyToBackground(b =>
             {
                 b.BlurAmount.Value = BACKGROUND_BLUR;
-                b.FadeTo(0.5f, 250);
+                b.FadeColour(OsuColour.Gray(0.5f), 250);
             });
 
             bottomPanel.FadeTo(1, 250);
@@ -245,9 +246,11 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
-            ApplyToBackground(b => b.FadeTo(1, 250));
+            if (base.OnExiting(next))
+                return true;
 
-            return base.OnExiting(next);
+            this.FadeOut(100);
+            return false;
         }
 
         public override bool OnBackButton()
@@ -295,7 +298,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = false;
 
                 // Dim background.
-                ApplyToBackground(b => b.FadeTo(0.1f, 150));
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.1f), 150));
 
                 detachedPanel = expandedPanel;
             }
@@ -319,15 +322,15 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = true;
 
                 // Un-dim background.
-                ApplyToBackground(b => b.FadeTo(0.5f, 150));
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.5f), 150));
 
                 detachedPanel = null;
             }
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Select:
                     statisticsPanel.ToggleVisibility();
@@ -337,11 +340,11 @@ namespace osu.Game.Screens.Ranking
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
-        private class VerticalScrollContainer : OsuScrollContainer
+        protected class VerticalScrollContainer : OsuScrollContainer
         {
             protected override Container<Drawable> Content => content;
 
@@ -349,6 +352,8 @@ namespace osu.Game.Screens.Ranking
 
             public VerticalScrollContainer()
             {
+                Masking = false;
+
                 base.Content.Add(content = new Container { RelativeSizeAxes = Axes.X });
             }
 

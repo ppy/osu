@@ -71,7 +71,8 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public TwoLayerButton()
+        public TwoLayerButton(HoverSampleSet sampleSet = HoverSampleSet.Default)
+            : base(sampleSet)
         {
             Size = SIZE_RETRACTED;
             Shear = shear;

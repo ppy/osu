@@ -9,13 +9,16 @@ using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
+using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Beatmaps
 {
@@ -107,6 +110,8 @@ namespace osu.Game.Tests.Beatmaps
         {
             var beatmap = GetBeatmap(name);
 
+            string beforeConversion = beatmap.Serialize();
+
             var converterResult = new Dictionary<HitObject, IEnumerable<HitObject>>();
 
             var working = new ConversionWorkingBeatmap(beatmap)
@@ -119,6 +124,10 @@ namespace osu.Game.Tests.Beatmaps
             };
 
             working.GetPlayableBeatmap(CreateRuleset().RulesetInfo, mods);
+
+            string afterConversion = beatmap.Serialize();
+
+            Assert.AreEqual(beforeConversion, afterConversion, "Conversion altered original beatmap");
 
             return new ConvertResult
             {
@@ -164,7 +173,7 @@ namespace osu.Game.Tests.Beatmaps
 
         private Stream openResource(string name)
         {
-            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
+            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path)).AsNonNull();
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 
@@ -189,7 +198,6 @@ namespace osu.Game.Tests.Beatmaps
         /// <summary>
         /// Creates the <see cref="Ruleset"/> applicable to this <see cref="BeatmapConversionTest{TConvertMapping,TConvertValue}"/>.
         /// </summary>
-        /// <returns></returns>
         protected abstract Ruleset CreateRuleset();
 
         private class ConvertResult
@@ -215,6 +223,10 @@ namespace osu.Game.Tests.Beatmaps
             protected override Texture GetBackground() => throw new NotImplementedException();
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
+
+            protected internal override ISkin GetSkin() => throw new NotImplementedException();
+
+            public override Stream GetStream(string storagePath) => throw new NotImplementedException();
 
             protected override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
             {

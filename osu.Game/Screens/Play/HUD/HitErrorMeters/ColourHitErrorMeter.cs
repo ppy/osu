@@ -19,14 +19,21 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private readonly JudgementFlow judgementsFlow;
 
-        public ColourHitErrorMeter(HitWindows hitWindows)
-            : base(hitWindows)
+        public ColourHitErrorMeter()
         {
             AutoSizeAxes = Axes.Both;
             InternalChild = judgementsFlow = new JudgementFlow();
         }
 
-        public override void OnNewJudgement(JudgementResult judgement) => judgementsFlow.Push(GetColourForHitResult(HitWindows.ResultFor(judgement.TimeOffset)));
+        protected override void OnNewJudgement(JudgementResult judgement)
+        {
+            if (!judgement.Type.IsScorable() || judgement.Type.IsBonus())
+                return;
+
+            judgementsFlow.Push(GetColourForHitResult(judgement.Type));
+        }
+
+        public override void Clear() => judgementsFlow.Clear();
 
         private class JudgementFlow : FillFlowContainer<HitErrorCircle>
         {
@@ -55,7 +62,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        private class HitErrorCircle : Container
+        internal class HitErrorCircle : Container
         {
             public bool IsRemoved { get; private set; }
 

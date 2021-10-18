@@ -5,13 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Objects;
@@ -324,6 +322,33 @@ namespace osu.Game.Rulesets.Mania.Tests
             assertTailJudgement(HitResult.Ok);
         }
 
+        [Test]
+        public void TestZeroLength()
+        {
+            var beatmap = new Beatmap<ManiaHitObject>
+            {
+                HitObjects =
+                {
+                    new HoldNote
+                    {
+                        StartTime = 1000,
+                        Duration = 0,
+                        Column = 0,
+                    },
+                },
+                BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
+            };
+
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(beatmap.HitObjects[0].StartTime, ManiaAction.Key1),
+                new ManiaReplayFrame(beatmap.HitObjects[0].GetEndTime() + 1),
+            }, beatmap);
+
+            AddAssert("hold note hit", () => judgementResults.Where(j => beatmap.HitObjects[0].NestedHitObjects.Contains(j.HitObject))
+                                                             .All(j => j.Type.IsHit()));
+        }
+
         private void assertHeadJudgement(HitResult result)
             => AddAssert($"head judged as {result}", () => judgementResults.First(j => j.HitObject is Note).Type == result);
 
@@ -363,7 +388,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     },
                 };
 
-                beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
+                beatmap.ControlPointInfo.Add(0, new EffectControlPoint { ScrollSpeed = 0.1f });
             }
 
             AddStep("load player", () =>
@@ -387,14 +412,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
 
-            AddUntilStep("wait for head", () => currentPlayer.GameplayClockContainer.GameplayClock.CurrentTime >= time_head);
-            AddAssert("head is visible",
-                () => currentPlayer.ChildrenOfType<DrawableHoldNote>()
-                                   .Single(note => note.HitObject == beatmap.HitObjects[0])
-                                   .Head
-                                   .Alpha == 1);
-
-            AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
+            AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor?.HasCompleted.Value == true);
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer

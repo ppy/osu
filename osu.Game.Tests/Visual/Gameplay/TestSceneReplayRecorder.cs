@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -17,6 +18,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -38,7 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestReplayRecorder recorder;
 
         [Cached]
-        private GameplayBeatmap gameplayBeatmap = new GameplayBeatmap(new Beatmap());
+        private GameplayState gameplayState = new GameplayState(new Beatmap(), new OsuRuleset(), Array.Empty<Mod>());
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -54,7 +57,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            Recorder = recorder = new TestReplayRecorder(new Score { Replay = replay })
+                            Recorder = recorder = new TestReplayRecorder(new Score
+                            {
+                                Replay = replay,
+                                ScoreInfo = { BeatmapInfo = gameplayState.Beatmap.BeatmapInfo }
+                            })
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
                             },
@@ -118,8 +125,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestBasic()
         {
             AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("one frame recorded", () => replay.Frames.Count == 1);
-            AddAssert("position matches", () => playbackManager.ChildrenOfType<Box>().First().Position == recordingManager.ChildrenOfType<Box>().First().Position);
+            AddUntilStep("at least one frame recorded", () => replay.Frames.Count > 0);
+            AddUntilStep("position matches", () => playbackManager.ChildrenOfType<Box>().First().Position == recordingManager.ChildrenOfType<Box>().First().Position);
         }
 
         [Test]
@@ -139,14 +146,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestLimitedFrameRate()
         {
             ScheduledDelegate moveFunction = null;
+            int initialFrameCount = 0;
 
             AddStep("lower rate", () => recorder.RecordFrameRate = 2);
+            AddStep("count frames", () => initialFrameCount = replay.Frames.Count);
             AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
             AddStep("much move", () => moveFunction = Scheduler.AddDelayed(() =>
                 InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0)), 10, true));
             AddWaitStep("move", 10);
             AddStep("stop move", () => moveFunction.Cancel());
-            AddAssert("less than 10 frames recorded", () => replay.Frames.Count < 10);
+            AddAssert("less than 10 frames recorded", () => replay.Frames.Count - initialFrameCount < 10);
         }
 
         [Test]
@@ -220,13 +229,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return base.OnMouseMove(e);
             }
 
-            public bool OnPressed(TestAction action)
+            public bool OnPressed(KeyBindingPressEvent<TestAction> e)
             {
                 box.Colour = Color4.White;
                 return true;
             }
 
-            public void OnReleased(TestAction action)
+            public void OnReleased(KeyBindingReleaseEvent<TestAction> e)
             {
                 box.Colour = Color4.Black;
             }

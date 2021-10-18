@@ -51,14 +51,14 @@ namespace osu.Game.Overlays.Mods
                     if (m == null)
                         return new ModButtonEmpty();
 
-                    return new ModButton(m)
+                    return CreateModButton(m).With(b =>
                     {
-                        SelectionChanged = mod =>
+                        b.SelectionChanged = mod =>
                         {
                             ModButtonStateChanged(mod);
                             Action?.Invoke(mod);
-                        },
-                    };
+                        };
+                    });
                 }).ToArray();
 
                 modsLoadCts?.Cancel();
@@ -159,11 +159,15 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
         /// <param name="immediate">Whether the deselection should happen immediately. Should only be used when required to ensure correct selection flow.</param>
-        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
+        /// <param name="newSelection">If this deselection is triggered by a user selection, this should contain the newly selected type. This type will never be deselected, even if it matches one provided in <paramref name="modTypes"/>.</param>
+        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false, Mod newSelection = null)
         {
             foreach (var button in Buttons)
             {
                 if (button.SelectedMod == null) continue;
+
+                if (button.SelectedMod == newSelection)
+                    continue;
 
                 foreach (var type in modTypes)
                 {
@@ -242,6 +246,8 @@ namespace osu.Game.Overlays.Mods
             Font = OsuFont.GetFont(weight: FontWeight.Bold),
             Text = text
         };
+
+        protected virtual ModButton CreateModButton(Mod mod) => new ModButton(mod);
 
         /// <summary>
         /// Play out all remaining animations immediately to leave mods in a good (final) state.

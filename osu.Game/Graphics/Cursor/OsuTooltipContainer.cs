@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Cursor
@@ -30,12 +31,9 @@ namespace osu.Game.Graphics.Cursor
             private readonly OsuSpriteText text;
             private bool instantMovement = true;
 
-            public override bool SetContent(object content)
+            public override void SetContent(LocalisableString contentString)
             {
-                if (!(content is string contentString))
-                    return false;
-
-                if (contentString == text.Text) return true;
+                if (contentString == text.Text) return;
 
                 text.Text = contentString;
 
@@ -46,8 +44,6 @@ namespace osu.Game.Graphics.Cursor
                 }
                 else
                     AutoSizeDuration = 0;
-
-                return true;
             }
 
             public OsuTooltip()

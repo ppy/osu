@@ -33,26 +33,26 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private class MouseInputHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
         {
-            private readonly Catcher catcher;
+            private readonly CatcherArea catcherArea;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             public MouseInputHelper(CatchPlayfield playfield)
             {
-                catcher = playfield.CatcherArea.MovableCatcher;
+                catcherArea = playfield.CatcherArea;
                 RelativeSizeAxes = Axes.Both;
             }
 
             // disable keyboard controls
-            public bool OnPressed(CatchAction action) => true;
+            public bool OnPressed(KeyBindingPressEvent<CatchAction> e) => true;
 
-            public void OnReleased(CatchAction action)
+            public void OnReleased(KeyBindingReleaseEvent<CatchAction> e)
             {
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                catcher.UpdatePosition(e.MousePosition.X / DrawSize.X * CatchPlayfield.WIDTH);
+                catcherArea.SetCatcherPosition(e.MousePosition.X / DrawSize.X * CatchPlayfield.WIDTH);
                 return base.OnMouseMove(e);
             }
         }

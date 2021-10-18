@@ -35,9 +35,8 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
-        /// <summary>
-        /// The username/email provided by the user when initiating a login.
-        /// </summary>
+        public Exception LastLoginError { get; private set; }
+
         public string ProvidedUsername { get; private set; }
 
         private string password;
@@ -136,18 +135,37 @@ namespace osu.Game.Online.API
                         // save the username at this point, if the user requested for it to be.
                         config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
-                        if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(ProvidedUsername, password))
+                        if (!authentication.HasValidAccessToken)
                         {
-                            //todo: this fails even on network-related issues. we should probably handle those differently.
-                            //NotificationOverlay.ShowMessage("Login failed!");
-                            log.Add(@"Login failed!");
-                            password = null;
-                            authentication.Clear();
-                            continue;
+                            LastLoginError = null;
+
+                            try
+                            {
+                                authentication.AuthenticateWithLogin(ProvidedUsername, password);
+                            }
+                            catch (Exception e)
+                            {
+                                //todo: this fails even on network-related issues. we should probably handle those differently.
+                                LastLoginError = e;
+                                log.Add(@"Login failed!");
+                                password = null;
+                                authentication.Clear();
+                                continue;
+                            }
                         }
 
                         var userReq = new GetUserRequest();
 
+                        userReq.Failure += ex =>
+                        {
+                            if (ex is WebException webException && webException.Message == @"Unauthorized")
+                            {
+                                log.Add(@"Login no longer valid");
+                                Logout();
+                            }
+                            else
+                                failConnectionProcess();
+                        };
                         userReq.Success += u =>
                         {
                             localUser.Value = u;
@@ -167,6 +185,7 @@ namespace osu.Game.Online.API
                         // getting user's friends is considered part of the connection process.
                         var friendsReq = new GetFriendsRequest();
 
+                        friendsReq.Failure += _ => failConnectionProcess();
                         friendsReq.Success += res =>
                         {
                             friends.AddRange(res);
@@ -246,8 +265,8 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
-        public IHubClientConnector GetHubConnector(string clientName, string endpoint) =>
-            new HubClientConnector(clientName, endpoint, this, versionHash);
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) =>
+            new HubClientConnector(clientName, endpoint, this, versionHash, preferMessagePack);
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
@@ -270,7 +289,7 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    return JObject.Parse(req.GetResponseString()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                    return JObject.Parse(req.GetResponseString().AsNonNull()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
                 }
                 catch
                 {
@@ -294,9 +313,11 @@ namespace osu.Game.Online.API
             {
                 req.Perform(this);
 
+                if (req.CompletionState != APIRequestCompletionState.Completed)
+                    return false;
+
                 // we could still be in initialisation, at which point we don't want to say we're Online yet.
                 if (IsLoggedIn) state.Value = APIState.Online;
-
                 failureCount = 0;
                 return true;
             }
@@ -370,7 +391,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        public bool IsLoggedIn => localUser.Value.Id > 1;
+        public bool IsLoggedIn => localUser.Value.Id > 1; // TODO: should this also be true if attempting to connect?
 
         public void Queue(APIRequest request)
         {

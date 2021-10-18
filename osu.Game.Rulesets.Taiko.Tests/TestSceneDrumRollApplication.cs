@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Duration = 500,
                 IsStrong = false,
                 TickRate = 2
-            }), null));
+            })));
 
             AddHitObject(drumRoll);
             RemoveHitObject(drumRoll);
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Duration = 400,
                 IsStrong = true,
                 TickRate = 16
-            }), null));
+            })));
 
             AddHitObject(drumRoll);
         }

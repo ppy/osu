@@ -16,8 +16,11 @@ using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -52,15 +55,23 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
+        [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
         {
         }
 
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string filename)
-            : base(skin)
+        /// <summary>
+        /// Construct a new legacy skin instance.
+        /// </summary>
+        /// <param name="skin">The model for this skin.</param>
+        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
+        /// <param name="resources">Access to raw game resources.</param>
+        /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
+            : base(skin, resources)
         {
-            using (var stream = storage?.GetStream(filename))
+            using (var stream = storage?.GetStream(configurationFilename))
             {
                 if (stream != null)
                 {
@@ -119,12 +130,15 @@ namespace osu.Game.Skinning
 
                     break;
 
+                case SkinComboColourLookup comboColour:
+                    return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
+
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
 
                 case LegacyManiaSkinConfigurationLookup maniaLookup:
                     if (!AllowManiaSkin)
-                        return null;
+                        break;
 
                     var result = lookupForMania<TValue>(maniaLookup);
                     if (result != null)
@@ -276,6 +290,18 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        /// <summary>
+        /// Retrieves the correct combo colour for a given colour index and information on the combo.
+        /// </summary>
+        /// <param name="source">The source to retrieve the combo colours from.</param>
+        /// <param name="colourIndex">The preferred index for retrieving the combo colour with.</param>
+        /// <param name="combo">Information on the combo whose using the returned colour.</param>
+        protected virtual IBindable<Color4> GetComboColour(IHasComboColours source, int colourIndex, IHasComboInformation combo)
+        {
+            var colour = source.ComboColours?[colourIndex % source.ComboColours.Count];
+            return colour.HasValue ? new Bindable<Color4>(colour.Value) : null;
+        }
+
         private IBindable<Color4> getCustomColour(IHasCustomColours source, string lookup)
             => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
@@ -321,32 +347,73 @@ namespace osu.Game.Skinning
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
+            if (base.GetDrawableComponent(component) is Drawable c)
+                return c;
+
             switch (component)
             {
-                case HUDSkinComponent hudComponent:
-                {
-                    if (!this.HasFont(LegacyFont.Score))
-                        return null;
-
-                    switch (hudComponent.Component)
+                case SkinnableTargetComponent target:
+                    switch (target.Target)
                     {
-                        case HUDSkinComponents.ComboCounter:
-                            return new LegacyComboCounter();
+                        case SkinnableTarget.MainHUDComponents:
+                            var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
+                            {
+                                var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
+                                var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
+                                var combo = container.OfType<LegacyComboCounter>().FirstOrDefault();
 
-                        case HUDSkinComponents.ScoreCounter:
-                            return new LegacyScoreCounter(this);
+                                if (score != null && accuracy != null)
+                                {
+                                    accuracy.Y = container.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight).Y;
+                                }
 
-                        case HUDSkinComponents.AccuracyCounter:
-                            return new LegacyAccuracyCounter(this);
+                                var songProgress = container.OfType<SongProgress>().FirstOrDefault();
 
-                        case HUDSkinComponents.HealthDisplay:
-                            return new LegacyHealthDisplay(this);
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+
+                                if (hitError != null)
+                                {
+                                    hitError.Anchor = Anchor.BottomCentre;
+                                    hitError.Origin = Anchor.CentreLeft;
+                                    hitError.Rotation = -90;
+                                }
+
+                                if (songProgress != null)
+                                {
+                                    if (hitError != null) hitError.Y -= SongProgress.MAX_HEIGHT;
+                                    if (combo != null) combo.Y -= SongProgress.MAX_HEIGHT;
+                                }
+                            })
+                            {
+                                Children = this.HasFont(LegacyFont.Score)
+                                    ? new Drawable[]
+                                    {
+                                        new LegacyComboCounter(),
+                                        new LegacyScoreCounter(),
+                                        new LegacyAccuracyCounter(),
+                                        new LegacyHealthDisplay(),
+                                        new SongProgress(),
+                                        new BarHitErrorMeter(),
+                                    }
+                                    : new Drawable[]
+                                    {
+                                        // TODO: these should fallback to using osu!classic skin textures, rather than doing this.
+                                        new DefaultComboCounter(),
+                                        new DefaultScoreCounter(),
+                                        new DefaultAccuracyCounter(),
+                                        new DefaultHealthDisplay(),
+                                        new SongProgress(),
+                                        new BarHitErrorMeter(),
+                                    }
+                            };
+
+                            return skinnableTargetWrapper;
                     }
 
                     return null;
-                }
 
                 case GameplaySkinComponent<HitResult> resultComponent:
+                    // TODO: this should be inside the judgement pieces.
                     Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component);
 
                     // kind of wasteful that we throw this away, but should do for now.
@@ -442,7 +509,9 @@ namespace osu.Game.Skinning
                 var sample = Samples?.Get(lookup);
 
                 if (sample != null)
+                {
                     return sample;
+                }
             }
 
             return null;
@@ -475,8 +544,7 @@ namespace osu.Game.Skinning
             yield return componentName;
 
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
-            string lastPiece = componentName.Split('/').Last();
-            yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
+            yield return componentName.Split('/').Last();
         }
 
         protected override void Dispose(bool isDisposing)

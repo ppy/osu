@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -29,7 +30,12 @@ namespace osu.Game.Rulesets
             // On android in release configuration assemblies are loaded from the apk directly into memory.
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
             loadFromAppDomain();
-            loadFromDisk();
+
+            // This null check prevents Android from attempting to load the rulesets from disk,
+            // as the underlying path "AppContext.BaseDirectory", despite being non-nullable, it returns null on android.
+            // See https://github.com/xamarin/xamarin-android/issues/3489.
+            if (RuntimeInfo.StartupDirectory != null)
+                loadFromDisk();
 
             // the event handler contains code for resolving dependency on the game assembly for rulesets located outside the base game directory.
             // It needs to be attached to the assembly lookup event before the actual call to loadUserRulesets() else rulesets located out of the base game directory will fail
@@ -95,13 +101,25 @@ namespace osu.Game.Rulesets
 
                 context.SaveChanges();
 
-                // add any other modes
                 var existingRulesets = context.RulesetInfo.ToList();
 
+                // add any other rulesets which have assemblies present but are not yet in the database.
                 foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
                 {
                     if (existingRulesets.FirstOrDefault(ri => ri.InstantiationInfo.Equals(r.RulesetInfo.InstantiationInfo, StringComparison.Ordinal)) == null)
-                        context.RulesetInfo.Add(r.RulesetInfo);
+                    {
+                        var existingSameShortName = existingRulesets.FirstOrDefault(ri => ri.ShortName == r.RulesetInfo.ShortName);
+
+                        if (existingSameShortName != null)
+                        {
+                            // even if a matching InstantiationInfo was not found, there may be an existing ruleset with the same ShortName.
+                            // this generally means the user or ruleset provider has renamed their dll but the underlying ruleset is *likely* the same one.
+                            // in such cases, update the instantiation info of the existing entry to point to the new one.
+                            existingSameShortName.InstantiationInfo = r.RulesetInfo.InstantiationInfo;
+                        }
+                        else
+                            context.RulesetInfo.Add(r.RulesetInfo);
+                    }
                 }
 
                 context.SaveChanges();
@@ -111,7 +129,7 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo))).RulesetInfo;
+                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo).AsNonNull())).RulesetInfo;
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
@@ -173,7 +191,7 @@ namespace osu.Game.Rulesets
         {
             var filename = Path.GetFileNameWithoutExtension(file);
 
-            if (loadedAssemblies.Values.Any(t => t.Namespace == filename))
+            if (loadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
                 return;
 
             try

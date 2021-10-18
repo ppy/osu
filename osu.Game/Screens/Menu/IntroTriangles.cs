@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -41,6 +42,14 @@ namespace osu.Game.Screens.Menu
 
         private Sample welcome;
 
+        private DecoupleableInterpolatingFramedClock decoupledClock;
+        private TrianglesIntroSequence intro;
+
+        public IntroTriangles([CanBeNull] Func<MainMenu> createNextScreen = null)
+            : base(createNextScreen)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -56,10 +65,18 @@ namespace osu.Game.Screens.Menu
             {
                 PrepareMenuLoad();
 
-                LoadComponentAsync(new TrianglesIntroSequence(logo, background)
+                decoupledClock = new DecoupleableInterpolatingFramedClock
+                {
+                    IsCoupled = false
+                };
+
+                if (UsingThemedIntro)
+                    decoupledClock.ChangeSource(Track);
+
+                LoadComponentAsync(intro = new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(UsingThemedIntro ? Track : null),
+                    Clock = decoupledClock,
                     LoadMenu = LoadMenu
                 }, t =>
                 {
@@ -72,10 +89,23 @@ namespace osu.Game.Screens.Menu
             }
         }
 
+        public override void OnSuspending(IScreen next)
+        {
+            base.OnSuspending(next);
+
+            // important as there is a clock attached to a track which will likely be disposed before returning to this screen.
+            intro.Expire();
+        }
+
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
             background.FadeOut(100);
+        }
+
+        protected override void StartTrack()
+        {
+            decoupledClock.Start();
         }
 
         private class TrianglesIntroSequence : CompositeDrawable
@@ -172,27 +202,27 @@ namespace osu.Game.Screens.Menu
                 lazerLogo.Hide();
                 background.ApplyToBackground(b => b.Hide());
 
-                using (BeginAbsoluteSequence(0, true))
+                using (BeginAbsoluteSequence(0))
                 {
-                    using (BeginDelayedSequence(text_1, true))
+                    using (BeginDelayedSequence(text_1))
                         welcomeText.FadeIn().OnComplete(t => t.Text = "wel");
 
-                    using (BeginDelayedSequence(text_2, true))
+                    using (BeginDelayedSequence(text_2))
                         welcomeText.FadeIn().OnComplete(t => t.Text = "welcome");
 
-                    using (BeginDelayedSequence(text_3, true))
+                    using (BeginDelayedSequence(text_3))
                         welcomeText.FadeIn().OnComplete(t => t.Text = "welcome to");
 
-                    using (BeginDelayedSequence(text_4, true))
+                    using (BeginDelayedSequence(text_4))
                     {
                         welcomeText.FadeIn().OnComplete(t => t.Text = "welcome to osu!");
                         welcomeText.TransformTo(nameof(welcomeText.Spacing), new Vector2(50, 0), 5000);
                     }
 
-                    using (BeginDelayedSequence(text_glitch, true))
+                    using (BeginDelayedSequence(text_glitch))
                         triangles.FadeIn();
 
-                    using (BeginDelayedSequence(rulesets_1, true))
+                    using (BeginDelayedSequence(rulesets_1))
                     {
                         rulesetsScale.ScaleTo(0.8f, 1000);
                         rulesets.FadeIn().ScaleTo(1).TransformSpacingTo(new Vector2(200, 0));
@@ -200,18 +230,18 @@ namespace osu.Game.Screens.Menu
                         triangles.FadeOut();
                     }
 
-                    using (BeginDelayedSequence(rulesets_2, true))
+                    using (BeginDelayedSequence(rulesets_2))
                     {
                         rulesets.ScaleTo(2).TransformSpacingTo(new Vector2(30, 0));
                     }
 
-                    using (BeginDelayedSequence(rulesets_3, true))
+                    using (BeginDelayedSequence(rulesets_3))
                     {
                         rulesets.ScaleTo(4).TransformSpacingTo(new Vector2(10, 0));
                         rulesetsScale.ScaleTo(1.3f, 1000);
                     }
 
-                    using (BeginDelayedSequence(logo_1, true))
+                    using (BeginDelayedSequence(logo_1))
                     {
                         rulesets.FadeOut();
 
@@ -223,7 +253,7 @@ namespace osu.Game.Screens.Menu
                         logoContainerSecondary.ScaleTo(scale_start).Then().ScaleTo(scale_start - scale_adjust * 0.25f, logo_scale_duration, Easing.InQuad);
                     }
 
-                    using (BeginDelayedSequence(logo_2, true))
+                    using (BeginDelayedSequence(logo_2))
                     {
                         lazerLogo.FadeOut().OnComplete(_ =>
                         {

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Chat.Tabs;
@@ -34,6 +35,16 @@ namespace osu.Game.Online.Chat
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         /// <summary>
+        /// Keeps a stack of recently closed channels
+        /// </summary>
+        private readonly List<ClosedChannel> closedChannels = new List<ClosedChannel>();
+
+        // For efficiency purposes, this constant bounds the number of closed channels we store.
+        // This number is somewhat arbitrary; future developers are free to modify it.
+        // Must be a positive number.
+        private const int closed_channels_max_size = 50;
+
+        /// <summary>
         /// The currently opened channel
         /// </summary>
         public Bindable<Channel> CurrentChannel { get; } = new Bindable<Channel>();
@@ -50,6 +61,9 @@ namespace osu.Game.Online.Chat
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private UserLookupCache users { get; set; }
 
         public readonly BindableBool HighPollRate = new BindableBool();
 
@@ -211,7 +225,7 @@ namespace osu.Game.Online.Chat
             switch (command)
             {
                 case "np":
-                    AddInternal(new NowPlayingCommand());
+                    AddInternal(new NowPlayingCommand(target));
                     break;
 
                 case "me":
@@ -221,7 +235,7 @@ namespace osu.Game.Online.Chat
                         break;
                     }
 
-                    PostMessage(content, true);
+                    PostMessage(content, true, target);
                     break;
 
                 case "join":
@@ -242,8 +256,36 @@ namespace osu.Game.Online.Chat
                     JoinChannel(channel);
                     break;
 
+                case "chat":
+                case "msg":
+                case "query":
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        target.AddNewMessages(new ErrorMessage($"Usage: /{command} [user]"));
+                        break;
+                    }
+
+                    // Check if the user has joined the requested channel already.
+                    // This uses the channel name for comparison as the PM user's username is unavailable after a restart.
+                    var privateChannel = JoinedChannels.FirstOrDefault(
+                        c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Name.Equals(content, StringComparison.OrdinalIgnoreCase));
+
+                    if (privateChannel != null)
+                    {
+                        CurrentChannel.Value = privateChannel;
+                        break;
+                    }
+
+                    var request = new GetUserRequest(content);
+                    request.Success += OpenPrivateChannel;
+                    request.Failure += e => target.AddNewMessages(
+                        new ErrorMessage(e.InnerException?.Message == @"NotFound" ? $"User '{content}' was not found." : $"Could not fetch user '{content}'."));
+
+                    api.Queue(request);
+                    break;
+
                 case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /np"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np"));
                     break;
 
                 default:
@@ -420,12 +462,64 @@ namespace osu.Game.Online.Chat
 
             joinedChannels.Remove(channel);
 
+            // Prevent the closedChannel list from exceeding the max size
+            // by removing the oldest element
+            if (closedChannels.Count >= closed_channels_max_size)
+            {
+                closedChannels.RemoveAt(0);
+            }
+
+            // For PM channels, we store the user ID; else, we store the channel ID
+            closedChannels.Add(channel.Type == ChannelType.PM
+                ? new ClosedChannel(ChannelType.PM, channel.Users.Single().Id)
+                : new ClosedChannel(channel.Type, channel.Id));
+
             if (channel.Joined.Value)
             {
                 api.Queue(new LeaveChannelRequest(channel));
                 channel.Joined.Value = false;
             }
         });
+
+        /// <summary>
+        /// Opens the most recently closed channel that has not already been reopened,
+        /// Works similarly to reopening the last closed tab on a web browser.
+        /// </summary>
+        public void JoinLastClosedChannel()
+        {
+            // This loop could be eliminated if the join channel operation ensured that every channel joined
+            // is removed from the closedChannels list, but it'd require a linear scan of closed channels on every join.
+            // To keep the overhead of joining channels low, just lazily scan the list of closed channels locally.
+            while (closedChannels.Count > 0)
+            {
+                ClosedChannel lastClosedChannel = closedChannels.Last();
+                closedChannels.RemoveAt(closedChannels.Count - 1);
+
+                // If the user has already joined the channel, try the next one
+                if (joinedChannels.FirstOrDefault(lastClosedChannel.Matches) != null)
+                    continue;
+
+                Channel lastChannel = AvailableChannels.FirstOrDefault(lastClosedChannel.Matches);
+
+                if (lastChannel != null)
+                {
+                    // Channel exists as an available channel, directly join it
+                    CurrentChannel.Value = JoinChannel(lastChannel);
+                }
+                else if (lastClosedChannel.Type == ChannelType.PM)
+                {
+                    // Try to get user in order to open PM chat
+                    users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(u =>
+                    {
+                        if (u.Result == null) return;
+
+                        Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(u.Result)));
+                    });
+                }
+
+                return;
+            }
+        }
 
         private long lastMessageId;
 
@@ -487,7 +581,7 @@ namespace osu.Game.Online.Chat
             if (channel.LastMessageId == channel.LastReadId)
                 return;
 
-            var message = channel.Messages.LastOrDefault();
+            var message = channel.Messages.FindLast(msg => !(msg is LocalMessage));
 
             if (message == null)
                 return;
@@ -509,6 +603,30 @@ namespace osu.Game.Online.Chat
         public ChannelNotFoundException(string channelName)
             : base($"A channel with the name {channelName} could not be found.")
         {
+        }
+    }
+
+    /// <summary>
+    /// Stores information about a closed channel
+    /// </summary>
+    public class ClosedChannel
+    {
+        public readonly ChannelType Type;
+        public readonly long Id;
+
+        public ClosedChannel(ChannelType type, long id)
+        {
+            Type = type;
+            Id = id;
+        }
+
+        public bool Matches(Channel channel)
+        {
+            if (channel.Type != Type) return false;
+
+            return Type == ChannelType.PM
+                ? channel.Users.Single().Id == Id
+                : channel.Id == Id;
         }
     }
 }

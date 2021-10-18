@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,6 +17,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osuTK;
 
@@ -26,7 +28,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float tile_icon_padding = 7;
         private const float tile_spacing = 2;
 
-        private readonly OsuSpriteText version, starRating;
+        private readonly OsuSpriteText version, starRating, starRatingText;
+        private readonly FillFlowContainer starRatingContainer;
         private readonly Statistic plays, favourites;
 
         public readonly DifficultiesContainer Difficulties;
@@ -68,14 +71,14 @@ namespace osu.Game.Overlays.BeatmapSet
                             OnLostHover = () =>
                             {
                                 showBeatmap(Beatmap.Value);
-                                starRating.FadeOut(100);
+                                starRatingContainer.FadeOut(100);
                             },
                         },
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(5f),
-                            Children = new[]
+                            Children = new Drawable[]
                             {
                                 version = new OsuSpriteText
                                 {
@@ -83,14 +86,31 @@ namespace osu.Game.Overlays.BeatmapSet
                                     Origin = Anchor.BottomLeft,
                                     Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
                                 },
-                                starRating = new OsuSpriteText
+                                starRatingContainer = new FillFlowContainer
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold),
-                                    Text = "Star Difficulty",
                                     Alpha = 0,
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(2f, 0),
                                     Margin = new MarginPadding { Bottom = 1 },
+                                    Children = new[]
+                                    {
+                                        starRatingText = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold),
+                                            Text = BeatmapsetsStrings.ShowStatsStars,
+                                        },
+                                        starRating = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold),
+                                            Text = string.Empty,
+                                        },
+                                    }
                                 },
                             },
                         },
@@ -124,6 +144,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OsuColour colours)
         {
             starRating.Colour = colours.Yellow;
+            starRatingText.Colour = colours.Yellow;
             updateDisplay();
         }
 
@@ -149,29 +170,29 @@ namespace osu.Game.Overlays.BeatmapSet
                     OnHovered = beatmap =>
                     {
                         showBeatmap(beatmap);
-                        starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
-                        starRating.FadeIn(100);
+                        starRating.Text = beatmap.StarDifficulty.ToLocalisableString(@"0.##");
+                        starRatingContainer.FadeIn(100);
                     },
                     OnClicked = beatmap => { Beatmap.Value = beatmap; },
                 });
             }
 
-            starRating.FadeOut(100);
-            Beatmap.Value = Difficulties.FirstOrDefault()?.Beatmap;
+            starRatingContainer.FadeOut(100);
+            Beatmap.Value = Difficulties.FirstOrDefault()?.BeatmapInfo;
             plays.Value = BeatmapSet?.OnlineInfo.PlayCount ?? 0;
             favourites.Value = BeatmapSet?.OnlineInfo.FavouriteCount ?? 0;
 
             updateDifficultyButtons();
         }
 
-        private void showBeatmap(BeatmapInfo beatmap)
+        private void showBeatmap(BeatmapInfo beatmapInfo)
         {
-            version.Text = beatmap?.Version;
+            version.Text = beatmapInfo?.Version;
         }
 
         private void updateDifficultyButtons()
         {
-            Difficulties.Children.ToList().ForEach(diff => diff.State = diff.Beatmap == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
+            Difficulties.Children.ToList().ForEach(diff => diff.State = diff.BeatmapInfo == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
         }
 
         public class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
@@ -195,7 +216,7 @@ namespace osu.Game.Overlays.BeatmapSet
             private readonly Box backgroundBox;
             private readonly DifficultyIcon icon;
 
-            public readonly BeatmapInfo Beatmap;
+            public readonly BeatmapInfo BeatmapInfo;
 
             public Action<BeatmapInfo> OnHovered;
             public Action<BeatmapInfo> OnClicked;
@@ -220,9 +241,9 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
             }
 
-            public DifficultySelectorButton(BeatmapInfo beatmap)
+            public DifficultySelectorButton(BeatmapInfo beatmapInfo)
             {
-                Beatmap = beatmap;
+                BeatmapInfo = beatmapInfo;
                 Size = new Vector2(size);
                 Margin = new MarginPadding { Horizontal = tile_spacing / 2 };
 
@@ -239,7 +260,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Alpha = 0.5f
                         }
                     },
-                    icon = new DifficultyIcon(beatmap, shouldShowTooltip: false)
+                    icon = new DifficultyIcon(beatmapInfo, shouldShowTooltip: false)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -252,7 +273,7 @@ namespace osu.Game.Overlays.BeatmapSet
             protected override bool OnHover(HoverEvent e)
             {
                 fadeIn();
-                OnHovered?.Invoke(Beatmap);
+                OnHovered?.Invoke(BeatmapInfo);
                 return base.OnHover(e);
             }
 
@@ -265,7 +286,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             protected override bool OnClick(ClickEvent e)
             {
-                OnClicked?.Invoke(Beatmap);
+                OnClicked?.Invoke(BeatmapInfo);
                 return base.OnClick(e);
             }
 
@@ -300,7 +321,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 set
                 {
                     this.value = value;
-                    text.Text = Value.ToString(@"N0");
+                    text.Text = Value.ToLocalisableString(@"N0");
                 }
             }
 

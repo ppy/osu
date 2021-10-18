@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            SetContents(() => new FillFlowContainer
+            SetContents(_ => new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                         {
                             c.Add(CreateHitObject().With(h =>
                             {
-                                h.HitObject.StartTime = START_TIME;
+                                h.HitObject.StartTime = Time.Current + 5000;
                                 h.AccentColour.Value = Color4.Orange;
                             }));
                         })
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                         {
                             c.Add(CreateHitObject().With(h =>
                             {
-                                h.HitObject.StartTime = START_TIME;
+                                h.HitObject.StartTime = Time.Current + 5000;
                                 h.AccentColour.Value = Color4.Orange;
                             }));
                         })

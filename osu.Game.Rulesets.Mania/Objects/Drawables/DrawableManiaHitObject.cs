@@ -21,6 +21,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
+        // Leaving the default (10s) makes hitobjects not appear, as this offset is used for the initial state transforms.
+        // Calculated as DrawableManiaRuleset.MAX_TIME_RANGE + some additional allowance for velocity < 1.
+        protected override double InitialLifetimeOffset => 30000;
+
         [Resolved(canBeNull: true)]
         private ManiaPlayfield playfield { get; set; }
 
@@ -44,6 +48,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected DrawableManiaHitObject(ManiaHitObject hitObject)
             : base(hitObject)
         {
+            RelativeSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -53,64 +58,29 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Action.BindTo(action);
 
             Direction.BindTo(scrollingInfo.Direction);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             Direction.BindValueChanged(OnDirectionChanged, true);
         }
 
-        private double computedLifetimeStart;
-
-        public override double LifetimeStart
+        protected override void OnApply()
         {
-            get => base.LifetimeStart;
-            set
-            {
-                computedLifetimeStart = value;
+            base.OnApply();
 
-                if (!AlwaysAlive)
-                    base.LifetimeStart = value;
-            }
+            if (ParentHitObject != null)
+                AccentColour.BindTo(ParentHitObject.AccentColour);
         }
 
-        private double computedLifetimeEnd;
-
-        public override double LifetimeEnd
+        protected override void OnFree()
         {
-            get => base.LifetimeEnd;
-            set
-            {
-                computedLifetimeEnd = value;
+            base.OnFree();
 
-                if (!AlwaysAlive)
-                    base.LifetimeEnd = value;
-            }
-        }
-
-        private bool alwaysAlive;
-
-        /// <summary>
-        /// Whether this <see cref="DrawableManiaHitObject"/> should always remain alive.
-        /// </summary>
-        internal bool AlwaysAlive
-        {
-            get => alwaysAlive;
-            set
-            {
-                if (alwaysAlive == value)
-                    return;
-
-                alwaysAlive = value;
-
-                if (value)
-                {
-                    // Set the base lifetimes directly, to avoid mangling the computed lifetimes
-                    base.LifetimeStart = double.MinValue;
-                    base.LifetimeEnd = double.MaxValue;
-                }
-                else
-                {
-                    LifetimeStart = computedLifetimeStart;
-                    LifetimeEnd = computedLifetimeEnd;
-                }
-            }
+            if (ParentHitObject != null)
+                AccentColour.UnbindFrom(ParentHitObject.AccentColour);
         }
 
         protected virtual void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
@@ -141,12 +111,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject
         where TObject : ManiaHitObject
     {
-        public new readonly TObject HitObject;
+        public new TObject HitObject => (TObject)base.HitObject;
 
         protected DrawableManiaHitObject(TObject hitObject)
             : base(hitObject)
         {
-            HitObject = hitObject;
         }
     }
 }

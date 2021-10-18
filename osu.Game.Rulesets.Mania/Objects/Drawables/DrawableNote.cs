@@ -2,13 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -17,21 +24,53 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IBeatmap beatmap { get; set; }
+
+        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
+
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
 
-        private readonly Drawable headPiece;
+        private Drawable headPiece;
+
+        public DrawableNote()
+            : this(null)
+        {
+        }
 
         public DrawableNote(Note hitObject)
             : base(hitObject)
         {
-            RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+        }
 
-            AddInternal(headPiece = new SkinnableDrawable(new ManiaSkinComponent(Component, hitObject.Column), _ => new DefaultNotePiece())
+        [BackgroundDependencyLoader(true)]
+        private void load(ManiaRulesetConfigManager rulesetConfig)
+        {
+            rulesetConfig?.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
+
+            AddInternal(headPiece = new SkinnableDrawable(new ManiaSkinComponent(Component), _ => new DefaultNotePiece())
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+            updateSnapColour();
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
@@ -59,9 +98,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             ApplyResult(r => r.Type = result);
         }
 
-        public virtual bool OnPressed(ManiaAction action)
+        public virtual bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
-            if (action != Action.Value)
+            if (e.Action != Action.Value)
                 return false;
 
             if (CheckHittable?.Invoke(this, Time.Current) == false)
@@ -70,8 +109,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             return UpdateResult(true);
         }
 
-        public virtual void OnReleased(ManiaAction action)
+        public virtual void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
+        }
+
+        private void updateSnapColour()
+        {
+            if (beatmap == null || HitObject == null) return;
+
+            int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
+
+            Colour = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
         }
     }
 }

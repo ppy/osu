@@ -29,8 +29,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("allow skin lookup", () => storyboard.UseSkinSprites = false);
 
-            AddStep("create sprites", () => SetContents(
-                () => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
+            AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
 
             assertSpritesFromSkin(false);
         }
@@ -42,8 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("allow skin lookup", () => storyboard.UseSkinSprites = true);
 
-            AddStep("create sprites", () => SetContents(
-                () => createSprite(lookup_name, Anchor.Centre, Vector2.Zero)));
+            AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.Centre, Vector2.Zero)));
 
             assertSpritesFromSkin(true);
         }

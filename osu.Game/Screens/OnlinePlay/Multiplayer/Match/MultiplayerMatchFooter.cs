@@ -2,49 +2,62 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchFooter : CompositeDrawable
     {
-        public const float HEIGHT = 50;
+        private const float ready_button_width = 600;
+        private const float spectate_button_width = 200;
 
         public Action OnReadyClick
         {
             set => readyButton.OnReadyClick = value;
         }
 
-        private readonly Drawable background;
+        public Action OnSpectateClick
+        {
+            set => spectateButton.OnSpectateClick = value;
+        }
+
         private readonly MultiplayerReadyButton readyButton;
+        private readonly MultiplayerSpectateButton spectateButton;
 
         public MultiplayerMatchFooter()
         {
-            RelativeSizeAxes = Axes.X;
-            Height = HEIGHT;
+            RelativeSizeAxes = Axes.Both;
 
-            InternalChildren = new[]
+            InternalChild = new GridContainer
             {
-                background = new Box { RelativeSizeAxes = Axes.Both },
-                readyButton = new MultiplayerReadyButton
+                RelativeSizeAxes = Axes.Both,
+                Content = new[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(600, 50),
+                    new Drawable[]
+                    {
+                        null,
+                        spectateButton = new MultiplayerSpectateButton
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        null,
+                        readyButton = new MultiplayerReadyButton
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        null
+                    }
+                },
+                ColumnDimensions = new[]
+                {
+                    new Dimension(),
+                    new Dimension(maxSize: spectate_button_width),
+                    new Dimension(GridSizeMode.Absolute, 5),
+                    new Dimension(maxSize: ready_button_width),
+                    new Dimension()
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            background.Colour = Color4Extensions.FromHex(@"28242d");
         }
     }
 }

@@ -4,12 +4,11 @@
 using System.Collections.Generic;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
-    public interface IBeatmap : IJsonSerializable
+    public interface IBeatmap
     {
         /// <summary>
         /// This beatmap's info.
@@ -20,6 +19,11 @@ namespace osu.Game.Beatmaps
         /// This beatmap's metadata.
         /// </summary>
         BeatmapMetadata Metadata { get; }
+
+        /// <summary>
+        /// This beatmap's difficulty settings.
+        /// </summary>
+        public BeatmapDifficulty Difficulty { get; set; }
 
         /// <summary>
         /// The control points in this beatmap.
@@ -44,7 +48,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Returns statistics for the <see cref="HitObjects"/> contained in this beatmap.
         /// </summary>
-        /// <returns></returns>
         IEnumerable<BeatmapStatistic> GetStatistics();
 
         /// <summary>

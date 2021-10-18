@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -19,8 +20,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private const float panel_padding = 10f;
         private readonly BeatmapSetType type;
 
-        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string headerText)
-            : base(user, headerText, "", CounterVisibilityState.AlwaysVisible)
+        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, LocalisableString headerText)
+            : base(user, headerText)
         {
             this.type = type;
             ItemsPerPage = 6;
@@ -45,11 +46,11 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 case BeatmapSetType.Loved:
                     return user.LovedBeatmapsetCount;
 
-                case BeatmapSetType.RankedAndApproved:
-                    return user.RankedAndApprovedBeatmapsetCount;
+                case BeatmapSetType.Ranked:
+                    return user.RankedBeatmapsetCount;
 
-                case BeatmapSetType.Unranked:
-                    return user.UnrankedBeatmapsetCount;
+                case BeatmapSetType.Pending:
+                    return user.PendingBeatmapsetCount;
 
                 default:
                     return 0;

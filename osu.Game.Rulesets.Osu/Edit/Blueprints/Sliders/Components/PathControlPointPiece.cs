@@ -2,14 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -28,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     public class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
     {
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
+        public List<PathControlPoint> PointsInSegment;
 
         public readonly BindableBool IsSelected = new BindableBool();
         public readonly PathControlPoint ControlPoint;
@@ -47,14 +53,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private IBindable<Vector2> sliderPosition;
         private IBindable<float> sliderScale;
-        private IBindable<Vector2> controlPointPosition;
 
         public PathControlPointPiece(Slider slider, PathControlPoint controlPoint)
         {
             this.slider = slider;
             ControlPoint = controlPoint;
 
-            controlPoint.Type.BindValueChanged(_ => updateMarkerDisplay());
+            // we don't want to run the path type update on construction as it may inadvertently change the slider.
+            cachePoints(slider);
+
+            slider.Path.Version.BindValueChanged(_ =>
+            {
+                cachePoints(slider);
+                updatePathType();
+            });
+
+            controlPoint.Changed += updateMarkerDisplay;
 
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
@@ -102,9 +116,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             sliderPosition = slider.PositionBindable.GetBoundCopy();
             sliderPosition.BindValueChanged(_ => updateMarkerDisplay());
 
-            controlPointPosition = ControlPoint.Position.GetBoundCopy();
-            controlPointPosition.BindValueChanged(_ => updateMarkerDisplay());
-
             sliderScale = slider.ScaleBindable.GetBoundCopy();
             sliderScale.BindValueChanged(_ => updateMarkerDisplay());
 
@@ -150,6 +161,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
         private Vector2 dragStartPosition;
+        private PathType? dragPathType;
 
         protected override bool OnDragStart(DragStartEvent e)
         {
@@ -158,7 +170,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             if (e.Button == MouseButton.Left)
             {
-                dragStartPosition = ControlPoint.Position.Value;
+                dragStartPosition = ControlPoint.Position;
+                dragPathType = PointsInSegment[0].Type;
+
                 changeHandler?.BeginChange();
                 return true;
             }
@@ -168,6 +182,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override void OnDrag(DragEvent e)
         {
+            Vector2[] oldControlPoints = slider.Path.ControlPoints.Select(cp => cp.Position).ToArray();
+            var oldPosition = slider.Position;
+            var oldStartTime = slider.StartTime;
+
             if (ControlPoint == slider.Path.ControlPoints[0])
             {
                 // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
@@ -180,20 +198,55 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
                 for (int i = 1; i < slider.Path.ControlPoints.Count; i++)
-                    slider.Path.ControlPoints[i].Position.Value -= movementDelta;
+                    slider.Path.ControlPoints[i].Position -= movementDelta;
             }
             else
-                ControlPoint.Position.Value = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
+                ControlPoint.Position = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
+
+            if (!slider.Path.HasValidLength)
+            {
+                for (var i = 0; i < slider.Path.ControlPoints.Count; i++)
+                    slider.Path.ControlPoints[i].Position = oldControlPoints[i];
+
+                slider.Position = oldPosition;
+                slider.StartTime = oldStartTime;
+                return;
+            }
+
+            // Maintain the path type in case it got defaulted to bezier at some point during the drag.
+            PointsInSegment[0].Type = dragPathType;
         }
 
         protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
+
+        private void cachePoints(Slider slider) => PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
+
+        /// <summary>
+        /// Handles correction of invalid path types.
+        /// </summary>
+        private void updatePathType()
+        {
+            if (ControlPoint.Type != PathType.PerfectCurve)
+                return;
+
+            if (PointsInSegment.Count > 3)
+                ControlPoint.Type = PathType.Bezier;
+
+            if (PointsInSegment.Count != 3)
+                return;
+
+            ReadOnlySpan<Vector2> points = PointsInSegment.Select(p => p.Position).ToArray();
+            RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
+            if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
+                ControlPoint.Type = PathType.Bezier;
+        }
 
         /// <summary>
         /// Updates the state of the circular control point marker.
         /// </summary>
         private void updateMarkerDisplay()
         {
-            Position = slider.StackedPosition + ControlPoint.Position.Value;
+            Position = slider.StackedPosition + ControlPoint.Position;
 
             markerRing.Alpha = IsSelected.Value ? 1 : 0;
 
@@ -208,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private Color4 getColourFromNodeType()
         {
-            if (!(ControlPoint.Type.Value is PathType pathType))
+            if (!(ControlPoint.Type is PathType pathType))
                 return colours.Yellow;
 
             switch (pathType)
@@ -227,6 +280,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
         }
 
-        public string TooltipText => ControlPoint.Type.Value.ToString() ?? string.Empty;
+        public LocalisableString TooltipText => ControlPoint.Type.ToString() ?? string.Empty;
     }
 }

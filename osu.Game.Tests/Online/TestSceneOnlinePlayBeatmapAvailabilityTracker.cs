@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -38,13 +39,13 @@ namespace osu.Game.Tests.Online
         private BeatmapSetInfo testBeatmapSet;
 
         private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-        private OnlinePlayBeatmapAvailablilityTracker availablilityTracker;
+        private OnlinePlayBeatmapAvailabilityTracker availabilityTracker;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, GameHost host)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, API, audio, host, Beatmap.Default));
+            Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, API, audio, Resources, host, Beatmap.Default));
         }
 
         [SetUp]
@@ -67,7 +68,7 @@ namespace osu.Game.Tests.Online
                 Ruleset = { Value = testBeatmapInfo.Ruleset },
             };
 
-            Child = availablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+            Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem, }
             };
@@ -118,7 +119,7 @@ namespace osu.Game.Tests.Online
             });
             addAvailabilityCheckStep("state still not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("recreate tracker", () => Child = availablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+            AddStep("recreate tracker", () => Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem }
             });
@@ -127,7 +128,7 @@ namespace osu.Game.Tests.Online
 
         private void addAvailabilityCheckStep(string description, Func<BeatmapAvailability> expected)
         {
-            AddAssert(description, () => availablilityTracker.Availability.Value.Equals(expected.Invoke()));
+            AddAssert(description, () => availabilityTracker.Availability.Value.Equals(expected.Invoke()));
         }
 
         private static BeatmapInfo getTestBeatmapInfo(string archiveFile)
@@ -155,20 +156,49 @@ namespace osu.Game.Tests.Online
         {
             public TaskCompletionSource<bool> AllowImport = new TaskCompletionSource<bool>();
 
-            public Task<BeatmapSetInfo> CurrentImportTask { get; private set; }
+            public Task<ILive<BeatmapSetInfo>> CurrentImportTask { get; private set; }
 
-            protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
-                => new TestDownloadRequest(set);
-
-            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
-                : base(storage, contextFactory, rulesets, api, audioManager, host, defaultBeatmap, performOnlineLookups)
+            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
+                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
             {
             }
 
-            public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host)
             {
-                await AllowImport.Task;
-                return await (CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken));
+                return new TestBeatmapModelManager(this, storage, contextFactory, rulesets, api, host);
+            }
+
+            protected override BeatmapModelDownloader CreateBeatmapModelDownloader(IBeatmapModelManager manager, IAPIProvider api, GameHost host)
+            {
+                return new TestBeatmapModelDownloader(manager, api, host);
+            }
+
+            internal class TestBeatmapModelDownloader : BeatmapModelDownloader
+            {
+                public TestBeatmapModelDownloader(IBeatmapModelManager modelManager, IAPIProvider apiProvider, GameHost gameHost)
+                    : base(modelManager, apiProvider, gameHost)
+                {
+                }
+
+                protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
+                    => new TestDownloadRequest(set);
+            }
+
+            internal class TestBeatmapModelManager : BeatmapModelManager
+            {
+                private readonly TestBeatmapManager testBeatmapManager;
+
+                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, IDatabaseContextFactory databaseContextFactory, RulesetStore rulesetStore, IAPIProvider apiProvider, GameHost gameHost)
+                    : base(storage, databaseContextFactory, rulesetStore, gameHost)
+                {
+                    this.testBeatmapManager = testBeatmapManager;
+                }
+
+                public override async Task<ILive<BeatmapSetInfo>> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+                {
+                    await testBeatmapManager.AllowImport.Task.ConfigureAwait(false);
+                    return await (testBeatmapManager.CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken)).ConfigureAwait(false);
+                }
             }
         }
 

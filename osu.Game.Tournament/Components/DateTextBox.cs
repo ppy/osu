@@ -26,7 +26,7 @@ namespace osu.Game.Tournament.Components
 
         public DateTextBox()
         {
-            base.Current = new Bindable<string>();
+            base.Current = new Bindable<string>(string.Empty);
 
             ((OsuTextBox)Control).OnCommit += (sender, newText) =>
             {

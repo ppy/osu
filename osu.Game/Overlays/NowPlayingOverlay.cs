@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Music;
 using osuTK;
 using osuTK.Graphics;
@@ -28,8 +29,8 @@ namespace osu.Game.Overlays
     public class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/music";
-        public string Title => "now playing";
-        public string Description => "manage the currently playing track";
+        public LocalisableString Title => NowPlayingStrings.HeaderTitle;
+        public LocalisableString Description => NowPlayingStrings.HeaderDescription;
 
         private const float player_height = 130;
         private const float transition_length = 800;
@@ -53,11 +54,6 @@ namespace osu.Game.Overlays
 
         protected override string PopInSampleName => "UI/now-playing-pop-in";
         protected override string PopOutSampleName => "UI/now-playing-pop-out";
-
-        /// <summary>
-        /// Provide a source for the toolbar height.
-        /// </summary>
-        public Func<float> GetToolbarHeight;
 
         [Resolved]
         private MusicController musicController { get; set; }
@@ -245,7 +241,6 @@ namespace osu.Game.Overlays
             base.UpdateAfterChildren();
 
             Height = dragContainer.Height;
-            dragContainer.Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
         protected override void Update()

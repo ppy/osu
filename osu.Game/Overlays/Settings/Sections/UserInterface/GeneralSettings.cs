@@ -3,14 +3,16 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override string Header => "General";
+        protected override LocalisableString Header => UserInterfaceStrings.GeneralHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -19,23 +21,23 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Rotate cursor when dragging",
+                    LabelText = UserInterfaceStrings.CursorRotation,
                     Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
                 new SettingsSlider<float, SizeSlider>
                 {
-                    LabelText = "Menu cursor size",
+                    LabelText = UserInterfaceStrings.MenuCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Parallax",
+                    LabelText = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
                 new SettingsSlider<float, TimeSlider>
                 {
-                    LabelText = "Hold-to-confirm activation time",
+                    LabelText = UserInterfaceStrings.HoldToConfirmActivationTime,
                     Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
                     KeyboardStep = 50
                 },
@@ -44,7 +46,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
         private class TimeSlider : OsuSliderBar<float>
         {
-            public override string TooltipText => Current.Value.ToString("N0") + "ms";
+            public override LocalisableString TooltipText => Current.Value.ToString(@"N0") + "ms";
         }
     }
 }

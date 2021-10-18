@@ -15,6 +15,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -29,7 +30,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerMatchSongSelect : RoomTestScene
+    public class TestSceneMultiplayerMatchSongSelect : MultiplayerTestScene
     {
         private BeatmapManager manager;
         private RulesetStore rulesets;
@@ -42,7 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
 
             beatmaps = new List<BeatmapInfo>();
 
@@ -89,7 +90,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 SelectedMods.SetDefault();
             });
 
-            AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect()));
+            AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value)));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen());
         }
 
@@ -168,6 +169,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             public new Bindable<IReadOnlyList<Mod>> FreeMods => base.FreeMods;
 
             public new BeatmapCarousel Carousel => base.Carousel;
+
+            public TestMultiplayerMatchSongSelect(Room room, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
+                : base(room, beatmap, ruleset)
+            {
+            }
         }
     }
 }

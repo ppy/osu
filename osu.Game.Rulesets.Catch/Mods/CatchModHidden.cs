@@ -25,13 +25,14 @@ namespace osu.Game.Rulesets.Catch.Mods
             var drawableCatchRuleset = (DrawableCatchRuleset)drawableRuleset;
             var catchPlayfield = (CatchPlayfield)drawableCatchRuleset.Playfield;
 
-            catchPlayfield.CatcherArea.MovableCatcher.CatchFruitOnPlate = false;
+            catchPlayfield.Catcher.CatchFruitOnPlate = false;
         }
+
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
+            => ApplyNormalVisibilityState(hitObject, state);
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            base.ApplyNormalVisibilityState(hitObject, state);
-
             if (!(hitObject is DrawableCatchHitObject catchDrawable))
                 return;
 
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             var offset = hitObject.TimePreempt * fade_out_offset_multiplier;
             var duration = offset - hitObject.TimePreempt * fade_out_duration_multiplier;
 
-            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - offset, true))
+            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - offset))
                 drawable.FadeOut(duration);
         }
     }

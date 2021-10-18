@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 },
             };
 
-            Action = () => playButton.Click();
+            Action = () => playButton.TriggerClick();
             Playing.ValueChanged += playing => progress.FadeTo(playing.NewValue ? 1 : 0, 100);
         }
 

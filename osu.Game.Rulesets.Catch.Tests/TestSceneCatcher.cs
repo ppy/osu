@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
@@ -20,6 +21,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
@@ -29,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        private Container<CaughtObject> droppedObjectContainer;
+        private DroppedObjectContainer droppedObjectContainer;
 
         private TestCatcher catcher;
 
@@ -41,18 +43,15 @@ namespace osu.Game.Rulesets.Catch.Tests
                 CircleSize = 0,
             };
 
-            var trailContainer = new Container();
-            droppedObjectContainer = new Container<CaughtObject>();
-            catcher = new TestCatcher(trailContainer, droppedObjectContainer, difficulty);
+            droppedObjectContainer = new DroppedObjectContainer();
 
             Child = new Container
             {
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    trailContainer,
                     droppedObjectContainer,
-                    catcher
+                    catcher = new TestCatcher(droppedObjectContainer, difficulty),
                 }
             };
         });
@@ -170,16 +169,25 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [Test]
-        public void TestCatcherStacking()
+        public void TestCatcherRandomStacking()
+        {
+            AddStep("catch more fruits", () => attemptCatch(() => new Fruit
+            {
+                X = (RNG.NextSingle() - 0.5f) * Catcher.CalculateCatchWidth(Vector2.One)
+            }, 50));
+        }
+
+        [Test]
+        public void TestCatcherStackingSameCaughtPosition()
         {
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
             checkPlate(1);
-            AddStep("catch more fruits", () => attemptCatch(new Fruit(), 9));
+            AddStep("catch more fruits", () => attemptCatch(() => new Fruit(), 9));
             checkPlate(10);
             AddAssert("caught objects are stacked", () =>
                 catcher.CaughtObjects.All(obj => obj.Y <= 0) &&
                 catcher.CaughtObjects.Any(obj => obj.Y == 0) &&
-                catcher.CaughtObjects.Any(obj => obj.Y < -20));
+                catcher.CaughtObjects.Any(obj => obj.Y < 0));
         }
 
         [Test]
@@ -189,11 +197,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("catch tiny droplet", () => attemptCatch(new TinyDroplet()));
             AddAssert("tiny droplet is exploded", () => catcher.CaughtObjects.Count() == 1 && droppedObjectContainer.Count == 1);
             AddUntilStep("wait explosion", () => !droppedObjectContainer.Any());
-            AddStep("catch more fruits", () => attemptCatch(new Fruit(), 9));
+            AddStep("catch more fruits", () => attemptCatch(() => new Fruit(), 9));
             AddStep("explode", () => catcher.Explode());
             AddAssert("fruits are exploded", () => !catcher.CaughtObjects.Any() && droppedObjectContainer.Count == 10);
             AddUntilStep("wait explosion", () => !droppedObjectContainer.Any());
-            AddStep("catch fruits", () => attemptCatch(new Fruit(), 10));
+            AddStep("catch fruits", () => attemptCatch(() => new Fruit(), 10));
             AddStep("drop", () => catcher.Drop());
             AddAssert("fruits are dropped", () => !catcher.CaughtObjects.Any() && droppedObjectContainer.Count == 10);
         }
@@ -205,7 +213,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("enable hit lighting", () => config.SetValue(OsuSetting.HitLighting, true));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
             AddAssert("correct hit lighting colour", () =>
-                catcher.ChildrenOfType<HitExplosion>().First()?.ObjectColour == fruitColour);
+                catcher.ChildrenOfType<HitExplosion>().First()?.Entry?.ObjectColour == fruitColour);
         }
 
         [Test]
@@ -222,10 +230,15 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void checkHyperDash(bool state) => AddAssert($"catcher is {(state ? "" : "not ")}hyper dashing", () => catcher.HyperDashing == state);
 
-        private void attemptCatch(CatchHitObject hitObject, int count = 1)
+        private void attemptCatch(CatchHitObject hitObject)
+        {
+            attemptCatch(() => hitObject, 1);
+        }
+
+        private void attemptCatch(Func<CatchHitObject> hitObject, int count)
         {
             for (var i = 0; i < count; i++)
-                attemptCatch(hitObject, out _, out _);
+                attemptCatch(hitObject(), out _, out _);
         }
 
         private void attemptCatch(CatchHitObject hitObject, out DrawableCatchHitObject drawableObject, out JudgementResult result)
@@ -277,15 +290,15 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 
-            public TestCatcher(Container trailsTarget, Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty)
-                : base(trailsTarget, droppedObjectTarget, difficulty)
+            public TestCatcher(DroppedObjectContainer droppedObjectTarget, IBeatmapDifficultyInfo difficulty)
+                : base(droppedObjectTarget, difficulty)
             {
             }
         }
 
         public class TestKiaiFruit : Fruit
         {
-            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
             {
                 controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
                 base.ApplyDefaultsToSelf(controlPointInfo, difficulty);

@@ -16,13 +16,14 @@ using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class LayoutSettings : SettingsSubsection
     {
-        protected override string Header => "Layout";
+        protected override LocalisableString Header => GraphicsSettingsStrings.LayoutHeader;
 
         private FillFlowContainer<SettingsSlider<float>> scalingSettings;
 
@@ -67,20 +68,20 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 windowModeDropdown = new SettingsDropdown<WindowMode>
                 {
-                    LabelText = "Screen mode",
+                    LabelText = GraphicsSettingsStrings.ScreenMode,
                     ItemSource = windowModes,
                     Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
                 resolutionDropdown = new ResolutionSettingsDropdown
                 {
-                    LabelText = "Resolution",
+                    LabelText = GraphicsSettingsStrings.Resolution,
                     ShowsDefaultIndicator = false,
                     ItemSource = resolutions,
                     Current = sizeFullscreen
                 },
                 new SettingsSlider<float, UIScaleSlider>
                 {
-                    LabelText = "UI Scaling",
+                    LabelText = GraphicsSettingsStrings.UIScaling,
                     TransferValueOnCommit = true,
                     Current = osuConfig.GetBindable<float>(OsuSetting.UIScale),
                     KeyboardStep = 0.01f,
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 new SettingsEnumDropdown<ScalingMode>
                 {
-                    LabelText = "Screen Scaling",
+                    LabelText = GraphicsSettingsStrings.ScreenScaling,
                     Current = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
                     Keywords = new[] { "scale", "letterbox" },
                 },
@@ -97,35 +98,33 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    AutoSizeDuration = transition_duration,
-                    AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
                     Children = new[]
                     {
                         new SettingsSlider<float>
                         {
-                            LabelText = "Horizontal position",
+                            LabelText = GraphicsSettingsStrings.HorizontalPosition,
                             Current = scalingPositionX,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
-                            LabelText = "Vertical position",
+                            LabelText = GraphicsSettingsStrings.VerticalPosition,
                             Current = scalingPositionY,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
-                            LabelText = "Horizontal scale",
+                            LabelText = GraphicsSettingsStrings.HorizontalScale,
                             Current = scalingSizeX,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
-                            LabelText = "Vertical scale",
+                            LabelText = GraphicsSettingsStrings.VerticalScale,
                             Current = scalingSizeY,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
@@ -141,7 +140,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
-            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
+            windowModeDropdown.Current.BindValueChanged(mode =>
+            {
+                updateResolutionDropdown();
+
+                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? GraphicsSettingsStrings.NotFullscreenNote : default;
+            }, true);
 
             windowModes.BindCollectionChanged((sender, args) =>
             {
@@ -170,13 +174,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingMode.BindValueChanged(mode =>
             {
                 scalingSettings.ClearTransforms();
-                scalingSettings.AutoSizeAxes = mode.NewValue != ScalingMode.Off ? Axes.Y : Axes.None;
+                scalingSettings.AutoSizeDuration = transition_duration;
+                scalingSettings.AutoSizeEasing = Easing.OutQuint;
 
-                if (mode.NewValue == ScalingMode.Off)
-                    scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+                updateScalingModeVisibility();
+            });
 
-                scalingSettings.ForEach(s => s.TransferValueOnCommit = mode.NewValue == ScalingMode.Everything);
-            }, true);
+            // initial update bypasses transforms
+            updateScalingModeVisibility();
 
             void updateResolutionDropdown()
             {
@@ -184,6 +189,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     resolutionDropdown.Show();
                 else
                     resolutionDropdown.Hide();
+            }
+
+            void updateScalingModeVisibility()
+            {
+                if (scalingMode.Value == ScalingMode.Off)
+                    scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+
+                scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
+                scalingSettings.ForEach(s => s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything);
             }
         }
 
@@ -226,7 +240,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private class UIScaleSlider : OsuSliderBar<float>
         {
-            public override string TooltipText => base.TooltipText + "x";
+            public override LocalisableString TooltipText => base.TooltipText + "x";
         }
 
         private class ResolutionSettingsDropdown : SettingsDropdown<Size>
@@ -238,7 +252,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 protected override LocalisableString GenerateItemText(Size item)
                 {
                     if (item == new Size(9999, 9999))
-                        return "Default";
+                        return CommonStrings.Default;
 
                     return $"{item.Width}x{item.Height}";
                 }

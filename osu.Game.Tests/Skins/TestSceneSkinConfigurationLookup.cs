@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -132,11 +133,12 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestEmptyComboColoursNoFallback()
         {
-            AddStep("Add custom combo colours to user skin", () => userSource.Configuration.AddComboColours(
+            AddStep("Add custom combo colours to user skin", () => userSource.Configuration.CustomComboColours = new List<Color4>
+            {
                 new Color4(100, 150, 200, 255),
                 new Color4(55, 110, 166, 255),
                 new Color4(75, 125, 175, 255)
-            ));
+            });
 
             AddStep("Disallow default colours fallback in beatmap skin", () => beatmapSource.Configuration.AllowDefaultComboColoursFallback = false);
 
@@ -222,6 +224,8 @@ namespace osu.Game.Tests.Skins
             public ISample GetSample(ISampleInfo sampleInfo) => skin.GetSample(sampleInfo);
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => skin.GetConfig<TLookup, TValue>(lookup);
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => skin.FindProvider(lookupFunction);
         }
     }
 }

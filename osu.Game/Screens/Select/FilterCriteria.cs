@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Select
         public OptionalRange<float> ApproachRate;
         public OptionalRange<float> DrainRate;
         public OptionalRange<float> CircleSize;
+        public OptionalRange<float> OverallDifficulty;
         public OptionalRange<double> Length;
         public OptionalRange<double> BPM;
         public OptionalRange<int> BeatDivisor;
@@ -55,7 +56,7 @@ namespace osu.Game.Screens.Select
             set
             {
                 searchText = value;
-                SearchTerms = searchText.Split(new[] { ',', ' ', '!' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
+                SearchTerms = searchText.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
 
                 SearchNumber = null;
 

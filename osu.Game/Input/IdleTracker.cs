@@ -6,13 +6,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Input
 {
     /// <summary>
     /// Track whether the end-user is in an idle state, based on their last interaction with the game.
     /// </summary>
-    public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>, IHandleGlobalKeyboardInput
+    public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly double timeToIdle;
 
@@ -42,15 +43,25 @@ namespace osu.Game.Input
             RelativeSizeAxes = Axes.Both;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateLastInteractionTime();
+        }
+
         protected override void Update()
         {
             base.Update();
             isIdle.Value = TimeSpentIdle > timeToIdle && AllowIdle;
         }
 
-        public bool OnPressed(PlatformAction action) => updateLastInteractionTime();
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e) => updateLastInteractionTime();
 
-        public void OnReleased(PlatformAction action) => updateLastInteractionTime();
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e) => updateLastInteractionTime();
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e) => updateLastInteractionTime();
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => updateLastInteractionTime();
 
         protected override bool Handle(UIEvent e)
         {

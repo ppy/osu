@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -21,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyMainCirclePiece : CompositeDrawable
     {
+        public override bool RemoveCompletedTransforms => false;
+
         private readonly string priorityLookup;
         private readonly bool hasNumber;
 
@@ -32,10 +33,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
 
-        private Container<Sprite> circleSprites;
-        private Sprite hitCircleSprite;
-        private Sprite hitCircleOverlay;
+        private Drawable hitCircleSprite;
 
+        protected Container OverlayLayer { get; private set; }
+
+        private Drawable hitCircleOverlay;
         private SkinnableSpriteText hitCircleText;
 
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
@@ -69,34 +71,30 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png (potentially from the default/fall-through skin).
             Texture overlayTexture = getTextureWithFallback("overlay");
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                circleSprites = new Container<Sprite>
+                hitCircleSprite = new KiaiFlashingSprite
+                {
+                    Texture = baseTexture,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                OverlayLayer = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
+                    Child = hitCircleOverlay = new KiaiFlashingSprite
                     {
-                        hitCircleSprite = new Sprite
-                        {
-                            Texture = baseTexture,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        hitCircleOverlay = new Sprite
-                        {
-                            Texture = overlayTexture,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }
-                    }
-                },
+                        Texture = overlayTexture,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                }
             };
 
             if (hasNumber)
             {
-                AddInternal(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
+                OverlayLayer.Add(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
@@ -110,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
 
             if (overlayAboveNumber)
-                AddInternal(hitCircleOverlay.CreateProxy());
+                OverlayLayer.ChangeChildDepth(hitCircleOverlay, float.MinValue);
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
@@ -139,21 +137,24 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (hasNumber)
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
 
-            drawableObject.ApplyCustomUpdateState += updateState;
-            updateState(drawableObject, drawableObject.State.Value);
+            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
+            updateStateTransforms(drawableObject, drawableObject.State.Value);
         }
 
-        private void updateState(DrawableHitObject drawableObject, ArmedState state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             const double legacy_fade_duration = 240;
 
-            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime, true))
+            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        circleSprites.FadeOut(legacy_fade_duration, Easing.Out);
-                        circleSprites.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        hitCircleSprite.FadeOut(legacy_fade_duration, Easing.Out);
+                        hitCircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+
+                        hitCircleOverlay.FadeOut(legacy_fade_duration, Easing.Out);
+                        hitCircleOverlay.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
                         if (hasNumber)
                         {
@@ -173,6 +174,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         break;
                 }
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableObject != null)
+                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

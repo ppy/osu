@@ -127,18 +127,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             return false;
         }
 
-        public bool OnPressed(PlatformAction action)
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            switch (action.ActionMethod)
+            switch (e.Action)
             {
-                case PlatformActionMethod.Delete:
+                case PlatformAction.Delete:
                     return DeleteSelected();
             }
 
             return false;
         }
 
-        public void OnReleased(PlatformAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
         }
 
@@ -151,6 +151,34 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 foreach (var p in Pieces)
                     p.IsSelected.Value = p == piece;
             }
+        }
+
+        /// <summary>
+        /// Attempts to set the given control point piece to the given path type.
+        /// If that would fail, try to change the path such that it instead succeeds
+        /// in a UX-friendly way.
+        /// </summary>
+        /// <param name="piece">The control point piece that we want to change the path type of.</param>
+        /// <param name="type">The path type we want to assign to the given control point piece.</param>
+        private void updatePathType(PathControlPointPiece piece, PathType? type)
+        {
+            int indexInSegment = piece.PointsInSegment.IndexOf(piece.ControlPoint);
+
+            switch (type)
+            {
+                case PathType.PerfectCurve:
+                    // Can't always create a circular arc out of 4 or more points,
+                    // so we split the segment into one 3-point circular arc segment
+                    // and one segment of the previous type.
+                    int thirdPointIndex = indexInSegment + 2;
+
+                    if (piece.PointsInSegment.Count > thirdPointIndex + 1)
+                        piece.PointsInSegment[thirdPointIndex].Type = piece.PointsInSegment[0].Type;
+
+                    break;
+            }
+
+            piece.ControlPoint.Type = type;
         }
 
         [Resolved(CanBeNull = true)]
@@ -213,12 +241,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private MenuItem createMenuItemForPathType(PathType? type)
         {
             int totalCount = Pieces.Count(p => p.IsSelected.Value);
-            int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type.Value == type);
+            int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type == type);
 
-            var item = new PathTypeMenuItem(type, () =>
+            var item = new TernaryStateRadioMenuItem(type == null ? "Inherit" : type.ToString().Humanize(), MenuItemType.Standard, _ =>
             {
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
-                    p.ControlPoint.Type.Value = type;
+                    updatePathType(p, type);
             });
 
             if (countOfState == totalCount)
@@ -229,16 +257,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 item.State.Value = TernaryState.False;
 
             return item;
-        }
-
-        private class PathTypeMenuItem : TernaryStateMenuItem
-        {
-            public PathTypeMenuItem(PathType? type, Action action)
-                : base(type == null ? "Inherit" : type.ToString().Humanize(), changeState, MenuItemType.Standard, _ => action?.Invoke())
-            {
-            }
-
-            private static TernaryState changeState(TernaryState state) => TernaryState.True;
         }
     }
 }

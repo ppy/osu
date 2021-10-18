@@ -3,13 +3,15 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
     public class GraphicsSection : SettingsSection
     {
-        public override string Header => "Graphics";
+        public override LocalisableString Header => GraphicsSettingsStrings.GraphicsSectionHeader;
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
@@ -20,9 +22,9 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                new RendererSettings(),
                 new LayoutSettings(),
-                new DetailSettings(),
+                new RendererSettings(),
+                new ScreenshotSettings(),
             };
         }
     }

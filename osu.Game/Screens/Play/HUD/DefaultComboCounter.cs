@@ -4,19 +4,21 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultComboCounter : RollingCounter<int>, IComboCounter
+    public class DefaultComboCounter : RollingCounter<int>, ISkinnableDrawable
     {
-        private readonly Vector2 offset = new Vector2(20, 5);
-
         [Resolved(canBeNull: true)]
         private HUDOverlay hud { get; set; }
+
+        public bool UsesFixedAnchor { get; set; }
 
         public DefaultComboCounter()
         {
@@ -24,20 +26,13 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => Colour = colours.BlueLighter;
-
-        protected override void Update()
+        private void load(OsuColour colours, ScoreProcessor scoreProcessor)
         {
-            base.Update();
-
-            if (hud?.ScoreCounter.Drawable is DefaultScoreCounter score)
-            {
-                // for now align with the score counter. eventually this will be user customisable.
-                Position = Parent.ToLocalSpace(score.ScreenSpaceDrawQuad.TopRight) + offset;
-            }
+            Colour = colours.BlueLighter;
+            Current.BindTo(scoreProcessor.Combo);
         }
 
-        protected override string FormatCount(int count)
+        protected override LocalisableString FormatCount(int count)
         {
             return $@"{count}x";
         }

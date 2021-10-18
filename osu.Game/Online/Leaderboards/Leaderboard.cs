@@ -44,9 +44,9 @@ namespace osu.Game.Online.Leaderboards
 
         protected override Container<Drawable> Content => content;
 
-        private IEnumerable<TScoreInfo> scores;
+        private ICollection<TScoreInfo> scores;
 
-        public IEnumerable<TScoreInfo> Scores
+        public ICollection<TScoreInfo> Scores
         {
             get => scores;
             set
@@ -82,7 +82,7 @@ namespace osu.Game.Online.Leaderboards
 
                     foreach (var s in scrollFlow.Children)
                     {
-                        using (s.BeginDelayedSequence(i++ * 50, true))
+                        using (s.BeginDelayedSequence(i++ * 50))
                             s.Show();
                     }
 
@@ -126,7 +126,7 @@ namespace osu.Game.Online.Leaderboards
                     return;
 
                 scope = value;
-                UpdateScores();
+                RefreshScores();
             }
         }
 
@@ -154,7 +154,7 @@ namespace osu.Game.Online.Leaderboards
                     case PlaceholderState.NetworkFailure:
                         replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
                         {
-                            Action = UpdateScores,
+                            Action = RefreshScores
                         });
                         break;
 
@@ -254,9 +254,8 @@ namespace osu.Game.Online.Leaderboards
             apiState.BindValueChanged(onlineStateChanged, true);
         }
 
-        public void RefreshScores() => UpdateScores();
-
         private APIRequest getScoresRequest;
+        private ScheduledDelegate getScoresRequestCallback;
 
         protected abstract bool IsOnlineScope { get; }
 
@@ -267,11 +266,13 @@ namespace osu.Game.Online.Leaderboards
                 case APIState.Online:
                 case APIState.Offline:
                     if (IsOnlineScope)
-                        UpdateScores();
+                        RefreshScores();
 
                     break;
             }
         });
+
+        public void RefreshScores() => Scheduler.AddOnce(UpdateScores);
 
         protected void UpdateScores()
         {
@@ -282,22 +283,25 @@ namespace osu.Game.Online.Leaderboards
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
+            getScoresRequestCallback?.Cancel();
+            getScoresRequestCallback = null;
+
             pendingUpdateScores?.Cancel();
             pendingUpdateScores = Schedule(() =>
             {
                 PlaceholderState = PlaceholderState.Retrieving;
                 loading.Show();
 
-                getScoresRequest = FetchScores(scores => Schedule(() =>
+                getScoresRequest = FetchScores(scores => getScoresRequestCallback = Schedule(() =>
                 {
-                    Scores = scores;
+                    Scores = scores.ToArray();
                     PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
                 }));
 
                 if (getScoresRequest == null)
                     return;
 
-                getScoresRequest.Failure += e => Schedule(() =>
+                getScoresRequest.Failure += e => getScoresRequestCallback = Schedule(() =>
                 {
                     if (e is OperationCanceledException)
                         return;

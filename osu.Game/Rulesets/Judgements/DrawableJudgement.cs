@@ -32,17 +32,8 @@ namespace osu.Game.Rulesets.Judgements
 
         private readonly Container aboveHitObjectsContent;
 
-        /// <summary>
-        /// Duration of initial fade in.
-        /// </summary>
-        [Obsolete("Apply any animations manually via ApplyHitAnimations / ApplyMissAnimations. Defaults were moved inside skinned components.")]
-        protected virtual double FadeInDuration => 100;
-
-        /// <summary>
-        /// Duration to wait until fade out begins. Defaults to <see cref="FadeInDuration"/>.
-        /// </summary>
-        [Obsolete("Apply any animations manually via ApplyHitAnimations / ApplyMissAnimations. Defaults were moved inside skinned components.")]
-        protected virtual double FadeOutDelay => FadeInDuration;
+        private readonly Lazy<Drawable> proxiedAboveHitObjectsContent;
+        public Drawable ProxiedAboveHitObjectsContent => proxiedAboveHitObjectsContent.Value;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
@@ -65,6 +56,8 @@ namespace osu.Game.Rulesets.Judgements
                 Depth = float.MinValue,
                 RelativeSizeAxes = Axes.Both
             });
+
+            proxiedAboveHitObjectsContent = new Lazy<Drawable>(() => aboveHitObjectsContent.CreateProxy());
         }
 
         [BackgroundDependencyLoader]
@@ -72,8 +65,6 @@ namespace osu.Game.Rulesets.Judgements
         {
             prepareDrawables();
         }
-
-        public Drawable GetProxyAboveHitObjectsContent() => aboveHitObjectsContent.CreateProxy();
 
         /// <summary>
         /// Apply top-level animations to the current judgement when successfully hit.
@@ -130,7 +121,7 @@ namespace osu.Game.Rulesets.Judgements
 
             LifetimeStart = Result.TimeAbsolute;
 
-            using (BeginAbsoluteSequence(Result.TimeAbsolute, true))
+            using (BeginAbsoluteSequence(Result.TimeAbsolute))
             {
                 // not sure if this should remain going forward.
                 JudgementBody.ResetAnimation();

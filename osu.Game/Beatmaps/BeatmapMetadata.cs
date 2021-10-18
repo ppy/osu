@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
@@ -14,13 +13,18 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey
+    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey, IBeatmapMetadataInfo
     {
         public int ID { get; set; }
 
         public string Title { get; set; }
+
+        [JsonProperty("title_unicode")]
         public string TitleUnicode { get; set; }
+
         public string Artist { get; set; }
+
+        [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; }
 
         [JsonIgnore]
@@ -32,12 +36,31 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Helper property to deserialize a username to <see cref="User"/>.
         /// </summary>
+        [JsonProperty(@"user_id")]
+        [Column("AuthorID")]
+        public int AuthorID
+        {
+            get => Author?.Id ?? 1;
+            set
+            {
+                Author ??= new User();
+                Author.Id = value;
+            }
+        }
+
+        /// <summary>
+        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// </summary>
         [JsonProperty(@"creator")]
         [Column("Author")]
         public string AuthorString
         {
             get => Author?.Username;
-            set => Author = new User { Username = value };
+            set
+            {
+                Author ??= new User();
+                Author.Username = value;
+            }
         }
 
         /// <summary>
@@ -58,41 +81,13 @@ namespace osu.Game.Beatmaps
         public int PreviewTime { get; set; }
 
         public string AudioFile { get; set; }
+
         public string BackgroundFile { get; set; }
 
-        public override string ToString()
-        {
-            string author = Author == null ? string.Empty : $"({Author})";
-            return $"{Artist} - {Title} {author}".Trim();
-        }
+        public bool Equals(BeatmapMetadata other) => ((IBeatmapMetadataInfo)this).Equals(other);
 
-        [JsonIgnore]
-        public string[] SearchableTerms => new[]
-        {
-            Author?.Username,
-            Artist,
-            ArtistUnicode,
-            Title,
-            TitleUnicode,
-            Source,
-            Tags
-        }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+        public override string ToString() => this.GetDisplayTitle();
 
-        public bool Equals(BeatmapMetadata other)
-        {
-            if (other == null)
-                return false;
-
-            return Title == other.Title
-                   && TitleUnicode == other.TitleUnicode
-                   && Artist == other.Artist
-                   && ArtistUnicode == other.ArtistUnicode
-                   && AuthorString == other.AuthorString
-                   && Source == other.Source
-                   && Tags == other.Tags
-                   && PreviewTime == other.PreviewTime
-                   && AudioFile == other.AudioFile
-                   && BackgroundFile == other.BackgroundFile;
-        }
+        string IBeatmapMetadataInfo.Author => AuthorString;
     }
 }

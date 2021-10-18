@@ -16,11 +16,15 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "PF";
         public override IconUsage? Icon => OsuIcon.ModPerfect;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override bool Ranked => true;
         public override double ScoreMultiplier => 1;
         public override string Description => "SS or quit.";
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModSuddenDeath)).ToArray();
+
+        protected ModPerfect()
+        {
+            Restart.Value = Restart.Default = true;
+        }
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
             => result.Type.AffectsAccuracy()

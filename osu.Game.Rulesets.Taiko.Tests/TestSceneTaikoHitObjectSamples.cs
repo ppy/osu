@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         protected override Ruleset CreatePlayerRuleset() => new TaikoRuleset();
 
-        protected override IResourceStore<byte[]> Resources => new DllResourceStore(Assembly.GetAssembly(typeof(TestSceneTaikoHitObjectSamples)));
+        protected override IResourceStore<byte[]> RulesetResources => new DllResourceStore(Assembly.GetAssembly(typeof(TestSceneTaikoHitObjectSamples)));
 
         [TestCase("taiko-normal-hitnormal")]
         [TestCase("normal-hitnormal")]

@@ -24,15 +24,19 @@ using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Online;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
+    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, IKeyBindingHandler<PlatformAction>
     {
         public string IconTexture => "Icons/Hexacons/messaging";
-        public string Title => "chat";
-        public string Description => "join the real-time discussion";
+        public LocalisableString Title => ChatStrings.HeaderTitle;
+        public LocalisableString Description => ChatStrings.HeaderDescription;
 
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
@@ -280,6 +284,10 @@ namespace osu.Game.Overlays
                     if (currentChannel.Value != e.NewValue)
                         return;
 
+                    // check once more to ensure the channel hasn't since been removed from the loaded channels list (may have been left by some automated means).
+                    if (!loadedChannels.Contains(loaded))
+                        return;
+
                     loading.Hide();
 
                     currentChannelContainer.Clear(false);
@@ -368,6 +376,30 @@ namespace osu.Game.Overlays
             return base.OnKeyDown(e);
         }
 
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+        {
+            switch (e.Action)
+            {
+                case PlatformAction.TabNew:
+                    ChannelTabControl.SelectChannelSelectorTab();
+                    return true;
+
+                case PlatformAction.TabRestore:
+                    channelManager.JoinLastClosedChannel();
+                    return true;
+
+                case PlatformAction.DocumentClose:
+                    channelManager.LeaveChannel(channelManager.CurrentChannel.Value);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
+        {
+        }
+
         public override bool AcceptsFocus => true;
 
         protected override void OnFocus(FocusEvent e)
@@ -416,10 +448,9 @@ namespace osu.Game.Overlays
 
                         if (loaded != null)
                         {
-                            loadedChannels.Remove(loaded);
-
                             // Because the container is only cleared in the async load callback of a new channel, it is forcefully cleared
                             // to ensure that the previous channel doesn't get updated after it's disposed
+                            loadedChannels.Remove(loaded);
                             currentChannelContainer.Remove(loaded);
                             loaded.Dispose();
                         }

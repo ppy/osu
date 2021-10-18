@@ -5,6 +5,8 @@ using System;
 using Foundation;
 using osu.Game;
 using osu.Game.Updater;
+using osu.Game.Utils;
+using Xamarin.Essentials;
 
 namespace osu.iOS
 {
@@ -13,5 +15,14 @@ namespace osu.iOS
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
+
+        protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
+
+        private class IOSBatteryInfo : BatteryInfo
+        {
+            public override double ChargeLevel => Battery.ChargeLevel;
+
+            public override bool IsCharging => Battery.PowerSource != BatteryPowerSource.Battery;
+        }
     }
 }

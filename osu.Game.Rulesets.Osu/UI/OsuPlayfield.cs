@@ -24,6 +24,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
+    [Cached]
     public class OsuPlayfield : Playfield
     {
         private readonly PlayfieldBorder playfieldBorder;
@@ -42,6 +43,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public OsuPlayfield()
         {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
             InternalChildren = new Drawable[]
             {
                 playfieldBorder = new PlayfieldBorder { RelativeSizeAxes = Axes.Both },
@@ -57,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             var hitWindows = new OsuHitWindows();
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
-                poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgmentLoaded));
+                poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgementLoaded));
 
             AddRangeInternal(poolDictionary.Values);
 
@@ -99,9 +103,9 @@ namespace osu.Game.Rulesets.Osu.UI
             }
         }
 
-        private void onJudgmentLoaded(DrawableOsuJudgement judgement)
+        private void onJudgementLoaded(DrawableOsuJudgement judgement)
         {
-            judgementAboveHitObjectLayer.Add(judgement.GetProxyAboveHitObjectsContent());
+            judgementAboveHitObjectLayer.Add(judgement.ProxiedAboveHitObjectsContent);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -147,6 +151,10 @@ namespace osu.Game.Rulesets.Osu.UI
             DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj => doj.Apply(result, judgedObject));
 
             judgementLayer.Add(explosion);
+
+            // the proxied content is added to judgementAboveHitObjectLayer once, on first load, and never removed from it.
+            // ensure that ordering is consistent with expectations (latest judgement should be front-most).
+            judgementAboveHitObjectLayer.ChangeChildDepth(explosion.ProxiedAboveHitObjectsContent, (float)-result.TimeAbsolute);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);

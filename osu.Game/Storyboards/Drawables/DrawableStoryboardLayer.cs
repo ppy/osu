@@ -5,6 +5,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -15,6 +16,8 @@ namespace osu.Game.Storyboards.Drawables
 
         public override bool IsPresent => Enabled && base.IsPresent;
 
+        protected LayerElementContainer ElementContainer { get; }
+
         public DrawableStoryboardLayer(StoryboardLayer layer)
         {
             Layer = layer;
@@ -24,10 +27,10 @@ namespace osu.Game.Storyboards.Drawables
             Enabled = layer.VisibleWhenPassing;
             Masking = layer.Masking;
 
-            InternalChild = new LayerElementContainer(layer);
+            InternalChild = ElementContainer = new LayerElementContainer(layer);
         }
 
-        private class LayerElementContainer : LifetimeManagementContainer
+        protected class LayerElementContainer : LifetimeManagementContainer
         {
             private readonly StoryboardLayer storyboardLayer;
 
@@ -35,8 +38,8 @@ namespace osu.Game.Storyboards.Drawables
             {
                 storyboardLayer = layer;
 
-                Width = 640;
-                Height = 480;
+                Size = new Vector2(640, 480);
+
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
             }

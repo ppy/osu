@@ -8,9 +8,8 @@ namespace osu.Game.Rulesets.Catch
         Fruit,
         Banana,
         Droplet,
-        CatcherIdle,
-        CatcherFail,
-        CatcherKiai,
-        CatchComboCounter
+        Catcher,
+        CatchComboCounter,
+        HitExplosion
     }
 }

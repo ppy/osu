@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Win32;
+using osu.Desktop.Security;
 using osu.Desktop.Overlays;
 using osu.Framework.Platform;
 using osu.Game;
@@ -56,7 +57,7 @@ namespace osu.Desktop
 
         private string getStableInstallPath()
         {
-            static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
+            static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs")) || File.Exists(Path.Combine(p, "osu!.cfg"));
 
             string stableInstallPath;
 
@@ -114,6 +115,8 @@ namespace osu.Desktop
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
+
+            LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)

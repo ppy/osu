@@ -4,14 +4,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
+using osu.Framework.Utils;
+using osu.Game.Screens.Edit;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
     [Serializable]
-    public class ControlPointInfo
+    public class ControlPointInfo : IDeepCloneable<ControlPointInfo>
     {
         /// <summary>
         /// All control points grouped by time.
@@ -30,22 +34,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         private readonly SortedList<TimingControlPoint> timingPoints = new SortedList<TimingControlPoint>(Comparer<TimingControlPoint>.Default);
 
         /// <summary>
-        /// All difficulty points.
-        /// </summary>
-        [JsonProperty]
-        public IReadOnlyList<DifficultyControlPoint> DifficultyPoints => difficultyPoints;
-
-        private readonly SortedList<DifficultyControlPoint> difficultyPoints = new SortedList<DifficultyControlPoint>(Comparer<DifficultyControlPoint>.Default);
-
-        /// <summary>
-        /// All sound points.
-        /// </summary>
-        [JsonProperty]
-        public IBindableList<SampleControlPoint> SamplePoints => samplePoints;
-
-        private readonly BindableList<SampleControlPoint> samplePoints = new BindableList<SampleControlPoint>();
-
-        /// <summary>
         /// All effect points.
         /// </summary>
         [JsonProperty]
@@ -60,32 +48,20 @@ namespace osu.Game.Beatmaps.ControlPoints
         public IEnumerable<ControlPoint> AllControlPoints => Groups.SelectMany(g => g.ControlPoints).ToArray();
 
         /// <summary>
-        /// Finds the difficulty control point that is active at <paramref name="time"/>.
-        /// </summary>
-        /// <param name="time">The time to find the difficulty control point at.</param>
-        /// <returns>The difficulty control point.</returns>
-        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearchWithFallback(DifficultyPoints, time, DifficultyControlPoint.DEFAULT);
-
-        /// <summary>
         /// Finds the effect control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the effect control point at.</param>
         /// <returns>The effect control point.</returns>
-        public EffectControlPoint EffectPointAt(double time) => binarySearchWithFallback(EffectPoints, time, EffectControlPoint.DEFAULT);
-
-        /// <summary>
-        /// Finds the sound control point that is active at <paramref name="time"/>.
-        /// </summary>
-        /// <param name="time">The time to find the sound control point at.</param>
-        /// <returns>The sound control point.</returns>
-        public SampleControlPoint SamplePointAt(double time) => binarySearchWithFallback(SamplePoints, time, SamplePoints.Count > 0 ? SamplePoints[0] : SampleControlPoint.DEFAULT);
+        [NotNull]
+        public EffectControlPoint EffectPointAt(double time) => BinarySearchWithFallback(EffectPoints, time, EffectControlPoint.DEFAULT);
 
         /// <summary>
         /// Finds the timing control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <returns>The timing control point.</returns>
-        public TimingControlPoint TimingPointAt(double time) => binarySearchWithFallback(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : TimingControlPoint.DEFAULT);
+        [NotNull]
+        public TimingControlPoint TimingPointAt(double time) => BinarySearchWithFallback(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : TimingControlPoint.DEFAULT);
 
         /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
@@ -104,12 +80,10 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// Remove all <see cref="ControlPointGroup"/>s and return to a pristine state.
         /// </summary>
-        public void Clear()
+        public virtual void Clear()
         {
             groups.Clear();
             timingPoints.Clear();
-            difficultyPoints.Clear();
-            samplePoints.Clear();
             effectPoints.Clear();
         }
 
@@ -121,7 +95,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <returns>Whether the control point was added.</returns>
         public bool Add(double time, ControlPoint controlPoint)
         {
-            if (checkAlreadyExisting(time, controlPoint))
+            if (CheckAlreadyExisting(time, controlPoint))
                 return false;
 
             GroupAt(time, true).Add(controlPoint);
@@ -139,8 +113,8 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             if (addIfNotExisting)
             {
-                newGroup.ItemAdded += groupItemAdded;
-                newGroup.ItemRemoved += groupItemRemoved;
+                newGroup.ItemAdded += GroupItemAdded;
+                newGroup.ItemRemoved += GroupItemRemoved;
 
                 groups.Insert(~i, newGroup);
                 return newGroup;
@@ -154,10 +128,62 @@ namespace osu.Game.Beatmaps.ControlPoints
             foreach (var item in group.ControlPoints.ToArray())
                 group.Remove(item);
 
-            group.ItemAdded -= groupItemAdded;
-            group.ItemRemoved -= groupItemRemoved;
+            group.ItemAdded -= GroupItemAdded;
+            group.ItemRemoved -= GroupItemRemoved;
 
             groups.Remove(group);
+        }
+
+        /// <summary>
+        /// Returns the time on the given beat divisor closest to the given time.
+        /// </summary>
+        /// <param name="time">The time to find the closest snapped time to.</param>
+        /// <param name="beatDivisor">The beat divisor to snap to.</param>
+        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
+        public double GetClosestSnappedTime(double time, int beatDivisor, double? referenceTime = null)
+        {
+            var timingPoint = TimingPointAt(referenceTime ?? time);
+            return getClosestSnappedTime(timingPoint, time, beatDivisor);
+        }
+
+        /// <summary>
+        /// Returns the time on *ANY* valid beat divisor, favouring the divisor closest to the given time.
+        /// </summary>
+        /// <param name="time">The time to find the closest snapped time to.</param>
+        public double GetClosestSnappedTime(double time) => GetClosestSnappedTime(time, GetClosestBeatDivisor(time));
+
+        /// <summary>
+        /// Returns the beat snap divisor closest to the given time. If two are equally close, the smallest divisor is returned.
+        /// </summary>
+        /// <param name="time">The time to find the closest beat snap divisor to.</param>
+        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
+        public int GetClosestBeatDivisor(double time, double? referenceTime = null)
+        {
+            TimingControlPoint timingPoint = TimingPointAt(referenceTime ?? time);
+
+            int closestDivisor = 0;
+            double closestTime = double.MaxValue;
+
+            foreach (int divisor in BindableBeatDivisor.VALID_DIVISORS)
+            {
+                double distanceFromSnap = Math.Abs(time - getClosestSnappedTime(timingPoint, time, divisor));
+
+                if (Precision.DefinitelyBigger(closestTime, distanceFromSnap))
+                {
+                    closestDivisor = divisor;
+                    closestTime = distanceFromSnap;
+                }
+            }
+
+            return closestDivisor;
+        }
+
+        private static double getClosestSnappedTime(TimingControlPoint timingPoint, double time, int beatDivisor)
+        {
+            var beatLength = timingPoint.BeatLength / beatDivisor;
+            var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
+
+            return timingPoint.Time + beatLengths * beatLength;
         }
 
         /// <summary>
@@ -168,10 +194,10 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the control point at.</param>
         /// <param name="fallback">The control point to use when <paramref name="time"/> is before any control points.</param>
         /// <returns>The active control point at <paramref name="time"/>, or a fallback <see cref="ControlPoint"/> if none found.</returns>
-        private T binarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
+        protected T BinarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
             where T : ControlPoint
         {
-            return binarySearch(list, time) ?? fallback;
+            return BinarySearch(list, time) ?? fallback;
         }
 
         /// <summary>
@@ -180,7 +206,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
         /// <returns>The active control point at <paramref name="time"/>.</returns>
-        private T binarySearch<T>(IReadOnlyList<T> list, double time)
+        protected virtual T BinarySearch<T>(IReadOnlyList<T> list, double time)
             where T : ControlPoint
         {
             if (list == null)
@@ -220,7 +246,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the timing control point at.</param>
         /// <param name="newPoint">A point to be added.</param>
         /// <returns>Whether the new point should be added.</returns>
-        private bool checkAlreadyExisting(double time, ControlPoint newPoint)
+        protected virtual bool CheckAlreadyExisting(double time, ControlPoint newPoint)
         {
             ControlPoint existing = null;
 
@@ -228,26 +254,18 @@ namespace osu.Game.Beatmaps.ControlPoints
             {
                 case TimingControlPoint _:
                     // Timing points are a special case and need to be added regardless of fallback availability.
-                    existing = binarySearch(TimingPoints, time);
+                    existing = BinarySearch(TimingPoints, time);
                     break;
 
                 case EffectControlPoint _:
                     existing = EffectPointAt(time);
-                    break;
-
-                case SampleControlPoint _:
-                    existing = binarySearch(SamplePoints, time);
-                    break;
-
-                case DifficultyControlPoint _:
-                    existing = DifficultyPointAt(time);
                     break;
             }
 
             return newPoint?.IsRedundant(existing) == true;
         }
 
-        private void groupItemAdded(ControlPoint controlPoint)
+        protected virtual void GroupItemAdded(ControlPoint controlPoint)
         {
             switch (controlPoint)
             {
@@ -259,17 +277,12 @@ namespace osu.Game.Beatmaps.ControlPoints
                     effectPoints.Add(typed);
                     break;
 
-                case SampleControlPoint typed:
-                    samplePoints.Add(typed);
-                    break;
-
-                case DifficultyControlPoint typed:
-                    difficultyPoints.Add(typed);
-                    break;
+                default:
+                    throw new ArgumentException($"A control point of unexpected type {controlPoint.GetType()} was added to this {nameof(ControlPointInfo)}");
             }
         }
 
-        private void groupItemRemoved(ControlPoint controlPoint)
+        protected virtual void GroupItemRemoved(ControlPoint controlPoint)
         {
             switch (controlPoint)
             {
@@ -280,23 +293,15 @@ namespace osu.Game.Beatmaps.ControlPoints
                 case EffectControlPoint typed:
                     effectPoints.Remove(typed);
                     break;
-
-                case SampleControlPoint typed:
-                    samplePoints.Remove(typed);
-                    break;
-
-                case DifficultyControlPoint typed:
-                    difficultyPoints.Remove(typed);
-                    break;
             }
         }
 
-        public ControlPointInfo CreateCopy()
+        public ControlPointInfo DeepClone()
         {
-            var controlPointInfo = new ControlPointInfo();
+            var controlPointInfo = (ControlPointInfo)Activator.CreateInstance(GetType());
 
             foreach (var point in AllControlPoints)
-                controlPointInfo.Add(point.Time, point.CreateCopy());
+                controlPointInfo.Add(point.Time, point.DeepClone());
 
             return controlPointInfo;
         }

@@ -90,6 +90,20 @@ namespace osu.Game.Tests.Visual.Gameplay
             assertChildPosition(5);
         }
 
+        [TestCase("pooled")]
+        [TestCase("non-pooled")]
+        public void TestLifetimeRecomputedWhenTimeRangeChanges(string pooled)
+        {
+            var beatmap = createBeatmap(_ => pooled == "pooled" ? new TestPooledHitObject() : new TestHitObject());
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
+            createTest(beatmap);
+
+            assertDead(3);
+
+            AddStep("increase time range", () => drawableRuleset.TimeRange.Value = 3 * time_range);
+            assertPosition(3, 1);
+        }
+
         [Test]
         public void TestRelativeBeatLengthScaleSingleTimingPoint()
         {
@@ -168,7 +182,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = createBeatmap();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
-            beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2;
+            beatmap.Difficulty.SliderMultiplier = 2;
 
             createTest(beatmap, d => d.RelativeScaleBeatLengthsOverride = true);
             AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 5000);
@@ -182,7 +196,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = createBeatmap();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
-            beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2;
+            beatmap.Difficulty.SliderMultiplier = 2;
 
             createTest(beatmap);
             AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 2000);

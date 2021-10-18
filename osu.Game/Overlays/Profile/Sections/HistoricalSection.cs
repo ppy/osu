@@ -2,17 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile.Sections.Historical;
 using osu.Game.Overlays.Profile.Sections.Ranks;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
     public class HistoricalSection : ProfileSection
     {
-        public override string Title => "Historical";
+        public override LocalisableString Title => UsersStrings.ShowExtraHistoricalTitle;
 
-        public override string Identifier => "historical";
+        public override string Identifier => @"historical";
 
         public HistoricalSection()
         {
@@ -20,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Sections
             {
                 new PlayHistorySubsection(User),
                 new PaginatedMostPlayedBeatmapContainer(User),
-                new PaginatedScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)", CounterVisibilityState.VisibleWhenZero),
+                new PaginatedScoreContainer(ScoreType.Recent, User, UsersStrings.ShowExtraHistoricalRecentPlaysTitle),
                 new ReplaysSubsection(User)
             };
         }

@@ -8,6 +8,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -52,21 +53,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void OnApply()
         {
             type.BindTo(HitObject.TypeBindable);
-            type.BindValueChanged(_ =>
-            {
-                updateActionsFromType();
-
-                // will overwrite samples, should only be called on subsequent changes
-                // after the initial application.
-                updateSamplesFromTypeChange();
-
-                RecreatePieces();
-            });
-
-            // action update also has to happen immediately on application.
-            updateActionsFromType();
+            // this doesn't need to be run inline as RecreatePieces is called by the base call below.
+            type.BindValueChanged(_ => Scheduler.AddOnce(RecreatePieces));
 
             base.OnApply();
+        }
+
+        protected override void RecreatePieces()
+        {
+            updateActionsFromType();
+            base.RecreatePieces();
         }
 
         protected override void OnFree()
@@ -81,33 +77,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             HitActions = null;
             HitAction = null;
             validActionPressed = pressHandledThisFrame = false;
-        }
-
-        private HitSampleInfo[] getRimSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
-
-        protected override void LoadSamples()
-        {
-            base.LoadSamples();
-
-            type.Value = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
-        }
-
-        private void updateSamplesFromTypeChange()
-        {
-            var rimSamples = getRimSamples();
-
-            bool isRimType = HitObject.Type == HitType.Rim;
-
-            if (isRimType != rimSamples.Any())
-            {
-                if (isRimType)
-                    HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_CLAP));
-                else
-                {
-                    foreach (var sample in rimSamples)
-                        HitObject.Samples.Remove(sample);
-                }
-            }
         }
 
         private void updateActionsFromType()
@@ -177,19 +146,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(r => r.Type = result);
         }
 
-        public override bool OnPressed(TaikoAction action)
+        public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
             if (pressHandledThisFrame)
                 return true;
             if (Judged)
                 return false;
 
-            validActionPressed = HitActions.Contains(action);
+            validActionPressed = HitActions.Contains(e.Action);
 
             // Only count this as handled if the new judgement is a hit
             var result = UpdateResult(true);
             if (IsHit)
-                HitAction = action;
+                HitAction = e.Action;
 
             // Regardless of whether we've hit or not, any secondary key presses in the same frame should be discarded
             // E.g. hitting a non-strong centre as a strong should not fall through and perform a hit on the next note
@@ -197,11 +166,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return result;
         }
 
-        public override void OnReleased(TaikoAction action)
+        public override void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
         {
-            if (action == HitAction)
+            if (e.Action == HitAction)
                 HitAction = null;
-            base.OnReleased(action);
+            base.OnReleased(e);
         }
 
         protected override void Update()
@@ -297,7 +266,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     ApplyResult(r => r.Type = r.Judgement.MaxResult);
             }
 
-            public override bool OnPressed(TaikoAction action)
+            public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
                 // Don't process actions until the main hitobject is hit
                 if (!ParentHitObject.IsHit)
@@ -308,7 +277,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     return false;
 
                 // Don't handle invalid hit action presses
-                if (!ParentHitObject.HitActions.Contains(action))
+                if (!ParentHitObject.HitActions.Contains(e.Action))
                     return false;
 
                 return UpdateResult(true);

@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The head note of the hold.
         /// </summary>
-        public Note Head { get; private set; }
+        public HeadNote Head { get; private set; }
 
         /// <summary>
         /// The tail note of the hold.
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// </summary>
         private double tickSpacing = 50;
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
             createTicks(cancellationToken);
 
-            AddNested(Head = new Note
+            AddNested(Head = new HeadNote
             {
                 StartTime = StartTime,
                 Column = Column,

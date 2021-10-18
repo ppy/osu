@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -25,8 +25,6 @@ namespace osu.Game.Overlays
 
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
-        private Sample sampleBack;
-
         private List<APIChangelogBuild> builds;
 
         protected List<APIUpdateStream> Streams;
@@ -40,8 +38,6 @@ namespace osu.Game.Overlays
         private void load(AudioManager audio)
         {
             Header.Build.BindTarget = Current;
-
-            sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
 
             Current.BindValueChanged(e =>
             {
@@ -96,9 +92,9 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        public override bool OnPressed(GlobalAction action)
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case GlobalAction.Back:
                     if (Current.Value == null)
@@ -108,7 +104,6 @@ namespace osu.Game.Overlays
                     else
                     {
                         Current.Value = null;
-                        sampleBack?.Play();
                     }
 
                     return true;

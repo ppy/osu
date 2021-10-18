@@ -2,46 +2,67 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
+using osu.Game.Online.API;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public class MainMenuSettings : SettingsSubsection
     {
-        protected override string Header => "Main Menu";
+        protected override LocalisableString Header => UserInterfaceStrings.MainMenuHeader;
+
+        private IBindable<User> user;
+
+        private SettingsEnumDropdown<BackgroundSource> backgroundSourceDropdown;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, IAPIProvider api)
         {
+            user = api.LocalUser.GetBoundCopy();
+
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Interface voices",
+                    LabelText = UserInterfaceStrings.InterfaceVoices,
                     Current = config.GetBindable<bool>(OsuSetting.MenuVoice)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "osu! music theme",
+                    LabelText = UserInterfaceStrings.OsuMusicTheme,
                     Current = config.GetBindable<bool>(OsuSetting.MenuMusic)
                 },
                 new SettingsEnumDropdown<IntroSequence>
                 {
-                    LabelText = "Intro sequence",
+                    LabelText = UserInterfaceStrings.IntroSequence,
                     Current = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
                 },
-                new SettingsEnumDropdown<BackgroundSource>
+                backgroundSourceDropdown = new SettingsEnumDropdown<BackgroundSource>
                 {
-                    LabelText = "Background source",
+                    LabelText = UserInterfaceStrings.BackgroundSource,
                     Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
                 },
                 new SettingsEnumDropdown<SeasonalBackgroundMode>
                 {
-                    LabelText = "Seasonal backgrounds",
+                    LabelText = UserInterfaceStrings.SeasonalBackgrounds,
                     Current = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode),
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            user.BindValueChanged(u =>
+            {
+                backgroundSourceDropdown.WarningText = u.NewValue?.IsSupporter != true ? UserInterfaceStrings.NotSupporterNote : default;
+            }, true);
         }
     }
 }

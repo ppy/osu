@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -85,6 +86,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         public override void ApplyTransformsAt(double time, bool propagateChildren = false)
         {
             // For the same reasons as above w.r.t rewinding, we shouldn't propagate to children here either.
+            // ReSharper disable once RedundantArgumentDefaultValue - removing the "redundant" default value triggers BaseMethodCallWithDefaultParameter
             base.ApplyTransformsAt(time, false);
         }
 
@@ -134,6 +136,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// </summary>
         private double? timeToAcceptAnyKeyAfter;
 
+        /// <summary>
+        /// The actions that were pressed in the previous frame.
+        /// </summary>
+        private readonly List<OsuAction> lastPressedActions = new List<OsuAction>();
+
         protected override void Update()
         {
             base.Update();
@@ -152,8 +159,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             {
                 var otherKey = headCircleHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton;
 
-                // we can return to accepting all keys if the initial head circle key is the *only* key pressed, or all keys have been released.
-                if (actions?.Contains(otherKey) != true)
+                // we can start accepting any key once all other keys have been released in the previous frame.
+                if (!lastPressedActions.Contains(otherKey))
                     timeToAcceptAnyKeyAfter = Time.Current;
             }
 
@@ -164,6 +171,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 lastScreenSpaceMousePosition.HasValue && followCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
+
+            lastPressedActions.Clear();
+            if (actions != null)
+                lastPressedActions.AddRange(actions);
         }
 
         /// <summary>

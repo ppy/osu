@@ -17,16 +17,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class MultiplayerMatchSongSelect : OnlinePlaySongSelect
     {
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         private LoadingLayer loadingLayer;
 
         /// <summary>
         /// Construct a new instance of multiplayer song select.
         /// </summary>
+        /// <param name="room">The room.</param>
         /// <param name="beatmap">An optional initial beatmap selection to perform.</param>
         /// <param name="ruleset">An optional initial ruleset selection to perform.</param>
-        public MultiplayerMatchSongSelect(WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
+        public MultiplayerMatchSongSelect(Room room, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
+            : base(room)
         {
             if (beatmap != null || ruleset != null)
             {

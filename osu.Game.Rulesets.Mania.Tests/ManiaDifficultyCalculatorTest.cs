@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        [TestCase(2.7646128945056723d, "diffcalc-test")]
+        [TestCase(2.7879104989252959d, "diffcalc-test")]
         public void TestClockRateAdjusted(double expected, string name)
             => Test(expected, name, new ManiaModDoubleTime());
 

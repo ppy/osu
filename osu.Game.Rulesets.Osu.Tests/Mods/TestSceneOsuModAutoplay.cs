@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         private void runSpmTest(Mod mod)
         {
-            SpinnerSpmCounter spmCounter = null;
+            SpinnerSpmCalculator spmCalculator = null;
 
             CreateModTest(new ModTestData
             {
@@ -45,21 +45,21 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     {
                         new Spinner
                         {
-                            Duration = 2000,
-                            Position = OsuPlayfield.BASE_SIZE / 2
+                            Duration = 6000,
+                            Position = OsuPlayfield.BASE_SIZE / 2,
                         }
                     }
                 },
                 PassCondition = () => Player.ScoreProcessor.JudgedHits >= 1
             });
 
-            AddUntilStep("fetch SPM counter", () =>
+            AddUntilStep("fetch SPM calculator", () =>
             {
-                spmCounter = this.ChildrenOfType<SpinnerSpmCounter>().SingleOrDefault();
-                return spmCounter != null;
+                spmCalculator = this.ChildrenOfType<SpinnerSpmCalculator>().SingleOrDefault();
+                return spmCalculator != null;
             });
 
-            AddUntilStep("SPM is correct", () => Precision.AlmostEquals(spmCounter.SpinsPerMinute, 477, 5));
+            AddUntilStep("SPM is correct", () => Precision.AlmostEquals(spmCalculator.Result.Value, 477, 5));
         }
     }
 }

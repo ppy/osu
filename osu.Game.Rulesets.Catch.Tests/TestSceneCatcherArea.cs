@@ -6,8 +6,9 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
@@ -31,12 +32,33 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private float circleSize;
 
+        private ScheduledDelegate addManyFruit;
+
+        private IBeatmapDifficultyInfo beatmapDifficulty;
+
         public TestSceneCatcherArea()
         {
             AddSliderStep<float>("circle size", 0, 8, 5, createCatcher);
             AddToggleStep("hyper dash", t => this.ChildrenOfType<TestCatcherArea>().ForEach(area => area.ToggleHyperDash(t)));
+            AddToggleStep("toggle hit lighting", lighting => config.SetValue(OsuSetting.HitLighting, lighting));
 
-            AddStep("catch fruit", () => attemptCatch(new Fruit()));
+            AddStep("catch centered fruit", () => attemptCatch(new Fruit()));
+            AddStep("catch many random fruit", () =>
+            {
+                int count = 50;
+
+                addManyFruit?.Cancel();
+                addManyFruit = Scheduler.AddDelayed(() =>
+                {
+                    attemptCatch(new Fruit
+                    {
+                        X = (RNG.NextSingle() - 0.5f) * Catcher.CalculateCatchWidth(beatmapDifficulty) * 0.6f,
+                    });
+
+                    if (count-- == 0)
+                        addManyFruit?.Cancel();
+                }, 50, true);
+            });
             AddStep("catch fruit last in combo", () => attemptCatch(new Fruit { LastInCombo = true }));
             AddStep("catch kiai fruit", () => attemptCatch(new TestSceneCatcher.TestKiaiFruit()));
             AddStep("miss last in combo", () => attemptCatch(new Fruit { X = 100, LastInCombo = true }));
@@ -45,10 +67,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         private void attemptCatch(Fruit fruit)
         {
             fruit.X = fruit.OriginalX + catcher.X;
-            fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty
-            {
-                CircleSize = circleSize
-            });
+            fruit.ApplyDefaults(new ControlPointInfo(), beatmapDifficulty);
 
             foreach (var area in this.ChildrenOfType<CatcherArea>())
             {
@@ -59,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     area.OnNewResult(drawable, new CatchJudgementResult(fruit, new CatchJudgement())
                     {
-                        Type = area.MovableCatcher.CanCatch(fruit) ? HitResult.Great : HitResult.Miss
+                        Type = area.Catcher.CanCatch(fruit) ? HitResult.Great : HitResult.Miss
                     });
 
                     drawable.Expire();
@@ -71,20 +90,19 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             circleSize = size;
 
-            SetContents(() =>
+            beatmapDifficulty = new BeatmapDifficulty
             {
-                var droppedObjectContainer = new Container<CaughtObject>
-                {
-                    RelativeSizeAxes = Axes.Both
-                };
+                CircleSize = circleSize
+            };
 
+            SetContents(_ =>
+            {
                 return new CatchInputManager(catchRuleset)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        droppedObjectContainer,
-                        new TestCatcherArea(droppedObjectContainer, new BeatmapDifficulty { CircleSize = size })
+                        new TestCatcherArea(beatmapDifficulty)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.TopCentre,
@@ -102,12 +120,18 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
-                : base(droppedObjectContainer, beatmapDifficulty)
+            public TestCatcherArea(IBeatmapDifficultyInfo beatmapDifficulty)
             {
+                var droppedObjectContainer = new DroppedObjectContainer();
+                Add(droppedObjectContainer);
+
+                Catcher = new Catcher(droppedObjectContainer, beatmapDifficulty)
+                {
+                    X = CatchPlayfield.CENTER_X
+                };
             }
 
-            public void ToggleHyperDash(bool status) => MovableCatcher.SetHyperDashState(status ? 2 : 1);
+            public void ToggleHyperDash(bool status) => Catcher.SetHyperDashState(status ? 2 : 1);
         }
     }
 }

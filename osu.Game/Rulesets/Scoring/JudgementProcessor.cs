@@ -19,6 +19,11 @@ namespace osu.Game.Rulesets.Scoring
         public event Action<JudgementResult> NewJudgement;
 
         /// <summary>
+        /// Invoked when a judgement is reverted, usually due to rewinding gameplay.
+        /// </summary>
+        public event Action<JudgementResult> JudgementReverted;
+
+        /// <summary>
         /// The maximum number of hits that can be judged.
         /// </summary>
         protected int MaxHits { get; private set; }
@@ -27,6 +32,8 @@ namespace osu.Game.Rulesets.Scoring
         /// The total number of judged <see cref="HitObject"/>s at the current point in time.
         /// </summary>
         public int JudgedHits { get; private set; }
+
+        private JudgementResult lastAppliedResult;
 
         private readonly BindableBool hasCompleted = new BindableBool();
 
@@ -53,12 +60,11 @@ namespace osu.Game.Rulesets.Scoring
         public void ApplyResult(JudgementResult result)
         {
             JudgedHits++;
+            lastAppliedResult = result;
 
             ApplyResultInternal(result);
 
             NewJudgement?.Invoke(result);
-
-            updateHasCompleted();
         }
 
         /// <summary>
@@ -69,9 +75,9 @@ namespace osu.Game.Rulesets.Scoring
         {
             JudgedHits--;
 
-            updateHasCompleted();
-
             RevertResultInternal(result);
+
+            JudgementReverted?.Invoke(result);
         }
 
         /// <summary>
@@ -134,6 +140,10 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
-        private void updateHasCompleted() => hasCompleted.Value = JudgedHits == MaxHits;
+        protected override void Update()
+        {
+            base.Update();
+            hasCompleted.Value = JudgedHits == MaxHits && (JudgedHits == 0 || lastAppliedResult.TimeAbsolute < Clock.CurrentTime);
+        }
     }
 }

@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaSettingsSubsection : RulesetSettingsSubsection
     {
-        protected override string Header => "osu!mania";
+        protected override LocalisableString Header => "osu!mania";
 
         public ManiaSettingsSubsection(ManiaRuleset ruleset)
             : base(ruleset)
@@ -37,12 +38,17 @@ namespace osu.Game.Rulesets.Mania
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
                     KeyboardStep = 5
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Timing-based note colouring",
+                    Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
+                }
             };
         }
 
         private class TimeSlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Value.ToString("N0") + "ms";
+            public override LocalisableString TooltipText => Current.Value.ToString(@"N0") + "ms";
         }
     }
 }

@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
@@ -21,12 +22,12 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         private const int cover_width = 100;
         private const int corner_radius = 6;
 
-        private readonly BeatmapInfo beatmap;
+        private readonly BeatmapInfo beatmapInfo;
         private readonly int playCount;
 
-        public DrawableMostPlayedBeatmap(BeatmapInfo beatmap, int playCount)
+        public DrawableMostPlayedBeatmap(BeatmapInfo beatmapInfo, int playCount)
         {
-            this.beatmap = beatmap;
+            this.beatmapInfo = beatmapInfo;
             this.playCount = playCount;
 
             RelativeSizeAxes = Axes.X;
@@ -41,12 +42,11 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             AddRangeInternal(new Drawable[]
             {
-                new UpdateableBeatmapSetCover
+                new UpdateableBeatmapSetCover(BeatmapSetCoverType.List)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = cover_width,
-                    BeatmapSet = beatmap.BeatmapSet,
-                    CoverType = BeatmapSetCoverType.List,
+                    BeatmapSet = beatmapInfo.BeatmapSet,
                 },
                 new Container
                 {
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                 Direction = FillDirection.Vertical,
                                                 Children = new Drawable[]
                                                 {
-                                                    new MostPlayedBeatmapMetadataContainer(beatmap),
+                                                    new MostPlayedBeatmapMetadataContainer(beatmapInfo),
                                                     new LinkFlowContainer(t =>
                                                     {
                                                         t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                     }.With(d =>
                                                     {
                                                         d.AddText("mapped by ");
-                                                        d.AddUserLink(beatmap.Metadata.Author);
+                                                        d.AddUserLink(beatmapInfo.Metadata.Author);
                                                     }),
                                                 }
                                             },
@@ -120,23 +120,23 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class MostPlayedBeatmapMetadataContainer : BeatmapMetadataContainer
         {
-            public MostPlayedBeatmapMetadataContainer(BeatmapInfo beatmap)
-                : base(beatmap)
+            public MostPlayedBeatmapMetadataContainer(BeatmapInfo beatmapInfo)
+                : base(beatmapInfo)
             {
             }
 
-            protected override Drawable[] CreateText(BeatmapInfo beatmap) => new Drawable[]
+            protected override Drawable[] CreateText(BeatmapInfo beatmapInfo) => new Drawable[]
             {
                 new OsuSpriteText
                 {
                     Text = new RomanisableString(
-                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
-                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] "),
+                        $"{beatmapInfo.Metadata.TitleUnicode ?? beatmapInfo.Metadata.Title} [{beatmapInfo.Version}] ",
+                        $"{beatmapInfo.Metadata.Title ?? beatmapInfo.Metadata.TitleUnicode} [{beatmapInfo.Version}] "),
                     Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 },
                 new OsuSpriteText
                 {
-                    Text = "by " + new RomanisableString(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
+                    Text = "by " + new RomanisableString(beatmapInfo.Metadata.ArtistUnicode, beatmapInfo.Metadata.Artist),
                     Font = OsuFont.GetFont(weight: FontWeight.Regular)
                 },
             };
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class PlayCountText : CompositeDrawable, IHasTooltip
         {
-            public string TooltipText => "times played";
+            public LocalisableString TooltipText => UsersStrings.ShowExtraHistoricalMostPlayedCount;
 
             public PlayCountText(int playCount)
             {

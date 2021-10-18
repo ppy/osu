@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
@@ -22,8 +23,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerParticipantsList : MultiplayerTestScene
     {
-        [SetUp]
-        public new void Setup() => Schedule(createNewParticipantsList);
+        [SetUpSteps]
+        public void SetupSteps()
+        {
+            createNewParticipantsList();
+        }
 
         [Test]
         public void TestAddUser()
@@ -45,9 +49,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 1);
 
-            AddStep("add non-resolvable user", () => Client.AddNullUser(-3));
+            AddStep("add non-resolvable user", () => Client.AddNullUser());
+            AddAssert("null user added", () => Client.Room.AsNonNull().Users.Count(u => u.User == null) == 1);
 
             AddUntilStep("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
+
+            AddStep("kick null user", () => this.ChildrenOfType<ParticipantPanel>().Single(p => p.User.User == null)
+                                                .ChildrenOfType<ParticipantPanel.KickButton>().Single().TriggerClick());
+
+            AddAssert("null user kicked", () => Client.Room.AsNonNull().Users.Count == 1);
         }
 
         [Test]
@@ -88,7 +98,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestCorrectInitialState()
         {
             AddStep("set to downloading map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
-            AddStep("recreate list", createNewParticipantsList);
+            createNewParticipantsList();
             checkProgressBarVisibility(true);
         }
 
@@ -127,6 +137,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestToggleSpectateState()
+        {
+            AddStep("make user spectating", () => Client.ChangeState(MultiplayerUserState.Spectating));
+            AddStep("make user idle", () => Client.ChangeState(MultiplayerUserState.Idle));
+        }
+
+        [Test]
         public void TestCrownChangesStateWhenHostTransferred()
         {
             AddStep("add user", () => Client.AddUser(new User
@@ -143,6 +160,42 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("first user crown hidden", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(0).ChildrenOfType<SpriteIcon>().First().Alpha == 0);
             AddUntilStep("second user crown visible", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(1).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
+        }
+
+        [Test]
+        public void TestKickButtonOnlyPresentWhenHost()
+        {
+            AddStep("add user", () => Client.AddUser(new User
+            {
+                Id = 3,
+                Username = "Second",
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+            }));
+
+            AddUntilStep("kick buttons visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 1);
+
+            AddStep("make second user host", () => Client.TransferHost(3));
+
+            AddUntilStep("kick buttons not visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 0);
+
+            AddStep("make local user host again", () => Client.TransferHost(API.LocalUser.Value.Id));
+
+            AddUntilStep("kick buttons visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 1);
+        }
+
+        [Test]
+        public void TestKickButtonKicks()
+        {
+            AddStep("add user", () => Client.AddUser(new User
+            {
+                Id = 3,
+                Username = "Second",
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+            }));
+
+            AddStep("kick second user", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Single(d => d.IsPresent).TriggerClick());
+
+            AddAssert("second user kicked", () => Client.Room?.Users.Single().UserID == API.LocalUser.Value.Id);
         }
 
         [Test]
@@ -222,11 +275,83 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var state = i;
                 AddStep($"set state: {state}", () => Client.ChangeUserState(0, state));
             }
+
+            AddStep("set state: downloading", () => Client.ChangeUserBeatmapAvailability(0, BeatmapAvailability.Downloading(0)));
+
+            AddStep("set state: locally available", () => Client.ChangeUserBeatmapAvailability(0, BeatmapAvailability.LocallyAvailable()));
+        }
+
+        [Test]
+        public void TestModOverlap()
+        {
+            AddStep("add dummy mods", () =>
+            {
+                Client.ChangeUserMods(new Mod[]
+                {
+                    new OsuModNoFail(),
+                    new OsuModDoubleTime()
+                });
+            });
+
+            AddStep("add user with mods", () =>
+            {
+                Client.AddUser(new User
+                {
+                    Id = 0,
+                    Username = "Baka",
+                    RulesetsStatistics = new Dictionary<string, UserStatistics>
+                    {
+                        {
+                            Ruleset.Value.ShortName,
+                            new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
+                        }
+                    },
+                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                });
+                Client.ChangeUserMods(0, new Mod[]
+                {
+                    new OsuModHardRock(),
+                    new OsuModDoubleTime()
+                });
+            });
+
+            AddStep("set 0 ready", () => Client.ChangeState(MultiplayerUserState.Ready));
+
+            AddStep("set 1 spectate", () => Client.ChangeUserState(0, MultiplayerUserState.Spectating));
+
+            // Have to set back to idle due to status priority.
+            AddStep("set 0 no map, 1 ready", () =>
+            {
+                Client.ChangeState(MultiplayerUserState.Idle);
+                Client.ChangeBeatmapAvailability(BeatmapAvailability.NotDownloaded());
+                Client.ChangeUserState(0, MultiplayerUserState.Ready);
+            });
+
+            AddStep("set 0 downloading", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
+
+            AddStep("set 0 spectate", () => Client.ChangeUserState(0, MultiplayerUserState.Spectating));
+
+            AddStep("make both default", () =>
+            {
+                Client.ChangeBeatmapAvailability(BeatmapAvailability.LocallyAvailable());
+                Client.ChangeUserState(0, MultiplayerUserState.Idle);
+                Client.ChangeState(MultiplayerUserState.Idle);
+            });
         }
 
         private void createNewParticipantsList()
         {
-            Child = new ParticipantsList { Anchor = Anchor.Centre, Origin = Anchor.Centre, RelativeSizeAxes = Axes.Y, Size = new Vector2(380, 0.7f) };
+            ParticipantsList participantsList = null;
+
+            AddStep("create new list", () => Child = participantsList = new ParticipantsList
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Y,
+                Size = new Vector2(380, 0.7f)
+            });
+
+            AddUntilStep("wait for list to load", () => participantsList.IsLoaded);
         }
 
         private void checkProgressBarVisibility(bool visible) =>

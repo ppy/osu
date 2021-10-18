@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -29,12 +30,12 @@ namespace osu.Game.Rulesets.UI
 
         private const float size = 80;
 
-        public virtual string TooltipText => showTooltip ? mod.IconTooltip : null;
+        public virtual LocalisableString TooltipText => showTooltip ? ((mod as Mod)?.IconTooltip ?? mod.Name) : null;
 
-        private Mod mod;
+        private IMod mod;
         private readonly bool showTooltip;
 
-        public Mod Mod
+        public IMod Mod
         {
             get => mod;
             set
@@ -57,7 +58,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="mod">The mod to be displayed</param>
         /// <param name="showTooltip">Whether a tooltip describing the mod should display on hover.</param>
-        public ModIcon(Mod mod, bool showTooltip = true)
+        public ModIcon(IMod mod, bool showTooltip = true)
         {
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
             this.showTooltip = showTooltip;
@@ -104,7 +105,7 @@ namespace osu.Game.Rulesets.UI
             updateMod(mod);
         }
 
-        private void updateMod(Mod value)
+        private void updateMod(IMod value)
         {
             modAcronym.Text = value.Acronym;
             modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;

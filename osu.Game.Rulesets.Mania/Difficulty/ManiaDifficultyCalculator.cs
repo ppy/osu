@@ -41,15 +41,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return new ManiaDifficultyAttributes { Mods = mods, Skills = skills };
 
             HitWindows hitWindows = new ManiaHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             return new ManiaDifficultyAttributes
             {
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
                 Mods = mods,
-                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)Math.Ceiling(getHitWindow300(mods) / clockRate),
-                ScoreMultiplier = getScoreMultiplier(beatmap, mods),
+                GreatHitWindow = Math.Ceiling(getHitWindow300(mods) / clockRate),
+                ScoreMultiplier = getScoreMultiplier(mods),
                 MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
                 Skills = skills
             };
@@ -68,9 +67,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         // Sorting is done in CreateDifficultyHitObjects, since the full list of hitobjects is required.
         protected override IEnumerable<DifficultyHitObject> SortObjects(IEnumerable<DifficultyHitObject> input) => input;
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
         {
-            new Strain(mods, ((ManiaBeatmap)beatmap).TotalColumns)
+            new Strain(mods, ((ManiaBeatmap)Beatmap).TotalColumns)
         };
 
         protected override Mod[] DifficultyAdjustmentMods
@@ -138,7 +137,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             }
         }
 
-        private double getScoreMultiplier(IBeatmap beatmap, Mod[] mods)
+        private double getScoreMultiplier(Mod[] mods)
         {
             double scoreMultiplier = 1;
 
@@ -154,7 +153,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 }
             }
 
-            var maniaBeatmap = (ManiaBeatmap)beatmap;
+            var maniaBeatmap = (ManiaBeatmap)Beatmap;
             int diff = maniaBeatmap.TotalColumns - maniaBeatmap.OriginalTotalColumns;
 
             if (diff > 0)

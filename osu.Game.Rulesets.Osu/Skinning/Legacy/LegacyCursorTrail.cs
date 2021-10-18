@@ -9,24 +9,43 @@ using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyCursorTrail : CursorTrail
     {
+        private readonly ISkin skin;
         private const double disjoint_trail_time_separation = 1000 / 60.0;
 
         private bool disjointTrail;
         private double lastTrailTime;
         private IBindable<float> cursorSize;
 
+        private Vector2? currentPosition;
+
+        public LegacyCursorTrail(ISkin skin)
+        {
+            this.skin = skin;
+        }
+
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
             Texture = skin.GetTexture("cursortrail");
             disjointTrail = skin.GetTexture("cursormiddle") == null;
 
-            Blending = !disjointTrail ? BlendingParameters.Additive : BlendingParameters.Inherit;
+            if (disjointTrail)
+            {
+                bool centre = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorCentre)?.Value ?? true;
+
+                TrailOrigin = centre ? Anchor.Centre : Anchor.TopLeft;
+                Blending = BlendingParameters.Inherit;
+            }
+            else
+            {
+                Blending = BlendingParameters.Additive;
+            }
 
             if (Texture != null)
             {
@@ -38,22 +57,35 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         }
 
         protected override double FadeDuration => disjointTrail ? 150 : 500;
+        protected override float FadeExponent => 1;
 
         protected override bool InterpolateMovements => !disjointTrail;
 
         protected override float IntervalMultiplier => 1 / Math.Max(cursorSize.Value, 1);
+        protected override bool AvoidDrawingNearCursor => !disjointTrail;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!disjointTrail || !currentPosition.HasValue)
+                return;
+
+            if (Time.Current - lastTrailTime >= disjoint_trail_time_separation)
+            {
+                lastTrailTime = Time.Current;
+                AddTrail(currentPosition.Value);
+            }
+        }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             if (!disjointTrail)
                 return base.OnMouseMove(e);
 
-            if (Time.Current - lastTrailTime >= disjoint_trail_time_separation)
-            {
-                lastTrailTime = Time.Current;
-                return base.OnMouseMove(e);
-            }
+            currentPosition = e.ScreenSpaceMousePosition;
 
+            // Intentionally block the base call as we're adding the trails ourselves.
             return false;
         }
     }

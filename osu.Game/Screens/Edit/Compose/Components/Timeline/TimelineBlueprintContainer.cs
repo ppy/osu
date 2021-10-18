@@ -6,7 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
@@ -16,26 +19,22 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    internal class TimelineBlueprintContainer : BlueprintContainer
+    internal class TimelineBlueprintContainer : EditorBlueprintContainer
     {
         [Resolved(CanBeNull = true)]
         private Timeline timeline { get; set; }
 
-        [Resolved]
-        private EditorBeatmap beatmap { get; set; }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private DragEvent lastDragEvent;
         private Bindable<HitObject> placement;
-        private SelectionBlueprint placementBlueprint;
+        private SelectionBlueprint<HitObject> placementBlueprint;
 
-        private readonly Box backgroundBox;
+        // We want children within the timeline to be interactable
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => timeline.ScreenSpaceDrawQuad.Contains(screenSpacePos);
 
         public TimelineBlueprintContainer(HitObjectComposer composer)
             : base(composer)
@@ -45,12 +44,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Origin = Anchor.Centre;
 
             Height = 0.6f;
+        }
 
-            AddInternal(backgroundBox = new Box
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(new SelectableAreaBackground
             {
                 Colour = Color4.Black,
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0.1f,
+                Depth = float.MaxValue,
+                Blending = BlendingParameters.Additive,
             });
         }
 
@@ -59,7 +62,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.LoadComplete();
             DragBox.Alpha = 0;
 
-            placement = beatmap.PlacementObject.GetBoundCopy();
+            placement = Beatmap.PlacementObject.GetBoundCopy();
             placement.ValueChanged += placementChanged;
         }
 
@@ -75,7 +78,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
             else
             {
-                placementBlueprint = CreateBlueprintFor(obj.NewValue);
+                placementBlueprint = CreateBlueprintFor(obj.NewValue).AsNonNull();
 
                 placementBlueprint.Colour = Color4.MediumPurple;
 
@@ -83,19 +86,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected override Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            backgroundBox.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            backgroundBox.FadeColour(Color4.Black, 600, Easing.OutQuint);
-            base.OnHoverLost(e);
-        }
+        protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
         protected override void OnDrag(DragEvent e)
         {
@@ -143,7 +134,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // remove objects from the stack as long as their end time is in the past.
                 while (currentConcurrentObjects.TryPeek(out HitObject hitObject))
                 {
-                    if (Precision.AlmostBigger(hitObject.GetEndTime(), b.HitObject.StartTime, 1))
+                    if (Precision.AlmostBigger(hitObject.GetEndTime(), b.Item.StartTime, 1))
                         break;
 
                     currentConcurrentObjects.Pop();
@@ -151,7 +142,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 // if the stack gets too high, we should have space below it to display the next batch of objects.
                 // importantly, we only do this if time has incremented, else a stack of hitobjects all at the same time value would start to overlap themselves.
-                if (currentConcurrentObjects.TryPeek(out HitObject h) && !Precision.AlmostEquals(h.StartTime, b.HitObject.StartTime, 1))
+                if (currentConcurrentObjects.TryPeek(out HitObject h) && !Precision.AlmostEquals(h.StartTime, b.Item.StartTime, 1))
                 {
                     if (currentConcurrentObjects.Count >= stack_reset_count)
                         currentConcurrentObjects.Clear();
@@ -159,17 +150,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 b.Y = -(stack_offset * currentConcurrentObjects.Count);
 
-                currentConcurrentObjects.Push(b.HitObject);
+                currentConcurrentObjects.Push(b.Item);
             }
         }
 
-        protected override SelectionHandler CreateSelectionHandler() => new TimelineSelectionHandler();
+        protected override SelectionHandler<HitObject> CreateSelectionHandler() => new TimelineSelectionHandler();
 
-        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
+        protected override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject item)
         {
-            return new TimelineHitObjectBlueprint(hitObject)
+            return new TimelineHitObjectBlueprint(item)
             {
-                OnDragHandled = handleScrollViaDrag
+                OnDragHandled = handleScrollViaDrag,
             };
         }
 
@@ -195,80 +186,61 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        internal class TimelineSelectionHandler : SelectionHandler
+        private class SelectableAreaBackground : CompositeDrawable
         {
-            // for now we always allow movement. snapping is provided by the Timeline's "distance" snap implementation
-            public override bool HandleMovement(MoveSelectionEvent moveEvent) => true;
-        }
-
-        private class TimelineDragBox : DragBox
-        {
-            // the following values hold the start and end X positions of the drag box in the timeline's local space,
-            // but with zoom unapplied in order to be able to compensate for positional changes
-            // while the timeline is being zoomed in/out.
-            private float? selectionStart;
-            private float selectionEnd;
-
             [Resolved]
-            private Timeline timeline { get; set; }
+            private OsuColour colours { get; set; }
 
-            public TimelineDragBox(Action<RectangleF> performSelect)
-                : base(performSelect)
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             {
+                float localY = ToLocalSpace(screenSpacePos).Y;
+                return DrawRectangle.Top <= localY && DrawRectangle.Bottom >= localY;
             }
 
-            protected override Drawable CreateBox() => new Box
+            [BackgroundDependencyLoader]
+            private void load()
             {
-                RelativeSizeAxes = Axes.Y,
-                Alpha = 0.3f
-            };
+                RelativeSizeAxes = Axes.Both;
+                Alpha = 0.1f;
 
-            public override bool HandleDrag(MouseButtonEvent e)
-            {
-                selectionStart ??= e.MouseDownPosition.X / timeline.CurrentZoom;
-
-                // only calculate end when a transition is not in progress to avoid bouncing.
-                if (Precision.AlmostEquals(timeline.CurrentZoom, timeline.Zoom))
-                    selectionEnd = e.MousePosition.X / timeline.CurrentZoom;
-
-                updateDragBoxPosition();
-                return true;
+                AddRangeInternal(new[]
+                {
+                    // fade out over intro time, outside the valid time bounds.
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 200,
+                        Origin = Anchor.TopRight,
+                        Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White),
+                    },
+                    new Box
+                    {
+                        Colour = Color4.White,
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                });
             }
 
-            private void updateDragBoxPosition()
+            protected override bool OnHover(HoverEvent e)
             {
-                if (selectionStart == null)
-                    return;
-
-                float rescaledStart = selectionStart.Value * timeline.CurrentZoom;
-                float rescaledEnd = selectionEnd * timeline.CurrentZoom;
-
-                Box.X = Math.Min(rescaledStart, rescaledEnd);
-                Box.Width = Math.Abs(rescaledStart - rescaledEnd);
-
-                var boxScreenRect = Box.ScreenSpaceDrawQuad.AABBFloat;
-
-                // we don't care about where the hitobjects are vertically. in cases like stacking display, they may be outside the box without this adjustment.
-                boxScreenRect.Y -= boxScreenRect.Height;
-                boxScreenRect.Height *= 2;
-
-                PerformSelection?.Invoke(boxScreenRect);
+                this.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
+                return base.OnHover(e);
             }
 
-            public override void Hide()
+            protected override void OnHoverLost(HoverLostEvent e)
             {
-                base.Hide();
-                selectionStart = null;
+                this.FadeColour(Color4.Black, 600, Easing.OutQuint);
+                base.OnHoverLost(e);
             }
         }
 
-        protected class TimelineSelectionBlueprintContainer : Container<SelectionBlueprint>
+        protected class TimelineSelectionBlueprintContainer : Container<SelectionBlueprint<HitObject>>
         {
-            protected override Container<SelectionBlueprint> Content { get; }
+            protected override Container<SelectionBlueprint<HitObject>> Content { get; }
 
             public TimelineSelectionBlueprintContainer()
             {
-                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
+                AddInternal(new TimelinePart<SelectionBlueprint<HitObject>>(Content = new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
             }
         }
     }
