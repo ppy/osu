@@ -35,7 +35,8 @@ namespace osu.Game.Overlays.Music
             private void load(OsuColour colours)
             {
                 BackgroundColour = colours.Gray4;
-                HoverColour = SelectionColour = colours.Gray6;
+                SelectionColour = colours.Gray5;
+                HoverColour = colours.Gray6;
             }
         }
 
