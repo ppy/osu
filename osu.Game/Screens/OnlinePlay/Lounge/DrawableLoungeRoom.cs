@@ -103,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public IEnumerable<string> FilterTerms => new[] { Room.Name.Value };
 
-        private bool matchingFilter;
+        private bool matchingFilter = true;
 
         public bool MatchingFilter
         {
