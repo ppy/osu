@@ -64,39 +64,16 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                skinDropdown = new SkinSettingsDropdown(),
+                skinDropdown = new SkinSettingsDropdown
+                {
+                    LabelText = SkinSettingsStrings.CurrentSkin
+                },
                 new SettingsButton
                 {
                     Text = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.Toggle(),
                 },
                 new ExportSkinButton(),
-                new SettingsSlider<float, SizeSlider>
-                {
-                    LabelText = SkinSettingsStrings.GameplayCursorSize,
-                    Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
-                    KeyboardStep = 0.01f
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = SkinSettingsStrings.AutoCursorSize,
-                    Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = SkinSettingsStrings.BeatmapSkins,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = SkinSettingsStrings.BeatmapColours,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = SkinSettingsStrings.BeatmapHitsounds,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
-                },
             };
 
             managerUpdated = skins.ItemUpdated.GetBoundCopy();
