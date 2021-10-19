@@ -227,12 +227,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
         }
 
-        [Test]
-        public void TestNoSubmissionOnCustomRuleset()
+        [TestCase(null)]
+        [TestCase(10)]
+        public void TestNoSubmissionOnCustomRuleset(int? rulesetId)
         {
             prepareTokenResponse(true);
 
-            createPlayerTest(false, createRuleset: () => new OsuRuleset { RulesetInfo = { ID = 10 } });
+            createPlayerTest(false, createRuleset: () => new OsuRuleset { RulesetInfo = { ID = rulesetId } });
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
