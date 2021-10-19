@@ -22,7 +22,6 @@ using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Development;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -90,6 +89,8 @@ namespace osu.Game
         private BeatmapSetOverlay beatmapSetOverlay;
 
         private WikiOverlay wikiOverlay;
+
+        private ChangelogOverlay changelogOverlay;
 
         private SkinEditorOverlay skinEditor;
 
@@ -210,19 +211,6 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (!Host.IsPrimaryInstance && !DebugUtils.IsDebugBuild)
-            {
-                Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
-                Environment.Exit(0);
-            }
-
-            if (args?.Length > 0)
-            {
-                var paths = args.Where(a => !a.StartsWith('-')).ToArray();
-                if (paths.Length > 0)
-                    Task.Run(() => Import(paths));
-            }
-
             dependencies.CacheAs(this);
 
             dependencies.Cache(SentryLogger);
@@ -343,6 +331,17 @@ namespace osu.Game
                     ShowWiki(link.Argument);
                     break;
 
+                case LinkAction.OpenChangelog:
+                    if (string.IsNullOrEmpty(link.Argument))
+                        ShowChangelogListing();
+                    else
+                    {
+                        var changelogArgs = link.Argument.Split("/");
+                        ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
+                    }
+
+                    break;
+
                 default:
                     throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
             }
@@ -407,6 +406,18 @@ namespace osu.Game
         /// </summary>
         /// <param name="path">The wiki page to show</param>
         public void ShowWiki(string path) => waitForReady(() => wikiOverlay, _ => wikiOverlay.ShowPage(path));
+
+        /// <summary>
+        /// Show changelog listing overlay
+        /// </summary>
+        public void ShowChangelogListing() => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowListing());
+
+        /// <summary>
+        /// Show changelog's build as an overlay
+        /// </summary>
+        /// <param name="updateStream">The update stream name</param>
+        /// <param name="version">The build version of the update stream</param>
+        public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
 
         /// <summary>
         /// Present a beatmap at song select immediately.
@@ -489,7 +500,7 @@ namespace osu.Game
                 return;
             }
 
-            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.Beatmap.ID);
+            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.BeatmapInfo.ID);
 
             if (databasedBeatmap == null)
             {
@@ -543,6 +554,7 @@ namespace osu.Game
         {
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
+            Logger.Log($"Game-wide working beatmap updated to {beatmap.NewValue}");
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -631,10 +643,10 @@ namespace osu.Game
             SkinManager.PostNotification = n => Notifications.Post(n);
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
-            BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
+            BeatmapManager.PostImport = items => PresentBeatmap(items.First().Value);
 
             ScoreManager.PostNotification = n => Notifications.Post(n);
-            ScoreManager.PresentImport = items => PresentScore(items.First());
+            ScoreManager.PostImport = items => PresentScore(items.First().Value);
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
@@ -776,7 +788,7 @@ namespace osu.Game
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
-            var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
@@ -849,6 +861,19 @@ namespace osu.Game
             {
                 if (mode.NewValue != OverlayActivation.All) CloseAllOverlays();
             };
+
+            // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
+            handleStartupImport();
+        }
+
+        private void handleStartupImport()
+        {
+            if (args?.Length > 0)
+            {
+                var paths = args.Where(a => !a.StartsWith('-')).ToArray();
+                if (paths.Length > 0)
+                    Task.Run(() => Import(paths));
+            }
         }
 
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)

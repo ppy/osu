@@ -10,7 +10,6 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
@@ -21,15 +20,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         protected override LocalisableString Header => "General";
 
-        private TriangleButton importBeatmapsButton;
-        private TriangleButton importScoresButton;
-        private TriangleButton importSkinsButton;
-        private TriangleButton importCollectionsButton;
-        private TriangleButton deleteBeatmapsButton;
-        private TriangleButton deleteScoresButton;
-        private TriangleButton deleteSkinsButton;
-        private TriangleButton restoreButton;
-        private TriangleButton undeleteButton;
+        private SettingsButton importBeatmapsButton;
+        private SettingsButton importScoresButton;
+        private SettingsButton importSkinsButton;
+        private SettingsButton importCollectionsButton;
+        private SettingsButton deleteBeatmapsButton;
+        private SettingsButton deleteScoresButton;
+        private SettingsButton deleteSkinsButton;
+        private SettingsButton restoreButton;
+        private SettingsButton undeleteButton;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] StableImportManager stableImportManager, DialogOverlay dialogOverlay)

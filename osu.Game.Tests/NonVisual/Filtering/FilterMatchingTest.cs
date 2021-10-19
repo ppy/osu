@@ -239,7 +239,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 match = shouldMatch;
             }
 
-            public bool Matches(BeatmapInfo beatmap) => match;
+            public bool Matches(BeatmapInfo beatmapInfo) => match;
             public bool TryParseCustomKeywordCriteria(string key, Operator op, string value) => false;
         }
     }
