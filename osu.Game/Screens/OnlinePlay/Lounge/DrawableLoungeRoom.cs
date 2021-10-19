@@ -181,6 +181,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             [Resolved(canBeNull: true)]
             private LoungeSubScreen lounge { get; set; }
 
+            public override bool HandleNonPositionalInput => true;
+
+            protected override bool BlockNonPositionalInput => true;
+
             public PasswordEntryPopover(Room room)
             {
                 this.room = room;
