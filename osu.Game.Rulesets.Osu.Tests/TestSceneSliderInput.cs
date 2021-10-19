@@ -348,6 +348,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         {
                             StartTime = time_slider_start,
                             Position = new Vector2(0, 0),
+                            DifficultyControlPoint = new DifficultyControlPoint { SliderVelocity = 0.1f },
                             Path = new SliderPath(PathType.PerfectCurve, new[]
                             {
                                 Vector2.Zero,
@@ -361,8 +362,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                         Ruleset = new OsuRuleset().RulesetInfo
                     },
                 });
-
-                Beatmap.Value.Beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 

@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 dropdown = new AudioDeviceSettingsDropdown
                 {
+                    LabelText = AudioSettingsStrings.OutputDevice,
                     Keywords = new[] { "speaker", "headphone", "output" }
                 }
             };
