@@ -188,15 +188,46 @@ namespace osu.Game.Configuration
 
             return new TrackedSettings
             {
-                new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons, v ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(), LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))),
-                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, GameplaySettingsStrings.HUDVisibilityMode, m.GetLocalisableDescription(), $"{GlobalActionKeyBindingStrings.ToggleInGameInterface}: {LookupKeyBindings(GlobalAction.ToggleInGameInterface)} {GlobalActionKeyBindingStrings.HoldForHUD}: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
-                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, GraphicsSettingsStrings.ScreenScaling, m.GetLocalisableDescription())),
-                new TrackedSetting<int>(OsuSetting.Skin, m =>
+                new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, disabledState => new SettingDescription(
+                    rawValue: !disabledState,
+                    name: GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons,
+                    value: disabledState ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(),
+                    shortcut: LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))
+                ),
+                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, mode => new SettingDescription(
+                    rawValue: mode,
+                    name: GameplaySettingsStrings.HUDVisibilityMode,
+                    value: mode.GetLocalisableDescription(),
+                    shortcut: new TranslatableString(@"_", @"{0}: {1} {2}: {3}",
+                        GlobalActionKeyBindingStrings.ToggleInGameInterface,
+                        LookupKeyBindings(GlobalAction.ToggleInGameInterface),
+                        GlobalActionKeyBindingStrings.HoldForHUD,
+                        LookupKeyBindings(GlobalAction.HoldForHUD)))
+                ),
+                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, scalingMode => new SettingDescription(
+                        rawValue: scalingMode,
+                        name: GraphicsSettingsStrings.ScreenScaling,
+                        value: scalingMode.GetLocalisableDescription()
+                    )
+                ),
+                new TrackedSetting<int>(OsuSetting.Skin, skin =>
                 {
-                    string skinName = LookupSkinName(m) ?? string.Empty;
-                    return new SettingDescription(skinName, SkinSettingsStrings.SkinSectionHeader, skinName, $"{GlobalActionKeyBindingStrings.RandomSkin}: {LookupKeyBindings(GlobalAction.RandomSkin)}");
+                    string skinName = LookupSkinName(skin) ?? string.Empty;
+
+                    return new SettingDescription(
+                        rawValue: skinName,
+                        name: SkinSettingsStrings.SkinSectionHeader,
+                        value: skinName,
+                        shortcut: $"{GlobalActionKeyBindingStrings.RandomSkin}: {LookupKeyBindings(GlobalAction.RandomSkin)}"
+                    );
                 }),
-                new TrackedSetting<float>(OsuSetting.UIScale, m => new SettingDescription(m, GraphicsSettingsStrings.UIScaling, $"{m:N2}x")), // TODO: implement lookup for framework platform key bindings
+                new TrackedSetting<float>(OsuSetting.UIScale, scale => new SettingDescription(
+                        rawValue: scale,
+                        name: GraphicsSettingsStrings.UIScaling,
+                        value: $"{scale:N2}x"
+                        // TODO: implement lookup for framework platform key bindings
+                    )
+                ),
             };
         }
 
