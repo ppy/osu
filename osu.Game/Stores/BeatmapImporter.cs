@@ -93,14 +93,14 @@ namespace osu.Game.Stores
 
             if (beatmapSet.OnlineID > -1)
             {
-                var existingOnlineId = realm.All<RealmBeatmapSet>().SingleOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
+                var existingSetWithSameOnlineID = realm.All<RealmBeatmapSet>().SingleOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
 
-                if (existingOnlineId != null)
+                if (existingSetWithSameOnlineID != null)
                 {
-                    existingOnlineId.DeletePending = true;
-                    existingOnlineId.OnlineID = -1;
+                    existingSetWithSameOnlineID.DeletePending = true;
+                    existingSetWithSameOnlineID.OnlineID = -1;
 
-                    foreach (var b in existingOnlineId.Beatmaps)
+                    foreach (var b in existingSetWithSameOnlineID.Beatmaps)
                         b.OnlineID = -1;
 
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be deleted.");
