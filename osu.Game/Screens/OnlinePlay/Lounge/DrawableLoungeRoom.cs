@@ -232,7 +232,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
                 sampleJoinFail = audio.Samples.Get(@"UI/password-fail");
 
-                joinButton.Action = () => lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
+                joinButton.Action = performJoin;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
+                passwordTextbox.OnCommit += (_, __) => performJoin();
+            }
+
+            private void performJoin()
+            {
+                lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
+                GetContainingInputManager().TriggerFocusContention(passwordTextbox);
             }
 
             private void joinFailed(string error)
@@ -251,14 +265,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 Body.Shake();
 
                 sampleJoinFail?.Play();
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
-                passwordTextbox.OnCommit += (_, __) => lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
             }
         }
     }
