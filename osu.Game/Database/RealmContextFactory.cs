@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
+using osu.Game.Models;
 using Realms;
 
 #nullable enable
@@ -26,7 +28,12 @@ namespace osu.Game.Database
         /// </summary>
         public readonly string Filename;
 
-        private const int schema_version = 6;
+        /// <summary>
+        /// Version history:
+        /// 6  First tracked version (~20211018)
+        /// 7  Changed OnlineID fields to non-nullable to add indexing support (20211018)
+        /// </summary>
+        private const int schema_version = 7;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
@@ -120,6 +127,31 @@ namespace osu.Game.Database
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
         {
+            if (lastSchemaVersion < 7)
+            {
+                convertOnlineIDs<RealmBeatmap>();
+                convertOnlineIDs<RealmBeatmapSet>();
+                convertOnlineIDs<RealmRuleset>();
+
+                void convertOnlineIDs<T>() where T : RealmObject
+                {
+                    var className = typeof(T).Name.Replace(@"Realm", string.Empty);
+
+                    var oldItems = migration.OldRealm.DynamicApi.All(className);
+                    var newItems = migration.NewRealm.DynamicApi.All(className);
+
+                    int itemCount = newItems.Count();
+
+                    for (int i = 0; i < itemCount; i++)
+                    {
+                        var oldItem = oldItems.ElementAt(i);
+                        var newItem = newItems.ElementAt(i);
+
+                        long? nullableOnlineID = oldItem?.OnlineID;
+                        newItem.OnlineID = (int)(nullableOnlineID ?? -1);
+                    }
+                }
+            }
         }
 
         /// <summary>
