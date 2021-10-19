@@ -54,8 +54,8 @@ namespace osu.Game.Graphics.UserInterface
             private void load(OverlayColourProvider? colourProvider, OsuColour colours, AudioManager audio)
             {
                 BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
-                HoverColour = colourProvider?.Highlight1 ?? colours.PinkDarker;
-                SelectionColour = colourProvider?.Light4 ?? colours.PinkDarker.Opacity(0.5f);
+                HoverColour = colourProvider?.Light4 ?? colours.PinkDarker;
+                SelectionColour = colourProvider?.Background3 ?? colours.PinkDarker.Opacity(0.5f);
 
                 sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
                 sampleClose = audio.Samples.Get(@"UI/dropdown-close");
@@ -344,7 +344,7 @@ namespace osu.Game.Graphics.UserInterface
             private void load(OverlayColourProvider? colourProvider, OsuColour colours)
             {
                 BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
-                BackgroundColourHover = colourProvider?.Highlight1 ?? colours.PinkDarker;
+                BackgroundColourHover = colourProvider?.Light4 ?? colours.PinkDarker;
             }
         }
     }
