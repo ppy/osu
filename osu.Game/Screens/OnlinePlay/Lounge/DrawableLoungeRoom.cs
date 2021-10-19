@@ -253,7 +253,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 GetContainingInputManager().TriggerFocusContention(passwordTextbox);
             }
 
-            private void joinFailed(string error)
+            private void joinFailed(string error) => Schedule(() =>
             {
                 passwordTextbox.Text = string.Empty;
 
@@ -269,7 +269,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 Body.Shake();
 
                 sampleJoinFail?.Play();
-            }
+            });
         }
     }
 }
