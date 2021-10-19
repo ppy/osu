@@ -200,6 +200,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     Spacing = new Vector2(5),
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
+                    LayoutDuration = 500,
+                    LayoutEasing = Easing.OutQuint,
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
