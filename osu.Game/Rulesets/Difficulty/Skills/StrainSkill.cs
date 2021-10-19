@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected abstract double StrainValueAt(DifficultyHitObject hitObject);
 
         /// <summary>
-        /// Calculates the total strain value at section boundaries.
+        /// Calculate the strain value at a point in time in between hit objects.
         /// </summary>
         protected abstract double StrainAtTime(double time);
 
