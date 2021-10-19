@@ -5,14 +5,15 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     public abstract class CircularDistanceSnapGrid : DistanceSnapGrid
     {
-        protected CircularDistanceSnapGrid(Vector2 startPosition, double startTime, double? endTime = null)
-            : base(startPosition, startTime, endTime)
+        protected CircularDistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
+            : base(referenceObject, startPosition, startTime, endTime)
         {
         }
 
@@ -79,7 +80,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 normalisedDirection = direction * new Vector2(1f / distance);
             Vector2 snappedPosition = StartPosition + normalisedDirection * radialCount * radius;
 
-            return (snappedPosition, StartTime + SnapProvider.GetSnappedDurationFromDistance(StartTime, (snappedPosition - StartPosition).Length));
+            return (snappedPosition, StartTime + SnapProvider.GetSnappedDurationFromDistance(ReferenceObject, (snappedPosition - StartPosition).Length));
         }
     }
 }

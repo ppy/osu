@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets
 
         #region Implementation of IHasOnlineID
 
-        public int? OnlineID => ID;
+        public int OnlineID => ID ?? -1;
 
         #endregion
     }

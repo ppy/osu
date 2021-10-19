@@ -8,8 +8,8 @@ namespace osu.Game.Database
     public interface IHasOnlineID
     {
         /// <summary>
-        /// The server-side ID representing this instance, if one exists.
+        /// The server-side ID representing this instance, if one exists. -1 denotes a missing ID.
         /// </summary>
-        int? OnlineID { get; }
+        int OnlineID { get; }
     }
 }
