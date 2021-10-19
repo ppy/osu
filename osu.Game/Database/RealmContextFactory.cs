@@ -137,6 +137,11 @@ namespace osu.Game.Database
                 {
                     var className = typeof(T).Name.Replace(@"Realm", string.Empty);
 
+                    // version was not bumped when the beatmap/ruleset models were added
+                    // therefore we must manually check for their presence to avoid throwing on the `DynamicApi` calls.
+                    if (!migration.OldRealm.Schema.TryFindObjectSchema(className, out _))
+                        return;
+
                     var oldItems = migration.OldRealm.DynamicApi.All(className);
                     var newItems = migration.NewRealm.DynamicApi.All(className);
 
