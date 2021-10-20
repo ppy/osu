@@ -317,14 +317,18 @@ namespace osu.Game.Database
         /// </remarks>
         protected virtual string ComputeHash(TModel item, ArchiveReader reader = null)
         {
-            if (reader != null)
-                // fast hashing for cases where the item's files may not be populated.
-                return computeHashFast(reader);
+            var hashableFiles = item.Files
+                                    .Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+                                    .OrderBy(f => f.Filename)
+                                    .ToArray();
+
+            if (hashableFiles.Length == 0)
+                throw new InvalidOperationException("Attempted to hash an archive with no files");
 
             // for now, concatenate all hashable files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
 
-            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
+            foreach (TFileModel file in hashableFiles)
             {
                 using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
                     s.CopyTo(hashable);
@@ -700,10 +704,10 @@ namespace osu.Game.Database
                     s.CopyTo(hashable);
             }
 
-            if (hashable.Length > 0)
-                return hashable.ComputeSHA2Hash();
+            if (hashable.Length == 0)
+                throw new InvalidOperationException("Attempted to hash an archive with no files");
 
-            return reader.Name.ComputeSHA2Hash();
+            return hashable.ComputeSHA2Hash();
         }
 
         /// <summary>
