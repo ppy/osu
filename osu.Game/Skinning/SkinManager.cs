@@ -140,26 +140,19 @@ namespace osu.Game.Skinning
             // This function can be run on fresh import or save. The logic here ensures a skin.ini file is in a good state for both operations.
 
             // LegacySkin will parse the skin.ini and populate `Skin.Configuration` during construction above.
-            bool hasSkinIni = !string.IsNullOrEmpty(instance.Configuration.SkinInfo.Name);
-
-            if (hasSkinIni)
-            {
-                item.Name = instance.Configuration.SkinInfo.Name;
-                item.Creator = instance.Configuration.SkinInfo.Creator;
-            }
-
-            item.Creator ??= unknown_creator_string;
+            string skinIniSourcedName = instance.Configuration.SkinInfo.Name;
+            string archiveName = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
 
             bool isImport = reader != null;
 
             if (isImport)
             {
+                item.Name = !string.IsNullOrEmpty(skinIniSourcedName) ? skinIniSourcedName : archiveName;
+                item.Creator = instance.Configuration.SkinInfo.Creator ?? unknown_creator_string;
+
                 // For imports, we want to use the archive or folder name as part of the metadata, in addition to any existing skin.ini metadata.
                 // In an ideal world, skin.ini would be the only source of metadata, but a lot of skin creators and users don't update it when making modifications.
                 // In both of these cases, the expectation from the user is that the filename or folder name is displayed somewhere to identify the skin.
-
-                string archiveName = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
-
                 if (archiveName != item.Name)
                     item.Name = $"{item.Name} [{archiveName}]";
             }
@@ -167,25 +160,25 @@ namespace osu.Game.Skinning
             // By this point, the metadata in SkinInfo will be correct.
             // Regardless of whether this is an import or not, let's write the skin.ini if non-existing or non-matching.
             // This is (weirdly) done inside ComputeHash to avoid adding a new method to handle this case. After switching to realm it can be moved into another place.
-            if (instance.Configuration.SkinInfo.Name != item.Name)
-                updateSkinIniMetadata(item, hasSkinIni);
+            if (skinIniSourcedName != item.Name)
+                updateSkinIniMetadata(item);
 
             return base.ComputeHash(item, reader);
         }
 
-        private void updateSkinIniMetadata(SkinInfo item, bool hasSkinIni)
+        private void updateSkinIniMetadata(SkinInfo item)
         {
             string nameLine = $"Name: {item.Name}";
-            string authorLine = $"Author: {item.Name}";
+            string authorLine = $"Author: {item.Creator}";
 
-            if (hasSkinIni)
+            var existingFile = item.Files.SingleOrDefault(f => f.Filename == "skin.ini");
+
+            if (existingFile != null)
             {
                 List<string> outputLines = new List<string>();
 
                 bool addedName = false;
                 bool addedAuthor = false;
-
-                var existingFile = item.Files.First(f => f.Filename == "skin.ini");
 
                 using (var stream = Files.Storage.GetStream(existingFile.FileInfo.StoragePath))
                 using (var sr = new StreamReader(stream))
@@ -220,10 +213,12 @@ namespace osu.Game.Skinning
                 }
 
                 using (Stream stream = new MemoryStream())
-                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                 {
-                    foreach (string line in outputLines)
-                        sw.WriteLine(line);
+                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    {
+                        foreach (string line in outputLines)
+                            sw.WriteLine(line);
+                    }
 
                     ReplaceFile(item, existingFile, stream);
                 }
@@ -231,11 +226,13 @@ namespace osu.Game.Skinning
             else
             {
                 using (Stream stream = new MemoryStream())
-                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                 {
-                    sw.WriteLine("[General]");
-                    sw.WriteLine(nameLine);
-                    sw.WriteLine(authorLine);
+                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    {
+                        sw.WriteLine("[General]");
+                        sw.WriteLine(nameLine);
+                        sw.WriteLine(authorLine);
+                    }
 
                     AddFile(item, stream, "skin.ini");
                 }
