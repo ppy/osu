@@ -4,7 +4,6 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -19,12 +18,11 @@ namespace osu.Game.Tests.Visual.Online
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private readonly Bindable<User> user = new Bindable<User>();
         private GetUserRequest request;
         private PreviousUsernames container;
 
         [SetUp]
-        public void SetUp()
+        public void SetUp() => Schedule(() =>
         {
             request?.Cancel();
 
@@ -32,31 +30,30 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                User = { BindTarget = user },
             };
-        }
+        });
 
         [Test]
         public void TestOffline()
         {
             AddAssert("Is Hidden", () => container?.Alpha == 0);
 
-            AddStep("1 username", () => user.Value = users[0]);
+            AddStep("1 username", () => container.User.Value = users[0]);
             AddUntilStep("Is visible", () => container?.Alpha == 1);
 
-            AddStep("2 usernames", () => user.Value = users[1]);
+            AddStep("2 usernames", () => container.User.Value = users[1]);
             AddUntilStep("Is visible", () => container?.Alpha == 1);
 
-            AddStep("3 usernames", () => user.Value = users[2]);
+            AddStep("3 usernames", () => container.User.Value = users[2]);
             AddUntilStep("Is visible", () => container?.Alpha == 1);
 
-            AddStep("4 usernames", () => user.Value = users[3]);
+            AddStep("4 usernames", () => container.User.Value = users[3]);
             AddUntilStep("Is visible", () => container?.Alpha == 1);
 
-            AddStep("No username", () => user.Value = users[4]);
+            AddStep("No username", () => container.User.Value = users[4]);
             AddUntilStep("Is hidden", () => container?.Alpha == 0);
 
-            AddStep("Null user", () => user.Value = users[5]);
+            AddStep("Null user", () => container.User.Value = users[5]);
             AddUntilStep("Is hidden", () => container?.Alpha == 0);
         }
 
@@ -68,7 +65,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Create request", () =>
             {
                 request = new GetUserRequest(1777162);
-                request.Success += u => user.Value = u;
+                request.Success += u => container.User.Value = u;
                 api?.Queue(request);
             });
 
