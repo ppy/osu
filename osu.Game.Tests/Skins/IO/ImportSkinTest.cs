@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -16,180 +17,130 @@ namespace osu.Game.Tests.Skins.IO
 {
     public class ImportSkinTest : ImportTest
     {
-        [Test]
-        public async Task TestBasicImport()
-        {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
-            {
-                try
-                {
-                    var osu = LoadOsuIntoHost(host);
-
-                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
-
-                    Assert.That(imported.Name, Is.EqualTo("test skin"));
-                    Assert.That(imported.Creator, Is.EqualTo("skinner"));
-                }
-                finally
-                {
-                    host.Exit();
-                }
-            }
-        }
+        #region Testing filename metadata inclusion
 
         [Test]
-        public async Task TestImportTwiceWithSameMetadataAndFilename()
+        public Task TestSingleImportDifferentFilename() => runSkinTest(async osu =>
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
-            {
-                try
-                {
-                    var osu = LoadOsuIntoHost(host);
+            var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
 
-                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
-                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
-
-                    Assert.That(imported2.ID, Is.EqualTo(imported.ID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Count, Is.EqualTo(1));
-
-                    // the first should be overwritten by the second import.
-                    Assert.That(imported.Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
-                }
-                finally
-                {
-                    host.Exit();
-                }
-            }
-        }
+            // When the import filename doesn't match, it should be appended (and update the skin.ini).
+            Assert.That(imported.Name, Is.EqualTo("test skin [skin]"));
+            Assert.That(imported.Creator, Is.EqualTo("skinner"));
+        });
 
         [Test]
-        public async Task TestImportTwiceWithSameMetadataButDifferentFilename()
+        public Task TestSingleImportMatchingFilename() => runSkinTest(async osu =>
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
-            {
-                try
-                {
-                    var osu = LoadOsuIntoHost(host);
+            var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "test skin.osk"));
 
-                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
-                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin2.osk"));
+            // When the import filename matches it shouldn't be appended.
+            Assert.That(imported.Name, Is.EqualTo("test skin"));
+            Assert.That(imported.Creator, Is.EqualTo("skinner"));
+        });
 
-                    Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Count, Is.EqualTo(2));
+        #endregion
 
-                    // skin.ini will be rewritten and therefore not match.
-                    Assert.That(imported.Files.First().FileInfoID, Is.Not.EqualTo(imported2.Files.First().FileInfoID));
-                }
-                finally
-                {
-                    host.Exit();
-                }
-            }
-        }
+        #region Cases where imports should match existing
 
         [Test]
-        public async Task TestImportTwiceWithNoMetadata()
+        public Task TestImportTwiceWithSameMetadataAndFilename() => runSkinTest(async osu =>
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
-            {
-                try
-                {
-                    var osu = LoadOsuIntoHost(host);
+            var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
+            var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
 
-                    // if a user downloads two skins that do have skin.ini files but don't have any creator metadata in the skin.ini, they should both import separately just for safety.
-                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
-                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
-
-                    Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Count, Is.EqualTo(2));
-
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).First().Files.First().FileInfoID, Is.EqualTo(imported.Files.First().FileInfoID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Last().Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
-                }
-                finally
-                {
-                    host.Exit();
-                }
-            }
-        }
+            assertImportedOnce(imported, imported2);
+        });
 
         [Test]
-        public async Task TestImportTwiceWithDifferentMetadata()
+        public Task TestImportTwiceWithNoMetadataSameDownloadFilename() => runSkinTest(async osu =>
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
-            {
-                try
-                {
-                    var osu = LoadOsuIntoHost(host);
+            // if a user downloads two skins that do have skin.ini files but don't have any creator metadata in the skin.ini, they should both import separately just for safety.
+            var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
+            var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
 
-                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin v2", "skinner"), "skin.osk"));
-                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin v2.1", "skinner"), "skin2.osk"));
-
-                    Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Count, Is.EqualTo(2));
-
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).First().Files.First().FileInfoID, Is.EqualTo(imported.Files.First().FileInfoID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Last().Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
-                }
-                finally
-                {
-                    host.Exit();
-                }
-            }
-        }
+            assertImportedOnce(imported, imported2);
+        });
 
         [Test]
-        public async Task TestImportUpperCasedOskArchive()
+        public Task TestImportUpperCasedOskArchive() => runSkinTest(async osu =>
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
-            {
-                try
-                {
-                    var osu = LoadOsuIntoHost(host);
+            var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1"), "name 1.OsK"));
+            assertCorrectMetadata(imported, "name 1", "author 1");
 
-                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1"), "skin1.OsK"));
+            var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1"), "name 1.oSK"));
 
-                    Assert.That(imported.Name, Is.EqualTo("name 1"));
-                    Assert.That(imported.Creator, Is.EqualTo("author 1"));
+            assertImportedOnce(imported, imported2);
+        });
 
-                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1"), "skin1.oSK"));
+        #endregion
 
-                    Assert.That(imported2.Hash, Is.EqualTo(imported.Hash));
-                }
-                finally
-                {
-                    host.Exit();
-                }
-            }
-        }
+        #region Cases where imports should be uniquely imported
 
         [Test]
-        public async Task TestSameMetadataNameDifferentFolderName()
+        public Task TestImportTwiceWithSameMetadataButDifferentFilename() => runSkinTest(async osu =>
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
-            {
-                try
-                {
-                    var osu = LoadOsuIntoHost(host);
+            var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
+            var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin2.osk"));
 
-                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1", false), "my custom skin 1"));
-                    Assert.That(imported.Name, Is.EqualTo("name 1 [my custom skin 1]"));
-                    Assert.That(imported.Creator, Is.EqualTo("author 1"));
+            assertImportedBoth(imported, imported2);
+        });
 
-                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1", false), "my custom skin 2"));
-                    Assert.That(imported2.Name, Is.EqualTo("name 1 [my custom skin 2]"));
-                    Assert.That(imported2.Creator, Is.EqualTo("author 1"));
+        [Test]
+        public Task TestImportTwiceWithNoMetadataDifferentDownloadFilename() => runSkinTest(async osu =>
+        {
+            // if a user downloads two skins that do have skin.ini files but don't have any creator metadata in the skin.ini, they should both import separately just for safety.
+            var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
+            var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download2.osk"));
 
-                    Assert.That(imported2.Hash, Is.Not.EqualTo(imported.Hash));
-                }
-                finally
-                {
-                    host.Exit();
-                }
-            }
+            assertImportedBoth(imported, imported2);
+        });
+
+        [Test]
+        public Task TestImportTwiceWithSameFilenameDifferentMetadata() => runSkinTest(async osu =>
+        {
+            var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin v2", "skinner"), "skin.osk"));
+            var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin v2.1", "skinner"), "skin.osk"));
+
+            assertImportedBoth(imported, imported2);
+            assertCorrectMetadata(imported, "test skin v2 [skin]", "skinner");
+            assertCorrectMetadata(imported2, "test skin v2.1 [skin]", "skinner");
+        });
+
+        [Test]
+        public Task TestSameMetadataNameDifferentFolderName() => runSkinTest(async osu =>
+        {
+            var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1"), "my custom skin 1"));
+            var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("name 1", "author 1"), "my custom skin 2"));
+
+            assertImportedBoth(imported, imported2);
+            assertCorrectMetadata(imported, "name 1 [my custom skin 2]", "author 1");
+            assertCorrectMetadata(imported, "name 1 [my custom skin 2]", "author 1");
+        });
+
+        #endregion
+
+        private void assertCorrectMetadata(SkinInfo imported, string name, string creator)
+        {
+            Assert.That(imported.Name, Is.EqualTo(name));
+            Assert.That(imported.Creator, Is.EqualTo(creator));
         }
 
-        private MemoryStream createOsk(string name, string author, bool makeUnique = true)
+        private void assertImportedBoth(SkinInfo imported, SkinInfo imported2)
+        {
+            Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
+            Assert.That(imported2.Hash, Is.Not.EqualTo(imported.Hash));
+            Assert.That(imported2.Files.Select(f => f.FileInfoID), Is.Not.EquivalentTo(imported.Files.Select(f => f.FileInfoID)));
+        }
+
+        private void assertImportedOnce(SkinInfo imported, SkinInfo imported2)
+        {
+            Assert.That(imported2.ID, Is.EqualTo(imported.ID));
+            Assert.That(imported2.Hash, Is.EqualTo(imported.Hash));
+            Assert.That(imported2.Files.Select(f => f.FileInfoID), Is.EquivalentTo(imported.Files.Select(f => f.FileInfoID)));
+        }
+
+        private MemoryStream createOsk(string name, string author, bool makeUnique = false)
         {
             var zipStream = new MemoryStream();
             using var zip = ZipArchive.Create();
@@ -216,6 +167,22 @@ namespace osu.Game.Tests.Skins.IO
             writer.Flush();
 
             return stream;
+        }
+
+        private async Task runSkinTest(Func<OsuGameBase, Task> action, [CallerMemberName] string callingMethodName = @"")
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+                    await action(osu);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
         }
 
         private async Task<SkinInfo> loadSkinIntoOsu(OsuGameBase osu, ArchiveReader archive = null)
