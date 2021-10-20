@@ -339,13 +339,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 // Otherwise, update the room directly in preparation for it to be submitted to the API on match creation.
                 if (client.Room != null)
                 {
-                    client.ChangeSettings(name: NameField.Text, password: PasswordTextBox.Text, matchType: TypePicker.Current.Value).ContinueWith(t => Schedule(() =>
-                    {
-                        if (t.IsCompletedSuccessfully)
-                            onSuccess(room);
-                        else
-                            onError(t.Exception?.AsSingular().Message ?? "Error changing settings.");
-                    }));
+                    client.ChangeSettings(
+                              name: NameField.Text,
+                              password: PasswordTextBox.Text,
+                              matchType: TypePicker.Current.Value,
+                              queueMode: QueueModeDropdown.Current.Value)
+                          .ContinueWith(t => Schedule(() =>
+                          {
+                              if (t.IsCompletedSuccessfully)
+                                  onSuccess(room);
+                              else
+                                  onError(t.Exception?.AsSingular().Message ?? "Error changing settings.");
+                          }));
                 }
                 else
                 {
@@ -353,6 +358,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     room.Availability.Value = AvailabilityPicker.Current.Value;
                     room.Type.Value = TypePicker.Current.Value;
                     room.Password.Value = PasswordTextBox.Current.Value;
+                    room.QueueMode.Value = QueueModeDropdown.Current.Value;
 
                     if (int.TryParse(MaxParticipantsField.Text, out int max))
                         room.MaxParticipants.Value = max;
