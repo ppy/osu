@@ -11,10 +11,10 @@ namespace osu.Game.Beatmaps.Drawables
     [LongRunningLoad]
     public class BeatmapSetCover : Sprite
     {
-        private readonly BeatmapSetInfo set;
+        private readonly IBeatmapSetOnlineInfo set;
         private readonly BeatmapSetCoverType type;
 
-        public BeatmapSetCover(BeatmapSetInfo set, BeatmapSetCoverType type = BeatmapSetCoverType.Cover)
+        public BeatmapSetCover(IBeatmapSetOnlineInfo set, BeatmapSetCoverType type = BeatmapSetCoverType.Cover)
         {
             if (set == null)
                 throw new ArgumentNullException(nameof(set));
@@ -31,15 +31,15 @@ namespace osu.Game.Beatmaps.Drawables
             switch (type)
             {
                 case BeatmapSetCoverType.Cover:
-                    resource = set.OnlineInfo.Covers.Cover;
+                    resource = set.Covers.Cover;
                     break;
 
                 case BeatmapSetCoverType.Card:
-                    resource = set.OnlineInfo.Covers.Card;
+                    resource = set.Covers.Card;
                     break;
 
                 case BeatmapSetCoverType.List:
-                    resource = set.OnlineInfo.Covers.List;
+                    resource = set.Covers.List;
                     break;
             }
 
