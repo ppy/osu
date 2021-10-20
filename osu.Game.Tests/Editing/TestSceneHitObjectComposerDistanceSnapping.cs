@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
@@ -55,8 +56,6 @@ namespace osu.Game.Tests.Editing
 
             composer.EditorBeatmap.Difficulty.SliderMultiplier = 1;
             composer.EditorBeatmap.ControlPointInfo.Clear();
-
-            composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 1 });
             composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
         });
 
@@ -73,13 +72,13 @@ namespace osu.Game.Tests.Editing
         [TestCase(2)]
         public void TestSpeedMultiplier(float multiplier)
         {
-            AddStep($"set multiplier = {multiplier}", () =>
+            assertSnapDistance(100 * multiplier, new HitObject
             {
-                composer.EditorBeatmap.ControlPointInfo.Clear();
-                composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = multiplier });
+                DifficultyControlPoint = new DifficultyControlPoint
+                {
+                    SliderVelocity = multiplier
+                }
             });
-
-            assertSnapDistance(100 * multiplier);
         }
 
         [TestCase(1)]
@@ -197,20 +196,20 @@ namespace osu.Game.Tests.Editing
             assertSnappedDistance(400, 400);
         }
 
-        private void assertSnapDistance(float expectedDistance)
-            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(0) == expectedDistance);
+        private void assertSnapDistance(float expectedDistance, HitObject hitObject = null)
+            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(hitObject ?? new HitObject()) == expectedDistance);
 
         private void assertDurationToDistance(double duration, float expectedDistance)
-            => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DurationToDistance(0, duration) == expectedDistance);
+            => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DurationToDistance(new HitObject(), duration) == expectedDistance);
 
         private void assertDistanceToDuration(float distance, double expectedDuration)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceToDuration(0, distance) == expectedDuration);
+            => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceToDuration(new HitObject(), distance) == expectedDuration);
 
         private void assertSnappedDuration(float distance, double expectedDuration)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.GetSnappedDurationFromDistance(0, distance) == expectedDuration);
+            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.GetSnappedDurationFromDistance(new HitObject(), distance) == expectedDuration);
 
         private void assertSnappedDistance(float distance, float expectedDistance)
-            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.GetSnappedDistanceFromDistance(0, distance) == expectedDistance);
+            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.GetSnappedDistanceFromDistance(new HitObject(), distance) == expectedDistance);
 
         private class TestHitObjectComposer : OsuHitObjectComposer
         {

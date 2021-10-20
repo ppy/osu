@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             double distance = distanceData.Distance * spans * LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
-            DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(obj.StartTime);
+            DifficultyControlPoint difficultyPoint = obj.DifficultyControlPoint;
 
             double beatLength;
 #pragma warning disable 618
@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 #pragma warning restore 618
                 beatLength = timingPoint.BeatLength * legacyDifficultyPoint.BpmMultiplier;
             else
-                beatLength = timingPoint.BeatLength / difficultyPoint.SpeedMultiplier;
+                beatLength = timingPoint.BeatLength / difficultyPoint.SliderVelocity;
 
             double sliderScoringPointDistance = osu_base_scoring_distance * beatmap.Difficulty.SliderMultiplier / beatmap.Difficulty.SliderTickRate;
 

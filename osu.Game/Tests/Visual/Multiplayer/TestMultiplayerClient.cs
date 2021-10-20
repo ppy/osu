@@ -53,7 +53,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public MultiplayerRoomUser AddUser(User user, bool markAsPlaying = false)
         {
             var roomUser = new MultiplayerRoomUser(user.Id) { User = user };
-            ((IMultiplayerClient)this).UserJoined(roomUser);
+
+            addUser(roomUser);
 
             if (markAsPlaying)
                 PlayingUserIds.Add(user.Id);
@@ -61,7 +62,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return roomUser;
         }
 
-        public void AddNullUser() => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(TestUserLookupCache.NULL_USER_ID));
+        public void AddNullUser() => addUser(new MultiplayerRoomUser(TestUserLookupCache.NULL_USER_ID));
+
+        private void addUser(MultiplayerRoomUser user)
+        {
+            ((IMultiplayerClient)this).UserJoined(user).Wait();
+
+            // We want the user to be immediately available for testing, so force a scheduler update to run the update-bound continuation.
+            Scheduler.Update();
+        }
 
         public void RemoveUser(User user)
         {

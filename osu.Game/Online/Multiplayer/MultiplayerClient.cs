@@ -374,7 +374,7 @@ namespace osu.Game.Online.Multiplayer
 
                 UserJoined?.Invoke(user);
                 RoomUpdated?.Invoke();
-            }, false);
+            });
         }
 
         Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user) =>
