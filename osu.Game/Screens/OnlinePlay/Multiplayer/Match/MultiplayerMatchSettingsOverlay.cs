@@ -193,9 +193,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 },
                                                                 new Section("Beatmap queueing mode")
                                                                 {
-                                                                    Child = QueueModeDropdown = new OsuEnumDropdown<QueueModes>
+                                                                    Child = new Container
                                                                     {
-                                                                        RelativeSizeAxes = Axes.X
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        Height = 40,
+                                                                        Child = QueueModeDropdown = new OsuEnumDropdown<QueueModes>
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.X
+                                                                        }
                                                                     }
                                                                 }
                                                             },
@@ -235,7 +240,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                     Anchor = Anchor.TopCentre,
                                                     Origin = Anchor.TopCentre,
                                                     RelativeSizeAxes = Axes.X,
-                                                    Width = 0.5f
+                                                    Width = 0.5f,
+                                                    Depth = float.MaxValue
                                                 }
                                             }
                                         }
