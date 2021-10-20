@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox()
+                        searchTextBox = new SearchTextBox
                         {
                             HoldFocus = true,
                             Anchor = Anchor.TopCentre,
