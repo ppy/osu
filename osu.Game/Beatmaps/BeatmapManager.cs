@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : IModelDownloader<BeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, ICanAcceptFiles, IWorkingBeatmapCache, IDisposable
+    public class BeatmapManager : IModelDownloader<BeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IWorkingBeatmapCache, IDisposable
     {
         private readonly BeatmapModelManager beatmapModelManager;
         private readonly BeatmapModelDownloader beatmapModelDownloader;
@@ -175,11 +175,6 @@ namespace osu.Game.Beatmaps
                 beatmapModelDownloader.PostNotification = value;
             }
         }
-
-        /// <summary>
-        /// Fired when the user requests to view the resulting import.
-        /// </summary>
-        public Action<IEnumerable<ILive<BeatmapSetInfo>>> PresentImport { set => beatmapModelManager.PostImport = value; }
 
         /// <summary>
         /// Delete a beatmap difficulty.
@@ -335,6 +330,15 @@ namespace osu.Game.Beatmaps
         public void Dispose()
         {
             onlineBeatmapLookupQueue?.Dispose();
+        }
+
+        #endregion
+
+        #region Implementation of IPostImports<out BeatmapSetInfo>
+
+        public Action<IEnumerable<ILive<BeatmapSetInfo>>> PostImport
+        {
+            set => beatmapModelManager.PostImport = value;
         }
 
         #endregion

@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             Debug.Assert(distanceData != null);
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
-            DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(hitObject.StartTime);
+            DifficultyControlPoint difficultyPoint = hitObject.DifficultyControlPoint;
 
             double beatLength;
 #pragma warning disable 618
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 #pragma warning restore 618
                 beatLength = timingPoint.BeatLength * legacyDifficultyPoint.BpmMultiplier;
             else
-                beatLength = timingPoint.BeatLength / difficultyPoint.SpeedMultiplier;
+                beatLength = timingPoint.BeatLength / difficultyPoint.SliderVelocity;
 
             SpanCount = repeatsData?.SpanCount() ?? 1;
             StartTime = (int)Math.Round(hitObject.StartTime);

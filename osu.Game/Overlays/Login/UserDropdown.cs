@@ -29,12 +29,6 @@ namespace osu.Game.Overlays.Login
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            AccentColour = colours.Gray5;
-        }
-
         protected class UserDropdownMenu : OsuDropdownMenu
         {
             public UserDropdownMenu()
@@ -56,6 +50,8 @@ namespace osu.Game.Overlays.Login
             private void load(OsuColour colours)
             {
                 BackgroundColour = colours.Gray3;
+                SelectionColour = colours.Gray4;
+                HoverColour = colours.Gray5;
             }
 
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
@@ -118,6 +114,7 @@ namespace osu.Game.Overlays.Login
             private void load(OsuColour colours)
             {
                 BackgroundColour = colours.Gray3;
+                BackgroundColourHover = colours.Gray5;
             }
         }
     }

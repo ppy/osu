@@ -13,21 +13,9 @@ namespace osu.Game.Database
     /// A class which handles importing of associated models to the game store.
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
-    public interface IModelImporter<TModel> : IPostNotifications
+    public interface IModelImporter<TModel> : IPostNotifications, IPostImports<TModel>, ICanAcceptFiles
         where TModel : class
     {
-        /// <summary>
-        /// Import one or more <typeparamref name="TModel"/> items from filesystem <paramref name="paths"/>.
-        /// </summary>
-        /// <remarks>
-        /// This will be treated as a low priority import if more than one path is specified; use <see cref="ArchiveModelManager{TModel,TFileModel}.Import(osu.Game.Database.ImportTask[])"/> to always import at standard priority.
-        /// This will post notifications tracking progress.
-        /// </remarks>
-        /// <param name="paths">One or more archive locations on disk.</param>
-        Task Import(params string[] paths);
-
-        Task Import(params ImportTask[] tasks);
-
         Task<IEnumerable<ILive<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks);
 
         /// <summary>
