@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.IO.Serialization.Converters;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -71,6 +72,18 @@ namespace osu.Game.Online.Rooms
         {
             get => Type.Value;
             set => Type.Value = value;
+        }
+
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<QueueModes> QueueMode = new Bindable<QueueModes>();
+
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("queue_mode")]
+        private QueueModes queueMode
+        {
+            get => QueueMode.Value;
+            set => QueueMode.Value = value;
         }
 
         [Cached]
