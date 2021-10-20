@@ -11,7 +11,6 @@ namespace osu.Game.Overlays.Settings
     {
         protected override Drawable CreateControl() => new OutlinedTextBox
         {
-            Margin = new MarginPadding { Top = 5 },
             RelativeSizeAxes = Axes.X,
             CommitOnFocusLost = true
         };
