@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MessagePack;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer.Queueing;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
