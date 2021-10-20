@@ -135,6 +135,10 @@ namespace osu.Game.Skinning
 
         protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
         {
+            // we will be adding a hashable file below, but this is only useful if there are any other files in the skin.
+            if (item.Files.Count == 0)
+                throw new InvalidOperationException("Attempted to hash an archive with no files");
+
             var instance = GetSkin(item);
 
             // This function can be run on fresh import or save. The logic here ensures a skin.ini file is in a good state for both operations.
