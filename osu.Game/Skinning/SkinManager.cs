@@ -50,7 +50,7 @@ namespace osu.Game.Skinning
 
         public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
 
-        protected override string[] HashableFileTypes => new[] { ".ini" };
+        protected override string[] HashableFileTypes => new[] { ".ini", ".json" };
 
         protected override string ImportFromStablePath => "Skins";
 
@@ -140,7 +140,7 @@ namespace osu.Game.Skinning
             // This function can be run on fresh import or save. The logic here ensures a skin.ini file is in a good state for both operations.
 
             // LegacySkin will parse the skin.ini and populate `Skin.Configuration` during construction above.
-            bool hasSkinIni = string.IsNullOrEmpty(instance.Configuration.SkinInfo.Name);
+            bool hasSkinIni = !string.IsNullOrEmpty(instance.Configuration.SkinInfo.Name);
 
             if (hasSkinIni)
             {
