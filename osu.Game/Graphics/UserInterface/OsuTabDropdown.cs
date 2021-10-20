@@ -27,18 +27,6 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private void propagateAccentColour()
-        {
-            if (Menu is OsuDropdownMenu dropdownMenu)
-            {
-                dropdownMenu.HoverColour = accentColour;
-                dropdownMenu.SelectionColour = accentColour.Opacity(0.5f);
-            }
-
-            if (Header is OsuTabDropdownHeader tabDropdownHeader)
-                tabDropdownHeader.AccentColour = accentColour;
-        }
-
         public OsuTabDropdown()
         {
             RelativeSizeAxes = Axes.X;
@@ -57,6 +45,18 @@ namespace osu.Game.Graphics.UserInterface
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight
         };
+
+        private void propagateAccentColour()
+        {
+            if (Menu is OsuDropdownMenu dropdownMenu)
+            {
+                dropdownMenu.HoverColour = accentColour;
+                dropdownMenu.SelectionColour = accentColour.Opacity(0.5f);
+            }
+
+            if (Header is OsuTabDropdownHeader tabDropdownHeader)
+                tabDropdownHeader.AccentColour = accentColour;
+        }
 
         private class OsuTabDropdownMenu : OsuDropdownMenu
         {
