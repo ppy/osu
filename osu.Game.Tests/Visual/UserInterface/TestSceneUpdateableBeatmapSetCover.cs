@@ -13,6 +13,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -133,7 +134,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private static BeatmapSetInfo createBeatmapWithCover(string coverUrl) => new BeatmapSetInfo
         {
-            OnlineInfo = new BeatmapSetOnlineInfo
+            OnlineInfo = new APIBeatmapSet
             {
                 Covers = new BeatmapSetOnlineCovers { Cover = coverUrl }
             }
@@ -148,7 +149,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 this.loadDelay = loadDelay;
             }
 
-            protected override Drawable CreateDrawable(BeatmapSetInfo model)
+            protected override Drawable CreateDrawable(IBeatmapSetOnlineInfo model)
             {
                 if (model == null)
                     return null;
@@ -167,7 +168,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             private readonly int loadDelay;
 
-            public TestBeatmapSetCover(BeatmapSetInfo set, int loadDelay)
+            public TestBeatmapSetCover(IBeatmapSetOnlineInfo set, int loadDelay)
                 : base(set)
             {
                 this.loadDelay = loadDelay;

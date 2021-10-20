@@ -9,7 +9,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Beatmap set info retrieved for previewing locally without having the set downloaded.
     /// </summary>
-    public class BeatmapSetOnlineInfo
+    public interface IBeatmapSetOnlineInfo
     {
         /// <summary>
         /// The date this beatmap set was submitted to the online listing.

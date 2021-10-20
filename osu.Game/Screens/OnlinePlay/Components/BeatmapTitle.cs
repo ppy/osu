@@ -86,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                         Text = new RomanisableString(beatmap.Value.Metadata.TitleUnicode, beatmap.Value.Metadata.Title),
                         Font = OsuFont.GetFont(size: TextSize),
                     }
-                }, LinkAction.OpenBeatmap, beatmap.Value.OnlineBeatmapID.ToString(), "Open beatmap");
+                }, LinkAction.OpenBeatmap, beatmap.Value.OnlineID.ToString(), "Open beatmap");
             }
         }
     }
