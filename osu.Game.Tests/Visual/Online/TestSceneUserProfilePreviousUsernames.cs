@@ -20,44 +20,75 @@ namespace osu.Game.Tests.Visual.Online
         private IAPIProvider api { get; set; }
 
         private readonly Bindable<User> user = new Bindable<User>();
+        private GetUserRequest request;
+        private PreviousUsernames container;
 
-        public TestSceneUserProfilePreviousUsernames()
+        [SetUp]
+        public void SetUp()
         {
-            Child = new PreviousUsernames
+            request?.Cancel();
+
+            Child = container = new PreviousUsernames
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 User = { BindTarget = user },
             };
-
-            User[] users =
-            {
-                new User { PreviousUsernames = new[] { "username1" } },
-                new User { PreviousUsernames = new[] { "longusername", "longerusername" } },
-                new User { PreviousUsernames = new[] { "test", "angelsim", "verylongusername" } },
-                new User { PreviousUsernames = new[] { "ihavenoidea", "howcani", "makethistext", "anylonger" } },
-                new User { PreviousUsernames = Array.Empty<string>() },
-                null
-            };
-
-            AddStep("single username", () => user.Value = users[0]);
-            AddStep("two usernames", () => user.Value = users[1]);
-            AddStep("three usernames", () => user.Value = users[2]);
-            AddStep("four usernames", () => user.Value = users[3]);
-            AddStep("no username", () => user.Value = users[4]);
-            AddStep("null user", () => user.Value = users[5]);
         }
 
-        protected override void LoadComplete()
+        [Test]
+        public void TestOffline()
         {
-            base.LoadComplete();
+            AddAssert("Is Hidden", () => container?.Alpha == 0);
 
-            AddStep("online user (Angelsim)", () =>
+            AddStep("1 username", () => user.Value = users[0]);
+            AddUntilStep("Is visible", () => container?.Alpha == 1);
+
+            AddStep("2 usernames", () => user.Value = users[1]);
+            AddUntilStep("Is visible", () => container?.Alpha == 1);
+
+            AddStep("3 usernames", () => user.Value = users[2]);
+            AddUntilStep("Is visible", () => container?.Alpha == 1);
+
+            AddStep("4 usernames", () => user.Value = users[3]);
+            AddUntilStep("Is visible", () => container?.Alpha == 1);
+
+            AddStep("No username", () => user.Value = users[4]);
+            AddUntilStep("Is hidden", () => container?.Alpha == 0);
+
+            AddStep("Null user", () => user.Value = users[5]);
+            AddUntilStep("Is hidden", () => container?.Alpha == 0);
+        }
+
+        [Test]
+        public void TestOnline()
+        {
+            AddAssert("Is Hidden", () => container?.Alpha == 0);
+
+            AddStep("Create request", () =>
             {
-                var request = new GetUserRequest(1777162);
-                request.Success += user => this.user.Value = user;
-                api.Queue(request);
+                request = new GetUserRequest(1777162);
+                request.Success += u => user.Value = u;
+                api?.Queue(request);
             });
+
+            AddUntilStep("Is visible", () => container?.Alpha == 1);
+        }
+
+        private static readonly User[] users =
+        {
+            new User { Id = 1, PreviousUsernames = new[] { "username1" } },
+            new User { Id = 2, PreviousUsernames = new[] { "longusername", "longerusername" } },
+            new User { Id = 3, PreviousUsernames = new[] { "test", "angelsim", "verylongusername" } },
+            new User { Id = 4, PreviousUsernames = new[] { "ihavenoidea", "howcani", "makethistext", "anylonger" } },
+            new User { Id = 5, PreviousUsernames = Array.Empty<string>() },
+            null
+        };
+
+        protected override void Dispose(bool isDisposing)
+        {
+            request?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }
