@@ -11,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -212,39 +211,18 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="name">The new room name, if any.</param>
         /// <param name="password">The new password, if any.</param>
         /// <param name="matchType">The type of the match, if any.</param>
-        /// <param name="item">The new room playlist item, if any.</param>
         /// <param name="queueMode">The new queue mode, if any.</param>
-        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<PlaylistItem> item = default,
-                                   Optional<QueueModes> queueMode = default)
+        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<QueueModes> queueMode = default)
         {
             if (Room == null)
                 throw new InvalidOperationException("Must be joined to a match to change settings.");
-
-            // A dummy playlist item filled with the current room settings (except mods).
-            var existingPlaylistItem = new PlaylistItem
-            {
-                Beatmap =
-                {
-                    Value = new BeatmapInfo
-                    {
-                        OnlineBeatmapID = Room.Settings.BeatmapID,
-                        MD5Hash = Room.Settings.BeatmapChecksum
-                    }
-                },
-                RulesetID = Room.Settings.RulesetID
-            };
 
             return ChangeSettings(new MultiplayerRoomSettings
             {
                 Name = name.GetOr(Room.Settings.Name),
                 Password = password.GetOr(Room.Settings.Password),
-                BeatmapID = item.GetOr(existingPlaylistItem).BeatmapID,
-                BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
-                RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
                 MatchType = matchType.GetOr(Room.Settings.MatchType),
                 QueueMode = queueMode.GetOr(Room.Settings.QueueMode),
-                RequiredMods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.RequiredMods,
-                AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods,
             });
         }
 

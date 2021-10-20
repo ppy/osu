@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.Queueing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -54,7 +57,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 loadingLayer.Show();
 
-                client.ChangeSettings(item: item).ContinueWith(t =>
+                client.SendMatchRequest(new AddPlaylistItemRequest
+                {
+                    BeatmapID = item.BeatmapID,
+                    RulesetID = item.RulesetID,
+                    BeatmapChecksum = item.Beatmap.Value.MD5Hash,
+                    RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray(),
+                    AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray()
+                }).ContinueWith(t =>
                 {
                     Schedule(() =>
                     {
