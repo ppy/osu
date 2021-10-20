@@ -18,6 +18,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -84,6 +85,27 @@ namespace osu.Game.Skinning
 
                 SourceChanged?.Invoke();
             };
+
+            // can be removed 20220420.
+            populateMissingHashes();
+        }
+
+        private void populateMissingHashes()
+        {
+            var skinsWithoutHashes = ModelStore.ConsumableItems.Where(i => i.Hash == null).ToArray();
+
+            foreach (SkinInfo skin in skinsWithoutHashes)
+            {
+                try
+                {
+                    Update(skin);
+                }
+                catch (Exception e)
+                {
+                    Delete(skin);
+                    Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
+                }
+            }
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osk";
