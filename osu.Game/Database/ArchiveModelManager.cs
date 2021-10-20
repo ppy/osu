@@ -507,18 +507,26 @@ namespace osu.Game.Database
         /// <param name="file">The existing file to be deleted.</param>
         public void DeleteFile(TModel model, TFileModel file)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            if (model.ID > 0)
             {
-                // Dereference the existing file info, since the file model will be removed.
-                if (file.FileInfo != null)
+                using (var usage = ContextFactory.GetForWrite())
                 {
-                    Files.Dereference(file.FileInfo);
+                    // Dereference the existing file info, since the file model will be removed.
+                    if (file.FileInfo != null)
+                    {
+                        Files.Dereference(file.FileInfo);
 
-                    // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
-                    // Definitely can be removed once we rework the database backend.
-                    usage.Context.Set<TFileModel>().Remove(file);
+                        // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
+                        // Definitely can be removed once we rework the database backend.
+                        usage.Context.Set<TFileModel>().Remove(file);
+                    }
+
+                    model.Files.Remove(file);
                 }
-
+            }
+            else
+            {
+                Files.Dereference(file.FileInfo);
                 model.Files.Remove(file);
             }
         }
@@ -531,15 +539,28 @@ namespace osu.Game.Database
         /// <param name="filename">The filename for the new file.</param>
         public void AddFile(TModel model, Stream contents, string filename)
         {
-            using (ContextFactory.GetForWrite())
+            if (model.ID > 0)
             {
+                using (ContextFactory.GetForWrite())
+                {
+                    model.Files.Add(new TFileModel
+                    {
+                        Filename = filename,
+                        FileInfo = Files.Add(contents)
+                    });
+
+                    Update(model);
+                }
+            }
+            else
+            {
+                // This function may be called during the import process.
+                // Should not exist like this once we have switched to realm.
                 model.Files.Add(new TFileModel
                 {
                     Filename = filename,
                     FileInfo = Files.Add(contents)
                 });
-
-                Update(model);
             }
         }
 
