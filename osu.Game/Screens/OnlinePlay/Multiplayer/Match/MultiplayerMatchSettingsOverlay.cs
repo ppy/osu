@@ -59,6 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public OsuTextBox NameField, MaxParticipantsField;
             public RoomAvailabilityPicker AvailabilityPicker;
             public MatchTypePicker TypePicker;
+            public OsuEnumDropdown<QueueModes> QueueModeDropdown;
             public OsuTextBox PasswordTextBox;
             public TriangleButton ApplyButton;
 
@@ -190,6 +191,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         },
                                                                     },
                                                                 },
+                                                                new Section("Beatmap queueing mode")
+                                                                {
+                                                                    Child = QueueModeDropdown = new OsuEnumDropdown<QueueModes>
+                                                                    {
+                                                                        RelativeSizeAxes = Axes.X
+                                                                    }
+                                                                }
                                                             },
                                                         },
                                                         new SectionContainer

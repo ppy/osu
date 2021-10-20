@@ -3,9 +3,11 @@
 
 namespace osu.Game.Online.Multiplayer
 {
-    public enum QueueingModes
+    public enum QueueModes
     {
-        Host,
+        // used for osu-web deserialization so names shouldn't be changed.
+
+        HostPick,
         Karaoke,
     }
 }

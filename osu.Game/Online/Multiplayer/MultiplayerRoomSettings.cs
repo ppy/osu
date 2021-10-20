@@ -44,7 +44,7 @@ namespace osu.Game.Online.Multiplayer
         public MatchType MatchType { get; set; } = MatchType.HeadToHead;
 
         [Key(9)]
-        public QueueingModes QueueingMode { get; set; } = QueueingModes.Host;
+        public QueueModes QueueMode { get; set; } = QueueModes.HostPick;
 
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
@@ -56,7 +56,7 @@ namespace osu.Game.Online.Multiplayer
                && Name.Equals(other.Name, StringComparison.Ordinal)
                && PlaylistItemId == other.PlaylistItemId
                && MatchType == other.MatchType
-               && QueueingMode == other.QueueingMode;
+               && QueueMode == other.QueueMode;
 
         public override string ToString() => $"Name:{Name}"
                                              + $" Beatmap:{BeatmapID} ({BeatmapChecksum})"
@@ -66,6 +66,6 @@ namespace osu.Game.Online.Multiplayer
                                              + $" Ruleset:{RulesetID}"
                                              + $" Type:{MatchType}"
                                              + $" Item:{PlaylistItemId}"
-                                             + $" Queue:{QueueingMode}";
+                                             + $" Queue:{QueueMode}";
     }
 }
