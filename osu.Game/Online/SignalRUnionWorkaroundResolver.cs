@@ -8,6 +8,7 @@ using MessagePack.Formatters;
 using MessagePack.Resolvers;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
+using osu.Game.Online.Multiplayer.Queueing;
 
 namespace osu.Game.Online
 {
@@ -25,6 +26,7 @@ namespace osu.Game.Online
             { typeof(TeamVersusUserState), new TypeRedirectingFormatter<TeamVersusUserState, MatchUserState>() },
             { typeof(TeamVersusRoomState), new TypeRedirectingFormatter<TeamVersusRoomState, MatchRoomState>() },
             { typeof(ChangeTeamRequest), new TypeRedirectingFormatter<ChangeTeamRequest, MatchUserRequest>() },
+            { typeof(AddPlaylistItemRequest), new TypeRedirectingFormatter<AddPlaylistItemRequest, MatchUserRequest>() },
 
             // These should not be required. The fallback should work. But something is weird with the way caching is done.
             // For future adventurers, I would not advise looking into this further. It's likely not worth the effort.
