@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.IO.Serialization.Converters;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.Queueing;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Users;
 using osu.Game.Utils;
