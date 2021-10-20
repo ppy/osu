@@ -38,7 +38,32 @@ namespace osu.Game.Tests.Skins.IO
         }
 
         [Test]
-        public async Task TestImportTwiceWithSameMetadata()
+        public async Task TestImportTwiceWithSameMetadataAndFilename()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
+                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
+
+                    Assert.That(imported2.ID, Is.EqualTo(imported.ID));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Count, Is.EqualTo(1));
+
+                    // the first should be overwritten by the second import.
+                    Assert.That(imported.Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestImportTwiceWithSameMetadataButDifferentFilename()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
             {
@@ -50,10 +75,10 @@ namespace osu.Game.Tests.Skins.IO
                     var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin2.osk"));
 
                     Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Count, Is.EqualTo(1));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).Count, Is.EqualTo(2));
 
-                    // the first should be overwritten by the second import.
-                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins(true).First().Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
+                    // skin.ini will be rewritten and therefore not match.
+                    Assert.That(imported.Files.First().FileInfoID, Is.Not.EqualTo(imported2.Files.First().FileInfoID));
                 }
                 finally
                 {
