@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Mvis
 
             protected override void LoadComplete()
             {
-                MvisScreen.OnBeatmapChanged(b =>
+                Mvis.OnBeatmapChanged(b =>
                 {
                     songTitle.Text = b.Metadata.TitleUnicode ?? b.Metadata.Title;
                     songArtist.Text = b.Metadata.ArtistUnicode ?? b.Metadata.Artist;

@@ -41,7 +41,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         }
 
         [BackgroundDependencyLoader]
-        private void load(CustomColourProvider colourProvider, OsuColour osuColour, MvisScreen mvisScreen)
+        private void load(CustomColourProvider colourProvider, OsuColour osuColour, IImplementMvis mvisScreen)
         {
             CornerRadius = 5f;
             Masking = true;

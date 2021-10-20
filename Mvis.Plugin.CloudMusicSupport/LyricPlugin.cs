@@ -45,7 +45,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
             => new LyricSidebarSection(this);
 
-        public override int Version => 7;
+        public override int Version => 8;
 
         private WorkingBeatmap currentWorkingBeatmap;
         private LyricLineHandler lrcLine;
@@ -80,7 +80,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         public void RequestControl(Action onAllow)
         {
-            MvisScreen.RequestAudioControl(this,
+            Mvis.RequestAudioControl(this,
                 CloudMusicStrings.AudioControlRequest,
                 () => IsEditing = false,
                 onAllow);
@@ -97,7 +97,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             set
             {
                 if (!value)
-                    MvisScreen.ReleaseAudioControlFrom(this);
+                    Mvis.ReleaseAudioControlFrom(this);
             }
         }
 
@@ -150,9 +150,9 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
 
-            if (MvisScreen != null)
+            if (Mvis != null)
             {
-                MvisScreen.OnScreenExiting += onMvisExiting;
+                Mvis.Exiting += onMvisExiting;
             }
         }
 
@@ -239,7 +239,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             this.MoveToX(0, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
 
-            MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
+            Mvis?.OnBeatmapChanged(onBeatmapChanged, this, true);
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
@@ -292,7 +292,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             base.Update();
 
-            Padding = new MarginPadding { Bottom = (MvisScreen?.BottombarHeight ?? 0) + 20 };
+            Padding = new MarginPadding { Bottom = (Mvis?.BottomBarHeight ?? 0) + 20 };
 
             if (ContentLoaded)
             {

@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
         }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config, MvisPluginManager pluginManager, MvisScreen mvisScreen)
+        private void load(MConfigManager config, MvisPluginManager pluginManager, IImplementMvis mvisScreen)
         {
             config.BindWith(MSetting.MvisInterfaceRed, iR);
             config.BindWith(MSetting.MvisInterfaceGreen, iG);

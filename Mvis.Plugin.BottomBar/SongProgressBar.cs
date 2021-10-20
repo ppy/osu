@@ -17,7 +17,7 @@ namespace Mvis.Plugin.BottomBar
         private CustomColourProvider colourProvider { get; set; }
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvis { get; set; }
 
         private const float idle_alpha = 0.5f;
 
@@ -52,12 +52,12 @@ namespace Mvis.Plugin.BottomBar
 
         protected override void LoadComplete()
         {
-            mvisScreen.OnIdle += () =>
+            mvis.OnIdle += () =>
             {
                 if (IsHovered) showIndicators();
                 UpdateValue(fill.Width);
             };
-            mvisScreen.OnResumeFromIdle += hideIndicators;
+            mvis.OnResumeFromIdle += hideIndicators;
 
             base.LoadComplete();
         }
@@ -89,7 +89,7 @@ namespace Mvis.Plugin.BottomBar
         {
             fill.Width = value;
 
-            if (mvisScreen.OverlaysHidden)
+            if (mvis.InterfacesHidden)
             {
                 songProgressIndicator.MoveToX(
                     getFinalPosX(songProgressIndicator, (value * UsableWidth) - (songProgressIndicator.Width / 2)),
@@ -116,7 +116,7 @@ namespace Mvis.Plugin.BottomBar
 
         protected override void Update()
         {
-            if (mvisScreen.OverlaysHidden)
+            if (mvis.InterfacesHidden)
             {
                 var indicatorX = indicator.X - 5;
                 var indicatorEnd = indicatorX + indicator.Width + 5;
@@ -144,7 +144,7 @@ namespace Mvis.Plugin.BottomBar
 
         private void showIndicators()
         {
-            if (!mvisScreen.OverlaysHidden) return;
+            if (!mvis.InterfacesHidden) return;
 
             indicator.Show();
             songProgressIndicator.Show();

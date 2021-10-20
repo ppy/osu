@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         [CanBeNull]
         [Resolved(CanBeNull = true)]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvisScreen { get; set; }
 
         public readonly List<ISidebarContent> Components = new List<ISidebarContent>();
         public TabControl Header;
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 Right = Header.GetRightUnavaliableSpace(),
                 Left = Header.GetLeftUnavaliableSpace(),
                 Top = Header.GetTopUnavaliableSpace(),
-                Bottom = mvisScreen?.BottombarHeight ?? 0
+                Bottom = mvisScreen?.BottomBarHeight ?? 0
             };
 
             base.UpdateAfterChildren();

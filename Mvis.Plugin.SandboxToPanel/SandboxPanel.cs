@@ -18,7 +18,7 @@ namespace Mvis.Plugin.Sandbox
     public class SandboxPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
-        public override int Version => 7;
+        public override int Version => 8;
         public Bindable<WorkingBeatmap> CurrentBeatmap = new Bindable<WorkingBeatmap>();
 
         public SandboxPanel()
@@ -51,23 +51,23 @@ namespace Mvis.Plugin.Sandbox
             config.BindWith(SandboxSetting.EnableRulesetPanel, Value);
             config.BindWith(SandboxSetting.IdleAlpha, idleAlpha);
 
-            if (MvisScreen != null)
+            if (Mvis != null)
             {
-                MvisScreen.OnIdle += () => idleAlpha.TriggerChange();
-                MvisScreen.OnResumeFromIdle += () =>
+                Mvis.OnIdle += () => idleAlpha.TriggerChange();
+                Mvis.OnResumeFromIdle += () =>
                 {
                     if (Value.Value)
                         this.FadeTo(1, 750, Easing.OutQuint);
 
                     CurrentBeatmap.Disabled = false;
-                    MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
+                    Mvis?.OnBeatmapChanged(onBeatmapChanged, this, true);
                 };
             }
         }
 
         private void onIdleAlphaChanged(ValueChangedEvent<float> v)
         {
-            if ((MvisScreen?.OverlaysHidden ?? true) && Value.Value)
+            if ((Mvis?.InterfacesHidden ?? true) && Value.Value)
             {
                 this.FadeTo(v.NewValue, 750, Easing.OutQuint);
                 if (v.NewValue == 0) CurrentBeatmap.Disabled = true;
@@ -108,8 +108,8 @@ namespace Mvis.Plugin.Sandbox
         {
             bool result = base.Enable();
 
-            this.FadeTo(MvisScreen?.OverlaysHidden ?? false ? idleAlpha.Value : 1, 300).ScaleTo(1, 400, Easing.OutQuint);
-            MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
+            this.FadeTo(Mvis?.InterfacesHidden ?? false ? idleAlpha.Value : 1, 300).ScaleTo(1, 400, Easing.OutQuint);
+            Mvis?.OnBeatmapChanged(onBeatmapChanged, this, true);
 
             return result;
         }

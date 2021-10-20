@@ -14,8 +14,8 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (MvisScreen != null)
-                MvisScreen.OnScreenExiting += () => mvisExiting = true;
+            if (Mvis != null)
+                Mvis.Exiting += () => mvisExiting = true;
         }
 
         protected override void LoadComplete()

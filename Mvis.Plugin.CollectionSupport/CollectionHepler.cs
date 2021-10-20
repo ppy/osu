@@ -63,7 +63,7 @@ namespace Mvis.Plugin.CollectionSupport
 
         protected override bool PostInit() => true;
 
-        public override int Version => 7;
+        public override int Version => 8;
 
         public override PluginSidebarPage CreateSidebarPage()
             => new CollectionPluginPage(this);
@@ -110,10 +110,10 @@ namespace Mvis.Plugin.CollectionSupport
 
             PluginManager.RegisterDBusObject(dBusObject = new CollectionDBusObject());
 
-            if (MvisScreen != null)
+            if (Mvis != null)
             {
-                MvisScreen.OnScreenResuming += UpdateBeatmaps;
-                MvisScreen.OnScreenExiting += onMvisExiting;
+                Mvis.Resuming += UpdateBeatmaps;
+                Mvis.Exiting += onMvisExiting;
             }
         }
 
@@ -341,7 +341,7 @@ namespace Mvis.Plugin.CollectionSupport
             if (collectionManager != null)
                 collectionManager.Collections.CollectionChanged -= triggerRefresh;
 
-            if (MvisScreen != null) MvisScreen.OnScreenResuming -= UpdateBeatmaps;
+            if (Mvis != null) Mvis.Resuming -= UpdateBeatmaps;
 
             base.Dispose(isDisposing);
         }

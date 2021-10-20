@@ -36,7 +36,7 @@ namespace Mvis.Plugin.FakeEditor
 
         private WorkingBeatmap beatmap;
 
-        public override int Version => 7;
+        public override int Version => 8;
 
         public FakeEditor()
         {
@@ -71,10 +71,10 @@ namespace Mvis.Plugin.FakeEditor
                 Alpha = 0.001f
             });
 
-            if (MvisScreen != null)
+            if (Mvis != null)
             {
-                MvisScreen.OnSeek += Seek;
-                MvisScreen.OnBeatmapChanged(initDependencies, this);
+                Mvis.OnSeek += Seek;
+                Mvis.OnBeatmapChanged(initDependencies, this);
             }
         }
 
@@ -89,8 +89,8 @@ namespace Mvis.Plugin.FakeEditor
 
         public override void UnLoad()
         {
-            if (MvisScreen != null)
-                MvisScreen.OnSeek -= Seek;
+            if (Mvis != null)
+                Mvis.OnSeek -= Seek;
 
             base.UnLoad();
         }
@@ -170,8 +170,8 @@ namespace Mvis.Plugin.FakeEditor
             //todo: 移除下面这一行的同时确保samplePlaybackDisabled的值可以正常随音乐变动
             updateSamplePlaybackDisabled();
 
-            if (MvisScreen != null)
-                MvisScreen.OnTrackRunningToggle += _ => updateSamplePlaybackDisabled();
+            if (Mvis != null)
+                Mvis.OnTrackRunningToggle += _ => updateSamplePlaybackDisabled();
 
             //Logger.Log($"Clock源: {EditorClock.Source}");
             //Logger.Log($"是否不能单独操作: {EditorClock.IsCoupled}");

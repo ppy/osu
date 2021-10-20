@@ -48,12 +48,12 @@ using Sidebar = osu.Game.Screens.Mvis.SideBar.Sidebar;
 namespace osu.Game.Screens.Mvis
 {
     //todo: 重写界面?
-    public class MvisScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
+    internal class MvisScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IImplementMvis
     {
         public override bool HideOverlaysOnEnter => true;
         public override bool AllowBackButton => false;
 
-        public override bool CursorVisible => !OverlaysHidden
+        public override bool CursorVisible => !InterfacesHidden
                                               || sidebar.State.Value == Visibility.Visible
                                               || tabHeader.IsVisible.Value //TabHeader可见
                                               || IsHovered == false; //隐藏界面或侧边栏可见，显示光标
@@ -68,48 +68,18 @@ namespace osu.Game.Screens.Mvis
                                   && inputManager?.DraggedDrawable == null
                                   && inputManager?.FocusedDrawable == null;
 
-        #region 外部事件
+        #region IImplementMvis
 
-        /// <summary>
-        /// 切换暂停时调用。<br/><br/>
-        /// 传递: 当前音乐是否暂停<br/>
-        /// true: 暂停<br/>
-        /// false: 播放<br/>
-        /// </summary>
-        public Action<bool> OnTrackRunningToggle;
-
-        /// <summary>
-        /// 播放器屏幕退出时调用
-        /// </summary>
-        public Action OnScreenExiting;
-
-        /// <summary>
-        /// 播放器屏幕进入后台时调用
-        /// </summary>
-        public Action OnScreenSuspending;
-
-        /// <summary>
-        /// 播放器屏幕进入前台时调用
-        /// </summary>
-        public Action OnScreenResuming;
-
-        /// <summary>
-        /// 进入空闲状态(长时间没有输入)时调用
-        /// </summary>
-        public Action OnIdle;
-
-        /// <summary>
-        /// 从空闲状态退出时调用
-        /// </summary>
-        public Action OnResumeFromIdle;
-
-        /// <summary>
-        /// 谱面变更时调用<br/><br/>
-        /// 传递: 当前谱面(WorkingBeatmap)<br/>
-        /// </summary>
+        public Action<bool> OnTrackRunningToggle { get; set; }
+        public Action Exiting { get; set; }
+        public Action Suspending { get; set; }
+        public Action Resuming { get; set; }
+        public Action<double> OnSeek { get; set; }
+        public Action OnIdle { get; set; }
+        public Action OnResumeFromIdle { get; set; }
         private Action<WorkingBeatmap> onBeatmapChangedAction;
 
-        public void OnBeatmapChanged(Action<WorkingBeatmap> action, Drawable sender, bool runOnce = false)
+        public void OnBeatmapChanged(Action<WorkingBeatmap> action, object sender, bool runOnce = false)
         {
             bool alreadyRegistered = onBeatmapChangedAction?.GetInvocationList().ToList().Contains(action) ?? false;
 
@@ -142,6 +112,16 @@ namespace osu.Game.Screens.Mvis
             pluginKeyBindings[keybind] = plugin;
         }
 
+        private readonly PlayerInfo info = new PlayerInfo
+        {
+            Name = "Mvis",
+            Version = 1,
+            VendorName = "MATRIX-夜翎",
+            SupportedFlags = PlayerFlags.All
+        };
+
+        public PlayerInfo GetInfo() => info;
+
         private void unBindFor(MvisPlugin pl)
         {
             //查找插件是pl的绑定
@@ -151,11 +131,116 @@ namespace osu.Game.Screens.Mvis
                 pluginKeyBindings.Remove(bind.Key);
         }
 
+        private readonly Container proxyLayer = new Container
+        {
+            RelativeSizeAxes = Axes.Both,
+            Name = "Proxy Layer",
+            Depth = -1
+        };
+
         /// <summary>
-        /// 拖动下方进度条时调用<br/><br/>
-        /// 传递: 拖动的目标时间
+        /// 添加一个Drawable到Proxy层
         /// </summary>
-        public Action<double> OnSeek;
+        /// <param name="d">要添加的Drawable</param>
+        public void AddDrawableToProxy(Drawable d) => proxyLayer.Add(d);
+
+        /// <summary>
+        /// 从Proxy层移除一个Drawablw
+        /// </summary>
+        /// <param name="d">要移除的Drawable</param>
+        /// <returns>
+        /// true: 移除成功<br/>
+        /// false: 移除出现异常</returns>
+        public bool RemoveDrawableFromProxy(Drawable d)
+        {
+            try
+            {
+                proxyLayer.Remove(d);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool InterfacesHidden { get; private set; }
+
+        public DrawableTrack CurrentTrack => audioControlProvider.GetCurrentTrack();
+
+        public void RequestAudioControl(IProvideAudioControlPlugin pacp, LocalisableString message, Action onDeny, Action onAllow)
+        {
+            if (!(pacp is MvisPlugin mpl)) return;
+
+            dialog.Push(new ConfirmDialog(
+                mpl.ToString()
+                + MvisBaseStrings.AudioControlRequestedMain
+                + "\n"
+                + MvisBaseStrings.AudioControlRequestedSub(message.ToString()),
+                () =>
+                {
+                    changeAudioControlProvider(pacp);
+                    onAllow?.Invoke();
+                },
+                onDeny));
+        }
+
+        public void ReleaseAudioControlFrom(IProvideAudioControlPlugin pacp)
+        {
+            if (audioControlProvider == pacp)
+                changeAudioControlProvider(null);
+        }
+
+        public void SeekTo(double position)
+        {
+            if (position > CurrentTrack.Length)
+                position = CurrentTrack.Length - 10000;
+
+            audioControlProvider?.Seek(position);
+            OnSeek?.Invoke(position);
+        }
+
+        public float BottomBarHeight => currentFunctionBarProvider.GetSafeAreaPadding();
+
+        private readonly List<MvisPlugin> blackScreenPlugins = new List<MvisPlugin>();
+        private readonly List<MvisPlugin> cleanScreenPlugins = new List<MvisPlugin>();
+
+        public bool RequestBlackBackground(MvisPlugin sender)
+        {
+            if (blackScreenPlugins.Contains(sender)) return true;
+
+            blackScreenPlugins.Add(sender);
+            HideScreenBackground.Value = true;
+            return true;
+        }
+
+        public bool RequestNonBlackBackground(MvisPlugin sender)
+        {
+            if (!blackScreenPlugins.Contains(sender)) return false;
+
+            blackScreenPlugins.Remove(sender);
+            HideScreenBackground.Value = blackScreenPlugins.Count > 0;
+            return true;
+        }
+
+        public bool RequestCleanBackground(MvisPlugin sender)
+        {
+            if (cleanScreenPlugins.Contains(sender)) return true;
+
+            cleanScreenPlugins.Add(sender);
+            HideTriangles.Value = true;
+            return true;
+        }
+
+        public bool RequestNonCleanBackground(MvisPlugin sender)
+        {
+            if (!cleanScreenPlugins.Contains(sender)) return false;
+
+            cleanScreenPlugins.Remove(sender);
+            HideTriangles.Value = cleanScreenPlugins.Count > 0;
+            return true;
+        }
 
         #endregion
 
@@ -243,44 +328,6 @@ namespace osu.Game.Screens.Mvis
 
         #endregion
 
-        #region proxy
-
-        private readonly Container proxyLayer = new Container
-        {
-            RelativeSizeAxes = Axes.Both,
-            Name = "Proxy Layer",
-            Depth = -1
-        };
-
-        /// <summary>
-        /// 添加一个Drawable到Proxy层
-        /// </summary>
-        /// <param name="d">要添加的Drawable</param>
-        public void AddDrawableToProxy(Drawable d) => proxyLayer.Add(d);
-
-        /// <summary>
-        /// 从Proxy层移除一个Drawablw
-        /// </summary>
-        /// <param name="d">要移除的Drawable</param>
-        /// <returns>
-        /// true: 移除成功<br/>
-        /// false: 移除出现异常</returns>
-        public bool RemoveDrawableFromProxy(Drawable d)
-        {
-            try
-            {
-                proxyLayer.Remove(d);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        #endregion
-
         #region 杂项
 
         private const float duration = 500;
@@ -291,12 +338,9 @@ namespace osu.Game.Screens.Mvis
 
         private readonly Dictionary<GlobalAction, Action> keyBindings = new Dictionary<GlobalAction, Action>();
 
-        public bool OverlaysHidden { get; private set; }
         private readonly IBindable<bool> isIdle = new BindableBool();
 
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
-
-        public DrawableTrack CurrentTrack => audioControlProvider.GetCurrentTrack();
 
         private readonly BindableList<MvisPlugin> loadList = new BindableList<MvisPlugin>();
 
@@ -306,8 +350,6 @@ namespace osu.Game.Screens.Mvis
         private IProvideAudioControlPlugin audioControlProvider;
         private SettingsButton songSelectButton;
         private PlayerSettings settingsScroll;
-
-        public float BottombarHeight => currentFunctionBarProvider.GetSafeAreaPadding();
 
         private readonly SimpleEntry mvisEntry = new SimpleEntry
         {
@@ -328,7 +370,7 @@ namespace osu.Game.Screens.Mvis
         private void load(MConfigManager config, IdleTracker idleTracker, GameHost host)
         {
             dependencies.Cache(colourProvider = new CustomColourProvider());
-            dependencies.Cache(this);
+            dependencies.CacheAs<IImplementMvis>(this);
 
             //向侧边栏添加内容
             SidebarPluginsPage pluginsPage;
@@ -704,7 +746,7 @@ namespace osu.Game.Screens.Mvis
                     return;
                 }
 
-                if (OverlaysHidden)
+                if (InterfacesHidden)
                 {
                     lockButton.Bindable.Disabled = false;
                     lockButton.Bindable.Value = false;
@@ -745,17 +787,17 @@ namespace osu.Game.Screens.Mvis
                 changeFunctionBarProvider(null);
         }
 
-        internal bool RemovePluginFromLoadList(MvisPlugin pl)
+        public bool UnmarkFromLoading(MvisPlugin pl)
         {
-            if (!loadList.Contains(pl)) return false;
+            if (!loadList.Contains(pl) || !pluginManager.GetAllPlugins(false).Contains(pl)) return false;
 
             loadList.Remove(pl);
             return true;
         }
 
-        internal bool AddPluginToLoadList(MvisPlugin pl)
+        public bool MarkAsLoading(MvisPlugin pl)
         {
-            if (loadList.Contains(pl)) return false;
+            if (loadList.Contains(pl) || !pluginManager.GetAllPlugins(false).Contains(pl)) return false;
 
             loadList.Add(pl);
             return true;
@@ -763,29 +805,6 @@ namespace osu.Game.Screens.Mvis
 
         [Resolved]
         private DialogOverlay dialog { get; set; }
-
-        public void RequestAudioControl(IProvideAudioControlPlugin pacp, LocalisableString message, Action onDeny, Action onAllow)
-        {
-            if (!(pacp is MvisPlugin mpl)) return;
-
-            dialog.Push(new ConfirmDialog(
-                mpl.ToString()
-                + MvisBaseStrings.AudioControlRequestedMain
-                + "\n"
-                + MvisBaseStrings.AudioControlRequestedSub(message.ToString()),
-                () =>
-                {
-                    changeAudioControlProvider(pacp);
-                    onAllow?.Invoke();
-                },
-                onDeny));
-        }
-
-        public void ReleaseAudioControlFrom(IProvideAudioControlPlugin pacp)
-        {
-            if (audioControlProvider == pacp)
-                changeAudioControlProvider(null);
-        }
 
         private void onLoadListChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -856,7 +875,7 @@ namespace osu.Game.Screens.Mvis
 
             this.FadeOut(500, Easing.OutQuint);
 
-            OnScreenExiting?.Invoke();
+            Exiting?.Invoke();
             pluginManager.OnPluginUnLoad -= onPluginUnLoad;
 
             pluginManager.RemoveDBusMenuEntry(mvisEntry);
@@ -882,7 +901,7 @@ namespace osu.Game.Screens.Mvis
                 .ScaleTo(1.2f, duration * 0.6f, Easing.OutQuint);
 
             Beatmap.UnbindEvents();
-            OnScreenSuspending?.Invoke();
+            Suspending?.Invoke();
 
             base.OnSuspending(next);
         }
@@ -908,7 +927,7 @@ namespace osu.Game.Screens.Mvis
 
             //背景层的动画
             background.FadeOut().Then().Delay(duration * 0.6f).FadeIn(duration / 2);
-            OnScreenResuming?.Invoke();
+            Resuming?.Invoke();
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> action)
@@ -942,7 +961,7 @@ namespace osu.Game.Screens.Mvis
         //当有弹窗或游戏失去焦点时要进行的动作
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (lockButton.Bindable.Value && OverlaysHidden && !lockButton.Bindable.Disabled)
+            if (lockButton.Bindable.Value && InterfacesHidden && !lockButton.Bindable.Disabled)
                 lockButton.Bindable.Toggle();
 
             showOverlays(false);
@@ -962,7 +981,7 @@ namespace osu.Game.Screens.Mvis
             if (!force && !okForHide)
                 return;
 
-            OverlaysHidden = true;
+            InterfacesHidden = true;
             updateIdleVisuals();
             OnIdle?.Invoke();
         }
@@ -970,7 +989,7 @@ namespace osu.Game.Screens.Mvis
         private void showOverlays(bool force)
         {
             //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
-            if (!force && ((lockButton.Bindable.Value && OverlaysHidden) || !OverlaysHidden || lockButton.Bindable.Disabled))
+            if (!force && ((lockButton.Bindable.Value && InterfacesHidden) || !InterfacesHidden || lockButton.Bindable.Disabled))
             {
                 showPluginEntriesTemporary();
                 return;
@@ -978,7 +997,7 @@ namespace osu.Game.Screens.Mvis
 
             currentFunctionBarProvider.Show();
 
-            OverlaysHidden = false;
+            InterfacesHidden = false;
 
             applyBackgroundBrightness();
             OnResumeFromIdle?.Invoke();
@@ -990,18 +1009,9 @@ namespace osu.Game.Screens.Mvis
             OnTrackRunningToggle?.Invoke(CurrentTrack.IsRunning);
         }
 
-        public void SeekTo(double position)
-        {
-            if (position > CurrentTrack.Length)
-                position = CurrentTrack.Length - 10000;
-
-            audioControlProvider?.Seek(position);
-            OnSeek?.Invoke(position);
-        }
-
         private void updateIdleVisuals()
         {
-            if (!OverlaysHidden)
+            if (!InterfacesHidden)
                 return;
 
             applyBackgroundBrightness(true, idleBgDim.Value);
@@ -1042,7 +1052,7 @@ namespace osu.Game.Screens.Mvis
             ApplyToBackground(b =>
             {
                 Color4 targetColor = auto
-                    ? OsuColour.Gray(OverlaysHidden ? idleBgDim.Value : 0.6f)
+                    ? OsuColour.Gray(InterfacesHidden ? idleBgDim.Value : 0.6f)
                     : OsuColour.Gray(brightness);
 
                 b.FadeColour(HideScreenBackground.Value ? Color4.Black : targetColor, duration, Easing.OutQuint);

@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
         private string timeTotal;
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvisScreen { get; set; }
 
         private DrawableTrack track => mvisScreen.CurrentTrack;
 

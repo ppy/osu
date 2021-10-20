@@ -38,7 +38,7 @@ namespace Mvis.Plugin.Yasp
         public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
             => new YaspSidebarSection(this);
 
-        public override int Version => 7;
+        public override int Version => 8;
 
         public YaspPlugin()
         {
@@ -143,7 +143,7 @@ namespace Mvis.Plugin.Yasp
             bool result = base.Enable();
 
             this.MoveToX(0, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
-            MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
+            Mvis?.OnBeatmapChanged(onBeatmapChanged, this, true);
 
             return result;
         }
@@ -165,7 +165,7 @@ namespace Mvis.Plugin.Yasp
 
         protected override bool PostInit()
         {
-            currentWorkingBeatmap ??= MvisScreen.Beatmap.Value;
+            currentWorkingBeatmap ??= Mvis.Beatmap.Value;
             return true;
         }
 

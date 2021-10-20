@@ -95,7 +95,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         }
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvisScreen { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()

@@ -84,8 +84,8 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
         [BackgroundDependencyLoader]
         private void load()
         {
-            MvisScreen.OnIdle += onIdle;
-            MvisScreen.OnResumeFromIdle += resumeFromIdle;
+            Mvis.OnIdle += onIdle;
+            Mvis.OnResumeFromIdle += resumeFromIdle;
         }
 
         private void resumeFromIdle()
@@ -100,10 +100,10 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
 
         protected override void Dispose(bool isDisposing)
         {
-            if (MvisScreen != null)
+            if (Mvis != null)
             {
-                MvisScreen.OnIdle -= onIdle;
-                MvisScreen.OnResumeFromIdle -= resumeFromIdle;
+                Mvis.OnIdle -= onIdle;
+                Mvis.OnResumeFromIdle -= resumeFromIdle;
             }
 
             base.Dispose(isDisposing);

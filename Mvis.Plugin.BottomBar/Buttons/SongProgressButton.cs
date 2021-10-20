@@ -13,9 +13,9 @@ namespace Mvis.Plugin.BottomBar.Buttons
         private string timeTotal;
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvis { get; set; }
 
-        private DrawableTrack track => mvisScreen.CurrentTrack;
+        private DrawableTrack track => mvis.CurrentTrack;
 
         private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
 

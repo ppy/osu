@@ -15,7 +15,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
     public class TrackTimeIndicator : CompositeDrawable
     {
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvisScreen { get; set; }
 
         [Resolved]
         private LyricSidebarSectionContainer sidebarPage { get; set; }

@@ -19,7 +19,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
     public class LyricViewScreenWithDrawablePool : LyricScreenWithDrawablePool<LyricPiece>
     {
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvisScreen { get; set; }
 
         [Resolved]
         private LyricPlugin plugin { get; set; }

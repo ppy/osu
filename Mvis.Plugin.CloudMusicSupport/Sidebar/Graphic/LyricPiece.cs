@@ -53,7 +53,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         }
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvisScreen { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(CustomColourProvider colourProvider)

@@ -5,7 +5,6 @@ using Mvis.Plugin.BottomBar.Buttons;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Mvis.SideBar.Settings.Items;
@@ -29,10 +28,7 @@ namespace Mvis.Plugin.BottomBar
         private readonly SongProgressBar progressBar;
         private readonly Container contentContainer;
 
-        [Resolved]
-        private MvisScreen mvisScreen { get; set; }
-
-        public override int Version => 7;
+        public override int Version => 8;
 
         public override TargetLayer Target => TargetLayer.FunctionBar;
 
@@ -110,18 +106,18 @@ namespace Mvis.Plugin.BottomBar
         }
 
         [BackgroundDependencyLoader]
-        private void load(MvisScreen mvisScreen)
+        private void load()
         {
-            mvisScreen.OnIdle += Hide;
-            mvisScreen.OnResumeFromIdle += Show;
+            Mvis.OnIdle += Hide;
+            Mvis.OnResumeFromIdle += Show;
 
-            progressBar.OnSeek = mvisScreen.SeekTo;
+            progressBar.OnSeek = Mvis.SeekTo;
         }
 
         protected override void Update()
         {
-            progressBar.CurrentTime = mvisScreen.CurrentTrack.CurrentTime;
-            progressBar.EndTime = mvisScreen.CurrentTrack.Length;
+            progressBar.CurrentTime = Mvis.CurrentTrack.CurrentTime;
+            progressBar.EndTime = Mvis.CurrentTrack.Length;
             base.Update();
         }
 

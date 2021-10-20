@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -77,9 +78,10 @@ namespace osu.Game.Screens.Mvis.Plugins
         public abstract int Version { get; }
 
         [Resolved(CanBeNull = true)]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvis { get; set; }
 
-        protected MvisScreen MvisScreen => mvisScreen;
+        [CanBeNull]
+        protected IImplementMvis Mvis => mvis;
 
         #region 异步加载任务相关
 
@@ -108,7 +110,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         private void load()
         {
             var pluginManager = DependenciesContainer.Get<MvisPluginManager>();
-            this.PluginManager = pluginManager;
+            PluginManager = pluginManager;
 
             var config = pluginManager.GetConfigManager(this);
 
@@ -137,7 +139,7 @@ namespace osu.Game.Screens.Mvis.Plugins
                     //调用OnContentLoaded进行善后
                     OnContentLoaded(content);
 
-                    mvisScreen?.RemovePluginFromLoadList(this);
+                    mvis?.UnmarkFromLoading(this);
                 }, cancellationTokenSource.Token);
             }
             catch (Exception e)
@@ -154,7 +156,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             cancellationTokenSource.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
 
-            mvisScreen?.RemovePluginFromLoadList(this);
+            mvis?.UnmarkFromLoading(this);
         }
 
         /// <summary>
@@ -165,12 +167,12 @@ namespace osu.Game.Screens.Mvis.Plugins
             try
             {
                 //向加载列表添加这个plugin
-                mvisScreen?.AddPluginToLoadList(this);
+                mvis?.MarkAsLoading(this);
 
                 //调用PostInit在加载内容前初始化
                 if (!PostInit())
                 {
-                    mvisScreen?.RemovePluginFromLoadList(this);
+                    mvis?.UnmarkFromLoading(this);
                     return;
                 }
 
@@ -179,6 +181,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             catch (Exception e)
             {
                 Logger.Error(e, $"{Name}在加载时出现了问题");
+                mvis?.UnmarkFromLoading(this);
             }
         }
 

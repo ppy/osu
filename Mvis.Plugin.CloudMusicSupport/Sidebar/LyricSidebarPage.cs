@@ -31,7 +31,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             => new LyricFunctionProvider(this);
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvisScreen { get; set; }
 
         [Resolved]
         private Storage storage { get; set; }

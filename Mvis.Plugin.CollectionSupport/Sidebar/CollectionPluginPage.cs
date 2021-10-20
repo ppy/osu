@@ -22,7 +22,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private CollectionManager collectionManager { get; set; }
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvisScreen { get; set; }
 
         private readonly CollectionHelper collectionHelper;
 
@@ -102,7 +102,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             selectedPanel.BindValueChanged(updateSelectedPanel);
 
             RefreshCollectionList();
-            mvisScreen.OnScreenResuming += RefreshCollectionList;
+            mvisScreen.Resuming += RefreshCollectionList;
         }
 
         private void OnCurrentCollectionChanged(ValueChangedEvent<BeatmapCollection> v)

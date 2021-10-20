@@ -23,7 +23,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         protected LyricPlugin Plugin => plugin;
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementMvis mvisScreen { get; set; }
 
         protected readonly OsuScrollContainer LyricScroll;
         protected readonly FillFlowContainer<DrawableLyric> LyricFlow;
