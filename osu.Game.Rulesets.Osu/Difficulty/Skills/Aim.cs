@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuPrevObj = (OsuDifficultyHitObject)Previous[0];
             var osuLastObj = (OsuDifficultyHitObject)Previous[1];
 
-            double currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime; // Start iwth the base distance / time
+            double currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime; // Start with the base distance / time
 
             if (osuPrevObj.BaseObject is Slider) // If object is a slider
             {

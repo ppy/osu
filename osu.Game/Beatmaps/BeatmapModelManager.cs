@@ -123,15 +123,15 @@ namespace osu.Game.Beatmaps
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
             {
-                var existingOnlineId = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
+                var existingSetWithSameOnlineID = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
 
-                if (existingOnlineId != null)
+                if (existingSetWithSameOnlineID != null)
                 {
-                    Delete(existingOnlineId);
+                    Delete(existingSetWithSameOnlineID);
 
                     // in order to avoid a unique key constraint, immediately remove the online ID from the previous set.
-                    existingOnlineId.OnlineBeatmapSetID = null;
-                    foreach (var b in existingOnlineId.Beatmaps)
+                    existingSetWithSameOnlineID.OnlineBeatmapSetID = null;
+                    foreach (var b in existingSetWithSameOnlineID.Beatmaps)
                         b.OnlineBeatmapID = null;
 
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been deleted.");
