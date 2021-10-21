@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private void createThemedContent(OverlayColourScheme colourScheme)
+        protected void CreateThemedContent(OverlayColourScheme colourScheme)
         {
             var colourProvider = new OverlayColourProvider(colourScheme);
 
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestAllColourSchemes()
         {
             foreach (var scheme in Enum.GetValues(typeof(OverlayColourScheme)).Cast<OverlayColourScheme>())
-                AddStep($"set {scheme} scheme", () => createThemedContent(scheme));
+                AddStep($"set {scheme} scheme", () => CreateThemedContent(scheme));
         }
     }
 }
