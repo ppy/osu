@@ -205,7 +205,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
-            AddStep("retrieve mods", () => playerMod1 = (TestMod)player.Mods.Value.Single());
+            AddStep("retrieve mods", () => playerMod1 = (TestMod)player.GameplayState.Mods.Single());
             AddAssert("game mods not applied", () => gameMod.Applied == false);
             AddAssert("player mods applied", () => playerMod1.Applied);
 
@@ -217,7 +217,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
-            AddStep("retrieve mods", () => playerMod2 = (TestMod)player.Mods.Value.Single());
+            AddStep("retrieve mods", () => playerMod2 = (TestMod)player.GameplayState.Mods.Single());
             AddAssert("game mods not applied", () => gameMod.Applied == false);
             AddAssert("player has different mods", () => playerMod1 != playerMod2);
             AddAssert("player mods applied", () => playerMod2.Applied);
@@ -291,7 +291,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<EpilepsyWarning>().Any() == warning);
+            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => (getWarning() != null) == warning);
 
             if (warning)
             {
@@ -335,11 +335,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddUntilStep("wait for epilepsy warning", () => loader.ChildrenOfType<EpilepsyWarning>().Single().Alpha > 0);
+            AddUntilStep("wait for epilepsy warning", () => getWarning().Alpha > 0);
+            AddUntilStep("warning is shown", () => getWarning().State.Value == Visibility.Visible);
+
             AddStep("exit early", () => loader.Exit());
 
+            AddUntilStep("warning is hidden", () => getWarning().State.Value == Visibility.Hidden);
             AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
         }
+
+        private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();
 
         private class TestPlayerLoader : PlayerLoader
         {

@@ -3,10 +3,12 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets;
@@ -37,6 +39,45 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("resume player", () => Player.GameplayClockContainer.Start());
             confirmClockRunning(true);
+        }
+
+        [Test]
+        public void TestPauseWithLargeOffset()
+        {
+            double lastTime;
+            bool alwaysGoingForward = true;
+
+            AddStep("force large offset", () =>
+            {
+                var offset = (BindableDouble)LocalConfig.GetBindable<double>(OsuSetting.AudioOffset);
+
+                // use a large negative offset to avoid triggering a fail from forwards seeking.
+                offset.MinValue = -5000;
+                offset.Value = -5000;
+            });
+
+            AddStep("add time forward check hook", () =>
+            {
+                lastTime = double.MinValue;
+                alwaysGoingForward = true;
+
+                Player.OnUpdate += _ =>
+                {
+                    double currentTime = Player.GameplayClockContainer.CurrentTime;
+                    alwaysGoingForward &= currentTime >= lastTime;
+                    lastTime = currentTime;
+                };
+            });
+
+            AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
+
+            pauseAndConfirm();
+
+            resumeAndConfirm();
+
+            AddAssert("time didn't go backwards", () => alwaysGoingForward);
+
+            AddStep("reset offset", () => LocalConfig.SetValue(OsuSetting.AudioOffset, 0.0));
         }
 
         [Test]

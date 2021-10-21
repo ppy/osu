@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
 
                     default:
-                        if (BeatmapSet.Value?.OnlineInfo?.Availability?.DownloadDisabled ?? false)
+                        if (BeatmapSet.Value?.OnlineInfo?.Availability.DownloadDisabled ?? false)
                         {
                             button.Enabled.Value = false;
                             button.TooltipText = "this beatmap is currently not available for download.";

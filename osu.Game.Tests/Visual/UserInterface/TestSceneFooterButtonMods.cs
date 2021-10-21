@@ -36,9 +36,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"Add DoubleTime", () => changeMods(doubleTimeMod));
             AddAssert(@"Check DoubleTime multiplier", () => assertModsMultiplier(doubleTimeMod));
 
-            var mutlipleIncrementMods = new Mod[] { new OsuModDoubleTime(), new OsuModHidden(), new OsuModHardRock() };
-            AddStep(@"Add multiple Mods", () => changeMods(mutlipleIncrementMods));
-            AddAssert(@"Check multiple mod multiplier", () => assertModsMultiplier(mutlipleIncrementMods));
+            var multipleIncrementMods = new Mod[] { new OsuModDoubleTime(), new OsuModHidden(), new OsuModHardRock() };
+            AddStep(@"Add multiple Mods", () => changeMods(multipleIncrementMods));
+            AddAssert(@"Check multiple mod multiplier", () => assertModsMultiplier(multipleIncrementMods));
         }
 
         [Test]

@@ -147,11 +147,11 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             if (map != null)
             {
-                if (e.Button == MouseButton.Left && map.Beatmap.OnlineBeatmapID != null)
-                    addForBeatmap(map.Beatmap.OnlineBeatmapID.Value);
+                if (e.Button == MouseButton.Left && map.BeatmapInfo.OnlineID > 0)
+                    addForBeatmap(map.BeatmapInfo.OnlineID);
                 else
                 {
-                    var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap.OnlineBeatmapID);
+                    var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.BeatmapInfo.OnlineID);
 
                     if (existing != null)
                     {

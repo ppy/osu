@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterfaceV2;
 
@@ -13,13 +14,20 @@ namespace osu.Game.Screens.Edit.Timing
         private LabelledSwitchButton kiai;
         private LabelledSwitchButton omitBarLine;
 
+        private SliderWithTextBoxInput<double> scrollSpeedSlider;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Flow.AddRange(new[]
+            Flow.AddRange(new Drawable[]
             {
                 kiai = new LabelledSwitchButton { Label = "Kiai Time" },
                 omitBarLine = new LabelledSwitchButton { Label = "Skip Bar Line" },
+                scrollSpeedSlider = new SliderWithTextBoxInput<double>("Scroll Speed")
+                {
+                    Current = new EffectControlPoint().ScrollSpeedBindable,
+                    KeyboardStep = 0.1f
+                }
             });
         }
 
@@ -32,6 +40,9 @@ namespace osu.Game.Screens.Edit.Timing
 
                 omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
                 omitBarLine.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+
+                scrollSpeedSlider.Current = point.NewValue.ScrollSpeedBindable;
+                scrollSpeedSlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
         }
 
@@ -42,7 +53,8 @@ namespace osu.Game.Screens.Edit.Timing
             return new EffectControlPoint
             {
                 KiaiMode = reference.KiaiMode,
-                OmitFirstBarLine = reference.OmitFirstBarLine
+                OmitFirstBarLine = reference.OmitFirstBarLine,
+                ScrollSpeed = reference.ScrollSpeed,
             };
         }
     }

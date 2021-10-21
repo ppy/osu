@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select
             {
                 base.Beatmap = value;
 
-                Leaderboard.Beatmap = value is DummyWorkingBeatmap ? null : value?.BeatmapInfo;
+                Leaderboard.BeatmapInfo = value is DummyWorkingBeatmap ? null : value?.BeatmapInfo;
             }
         }
 

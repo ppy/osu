@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         internal CatcherArea CatcherArea { get; private set; }
 
-        private readonly BeatmapDifficulty difficulty;
+        private readonly IBeatmapDifficultyInfo difficulty;
 
-        public CatchPlayfield(BeatmapDifficulty difficulty)
+        public CatchPlayfield(IBeatmapDifficultyInfo difficulty)
         {
             this.difficulty = difficulty;
         }

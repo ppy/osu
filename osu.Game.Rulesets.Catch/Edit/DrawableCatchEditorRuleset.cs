@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
         }
 
-        protected override Playfield CreatePlayfield() => new CatchEditorPlayfield(Beatmap.BeatmapInfo.BaseDifficulty);
+        protected override Playfield CreatePlayfield() => new CatchEditorPlayfield(Beatmap.Difficulty);
     }
 }

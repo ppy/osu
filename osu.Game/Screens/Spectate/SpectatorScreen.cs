@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Spectate
         private readonly IBindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
 
         private readonly Dictionary<int, User> userMap = new Dictionary<int, User>();
-        private readonly Dictionary<int, GameplayState> gameplayStates = new Dictionary<int, GameplayState>();
+        private readonly Dictionary<int, SpectatorGameplayState> gameplayStates = new Dictionary<int, SpectatorGameplayState>();
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Spectate
             {
                 ScoreInfo = new ScoreInfo
                 {
-                    Beatmap = resolvedBeatmap,
+                    BeatmapInfo = resolvedBeatmap,
                     User = user,
                     Mods = spectatorState.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
                     Ruleset = resolvedRuleset.RulesetInfo,
@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Spectate
                 Replay = new Replay { HasReceivedAllFrames = false },
             };
 
-            var gameplayState = new GameplayState(score, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));
+            var gameplayState = new SpectatorGameplayState(score, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));
 
             gameplayStates[userId] = gameplayState;
             Schedule(() => StartGameplay(userId, gameplayState));
@@ -190,8 +190,8 @@ namespace osu.Game.Screens.Spectate
         /// Starts gameplay for a user.
         /// </summary>
         /// <param name="userId">The user to start gameplay for.</param>
-        /// <param name="gameplayState">The gameplay state.</param>
-        protected abstract void StartGameplay(int userId, [NotNull] GameplayState gameplayState);
+        /// <param name="spectatorGameplayState">The gameplay state.</param>
+        protected abstract void StartGameplay(int userId, [NotNull] SpectatorGameplayState spectatorGameplayState);
 
         /// <summary>
         /// Ends gameplay for a user.

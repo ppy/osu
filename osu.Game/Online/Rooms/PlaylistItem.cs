@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
@@ -42,7 +43,7 @@ namespace osu.Game.Online.Rooms
         public readonly BindableList<Mod> RequiredMods = new BindableList<Mod>();
 
         [JsonProperty("beatmap")]
-        private APIPlaylistBeatmap apiBeatmap { get; set; }
+        private APIBeatmap apiBeatmap { get; set; }
 
         private APIMod[] allowedModsBacking;
 
@@ -70,7 +71,7 @@ namespace osu.Game.Online.Rooms
 
         public void MapObjects(BeatmapManager beatmaps, RulesetStore rulesets)
         {
-            Beatmap.Value ??= apiBeatmap.ToBeatmap(rulesets);
+            Beatmap.Value ??= apiBeatmap.ToBeatmapInfo(rulesets);
             Ruleset.Value ??= rulesets.GetRuleset(RulesetID);
 
             Ruleset rulesetInstance = Ruleset.Value.CreateInstance();

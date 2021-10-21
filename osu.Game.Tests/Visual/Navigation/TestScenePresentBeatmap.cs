@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.Navigation
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                     }
-                }).Result;
+                }).Result.Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);

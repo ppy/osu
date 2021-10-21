@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestAllMetrics()
         {
-            AddStep("all metrics", () => details.Beatmap = new BeatmapInfo
+            AddStep("all metrics", () => details.BeatmapInfo = new BeatmapInfo
             {
                 BeatmapSet = new BeatmapSetInfo
                 {
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestAllMetricsExceptSource()
         {
-            AddStep("all except source", () => details.Beatmap = new BeatmapInfo
+            AddStep("all except source", () => details.BeatmapInfo = new BeatmapInfo
             {
                 BeatmapSet = new BeatmapSetInfo
                 {
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestOnlyRatings()
         {
-            AddStep("ratings", () => details.Beatmap = new BeatmapInfo
+            AddStep("ratings", () => details.BeatmapInfo = new BeatmapInfo
             {
                 BeatmapSet = new BeatmapSetInfo
                 {
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestOnlyFailsAndRetries()
         {
-            AddStep("fails retries", () => details.Beatmap = new BeatmapInfo
+            AddStep("fails retries", () => details.BeatmapInfo = new BeatmapInfo
             {
                 Version = "Only Retries and Fails",
                 Metadata = new BeatmapMetadata
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestNoMetrics()
         {
-            AddStep("no metrics", () => details.Beatmap = new BeatmapInfo
+            AddStep("no metrics", () => details.BeatmapInfo = new BeatmapInfo
             {
                 Version = "No Metrics",
                 Metadata = new BeatmapMetadata
@@ -166,13 +166,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestNullBeatmap()
         {
-            AddStep("null beatmap", () => details.Beatmap = null);
+            AddStep("null beatmap", () => details.BeatmapInfo = null);
         }
 
         [Test]
         public void TestOnlineMetrics()
         {
-            AddStep("online ratings/retries/fails", () => details.Beatmap = new BeatmapInfo
+            AddStep("online ratings/retries/fails", () => details.BeatmapInfo = new BeatmapInfo
             {
                 OnlineBeatmapID = 162,
             });

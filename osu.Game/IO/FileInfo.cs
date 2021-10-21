@@ -6,7 +6,7 @@ using osu.Game.Database;
 
 namespace osu.Game.IO
 {
-    public class FileInfo : IHasPrimaryKey
+    public class FileInfo : IHasPrimaryKey, IFileInfo
     {
         public int ID { get; set; }
 
