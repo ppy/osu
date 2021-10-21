@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             AddRangeInternal(new Drawable[]
             {
-                new UpdateableBeatmapSetCover(BeatmapSetCoverType.List)
+                new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = cover_width,

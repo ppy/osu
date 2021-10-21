@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.OSD
         private Sample sampleChange;
 
         public TrackedSettingToast(SettingDescription description)
-            : base(description.Name.ToString(), description.Value.ToString(), description.Shortcut.ToString())
+            : base(description.Name, description.Value, description.Shortcut)
         {
             FillFlowContainer<OptionLight> optionLights;
 

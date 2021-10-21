@@ -13,7 +13,9 @@ namespace osu.Game.Screens.Play.Break
     public class BreakInfo : Container
     {
         public PercentageBreakInfoLine AccuracyDisplay;
-        public BreakInfoLine<int> RankDisplay;
+
+        // Currently unused but may be revisited in a future design update (see https://github.com/ppy/osu/discussions/15185)
+        // public BreakInfoLine<int> RankDisplay;
         public BreakInfoLine<ScoreRank> GradeDisplay;
 
         public BreakInfo()
@@ -41,7 +43,9 @@ namespace osu.Game.Screens.Play.Break
                         Children = new Drawable[]
                         {
                             AccuracyDisplay = new PercentageBreakInfoLine("Accuracy"),
-                            RankDisplay = new BreakInfoLine<int>("Rank"),
+
+                            // See https://github.com/ppy/osu/discussions/15185
+                            // RankDisplay = new BreakInfoLine<int>("Rank"),
                             GradeDisplay = new BreakInfoLine<ScoreRank>("Grade"),
                         },
                     }
