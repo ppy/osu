@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 
+#nullable enable
+
 namespace osu.Game.Database
 {
     public interface IPostImports<out TModel>
@@ -12,6 +14,6 @@ namespace osu.Game.Database
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<ILive<TModel>>> PostImport { set; }
+        public Action<IEnumerable<ILive<TModel>>>? PostImport { set; }
     }
 }

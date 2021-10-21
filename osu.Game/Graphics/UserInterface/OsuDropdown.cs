@@ -21,36 +21,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuDropdown<T> : Dropdown<T>, IHasAccentColour
+    public class OsuDropdown<T> : Dropdown<T>
     {
         private const float corner_radius = 5;
-
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                accentColour = value;
-                updateAccentColour();
-            }
-        }
-
-        [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider, OsuColour colours)
-        {
-            if (accentColour == default)
-                accentColour = colourProvider?.Light4 ?? colours.PinkDarker;
-            updateAccentColour();
-        }
-
-        private void updateAccentColour()
-        {
-            if (Header is IHasAccentColour header) header.AccentColour = accentColour;
-
-            if (Menu is IHasAccentColour menu) menu.AccentColour = accentColour;
-        }
 
         protected override DropdownHeader CreateHeader() => new OsuDropdownHeader();
 
@@ -58,7 +31,7 @@ namespace osu.Game.Graphics.UserInterface
 
         #region OsuDropdownMenu
 
-        protected class OsuDropdownMenu : DropdownMenu, IHasAccentColour
+        protected class OsuDropdownMenu : DropdownMenu
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
@@ -78,9 +51,11 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             [BackgroundDependencyLoader(true)]
-            private void load(OverlayColourProvider? colourProvider, AudioManager audio)
+            private void load(OverlayColourProvider? colourProvider, OsuColour colours, AudioManager audio)
             {
                 BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+                HoverColour = colourProvider?.Light4 ?? colours.PinkDarker;
+                SelectionColour = colourProvider?.Background3 ?? colours.PinkDarker.Opacity(0.5f);
 
                 sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
                 sampleClose = audio.Samples.Get(@"UI/dropdown-close");
@@ -121,56 +96,76 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            private Color4 accentColour;
+            private Color4 hoverColour;
 
-            public Color4 AccentColour
+            public Color4 HoverColour
             {
-                get => accentColour;
+                get => hoverColour;
                 set
                 {
-                    accentColour = value;
-                    foreach (var c in Children.OfType<IHasAccentColour>())
-                        c.AccentColour = value;
+                    hoverColour = value;
+                    foreach (var c in Children.OfType<DrawableOsuDropdownMenuItem>())
+                        c.BackgroundColourHover = value;
+                }
+            }
+
+            private Color4 selectionColour;
+
+            public Color4 SelectionColour
+            {
+                get => selectionColour;
+                set
+                {
+                    selectionColour = value;
+                    foreach (var c in Children.OfType<DrawableOsuDropdownMenuItem>())
+                        c.BackgroundColourSelected = value;
                 }
             }
 
             protected override Menu CreateSubMenu() => new OsuMenu(Direction.Vertical);
 
-            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item) { AccentColour = accentColour };
+            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item)
+            {
+                BackgroundColourHover = HoverColour,
+                BackgroundColourSelected = SelectionColour
+            };
 
             protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
 
             #region DrawableOsuDropdownMenuItem
 
-            public class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem, IHasAccentColour
+            public class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem
             {
                 // IsHovered is used
                 public override bool HandlePositionalInput => true;
 
-                private Color4? accentColour;
-
-                public Color4 AccentColour
+                public new Color4 BackgroundColourHover
                 {
-                    get => accentColour ?? nonAccentSelectedColour;
+                    get => base.BackgroundColourHover;
                     set
                     {
-                        accentColour = value;
+                        base.BackgroundColourHover = value;
+                        updateColours();
+                    }
+                }
+
+                public new Color4 BackgroundColourSelected
+                {
+                    get => base.BackgroundColourSelected;
+                    set
+                    {
+                        base.BackgroundColourSelected = value;
                         updateColours();
                     }
                 }
 
                 private void updateColours()
                 {
-                    BackgroundColourHover = accentColour ?? nonAccentHoverColour;
-                    BackgroundColourSelected = accentColour ?? nonAccentSelectedColour;
                     BackgroundColour = BackgroundColourHover.Opacity(0);
 
                     UpdateBackgroundColour();
                     UpdateForegroundColour();
                 }
-
-                private Color4 nonAccentHoverColour;
-                private Color4 nonAccentSelectedColour;
 
                 public DrawableOsuDropdownMenuItem(MenuItem item)
                     : base(item)
@@ -182,12 +177,8 @@ namespace osu.Game.Graphics.UserInterface
                 }
 
                 [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
+                private void load()
                 {
-                    nonAccentHoverColour = colours.PinkDarker;
-                    nonAccentSelectedColour = Color4.Black.Opacity(0.5f);
-                    updateColours();
-
                     AddInternal(new HoverSounds());
                 }
 
@@ -290,7 +281,7 @@ namespace osu.Game.Graphics.UserInterface
 
         #endregion
 
-        public class OsuDropdownHeader : DropdownHeader, IHasAccentColour
+        public class OsuDropdownHeader : DropdownHeader
         {
             protected readonly SpriteText Text;
 
@@ -301,18 +292,6 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             protected readonly SpriteIcon Icon;
-
-            private Color4 accentColour;
-
-            public virtual Color4 AccentColour
-            {
-                get => accentColour;
-                set
-                {
-                    accentColour = value;
-                    BackgroundColourHover = accentColour;
-                }
-            }
 
             public OsuDropdownHeader()
             {

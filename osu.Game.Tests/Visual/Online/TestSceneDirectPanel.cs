@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -31,7 +32,7 @@ namespace osu.Game.Tests.Visual.Online
                     Id = 3,
                 },
             },
-            OnlineInfo = new BeatmapSetOnlineInfo
+            OnlineInfo = new APIBeatmapSet
             {
                 Availability = new BeatmapSetOnlineAvailability
                 {
@@ -86,7 +87,7 @@ namespace osu.Game.Tests.Visual.Online
                         Id = 3,
                     }
                 },
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     HasVideo = true,
                     HasStoryboard = true,

@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchFilterRow<SearchExplicit> explicitContentFilter;
 
         private readonly Box background;
-        private readonly UpdateableBeatmapSetCover beatmapCover;
+        private readonly UpdateableOnlineBeatmapSetCover beatmapCover;
 
         public BeatmapListingSearchControl()
         {
@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        private class TopSearchBeatmapSetCover : UpdateableBeatmapSetCover
+        private class TopSearchBeatmapSetCover : UpdateableOnlineBeatmapSetCover
         {
             protected override bool TransformImmediately => true;
         }

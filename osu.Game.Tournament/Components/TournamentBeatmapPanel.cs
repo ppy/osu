@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -21,7 +20,8 @@ namespace osu.Game.Tournament.Components
 {
     public class TournamentBeatmapPanel : CompositeDrawable
     {
-        public readonly BeatmapInfo BeatmapInfo;
+        public readonly IBeatmapInfo BeatmapInfo;
+
         private readonly string mod;
 
         private const float horizontal_padding = 10;
@@ -32,12 +32,13 @@ namespace osu.Game.Tournament.Components
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Box flash;
 
-        public TournamentBeatmapPanel(BeatmapInfo beatmapInfo, string mod = null)
+        public TournamentBeatmapPanel(IBeatmapInfo beatmapInfo, string mod = null)
         {
             if (beatmapInfo == null) throw new ArgumentNullException(nameof(beatmapInfo));
 
             BeatmapInfo = beatmapInfo;
             this.mod = mod;
+
             Width = 400;
             Height = HEIGHT;
         }
@@ -57,11 +58,11 @@ namespace osu.Game.Tournament.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                new UpdateableBeatmapSetCover
+                new UpdateableOnlineBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
-                    BeatmapSet = BeatmapInfo.BeatmapSet,
+                    BeatmapSet = BeatmapInfo.BeatmapSet as IBeatmapSetOnlineInfo,
                 },
                 new FillFlowContainer
                 {
@@ -74,9 +75,7 @@ namespace osu.Game.Tournament.Components
                     {
                         new TournamentSpriteText
                         {
-                            Text = new RomanisableString(
-                                $"{BeatmapInfo.Metadata.ArtistUnicode ?? BeatmapInfo.Metadata.Artist} - {BeatmapInfo.Metadata.TitleUnicode ?? BeatmapInfo.Metadata.Title}",
-                                $"{BeatmapInfo.Metadata.Artist} - {BeatmapInfo.Metadata.Title}"),
+                            Text = BeatmapInfo.GetDisplayTitleRomanisable(false),
                             Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                         },
                         new FillFlowContainer
@@ -93,7 +92,7 @@ namespace osu.Game.Tournament.Components
                                 },
                                 new TournamentSpriteText
                                 {
-                                    Text = BeatmapInfo.Metadata.AuthorString,
+                                    Text = BeatmapInfo.Metadata?.Author,
                                     Padding = new MarginPadding { Right = 20 },
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },
@@ -105,7 +104,7 @@ namespace osu.Game.Tournament.Components
                                 },
                                 new TournamentSpriteText
                                 {
-                                    Text = BeatmapInfo.Version,
+                                    Text = BeatmapInfo.DifficultyName,
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },
                             }
@@ -149,7 +148,7 @@ namespace osu.Game.Tournament.Components
 
         private void updateState()
         {
-            var found = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == BeatmapInfo.OnlineBeatmapID);
+            var found = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == BeatmapInfo.OnlineID);
 
             bool doFlash = found != choice;
             choice = found;
