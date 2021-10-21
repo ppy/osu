@@ -160,7 +160,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             return icons;
         }
 
-        protected Drawable CreateBackground() => new UpdateableBeatmapSetCover
+        protected Drawable CreateBackground() => new UpdateableOnlineBeatmapSetCover
         {
             RelativeSizeAxes = Axes.Both,
             BeatmapSet = SetInfo,

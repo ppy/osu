@@ -20,7 +20,8 @@ namespace osu.Game.Models
         [PrimaryKey]
         public Guid ID { get; set; } = Guid.NewGuid();
 
-        public int? OnlineID { get; set; }
+        [Indexed]
+        public int OnlineID { get; set; } = -1;
 
         public DateTimeOffset DateAdded { get; set; }
 
@@ -62,7 +63,7 @@ namespace osu.Game.Models
             if (IsManaged && other.IsManaged)
                 return ID == other.ID;
 
-            if (OnlineID.HasValue && other.OnlineID.HasValue)
+            if (OnlineID > 0 && other.OnlineID > 0)
                 return OnlineID == other.OnlineID;
 
             if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
