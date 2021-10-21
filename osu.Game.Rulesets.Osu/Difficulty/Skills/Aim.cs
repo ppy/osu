@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 1.5;
-        private const double slider_multiplier = 2.75;
+        private const double slider_multiplier = 1.75;
 
         private double currentStrain = 1;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
-            if (osuCurrObj.TravelDistance != 0)
+            if (osuCurrObj.TravelTime != 0)
             {
                 sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime; // add some slider rewards
             }

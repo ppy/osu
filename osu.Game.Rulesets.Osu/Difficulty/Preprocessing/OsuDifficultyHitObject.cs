@@ -86,10 +86,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (lastObject is Slider lastSlider)
             {
                 computeSliderCursorPosition(lastSlider);
-                TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
+                TravelDistance = 0;
                 TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
                 MovementTime = Math.Max(StrainTime - TravelTime, min_delta_time);
                 MovementDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
+
+                int repeatCount = 0;
+
+                for (int i = 1; i < lastSlider.NestedHitObjects.Count; i++)
+                {
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
+                        repeatCount++;
+
+                    Vector2 currSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition);
+
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat && (OsuHitObject)lastSlider.NestedHitObjects[i - 1] is SliderRepeat)
+                        TravelDistance += Math.Max(0, currSlider.Length * scalingFactor - 240);
+                    else if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderEndCircle || (OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
+                        TravelDistance += Math.Max(0, currSlider.Length * scalingFactor - 100);
+                    else
+                        TravelDistance += Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition).Length * scalingFactor;
+
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderTick && i != lastSlider.NestedHitObjects.Count - 1) // For some unknown reason to me sliders can have a tick as the last object
+                    {
+                        Vector2 nextSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i + 1]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition);
+                        TravelDistance += 2 * Vector2.Subtract(nextSlider, currSlider).Length * scalingFactor;
+                    }
+                }
+
+                TravelDistance *= Math.Sqrt(1 + repeatCount);
+                TravelDistance *= Math.Max(0, Math.Min(TravelTime, lastSlider.SpanDuration - 50)) / lastSlider.SpanDuration;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
