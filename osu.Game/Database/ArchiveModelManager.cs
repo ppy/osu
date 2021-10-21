@@ -322,22 +322,22 @@ namespace osu.Game.Database
                                     .OrderBy(f => f.Filename)
                                     .ToArray();
 
-            if (hashableFiles.Length == 0)
-                throw new InvalidOperationException("Attempted to hash an archive with no files");
-
-            // for now, concatenate all hashable files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
-
-            foreach (TFileModel file in hashableFiles)
+            if (hashableFiles.Length > 0)
             {
-                using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
-                    s.CopyTo(hashable);
+                // for now, concatenate all hashable files in the set to create a unique hash.
+                MemoryStream hashable = new MemoryStream();
+
+                foreach (TFileModel file in hashableFiles)
+                {
+                    using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
+                        s.CopyTo(hashable);
+                }
+
+                if (hashable.Length > 0)
+                    return hashable.ComputeSHA2Hash();
             }
 
-            if (hashable.Length > 0)
-                return hashable.ComputeSHA2Hash();
-
-            return item.Hash;
+            return generateFallbackHash();
         }
 
         /// <summary>
@@ -707,10 +707,10 @@ namespace osu.Game.Database
                     s.CopyTo(hashable);
             }
 
-            if (hashable.Length == 0)
-                throw new InvalidOperationException("Attempted to hash an archive with no files");
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
 
-            return hashable.ComputeSHA2Hash();
+            return generateFallbackHash();
         }
 
         /// <summary>
@@ -922,6 +922,14 @@ namespace osu.Game.Database
         }
 
         #endregion
+
+        private static string generateFallbackHash()
+        {
+            // if a hash could no be generated from file content, presume a unique / new import.
+            // therefore, let's use a guaranteed unique hash.
+            // this doesn't follow the SHA2 hashing schema intentionally, so such entries on the data store can be identified.
+            return Guid.NewGuid().ToString();
+        }
 
         private string getValidFilename(string filename)
         {

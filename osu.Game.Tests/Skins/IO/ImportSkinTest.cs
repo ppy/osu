@@ -48,11 +48,12 @@ namespace osu.Game.Tests.Skins.IO
         });
 
         [Test]
-        public Task TestEmptyImportFails() => runSkinTest(osu =>
+        public Task TestEmptyImportImportsWithFilename() => runSkinTest(async osu =>
         {
-            Assert.ThrowsAsync<InvalidOperationException>(() => loadSkinIntoOsu(osu, new ZipArchiveReader(createEmptyOsk(), "test skin.osk")));
+            var import1 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createEmptyOsk(), "test skin.osk"));
 
-            return Task.CompletedTask;
+            // When the import filename matches it shouldn't be appended.
+            assertCorrectMetadata(import1, "test skin", "Unknown", osu);
         });
 
         #endregion
