@@ -149,7 +149,7 @@ namespace osu.Game.Skinning
             CurrentSkinInfo.Value = ModelStore.ConsumableItems.Single(i => i.ID == chosen.ID);
         }
 
-        protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
+        protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name ?? "No name" };
 
         private const string unknown_creator_string = "Unknown";
 
@@ -163,6 +163,7 @@ namespace osu.Game.Skinning
 
             // LegacySkin will parse the skin.ini and populate `Skin.Configuration` during construction above.
             string skinIniSourcedName = instance.Configuration.SkinInfo.Name;
+            string skinIniSourcedCreator = instance.Configuration.SkinInfo.Creator;
             string archiveName = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
 
             bool isImport = reader != null;
@@ -170,7 +171,7 @@ namespace osu.Game.Skinning
             if (isImport)
             {
                 item.Name = !string.IsNullOrEmpty(skinIniSourcedName) ? skinIniSourcedName : archiveName;
-                item.Creator = instance.Configuration.SkinInfo.Creator ?? unknown_creator_string;
+                item.Creator = !string.IsNullOrEmpty(skinIniSourcedCreator) ? skinIniSourcedCreator : unknown_creator_string;
 
                 // For imports, we want to use the archive or folder name as part of the metadata, in addition to any existing skin.ini metadata.
                 // In an ideal world, skin.ini would be the only source of metadata, but a lot of skin creators and users don't update it when making modifications.
