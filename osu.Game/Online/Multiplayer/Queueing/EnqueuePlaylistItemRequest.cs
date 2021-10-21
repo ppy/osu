@@ -10,7 +10,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online.Multiplayer.Queueing
 {
-    public class AddPlaylistItemRequest : MatchUserRequest
+    public class EnqueuePlaylistItemRequest : MatchUserRequest
     {
         [Key(0)]
         public int BeatmapID { get; set; }

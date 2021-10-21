@@ -57,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 loadingLayer.Show();
 
-                client.SendMatchRequest(new AddPlaylistItemRequest
+                client.SendMatchRequest(new EnqueuePlaylistItemRequest
                 {
                     BeatmapID = item.BeatmapID,
                     RulesetID = item.RulesetID,

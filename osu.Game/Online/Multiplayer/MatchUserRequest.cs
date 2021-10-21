@@ -14,7 +14,7 @@ namespace osu.Game.Online.Multiplayer
     [Serializable]
     [MessagePackObject]
     [Union(0, typeof(ChangeTeamRequest))] // IMPORTANT: Add rules to SignalRUnionWorkaroundResolver for new derived types.
-    [Union(1, typeof(AddPlaylistItemRequest))]
+    [Union(1, typeof(EnqueuePlaylistItemRequest))]
     public abstract class MatchUserRequest
     {
     }
