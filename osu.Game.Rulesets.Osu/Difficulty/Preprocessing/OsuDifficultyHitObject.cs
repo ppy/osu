@@ -100,21 +100,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                     Vector2 currSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition);
 
-                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat && (OsuHitObject)lastSlider.NestedHitObjects[i - 1] is SliderRepeat)
-                        TravelDistance += Math.Max(0, currSlider.Length * scalingFactor - 240);
-                    else if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderEndCircle || (OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderEndCircle || (OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
                         TravelDistance += Math.Max(0, currSlider.Length * scalingFactor - 100);
                     else
                         TravelDistance += Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition).Length * scalingFactor;
 
-                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderTick && i != lastSlider.NestedHitObjects.Count - 1) // For some unknown reason to me sliders can have a tick as the last object
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderTick && i != lastSlider.NestedHitObjects.Count - 1) // Check for tick && not last object is necessary for 2007 bugged sliders.
                     {
                         Vector2 nextSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i + 1]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition);
                         TravelDistance += 2 * Vector2.Subtract(nextSlider, currSlider).Length * scalingFactor;
                     }
                 }
 
-                TravelDistance *= Math.Sqrt(1 + repeatCount);
                 TravelDistance *= Math.Max(0, Math.Min(TravelTime, lastSlider.SpanDuration - 50)) / lastSlider.SpanDuration;
             }
 
