@@ -1,80 +1,67 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuTextBox : OsuTestScene
+    public class TestSceneOsuTextBox : ThemeComparisonTestScene
     {
-        private readonly OsuNumberBox numberBox;
+        private IEnumerable<OsuNumberBox> numberBoxes => this.ChildrenOfType<OsuNumberBox>();
 
-        public TestSceneOsuTextBox()
+        protected override Drawable CreateContent() => new FillFlowContainer
         {
-            Child = new Container
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Direction = FillDirection.Vertical,
+            Padding = new MarginPadding(50f),
+            Spacing = new Vector2(0f, 50f),
+            Children = new[]
             {
-                Masking = true,
-                CornerRadius = 10f,
-                AutoSizeAxes = Axes.Both,
-                Padding = new MarginPadding(15f),
-                Children = new Drawable[]
+                new OsuTextBox
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.DarkSlateGray,
-                        Alpha = 0.75f,
-                    },
-                    new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding(50f),
-                        Spacing = new Vector2(0f, 50f),
-                        Children = new[]
-                        {
-                            new OsuTextBox
-                            {
-                                Width = 500f,
-                                PlaceholderText = "Normal textbox",
-                            },
-                            new OsuPasswordTextBox
-                            {
-                                Width = 500f,
-                                PlaceholderText = "Password textbox",
-                            },
-                            numberBox = new OsuNumberBox
-                            {
-                                Width = 500f,
-                                PlaceholderText = "Number textbox"
-                            }
-                        }
-                    }
+                    RelativeSizeAxes = Axes.X,
+                    PlaceholderText = "Normal textbox",
+                },
+                new OsuPasswordTextBox
+                {
+                    RelativeSizeAxes = Axes.X,
+                    PlaceholderText = "Password textbox",
+                },
+                new OsuNumberBox
+                {
+                    RelativeSizeAxes = Axes.X,
+                    PlaceholderText = "Number textbox"
                 }
-            };
-        }
+            }
+        };
 
         [Test]
         public void TestNumberBox()
         {
-            clearTextbox(numberBox);
-            AddStep("enter numbers", () => numberBox.Text = "987654321");
-            expectedValue(numberBox, "987654321");
+            AddStep("create themed content", () => CreateThemedContent(OverlayColourScheme.Red));
 
-            clearTextbox(numberBox);
-            AddStep("enter text + single number", () => numberBox.Text = "1 hello 2 world 3");
-            expectedValue(numberBox, "123");
+            clearTextboxes(numberBoxes);
+            AddStep("enter numbers", () => numberBoxes.ForEach(numberBox => numberBox.Text = "987654321"));
+            expectedValue(numberBoxes, "987654321");
 
-            clearTextbox(numberBox);
+            clearTextboxes(numberBoxes);
+            AddStep("enter text + single number", () => numberBoxes.ForEach(numberBox => numberBox.Text = "1 hello 2 world 3"));
+            expectedValue(numberBoxes, "123");
+
+            clearTextboxes(numberBoxes);
         }
 
-        private void clearTextbox(OsuTextBox textBox) => AddStep("clear textbox", () => textBox.Text = null);
-        private void expectedValue(OsuTextBox textBox, string value) => AddAssert("expected textbox value", () => textBox.Text == value);
+        private void clearTextboxes(IEnumerable<OsuTextBox> textBoxes) => AddStep("clear textbox", () => textBoxes.ForEach(textBox => textBox.Text = null));
+        private void expectedValue(IEnumerable<OsuTextBox> textBoxes, string value) => AddAssert("expected textbox value", () => textBoxes.All(textbox => textbox.Text == value));
     }
 }

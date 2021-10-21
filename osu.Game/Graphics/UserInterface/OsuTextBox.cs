@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -17,18 +19,13 @@ using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTextBox : BasicTextBox
     {
-        private readonly Sample[] textAddedSamples = new Sample[4];
-        private Sample capsTextAddedSample;
-        private Sample textRemovedSample;
-        private Sample textCommittedSample;
-        private Sample caretMovedSample;
-
         /// <summary>
         /// Whether to allow playing a different samples based on the type of character.
         /// If set to false, the same sample will be used for all characters.
@@ -42,9 +39,16 @@ namespace osu.Game.Graphics.UserInterface
         protected override SpriteText CreatePlaceholder() => new OsuSpriteText
         {
             Font = OsuFont.GetFont(italics: true),
-            Colour = new Color4(180, 180, 180, 255),
             Margin = new MarginPadding { Left = 2 },
         };
+
+        private readonly Sample?[] textAddedSamples = new Sample[4];
+        private Sample? capsTextAddedSample;
+        private Sample? textRemovedSample;
+        private Sample? textCommittedSample;
+        private Sample? caretMovedSample;
+
+        private OsuCaret? caret;
 
         public OsuTextBox()
         {
@@ -56,12 +60,18 @@ namespace osu.Game.Graphics.UserInterface
             Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colour, AudioManager audio)
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? colourProvider, OsuColour colour, AudioManager audio)
         {
-            BackgroundUnfocused = Color4.Black.Opacity(0.5f);
-            BackgroundFocused = OsuColour.Gray(0.3f).Opacity(0.8f);
-            BackgroundCommit = BorderColour = colour.Yellow;
+            BackgroundUnfocused = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+            BackgroundFocused = colourProvider?.Background4 ?? OsuColour.Gray(0.3f).Opacity(0.8f);
+            BackgroundCommit = BorderColour = colourProvider?.Highlight1 ?? colour.Yellow;
+            selectionColour = colourProvider?.Background1 ?? new Color4(249, 90, 255, 255);
+
+            if (caret != null)
+                caret.SelectionColour = selectionColour;
+
+            Placeholder.Colour = colourProvider?.Foreground1 ?? new Color4(180, 180, 180, 255);
 
             for (int i = 0; i < textAddedSamples.Length; i++)
                 textAddedSamples[i] = audio.Samples.Get($@"Keyboard/key-press-{1 + i}");
@@ -72,7 +82,9 @@ namespace osu.Game.Graphics.UserInterface
             caretMovedSample = audio.Samples.Get(@"Keyboard/key-movement");
         }
 
-        protected override Color4 SelectionColour => new Color4(249, 90, 255, 255);
+        private Color4 selectionColour;
+
+        protected override Color4 SelectionColour => selectionColour;
 
         protected override void OnUserTextAdded(string added)
         {
@@ -124,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
             Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) },
         };
 
-        protected override Caret CreateCaret() => new OsuCaret
+        protected override Caret CreateCaret() => caret = new OsuCaret
         {
             CaretWidth = CaretWidth,
             SelectionColour = SelectionColour,

@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osuTK;
@@ -111,7 +112,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private static readonly BeatmapSetInfo beatmap_set = new BeatmapSetInfo
         {
-            OnlineInfo = new BeatmapSetOnlineInfo
+            OnlineInfo = new APIBeatmapSet
             {
                 Covers = new BeatmapSetOnlineCovers
                 {
@@ -122,7 +123,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private static readonly BeatmapSetInfo no_cover_beatmap_set = new BeatmapSetInfo
         {
-            OnlineInfo = new BeatmapSetOnlineInfo
+            OnlineInfo = new APIBeatmapSet
             {
                 Covers = new BeatmapSetOnlineCovers
                 {
