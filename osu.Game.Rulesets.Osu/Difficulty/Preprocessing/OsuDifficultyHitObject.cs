@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderTick && i != lastSlider.NestedHitObjects.Count - 1) // Check for tick && not last object is necessary for 2007 bugged sliders.
                     {
                         Vector2 nextSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i + 1]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition);
-                        TravelDistance += 2 * Vector2.Subtract(nextSlider, currSlider).Length * scalingFactor;
+                        TravelDistance += Vector2.Subtract(nextSlider, currSlider).Length * scalingFactor;
                     }
                 }
 
