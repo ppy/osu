@@ -16,7 +16,7 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APIBeatmapSet : BeatmapMetadata, IBeatmapSetOnlineInfo, IBeatmapSetInfo
     {
         [JsonProperty(@"covers")]
-        public BeatmapSetOnlineCovers? Covers { get; set; }
+        public BeatmapSetOnlineCovers Covers { get; set; }
 
         [JsonProperty(@"id")]
         public int OnlineID { get; set; }
