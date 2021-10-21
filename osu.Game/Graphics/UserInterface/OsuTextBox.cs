@@ -48,6 +48,8 @@ namespace osu.Game.Graphics.UserInterface
         private Sample? textCommittedSample;
         private Sample? caretMovedSample;
 
+        private OsuCaret? caret;
+
         public OsuTextBox()
         {
             Height = 40;
@@ -62,8 +64,12 @@ namespace osu.Game.Graphics.UserInterface
         private void load(OverlayColourProvider? colourProvider, OsuColour colour, AudioManager audio)
         {
             BackgroundUnfocused = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
-            BackgroundFocused = colourProvider?.Background3 ?? OsuColour.Gray(0.3f).Opacity(0.8f);
+            BackgroundFocused = colourProvider?.Background4 ?? OsuColour.Gray(0.3f).Opacity(0.8f);
             BackgroundCommit = BorderColour = colourProvider?.Highlight1 ?? colour.Yellow;
+            selectionColour = colourProvider?.Background1 ?? new Color4(249, 90, 255, 255);
+
+            if (caret != null)
+                caret.SelectionColour = selectionColour;
 
             Placeholder.Colour = colourProvider?.Foreground1 ?? new Color4(180, 180, 180, 255);
 
@@ -76,7 +82,9 @@ namespace osu.Game.Graphics.UserInterface
             caretMovedSample = audio.Samples.Get(@"Keyboard/key-movement");
         }
 
-        protected override Color4 SelectionColour => new Color4(249, 90, 255, 255);
+        private Color4 selectionColour;
+
+        protected override Color4 SelectionColour => selectionColour;
 
         protected override void OnUserTextAdded(string added)
         {
@@ -128,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
             Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) },
         };
 
-        protected override Caret CreateCaret() => new OsuCaret
+        protected override Caret CreateCaret() => caret = new OsuCaret
         {
             CaretWidth = CaretWidth,
             SelectionColour = SelectionColour,
