@@ -26,7 +26,7 @@ namespace osu.Game.Online
             { typeof(TeamVersusUserState), new TypeRedirectingFormatter<TeamVersusUserState, MatchUserState>() },
             { typeof(TeamVersusRoomState), new TypeRedirectingFormatter<TeamVersusRoomState, MatchRoomState>() },
             { typeof(ChangeTeamRequest), new TypeRedirectingFormatter<ChangeTeamRequest, MatchUserRequest>() },
-            { typeof(AddPlaylistItemRequest), new TypeRedirectingFormatter<AddPlaylistItemRequest, MatchUserRequest>() },
+            { typeof(EnqueuePlaylistItemRequest), new TypeRedirectingFormatter<EnqueuePlaylistItemRequest, MatchUserRequest>() },
 
             // These should not be required. The fallback should work. But something is weird with the way caching is done.
             // For future adventurers, I would not advise looking into this further. It's likely not worth the effort.
