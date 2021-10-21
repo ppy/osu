@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     {
                         new Spinner
                         {
-                            Duration = 2000,
-                            Position = OsuPlayfield.BASE_SIZE / 2
+                            Duration = 6000,
+                            Position = OsuPlayfield.BASE_SIZE / 2,
                         }
                     }
                 },

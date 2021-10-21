@@ -11,6 +11,7 @@ using osu.Game.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -63,7 +64,7 @@ namespace osu.Game.Tests.Visual.Online
                             Id = 3,
                         },
                     },
-                    OnlineInfo = new BeatmapSetOnlineInfo
+                    OnlineInfo = new APIBeatmapSet
                     {
                         Preview = @"https://b.ppy.sh/preview/12345.mp3",
                         PlayCount = 123,
@@ -134,7 +135,7 @@ namespace osu.Game.Tests.Visual.Online
                             Id = 3,
                         },
                     },
-                    OnlineInfo = new BeatmapSetOnlineInfo
+                    OnlineInfo = new APIBeatmapSet
                     {
                         Availability = new BeatmapSetOnlineAvailability
                         {
@@ -224,7 +225,7 @@ namespace osu.Game.Tests.Visual.Online
                             Id = 3,
                         }
                     },
-                    OnlineInfo = new BeatmapSetOnlineInfo
+                    OnlineInfo = new APIBeatmapSet
                     {
                         Covers = new BeatmapSetOnlineCovers(),
                     },
@@ -233,7 +234,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
-            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.Equals(overlay.Header.RulesetSelector.Current.Value)));
+            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.BeatmapInfo.Ruleset.Equals(overlay.Header.RulesetSelector.Current.Value)));
             AddAssert("left-most beatmap selected", () => overlay.Header.HeaderContent.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
         }
 
@@ -309,7 +310,7 @@ namespace osu.Game.Tests.Visual.Online
                         Id = 3,
                     },
                 },
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     Preview = @"https://b.ppy.sh/preview/123.mp3",
                     HasVideo = true,

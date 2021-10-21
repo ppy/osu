@@ -24,10 +24,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
-        public BeatmapInfo Beatmap
+        public BeatmapInfo BeatmapInfo
         {
-            get => successRate.Beatmap;
-            set => successRate.Beatmap = value;
+            get => successRate.BeatmapInfo;
+            set => successRate.BeatmapInfo = value;
         }
 
         public Info()
@@ -117,8 +117,8 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 source.Text = b.NewValue?.Metadata.Source ?? string.Empty;
                 tags.Text = b.NewValue?.Metadata.Tags ?? string.Empty;
-                genre.Text = b.NewValue?.OnlineInfo?.Genre?.Name ?? string.Empty;
-                language.Text = b.NewValue?.OnlineInfo?.Language?.Name ?? string.Empty;
+                genre.Text = b.NewValue?.OnlineInfo?.Genre.Name ?? string.Empty;
+                language.Text = b.NewValue?.OnlineInfo?.Language.Name ?? string.Empty;
                 var setHasLeaderboard = b.NewValue?.OnlineInfo?.Status > 0;
                 successRate.Alpha = setHasLeaderboard ? 1 : 0;
                 notRankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;

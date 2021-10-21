@@ -15,12 +15,12 @@ namespace osu.Game.Overlays.Profile.Sections
     /// </summary>
     public abstract class BeatmapMetadataContainer : OsuHoverContainer
     {
-        private readonly BeatmapInfo beatmap;
+        private readonly BeatmapInfo beatmapInfo;
 
-        protected BeatmapMetadataContainer(BeatmapInfo beatmap)
+        protected BeatmapMetadataContainer(BeatmapInfo beatmapInfo)
             : base(HoverSampleSet.Submit)
         {
-            this.beatmap = beatmap;
+            this.beatmapInfo = beatmapInfo;
 
             AutoSizeAxes = Axes.Both;
         }
@@ -30,19 +30,19 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Action = () =>
             {
-                if (beatmap.OnlineBeatmapID != null)
-                    beatmapSetOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value);
-                else if (beatmap.BeatmapSet?.OnlineBeatmapSetID != null)
-                    beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet.OnlineBeatmapSetID.Value);
+                if (beatmapInfo.OnlineBeatmapID != null)
+                    beatmapSetOverlay?.FetchAndShowBeatmap(beatmapInfo.OnlineBeatmapID.Value);
+                else if (beatmapInfo.BeatmapSet?.OnlineBeatmapSetID != null)
+                    beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmapInfo.BeatmapSet.OnlineBeatmapSetID.Value);
             };
 
             Child = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
-                Children = CreateText(beatmap),
+                Children = CreateText(beatmapInfo),
             };
         }
 
-        protected abstract Drawable[] CreateText(BeatmapInfo beatmap);
+        protected abstract Drawable[] CreateText(BeatmapInfo beatmapInfo);
     }
 }

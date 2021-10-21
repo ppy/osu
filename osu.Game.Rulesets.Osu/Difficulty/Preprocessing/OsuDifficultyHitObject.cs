@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
     public class OsuDifficultyHitObject : DifficultyHitObject
     {
         private const int normalized_radius = 50; // Change radius to 50 to make 100 the diameter. Easier for mental maths.
+        private const int min_delta_time = 25;
 
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 
@@ -22,9 +23,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double JumpDistance { get; private set; }
 
         /// <summary>
-        /// Normalized Vector from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
+        /// Minimum distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        public Vector2 JumpVector { get; private set; }
+        public double MovementDistance { get; private set; }
 
         /// <summary>
         /// Normalized distance between the start and end position of the previous <see cref="OsuDifficultyHitObject"/>.
@@ -38,7 +39,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 50ms.
+        /// Milliseconds elapsed since the end time of the Previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// </summary>
+        public double MovementTime { get; private set; }
+
+        /// <summary>
+        /// Milliseconds elapsed since from the start time of the Previous <see cref="OsuDifficultyHitObject"/> to the end time of the same Previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// </summary>
+        public double TravelTime { get; private set; }
+
+        /// <summary>
+        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
         public readonly double StrainTime;
 
@@ -51,14 +62,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastLastObject = (OsuHitObject)lastLastObject;
             this.lastObject = (OsuHitObject)lastObject;
 
-            setDistances();
-
             // Capped to 25ms to prevent difficulty calculation breaking from simulatenous objects.
-            StrainTime = Math.Max(DeltaTime, 25);
+            StrainTime = Math.Max(DeltaTime, min_delta_time);
+
+            setDistances(clockRate);
         }
 
-        private void setDistances()
+        private void setDistances(double clockRate)
         {
+            // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
+            if (BaseObject is Spinner || lastObject is Spinner)
+                return;
+
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = normalized_radius / (float)BaseObject.Radius;
 
@@ -71,19 +86,41 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (lastObject is Slider lastSlider)
             {
                 computeSliderCursorPosition(lastSlider);
-                TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
+                TravelDistance = 0;
+                TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
+                MovementTime = Math.Max(StrainTime - TravelTime, min_delta_time);
+                MovementDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
+
+                int repeatCount = 0;
+
+                for (int i = 1; i < lastSlider.NestedHitObjects.Count; i++)
+                {
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
+                        repeatCount++;
+
+                    Vector2 currSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition);
+
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderEndCircle || (OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
+                        TravelDistance += Math.Max(0, currSlider.Length * scalingFactor - 100);
+                    else
+                        TravelDistance += Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition).Length * scalingFactor;
+
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderTick && i != lastSlider.NestedHitObjects.Count - 1) // Check for tick && not last object is necessary for 2007 bugged sliders.
+                    {
+                        Vector2 nextSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i + 1]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition);
+                        TravelDistance += 2 * Vector2.Subtract(nextSlider, currSlider).Length * scalingFactor;
+                    }
+                }
+
+                TravelDistance *= Math.Max(0, Math.Min(TravelTime, lastSlider.SpanDuration - 50)) / lastSlider.SpanDuration;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
-            // Don't need to jump to reach spinners
-            if (!(BaseObject is Spinner))
-            {
-                JumpVector = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor);
-                JumpDistance = JumpVector.Length;
-            }
+            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            MovementDistance = Math.Min(JumpDistance, MovementDistance);
 
-            if (lastLastObject != null)
+            if (lastLastObject != null && !(lastLastObject is Spinner))
             {
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastObject);
 
@@ -104,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             slider.LazyEndPosition = slider.StackedPosition;
 
-            float approxFollowCircleRadius = (float)(slider.Radius * 3);
+            float followCircleRadius = (float)(slider.Radius * 2.4);
             var computeVertex = new Action<double>(t =>
             {
                 double progress = (t - slider.StartTime) / slider.SpanDuration;
@@ -117,11 +154,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 var diff = slider.StackedPosition + slider.Path.PositionAt(progress) - slider.LazyEndPosition.Value;
                 float dist = diff.Length;
 
-                if (dist > approxFollowCircleRadius)
+                slider.LazyTravelTime = t - slider.StartTime;
+
+                if (dist > followCircleRadius)
                 {
                     // The cursor would be outside the follow circle, we need to move it
                     diff.Normalize(); // Obtain direction of diff
-                    dist -= approxFollowCircleRadius;
+                    dist -= followCircleRadius;
                     slider.LazyEndPosition += diff * dist;
                     slider.LazyTravelDistance += dist;
                 }

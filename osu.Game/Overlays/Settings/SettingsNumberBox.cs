@@ -13,7 +13,6 @@ namespace osu.Game.Overlays.Settings
         protected override Drawable CreateControl() => new NumberControl
         {
             RelativeSizeAxes = Axes.X,
-            Margin = new MarginPadding { Top = 5 }
         };
 
         private sealed class NumberControl : CompositeDrawable, IHasCurrentValue<int?>
@@ -36,6 +35,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     numberBox = new OutlinedNumberBox
                     {
+                        LengthLimit = 9, // limited to less than a value that could overflow int32 backing.
                         Margin = new MarginPadding { Top = 5 },
                         RelativeSizeAxes = Axes.X,
                         CommitOnFocusLost = true
