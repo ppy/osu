@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapSetOnlineAvailability
+    public struct BeatmapSetOnlineAvailability
     {
         [JsonProperty(@"download_disabled")]
         public bool DownloadDisabled { get; set; }

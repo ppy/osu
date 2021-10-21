@@ -61,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             {
                 var beatmap = playlistItem?.Beatmap.Value;
 
-                if (background?.BeatmapInfo?.BeatmapSet?.OnlineInfo?.Covers?.Cover == beatmap?.BeatmapSet?.OnlineInfo?.Covers?.Cover)
+                if (background?.BeatmapInfo?.BeatmapSet?.OnlineInfo?.Covers.Cover == beatmap?.BeatmapSet?.OnlineInfo?.Covers.Cover)
                     return;
 
                 cancellationSource?.Cancel();
