@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 computeSliderCursorPosition(lastSlider);
                 TravelDistance = 0;
                 TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
-                MovementTime = Math.Max(StrainTime - TravelTime, min_delta_time);
+                MovementTime = Math.Max(StrainTime - lastSlider.LazyTravelTime / clockRate, min_delta_time);
                 MovementDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
 
                 int repeatCount = 0;
@@ -112,13 +112,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     }
                 }
 
-                TravelDistance *= Math.Max(0, Math.Min(TravelTime, lastSlider.SpanDuration - 50)) / lastSlider.SpanDuration;
+                TravelDistance *= Math.Pow(1 + repeatCount, 1.0 / 3.0);
+
+                TravelDistance *= Math.Max(0, lastSlider.SpanDuration - 37.5) / lastSlider.SpanDuration;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
             JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-            MovementDistance = Math.Min(JumpDistance, MovementDistance);
+            MovementDistance = Math.Max(0, Math.Min(JumpDistance, MovementDistance) - 50);
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
             {
