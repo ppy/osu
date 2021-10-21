@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             Texture? texture = null;
 
             // prefer online cover where available.
-            if (BeatmapInfo?.BeatmapSet?.OnlineInfo?.Covers.Cover != null)
+            if (BeatmapInfo?.BeatmapSet?.OnlineInfo?.Covers?.Cover != null)
                 texture = textures.Get(BeatmapInfo.BeatmapSet.OnlineInfo.Covers.Cover);
 
             Sprite.Texture = texture ?? beatmaps.DefaultBeatmap.Background;
