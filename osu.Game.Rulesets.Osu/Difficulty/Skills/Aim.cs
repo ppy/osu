@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 1.5;
-        private const double slider_multiplier = 2.5;
+        private const double slider_multiplier = 2.0;
         private const double vel_change_multiplier = 0.75;
 
         private double currentStrain = 1;
