@@ -3,6 +3,8 @@
 
 using System;
 
+#nullable enable
+
 namespace osu.Game.Beatmaps
 {
     /// <summary>
@@ -48,7 +50,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The different sizes of cover art for this beatmap set.
         /// </summary>
-        BeatmapSetOnlineCovers Covers { get; set; }
+        BeatmapSetOnlineCovers? Covers { get; set; }
 
         /// <summary>
         /// A small sample clip of this beatmap set's song.
