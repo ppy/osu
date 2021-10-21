@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapSet
         public readonly Details Details;
         public readonly BeatmapPicker Picker;
 
-        private readonly UpdateableBeatmapSetCover cover;
+        private readonly UpdateableOnlineBeatmapSetCover cover;
         private readonly Box coverGradient;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            cover = new UpdateableBeatmapSetCover
+                            cover = new UpdateableOnlineBeatmapSetCover
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Masking = true,
