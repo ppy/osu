@@ -100,22 +100,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor = Attributes.ApproachRate - 10.33;
+                approachRateFactor = 0.3 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
-                approachRateFactor = 0.025 * (8.0 - Attributes.ApproachRate);
+                approachRateFactor = 0.1 * (8.0 - Attributes.ApproachRate);
 
-            double approachRateTotalHitsFactor = 1.0 / (1.0 + Math.Exp(-(0.007 * (totalHits - 400))));
-
-            double approachRateBonus = 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
+            aimValue *= 1.0 + approachRateFactor;
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
                 aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
-            aimValue *= approachRateBonus;
-
-            // Scale the aim value with accuracy _slightly_.
-            aimValue *= 0.5 + accuracy / 2.0;
+            // Scale the aim value with accuracy
+            aimValue *= accuracy;
             // It is important to also consider accuracy difficulty when doing that.
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
@@ -141,11 +137,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor = Attributes.ApproachRate - 10.33;
+                approachRateFactor = 0.3 * (Attributes.ApproachRate - 10.33);
 
-            double approachRateTotalHitsFactor = 1.0 / (1.0 + Math.Exp(-(0.007 * (totalHits - 400))));
-
-            speedValue *= 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
+            speedValue *= 1.0 + approachRateFactor;
 
             if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
