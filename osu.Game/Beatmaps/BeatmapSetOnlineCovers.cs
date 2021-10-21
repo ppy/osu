@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapSetOnlineCovers
+    public struct BeatmapSetOnlineCovers
     {
         public string CoverLowRes { get; set; }
 

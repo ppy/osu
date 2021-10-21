@@ -3,7 +3,7 @@
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapSetOnlineGenre
+    public struct BeatmapSetOnlineGenre
     {
         public int Id { get; set; }
         public string Name { get; set; }

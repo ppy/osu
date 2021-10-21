@@ -6,29 +6,26 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets;
+
+#nullable enable
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIBeatmapSet : BeatmapMetadata, IBeatmapSetOnlineInfo
+    public class APIBeatmapSet : BeatmapMetadata, IBeatmapSetOnlineInfo, IBeatmapSetInfo
     {
         [JsonProperty(@"covers")]
         public BeatmapSetOnlineCovers Covers { get; set; }
 
-        private int? onlineBeatmapSetID;
-
         [JsonProperty(@"id")]
-        public int? OnlineBeatmapSetID
-        {
-            get => onlineBeatmapSetID;
-            set => onlineBeatmapSetID = value > 0 ? value : null;
-        }
+        public int OnlineID { get; set; }
 
         [JsonProperty(@"status")]
         public BeatmapSetOnlineStatus Status { get; set; }
 
         [JsonProperty(@"preview_url")]
-        public string Preview { get; set; }
+        public string Preview { get; set; } = string.Empty;
 
         [JsonProperty(@"has_favourited")]
         public bool HasFavourited { get; set; }
@@ -61,7 +58,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset? LastUpdated { get; set; }
 
         [JsonProperty(@"ratings")]
-        private int[] ratings { get; set; }
+        private int[] ratings { get; set; } = Array.Empty<int>();
 
         [JsonProperty(@"track_id")]
         public int? TrackId { get; set; }
@@ -82,20 +79,20 @@ namespace osu.Game.Online.API.Requests.Responses
         public BeatmapSetOnlineLanguage Language { get; set; }
 
         [JsonProperty(@"beatmaps")]
-        private IEnumerable<APIBeatmap> beatmaps { get; set; }
+        private IEnumerable<APIBeatmap> beatmaps { get; set; } = Array.Empty<APIBeatmap>();
 
         public virtual BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
         {
             var beatmapSet = new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = OnlineBeatmapSetID,
+                OnlineBeatmapSetID = OnlineID,
                 Metadata = this,
                 Status = Status,
-                Metrics = ratings == null ? null : new BeatmapSetMetrics { Ratings = ratings },
+                Metrics = new BeatmapSetMetrics { Ratings = ratings },
                 OnlineInfo = this
             };
 
-            beatmapSet.Beatmaps = beatmaps?.Select(b =>
+            beatmapSet.Beatmaps = beatmaps.Select(b =>
             {
                 var beatmap = b.ToBeatmapInfo(rulesets);
                 beatmap.BeatmapSet = beatmapSet;
@@ -105,5 +102,19 @@ namespace osu.Game.Online.API.Requests.Responses
 
             return beatmapSet;
         }
+
+        #region Implementation of IBeatmapSetInfo
+
+        IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => beatmaps;
+
+        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => this;
+
+        DateTimeOffset IBeatmapSetInfo.DateAdded => throw new NotImplementedException();
+        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => throw new NotImplementedException();
+        double IBeatmapSetInfo.MaxStarDifficulty => throw new NotImplementedException();
+        double IBeatmapSetInfo.MaxLength => throw new NotImplementedException();
+        double IBeatmapSetInfo.MaxBPM => throw new NotImplementedException();
+
+        #endregion
     }
 }

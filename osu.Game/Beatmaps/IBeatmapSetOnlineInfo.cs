@@ -3,6 +3,8 @@
 
 using System;
 
+#nullable enable
+
 namespace osu.Game.Beatmaps
 {
     /// <summary>
