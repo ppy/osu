@@ -19,6 +19,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"status")]
         public BeatmapSetOnlineStatus Status { get; set; }
 
+        [JsonProperty("checksum")]
+        public string Checksum { get; set; }
+
         [JsonProperty(@"beatmapset")]
         public APIBeatmapSet BeatmapSet { get; set; }
 
@@ -78,6 +81,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 // this is actually an incorrect mapping (Length is calculated as drain length in lazer's import process, see BeatmapManager.calculateLength).
                 Length = TimeSpan.FromSeconds(length).TotalMilliseconds,
                 Status = Status,
+                MD5Hash = Checksum,
                 BeatmapSet = set,
                 Metrics = metrics,
                 MaxCombo = maxCombo,
