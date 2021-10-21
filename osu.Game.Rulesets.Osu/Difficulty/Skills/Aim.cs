@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-private int count = 1;
-
         protected override int HistoryLength => 2;
 
         private const double wide_angle_multiplier = 1.5;
@@ -38,8 +36,6 @@ private int count = 1;
         {
             if (current.BaseObject is Spinner || Previous.Count <= 1 || Previous[0].BaseObject is Spinner)
                 return 0;
-
-            count++;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = (OsuDifficultyHitObject)Previous[0];
