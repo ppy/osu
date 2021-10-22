@@ -107,27 +107,15 @@ namespace osu.Game.Beatmaps
 
         [NotMapped]
         [JsonIgnore]
-        public DateTimeOffset Submitted
-        {
-            get => OnlineInfo.Submitted;
-            set => OnlineInfo.Submitted = value;
-        }
+        public DateTimeOffset Submitted => OnlineInfo.Submitted;
 
         [NotMapped]
         [JsonIgnore]
-        public DateTimeOffset? Ranked
-        {
-            get => OnlineInfo.Ranked;
-            set => OnlineInfo.Ranked = value;
-        }
+        public DateTimeOffset? Ranked => OnlineInfo.Ranked;
 
         [NotMapped]
         [JsonIgnore]
-        public DateTimeOffset? LastUpdated
-        {
-            get => OnlineInfo.LastUpdated;
-            set => OnlineInfo.LastUpdated = value;
-        }
+        public DateTimeOffset? LastUpdated => OnlineInfo.LastUpdated;
 
         [NotMapped]
         [JsonIgnore]
@@ -135,107 +123,55 @@ namespace osu.Game.Beatmaps
 
         [NotMapped]
         [JsonIgnore]
-        public bool HasExplicitContent
-        {
-            get => OnlineInfo.HasExplicitContent;
-            set => OnlineInfo.HasExplicitContent = value;
-        }
+        public bool HasExplicitContent => OnlineInfo.HasExplicitContent;
 
         [NotMapped]
         [JsonIgnore]
-        public bool HasVideo
-        {
-            get => OnlineInfo.HasVideo;
-            set => OnlineInfo.HasVideo = value;
-        }
+        public bool HasVideo => OnlineInfo.HasVideo;
 
         [NotMapped]
         [JsonIgnore]
-        public bool HasStoryboard
-        {
-            get => OnlineInfo.HasStoryboard;
-            set => OnlineInfo.HasStoryboard = value;
-        }
+        public bool HasStoryboard => OnlineInfo.HasStoryboard;
 
         [NotMapped]
         [JsonIgnore]
-        public BeatmapSetOnlineCovers Covers
-        {
-            get => OnlineInfo.Covers;
-            set => OnlineInfo.Covers = value;
-        }
+        public BeatmapSetOnlineCovers Covers => OnlineInfo.Covers;
 
         [NotMapped]
         [JsonIgnore]
-        public string Preview
-        {
-            get => OnlineInfo.Preview;
-            set => OnlineInfo.Preview = value;
-        }
+        public string Preview => OnlineInfo.Preview;
 
         [NotMapped]
         [JsonIgnore]
-        public double BPM
-        {
-            get => OnlineInfo.BPM;
-            set => OnlineInfo.BPM = value;
-        }
+        public double BPM => OnlineInfo.BPM;
 
         [NotMapped]
         [JsonIgnore]
-        public int PlayCount
-        {
-            get => OnlineInfo.PlayCount;
-            set => OnlineInfo.PlayCount = value;
-        }
+        public int PlayCount => OnlineInfo.PlayCount;
 
         [NotMapped]
         [JsonIgnore]
-        public int FavouriteCount
-        {
-            get => OnlineInfo.FavouriteCount;
-            set => OnlineInfo.FavouriteCount = value;
-        }
+        public int FavouriteCount => OnlineInfo.FavouriteCount;
 
         [NotMapped]
         [JsonIgnore]
-        public bool HasFavourited
-        {
-            get => OnlineInfo.HasFavourited;
-            set => OnlineInfo.HasFavourited = value;
-        }
+        public bool HasFavourited => OnlineInfo.HasFavourited;
 
         [NotMapped]
         [JsonIgnore]
-        public BeatmapSetOnlineAvailability Availability
-        {
-            get => OnlineInfo.Availability;
-            set => OnlineInfo.Availability = value;
-        }
+        public BeatmapSetOnlineAvailability Availability => OnlineInfo.Availability;
 
         [NotMapped]
         [JsonIgnore]
-        public BeatmapSetOnlineGenre Genre
-        {
-            get => OnlineInfo.Genre;
-            set => OnlineInfo.Genre = value;
-        }
+        public BeatmapSetOnlineGenre Genre => OnlineInfo.Genre;
 
         [NotMapped]
         [JsonIgnore]
-        public BeatmapSetOnlineLanguage Language
-        {
-            get => OnlineInfo.Language;
-            set => OnlineInfo.Language = value;
-        }
+        public BeatmapSetOnlineLanguage Language => OnlineInfo.Language;
 
         [NotMapped]
         [JsonIgnore]
-        public int? TrackId
-        {
-            get => OnlineInfo.TrackId;
-            set => OnlineInfo.TrackId = value;
-        }
+        public int? TrackId => OnlineInfo?.TrackId;
 
         #endregion
     }
