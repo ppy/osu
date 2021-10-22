@@ -84,9 +84,6 @@ namespace osu.Android
             public override bool IsCharging => Battery.PowerSource != BatteryPowerSource.Battery;
         }
 
-        public override string GetInitialPath()
-        {
-            return "/storage/emulated/0/";
-        }
+        public override string GetInitialPath() => "/storage/emulated/0/";
     }
 }
