@@ -10,7 +10,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIBeatmap : BeatmapMetadata, IBeatmapInfo
+    public class APIBeatmap : IBeatmapInfo
     {
         [JsonProperty(@"id")]
         public int OnlineID { get; set; }
@@ -23,6 +23,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("checksum")]
         public string Checksum { get; set; } = string.Empty;
+
+        [JsonProperty(@"user_id")]
+        public int AuthorID { get; set; }
 
         [JsonProperty(@"beatmapset")]
         public APIBeatmapSet? BeatmapSet { get; set; }
@@ -77,7 +80,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             return new BeatmapInfo
             {
-                Metadata = set?.Metadata ?? this,
+                Metadata = set?.Metadata ?? new BeatmapMetadata(),
                 Ruleset = rulesets.GetRuleset(RulesetID),
                 StarDifficulty = StarRating,
                 OnlineBeatmapID = OnlineID,
@@ -108,7 +111,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         #region Implementation of IBeatmapInfo
 
-        public IBeatmapMetadataInfo Metadata => this;
+        public IBeatmapMetadataInfo Metadata => (BeatmapSet as IBeatmapSetInfo)?.Metadata ?? new BeatmapMetadata();
 
         public IBeatmapDifficultyInfo Difficulty => new BeatmapDifficulty
         {
