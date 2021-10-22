@@ -52,8 +52,6 @@ namespace Mvis.Plugin.FakeEditor.Editor
             beatmapSkinProvider = new BeatmapSkinProvidingContainer(beatmap.Skin);
             rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, editorBeatmap.PlayableBeatmap));
 
-            editorBeatmap.BeatmapInfo = beatmap.BeatmapInfo;
-
             InternalChild = beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(ruleset.CreateHitObjectComposer()));
         }
     }
