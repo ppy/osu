@@ -9,10 +9,13 @@ namespace osu.Game.Online.Multiplayer.Queueing
     {
         // used for osu-web deserialization so names shouldn't be changed.
 
-        [Description("Host pick")]
-        HostPick,
+        [Description("Host only")]
+        HostOnly,
 
-        [Description("Karaoke")]
-        Karaoke,
+        [Description("Free-for-all")]
+        FreeForAll,
+
+        [Description("Fair rotate")]
+        FairRotate
     }
 }
