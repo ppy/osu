@@ -47,12 +47,6 @@ namespace osu.Game.Skinning
         /// </summary>
         protected virtual bool UseCustomSampleBanks => false;
 
-        public new LegacySkinConfiguration Configuration
-        {
-            get => base.Configuration as LegacySkinConfiguration;
-            set => base.Configuration = value;
-        }
-
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
@@ -81,26 +75,8 @@ namespace osu.Game.Skinning
         /// <param name="resources">Access to raw game resources.</param>
         /// <param name="configurationStream">An optional stream containing the contents of a skin.ini file.</param>
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] Stream configurationStream)
-            : base(skin, resources)
+            : base(skin, resources, configurationStream)
         {
-            if (configurationStream != null)
-            {
-                using (LineBufferedReader reader = new LineBufferedReader(configurationStream, true))
-                    Configuration = new LegacySkinDecoder().Decode(reader);
-
-                configurationStream.Seek(0, SeekOrigin.Begin);
-
-                using (LineBufferedReader reader = new LineBufferedReader(configurationStream))
-                {
-                    var maniaList = new LegacyManiaSkinDecoder().Decode(reader);
-
-                    foreach (var config in maniaList)
-                        maniaConfigurations[config.Keys] = config;
-                }
-            }
-            else
-                Configuration = new LegacySkinConfiguration();
-
             if (storage != null)
             {
                 var samples = resources?.AudioManager?.GetSampleStore(storage);
@@ -117,6 +93,21 @@ namespace osu.Game.Skinning
             hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
                 lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
                 true) != null);
+        }
+
+        protected override void ParseConfigurationStream(Stream stream)
+        {
+            base.ParseConfigurationStream(stream);
+
+            stream.Seek(0, SeekOrigin.Begin);
+
+            using (LineBufferedReader reader = new LineBufferedReader(stream))
+            {
+                var maniaList = new LegacyManiaSkinDecoder().Decode(reader);
+
+                foreach (var config in maniaList)
+                    maniaConfigurations[config.Keys] = config;
+            }
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
@@ -155,7 +146,7 @@ namespace osu.Game.Skinning
 
                     break;
 
-                case LegacySkinConfiguration.LegacySetting legacy:
+                case SkinConfiguration.LegacySetting legacy:
                     return legacySettingLookup<TValue>(legacy);
 
                 default:
@@ -198,7 +189,7 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.ExplosionScale:
                     Debug.Assert(maniaLookup.TargetColumn != null);
 
-                    if (GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
                         return SkinUtils.As<TValue>(new Bindable<float>(1));
 
                     if (existing.ExplosionWidth[maniaLookup.TargetColumn.Value] != 0)
@@ -245,7 +236,7 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.HoldNoteLightScale:
                     Debug.Assert(maniaLookup.TargetColumn != null);
 
-                    if (GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
                         return SkinUtils.As<TValue>(new Bindable<float>(1));
 
                     if (existing.HoldNoteLightWidth[maniaLookup.TargetColumn.Value] != 0)
@@ -318,15 +309,15 @@ namespace osu.Game.Skinning
             => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
 
         [CanBeNull]
-        private IBindable<TValue> legacySettingLookup<TValue>(LegacySkinConfiguration.LegacySetting legacySetting)
+        private IBindable<TValue> legacySettingLookup<TValue>(SkinConfiguration.LegacySetting legacySetting)
         {
             switch (legacySetting)
             {
-                case LegacySkinConfiguration.LegacySetting.Version:
-                    return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
+                case SkinConfiguration.LegacySetting.Version:
+                    return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? SkinConfiguration.LATEST_VERSION));
 
                 default:
-                    return genericLookup<LegacySkinConfiguration.LegacySetting, TValue>(legacySetting);
+                    return genericLookup<SkinConfiguration.LegacySetting, TValue>(legacySetting);
             }
         }
 
