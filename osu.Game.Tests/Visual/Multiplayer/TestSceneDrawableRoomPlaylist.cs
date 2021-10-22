@@ -241,6 +241,50 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createPlaylist(beatmap);
         }
 
+        [Test]
+        public void TestExpiredItems()
+        {
+            AddStep("create playlist", () =>
+            {
+                Child = playlist = new TestPlaylist(false, false)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(500, 300),
+                    Items =
+                    {
+                        new PlaylistItem
+                        {
+                            ID = 0,
+                            Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                            Expired = true,
+                            RequiredMods =
+                            {
+                                new OsuModHardRock(),
+                                new OsuModDoubleTime(),
+                                new OsuModAutoplay()
+                            }
+                        },
+                        new PlaylistItem
+                        {
+                            ID = 1,
+                            Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                            RequiredMods =
+                            {
+                                new OsuModHardRock(),
+                                new OsuModDoubleTime(),
+                                new OsuModAutoplay()
+                            }
+                        }
+                    }
+                };
+            });
+
+            AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
+        }
+
         private void moveToItem(int index, Vector2? offset = null)
             => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DifficultyIcon>().ElementAt(index), offset));
 
@@ -261,7 +305,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 () => (playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>.PlaylistItemHandle>().ElementAt(index).Alpha > 0) == visible);
 
         private void assertDeleteButtonVisibility(int index, bool visible)
-            => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible", () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
+            => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible",
+                () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
 
         private void createPlaylist(bool allowEdit, bool allowSelection)
         {
