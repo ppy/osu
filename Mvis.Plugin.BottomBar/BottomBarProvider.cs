@@ -1,9 +1,9 @@
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace Mvis.Plugin.BottomBar
 {
-    public class BottomBarProvider : MvisPluginProvider
+    public class BottomBarProvider : LLinPluginProvider
     {
-        public override MvisPlugin CreatePlugin => new LegacyBottomBar();
+        public override LLinPlugin CreatePlugin => new LegacyBottomBar();
     }
 }

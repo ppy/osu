@@ -1,7 +1,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins.Types;
 using osuTK.Graphics;
 
 namespace Mvis.Plugin.BottomBar.Buttons

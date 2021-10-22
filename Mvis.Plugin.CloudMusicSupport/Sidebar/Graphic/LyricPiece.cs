@@ -1,5 +1,5 @@
 using System;
-using M.Resources.Localisation.Mvis.Plugins;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using osu.Framework.Allocation;
@@ -14,7 +14,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis;
+using osu.Game.Screens.LLin;
 using osuTK.Graphics;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
@@ -53,7 +53,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         }
 
         [Resolved]
-        private IImplementMvis mvisScreen { get; set; }
+        private IImplementLLin mvisScreen { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(CustomColourProvider colourProvider)

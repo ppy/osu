@@ -2,14 +2,14 @@ using Mvis.Plugin.Example.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
 
 namespace Mvis.Plugin.Example.UI
 {
     public class ExampleSettings : PluginSettingsSubSection
     {
-        public ExampleSettings(MvisPlugin plugin)
+        public ExampleSettings(LLinPlugin plugin)
             : base(plugin)
         {
         }

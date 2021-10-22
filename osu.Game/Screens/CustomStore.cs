@@ -12,7 +12,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Overlays.Settings.Sections.Mf;
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace osu.Game.Screens
 {
@@ -25,7 +25,7 @@ namespace osu.Game.Screens
         private readonly Dictionary<Assembly, Type> loadedFontAssemblies = new Dictionary<Assembly, Type>();
 
         public List<Font> ActiveFonts = new List<Font>();
-        public List<MvisPluginProvider> LoadedPluginProviders = new List<MvisPluginProvider>();
+        public List<LLinPluginProvider> LoadedPluginProviders = new List<LLinPluginProvider>();
         public static bool CustomFontLoaded;
 
         public CustomStore(Storage storage, OsuGameBase gameBase)
@@ -75,9 +75,10 @@ namespace osu.Game.Screens
         {
             //获取custom下面所有以Font.dll、.Mvis.dll结尾的文件
             var fonts = customStorage.GetFiles(".", "*.Font.dll");
-            var plugins = customStorage.GetFiles(".", "Mvis.Plugin.*.dll");
+            var legacyPlugins = customStorage.GetFiles(".", "Mvis.Plugin.*.dll");
+            var plugins = customStorage.GetFiles(".", "LLin.Plugin.*.dll");
 
-            var assemblies = fonts.Concat(plugins);
+            var assemblies = fonts.Concat(legacyPlugins).Concat(plugins);
 
             try
             {
@@ -87,7 +88,8 @@ namespace osu.Game.Screens
                 {
                     string name = assembly.GetName().Name;
 
-                    if (!name.StartsWith("Mvis.Plugin", StringComparison.InvariantCultureIgnoreCase))
+                    if (!name.StartsWith("Mvis.Plugin", StringComparison.Ordinal)
+                        && !name.StartsWith("LLin.Plugin", StringComparison.Ordinal))
                         continue;
 
                     loadAssembly(assembly);
@@ -97,6 +99,9 @@ namespace osu.Game.Screens
                 if (RuntimeInfo.IsDesktop)
                 {
                     foreach (var file in Directory.GetFiles(RuntimeInfo.StartupDirectory, "Mvis.Plugin.*.dll"))
+                        loadAssembly(Assembly.LoadFrom(file));
+
+                    foreach (var file in Directory.GetFiles(RuntimeInfo.StartupDirectory, "LLin.Plugin.*.dll"))
                         loadAssembly(Assembly.LoadFrom(file));
                 }
 
@@ -142,7 +147,7 @@ namespace osu.Game.Screens
                         continue;
                     }
 
-                    if (type.IsSubclassOf(typeof(MvisPluginProvider)))
+                    if (type.IsSubclassOf(typeof(LLinPluginProvider)))
                     {
                         loadedMvisPluginAssemblies[assembly] = type;
                         loadedAssemblies[assembly] = type;
@@ -219,7 +224,7 @@ namespace osu.Game.Screens
 
             try
             {
-                var providerInstance = (MvisPluginProvider)Activator.CreateInstance(pluginType);
+                var providerInstance = (LLinPluginProvider)Activator.CreateInstance(pluginType);
                 LoadedPluginProviders.Add(providerInstance);
                 //Logger.Log($"[OK] 载入 {fullName}");
             }

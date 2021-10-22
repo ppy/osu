@@ -8,7 +8,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Screens.Mvis.SideBar.Tabs;
+using osu.Game.Screens.LLin.SideBar.Tabs;
 using osuTK.Graphics;
 
 namespace osu.Game.Configuration

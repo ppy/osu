@@ -1,14 +1,9 @@
-using osu.Framework.Bindables;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
+using System;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings
 {
-    public interface ISettingsItem<T> : IHasTooltip
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public interface ISettingsItem<T> : osu.Game.Screens.LLin.SideBar.Settings.ISettingsItem<T>
     {
-        public LocalisableString Description { get; set; }
-        public IconUsage Icon { get; set; }
-        public Bindable<T> Bindable { get; }
     }
 }

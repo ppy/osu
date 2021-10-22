@@ -11,10 +11,10 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Misc;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin.Misc;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins.Types;
 using osuTK;
 using osuTK.Graphics;
 
@@ -25,7 +25,7 @@ namespace Mvis.Plugin.Yasp
         private Drawable currentContent;
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.TargetLayer"/>
+        /// 请参阅 <see cref="LLinPlugin.TargetLayer"/>
         /// </summary>
         public override TargetLayer Target => TargetLayer.Foreground;
 
@@ -58,7 +58,7 @@ namespace Mvis.Plugin.Yasp
         private WorkingBeatmap currentWorkingBeatmap;
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.CreateContent()"/>
+        /// 请参阅 <see cref="LLinPlugin.CreateContent()"/>
         /// </summary>
         protected override Drawable CreateContent() => new FillFlowContainer
         {
@@ -121,7 +121,7 @@ namespace Mvis.Plugin.Yasp
         });
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.OnContentLoaded(Drawable)"/>
+        /// 请参阅 <see cref="LLinPlugin.OnContentLoaded(Drawable)"/>
         /// </summary>
         protected override bool OnContentLoaded(Drawable content)
         {
@@ -143,7 +143,7 @@ namespace Mvis.Plugin.Yasp
             bool result = base.Enable();
 
             this.MoveToX(0, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
-            Mvis?.OnBeatmapChanged(onBeatmapChanged, this, true);
+            LLin?.OnBeatmapChanged(onBeatmapChanged, this, true);
 
             return result;
         }
@@ -153,7 +153,7 @@ namespace Mvis.Plugin.Yasp
         [BackgroundDependencyLoader]
         private void load()
         {
-            var config = (YaspConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
+            var config = (YaspConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
 
             config.BindWith(YaspSettings.EnablePlugin, Value);
             scaleBindable = config.GetBindable<float>(YaspSettings.Scale);
@@ -165,7 +165,7 @@ namespace Mvis.Plugin.Yasp
 
         protected override bool PostInit()
         {
-            currentWorkingBeatmap ??= Mvis.Beatmap.Value;
+            currentWorkingBeatmap ??= LLin.Beatmap.Value;
             return true;
         }
 

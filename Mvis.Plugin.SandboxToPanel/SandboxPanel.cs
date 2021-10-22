@@ -7,9 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins.Types;
 using osuTK;
 
 namespace Mvis.Plugin.Sandbox
@@ -46,28 +46,28 @@ namespace Mvis.Plugin.Sandbox
         {
             idleAlpha.BindValueChanged(onIdleAlphaChanged);
 
-            var config = (SandboxConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
+            var config = (SandboxConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
 
             config.BindWith(SandboxSetting.EnableRulesetPanel, Value);
             config.BindWith(SandboxSetting.IdleAlpha, idleAlpha);
 
-            if (Mvis != null)
+            if (LLin != null)
             {
-                Mvis.OnIdle += () => idleAlpha.TriggerChange();
-                Mvis.OnResumeFromIdle += () =>
+                LLin.OnIdle += () => idleAlpha.TriggerChange();
+                LLin.OnResumeFromIdle += () =>
                 {
                     if (Value.Value)
                         this.FadeTo(1, 750, Easing.OutQuint);
 
                     CurrentBeatmap.Disabled = false;
-                    Mvis?.OnBeatmapChanged(onBeatmapChanged, this, true);
+                    LLin?.OnBeatmapChanged(onBeatmapChanged, this, true);
                 };
             }
         }
 
         private void onIdleAlphaChanged(ValueChangedEvent<float> v)
         {
-            if ((Mvis?.InterfacesHidden ?? true) && Value.Value)
+            if ((LLin?.InterfacesHidden ?? true) && Value.Value)
             {
                 this.FadeTo(v.NewValue, 750, Easing.OutQuint);
                 if (v.NewValue == 0) CurrentBeatmap.Disabled = true;
@@ -108,8 +108,8 @@ namespace Mvis.Plugin.Sandbox
         {
             bool result = base.Enable();
 
-            this.FadeTo(Mvis?.InterfacesHidden ?? false ? idleAlpha.Value : 1, 300).ScaleTo(1, 400, Easing.OutQuint);
-            Mvis?.OnBeatmapChanged(onBeatmapChanged, this, true);
+            this.FadeTo(LLin?.InterfacesHidden ?? false ? idleAlpha.Value : 1, 300).ScaleTo(1, 400, Easing.OutQuint);
+            LLin?.OnBeatmapChanged(onBeatmapChanged, this, true);
 
             return result;
         }

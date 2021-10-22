@@ -3,7 +3,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis;
+using osu.Game.Screens.LLin;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf

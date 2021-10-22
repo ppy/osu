@@ -7,9 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Types;
-using osu.Game.Screens.Mvis.SideBar.Tabs;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Types;
+using osu.Game.Screens.LLin.SideBar.Tabs;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         private FunctionBarPluginDropDown dropdown;
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config, MvisPluginManager pluginManager)
+        private void load(MConfigManager config, LLinPluginManager pluginManager)
         {
             config.BindWith(MSetting.MvisInterfaceRed, iR);
             config.BindWith(MSetting.MvisInterfaceGreen, iG);
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     return;
                 }
 
-                var pl = (MvisPlugin)v.NewValue;
+                var pl = (LLinPlugin)v.NewValue;
 
                 config.SetValue(MSetting.MvisCurrentFunctionBar, pluginManager.ToPath(pl));
             });
@@ -136,7 +136,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             {
                 protected override LocalisableString GenerateItemText(IFunctionBarProvider item)
                 {
-                    return ((MvisPlugin)item).Name;
+                    return ((LLinPlugin)item).Name;
                 }
             }
         }

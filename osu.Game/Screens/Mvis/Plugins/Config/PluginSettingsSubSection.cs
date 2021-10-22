@@ -1,26 +1,14 @@
-using osu.Framework.Allocation;
-using osu.Framework.Localisation;
-using osu.Game.Overlays.Settings;
+using System;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace osu.Game.Screens.Mvis.Plugins.Config
 {
-    public abstract class PluginSettingsSubSection : SettingsSubsection
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public abstract class PluginSettingsSubSection : osu.Game.Screens.LLin.Plugins.Config.PluginSettingsSubSection
     {
-        private readonly MvisPlugin plugin;
-        protected IPluginConfigManager ConfigManager;
-
-        protected override LocalisableString Header => plugin.Name;
-
-        protected PluginSettingsSubSection(MvisPlugin plugin)
+        protected PluginSettingsSubSection(LLinPlugin plugin)
+            : base(plugin)
         {
-            this.plugin = plugin;
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            ConfigManager = dependencies.Get<MvisPluginManager>().GetConfigManager(plugin);
-            return dependencies;
         }
     }
 }

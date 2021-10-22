@@ -6,8 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Types;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         protected override LocalisableString Header => "音频";
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config, MvisPluginManager pluginManager)
+        private void load(MConfigManager config, LLinPluginManager pluginManager)
         {
             AudioControlPluginDropDown dropdown;
             Children = new Drawable[]
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     return;
                 }
 
-                var pl = (MvisPlugin)v.NewValue;
+                var pl = (LLinPlugin)v.NewValue;
 
                 config.SetValue(MSetting.MvisCurrentAudioProvider, pluginManager.ToPath(pl));
             });
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             {
                 protected override LocalisableString GenerateItemText(IProvideAudioControlPlugin item)
                 {
-                    return ((MvisPlugin)item).Name;
+                    return ((LLinPlugin)item).Name;
                 }
             }
         }

@@ -16,10 +16,10 @@ using osu.Game;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
-using osu.Game.Screens.Mvis.Plugins.Types;
-using osu.Game.Screens.Mvis.SideBar.Settings.Items;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins.Types;
+using osu.Game.Screens.LLin.SideBar.Settings.Items;
 
 namespace Mvis.Plugin.CollectionSupport
 {
@@ -100,7 +100,7 @@ namespace Mvis.Plugin.CollectionSupport
         [BackgroundDependencyLoader]
         private void load()
         {
-            var config = (CollectionHelperConfigManager)DependenciesContainer.Get<MvisPluginManager>().GetConfigManager(this);
+            var config = (CollectionHelperConfigManager)DependenciesContainer.Get<LLinPluginManager>().GetConfigManager(this);
             config.BindWith(CollectionSettings.EnablePlugin, Value);
             b.BindValueChanged(v =>
             {
@@ -110,10 +110,10 @@ namespace Mvis.Plugin.CollectionSupport
 
             PluginManager.RegisterDBusObject(dBusObject = new CollectionDBusObject());
 
-            if (Mvis != null)
+            if (LLin != null)
             {
-                Mvis.Resuming += UpdateBeatmaps;
-                Mvis.Exiting += onMvisExiting;
+                LLin.Resuming += UpdateBeatmaps;
+                LLin.Exiting += onMvisExiting;
             }
         }
 
@@ -341,7 +341,7 @@ namespace Mvis.Plugin.CollectionSupport
             if (collectionManager != null)
                 collectionManager.Collections.CollectionChanged -= triggerRefresh;
 
-            if (Mvis != null) Mvis.Resuming -= UpdateBeatmaps;
+            if (LLin != null) LLin.Resuming -= UpdateBeatmaps;
 
             base.Dispose(isDisposing);
         }

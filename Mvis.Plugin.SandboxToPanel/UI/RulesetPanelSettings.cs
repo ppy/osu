@@ -1,13 +1,13 @@
-using M.Resources.Localisation.Mvis;
-using M.Resources.Localisation.Mvis.Plugins;
+using M.Resources.Localisation.LLin;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.Sandbox.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Settings;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
 using osuTK;
 
 namespace Mvis.Plugin.Sandbox.UI
@@ -19,7 +19,7 @@ namespace Mvis.Plugin.Sandbox.UI
 
         private readonly Bindable<VisualizerLayout> layoutType = new Bindable<VisualizerLayout>();
 
-        public SandboxSettings(MvisPlugin plugin)
+        public SandboxSettings(LLinPlugin plugin)
             : base(plugin)
         {
         }
@@ -35,7 +35,7 @@ namespace Mvis.Plugin.Sandbox.UI
             {
                 new SettingsCheckbox
                 {
-                    LabelText = MvisGenericStrings.EnablePlugin,
+                    LabelText = LLinGenericStrings.EnablePlugin,
                     Current = config.GetBindable<bool>(SandboxSetting.EnableRulesetPanel)
                 },
                 new SettingsSlider<float>

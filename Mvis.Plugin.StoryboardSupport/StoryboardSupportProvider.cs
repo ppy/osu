@@ -1,9 +1,9 @@
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace Mvis.Plugin.StoryboardSupport
 {
-    public class RulesetPanelProvider : MvisPluginProvider
+    public class RulesetPanelProvider : LLinPluginProvider
     {
-        public override MvisPlugin CreatePlugin => new BackgroundStoryBoardLoader();
+        public override LLinPlugin CreatePlugin => new BackgroundStoryBoardLoader();
     }
 }

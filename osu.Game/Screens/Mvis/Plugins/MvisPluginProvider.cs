@@ -1,10 +1,9 @@
+using System;
+
 namespace osu.Game.Screens.Mvis.Plugins
 {
-    public abstract class MvisPluginProvider
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public abstract class MvisPluginProvider : osu.Game.Screens.LLin.Plugins.MvisPluginProvider
     {
-        /// <summary>
-        /// 要提供的插件
-        /// </summary>
-        public abstract MvisPlugin CreatePlugin { get; }
     }
 }

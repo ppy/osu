@@ -1,4 +1,4 @@
-using M.Resources.Localisation.Mvis.Plugins;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using osu.Framework.Allocation;
@@ -11,7 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Screens.Mvis;
+using osu.Game.Screens.LLin;
 using osuTK;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
@@ -19,7 +19,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
     public class LyricViewScreenWithDrawablePool : LyricScreenWithDrawablePool<LyricPiece>
     {
         [Resolved]
-        private IImplementMvis mvisScreen { get; set; }
+        private IImplementLLin mvisScreen { get; set; }
 
         [Resolved]
         private LyricPlugin plugin { get; set; }

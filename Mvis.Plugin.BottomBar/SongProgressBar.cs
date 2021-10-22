@@ -3,8 +3,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis;
-using osu.Game.Screens.Mvis.Misc;
+using osu.Game.Screens.LLin;
+using osu.Game.Screens.LLin.Misc;
 
 namespace Mvis.Plugin.BottomBar
 {
@@ -17,7 +17,7 @@ namespace Mvis.Plugin.BottomBar
         private CustomColourProvider colourProvider { get; set; }
 
         [Resolved]
-        private IImplementMvis mvis { get; set; }
+        private IImplementLLin mvis { get; set; }
 
         private const float idle_alpha = 0.5f;
 

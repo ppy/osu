@@ -9,10 +9,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Mvis.Misc;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin.Misc;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Game.Screens.Play;
 
 namespace Mvis.Plugin.FakeEditor
@@ -59,7 +59,7 @@ namespace Mvis.Plugin.FakeEditor
         [BackgroundDependencyLoader]
         private void load()
         {
-            var config = (FakeEditorConfigManager)dependencies.Get<MvisPluginManager>().GetConfigManager(this);
+            var config = (FakeEditorConfigManager)dependencies.Get<LLinPluginManager>().GetConfigManager(this);
             config.BindWith(FakeEditorSetting.EnableFakeEditor, Value);
 
             dependencies.CacheAs(beatDivisor);
@@ -71,10 +71,10 @@ namespace Mvis.Plugin.FakeEditor
                 Alpha = 0.001f
             });
 
-            if (Mvis != null)
+            if (LLin != null)
             {
-                Mvis.OnSeek += Seek;
-                Mvis.OnBeatmapChanged(initDependencies, this);
+                LLin.OnSeek += Seek;
+                LLin.OnBeatmapChanged(initDependencies, this);
             }
         }
 
@@ -89,8 +89,8 @@ namespace Mvis.Plugin.FakeEditor
 
         public override void UnLoad()
         {
-            if (Mvis != null)
-                Mvis.OnSeek -= Seek;
+            if (LLin != null)
+                LLin.OnSeek -= Seek;
 
             base.UnLoad();
         }
@@ -170,8 +170,8 @@ namespace Mvis.Plugin.FakeEditor
             //todo: 移除下面这一行的同时确保samplePlaybackDisabled的值可以正常随音乐变动
             updateSamplePlaybackDisabled();
 
-            if (Mvis != null)
-                Mvis.OnTrackRunningToggle += _ => updateSamplePlaybackDisabled();
+            if (LLin != null)
+                LLin.OnTrackRunningToggle += _ => updateSamplePlaybackDisabled();
 
             //Logger.Log($"Clock源: {EditorClock.Source}");
             //Logger.Log($"是否不能单独操作: {EditorClock.IsCoupled}");

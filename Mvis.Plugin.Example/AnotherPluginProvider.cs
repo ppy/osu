@@ -1,9 +1,9 @@
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace Mvis.Plugin.Example
 {
-    public class AnotherPanelProvider : MvisPluginProvider
+    public class AnotherPanelProvider : LLinPluginProvider
     {
-        public override MvisPlugin CreatePlugin => new AnotherPlugin();
+        public override LLinPlugin CreatePlugin => new AnotherPlugin();
     }
 }

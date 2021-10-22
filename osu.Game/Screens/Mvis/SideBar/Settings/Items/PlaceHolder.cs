@@ -1,8 +1,9 @@
-using osu.Framework.Graphics;
+using System;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
 {
-    public class PlaceHolder : Drawable
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public class PlaceHolder : osu.Game.Screens.LLin.SideBar.Settings.Items.PlaceHolder
     {
     }
 }

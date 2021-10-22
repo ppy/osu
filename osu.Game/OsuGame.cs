@@ -56,7 +56,7 @@ using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Localisation;
 using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
@@ -164,7 +164,7 @@ namespace osu.Game
 
         private OsuLogo osuLogo;
 
-        private MvisPluginManager mvisPlManager;
+        private LLinPluginManager mvisPlManager;
 
         private Bindable<GamemodeActivateCondition> gamemodeCondition;
 
@@ -269,7 +269,7 @@ namespace osu.Game
 
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
-            dependencies.Cache(mvisPlManager = new MvisPluginManager());
+            dependencies.Cache(mvisPlManager = new LLinPluginManager());
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);

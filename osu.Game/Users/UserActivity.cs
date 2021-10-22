@@ -40,9 +40,9 @@ namespace osu.Game.Users
             public override string Status => Ruleset.CreateInstance().PlayingVerb;
         }
 
-        public class InMvis : InGame
+        public class InLLin : InGame
         {
-            public InMvis(BeatmapInfo info)
+            public InLLin(BeatmapInfo info)
                 : base(info, info.Ruleset)
             {
             }

@@ -5,14 +5,14 @@ using Mvis.Plugin.BottomBar.Buttons;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Types;
-using osu.Game.Screens.Mvis.SideBar.Settings.Items;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Types;
+using osu.Game.Screens.LLin.SideBar.Settings.Items;
 using osuTK;
 
 namespace Mvis.Plugin.BottomBar
 {
-    internal class LegacyBottomBar : MvisPlugin, IFunctionBarProvider
+    internal class LegacyBottomBar : LLinPlugin, IFunctionBarProvider
     {
         protected override Drawable CreateContent() => new PlaceHolder();
 
@@ -108,16 +108,16 @@ namespace Mvis.Plugin.BottomBar
         [BackgroundDependencyLoader]
         private void load()
         {
-            Mvis.OnIdle += Hide;
-            Mvis.OnResumeFromIdle += Show;
+            LLin.OnIdle += Hide;
+            LLin.OnResumeFromIdle += Show;
 
-            progressBar.OnSeek = Mvis.SeekTo;
+            progressBar.OnSeek = LLin.SeekTo;
         }
 
         protected override void Update()
         {
-            progressBar.CurrentTime = Mvis.CurrentTrack.CurrentTime;
-            progressBar.EndTime = Mvis.CurrentTrack.Length;
+            progressBar.CurrentTime = LLin.CurrentTrack.CurrentTime;
+            progressBar.EndTime = LLin.CurrentTrack.Length;
             base.Update();
         }
 
