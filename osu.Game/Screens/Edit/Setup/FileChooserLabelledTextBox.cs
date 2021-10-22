@@ -111,7 +111,6 @@ namespace osu.Game.Screens.Edit.Setup
         {
             public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo> currentFile, OsuGameBase game)
             {
-                
                 string initialPath = currentFile.Value?.DirectoryName;
                 //Check if it's an instance of OsuGame. If it's only an OsuGameBase, the value from the line above will be used
                 if (game as OsuGame != null)
