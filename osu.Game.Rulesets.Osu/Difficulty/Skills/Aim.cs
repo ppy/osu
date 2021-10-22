@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuPrevObj = (OsuDifficultyHitObject)Previous[0];
             var osuLastObj = (OsuDifficultyHitObject)Previous[1];
 
-            double currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime; // Start with the base distance / time
+            double currVelocity = (osuCurrObj.JumpDistance + osuCurrObj.TravelDistance) / osuCurrObj.StrainTime; // Start with the base distance / time
 
             if (osuPrevObj.BaseObject is Slider) // If object is a slider
             {
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }
 
-            double prevVelocity = osuPrevObj.JumpDistance / osuPrevObj.StrainTime; // do the same for the previous velocity.
+            double prevVelocity = (osuPrevObj.JumpDistance + osuPrevObj.TravelDistance) / osuPrevObj.StrainTime; // do the same for the previous velocity.
 
             if (osuLastObj.BaseObject is Slider)
             {
