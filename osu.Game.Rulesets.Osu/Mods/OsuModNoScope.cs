@@ -22,7 +22,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModNoScope : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToBeatmap
+    public class OsuModNoScope : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToPlayer, IApplicableToBeatmap
     {
         /// <summary>
         /// Slightly higher than the cutoff for <see cref="Drawable.IsPresent"/>.
@@ -38,15 +38,13 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Where's the cursor?";
         public override double ScoreMultiplier => 1;
 
-        private BindableNumber<int> currentCombo;
-
         private float targetAlpha;
 
         private bool restPeriod;
 
         private bool spinnerPeriod;
 
-        private PeriodTracker breaksPeriods;
+        private IBindable<bool> isBreakTime;
 
         private PeriodTracker spinnerPeriods;
 
@@ -63,38 +61,35 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 50,
         };
 
-        [SettingSource("Always hidden", "Don't show cursor during breaks and spinners.")]
-        public BindableBool AlwaysHidden { get; } = new BindableBool();
-
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            breaksPeriods = new PeriodTracker(beatmap.Breaks.Where(b => b.HasEffect)
-                                                     .Select(b => new Period(b.StartTime - transition_duration, b.EndTime - BreakOverlay.BREAK_FADE_DURATION)));
             spinnerPeriods = new PeriodTracker(beatmap.HitObjects.OfType<Spinner>().Select(b => new Period(b.StartTime - transition_duration, b.EndTime)));
+        }
+
+        public void ApplyToPlayer(Player player)
+        {
+            isBreakTime = player.IsBreakTime.GetBoundCopy();
         }
 
         public virtual void Update(Playfield playfield)
         {
             var time = playfield.Clock.CurrentTime;
 
-            if (!AlwaysHidden.Value)
+            if (isBreakTime.Value || spinnerPeriods.IsInAny(time))
             {
-                if (breaksPeriods.IsInAny(time) || spinnerPeriods.IsInAny(time))
-                {
-                    targetAlpha = 1;
-                    restPeriod = true;
-                }
-                else if (HiddenComboCount.Value == 0)
-                {
-                    targetAlpha = 0;
-                }
+                targetAlpha = 1;
+                restPeriod = true;
+            }
+            else if (HiddenComboCount.Value == 0)
+            {
+                targetAlpha = 0;
+            }
 
-                if (spinnerPeriods.IsInAny(time))
-                {
-                    spinnerPeriod = true;
-                }
+            if (spinnerPeriods.IsInAny(time))
+            {
+                spinnerPeriod = true;
             }
 
             playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, Math.Max(min_alpha, targetAlpha), Math.Clamp(playfield.Time.Elapsed / transition_duration, 0, 1));
@@ -102,32 +97,31 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            int lastComboBeforeRest = 0;
+            int currentCombo = 0;
 
             if (HiddenComboCount.Value == 0) return;
 
-            currentCombo = scoreProcessor.Combo.GetBoundCopy();
-            currentCombo.BindValueChanged(combo =>
+            scoreProcessor.Combo.BindValueChanged(combo =>
             {
                 if (combo.NewValue == 0)
                 {
-                    lastComboBeforeRest = 0;
+                    currentCombo = 0;
                 }
 
                 if (restPeriod)
                 {
                     // handle combo increase after spinner
-                    lastComboBeforeRest = spinnerPeriod ? combo.NewValue : combo.NewValue - 1;
+                    currentCombo = spinnerPeriod ? combo.NewValue : combo.NewValue - 1;
                     restPeriod = spinnerPeriod = false;
                 }
 
-                targetAlpha = 1 - (float)(combo.NewValue - lastComboBeforeRest) / HiddenComboCount.Value;
+                targetAlpha = 1 - (float)(combo.NewValue - currentCombo) / HiddenComboCount.Value;
             }, true);
         }
     }
 
     public class HiddenComboSlider : OsuSliderBar<int>
     {
-        public override LocalisableString TooltipText => Current.Value == 0 ? "start hidden" : base.TooltipText;
+        public override LocalisableString TooltipText => Current.Value == 0 ? "always hidden" : base.TooltipText;
     }
 }
