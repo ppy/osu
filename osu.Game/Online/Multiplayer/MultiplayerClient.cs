@@ -622,7 +622,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
-                int index = APIRoom.Playlist.Where(p => p.ID == item.ID).Select((_, i) => i).Single();
+                int index = APIRoom.Playlist.Select((i, index) => (i, index)).Single(kvp => kvp.i.ID == item.ID).index;
                 APIRoom.Playlist.RemoveAt(index);
                 APIRoom.Playlist.Insert(index, playlistItem);
             }).ConfigureAwait(false);
