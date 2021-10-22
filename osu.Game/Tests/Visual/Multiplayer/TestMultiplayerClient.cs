@@ -15,6 +15,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
+using osu.Game.Online.Multiplayer.Queueing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
@@ -40,6 +41,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager beatmaps { get; set; } = null!;
 
         private readonly TestRequestHandlingMultiplayerRoomManager roomManager;
+
+        private long lastPlaylistItemId;
 
         public TestMultiplayerClient(TestRequestHandlingMultiplayerRoomManager roomManager)
         {
@@ -141,6 +144,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (password != apiRoom.Password.Value)
                 throw new InvalidOperationException("Invalid password.");
 
+            lastPlaylistItemId = apiRoom.Playlist.Last().ID;
+
             var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
                 User = api.LocalUser.Value
@@ -152,12 +157,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Name = apiRoom.Name.Value,
                     MatchType = apiRoom.Type.Value,
-                    BeatmapID = apiRoom.Playlist.Last().BeatmapID,
-                    RulesetID = apiRoom.Playlist.Last().RulesetID,
-                    BeatmapChecksum = apiRoom.Playlist.Last().Beatmap.Value.MD5Hash,
-                    RequiredMods = apiRoom.Playlist.Last().RequiredMods.Select(m => new APIMod(m)).ToArray(),
-                    AllowedMods = apiRoom.Playlist.Last().AllowedMods.Select(m => new APIMod(m)).ToArray(),
-                    PlaylistItemId = apiRoom.Playlist.Last().ID,
+                    PlaylistItemId = lastPlaylistItemId,
                     // ReSharper disable once ConstantNullCoalescingCondition Incorrect inspection due to lack of nullable in Room.cs.
                     Password = password ?? string.Empty,
                 },
@@ -263,6 +263,49 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
             return ((IMultiplayerClient)this).LoadRequested();
+        }
+
+        public override async Task AddPlaylistItem(APIPlaylistItem item)
+        {
+            Debug.Assert(Room != null);
+            Debug.Assert(APIRoom != null);
+
+            item.ID = lastPlaylistItemId + 1;
+
+            switch (Room.Settings.QueueMode)
+            {
+                case QueueModes.HostOnly:
+                    if (Room.Host?.UserID != LocalUser?.UserID)
+                        throw new InvalidOperationException("Local user is not the room host.");
+
+                    await RemovePlaylistItem(new APIPlaylistItem(APIRoom.Playlist.Single(i => i.ID == lastPlaylistItemId))).ConfigureAwait(false);
+                    await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
+
+                    Room.Settings.PlaylistItemId = item.ID;
+                    await ChangeSettings(Room.Settings).ConfigureAwait(false);
+                    break;
+
+                case QueueModes.FreeForAll:
+                    await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
+                    // Todo: Advance if the added item is the last non-expired one.
+                    break;
+
+                case QueueModes.FairRotate:
+                    // Todo: Not implemented.
+                    throw new NotImplementedException();
+            }
+
+            lastPlaylistItemId = item.ID;
+        }
+
+        public override Task RemovePlaylistItem(APIPlaylistItem item)
+        {
+            Debug.Assert(Room != null);
+
+            if (Room.Host?.UserID != LocalUser?.UserID)
+                throw new InvalidOperationException("Local user is not the room host.");
+
+            return ((IMultiplayerClient)this).PlaylistItemRemoved(item);
         }
 
         protected override Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)

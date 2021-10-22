@@ -4,7 +4,6 @@
 using System;
 using MessagePack;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
-using osu.Game.Online.Multiplayer.Queueing;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -14,7 +13,6 @@ namespace osu.Game.Online.Multiplayer
     [Serializable]
     [MessagePackObject]
     [Union(0, typeof(ChangeTeamRequest))] // IMPORTANT: Add rules to SignalRUnionWorkaroundResolver for new derived types.
-    [Union(1, typeof(EnqueuePlaylistItemRequest))]
     public abstract class MatchUserRequest
     {
     }
