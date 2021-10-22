@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Skins.IO
 
         #endregion
 
-        #region Cases where imports should be uniquely import1
+        #region Cases where imports should be uniquely imported
 
         [Test]
         public Task TestImportTwiceWithSameMetadataButDifferentFilename() => runSkinTest(async osu =>
