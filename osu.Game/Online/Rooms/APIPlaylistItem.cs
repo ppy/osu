@@ -30,6 +30,9 @@ namespace osu.Game.Online.Rooms
         [Key(5)]
         public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
 
+        [Key(6)]
+        public bool Expired { get; set; }
+
         public APIPlaylistItem()
         {
         }
@@ -42,6 +45,7 @@ namespace osu.Game.Online.Rooms
             RulesetID = item.RulesetID;
             RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray();
             AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray();
+            Expired = item.Expired;
         }
     }
 }
