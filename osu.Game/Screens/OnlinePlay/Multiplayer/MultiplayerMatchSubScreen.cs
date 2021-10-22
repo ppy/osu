@@ -134,32 +134,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 new Drawable[] { new OverlinedHeader("Beatmap") },
                                 new Drawable[]
                                 {
-                                    new FillFlowContainer
+                                    addOrEditPlaylistButton = new PurpleTriangleButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = 40,
+                                        Action = () =>
+                                        {
+                                            if (this.IsCurrentScreen())
+                                                this.Push(new MultiplayerMatchSongSelect(Room));
+                                        },
+                                        Alpha = 0
+                                    },
+                                },
+                                null,
+                                new Drawable[]
+                                {
+                                    new DrawableRoomPlaylist(false, false)
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(5),
-                                        Children = new Drawable[]
-                                        {
-                                            addOrEditPlaylistButton = new PurpleTriangleButton
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 40,
-                                                Action = () =>
-                                                {
-                                                    if (this.IsCurrentScreen())
-                                                        this.Push(new MultiplayerMatchSongSelect(Room));
-                                                },
-                                                Alpha = 0
-                                            },
-                                            new DrawableRoomPlaylist(false, false)
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Items = { BindTarget = Room.Playlist },
-                                                SelectedItem = { BindTarget = SelectedItem }
-                                            },
-                                        }
-                                    }
+                                        Items = { BindTarget = Room.Playlist },
+                                        SelectedItem = { BindTarget = SelectedItem }
+                                    },
                                 },
                                 new[]
                                 {
@@ -203,6 +198,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             RowDimensions = new[]
                             {
                                 new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(GridSizeMode.Absolute, 5),
                                 new Dimension(),
                                 new Dimension(GridSizeMode.AutoSize),
                             }
