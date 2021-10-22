@@ -5,6 +5,9 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays;
 
@@ -29,9 +32,10 @@ namespace osu.Game.Tests.Visual.Settings
                         Value = "test"
                     }
                 };
-
-                restoreDefaultValueButton = textBox.ChildrenOfType<RestoreDefaultValueButton<string>>().Single();
             });
+            AddUntilStep("wait for loaded", () => textBox.IsLoaded);
+            AddStep("retrieve restore default button", () => restoreDefaultValueButton = textBox.ChildrenOfType<RestoreDefaultValueButton<string>>().Single());
+
             AddAssert("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
 
             AddStep("change value from default", () => textBox.Current.Value = "non-default");
@@ -39,6 +43,48 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("restore default", () => textBox.Current.SetDefault());
             AddUntilStep("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
+        }
+
+        [Test]
+        public void TestSetAndClearLabelText()
+        {
+            SettingsTextBox textBox = null;
+            RestoreDefaultValueButton<string> restoreDefaultValueButton = null;
+            OsuTextBox control = null;
+
+            AddStep("create settings item", () =>
+            {
+                Child = textBox = new SettingsTextBox
+                {
+                    Current = new Bindable<string>
+                    {
+                        Default = "test",
+                        Value = "test"
+                    }
+                };
+            });
+            AddUntilStep("wait for loaded", () => textBox.IsLoaded);
+            AddStep("retrieve components", () =>
+            {
+                restoreDefaultValueButton = textBox.ChildrenOfType<RestoreDefaultValueButton<string>>().Single();
+                control = textBox.ChildrenOfType<OsuTextBox>().Single();
+            });
+
+            AddStep("set non-default value", () => restoreDefaultValueButton.Current.Value = "non-default");
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
+
+            AddStep("set label", () => textBox.LabelText = "label text");
+            AddAssert("default value button centre aligned to label size", () =>
+            {
+                var label = textBox.ChildrenOfType<OsuSpriteText>().Single(spriteText => spriteText.Text == "label text");
+                return Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, label.DrawHeight, 1);
+            });
+
+            AddStep("clear label", () => textBox.LabelText = default);
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
+
+            AddStep("set warning text", () => textBox.WarningText = "This is some very important warning text! Hopefully it doesn't break the alignment of the default value indicator...");
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
         }
 
         /// <summary>
@@ -64,9 +110,9 @@ namespace osu.Game.Tests.Visual.Settings
                         Precision = 0.1f,
                     }
                 };
-
-                restoreDefaultValueButton = sliderBar.ChildrenOfType<RestoreDefaultValueButton<float>>().Single();
             });
+            AddUntilStep("wait for loaded", () => sliderBar.IsLoaded);
+            AddStep("retrieve restore default button", () => restoreDefaultValueButton = sliderBar.ChildrenOfType<RestoreDefaultValueButton<float>>().Single());
 
             AddAssert("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
 

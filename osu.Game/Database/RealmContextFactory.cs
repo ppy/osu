@@ -77,6 +77,27 @@ namespace osu.Game.Database
 
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
+
+            cleanupPendingDeletions();
+        }
+
+        private void cleanupPendingDeletions()
+        {
+            using (var realm = CreateContext())
+            using (var transaction = realm.BeginWrite())
+            {
+                var pendingDeleteSets = realm.All<RealmBeatmapSet>().Where(s => s.DeletePending);
+
+                foreach (var s in pendingDeleteSets)
+                {
+                    foreach (var b in s.Beatmaps)
+                        realm.Remove(b);
+
+                    realm.Remove(s);
+                }
+
+                transaction.Commit();
+            }
         }
 
         /// <summary>

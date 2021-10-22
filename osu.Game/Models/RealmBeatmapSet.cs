@@ -63,7 +63,7 @@ namespace osu.Game.Models
             if (IsManaged && other.IsManaged)
                 return ID == other.ID;
 
-            if (OnlineID >= 0 && other.OnlineID >= 0)
+            if (OnlineID > 0 && other.OnlineID > 0)
                 return OnlineID == other.OnlineID;
 
             if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))

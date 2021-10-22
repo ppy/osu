@@ -19,7 +19,6 @@ namespace osu.Game.Overlays.Settings
     {
         protected override Drawable CreateControl() => new TSlider
         {
-            Margin = new MarginPadding { Vertical = 10 },
             RelativeSizeAxes = Axes.X
         };
 

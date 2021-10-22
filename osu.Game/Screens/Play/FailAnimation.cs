@@ -106,6 +106,7 @@ namespace osu.Game.Screens.Play
 
             this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
             {
+                RemoveFilters();
                 OnComplete?.Invoke();
             });
 
@@ -137,6 +138,9 @@ namespace osu.Game.Screens.Play
 
         public void RemoveFilters()
         {
+            if (filters.Parent == null)
+                return;
+
             RemoveInternal(filters);
             filters.Dispose();
 
