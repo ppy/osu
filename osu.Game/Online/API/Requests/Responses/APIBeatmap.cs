@@ -109,7 +109,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         #region Implementation of IBeatmapInfo
 
-        public IBeatmapMetadataInfo Metadata => new BeatmapMetadata();
+        public IBeatmapMetadataInfo Metadata => (BeatmapSet as IBeatmapSetInfo)?.Metadata ?? new BeatmapMetadata();
 
         public IBeatmapDifficultyInfo Difficulty => new BeatmapDifficulty
         {
