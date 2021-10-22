@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             // prefer online cover where available.
             if (model?.BeatmapSet?.OnlineInfo != null)
-                return new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
+                return new OnlineBeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
 
             return model?.ID > 0
                 ? new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(model))

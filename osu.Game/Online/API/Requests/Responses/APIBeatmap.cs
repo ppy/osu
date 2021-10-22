@@ -6,12 +6,14 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 
+#nullable enable
+
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIBeatmap : BeatmapMetadata
+    public class APIBeatmap : IBeatmapInfo
     {
         [JsonProperty(@"id")]
-        public int OnlineBeatmapID { get; set; }
+        public int OnlineID { get; set; }
 
         [JsonProperty(@"beatmapset_id")]
         public int OnlineBeatmapSetID { get; set; }
@@ -19,8 +21,14 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"status")]
         public BeatmapSetOnlineStatus Status { get; set; }
 
+        [JsonProperty("checksum")]
+        public string Checksum { get; set; } = string.Empty;
+
+        [JsonProperty(@"user_id")]
+        public int AuthorID { get; set; }
+
         [JsonProperty(@"beatmapset")]
-        public APIBeatmapSet BeatmapSet { get; set; }
+        public APIBeatmapSet? BeatmapSet { get; set; }
 
         [JsonProperty(@"playcount")]
         private int playCount { get; set; }
@@ -29,10 +37,10 @@ namespace osu.Game.Online.API.Requests.Responses
         private int passCount { get; set; }
 
         [JsonProperty(@"mode_int")]
-        private int ruleset { get; set; }
+        public int RulesetID { get; set; }
 
         [JsonProperty(@"difficulty_rating")]
-        private double starDifficulty { get; set; }
+        public double StarRating { get; set; }
 
         [JsonProperty(@"drain")]
         private float drainRate { get; set; }
@@ -46,8 +54,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"accuracy")]
         private float overallDifficulty { get; set; }
 
+        public double Length => lengthInSeconds * 1000;
+
         [JsonProperty(@"total_length")]
-        private double length { get; set; }
+        private double lengthInSeconds { get; set; }
 
         [JsonProperty(@"count_circles")]
         private int circleCount { get; set; }
@@ -56,10 +66,10 @@ namespace osu.Game.Online.API.Requests.Responses
         private int sliderCount { get; set; }
 
         [JsonProperty(@"version")]
-        private string version { get; set; }
+        public string DifficultyName { get; set; } = string.Empty;
 
         [JsonProperty(@"failtimes")]
-        private BeatmapMetrics metrics { get; set; }
+        private BeatmapMetrics? metrics { get; set; }
 
         [JsonProperty(@"max_combo")]
         private int? maxCombo { get; set; }
@@ -70,14 +80,15 @@ namespace osu.Game.Online.API.Requests.Responses
 
             return new BeatmapInfo
             {
-                Metadata = set?.Metadata ?? this,
-                Ruleset = rulesets.GetRuleset(ruleset),
-                StarDifficulty = starDifficulty,
-                OnlineBeatmapID = OnlineBeatmapID,
-                Version = version,
+                Metadata = set?.Metadata ?? new BeatmapMetadata(),
+                Ruleset = rulesets.GetRuleset(RulesetID),
+                StarDifficulty = StarRating,
+                OnlineBeatmapID = OnlineID,
+                Version = DifficultyName,
                 // this is actually an incorrect mapping (Length is calculated as drain length in lazer's import process, see BeatmapManager.calculateLength).
-                Length = TimeSpan.FromSeconds(length).TotalMilliseconds,
+                Length = TimeSpan.FromSeconds(Length).TotalMilliseconds,
                 Status = Status,
+                MD5Hash = Checksum,
                 BeatmapSet = set,
                 Metrics = metrics,
                 MaxCombo = maxCombo,
@@ -97,5 +108,28 @@ namespace osu.Game.Online.API.Requests.Responses
                 },
             };
         }
+
+        #region Implementation of IBeatmapInfo
+
+        public IBeatmapMetadataInfo Metadata => (BeatmapSet as IBeatmapSetInfo)?.Metadata ?? new BeatmapMetadata();
+
+        public IBeatmapDifficultyInfo Difficulty => new BeatmapDifficulty
+        {
+            DrainRate = drainRate,
+            CircleSize = circleSize,
+            ApproachRate = approachRate,
+            OverallDifficulty = overallDifficulty,
+        };
+
+        IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
+
+        public string MD5Hash => Checksum;
+
+        public IRulesetInfo Ruleset => new RulesetInfo { ID = RulesetID };
+
+        public double BPM => throw new NotImplementedException();
+        public string Hash => throw new NotImplementedException();
+
+        #endregion
     }
 }

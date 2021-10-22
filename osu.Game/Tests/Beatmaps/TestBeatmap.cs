@@ -8,6 +8,7 @@ using System.Text;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
@@ -32,7 +33,7 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo.BeatmapSet.Beatmaps = new List<BeatmapInfo> { BeatmapInfo };
             BeatmapInfo.Length = 75000;
             BeatmapInfo.OnlineInfo = new BeatmapOnlineInfo();
-            BeatmapInfo.BeatmapSet.OnlineInfo = new BeatmapSetOnlineInfo
+            BeatmapInfo.BeatmapSet.OnlineInfo = new APIBeatmapSet
             {
                 Status = BeatmapSetOnlineStatus.Ranked,
                 Covers = new BeatmapSetOnlineCovers
