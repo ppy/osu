@@ -51,8 +51,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"accuracy")]
         private float overallDifficulty { get; set; }
 
+        public double Length => lengthInSeconds * 1000;
+
         [JsonProperty(@"total_length")]
-        public double Length { get; set; }
+        private double lengthInSeconds { get; set; }
 
         [JsonProperty(@"count_circles")]
         private int circleCount { get; set; }
