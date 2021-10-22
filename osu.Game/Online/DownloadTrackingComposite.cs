@@ -15,10 +15,10 @@ namespace osu.Game.Online
     /// A component which tracks a <typeparamref name="TModel"/> through potential download/import/deletion.
     /// </summary>
     public abstract class DownloadTrackingComposite<TModel, TModelManager> : CompositeDrawable
-        where TModel : class, IEquatable<TModel>
+        where TModel : class, IEquatable<TModel>, IHasOnlineID
         where TModelManager : class, IModelDownloader<TModel>, IModelManager<TModel>
     {
-        protected readonly Bindable<TModel> Model = new Bindable<TModel>();
+        public readonly Bindable<IHasOnlineID> Model = new Bindable<IHasOnlineID>();
 
         [Resolved(CanBeNull = true)]
         protected TModelManager Manager { get; private set; }
@@ -30,9 +30,9 @@ namespace osu.Game.Online
 
         protected readonly BindableNumber<double> Progress = new BindableNumber<double> { MinValue = 0, MaxValue = 1 };
 
-        protected DownloadTrackingComposite(TModel model = null)
+        protected DownloadTrackingComposite(IHasOnlineID trackingItem = null)
         {
-            Model.Value = model;
+            Model.Value = trackingItem;
         }
 
         private IBindable<WeakReference<TModel>> managerUpdated;
@@ -88,7 +88,7 @@ namespace osu.Game.Online
             {
                 Schedule(() =>
                 {
-                    if (request.Model.Equals(Model.Value))
+                    if (request.Model.OnlineID == Model.Value?.OnlineID)
                         attachDownload(request);
                 });
             }
@@ -100,7 +100,7 @@ namespace osu.Game.Online
             {
                 Schedule(() =>
                 {
-                    if (request.Model.Equals(Model.Value))
+                    if (request.Model.OnlineID == Model.Value?.OnlineID)
                         attachDownload(null);
                 });
             }
@@ -154,7 +154,7 @@ namespace osu.Game.Online
             {
                 Schedule(() =>
                 {
-                    if (!item.Equals(Model.Value))
+                    if (item.OnlineID != Model.Value?.OnlineID)
                         return;
 
                     if (!VerifyDatabasedModel(item))
@@ -174,7 +174,7 @@ namespace osu.Game.Online
             {
                 Schedule(() =>
                 {
-                    if (item.Equals(Model.Value))
+                    if (item.OnlineID == Model.Value?.OnlineID)
                         State.Value = DownloadState.NotDownloaded;
                 });
             }

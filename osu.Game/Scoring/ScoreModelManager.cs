@@ -67,9 +67,8 @@ namespace osu.Game.Scoring
         protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
             => Task.CompletedTask;
 
-        protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
-            => base.CheckLocalAvailability(model, items)
-               || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
+        protected override bool CheckLocalAvailability(IHasOnlineID model, IQueryable<ScoreInfo> items)
+            => base.CheckLocalAvailability(model, items) || (model.OnlineID > 0 && items.Any(i => i.OnlineScoreID == model.OnlineID && i.Files.Any()));
 
         public override void ExportModelTo(ScoreInfo model, Stream outputStream)
         {

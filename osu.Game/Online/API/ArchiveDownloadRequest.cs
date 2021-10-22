@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Database;
 
 namespace osu.Game.Online.API
 {
     public abstract class ArchiveDownloadRequest<TModel> : APIDownloadRequest
-        where TModel : class
+        where TModel : class, IHasOnlineID
     {
         public readonly TModel Model;
 

@@ -12,7 +12,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     public interface IModelDownloader<TModel> : IPostNotifications
-        where TModel : class
+        where TModel : class, IHasOnlineID
     {
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> download begins.
@@ -39,6 +39,6 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The <typeparamref name="TModel"/> whose request is wanted.</param>
         /// <returns>The <see cref="ArchiveDownloadRequest{TModel}"/> object if it exists, otherwise null.</returns>
-        ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model);
+        ArchiveDownloadRequest<TModel> GetExistingDownload(IHasOnlineID model);
     }
 }

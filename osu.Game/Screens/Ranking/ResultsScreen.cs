@@ -152,11 +152,14 @@ namespace osu.Game.Screens.Ranking
 
             if (allowWatchingReplay)
             {
-                buttons.Add(new ReplayDownloadButton(null)
+                ReplayDownloadButton downloadButton;
+
+                buttons.Add(downloadButton = new ReplayDownloadButton(null)
                 {
-                    Score = { BindTarget = SelectedScore },
                     Width = 300
                 });
+
+                SelectedScore.BindValueChanged(score => downloadButton.Model.Value = score.NewValue, true);
             }
 
             if (player != null && allowRetry)

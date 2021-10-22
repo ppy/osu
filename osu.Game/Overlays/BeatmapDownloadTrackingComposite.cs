@@ -9,11 +9,14 @@ namespace osu.Game.Overlays
 {
     public abstract class BeatmapDownloadTrackingComposite : DownloadTrackingComposite<BeatmapSetInfo, BeatmapManager>
     {
-        public Bindable<BeatmapSetInfo> BeatmapSet => Model;
+        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
         protected BeatmapDownloadTrackingComposite(BeatmapSetInfo set = null)
             : base(set)
         {
+            BeatmapSet.Value = set;
+            BeatmapSet.BindValueChanged(s => Model.Value = s.NewValue);
+            Model.BindValueChanged(m => BeatmapSet.Value = m.NewValue as BeatmapSetInfo);
         }
     }
 }

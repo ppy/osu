@@ -322,7 +322,7 @@ namespace osu.Game.Scoring
             return scoreModelManager.Import(item, archive, lowPriority, cancellationToken);
         }
 
-        public bool IsAvailableLocally(ScoreInfo model)
+        public bool IsAvailableLocally(IHasOnlineID model)
         {
             return scoreModelManager.IsAvailableLocally(model);
         }
@@ -359,7 +359,7 @@ namespace osu.Game.Scoring
             return scoreModelDownloader.Download(model, minimiseDownloadSize);
         }
 
-        public ArchiveDownloadRequest<ScoreInfo> GetExistingDownload(ScoreInfo model)
+        public ArchiveDownloadRequest<ScoreInfo> GetExistingDownload(IHasOnlineID model)
         {
             return scoreModelDownloader.GetExistingDownload(model);
         }

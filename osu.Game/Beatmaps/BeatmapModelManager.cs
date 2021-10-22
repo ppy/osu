@@ -347,9 +347,8 @@ namespace osu.Game.Beatmaps
 
         public override string HumanisedModelName => "beatmap";
 
-        protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items)
-            => base.CheckLocalAvailability(model, items)
-               || (model.OnlineBeatmapSetID != null && items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID));
+        protected override bool CheckLocalAvailability(IHasOnlineID model, IQueryable<BeatmapSetInfo> items)
+            => base.CheckLocalAvailability(model, items) || (model.OnlineID > 0 && items.Any(b => b.OnlineBeatmapSetID == model.OnlineID));
 
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {

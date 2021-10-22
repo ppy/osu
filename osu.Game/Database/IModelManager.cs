@@ -85,6 +85,6 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
         /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
-        bool IsAvailableLocally(TModel model);
+        bool IsAvailableLocally(IHasOnlineID model);
     }
 }

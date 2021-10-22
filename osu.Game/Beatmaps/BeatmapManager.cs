@@ -192,7 +192,7 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelManager<BeatmapSetInfo>
 
-        public bool IsAvailableLocally(BeatmapSetInfo model)
+        public bool IsAvailableLocally(IHasOnlineID model)
         {
             return beatmapModelManager.IsAvailableLocally(model);
         }
@@ -254,7 +254,7 @@ namespace osu.Game.Beatmaps
             return beatmapModelDownloader.Download(model, minimiseDownloadSize);
         }
 
-        public ArchiveDownloadRequest<BeatmapSetInfo> GetExistingDownload(BeatmapSetInfo model)
+        public ArchiveDownloadRequest<BeatmapSetInfo> GetExistingDownload(IHasOnlineID model)
         {
             return beatmapModelDownloader.GetExistingDownload(model);
         }

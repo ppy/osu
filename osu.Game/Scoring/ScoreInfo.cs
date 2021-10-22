@@ -19,7 +19,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>, IDeepCloneable<ScoreInfo>
+    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>, IDeepCloneable<ScoreInfo>, IHasOnlineID
     {
         public int ID { get; set; }
 
@@ -271,5 +271,7 @@ namespace osu.Game.Scoring
 
             return ReferenceEquals(this, other);
         }
+
+        public int OnlineID => (int)(OnlineScoreID ?? -1);
     }
 }

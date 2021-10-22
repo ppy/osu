@@ -796,7 +796,7 @@ namespace osu.Game.Database
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
-        public bool IsAvailableLocally(TModel model) => CheckLocalAvailability(model, ModelStore.ConsumableItems.Where(m => !m.DeletePending));
+        public bool IsAvailableLocally(IHasOnlineID model) => CheckLocalAvailability(model, ModelStore.ConsumableItems.Where(m => !m.DeletePending));
 
         /// <summary>
         /// Performs implementation specific comparisons to determine whether a given model is present in the local store.
@@ -804,8 +804,7 @@ namespace osu.Game.Database
         /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
         /// <param name="items">The usable items present in the store.</param>
         /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
-        protected virtual bool CheckLocalAvailability(TModel model, IQueryable<TModel> items)
-            => model.ID > 0 && items.Any(i => i.ID == model.ID && i.Files.Any());
+        protected virtual bool CheckLocalAvailability(IHasOnlineID model, IQueryable<TModel> items) => false;
 
         /// <summary>
         /// Whether import can be skipped after finding an existing import early in the process.
