@@ -106,5 +106,17 @@ namespace osu.Game.Online.Multiplayer
         /// Signals that the match has ended, all players have finished and results are ready to be displayed.
         /// </summary>
         Task ResultsReady();
+
+        /// <summary>
+        /// Signals that an item has been added to the playlist.
+        /// </summary>
+        /// <param name="item">The added item.</param>
+        Task PlaylistItemAdded(APIPlaylistItem item);
+
+        /// <summary>
+        /// Signals that an item has been removed from the playlist.
+        /// </summary>
+        /// <param name="item">The removed item.</param>
+        Task PlaylistItemRemoved(APIPlaylistItem item);
     }
 }
