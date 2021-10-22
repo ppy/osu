@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -26,11 +24,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 {
     public class BeatmapCard : OsuClickableContainer
     {
+        public const float TRANSITION_DURATION = 400;
+
         private const float width = 408;
         private const float height = 100;
         private const float corner_radius = 10;
-
-        private const float transition_duration = 400;
 
         private readonly APIBeatmapSet beatmapSet;
 
@@ -38,7 +36,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private FillFlowContainer iconArea;
 
         private Container mainContent;
-        private Box foregroundGradient;
+        private BeatmapCardContentBackground mainContentBackground;
 
         private GridContainer titleContainer;
         private GridContainer artistContainer;
@@ -96,14 +94,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new UpdateableOnlineBeatmapSetCover
+                        mainContentBackground = new BeatmapCardContentBackground
                         {
                             RelativeSizeAxes = Axes.Both,
-                            OnlineInfo = beatmapSet,
-                        },
-                        foregroundGradient = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
+                            BeatmapSet = beatmapSet,
                         },
                         new FillFlowContainer
                         {
@@ -278,13 +272,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             if (IsHovered)
                 targetWidth -= 20;
 
-            mainContent.ResizeWidthTo(targetWidth, transition_duration, Easing.OutQuint);
+            mainContent.ResizeWidthTo(targetWidth, TRANSITION_DURATION, Easing.OutQuint);
+            mainContentBackground.Dimmed.Value = IsHovered;
 
-            var foregroundColour = IsHovered ? colourProvider.Background4 : colourProvider.Background2;
-            var foregroundGradientColour = ColourInfo.GradientHorizontal(foregroundColour, foregroundColour.Opacity(0.8f));
-            foregroundGradient.FadeColour(foregroundGradientColour, transition_duration, Easing.OutQuint);
-
-            leftCover.FadeColour(IsHovered ? OsuColour.Gray(0.2f) : Color4.White, transition_duration, Easing.OutQuint);
+            leftCover.FadeColour(IsHovered ? OsuColour.Gray(0.2f) : Color4.White, TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
