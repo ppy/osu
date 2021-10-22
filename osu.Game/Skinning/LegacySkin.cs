@@ -69,28 +69,37 @@ namespace osu.Game.Skinning
         /// <param name="resources">Access to raw game resources.</param>
         /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
+            : this(skin, storage, resources, storage?.GetStream(configurationFilename))
+        {
+        }
+
+        /// <summary>
+        /// Construct a new legacy skin instance.
+        /// </summary>
+        /// <param name="skin">The model for this skin.</param>
+        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
+        /// <param name="resources">Access to raw game resources.</param>
+        /// <param name="configurationStream">An optional stream containing the contents of a skin.ini file.</param>
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] Stream configurationStream)
             : base(skin, resources)
         {
-            using (var stream = storage?.GetStream(configurationFilename))
+            if (configurationStream != null)
             {
-                if (stream != null)
+                using (LineBufferedReader reader = new LineBufferedReader(configurationStream, true))
+                    Configuration = new LegacySkinDecoder().Decode(reader);
+
+                configurationStream.Seek(0, SeekOrigin.Begin);
+
+                using (LineBufferedReader reader = new LineBufferedReader(configurationStream))
                 {
-                    using (LineBufferedReader reader = new LineBufferedReader(stream, true))
-                        Configuration = new LegacySkinDecoder().Decode(reader);
+                    var maniaList = new LegacyManiaSkinDecoder().Decode(reader);
 
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    using (LineBufferedReader reader = new LineBufferedReader(stream))
-                    {
-                        var maniaList = new LegacyManiaSkinDecoder().Decode(reader);
-
-                        foreach (var config in maniaList)
-                            maniaConfigurations[config.Keys] = config;
-                    }
+                    foreach (var config in maniaList)
+                        maniaConfigurations[config.Keys] = config;
                 }
-                else
-                    Configuration = new LegacySkinConfiguration();
             }
+            else
+                Configuration = new LegacySkinConfiguration();
 
             if (storage != null)
             {
