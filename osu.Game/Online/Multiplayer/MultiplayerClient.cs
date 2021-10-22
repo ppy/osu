@@ -577,12 +577,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return;
 
-            var set = await GetOnlineBeatmapSet(item.BeatmapID).ConfigureAwait(false);
-
-            var beatmap = set.Beatmaps.Single(b => b.OnlineBeatmapID == item.BeatmapID);
-            beatmap.MD5Hash = item.BeatmapChecksum;
-
-            var ruleset = Rulesets.GetRuleset(item.RulesetID);
+            var playlistItem = await createPlaylistItem(item).ConfigureAwait(false);
 
             await scheduleAsync(() =>
             {
@@ -590,18 +585,6 @@ namespace osu.Game.Online.Multiplayer
                     return;
 
                 Debug.Assert(APIRoom != null);
-
-                var playlistItem = new PlaylistItem
-                {
-                    ID = item.ID,
-                    Beatmap = { Value = beatmap },
-                    Ruleset = { Value = ruleset },
-                };
-
-                var rulesetInstance = ruleset.CreateInstance();
-
-                playlistItem.RequiredMods.AddRange(item.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
-                playlistItem.AllowedMods.AddRange(item.AllowedMods.Select(m => m.ToMod(rulesetInstance)));
 
                 APIRoom.Playlist.Add(playlistItem);
                 RoomUpdated?.Invoke();
@@ -623,6 +606,26 @@ namespace osu.Game.Online.Multiplayer
                 APIRoom.Playlist.RemoveAll(i => i.ID == item.ID);
                 RoomUpdated?.Invoke();
             });
+        }
+
+        public async Task PlaylistItemChanged(APIPlaylistItem item)
+        {
+            if (Room == null)
+                return;
+
+            var playlistItem = await createPlaylistItem(item).ConfigureAwait(false);
+
+            await scheduleAsync(() =>
+            {
+                if (Room == null)
+                    return;
+
+                Debug.Assert(APIRoom != null);
+
+                int index = APIRoom.Playlist.Where(p => p.ID == item.ID).Select((_, i) => i).Single();
+                APIRoom.Playlist.RemoveAt(index);
+                APIRoom.Playlist.Insert(index, playlistItem);
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -662,6 +665,29 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>The <see cref="BeatmapSetInfo"/> retrieval task.</returns>
         protected abstract Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
+
+        private async Task<PlaylistItem> createPlaylistItem(APIPlaylistItem item)
+        {
+            var set = await GetOnlineBeatmapSet(item.BeatmapID).ConfigureAwait(false);
+
+            var beatmap = set.Beatmaps.Single(b => b.OnlineBeatmapID == item.BeatmapID);
+            beatmap.MD5Hash = item.BeatmapChecksum;
+
+            var ruleset = Rulesets.GetRuleset(item.RulesetID);
+            var rulesetInstance = ruleset.CreateInstance();
+
+            var playlistItem = new PlaylistItem
+            {
+                ID = item.ID,
+                Beatmap = { Value = beatmap },
+                Ruleset = { Value = ruleset },
+            };
+
+            playlistItem.RequiredMods.AddRange(item.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
+            playlistItem.AllowedMods.AddRange(item.AllowedMods.Select(m => m.ToMod(rulesetInstance)));
+
+            return playlistItem;
+        }
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.

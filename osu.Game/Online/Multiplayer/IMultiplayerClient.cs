@@ -118,5 +118,11 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="item">The removed item.</param>
         Task PlaylistItemRemoved(APIPlaylistItem item);
+
+        /// <summary>
+        /// Signals that an item has been changed in the playlist.
+        /// </summary>
+        /// <param name="item">The changed item.</param>
+        Task PlaylistItemChanged(APIPlaylistItem item);
     }
 }
