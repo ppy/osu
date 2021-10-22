@@ -45,7 +45,7 @@ namespace osu.Game.Online.Multiplayer
         public MatchType MatchType { get; set; } = MatchType.HeadToHead;
 
         [Key(9)]
-        public QueueModes QueueMode { get; set; } = QueueModes.HostPick;
+        public QueueModes QueueMode { get; set; } = QueueModes.HostOnly;
 
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
