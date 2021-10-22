@@ -91,36 +91,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 MovementTime = Math.Max(StrainTime - lastSlider.LazyTravelTime / clockRate, min_delta_time);
                 MovementDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
 
-                int repeatCount = 0;
-
                 for (int i = 1; i < lastSlider.NestedHitObjects.Count; i++)
                 {
-                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
-                        repeatCount++;
-
                     Vector2 currSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition);
 
-                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderEndCircle || (OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
-                        TravelDistance += Math.Max(0, currSlider.Length * scalingFactor - 100);
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
+                        TravelDistance += Math.Max(0, currSlider.Length * scalingFactor - 100); // remove 100 distance to avoid buffing overlapping followcircles.
+                    else if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderEndCircle)
+                    {
+                        Vector2 possSlider = Vector2.Subtract((Vector2)lastSlider.LazyEndPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition);
+                        TravelDistance += Math.Min(possSlider.Length, currSlider.Length) * scalingFactor; // Take the least distance from slider end vs lazy end.
+                    }
                     else
                         TravelDistance += Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition).Length * scalingFactor;
 
                     if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderTick && i != lastSlider.NestedHitObjects.Count - 1) // Check for tick && not last object is necessary for 2007 bugged sliders.
                     {
                         Vector2 nextSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i + 1]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition);
-                        TravelDistance += 3 * Math.Max(0, Vector2.Subtract(nextSlider, currSlider).Length - Math.Max(nextSlider.Length, currSlider.Length)) * scalingFactor;
+                        TravelDistance += Math.Max(0, Vector2.Subtract(nextSlider, currSlider).Length - Math.Max(nextSlider.Length, currSlider.Length)) * scalingFactor; // bonus for ticks where angles are less than 120 degrees.
                     }
                 }
-
-                TravelDistance *= Math.Pow(1 + repeatCount, 1.0 / 3.0);
-
-                TravelDistance *= Math.Max(0, lastSlider.SpanDuration - 37.5) / lastSlider.SpanDuration;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
             JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-            MovementDistance = Math.Max(0, Math.Min(JumpDistance, MovementDistance) - 50);
+            MovementDistance = Math.Max(0, Math.Min(JumpDistance - 50, MovementDistance - 120)); // radius for jumpdistance is within 50 of maximum possible sliderLeniency, 120 for movement distance.
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
             {
@@ -143,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             slider.LazyEndPosition = slider.StackedPosition;
 
-            float followCircleRadius = (float)(slider.Radius * 2.4);
+            float approxFollowCircleRadius = (float)(slider.Radius * 1.4); // using 1.4 to better follow the real movement of a cursor.
             var computeVertex = new Action<double>(t =>
             {
                 double progress = (t - slider.StartTime) / slider.SpanDuration;
@@ -158,11 +154,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 slider.LazyTravelTime = t - slider.StartTime;
 
-                if (dist > followCircleRadius)
+                if (dist > approxFollowCircleRadius)
                 {
                     // The cursor would be outside the follow circle, we need to move it
                     diff.Normalize(); // Obtain direction of diff
-                    dist -= followCircleRadius;
+                    dist -= approxFollowCircleRadius;
                     slider.LazyEndPosition += diff * dist;
                     slider.LazyTravelDistance += dist;
                 }
