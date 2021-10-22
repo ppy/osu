@@ -174,6 +174,10 @@ namespace osu.Game
 
             SentryLogger = new SentryLogger(this);
         }
+
+        /// <summary>
+        /// Returns a predefined platform-specific path to user data if the default directory is not accessible. If one is not required for the current platform, returns null.
+        /// </summary>
         public virtual string GetInitialPath() => null;
 
         private void updateBlockingOverlayFade() =>

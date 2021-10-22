@@ -105,30 +105,38 @@ namespace osu.Game.Screens.Edit.Setup
             }
         }
 
-        public Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile, game);
+        public Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile);
 
         private class FileChooserPopover : OsuPopover
         {
-            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo> currentFile, OsuGameBase game)
+            private string initialPath;
+
+            private string[] handledExts;
+
+            private Bindable<FileInfo> file;
+
+            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo> currentFile)
             {
-                string initialPath = currentFile.Value?.DirectoryName;
-                //Check if it's an instance of OsuGame. If it's only an OsuGameBase, the value from the line above will be used
-                if (game as OsuGame != null)
+                initialPath = currentFile.Value?.DirectoryName;
+                handledExts = handledExtensions;
+                file = currentFile;
+            }
+
+            [BackgroundDependencyLoader(true)]
+            private void load(OsuGame game)
+            {
+                if (game.GetInitialPath() != null)
                 {
-                    //Cast and call GetInitialPath();
-                    initialPath = ((OsuGame)game).GetInitialPath();
-                    //If the method is not overriden (so returns null), fallback to default to not cause any issues
-                    if (initialPath == null) {
-                        initialPath = currentFile.Value?.DirectoryName;
-                    }
+                    initialPath = game.GetInitialPath();
                 }
+
                 Child = new Container
                 {
                     Size = new Vector2(600, 400),
-                    Child = new OsuFileSelector(initialPath, handledExtensions)
+                    Child = new OsuFileSelector(initialPath, handledExts)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        CurrentFile = { BindTarget = currentFile }
+                        CurrentFile = { BindTarget = file }
                     },
                 };
             }
