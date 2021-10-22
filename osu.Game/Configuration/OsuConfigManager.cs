@@ -218,7 +218,9 @@ namespace osu.Game.Configuration
                         rawValue: skinName,
                         name: SkinSettingsStrings.SkinSectionHeader,
                         value: skinName,
-                        shortcut: $"{GlobalActionKeyBindingStrings.RandomSkin}: {LookupKeyBindings(GlobalAction.RandomSkin)}"
+                        shortcut: new TranslatableString(@"_", @"{0}: {1}",
+                            GlobalActionKeyBindingStrings.RandomSkin,
+                            LookupKeyBindings(GlobalAction.RandomSkin))
                     );
                 }),
                 new TrackedSetting<float>(OsuSetting.UIScale, scale => new SettingDescription(
