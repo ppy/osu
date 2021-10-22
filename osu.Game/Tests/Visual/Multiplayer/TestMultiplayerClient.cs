@@ -96,31 +96,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void ChangeUserState(int userId, MultiplayerUserState newState)
         {
             Debug.Assert(Room != null);
-
             ((IMultiplayerClient)this).UserStateChanged(userId, newState);
 
             Schedule(() =>
             {
-                switch (newState)
+                switch (Room.State)
                 {
-                    case MultiplayerUserState.Loaded:
+                    case MultiplayerRoomState.WaitingForLoad:
                         if (Room.Users.All(u => u.State != MultiplayerUserState.WaitingForLoad))
                         {
-                            ChangeRoomState(MultiplayerRoomState.Playing);
                             foreach (var u in Room.Users.Where(u => u.State == MultiplayerUserState.Loaded))
                                 ChangeUserState(u.UserID, MultiplayerUserState.Playing);
 
                             ((IMultiplayerClient)this).MatchStarted();
+
+                            ChangeRoomState(MultiplayerRoomState.Playing);
                         }
 
                         break;
 
-                    case MultiplayerUserState.FinishedPlay:
+                    case MultiplayerRoomState.Playing:
                         if (Room.Users.All(u => u.State != MultiplayerUserState.Playing))
                         {
-                            ChangeRoomState(MultiplayerRoomState.Open);
                             foreach (var u in Room.Users.Where(u => u.State == MultiplayerUserState.FinishedPlay))
                                 ChangeUserState(u.UserID, MultiplayerUserState.Results);
+                            ChangeRoomState(MultiplayerRoomState.Open);
 
                             ((IMultiplayerClient)this).ResultsReady();
                         }
