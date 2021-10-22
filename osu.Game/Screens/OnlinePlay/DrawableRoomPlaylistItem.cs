@@ -72,6 +72,9 @@ namespace osu.Game.Screens.OnlinePlay
             requiredMods.BindTo(item.RequiredMods);
 
             ShowDragHandle.Value = allowEdit;
+
+            if (item.Expired)
+                Colour = OsuColour.Gray(0.5f);
         }
 
         [BackgroundDependencyLoader]
