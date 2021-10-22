@@ -2,22 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Mods;
+using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModNoScope : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor
+    public class OsuModNoScope : Mod, IUpdatableByPlayfield, IApplicableToScoreProcessor, IApplicableToPlayer, IApplicableToBeatmap
     {
         /// <summary>
         /// Slightly higher than the cutoff for <see cref="Drawable.IsPresent"/>.
@@ -34,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
 
         private BindableNumber<int> currentCombo;
+        private IBindable<bool> isBreakTime;
+        private PeriodTracker spinnerPeriods;
 
         private float targetAlpha;
 
@@ -52,6 +59,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
+        public void ApplyToPlayer(Player player)
+        {
+            isBreakTime = player.IsBreakTime.GetBoundCopy();
+        }
+
+        public void ApplyToBeatmap(IBeatmap beatmap)
+        {
+            spinnerPeriods = new PeriodTracker(beatmap.HitObjects.OfType<Spinner>().Select(b => new Period(b.StartTime - transition_duration, b.EndTime)));
+        }
+
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             if (HiddenComboCount.Value == 0) return;
@@ -65,7 +82,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetAlpha, Math.Clamp(playfield.Time.Elapsed / transition_duration, 0, 1));
+            var overrideAlpha = isBreakTime.Value || spinnerPeriods.IsInAny(playfield.Clock.CurrentTime);
+            var targetOverriddenAlpha = overrideAlpha ? 1 : targetAlpha;
+            playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetOverriddenAlpha, Math.Clamp(playfield.Time.Elapsed / transition_duration, 0, 1));
         }
     }
 
