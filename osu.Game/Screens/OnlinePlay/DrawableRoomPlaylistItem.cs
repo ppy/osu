@@ -34,6 +34,8 @@ namespace osu.Game.Screens.OnlinePlay
 {
     public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>
     {
+        public const float HEIGHT = 50;
+
         public Action<PlaylistItem> RequestDeletion;
 
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
@@ -135,7 +137,7 @@ namespace osu.Game.Screens.OnlinePlay
             return maskingContainer = new Container
             {
                 RelativeSizeAxes = Axes.X,
-                Height = 50,
+                Height = HEIGHT,
                 Masking = true,
                 CornerRadius = 10,
                 Children = new Drawable[]
