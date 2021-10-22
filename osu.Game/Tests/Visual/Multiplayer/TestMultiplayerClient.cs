@@ -158,8 +158,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Name = apiRoom.Name.Value,
                     MatchType = apiRoom.Type.Value,
                     PlaylistItemId = lastPlaylistItemId,
-                    // ReSharper disable once ConstantNullCoalescingCondition Incorrect inspection due to lack of nullable in Room.cs.
-                    Password = password ?? string.Empty,
+                    Password = password,
+                    QueueMode = apiRoom.QueueMode.Value
                 },
                 Users = { localUser },
                 Host = localUser
