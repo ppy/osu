@@ -166,7 +166,7 @@ namespace osu.Game.Skinning
             string skinIniSourcedCreator = instance.Configuration.SkinInfo.Creator;
             string archiveName = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
 
-            bool isImport = reader != null;
+            bool isImport = item.ID == 0;
 
             if (isImport)
             {
