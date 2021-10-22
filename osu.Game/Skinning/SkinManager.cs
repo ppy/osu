@@ -255,6 +255,7 @@ namespace osu.Game.Skinning
                         sw.WriteLine("[General]");
                         sw.WriteLine(nameLine);
                         sw.WriteLine(authorLine);
+                        sw.WriteLine("Version: latest");
                     }
 
                     AddFile(item, stream, "skin.ini");
