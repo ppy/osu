@@ -105,16 +105,28 @@ namespace osu.Game.Screens.Edit.Setup
             }
         }
 
-        public Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile);
+        public Popover GetPopover() => new FileChooserPopover(handledExtensions, currentFile, game);
 
         private class FileChooserPopover : OsuPopover
         {
-            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo> currentFile)
+            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo> currentFile, OsuGameBase game)
             {
+                
+                string initialPath = currentFile.Value?.DirectoryName;
+                //Check if it's an instance of OsuGame. If it's only an OsuGameBase, the value from the line above will be used
+                if (game as OsuGame != null)
+                {
+                    //Cast and call GetInitialPath();
+                    initialPath = ((OsuGame)game).GetInitialPath();
+                    //If the method is not overriden (so returns null), fallback to default to not cause any issues
+                    if (initialPath == null) {
+                        initialPath = currentFile.Value?.DirectoryName;
+                    }
+                }
                 Child = new Container
                 {
                     Size = new Vector2(600, 400),
-                    Child = new OsuFileSelector(currentFile.Value?.DirectoryName, handledExtensions)
+                    Child = new OsuFileSelector(initialPath, handledExtensions)
                     {
                         RelativeSizeAxes = Axes.Both,
                         CurrentFile = { BindTarget = currentFile }

@@ -174,6 +174,9 @@ namespace osu.Game
 
             SentryLogger = new SentryLogger(this);
         }
+        public virtual string GetInitialPath() {
+            return null;
+        }
 
         private void updateBlockingOverlayFade() =>
             screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
