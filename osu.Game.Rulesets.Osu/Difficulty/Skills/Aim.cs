@@ -96,6 +96,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
             {
+                prevVelocity = (osuPrevObj.JumpDistance + osuPrevObj.TravelDistance) / osuPrevObj.StrainTime; // We want to use the average velocity when awarding differences, not necessarily combined.
+                currVelocity = (osuCurrObj.JumpDistance + osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
+
                 velChangeBonus = Math.Max(Math.Abs(prevVelocity - currVelocity) // reward for % distance slowed down compared to previous, paying attention to not award overlap
                                           * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, osuCurrObj.JumpDistance / 100)), 2) // do not award overlap
                                           * Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2), // scale with ratio of difference compared to max
