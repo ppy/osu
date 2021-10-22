@@ -14,8 +14,10 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.Queueing;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
@@ -52,6 +54,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         [CanBeNull]
         private IDisposable readyClickOperation;
+
+        private OsuButton addOrEditPlaylistButton;
 
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
@@ -128,7 +132,35 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             Content = new[]
                             {
                                 new Drawable[] { new OverlinedHeader("Beatmap") },
-                                new Drawable[] { new BeatmapSelectionControl { RelativeSizeAxes = Axes.X } },
+                                new Drawable[]
+                                {
+                                    new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(5),
+                                        Children = new Drawable[]
+                                        {
+                                            addOrEditPlaylistButton = new PurpleTriangleButton
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 40,
+                                                Action = () =>
+                                                {
+                                                    if (this.IsCurrentScreen())
+                                                        this.Push(new MultiplayerMatchSongSelect(Room));
+                                                },
+                                                Alpha = 0
+                                            },
+                                            new DrawableRoomPlaylist(false, false)
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Items = { BindTarget = Room.Playlist },
+                                                SelectedItem = { BindTarget = SelectedItem }
+                                            },
+                                        }
+                                    }
+                                },
                                 new[]
                                 {
                                     UserModsSection = new FillFlowContainer
@@ -171,7 +203,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             RowDimensions = new[]
                             {
                                 new Dimension(GridSizeMode.AutoSize),
-                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(),
                                 new Dimension(GridSizeMode.AutoSize),
                             }
                         },
@@ -352,6 +384,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 handleRoomLost();
                 return;
+            }
+
+            switch (client.Room.Settings.QueueMode)
+            {
+                case QueueModes.HostOnly:
+                    addOrEditPlaylistButton.Text = "Edit beatmap";
+                    addOrEditPlaylistButton.Alpha = client.Room.Host?.User?.Equals(client.LocalUser?.User) == true ? 1 : 0;
+                    break;
+
+                case QueueModes.FreeForAll:
+                case QueueModes.FairRotate:
+                    addOrEditPlaylistButton.Text = "Add beatmap";
+                    addOrEditPlaylistButton.Alpha = 1;
+                    break;
+
+                default:
+                    addOrEditPlaylistButton.Alpha = 0;
+                    break;
             }
 
             Scheduler.AddOnce(UpdateMods);

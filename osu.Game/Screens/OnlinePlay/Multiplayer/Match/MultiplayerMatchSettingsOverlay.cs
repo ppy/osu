@@ -11,6 +11,7 @@ using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -68,9 +69,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             private OsuSpriteText typeLabel;
             private LoadingLayer loadingLayer;
-            private BeatmapSelectionControl initialBeatmapControl;
 
-            public void SelectBeatmap() => initialBeatmapControl.BeginSelection();
+            public void SelectBeatmap()
+            {
+                if (matchSubScreen.IsCurrentScreen())
+                    matchSubScreen.Push(new MultiplayerMatchSongSelect(matchSubScreen.Room));
+            }
+
+            [Resolved]
+            private MultiplayerMatchSubScreen matchSubScreen { get; set; }
 
             [Resolved]
             private IRoomManager manager { get; set; }
@@ -93,6 +100,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private IDisposable applyingSettingsOperation;
 
             private readonly Room room;
+
+            private Drawable playlistContainer;
 
             public MatchSettings(Room room)
             {
@@ -137,7 +146,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                             AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
                                             Spacing = new Vector2(0, 10),
-                                            Children = new Drawable[]
+                                            Children = new[]
                                             {
                                                 new Container
                                                 {
@@ -236,13 +245,32 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                         }
                                                     },
                                                 },
-                                                initialBeatmapControl = new BeatmapSelectionControl
+                                                playlistContainer = new FillFlowContainer
                                                 {
                                                     Anchor = Anchor.TopCentre,
                                                     Origin = Anchor.TopCentre,
                                                     RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
                                                     Width = 0.5f,
-                                                    Depth = float.MaxValue
+                                                    Depth = float.MaxValue,
+                                                    Spacing = new Vector2(5),
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new DrawableRoomPlaylist(false, false)
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            Height = DrawableRoomPlaylistItem.HEIGHT,
+                                                            Items = { BindTarget = Playlist },
+                                                            SelectedItem = { BindTarget = SelectedItem }
+                                                        },
+                                                        new PurpleTriangleButton
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            Height = 40,
+                                                            Text = "Select beatmap",
+                                                            Action = SelectBeatmap
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -306,7 +334,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
-                RoomID.BindValueChanged(roomId => initialBeatmapControl.Alpha = roomId.NewValue == null ? 1 : 0, true);
+                RoomID.BindValueChanged(roomId => playlistContainer.Alpha = roomId.NewValue == null ? 1 : 0, true);
                 Password.BindValueChanged(password => PasswordTextBox.Text = password.NewValue ?? string.Empty, true);
 
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
