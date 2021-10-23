@@ -4,7 +4,6 @@
 using osuTK;
 using osu.Game.Audio;
 using System.Collections.Generic;
-using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Mania
 {
