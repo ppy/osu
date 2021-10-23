@@ -101,6 +101,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     Name = @"Left (icon) area",
                     Size = new Vector2(height),
+                    Padding = new MarginPadding { Right = corner_radius },
                     Child = leftIconArea = new FillFlowContainer
                     {
                         Margin = new MarginPadding(5),
@@ -310,10 +311,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             };
 
             if (beatmapSet.HasVideo)
-                leftIconArea.Add(new IconPill(FontAwesome.Solid.Film));
+                leftIconArea.Add(new IconPill(FontAwesome.Solid.Film) { IconSize = new Vector2(20) });
 
             if (beatmapSet.HasStoryboard)
-                leftIconArea.Add(new IconPill(FontAwesome.Solid.Image));
+                leftIconArea.Add(new IconPill(FontAwesome.Solid.Image) { IconSize = new Vector2(20) });
 
             if (beatmapSet.HasExplicitContent)
             {

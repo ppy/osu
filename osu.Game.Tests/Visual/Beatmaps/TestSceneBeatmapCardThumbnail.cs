@@ -41,6 +41,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 InputManager.MoveMouseTo(playButton);
                 InputManager.Click(MouseButton.Left);
             });
+            AddUntilStep("wait for start", () => playButton.Playing.Value && playButton.Enabled.Value);
             iconIs(FontAwesome.Solid.Stop);
 
             AddStep("click again", () =>
@@ -48,6 +49,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 InputManager.MoveMouseTo(playButton);
                 InputManager.Click(MouseButton.Left);
             });
+            AddUntilStep("wait for stop", () => !playButton.Playing.Value && playButton.Enabled.Value);
             iconIs(FontAwesome.Solid.Play);
 
             AddStep("click again", () =>
@@ -55,16 +57,17 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 InputManager.MoveMouseTo(playButton);
                 InputManager.Click(MouseButton.Left);
             });
+            AddUntilStep("wait for start", () => playButton.Playing.Value && playButton.Enabled.Value);
             iconIs(FontAwesome.Solid.Stop);
 
             AddStep("disable dim", () => thumbnail.Dimmed.Value = false);
             AddWaitStep("wait some", 3);
             AddAssert("button still visible", () => playButton.IsPresent);
 
-            AddStep("end track playback", () => playButton.Playing.Value = false);
+            AddUntilStep("wait for track to end", () => !playButton.Playing.Value);
             AddUntilStep("button hidden", () => !playButton.IsPresent);
         }
 
-        private void iconIs(IconUsage usage) => AddAssert("icon is correct", () => playButton.ChildrenOfType<SpriteIcon>().Single().Icon.Equals(usage));
+        private void iconIs(IconUsage usage) => AddUntilStep("icon is correct", () => playButton.ChildrenOfType<SpriteIcon>().Any(icon => icon.Icon.Equals(usage)));
     }
 }
