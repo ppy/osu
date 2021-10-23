@@ -23,7 +23,6 @@ using osu.Game.Overlays.BeatmapSet;
 using osuTK;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
-using osuTK.Graphics;
 using DownloadButton = osu.Game.Beatmaps.Drawables.Cards.Buttons.DownloadButton;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
@@ -42,7 +41,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private readonly BeatmapDownloadTracker downloadTracker;
 
-        private UpdateableOnlineBeatmapSetCover leftCover;
+        private BeatmapCardThumbnail thumbnail;
         private FillFlowContainer leftIconArea;
 
         private Container rightAreaBackground;
@@ -98,24 +97,16 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         Colour = Colour4.White
                     },
                 },
-                new Container
+                thumbnail = new BeatmapCardThumbnail(beatmapSet)
                 {
                     Name = @"Left (icon) area",
                     Size = new Vector2(height),
-                    Children = new Drawable[]
+                    Child = leftIconArea = new FillFlowContainer
                     {
-                        leftCover = new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            OnlineInfo = beatmapSet
-                        },
-                        leftIconArea = new FillFlowContainer
-                        {
-                            Margin = new MarginPadding(5),
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(1)
-                        }
+                        Margin = new MarginPadding(5),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(1)
                     }
                 },
                 new Container
@@ -395,10 +386,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             if (IsHovered)
                 targetWidth = targetWidth - icon_area_width + corner_radius;
 
+            thumbnail.Dimmed.Value = IsHovered;
+
             mainContent.ResizeWidthTo(targetWidth, TRANSITION_DURATION, Easing.OutQuint);
             mainContentBackground.Dimmed.Value = IsHovered;
 
-            leftCover.FadeColour(IsHovered ? OsuColour.Gray(0.2f) : Color4.White, TRANSITION_DURATION, Easing.OutQuint);
             statisticsContainer.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
 
             rightAreaBackground.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, TRANSITION_DURATION, Easing.OutQuint);
