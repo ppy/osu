@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps.Drawables.Cards.Buttons;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK.Graphics;
@@ -33,7 +34,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     RelativeSizeAxes = Axes.Both,
                     OnlineInfo = beatmapSetInfo
                 },
-                playButton = new PlayButton(),
+                playButton = new PlayButton(beatmapSetInfo)
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both
@@ -44,14 +48,17 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Dimmed.BindValueChanged(_ => updateState(), true);
+            Dimmed.BindValueChanged(_ => updateState());
+            playButton.Playing.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
         }
 
         private void updateState()
         {
-            playButton.FadeTo(Dimmed.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            cover.FadeColour(Dimmed.Value ? OsuColour.Gray(0.2f) : Color4.White, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            bool shouldDim = Dimmed.Value || playButton.Playing.Value;
+
+            playButton.FadeTo(shouldDim ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            cover.FadeColour(shouldDim ? OsuColour.Gray(0.2f) : Color4.White, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
