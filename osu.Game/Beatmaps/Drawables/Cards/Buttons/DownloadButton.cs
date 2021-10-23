@@ -2,14 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Online;
 using osu.Game.Overlays;
+using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
@@ -20,36 +20,54 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         protected readonly PlayIcon Play;
         protected readonly BeatmapDownloadTracker Tracker;
 
-        private readonly CircularProgress downloadProgress;
+        private readonly SmoothCircularProgress downloadProgress;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
 
         public DownloadButton(APIBeatmapSet beatmapSet)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+            AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
                 Tracker = new BeatmapDownloadTracker(beatmapSet),
                 Download = new DownloadIcon(),
-                downloadProgress = new CircularProgress
+                downloadProgress = new SmoothCircularProgress
                 {
-                    Size = new Vector2(16),
-                    InnerRadius = 0.1f,
+                    Size = new Vector2(12),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    InnerRadius = 0.4f,
                 },
                 Play = new PlayIcon()
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            downloadProgress.Colour = colourProvider.Highlight1;
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            ((IBindable<double>)downloadProgress.Current).BindTo(Tracker.Progress);
+
+            Tracker.Progress.BindValueChanged(_ => updateState());
+            Tracker.State.BindValueChanged(_ => updateState(), true);
+            FinishTransforms(true);
+        }
+
+        private void updateState()
+        {
+            Download.FadeTo(Tracker.State.Value == DownloadState.NotDownloaded ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+
+            downloadProgress.FadeTo(Tracker.State.Value == DownloadState.Downloading || Tracker.State.Value == DownloadState.Importing ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            downloadProgress.FadeColour(Tracker.State.Value == DownloadState.Importing ? colours.Yellow : colourProvider.Highlight1, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            if (Tracker.State.Value == DownloadState.Downloading)
+                downloadProgress.FillTo(Tracker.Progress.Value, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+
+            Play.FadeTo(Tracker.State.Value == DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected class DownloadIcon : BeatmapCardIconButton

@@ -6,12 +6,14 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards.Buttons;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -31,13 +33,25 @@ namespace osu.Game.Tests.Visual.Beatmaps
         public void TestDownloadableBeatmap()
         {
             createButton(true);
+
+            assertDownloadVisible(true);
             assertDownloadEnabled(true);
+            assertProgressVisible(false);
+            assertPlayVisible(false);
 
             AddStep("set downloading state", () => downloadButton.State.Value = DownloadState.Downloading);
+            assertDownloadVisible(false);
+            assertProgressVisible(true);
+            assertPlayVisible(false);
+
             AddStep("set progress to 30%", () => downloadButton.Progress.Value = 0.3f);
             AddStep("set progress to 100%", () => downloadButton.Progress.Value = 1f);
             AddStep("set importing state", () => downloadButton.State.Value = DownloadState.Importing);
+
             AddStep("set locally available state", () => downloadButton.State.Value = DownloadState.LocallyAvailable);
+            assertDownloadVisible(false);
+            assertProgressVisible(false);
+            assertPlayVisible(true);
         }
 
         [Test]
@@ -75,23 +89,22 @@ namespace osu.Game.Tests.Visual.Beatmaps
             });
         }
 
-        private void assertDownloadEnabled(bool enabled)
-        {
-            AddAssert($"button {(enabled ? "enabled" : "disabled")}", () => downloadButton.Download.IsPresent && downloadButton.Download.Enabled.Value == enabled);
-        }
+        private void assertDownloadVisible(bool visible) => AddUntilStep($"download {(visible ? "visible" : "not visible")}", () => downloadButton.Download.IsPresent == visible);
+        private void assertDownloadEnabled(bool enabled) => AddAssert($"download {(enabled ? "enabled" : "disabled")}", () => downloadButton.Download.Enabled.Value == enabled);
 
-        private APIBeatmapSet createSoleily()
+        private void assertProgressVisible(bool visible) => AddUntilStep($"progress {(visible ? "visible" : "not visible")}", () => downloadButton.ChildrenOfType<SmoothCircularProgress>().Single().IsPresent == visible);
+
+        private void assertPlayVisible(bool visible) => AddUntilStep($"play {(visible ? "visible" : "not visible")}", () => downloadButton.Play.IsPresent == visible);
+
+        private static APIBeatmapSet createSoleily() => new APIBeatmapSet
         {
-            return new APIBeatmapSet
+            OnlineID = 241526,
+            Availability = new BeatmapSetOnlineAvailability
             {
-                OnlineID = 241526,
-                Availability = new BeatmapSetOnlineAvailability
-                {
-                    DownloadDisabled = false,
-                    ExternalLink = string.Empty,
-                },
-            };
-        }
+                DownloadDisabled = false,
+                ExternalLink = string.Empty,
+            },
+        };
 
         private void createButtonWithBeatmap(APIBeatmapSet beatmap)
         {
