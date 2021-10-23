@@ -32,12 +32,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         [Resolved]
         private OsuColour colours { get; set; }
+        
         [Resolved(canBeNull: true)]
         private IBeatmap beatmap { get; set; }
         private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
         public OsuAction? HitAction => HitArea.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
-
         public SkinnableDrawable ApproachCircle { get; private set; }
         public HitReceptor HitArea { get; private set; }
         public SkinnableDrawable CirclePiece { get; private set; }
@@ -62,7 +62,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load(OsuRulesetConfigManager rulesetConfig)
         {
             rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
-
             Origin = Anchor.Centre;
 
             InternalChildren = new Drawable[]
@@ -116,7 +115,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             inputManager = GetContainingInputManager();
             configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
-
         }
            protected override void OnApply()
         {
@@ -253,7 +251,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 CornerRadius = OsuHitObject.OBJECT_RADIUS;
                 CornerExponent = 2;
             }
-
             public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
             {
                 switch (e.Action)
@@ -276,8 +273,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
             }
         }
-     
-
         private class ProxyableSkinnableDrawable : SkinnableDrawable
         {
             public override bool RemoveWhenNotAlive => false;
