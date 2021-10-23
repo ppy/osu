@@ -9,9 +9,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards.Buttons;
+using osu.Game.Configuration;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Tests.Resources;
@@ -29,15 +31,20 @@ namespace osu.Game.Tests.Visual.Beatmaps
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [Test]
         public void TestDownloadableBeatmap()
         {
+            ensureSoleilyRemoved();
             createButton(true);
 
             assertDownloadVisible(true);
             assertDownloadEnabled(true);
             assertProgressVisible(false);
             assertPlayVisible(false);
+            AddAssert("tooltip text correct", () => downloadButton.Download.TooltipText == BeatmapsetsStrings.PanelDownloadAll);
 
             AddStep("set downloading state", () => downloadButton.State.Value = DownloadState.Downloading);
             assertDownloadVisible(false);
@@ -55,16 +62,29 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         [Test]
+        public void TestDownloadableBeatmapWithVideo()
+        {
+            createButton(true, true);
+            assertDownloadEnabled(true);
+
+            AddStep("prefer no video", () => config.SetValue(OsuSetting.PreferNoVideo, true));
+            AddAssert("tooltip text correct", () => downloadButton.Download.TooltipText == BeatmapsetsStrings.PanelDownloadNoVideo);
+
+            AddStep("prefer video", () => config.SetValue(OsuSetting.PreferNoVideo, false));
+            AddAssert("tooltip text correct", () => downloadButton.Download.TooltipText == BeatmapsetsStrings.PanelDownloadVideo);
+        }
+
+        [Test]
         public void TestUndownloadableBeatmap()
         {
             createButton(false);
             assertDownloadEnabled(false);
+            AddAssert("tooltip text correct", () => downloadButton.Download.TooltipText == BeatmapsetsStrings.AvailabilityDisabled);
         }
 
         [Test]
         public void TestDownloadState()
         {
-            AddUntilStep("ensure manager loaded", () => beatmaps != null);
             ensureSoleilyRemoved();
             createButtonWithBeatmap(createSoleily());
             AddAssert("button state not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
@@ -81,6 +101,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
         private void ensureSoleilyRemoved()
         {
+            AddUntilStep("ensure manager loaded", () => beatmaps != null);
             AddStep("remove soleily", () =>
             {
                 var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineBeatmapSetID == 241526);
@@ -119,11 +140,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
             });
         }
 
-        private void createButton(bool downloadable)
+        private void createButton(bool downloadable, bool hasVideo = false)
         {
             AddStep("create button", () =>
             {
-                Child = downloadButton = new TestDownloadButton(downloadable ? getDownloadableBeatmapSet() : getUndownloadableBeatmapSet())
+                Child = downloadButton = new TestDownloadButton(downloadable ? getDownloadableBeatmapSet(hasVideo) : getUndownloadableBeatmapSet())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -132,10 +153,10 @@ namespace osu.Game.Tests.Visual.Beatmaps
             });
         }
 
-        private APIBeatmapSet getDownloadableBeatmapSet()
+        private APIBeatmapSet getDownloadableBeatmapSet(bool hasVideo)
         {
             var normal = CreateAPIBeatmapSet(new OsuRuleset().RulesetInfo);
-            normal.HasVideo = true;
+            normal.HasVideo = hasVideo;
             normal.HasStoryboard = true;
 
             return normal;
