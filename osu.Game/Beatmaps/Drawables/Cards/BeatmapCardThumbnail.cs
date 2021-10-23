@@ -17,6 +17,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private readonly APIBeatmapSet beatmapSetInfo;
 
         private readonly UpdateableOnlineBeatmapSetCover cover;
+        private readonly PlayButton playButton;
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
@@ -32,6 +33,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     RelativeSizeAxes = Axes.Both,
                     OnlineInfo = beatmapSetInfo
                 },
+                playButton = new PlayButton(),
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both
@@ -48,6 +50,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void updateState()
         {
+            playButton.FadeTo(Dimmed.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             cover.FadeColour(Dimmed.Value ? OsuColour.Gray(0.2f) : Color4.White, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
