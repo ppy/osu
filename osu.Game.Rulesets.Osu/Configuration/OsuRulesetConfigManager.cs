@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.SnakingOutSliders, true);
             SetDefault(OsuRulesetSetting.ShowCursorTrail, true);
             SetDefault(OsuRulesetSetting.PlayfieldBorderStyle, PlayfieldBorderStyle.None);
+            SetDefault(OsuRulesetSetting.TimingBasedNoteColouring, false);
         }
     }
 
@@ -30,5 +31,6 @@ namespace osu.Game.Rulesets.Osu.Configuration
         SnakingOutSliders,
         ShowCursorTrail,
         PlayfieldBorderStyle,
+        TimingBasedNoteColouring
     }
 }

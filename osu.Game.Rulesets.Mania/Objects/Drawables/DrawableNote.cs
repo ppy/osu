@@ -123,3 +123,4 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         }
     }
 }
+
