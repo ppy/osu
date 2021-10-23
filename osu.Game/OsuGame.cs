@@ -176,9 +176,21 @@ namespace osu.Game
         }
 
         /// <summary>
-        /// Returns a predefined platform-specific path to user data if the default directory is not accessible. If one is not required for the current platform, returns null.
+        /// Returns a predefined platform-specific path to user data.
         /// </summary>
         public virtual string GetInitialPath() => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        /// <summary>
+        /// Returns true if user data can be accessed.
+        /// </summary>
+        public virtual bool HasStoragePermission() => true;
+
+        /// <summary>
+        /// If HasStoragePermission() returns false, requests access to user data
+        /// </summary>
+        public virtual void RequestStoragePermission()
+        {
+        }
 
         private void updateBlockingOverlayFade() =>
             screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);

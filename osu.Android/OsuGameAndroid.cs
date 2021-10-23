@@ -2,10 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Android;
 using Android.App;
+using Android.Content.PM;
 using Android.OS;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Sprites;
 using osu.Game;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using Xamarin.Essentials;
@@ -21,6 +25,20 @@ namespace osu.Android
             : base(null)
         {
             gameActivity = activity;
+
+            if (!HasStoragePermission())
+            {
+                Notifications.Post(new SimpleNotification
+                {
+                    Icon = FontAwesome.Solid.EllipsisH,
+                    Text = "To use your own backgrounds and music in Edit mode, the Storage permission is required. This will require a game restart. Tap here to request...",
+                    Activated = () =>
+                    {
+                        RequestStoragePermission();
+                        return false;   //the game hard closes anyway
+                    }
+                });
+            }
         }
 
         public override Version AssemblyVersion
@@ -85,5 +103,9 @@ namespace osu.Android
         }
 
         public override string GetInitialPath() => "/sdcard/";
+
+        public override bool HasStoragePermission() => gameActivity.CheckSelfPermission(Manifest.Permission.ReadExternalStorage) == (int)Permission.Granted;
+
+        public override void RequestStoragePermission() => gameActivity.RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage }, 750);
     }
 }

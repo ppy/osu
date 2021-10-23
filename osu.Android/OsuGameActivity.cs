@@ -61,18 +61,6 @@ namespace osu.Android
 
             Window.AddFlags(WindowManagerFlags.Fullscreen);
             Window.AddFlags(WindowManagerFlags.KeepScreenOn);
-            if (CheckSelfPermission(Manifest.Permission.ReadExternalStorage) != (int)Permission.Granted && ShouldShowRequestPermissionRationale(Manifest.Permission.ReadExternalStorage))
-            {
-                AlertDialog.Builder alert = new AlertDialog.Builder(new ContextThemeWrapper(this, Theme));
-                alert.SetTitle("osu!");
-                //This can probably be a localized string
-                alert.SetMessage("Using your own resources in Edit mode requires the Read External Storage permission.\nIf you deny, you will still be able to play the game, but you will not be able to add your own music and backgrounds.");
-                alert.SetCancelable(true);
-                alert.SetPositiveButton("OK", delegate {
-                    RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage }, 0);
-                });
-                alert.Create().Show();
-            }
         }
 
         protected override void OnNewIntent(Intent intent) => handleIntent(intent);

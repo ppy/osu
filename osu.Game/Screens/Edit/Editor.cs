@@ -486,6 +486,15 @@ namespace osu.Game.Screens.Edit
             });
 
             resetTrack(true);
+
+            //BDL is too early to show popups
+            if (Game is OsuGame game)
+            {
+                if (!game.HasStoragePermission())
+                {
+                    dialogOverlay?.Push(new PromptRequestPermissionDialog(delegate { game.RequestStoragePermission(); }));
+                }
+            }
         }
 
         public override bool OnExiting(IScreen next)
