@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            sortControlBackground.Colour = colourProvider.Background5;
+            sortControlBackground.Colour = colourProvider.Background4;
         }
 
         public void Search(string query)
