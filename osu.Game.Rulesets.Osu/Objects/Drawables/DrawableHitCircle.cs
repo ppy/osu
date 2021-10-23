@@ -34,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         [Resolved(canBeNull: true)]
         private IBeatmap beatmap { get; set; }
+
         private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
         public OsuAction? HitAction => HitArea.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
@@ -57,7 +58,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-
         private void load(OsuRulesetConfigManager rulesetConfig)
         {
             rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
@@ -116,6 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
         protected override void OnApply()
+
         {
             base.OnApply();
             updateSnapColour();
