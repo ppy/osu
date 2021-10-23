@@ -102,14 +102,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     RelativeSizeAxes = Axes.Y,
                     Origin = Anchor.TopRight,
                     Anchor = Anchor.TopRight,
-                    Child = new FillFlowContainer<BeatmapCardIconButton>
+                    Child = new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, 14),
-                        Children = new BeatmapCardIconButton[]
+                        Children = new Drawable[]
                         {
                             new FavouriteButton(beatmapSet) { Current = favouriteState },
                             new DownloadButton(beatmapSet)
