@@ -12,7 +12,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
@@ -89,31 +88,6 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-        }
-
-        protected class SettingsTextBox : OsuTextBox
-        {
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                BackgroundUnfocused = Color4.Black;
-                BackgroundFocused = Color4.Black;
-            }
-        }
-
-        protected class SettingsNumberTextBox : SettingsTextBox
-        {
-            protected override bool CanAddCharacter(char character) => char.IsNumber(character);
-        }
-
-        protected class SettingsPasswordTextBox : OsuPasswordTextBox
-        {
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                BackgroundUnfocused = Color4.Black;
-                BackgroundFocused = Color4.Black;
-            }
         }
 
         protected class SectionContainer : FillFlowContainer<Section>

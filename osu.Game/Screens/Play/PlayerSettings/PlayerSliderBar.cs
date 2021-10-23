@@ -17,7 +17,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         protected override Drawable CreateControl() => new Sliderbar
         {
-            Margin = new MarginPadding { Top = 5, Bottom = 5 },
             RelativeSizeAxes = Axes.X
         };
 

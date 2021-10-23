@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Resources;
@@ -74,7 +75,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 ID = 1,
                 OnlineBeatmapSetID = 241526,
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     Availability = new BeatmapSetOnlineAvailability
                     {
