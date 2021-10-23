@@ -178,7 +178,7 @@ namespace osu.Game
         /// <summary>
         /// Returns a predefined platform-specific path to user data if the default directory is not accessible. If one is not required for the current platform, returns null.
         /// </summary>
-        public virtual string GetInitialPath() => null;
+        public virtual string GetInitialPath() => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
         private void updateBlockingOverlayFade() =>
             screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
