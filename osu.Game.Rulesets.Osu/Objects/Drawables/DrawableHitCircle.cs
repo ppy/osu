@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -32,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         [Resolved]
         private OsuColour colours { get; set; }
-        
+
         [Resolved(canBeNull: true)]
         private IBeatmap beatmap { get; set; }
         private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
@@ -58,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        
+
         private void load(OsuRulesetConfigManager rulesetConfig)
         {
             rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
@@ -116,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
-           protected override void OnApply()
+        protected override void OnApply()
         {
             base.OnApply();
             updateSnapColour();
