@@ -83,9 +83,9 @@ namespace osu.Game.Beatmaps
                 if (res != null)
                 {
                     beatmapInfo.Status = res.Status;
-                    beatmapInfo.BeatmapSet.Status = res.BeatmapSet.Status;
+                    beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapSetOnlineStatus.None;
                     beatmapInfo.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-                    beatmapInfo.OnlineBeatmapID = res.OnlineBeatmapID;
+                    beatmapInfo.OnlineBeatmapID = res.OnlineID;
 
                     if (beatmapInfo.Metadata != null)
                         beatmapInfo.Metadata.AuthorID = res.AuthorID;
@@ -93,7 +93,7 @@ namespace osu.Game.Beatmaps
                     if (beatmapInfo.BeatmapSet.Metadata != null)
                         beatmapInfo.BeatmapSet.Metadata.AuthorID = res.AuthorID;
 
-                    logForModel(set, $"Online retrieval mapped {beatmapInfo} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
+                    logForModel(set, $"Online retrieval mapped {beatmapInfo} to {res.OnlineBeatmapSetID} / {res.OnlineID}.");
                 }
             }
             catch (Exception e)

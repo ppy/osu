@@ -246,6 +246,9 @@ namespace osu.Game.Screens.Play
             cancelLoad();
             contentOut();
 
+            // If the load sequence was interrupted, the epilepsy warning may already be displayed (or in the process of being displayed).
+            epilepsyWarning?.Hide();
+
             // Ensure the screen doesn't expire until all the outwards fade operations have completed.
             this.Delay(content_out_duration).FadeOut();
 

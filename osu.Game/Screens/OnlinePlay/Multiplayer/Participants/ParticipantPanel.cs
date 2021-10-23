@@ -15,6 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
@@ -189,6 +190,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
+
+            if ((User.BeatmapAvailability.State == DownloadState.LocallyAvailable) && (User.State != MultiplayerUserState.Spectating))
+                userModsDisplay.FadeIn(fade_time);
+            else
+                userModsDisplay.FadeOut(fade_time);
 
             if (Client.IsHost && !User.Equals(Client.LocalUser))
                 kickButton.FadeIn(fade_time);
