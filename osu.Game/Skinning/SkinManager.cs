@@ -155,7 +155,7 @@ namespace osu.Game.Skinning
 
         protected override bool HasCustomHashFunction => true;
 
-        protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
+        protected override string ComputeHash(SkinInfo item)
         {
             var instance = GetSkin(item);
 
@@ -186,7 +186,7 @@ namespace osu.Game.Skinning
             if (skinIniSourcedName != item.Name)
                 updateSkinIniMetadata(item);
 
-            return base.ComputeHash(item, reader);
+            return base.ComputeHash(item);
         }
 
         private void updateSkinIniMetadata(SkinInfo item)
