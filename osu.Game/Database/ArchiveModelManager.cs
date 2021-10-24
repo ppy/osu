@@ -467,7 +467,7 @@ namespace osu.Game.Database
             using (var outputStream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
                 ExportModelTo(retrievedItem, outputStream);
 
-            exportStorage.ShowFileInNativeExplorer(filename);
+            exportStorage.PresentFileExternally(filename);
         }
 
         /// <summary>

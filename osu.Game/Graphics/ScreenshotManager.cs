@@ -135,7 +135,7 @@ namespace osu.Game.Graphics
                     Text = $"{fileName} saved!",
                     Activated = () =>
                     {
-                        storage.ShowFileInNativeExplorer(fileName);
+                        storage.PresentFileExternally(fileName);
                         return true;
                     }
                 });
