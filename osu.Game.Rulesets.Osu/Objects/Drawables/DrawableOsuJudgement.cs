@@ -40,12 +40,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (JudgedObject?.HitObject is OsuHitObject osuObject)
             {
                 if (JudgedObject?.HitObject is Spinner)
-                {
                     Position = osuObject.Position;
-                } else
-                {
+                else
                     Position = osuObject.StackedEndPosition;
-                }
                 Scale = new Vector2(osuObject.Scale);
             }
         }
