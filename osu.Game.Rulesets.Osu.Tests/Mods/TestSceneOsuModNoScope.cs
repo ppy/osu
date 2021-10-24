@@ -122,6 +122,38 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             });
         }
 
+        [Test]
+        public void CursorVisibleAfterComboBreak()
+        {
+            CreateModTest(new ModTestData
+            {
+                Mod = new OsuModNoScope
+                {
+                    HiddenComboCount = { Value = 1 },
+                },
+                Autoplay = false,
+                Beatmap = new Beatmap
+                {
+                    HitObjects = new List<HitObject>
+                    {
+                        new HitCircle
+                        {
+                            Position = new Vector2(300, 192),
+                            StartTime = 0,
+                        },
+                        new HitCircle
+                        {
+                            Position = new Vector2(300, 192),
+                            StartTime = 2000,
+                        },
+                    },
+                },
+                PassCondition = () => comboBreak() && cursorVisible(true)
+            });
+
+            AddStep("increase combo", () => Player.ScoreProcessor.Combo.Value += 1);
+        }
+
         private bool checkSomeHit() => Player.ScoreProcessor.JudgedHits >= 1;
 
         private bool cursorVisible(bool visible)
@@ -138,6 +170,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         private bool breakTime()
         {
             return Player.IsBreakTime.Value;
+        }
+
+        private bool comboBreak()
+        {
+            return Player.ScoreProcessor.HighestCombo != Player.ScoreProcessor.Combo;
         }
     }
 }
