@@ -109,12 +109,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
-        protected override void OnApply()
-        {
-            base.OnApply();
-            updateSnapColour();
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -122,6 +116,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             inputManager = GetContainingInputManager();
             configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
+        }
+        protected override void OnApply()
+        {
+            base.OnApply();
+            updateSnapColour();
         }
 
         public override double LifetimeStart
