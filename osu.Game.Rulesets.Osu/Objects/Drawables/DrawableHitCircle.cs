@@ -106,8 +106,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
-            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
-            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
         protected override void LoadComplete()
         {
