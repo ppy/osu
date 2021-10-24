@@ -120,6 +120,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
 
         public override double LifetimeStart
