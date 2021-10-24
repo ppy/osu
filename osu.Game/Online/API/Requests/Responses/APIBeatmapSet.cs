@@ -8,12 +8,13 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 
 #nullable enable
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIBeatmapSet : BeatmapMetadata, IBeatmapSetOnlineInfo, IBeatmapSetInfo
+    public class APIBeatmapSet : IBeatmapSetOnlineInfo, IBeatmapSetInfo
     {
         [JsonProperty(@"covers")]
         public BeatmapSetOnlineCovers Covers { get; set; }
@@ -63,10 +64,44 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"track_id")]
         public int? TrackId { get; set; }
 
+        public string Title { get; set; } = string.Empty;
+
+        [JsonProperty("title_unicode")]
+        public string TitleUnicode { get; set; } = string.Empty;
+
+        public string Artist { get; set; } = string.Empty;
+
+        [JsonProperty("artist_unicode")]
+        public string ArtistUnicode { get; set; } = string.Empty;
+
+        public User? Author = new User();
+
+        /// <summary>
+        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// </summary>
         [JsonProperty(@"user_id")]
-        private int creatorId
+        public int AuthorID
         {
-            set => Author.Id = value;
+            get => Author?.Id ?? 1;
+            set
+            {
+                Author ??= new User();
+                Author.Id = value;
+            }
+        }
+
+        /// <summary>
+        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// </summary>
+        [JsonProperty(@"creator")]
+        public string AuthorString
+        {
+            get => Author?.Username ?? string.Empty;
+            set
+            {
+                Author ??= new User();
+                Author.Username = value;
+            }
         }
 
         [JsonProperty(@"availability")]
@@ -78,6 +113,11 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"language")]
         public BeatmapSetOnlineLanguage Language { get; set; }
 
+        public string Source { get; set; } = string.Empty;
+
+        [JsonProperty(@"tags")]
+        public string Tags { get; set; } = string.Empty;
+
         [JsonProperty(@"beatmaps")]
         private IEnumerable<APIBeatmap> beatmaps { get; set; } = Array.Empty<APIBeatmap>();
 
@@ -86,7 +126,7 @@ namespace osu.Game.Online.API.Requests.Responses
             var beatmapSet = new BeatmapSetInfo
             {
                 OnlineBeatmapSetID = OnlineID,
-                Metadata = this,
+                Metadata = metadata,
                 Status = Status,
                 Metrics = new BeatmapSetMetrics { Ratings = ratings },
                 OnlineInfo = this
@@ -103,11 +143,23 @@ namespace osu.Game.Online.API.Requests.Responses
             return beatmapSet;
         }
 
+        private BeatmapMetadata metadata => new BeatmapMetadata
+        {
+            Title = Title,
+            TitleUnicode = TitleUnicode,
+            Artist = Artist,
+            ArtistUnicode = ArtistUnicode,
+            AuthorID = AuthorID,
+            Author = Author,
+            Source = Source,
+            Tags = Tags,
+        };
+
         #region Implementation of IBeatmapSetInfo
 
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => beatmaps;
 
-        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => this;
+        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => metadata;
 
         DateTimeOffset IBeatmapSetInfo.DateAdded => throw new NotImplementedException();
         IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => throw new NotImplementedException();
