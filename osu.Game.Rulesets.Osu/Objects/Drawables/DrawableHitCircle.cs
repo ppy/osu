@@ -116,7 +116,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
         protected override void OnApply()
-
         {
             base.OnApply();
             updateSnapColour();
