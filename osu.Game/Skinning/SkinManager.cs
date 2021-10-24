@@ -161,7 +161,7 @@ namespace osu.Game.Skinning
 
             // This function can be run on fresh import or save. The logic here ensures a skin.ini file is in a good state for both operations.
 
-            // LegacySkin will parse the skin.ini and populate `Skin.Configuration` during construction above.
+            // `Skin` will parse the skin.ini and populate `Skin.Configuration` during construction above.
             string skinIniSourcedName = instance.Configuration.SkinInfo.Name;
             string skinIniSourcedCreator = instance.Configuration.SkinInfo.Creator;
             string archiveName = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
