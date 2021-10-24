@@ -47,6 +47,7 @@ namespace osu.Game.Skinning
             configurationStream ??= getConfigurationStream();
 
             if (configurationStream != null)
+                // stream will be closed after use by LineBufferedReader.
                 ParseConfigurationStream(configurationStream);
             else
                 Configuration = new SkinConfiguration();
