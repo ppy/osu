@@ -5,24 +5,37 @@ using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
+using osuTK.Graphics;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableOsuHitObject, IHasMainCirclePiece, IHasApproachCircle
     {
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IBeatmap beatmap { get; set; }
+        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
+
         public OsuAction? HitAction => HitArea.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
 
@@ -46,8 +59,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuRulesetConfigManager rulesetConfig)
         {
+            rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
             Origin = Anchor.Centre;
 
             InternalChildren = new Drawable[]
@@ -92,6 +106,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
+        }
+        protected override void OnApply()
+        {
+            base.OnApply();
+            updateSnapColour();
         }
 
         protected override void LoadComplete()
@@ -262,6 +283,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 : base(component, defaultImplementation, confineMode)
             {
             }
+        }
+             private void updateSnapColour()
+        {
+            if (beatmap == null || HitObject == null) return;
+
+            int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
+
+            AccentColour.Value = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
         }
     }
 }

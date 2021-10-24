@@ -46,6 +46,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Playfield border style",
                     Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
                 },
+                   new SettingsCheckbox
+                {
+                    LabelText = "Timing-based note colouring",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.TimingBasedNoteColouring),
+                }
             };
         }
     }
