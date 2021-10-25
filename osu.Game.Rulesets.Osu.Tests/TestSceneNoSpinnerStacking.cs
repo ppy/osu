@@ -10,7 +10,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSpinnerSpam : TestSceneOsuPlayer
+    public class TestSceneNoSpinnerStacking : TestSceneOsuPlayer
     {
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
