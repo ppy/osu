@@ -14,9 +14,10 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
-using osuTK;
 using osu.Game.Screens.Edit;
 using osuTK.Graphics;
+using osuTK;
+
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -143,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
 
-            Colour = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
+            AccentColour.Value = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
         }
     }
 }

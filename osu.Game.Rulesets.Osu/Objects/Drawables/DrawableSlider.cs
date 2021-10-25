@@ -7,23 +7,35 @@ using System.Linq;
 using JetBrains.Annotations;
 using osuTK;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
-using osuTK.Graphics;
+using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
+using osuTK.Graphics;
+
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSlider : DrawableOsuHitObject
     {
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IBeatmap beatmap { get; set; }
+        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
         public new Slider HitObject => (Slider)base.HitObject;
 
         public DrawableSliderHead HeadCircle => headContainer.Child;
@@ -63,8 +75,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuRulesetConfigManager rulesetConfig)
         {
+            rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
             InternalChildren = new Drawable[]
             {
                 Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
@@ -96,12 +109,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Tracking.BindValueChanged(updateSlidingSample);
         }
+         protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
+        }
         protected override void OnApply()
         {
             base.OnApply();
 
             // Ensure that the version will change after the upcoming BindTo().
+            updateSnapColour();
             pathVersion.Value = int.MaxValue;
             PathVersion.BindTo(HitObject.Path.Version);
         }
@@ -346,6 +366,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private class DefaultSliderBody : PlaySliderBody
         {
+        }
+             private void updateSnapColour()
+        {
+            if (beatmap == null || HitObject == null) return;
+
+            int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
+
+            AccentColour.Value = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
         }
     }
 }
