@@ -73,10 +73,10 @@ namespace osu.Game.Tests.Visual.Online
                         Ranked = DateTime.Now,
                         BPM = 111,
                         HasVideo = true,
+                        Ratings = Enumerable.Range(0, 11).ToArray(),
                         HasStoryboard = true,
                         Covers = new BeatmapSetOnlineCovers(),
                     },
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
@@ -153,8 +153,8 @@ namespace osu.Game.Tests.Visual.Online
                         Covers = new BeatmapSetOnlineCovers(),
                         Language = new BeatmapSetOnlineLanguage { Id = 3, Name = "English" },
                         Genre = new BeatmapSetOnlineGenre { Id = 4, Name = "Rock" },
+                        Ratings = Enumerable.Range(0, 11).ToArray(),
                     },
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
@@ -228,8 +228,8 @@ namespace osu.Game.Tests.Visual.Online
                     OnlineInfo = new APIBeatmapSet
                     {
                         Covers = new BeatmapSetOnlineCovers(),
+                        Ratings = Enumerable.Range(0, 11).ToArray(),
                     },
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                     Beatmaps = beatmaps
                 });
             });
@@ -316,8 +316,8 @@ namespace osu.Game.Tests.Visual.Online
                     HasVideo = true,
                     HasStoryboard = true,
                     Covers = new BeatmapSetOnlineCovers(),
+                    Ratings = Enumerable.Range(0, 11).ToArray(),
                 },
-                Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
                 Beatmaps = beatmaps,
             };
         }

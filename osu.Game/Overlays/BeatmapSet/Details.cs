@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            Ratings.Metrics = BeatmapSet?.Metrics;
+            Ratings.Ratings = BeatmapSet?.Ratings;
             ratingBox.Alpha = BeatmapSet?.OnlineInfo?.Status > 0 ? 1 : 0;
         }
 

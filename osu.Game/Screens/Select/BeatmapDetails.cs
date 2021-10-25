@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
         private const float transition_duration = 250;
 
         private readonly AdvancedStats advanced;
-        private readonly UserRatings ratings;
+        private readonly UserRatings ratingsDisplay;
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
         private readonly FailRetryGraph failRetryGraph;
@@ -43,6 +43,9 @@ namespace osu.Game.Screens.Select
 
         private BeatmapInfo beatmapInfo;
 
+        private BeatmapMetrics metrics;
+        private int[] ratings;
+
         public BeatmapInfo BeatmapInfo
         {
             get => beatmapInfo;
@@ -51,6 +54,9 @@ namespace osu.Game.Screens.Select
                 if (value == beatmapInfo) return;
 
                 beatmapInfo = value;
+
+                metrics = beatmapInfo?.Metrics;
+                ratings = beatmapInfo?.BeatmapSet.Ratings;
 
                 Scheduler.AddOnce(updateStatistics);
             }
@@ -110,7 +116,7 @@ namespace osu.Game.Screens.Select
                                                         RelativeSizeAxes = Axes.X,
                                                         Height = 134,
                                                         Padding = new MarginPadding { Horizontal = spacing, Top = spacing },
-                                                        Child = ratings = new UserRatings
+                                                        Child = ratingsDisplay = new UserRatings
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
@@ -176,7 +182,7 @@ namespace osu.Game.Screens.Select
             tags.Text = BeatmapInfo?.Metadata?.Tags;
 
             // metrics may have been previously fetched
-            if (BeatmapInfo?.BeatmapSet?.Metrics != null && BeatmapInfo?.Metrics != null)
+            if (ratings != null && metrics != null)
             {
                 updateMetrics();
                 return;
@@ -201,14 +207,8 @@ namespace osu.Game.Screens.Select
                         // the beatmap has been changed since we started the lookup.
                         return;
 
-                    var b = res.ToBeatmapInfo(rulesets);
-
-                    if (requestedBeatmap.BeatmapSet == null)
-                        requestedBeatmap.BeatmapSet = b.BeatmapSet;
-                    else
-                        requestedBeatmap.BeatmapSet.Metrics = b.BeatmapSet.Metrics;
-
-                    requestedBeatmap.Metrics = b.Metrics;
+                    ratings = res.BeatmapSet?.Ratings;
+                    metrics = res.Metrics;
 
                     updateMetrics();
                 });
@@ -232,24 +232,23 @@ namespace osu.Game.Screens.Select
 
         private void updateMetrics()
         {
-            var hasRatings = beatmapInfo?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (beatmapInfo?.Metrics?.Retries?.Any() ?? false) || (beatmapInfo?.Metrics?.Fails?.Any() ?? false);
+            var hasMetrics = (metrics?.Retries?.Any() ?? false) || (metrics?.Fails?.Any() ?? false);
 
-            if (hasRatings)
+            if (ratings?.Any() ?? false)
             {
-                ratings.Metrics = beatmapInfo.BeatmapSet.Metrics;
-                ratings.FadeIn(transition_duration);
+                ratingsDisplay.Ratings = ratings;
+                ratingsDisplay.FadeIn(transition_duration);
             }
             else
             {
                 // loading or just has no data server-side.
-                ratings.Metrics = new BeatmapSetMetrics { Ratings = new int[10] };
-                ratings.FadeTo(0.25f, transition_duration);
+                ratingsDisplay.Ratings = new int[10];
+                ratingsDisplay.FadeTo(0.25f, transition_duration);
             }
 
-            if (hasRetriesFails)
+            if (hasMetrics)
             {
-                failRetryGraph.Metrics = beatmapInfo.Metrics;
+                failRetryGraph.Metrics = metrics;
                 failRetryContainer.FadeIn(transition_duration);
             }
             else
