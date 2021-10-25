@@ -47,10 +47,7 @@ namespace osu.Game.Beatmaps
         public BeatmapDifficulty BaseDifficulty { get; set; }
 
         [NotMapped]
-        public BeatmapMetrics Metrics { get; set; }
-
-        [NotMapped]
-        public BeatmapOnlineInfo OnlineInfo { get; set; }
+        public IBeatmapOnlineInfo OnlineInfo { get; set; }
 
         [NotMapped]
         public int? MaxCombo { get; set; }
@@ -190,6 +187,25 @@ namespace osu.Game.Beatmaps
         IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
         double IBeatmapInfo.StarRating => StarDifficulty;
+
+        #endregion
+
+        #region Implementation of IBeatmapOnlineInfo
+
+        [JsonIgnore]
+        public int CircleCount => OnlineInfo.CircleCount;
+
+        [JsonIgnore]
+        public int SliderCount => OnlineInfo.SliderCount;
+
+        [JsonIgnore]
+        public int PlayCount => OnlineInfo.PlayCount;
+
+        [JsonIgnore]
+        public int PassCount => OnlineInfo.PassCount;
+
+        [JsonIgnore]
+        public BeatmapMetrics Metrics => OnlineInfo.Metrics;
 
         #endregion
     }

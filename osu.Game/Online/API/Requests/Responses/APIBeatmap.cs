@@ -31,10 +31,10 @@ namespace osu.Game.Online.API.Requests.Responses
         public APIBeatmapSet? BeatmapSet { get; set; }
 
         [JsonProperty(@"playcount")]
-        private int playCount { get; set; }
+        public int PlayCount { get; set; }
 
         [JsonProperty(@"passcount")]
-        private int passCount { get; set; }
+        public int PassCount { get; set; }
 
         [JsonProperty(@"mode_int")]
         public int RulesetID { get; set; }
@@ -60,10 +60,10 @@ namespace osu.Game.Online.API.Requests.Responses
         private double lengthInSeconds { get; set; }
 
         [JsonProperty(@"count_circles")]
-        private int circleCount { get; set; }
+        public int CircleCount { get; set; }
 
         [JsonProperty(@"count_sliders")]
-        private int sliderCount { get; set; }
+        public int SliderCount { get; set; }
 
         [JsonProperty(@"version")]
         public string DifficultyName { get; set; } = string.Empty;
@@ -90,7 +90,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 Status = Status,
                 MD5Hash = Checksum,
                 BeatmapSet = set,
-                Metrics = Metrics,
                 MaxCombo = MaxCombo,
                 BaseDifficulty = new BeatmapDifficulty
                 {
@@ -99,13 +98,7 @@ namespace osu.Game.Online.API.Requests.Responses
                     ApproachRate = approachRate,
                     OverallDifficulty = overallDifficulty,
                 },
-                OnlineInfo = new BeatmapOnlineInfo
-                {
-                    PlayCount = playCount,
-                    PassCount = passCount,
-                    CircleCount = circleCount,
-                    SliderCount = sliderCount,
-                },
+                OnlineInfo = this,
             };
         }
 
