@@ -181,11 +181,22 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IBeatmapInfo
 
+        [JsonIgnore]
         string IBeatmapInfo.DifficultyName => Version;
+
+        [JsonIgnore]
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
+
+        [JsonIgnore]
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
+
+        [JsonIgnore]
         IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
+
+        [JsonIgnore]
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+
+        [JsonIgnore]
         double IBeatmapInfo.StarRating => StarDifficulty;
 
         #endregion
