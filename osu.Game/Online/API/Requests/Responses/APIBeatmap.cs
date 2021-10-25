@@ -54,7 +54,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"accuracy")]
         private float overallDifficulty { get; set; }
 
-        public double Length => lengthInSeconds * 1000;
+        public double Length => TimeSpan.FromSeconds(lengthInSeconds).TotalMilliseconds;
 
         [JsonProperty(@"total_length")]
         private double lengthInSeconds { get; set; }
@@ -88,7 +88,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineBeatmapID = OnlineID,
                 Version = DifficultyName,
                 // this is actually an incorrect mapping (Length is calculated as drain length in lazer's import process, see BeatmapManager.calculateLength).
-                Length = TimeSpan.FromSeconds(Length).TotalMilliseconds,
+                Length = Length,
                 Status = Status,
                 MD5Hash = Checksum,
                 BeatmapSet = set,
