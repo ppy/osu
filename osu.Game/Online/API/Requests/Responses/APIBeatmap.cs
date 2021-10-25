@@ -74,6 +74,8 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"max_combo")]
         public int? MaxCombo { get; set; }
 
+        public double BPM { get; set; }
+
         public virtual BeatmapInfo ToBeatmapInfo(RulesetStore rulesets)
         {
             var set = BeatmapSet?.ToBeatmapSet(rulesets);
@@ -120,7 +122,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public IRulesetInfo Ruleset => new RulesetInfo { ID = RulesetID };
 
-        public double BPM => throw new NotImplementedException();
+        [JsonIgnore]
         public string Hash => throw new NotImplementedException();
 
         #endregion

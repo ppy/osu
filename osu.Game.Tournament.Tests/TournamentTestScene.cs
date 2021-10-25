@@ -161,7 +161,7 @@ namespace osu.Game.Tournament.Tests
                     Artist = "Test Artist",
                     ID = RNG.Next(0, 1000000)
                 },
-                OnlineInfo = new BeatmapOnlineInfo(),
+                OnlineInfo = new APIBeatmap(),
             };
 
         protected override ITestSceneTestRunner CreateRunner() => new TournamentTestSceneTestRunner();
