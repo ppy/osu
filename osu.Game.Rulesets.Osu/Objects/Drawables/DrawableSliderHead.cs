@@ -6,13 +6,24 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Edit;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderHead : DrawableHitCircle
     {
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IBeatmap beatmap { get; set; }
+        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
         public new SliderHeadCircle HitObject => (SliderHeadCircle)base.HitObject;
 
         [CanBeNull]
@@ -42,10 +53,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuRulesetConfigManager rulesetConfig)
         {
+            rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
             PositionBindable.BindValueChanged(_ => updatePosition());
             pathVersion.BindValueChanged(_ => updatePosition());
+        }
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+             configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
 
         protected override void OnFree()
@@ -59,6 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.OnApply();
 
+            updateSnapColour();
             pathVersion.BindTo(DrawableSlider.PathVersion);
 
             OnShake = DrawableSlider.Shake;
@@ -102,6 +121,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (Slider != null)
                 Position = HitObject.Position - Slider.Position;
+        }
+             private void updateSnapColour()
+        {
+            if (beatmap == null || HitObject == null) return;
+
+            int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
+
+            AccentColour.Value = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
         }
     }
 }
