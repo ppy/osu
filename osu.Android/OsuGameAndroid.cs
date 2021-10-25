@@ -25,20 +25,6 @@ namespace osu.Android
             : base(null)
         {
             gameActivity = activity;
-
-            if (!HasStoragePermission())
-            {
-                Notifications.Post(new SimpleNotification
-                {
-                    Icon = FontAwesome.Solid.EllipsisH,
-                    Text = "To use your own backgrounds and music in Edit mode, the Storage permission is required. This will require a game restart. Tap here to request...",
-                    Activated = () =>
-                    {
-                        RequestStoragePermission();
-                        return false;   //the game hard closes anyway
-                    }
-                });
-            }
         }
 
         public override Version AssemblyVersion
