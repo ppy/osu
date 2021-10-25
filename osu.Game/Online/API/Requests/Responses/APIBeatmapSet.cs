@@ -58,8 +58,8 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"last_updated")]
         public DateTimeOffset? LastUpdated { get; set; }
 
-        [JsonProperty(@"ratings")]
-        private int[] ratings { get; set; } = Array.Empty<int>();
+        [JsonProperty("ratings")]
+        public int[] Ratings { get; set; } = Array.Empty<int>();
 
         [JsonProperty(@"track_id")]
         public int? TrackId { get; set; }
@@ -128,7 +128,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineBeatmapSetID = OnlineID,
                 Metadata = metadata,
                 Status = Status,
-                Metrics = new BeatmapSetMetrics { Ratings = ratings },
                 OnlineInfo = this
             };
 

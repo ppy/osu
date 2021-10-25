@@ -10,7 +10,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIBeatmap : IBeatmapInfo
+    public class APIBeatmap : IBeatmapInfo, IBeatmapOnlineInfo
     {
         [JsonProperty(@"id")]
         public int OnlineID { get; set; }
@@ -69,10 +69,10 @@ namespace osu.Game.Online.API.Requests.Responses
         public string DifficultyName { get; set; } = string.Empty;
 
         [JsonProperty(@"failtimes")]
-        private BeatmapMetrics? metrics { get; set; }
+        public BeatmapMetrics? Metrics { get; set; }
 
         [JsonProperty(@"max_combo")]
-        private int? maxCombo { get; set; }
+        public int? MaxCombo { get; set; }
 
         public virtual BeatmapInfo ToBeatmapInfo(RulesetStore rulesets)
         {
@@ -90,8 +90,8 @@ namespace osu.Game.Online.API.Requests.Responses
                 Status = Status,
                 MD5Hash = Checksum,
                 BeatmapSet = set,
-                Metrics = metrics,
-                MaxCombo = maxCombo,
+                Metrics = Metrics,
+                MaxCombo = MaxCombo,
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = drainRate,
