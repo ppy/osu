@@ -4,17 +4,23 @@
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 
+#nullable enable
+
 namespace osu.Game.Online.API.Requests
 {
     public class GetBeatmapRequest : APIRequest<APIBeatmap>
     {
-        private readonly BeatmapInfo beatmapInfo;
+        private readonly IBeatmapInfo beatmapInfo;
 
-        public GetBeatmapRequest(BeatmapInfo beatmapInfo)
+        private readonly string filename;
+
+        public GetBeatmapRequest(IBeatmapInfo beatmapInfo)
         {
             this.beatmapInfo = beatmapInfo;
+
+            filename = (beatmapInfo as BeatmapInfo)?.Path ?? string.Empty;
         }
 
-        protected override string Target => $@"beatmaps/lookup?id={beatmapInfo.OnlineBeatmapID}&checksum={beatmapInfo.MD5Hash}&filename={System.Uri.EscapeUriString(beatmapInfo.Path ?? string.Empty)}";
+        protected override string Target => $@"beatmaps/lookup?id={beatmapInfo.OnlineID}&checksum={beatmapInfo.MD5Hash}&filename={System.Uri.EscapeUriString(filename)}";
     }
 }
