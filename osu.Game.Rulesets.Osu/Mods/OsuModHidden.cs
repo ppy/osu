@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHidden : ModHidden, IHidesApproachCircles
     {
-        [SettingSource("Don't fade out hit circles", "This makes the hidden mod only remove approach circles, similar to Ouendan 2's Easy difficulties.")]
+        [SettingSource("Only fade approach circles", "The main object body will not fade when enabled.")]
         public Bindable<bool> NoHitCircles { get; } = new BindableBool(false);
 
         public override string Description => @"Play with no approach circles and fading circles/sliders.";
