@@ -117,7 +117,6 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public DateTimeOffset? LastUpdated => OnlineInfo.LastUpdated;
 
-        [NotMapped]
         [JsonIgnore]
         public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
 
