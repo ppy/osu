@@ -28,6 +28,8 @@ namespace osu.Game.Tests.Chat
         [TestCase(LinkAction.OpenBeatmapSet, "123", "https://dev.ppy.sh/beatmapsets/123")]
         [TestCase(LinkAction.OpenBeatmapSet, "123", "https://dev.ppy.sh/beatmapsets/123/whatever")]
         [TestCase(LinkAction.External, "https://dev.ppy.sh/beatmapsets/abc", "https://dev.ppy.sh/beatmapsets/abc")]
+        [TestCase(LinkAction.External, "https://dev.ppy.sh/beatmapsets/discussions", "https://dev.ppy.sh/beatmapsets/discussions")]
+        [TestCase(LinkAction.External, "https://dev.ppy.sh/beatmapsets/discussions/123", "https://dev.ppy.sh/beatmapsets/discussions/123")]
         public void TestBeatmapLinks(LinkAction expectedAction, string expectedArg, string link)
         {
             MessageFormatter.WebsiteRootUrl = "dev.ppy.sh";
@@ -506,6 +508,18 @@ namespace osu.Game.Tests.Chat
 
             Assert.AreEqual(LinkAction.External, result.Action);
             Assert.AreEqual("/relative", result.Argument);
+        }
+
+        [TestCase("https://dev.ppy.sh/home/changelog", "")]
+        [TestCase("https://dev.ppy.sh/home/changelog/lazer/2021.1012", "lazer/2021.1012")]
+        public void TestChangelogLinks(string link, string expectedArg)
+        {
+            MessageFormatter.WebsiteRootUrl = "dev.ppy.sh";
+
+            LinkDetails result = MessageFormatter.GetLinkDetails(link);
+
+            Assert.AreEqual(LinkAction.OpenChangelog, result.Action);
+            Assert.AreEqual(expectedArg, result.Argument);
         }
     }
 }

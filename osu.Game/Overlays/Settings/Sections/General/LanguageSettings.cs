@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
 
@@ -15,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private SettingsDropdown<Language> languageSelection;
         private Bindable<string> frameworkLocale;
 
-        protected override string Header => "Language";
+        protected override LocalisableString Header => GeneralSettingsStrings.LanguageHeader;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
@@ -26,11 +27,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 languageSelection = new SettingsEnumDropdown<Language>
                 {
-                    LabelText = "Language",
+                    LabelText = GeneralSettingsStrings.LanguageDropdown,
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Prefer metadata in original language",
+                    LabelText = GeneralSettingsStrings.PreferOriginalMetadataLanguage,
                     Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
                 },
             };

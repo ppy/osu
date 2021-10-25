@@ -31,32 +31,24 @@ namespace osu.Game.Tests.OnlinePlay
         }
 
         [Test]
-        public void TestMasterClockStartsWhenAllPlayerClocksHaveFrames()
+        public void TestPlayerClocksStartWhenAllHaveFrames()
         {
             setWaiting(() => player1, false);
-            assertMasterState(false);
             assertPlayerClockState(() => player1, false);
             assertPlayerClockState(() => player2, false);
 
             setWaiting(() => player2, false);
-            assertMasterState(true);
             assertPlayerClockState(() => player1, true);
             assertPlayerClockState(() => player2, true);
         }
 
         [Test]
-        public void TestMasterClockDoesNotStartWhenNoneReadyForMaximumDelayTime()
-        {
-            AddWaitStep($"wait {CatchUpSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(CatchUpSyncManager.MAXIMUM_START_DELAY / TimePerAction));
-            assertMasterState(false);
-        }
-
-        [Test]
-        public void TestMasterClockStartsWhenAnyReadyForMaximumDelayTime()
+        public void TestReadyPlayersStartWhenReadyForMaximumDelayTime()
         {
             setWaiting(() => player1, false);
             AddWaitStep($"wait {CatchUpSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(CatchUpSyncManager.MAXIMUM_START_DELAY / TimePerAction));
-            assertMasterState(true);
+            assertPlayerClockState(() => player1, true);
+            assertPlayerClockState(() => player2, false);
         }
 
         [Test]
@@ -153,9 +145,6 @@ namespace osu.Game.Tests.OnlinePlay
         private void setPlayerClockTime(Func<TestSpectatorPlayerClock> playerClock, double offsetFromMaster)
             => AddStep($"set player clock {playerClock().Id} = master - {offsetFromMaster}", () => playerClock().Seek(master.CurrentTime - offsetFromMaster));
 
-        private void assertMasterState(bool running)
-            => AddAssert($"master clock {(running ? "is" : "is not")} running", () => master.IsRunning == running);
-
         private void assertCatchingUp(Func<TestSpectatorPlayerClock> playerClock, bool catchingUp) =>
             AddAssert($"player clock {playerClock().Id} {(catchingUp ? "is" : "is not")} catching up", () => playerClock().IsCatchingUp == catchingUp);
 
@@ -201,6 +190,11 @@ namespace osu.Game.Tests.OnlinePlay
 
         private class TestManualClock : ManualClock, IAdjustableClock
         {
+            public TestManualClock()
+            {
+                IsRunning = true;
+            }
+
             public void Start() => IsRunning = true;
 
             public void Stop() => IsRunning = false;

@@ -3,21 +3,22 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osuTK;
-using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
-using osuTK.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -75,7 +76,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchFilterRow<SearchExplicit> explicitContentFilter;
 
         private readonly Box background;
-        private readonly UpdateableBeatmapSetCover beatmapCover;
+        private readonly UpdateableOnlineBeatmapSetCover beatmapCover;
 
         public BeatmapListingSearchControl()
         {
@@ -117,7 +118,7 @@ namespace osu.Game.Overlays.BeatmapListing
                             textBox = new BeatmapSearchTextBox
                             {
                                 RelativeSizeAxes = Axes.X,
-                                TypingStarted = () => TypingStarted?.Invoke(),
+                                TextChanged = () => TypingStarted?.Invoke(),
                             },
                             new ReverseChildIDFillFlowContainer<Drawable>
                             {
@@ -127,7 +128,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Padding = new MarginPadding { Horizontal = 10 },
                                 Children = new Drawable[]
                                 {
-                                    generalFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>(BeatmapsStrings.ListingSearchFiltersGeneral),
+                                    generalFilter = new BeatmapSearchGeneralFilterRow(),
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
                                     categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(BeatmapsStrings.ListingSearchFiltersStatus),
                                     genreFilter = new BeatmapSearchFilterRow<SearchGenre>(BeatmapsStrings.ListingSearchFiltersGenre),
@@ -167,7 +168,7 @@ namespace osu.Game.Overlays.BeatmapListing
             /// <summary>
             /// Any time the text box receives key events (even while masked).
             /// </summary>
-            public Action TypingStarted;
+            public Action TextChanged;
 
             protected override Color4 SelectionColour => Color4.Gray;
 
@@ -181,12 +182,21 @@ namespace osu.Game.Overlays.BeatmapListing
                 if (!base.OnKeyDown(e))
                     return false;
 
-                TypingStarted?.Invoke();
+                TextChanged?.Invoke();
+                return true;
+            }
+
+            public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                if (!base.OnPressed(e))
+                    return false;
+
+                TextChanged?.Invoke();
                 return true;
             }
         }
 
-        private class TopSearchBeatmapSetCover : UpdateableBeatmapSetCover
+        private class TopSearchBeatmapSetCover : UpdateableOnlineBeatmapSetCover
         {
             protected override bool TransformImmediately => true;
         }

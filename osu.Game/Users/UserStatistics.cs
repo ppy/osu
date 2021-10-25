@@ -3,6 +3,7 @@
 
 using System;
 using Newtonsoft.Json;
+using osu.Framework.Localisation;
 using osu.Game.Scoring;
 using osu.Game.Utils;
 using static osu.Game.Users.User;
@@ -45,7 +46,7 @@ namespace osu.Game.Users
         public double Accuracy;
 
         [JsonIgnore]
-        public string DisplayAccuracy => (Accuracy / 100).FormatAccuracy();
+        public LocalisableString DisplayAccuracy => (Accuracy / 100).FormatAccuracy();
 
         [JsonProperty(@"play_count")]
         public int PlayCount;

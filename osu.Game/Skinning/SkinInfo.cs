@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
@@ -39,14 +38,12 @@ namespace osu.Game.Skinning
 
         public List<SkinFileInfo> Files { get; set; } = new List<SkinFileInfo>();
 
-        public List<DatabasedSetting> Settings { get; set; }
-
         public bool DeletePending { get; set; }
 
         public static SkinInfo Default { get; } = new SkinInfo
         {
             ID = DEFAULT_SKIN,
-            Name = "osu!lazer",
+            Name = "osu! (triangles)",
             Creator = "team osu!",
             InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
         };

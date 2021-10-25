@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -112,7 +113,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollBody),
             _ => new ElongatedCirclePiece());
 
-        public override bool OnPressed(TaikoAction action) => false;
+        public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
 
         private void onNewResult(DrawableHitObject obj, JudgementResult result)
         {
@@ -196,7 +197,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
             }
 
-            public override bool OnPressed(TaikoAction action) => false;
+            public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
         }
     }
 }

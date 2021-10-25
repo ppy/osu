@@ -11,7 +11,7 @@ using osu.Game.Tournament.IPC;
 
 namespace osu.Game.Tournament.Screens
 {
-    public abstract class BeatmapInfoScreen : TournamentScreen
+    public abstract class BeatmapInfoScreen : TournamentMatchScreen
     {
         protected readonly SongBar SongBar;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Tournament.Screens
         private void beatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
         {
             SongBar.FadeInFromZero(300, Easing.OutQuint);
-            SongBar.Beatmap = beatmap.NewValue;
+            SongBar.BeatmapInfo = beatmap.NewValue;
         }
     }
 }

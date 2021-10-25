@@ -22,10 +22,18 @@ namespace osu.Game.Rulesets.Edit
             // Audio
             new CheckAudioPresence(),
             new CheckAudioQuality(),
+            new CheckMutedObjects(),
+            new CheckFewHitsounds(),
+            new CheckTooShortAudioFiles(),
+            new CheckAudioInVideo(),
+
+            // Files
+            new CheckZeroByteFiles(),
 
             // Compose
             new CheckUnsnappedObjects(),
-            new CheckConcurrentObjects()
+            new CheckConcurrentObjects(),
+            new CheckZeroLengthObjects(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
         private const double star_rating_scale_factor = 0.975;
+        private double hitWindowGreat;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -39,12 +40,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = speed.DifficultyValue();
             double starRating = star_rating_scale_factor * (aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2);
 
-            HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            if (mods.Any(h => h is OsuModRelax))
+                speedRating = 0.0;
 
-            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            double hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
-            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
+            double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating / 0.0675) - 4, 3) / 100000;
+            double baseFlashlightPerformance = 0.0;
+
+            if (mods.Any(h => h is OsuModFlashlight))
+                baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
+
+            double basePerformance =
+                Math.Pow(
+                    Math.Pow(baseAimPerformance, 1.1) +
+                    Math.Pow(baseSpeedPerformance, 1.1) +
+                    Math.Pow(baseFlashlightPerformance, 1.1), 1.0 / 1.1
+                );
+
+            double starRating = basePerformance > 0.00001 ? Math.Cbrt(1.12) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
+
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            double drainRate = beatmap.Difficulty.DrainRate;
 
             int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
@@ -52,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             int hitCircleCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int hitSliderCount = beatmap.HitObjects.Count(h => h is Slider);
+            int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
             return new OsuDifficultyAttributes
@@ -62,11 +79,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimMissCounts = aim.MissCounts,
                 SpeedComboBasedDifficulties = speed.ComboStarRatings,
                 SpeedMissCounts = speed.MissCounts,
+                FlashlightRating = flashlightRating,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
+                DrainRate = drainRate,
                 MaxCombo = maxCombo,
                 HitCircleCount = hitCircleCount,
                 HitSliderCount = hitSliderCount,
+                SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
                 Skills = skills
             };
@@ -86,11 +106,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
+            hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
+
+            return new Skill[]
+            {
             new Aim(mods),
-            new Speed(mods)
+                new Speed(mods, hitWindowGreat),
+                new Flashlight(mods)
         };
+        }
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
@@ -98,6 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new OsuModHalfTime(),
             new OsuModEasy(),
             new OsuModHardRock(),
+            new OsuModFlashlight(),
         };
     }
 }

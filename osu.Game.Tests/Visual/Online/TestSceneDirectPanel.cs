@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -31,7 +32,7 @@ namespace osu.Game.Tests.Visual.Online
                     Id = 3,
                 },
             },
-            OnlineInfo = new BeatmapSetOnlineInfo
+            OnlineInfo = new APIBeatmapSet
             {
                 Availability = new BeatmapSetOnlineAvailability
                 {
@@ -86,7 +87,7 @@ namespace osu.Game.Tests.Visual.Online
                         Id = 3,
                     }
                 },
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     HasVideo = true,
                     HasStoryboard = true,
@@ -99,15 +100,22 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            var normal = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+            var normal = getBeatmapSet();
             normal.OnlineInfo.HasVideo = true;
             normal.OnlineInfo.HasStoryboard = true;
 
             var undownloadable = getUndownloadableBeatmapSet();
             var manyDifficulties = getManyDifficultiesBeatmapSet(rulesets);
 
-            var explicitMap = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+            var explicitMap = getBeatmapSet();
             explicitMap.OnlineInfo.HasExplicitContent = true;
+
+            var featuredMap = getBeatmapSet();
+            featuredMap.OnlineInfo.TrackId = 1;
+
+            var explicitFeaturedMap = getBeatmapSet();
+            explicitFeaturedMap.OnlineInfo.HasExplicitContent = true;
+            explicitFeaturedMap.OnlineInfo.TrackId = 2;
 
             Child = new BasicScrollContainer
             {
@@ -125,13 +133,19 @@ namespace osu.Game.Tests.Visual.Online
                         new GridBeatmapPanel(undownloadable),
                         new GridBeatmapPanel(manyDifficulties),
                         new GridBeatmapPanel(explicitMap),
+                        new GridBeatmapPanel(featuredMap),
+                        new GridBeatmapPanel(explicitFeaturedMap),
                         new ListBeatmapPanel(normal),
                         new ListBeatmapPanel(undownloadable),
                         new ListBeatmapPanel(manyDifficulties),
-                        new ListBeatmapPanel(explicitMap)
+                        new ListBeatmapPanel(explicitMap),
+                        new ListBeatmapPanel(featuredMap),
+                        new ListBeatmapPanel(explicitFeaturedMap)
                     },
                 },
             };
+
+            BeatmapSetInfo getBeatmapSet() => CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
         }
     }
 }

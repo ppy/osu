@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Extensions;
-using osu.Game.IO.Serialization;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -18,7 +17,7 @@ namespace osu.Game.Screens.Play.HUD
     /// Serialised information governing custom changes to an <see cref="ISkinnableDrawable"/>.
     /// </summary>
     [Serializable]
-    public class SkinnableInfo : IJsonSerializable
+    public class SkinnableInfo
     {
         public Type Type { get; set; }
 
@@ -31,6 +30,9 @@ namespace osu.Game.Screens.Play.HUD
         public Anchor Anchor { get; set; }
 
         public Anchor Origin { get; set; }
+
+        /// <inheritdoc cref="ISkinnableDrawable.UsesFixedAnchor"/>
+        public bool UsesFixedAnchor { get; set; }
 
         public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
 
@@ -52,6 +54,9 @@ namespace osu.Game.Screens.Play.HUD
             Scale = component.Scale;
             Anchor = component.Anchor;
             Origin = component.Origin;
+
+            if (component is ISkinnableDrawable skinnable)
+                UsesFixedAnchor = skinnable.UsesFixedAnchor;
 
             if (component is Container<Drawable> container)
             {

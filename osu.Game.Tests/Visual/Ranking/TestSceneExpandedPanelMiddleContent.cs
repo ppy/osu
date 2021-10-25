@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
@@ -34,7 +35,18 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
-                Beatmap = createTestBeatmap(author)
+                BeatmapInfo = createTestBeatmap(author)
+            }));
+        }
+
+        [Test]
+        public void TestExcessMods()
+        {
+            var author = new User { Username = "mapper_name" };
+
+            AddStep("show excess mods score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo, true)
+            {
+                BeatmapInfo = createTestBeatmap(author)
             }));
 
             AddAssert("mapper name present", () => this.ChildrenOfType<OsuSpriteText>().Any(spriteText => spriteText.Current.Value == "mapper_name"));
@@ -45,14 +57,38 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
-                Beatmap = createTestBeatmap(null)
+                BeatmapInfo = createTestBeatmap(null)
             }));
 
             AddAssert("mapped by text not present", () =>
                 this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text.ToString(), "mapped", "by")));
+
+            AddAssert("play time displayed", () => this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
         }
 
-        private void showPanel(ScoreInfo score) => Child = new ExpandedPanelMiddleContentContainer(score);
+        [Test]
+        public void TestWithDefaultDate()
+        {
+            AddStep("show autoplay score", () =>
+            {
+                var ruleset = new OsuRuleset();
+
+                var mods = new Mod[] { ruleset.GetAutoplayMod() };
+                var beatmap = createTestBeatmap(null);
+
+                showPanel(new TestScoreInfo(ruleset.RulesetInfo)
+                {
+                    Mods = mods,
+                    BeatmapInfo = beatmap,
+                    Date = default,
+                });
+            });
+
+            AddAssert("play time not displayed", () => !this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
+        }
+
+        private void showPanel(ScoreInfo score) =>
+            Child = new ExpandedPanelMiddleContentContainer(score);
 
         private BeatmapInfo createTestBeatmap(User author)
         {

@@ -2,14 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Runtime.CompilerServices;
-using osu.Framework.Platform;
+using osu.Framework.Testing;
 
 namespace osu.Game.Tests
 {
     /// <summary>
     /// A headless host which cleans up before running (removing any remnants from a previous execution).
     /// </summary>
-    public class CleanRunHeadlessGameHost : HeadlessGameHost
+    public class CleanRunHeadlessGameHost : TestRunHeadlessGameHost
     {
         /// <summary>
         /// Create a new instance.
@@ -25,8 +25,11 @@ namespace osu.Game.Tests
 
         protected override void SetupForRun()
         {
-            base.SetupForRun();
             Storage.DeleteDirectory(string.Empty);
+
+            // base call needs to be run *after* storage is emptied, as it updates the (static) logger's storage and may start writing
+            // log entries from another source if a unit test host is shared over multiple tests, causing a file access denied exception.
+            base.SetupForRun();
         }
     }
 }

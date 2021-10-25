@@ -6,10 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using NUnit.Framework;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.IO;
 
@@ -142,7 +142,10 @@ namespace osu.Game.Tests.NonVisual
 
                     foreach (var file in osuStorage.IgnoreFiles)
                     {
-                        Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
+                        // avoid touching realm files which may be a pipe and break everything.
+                        // this is also done locally inside OsuStorage via the IgnoreFiles list.
+                        if (file.EndsWith(".ini", StringComparison.Ordinal))
+                            Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
                         Assert.That(storage.Exists(file), Is.False);
                     }
 
@@ -180,6 +183,9 @@ namespace osu.Game.Tests.NonVisual
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath2));
                     Assert.That(File.Exists(Path.Combine(customPath2, database_filename)));
+
+                    // some files may have been left behind for whatever reason, but that's not what we're testing here.
+                    customPath = prepareCustomPath();
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
                     Assert.That(File.Exists(Path.Combine(customPath, database_filename)));
@@ -272,7 +278,7 @@ namespace osu.Game.Tests.NonVisual
 
         private static string getDefaultLocationFor(string testTypeName)
         {
-            string path = Path.Combine(RuntimeInfo.StartupDirectory, "headless", testTypeName);
+            string path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, testTypeName);
 
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
@@ -282,7 +288,7 @@ namespace osu.Game.Tests.NonVisual
 
         private string prepareCustomPath(string suffix = "")
         {
-            string path = Path.Combine(RuntimeInfo.StartupDirectory, $"custom-path{suffix}");
+            string path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, $"custom-path{suffix}");
 
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
@@ -301,6 +307,19 @@ namespace osu.Game.Tests.NonVisual
 
                 InitialStorage = new DesktopStorage(defaultStorageLocation, this);
                 InitialStorage.DeleteDirectory(string.Empty);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                try
+                {
+                    // the storage may have changed from the initial location.
+                    // this handles cleanup of the initial location.
+                    InitialStorage.DeleteDirectory(string.Empty);
+                }
+                catch { }
             }
         }
     }

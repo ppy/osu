@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using osu.Framework.Extensions;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
@@ -19,7 +19,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>
+    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>, IDeepCloneable<ScoreInfo>
     {
         public int ID { get; set; }
 
@@ -35,7 +35,7 @@ namespace osu.Game.Scoring
         public double Accuracy { get; set; }
 
         [JsonIgnore]
-        public string DisplayAccuracy => Accuracy.FormatAccuracy();
+        public LocalisableString DisplayAccuracy => Accuracy.FormatAccuracy();
 
         [JsonProperty(@"pp")]
         public double? PP { get; set; }
@@ -46,7 +46,7 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public int Combo { get; set; } // Todo: Shouldn't exist in here
 
-        [JsonIgnore]
+        [JsonProperty("ruleset_id")]
         public int RulesetID { get; set; }
 
         [JsonProperty("passed")]
@@ -150,7 +150,8 @@ namespace osu.Game.Scoring
         public int BeatmapInfoID { get; set; }
 
         [JsonIgnore]
-        public virtual BeatmapInfo Beatmap { get; set; }
+        [Column("Beatmap")]
+        public virtual BeatmapInfo BeatmapInfo { get; set; }
 
         [JsonIgnore]
         public long? OnlineScoreID { get; set; }
@@ -209,13 +210,13 @@ namespace osu.Game.Scoring
         {
             foreach (var r in Ruleset.CreateInstance().GetHitResults())
             {
-                int value = Statistics.GetOrDefault(r.result);
+                int value = Statistics.GetValueOrDefault(r.result);
 
                 switch (r.result)
                 {
                     case HitResult.SmallTickHit:
                     {
-                        int total = value + Statistics.GetOrDefault(HitResult.SmallTickMiss);
+                        int total = value + Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
                         if (total > 0)
                             yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
 
@@ -224,7 +225,7 @@ namespace osu.Game.Scoring
 
                     case HitResult.LargeTickHit:
                     {
-                        int total = value + Statistics.GetOrDefault(HitResult.LargeTickMiss);
+                        int total = value + Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
                         if (total > 0)
                             yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
 
@@ -243,7 +244,16 @@ namespace osu.Game.Scoring
             }
         }
 
-        public override string ToString() => $"{User} playing {Beatmap}";
+        public ScoreInfo DeepClone()
+        {
+            var clone = (ScoreInfo)MemberwiseClone();
+
+            clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
+
+            return clone;
+        }
+
+        public override string ToString() => $"{User} playing {BeatmapInfo}";
 
         public bool Equals(ScoreInfo other)
         {

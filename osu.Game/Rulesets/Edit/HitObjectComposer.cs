@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -63,9 +63,11 @@ namespace osu.Game.Rulesets.Edit
 
         private InputManager inputManager;
 
-        private RadioButtonCollection toolboxCollection;
+        private EditorRadioButtonCollection toolboxCollection;
 
         private FillFlowContainer togglesCollection;
+
+        private IBindable<bool> hasTiming;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -126,7 +128,7 @@ namespace osu.Game.Rulesets.Edit
                     {
                         new ToolboxGroup("toolbox (1-9)")
                         {
-                            Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X }
+                            Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
                         },
                         new ToolboxGroup("toggles (Q~P)")
                         {
@@ -160,6 +162,14 @@ namespace osu.Game.Rulesets.Edit
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+
+            hasTiming = EditorBeatmap.HasTiming.GetBoundCopy();
+            hasTiming.BindValueChanged(timing =>
+            {
+                // it's important this is performed before the similar code in EditorRadioButton disables the button.
+                if (!timing.NewValue)
+                    setSelectTool();
+            });
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
@@ -219,7 +229,8 @@ namespace osu.Game.Rulesets.Edit
 
                 if (item != null)
                 {
-                    item.Select();
+                    if (!item.Selected.Disabled)
+                        item.Select();
                     return true;
                 }
             }
@@ -377,41 +388,42 @@ namespace osu.Game.Rulesets.Edit
             return new SnapResult(screenSpacePosition, targetTime, playfield);
         }
 
-        public override float GetBeatSnapDistanceAt(double referenceTime)
+        public override float GetBeatSnapDistanceAt(HitObject referenceObject)
         {
-            DifficultyControlPoint difficultyPoint = EditorBeatmap.ControlPointInfo.DifficultyPointAt(referenceTime);
-            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / BeatSnapProvider.BeatDivisor);
+            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * referenceObject.DifficultyControlPoint.SliderVelocity / BeatSnapProvider.BeatDivisor);
         }
 
-        public override float DurationToDistance(double referenceTime, double duration)
+        public override float DurationToDistance(HitObject referenceObject, double duration)
         {
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
-            return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceTime));
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
+            return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceObject));
         }
 
-        public override double DistanceToDuration(double referenceTime, float distance)
+        public override double DistanceToDuration(HitObject referenceObject, float distance)
         {
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
-            return distance / GetBeatSnapDistanceAt(referenceTime) * beatLength;
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
+            return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
         }
 
-        public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
-            => BeatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
+        public override double GetSnappedDurationFromDistance(HitObject referenceObject, float distance)
+            => BeatSnapProvider.SnapTime(referenceObject.StartTime + DistanceToDuration(referenceObject, distance), referenceObject.StartTime) - referenceObject.StartTime;
 
-        public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
+        public override float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance)
         {
-            double actualDuration = referenceTime + DistanceToDuration(referenceTime, distance);
+            double startTime = referenceObject.StartTime;
 
-            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, referenceTime);
+            double actualDuration = startTime + DistanceToDuration(referenceObject, distance);
 
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, startTime);
+
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(startTime);
 
             // we don't want to exceed the actual duration and snap to a point in the future.
             // as we are snapping to beat length via SnapTime (which will round-to-nearest), check for snapping in the forward direction and reverse it.
             if (snappedEndTime > actualDuration + 1)
                 snappedEndTime -= beatLength;
 
-            return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
+            return DurationToDistance(referenceObject, snappedEndTime - startTime);
         }
 
         #endregion
@@ -454,15 +466,15 @@ namespace osu.Game.Rulesets.Edit
         public virtual SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
             new SnapResult(screenSpacePosition, null);
 
-        public abstract float GetBeatSnapDistanceAt(double referenceTime);
+        public abstract float GetBeatSnapDistanceAt(HitObject referenceObject);
 
-        public abstract float DurationToDistance(double referenceTime, double duration);
+        public abstract float DurationToDistance(HitObject referenceObject, double duration);
 
-        public abstract double DistanceToDuration(double referenceTime, float distance);
+        public abstract double DistanceToDuration(HitObject referenceObject, float distance);
 
-        public abstract double GetSnappedDurationFromDistance(double referenceTime, float distance);
+        public abstract double GetSnappedDurationFromDistance(HitObject referenceObject, float distance);
 
-        public abstract float GetSnappedDistanceFromDistance(double referenceTime, float distance);
+        public abstract float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance);
 
         #endregion
     }

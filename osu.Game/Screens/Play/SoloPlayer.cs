@@ -6,18 +6,29 @@ using System.Diagnostics;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
+using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
 {
     public class SoloPlayer : SubmittingPlayer
     {
+        public SoloPlayer()
+            : this(null)
+        {
+        }
+
+        protected SoloPlayer(PlayerConfiguration configuration = null)
+            : base(configuration)
+        {
+        }
+
         protected override APIRequest<APIScoreToken> CreateTokenRequest()
         {
             if (!(Beatmap.Value.BeatmapInfo.OnlineBeatmapID is int beatmapId))
                 return null;
 
-            if (!(Ruleset.Value.ID is int rulesetId))
+            if (!(Ruleset.Value.ID is int rulesetId) || Ruleset.Value.ID > ILegacyRuleset.MAX_LEGACY_RULESET_ID)
                 return null;
 
             return new CreateSoloScoreRequest(beatmapId, rulesetId, Game.VersionHash);
@@ -27,9 +38,11 @@ namespace osu.Game.Screens.Play
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
         {
-            Debug.Assert(Beatmap.Value.BeatmapInfo.OnlineBeatmapID != null);
+            var beatmap = score.ScoreInfo.BeatmapInfo;
 
-            int beatmapId = Beatmap.Value.BeatmapInfo.OnlineBeatmapID.Value;
+            Debug.Assert(beatmap.OnlineBeatmapID != null);
+
+            int beatmapId = beatmap.OnlineBeatmapID.Value;
 
             return new SubmitSoloScoreRequest(beatmapId, token, score.ScoreInfo);
         }

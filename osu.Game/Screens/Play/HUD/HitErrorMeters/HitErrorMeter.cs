@@ -22,6 +22,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [Resolved]
         private OsuColour colours { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private GameplayClockContainer gameplayClockContainer { get; set; }
+
+        public bool UsesFixedAnchor { get; set; }
+
         [BackgroundDependencyLoader(true)]
         private void load(DrawableRuleset drawableRuleset)
         {
@@ -31,6 +36,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (gameplayClockContainer != null)
+                gameplayClockContainer.OnSeek += Clear;
 
             processor.NewJudgement += OnNewJudgement;
         }
@@ -65,12 +73,21 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
+        /// <summary>
+        /// Invoked by <see cref="GameplayClockContainer.OnSeek"/>.
+        /// Any inheritors of <see cref="HitErrorMeter"/> should have this method clear their container that displays the hit error results.
+        /// </summary>
+        public abstract void Clear();
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
             if (processor != null)
                 processor.NewJudgement -= OnNewJudgement;
+
+            if (gameplayClockContainer != null)
+                gameplayClockContainer.OnSeek -= Clear;
         }
     }
 }

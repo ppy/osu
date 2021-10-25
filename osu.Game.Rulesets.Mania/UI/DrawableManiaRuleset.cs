@@ -33,12 +33,12 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// The minimum time range. This occurs at a <see cref="relativeTimeRange"/> of 40.
         /// </summary>
-        public const double MIN_TIME_RANGE = 340;
+        public const double MIN_TIME_RANGE = 290;
 
         /// <summary>
         /// The maximum time range. This occurs at a <see cref="relativeTimeRange"/> of 1.
         /// </summary>
-        public const double MAX_TIME_RANGE = 13720;
+        public const double MAX_TIME_RANGE = 11485;
 
         protected new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override ScrollVisualisationMethod VisualisationMethod => scrollMethod;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
-        private readonly Bindable<double> configTimeRange = new BindableDouble();
+        private readonly BindableDouble configTimeRange = new BindableDouble();
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
@@ -90,11 +90,11 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 // Mania doesn't care about global velocity
                 p.Velocity = 1;
-                p.BaseBeatLength *= Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
+                p.BaseBeatLength *= Beatmap.Difficulty.SliderMultiplier;
 
                 // For non-mania beatmap, speed changes should only happen through timing points
                 if (!isForCurrentRuleset)
-                    p.DifficultyPoint = new DifficultyControlPoint();
+                    p.EffectPoint = new EffectControlPoint();
             }
 
             BarLines.ForEach(Playfield.Add);
@@ -103,6 +103,8 @@ namespace osu.Game.Rulesets.Mania.UI
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
             Config.BindWith(ManiaRulesetSetting.ScrollTime, configTimeRange);
+            TimeRange.MinValue = configTimeRange.MinValue;
+            TimeRange.MaxValue = configTimeRange.MaxValue;
         }
 
         protected override void AdjustScrollSpeed(int amount)

@@ -15,6 +15,10 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -46,6 +50,7 @@ namespace osu.Game.Overlays.Rankings
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             InternalChildren = new Drawable[]
             {
                 background = new Box
@@ -90,10 +95,10 @@ namespace osu.Game.Overlays.Rankings
                                         Margin = new MarginPadding { Bottom = 5 },
                                         Children = new Drawable[]
                                         {
-                                            startDateColumn = new InfoColumn(@"Start Date"),
-                                            endDateColumn = new InfoColumn(@"End Date"),
-                                            mapCountColumn = new InfoColumn(@"Map Count"),
-                                            participantsColumn = new InfoColumn(@"Participants")
+                                            startDateColumn = new InfoColumn(RankingsStrings.SpotlightStartDate),
+                                            endDateColumn = new InfoColumn(RankingsStrings.SpotlightEndDate),
+                                            mapCountColumn = new InfoColumn(RankingsStrings.SpotlightMapCount),
+                                            participantsColumn = new InfoColumn(RankingsStrings.SpotlightParticipants)
                                         }
                                     },
                                     new RankingsSortTabControl
@@ -120,26 +125,26 @@ namespace osu.Game.Overlays.Rankings
         {
             startDateColumn.Value = dateToString(response.Spotlight.StartDate);
             endDateColumn.Value = dateToString(response.Spotlight.EndDate);
-            mapCountColumn.Value = response.BeatmapSets.Count.ToString();
-            participantsColumn.Value = response.Spotlight.Participants?.ToString("N0");
+            mapCountColumn.Value = response.BeatmapSets.Count.ToLocalisableString(@"N0");
+            participantsColumn.Value = response.Spotlight.Participants?.ToLocalisableString(@"N0");
         }
 
-        private string dateToString(DateTimeOffset date) => date.ToString("yyyy-MM-dd");
+        private LocalisableString dateToString(DateTimeOffset date) => date.ToLocalisableString(@"yyyy-MM-dd");
 
         private class InfoColumn : FillFlowContainer
         {
-            public string Value
+            public LocalisableString Value
             {
                 set => valueText.Text = value;
             }
 
             private readonly OsuSpriteText valueText;
 
-            public InfoColumn(string name)
+            public InfoColumn(LocalisableString name)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Vertical;
-                Margin = new MarginPadding { Vertical = 10 };
+                Padding = new MarginPadding { Vertical = 15 };
                 Children = new Drawable[]
                 {
                     new OsuSpriteText
@@ -150,11 +155,11 @@ namespace osu.Game.Overlays.Rankings
                     new Container
                     {
                         AutoSizeAxes = Axes.X,
-                        Height = 20,
+                        Height = 25,
                         Child = valueText = new OsuSpriteText
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
                         }
                     }
@@ -170,15 +175,39 @@ namespace osu.Game.Overlays.Rankings
 
         private class SpotlightsDropdown : OsuDropdown<APISpotlight>
         {
-            private DropdownMenu menu;
+            private OsuDropdownMenu menu;
 
-            protected override DropdownMenu CreateMenu() => menu = base.CreateMenu().With(m => m.MaxHeight = 400);
+            protected override DropdownMenu CreateMenu() => menu = (OsuDropdownMenu)base.CreateMenu().With(m => m.MaxHeight = 400);
+
+            protected override DropdownHeader CreateHeader() => new SpotlightsDropdownHeader();
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
                 menu.BackgroundColour = colourProvider.Background5;
-                AccentColour = colourProvider.Background6;
+                menu.HoverColour = colourProvider.Background4;
+                menu.SelectionColour = colourProvider.Background3;
+                Padding = new MarginPadding { Vertical = 20 };
+            }
+
+            private class SpotlightsDropdownHeader : OsuDropdownHeader
+            {
+                public SpotlightsDropdownHeader()
+                {
+                    AutoSizeAxes = Axes.Y;
+                    Text.Font = OsuFont.GetFont(size: 15);
+                    Text.Padding = new MarginPadding { Vertical = 1.5f }; // osu-web line-height difference compensation
+                    Foreground.Padding = new MarginPadding { Horizontal = 10, Vertical = 15 };
+                    Margin = Icon.Margin = new MarginPadding(0);
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    BackgroundColour = colourProvider.Background6.Opacity(0.5f);
+                    // osu-web adds a 0.6 opacity container on top of the 0.5 base one when hovering, 0.8 on a single container here matches the resulting colour
+                    BackgroundColourHover = colourProvider.Background6.Opacity(0.8f);
+                }
             }
         }
     }

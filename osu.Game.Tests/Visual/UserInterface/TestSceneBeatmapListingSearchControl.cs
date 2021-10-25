@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osuTK;
@@ -73,7 +75,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
 
             control.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
-            control.General.BindCollectionChanged((u, v) => general.Text = $"General: {(control.General.Any() ? string.Join('.', control.General.Select(i => i.ToString().ToLowerInvariant())) : "")}", true);
+            control.General.BindCollectionChanged((u, v) => general.Text = $"General: {(control.General.Any() ? string.Join('.', control.General.Select(i => i.ToString().Underscore())) : "")}", true);
             control.Ruleset.BindValueChanged(r => ruleset.Text = $"Ruleset: {r.NewValue}", true);
             control.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
             control.Genre.BindValueChanged(g => genre.Text = $"Genre: {g.NewValue}", true);
@@ -110,7 +112,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private static readonly BeatmapSetInfo beatmap_set = new BeatmapSetInfo
         {
-            OnlineInfo = new BeatmapSetOnlineInfo
+            OnlineInfo = new APIBeatmapSet
             {
                 Covers = new BeatmapSetOnlineCovers
                 {
@@ -121,7 +123,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private static readonly BeatmapSetInfo no_cover_beatmap_set = new BeatmapSetInfo
         {
-            OnlineInfo = new BeatmapSetOnlineInfo
+            OnlineInfo = new APIBeatmapSet
             {
                 Covers = new BeatmapSetOnlineCovers
                 {

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,7 +13,9 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Edit;
@@ -38,7 +39,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly Bindable<double> startTime;
 
         private Bindable<int> indexInCurrentComboBindable;
+
         private Bindable<int> comboIndexBindable;
+        private Bindable<int> comboIndexWithOffsetsBindable;
+
         private Bindable<Color4> displayColourBindable;
 
         private readonly ExtendableCircle circle;
@@ -121,7 +125,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     indexInCurrentComboBindable.BindValueChanged(_ => updateComboIndex(), true);
 
                     comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
-                    comboIndexBindable.BindValueChanged(_ => updateColour(), true);
+                    comboIndexWithOffsetsBindable = comboInfo.ComboIndexWithOffsetsBindable.GetBoundCopy();
+
+                    comboIndexBindable.BindValueChanged(_ => updateColour());
+                    comboIndexWithOffsetsBindable.BindValueChanged(_ => updateColour(), true);
 
                     skin.SourceChanged += updateColour;
                     break;
@@ -153,25 +160,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     break;
 
                 case IHasComboInformation combo:
-                {
-                    var comboColours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
-                    colour = combo.GetComboColour(comboColours);
+                    colour = combo.GetComboColour(skin);
                     break;
-                }
 
                 default:
                     return;
             }
 
             if (IsSelected)
-            {
                 border.Show();
-                colour = colour.Lighten(0.3f);
-            }
             else
-            {
                 border.Hide();
-            }
 
             if (Item is IHasDuration duration && duration.Duration > 0)
                 circle.Colour = ColourInfo.GradientHorizontal(colour, colour.Lighten(0.4f));
@@ -181,6 +180,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             var col = circle.Colour.TopLeft.Linear;
             colouredComponents.Colour = OsuColour.ForegroundTextColourFor(col);
         }
+
+        private SamplePointPiece sampleOverrideDisplay;
+        private DifficultyPointPiece difficultyOverrideDisplay;
+
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; }
+
+        private DifficultyControlPoint difficultyControlPoint;
+        private SampleControlPoint sampleControlPoint;
 
         protected override void Update()
         {
@@ -197,6 +205,36 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (Item is IHasRepeats repeats)
                     updateRepeats(repeats);
             }
+
+            if (difficultyControlPoint != Item.DifficultyControlPoint)
+            {
+                difficultyControlPoint = Item.DifficultyControlPoint;
+                difficultyOverrideDisplay?.Expire();
+
+                if (Item.DifficultyControlPoint != null && Item is IHasDistance)
+                {
+                    AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(Item)
+                    {
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.BottomCentre
+                    });
+                }
+            }
+
+            if (sampleControlPoint != Item.SampleControlPoint)
+            {
+                sampleControlPoint = Item.SampleControlPoint;
+                sampleOverrideDisplay?.Expire();
+
+                if (Item.SampleControlPoint != null)
+                {
+                    AddInternal(sampleOverrideDisplay = new SamplePointPiece(Item)
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.TopCentre
+                    });
+                }
+            }
         }
 
         private void updateRepeats(IHasRepeats repeats)
@@ -210,14 +248,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             for (int i = 0; i < repeats.RepeatCount; i++)
             {
-                repeatsContainer.Add(new Circle
+                repeatsContainer.Add(new Tick
                 {
-                    Size = new Vector2(circle_size / 3),
-                    Alpha = 0.2f,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = (float)(i + 1) / (repeats.RepeatCount + 1),
+                    X = (float)(i + 1) / (repeats.RepeatCount + 1)
                 });
             }
         }
@@ -230,6 +263,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public override Quad SelectionQuad => circle.ScreenSpaceDrawQuad;
 
         public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
+
+        private class Tick : Circle
+        {
+            public Tick()
+            {
+                Size = new Vector2(circle_size / 4);
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.Centre;
+                RelativePositionAxes = Axes.X;
+            }
+        }
 
         public class DragArea : Circle
         {
@@ -302,20 +346,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private void updateState()
             {
-                if (hasMouseDown)
-                {
-                    this.ScaleTo(0.7f, 200, Easing.OutQuint);
-                }
-                else if (IsHovered)
-                {
-                    this.ScaleTo(0.8f, 200, Easing.OutQuint);
-                }
-                else
-                {
-                    this.ScaleTo(0.6f, 200, Easing.OutQuint);
-                }
+                float scale = 0.5f;
 
-                this.FadeTo(IsHovered || hasMouseDown ? 0.8f : 0.2f, 200, Easing.OutQuint);
+                if (hasMouseDown)
+                    scale = 0.6f;
+                else if (IsHovered)
+                    scale = 0.7f;
+
+                this.ScaleTo(scale, 200, Easing.OutQuint);
+                this.FadeTo(IsHovered || hasMouseDown ? 1f : 0.9f, 200, Easing.OutQuint);
             }
 
             [Resolved]
@@ -333,39 +372,66 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 return true;
             }
 
+            private ScheduledDelegate dragOperation;
+
             protected override void OnDrag(DragEvent e)
             {
                 base.OnDrag(e);
 
-                OnDragHandled?.Invoke(e);
-
-                if (timeline.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition).Time is double time)
+                // schedule is temporary to ensure we don't process multiple times on a single update frame. we need to find a better method of doing this.
+                // without it, a hitobject's endtime may not always be in a valid state (ie. sliders, which needs to recompute their path).
+                dragOperation?.Cancel();
+                dragOperation = Scheduler.Add(() =>
                 {
-                    switch (hitObject)
+                    OnDragHandled?.Invoke(e);
+
+                    if (timeline.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition).Time is double time)
                     {
-                        case IHasRepeats repeatHitObject:
-                            // find the number of repeats which can fit in the requested time.
-                            var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
-                            var proposedCount = Math.Max(0, (int)Math.Round((time - hitObject.StartTime) / lengthOfOneRepeat) - 1);
+                        switch (hitObject)
+                        {
+                            case IHasRepeats repeatHitObject:
+                                double proposedDuration = time - hitObject.StartTime;
 
-                            if (proposedCount == repeatHitObject.RepeatCount)
-                                return;
+                                if (e.CurrentState.Keyboard.ShiftPressed)
+                                {
+                                    if (hitObject.DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                                        hitObject.DifficultyControlPoint = new DifficultyControlPoint();
 
-                            repeatHitObject.RepeatCount = proposedCount;
-                            beatmap.Update(hitObject);
-                            break;
+                                    var newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
 
-                        case IHasDuration endTimeHitObject:
-                            var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
+                                    if (Precision.AlmostEquals(newVelocity, hitObject.DifficultyControlPoint.SliderVelocity))
+                                        return;
 
-                            if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
-                                return;
+                                    hitObject.DifficultyControlPoint.SliderVelocity = newVelocity;
+                                    beatmap.Update(hitObject);
+                                }
+                                else
+                                {
+                                    // find the number of repeats which can fit in the requested time.
+                                    var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
+                                    var proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
 
-                            endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
-                            beatmap.Update(hitObject);
-                            break;
+                                    if (proposedCount == repeatHitObject.RepeatCount)
+                                        return;
+
+                                    repeatHitObject.RepeatCount = proposedCount;
+                                    beatmap.Update(hitObject);
+                                }
+
+                                break;
+
+                            case IHasDuration endTimeHitObject:
+                                var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
+
+                                if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
+                                    return;
+
+                                endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
+                                beatmap.Update(hitObject);
+                                break;
+                        }
                     }
-                }
+                });
             }
 
             protected override void OnDragEnd(DragEndEvent e)

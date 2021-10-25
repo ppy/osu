@@ -5,18 +5,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Timing;
+using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -24,37 +25,125 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneBeatSyncedContainer : OsuTestScene
     {
-        private readonly NowPlayingOverlay np;
+        private TestBeatSyncedContainer beatContainer;
 
-        public TestSceneBeatSyncedContainer()
+        private MasterGameplayClockContainer gameplayClockContainer;
+
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            Clock = new FramedClock();
-            Clock.ProcessFrame();
-
-            AddRange(new Drawable[]
+            AddStep("Set beatmap", () =>
             {
-                new BeatContainer
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                },
-                np = new NowPlayingOverlay
-                {
-                    Origin = Anchor.TopRight,
-                    Anchor = Anchor.TopRight,
-                }
+                Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
             });
+
+            AddStep("Create beat sync container", () =>
+            {
+                Children = new Drawable[]
+                {
+                    gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
+                    {
+                        Child = beatContainer = new TestBeatSyncedContainer
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                        },
+                    }
+                };
+            });
+
+            AddStep("Start playback", () => gameplayClockContainer.Start());
         }
 
-        protected override void LoadComplete()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestDisallowMistimedEventFiring(bool allowMistimed)
         {
-            base.LoadComplete();
-            np.ToggleVisibility();
+            int? lastBeatIndex = null;
+            double? lastActuationTime = null;
+            TimingControlPoint lastTimingPoint = null;
+
+            AddStep($"set mistimed to {(allowMistimed ? "allowed" : "disallowed")}", () => beatContainer.AllowMistimedEventFiring = allowMistimed);
+
+            AddStep("Set time before zero", () =>
+            {
+                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                {
+                    lastActuationTime = gameplayClockContainer.CurrentTime;
+                    lastTimingPoint = timingControlPoint;
+                    lastBeatIndex = i;
+                    beatContainer.NewBeat = null;
+                };
+
+                gameplayClockContainer.Seek(-1000);
+            });
+
+            AddUntilStep("wait for trigger", () => lastBeatIndex != null);
+
+            if (!allowMistimed)
+            {
+                AddAssert("trigger is near beat length", () => lastActuationTime != null && lastBeatIndex != null && Precision.AlmostEquals(lastTimingPoint.Time + lastBeatIndex.Value * lastTimingPoint.BeatLength, lastActuationTime.Value, BeatSyncedContainer.MISTIMED_ALLOWANCE));
+            }
+            else
+            {
+                AddAssert("trigger is not near beat length", () => lastActuationTime != null && lastBeatIndex != null && !Precision.AlmostEquals(lastTimingPoint.Time + lastBeatIndex.Value * lastTimingPoint.BeatLength, lastActuationTime.Value, BeatSyncedContainer.MISTIMED_ALLOWANCE));
+            }
         }
 
-        private class BeatContainer : BeatSyncedContainer
+        [Test]
+        public void TestNegativeBeatsStillUsingBeatmapTiming()
         {
-            private const int flash_layer_heigth = 150;
+            int? lastBeatIndex = null;
+            double? lastBpm = null;
+
+            AddStep("Set time before zero", () =>
+            {
+                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                {
+                    lastBeatIndex = i;
+                    lastBpm = timingControlPoint.BPM;
+                };
+
+                gameplayClockContainer.Seek(-1000);
+            });
+
+            AddUntilStep("wait for trigger", () => lastBpm != null);
+            AddAssert("bpm is from beatmap", () => lastBpm != null && Precision.AlmostEquals(lastBpm.Value, 128));
+            AddAssert("beat index is less than zero", () => lastBeatIndex < 0);
+        }
+
+        [Test]
+        public void TestIdleBeatOnPausedClock()
+        {
+            double? lastBpm = null;
+
+            AddStep("bind event", () =>
+            {
+                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) => lastBpm = timingControlPoint.BPM;
+            });
+
+            AddUntilStep("wait for trigger", () => lastBpm != null);
+            AddAssert("bpm is from beatmap", () => lastBpm != null && Precision.AlmostEquals(lastBpm.Value, 128));
+
+            AddStep("pause gameplay clock", () =>
+            {
+                lastBpm = null;
+                gameplayClockContainer.Stop();
+            });
+
+            AddUntilStep("wait for trigger", () => lastBpm != null);
+            AddAssert("bpm is default", () => lastBpm != null && Precision.AlmostEquals(lastBpm.Value, 60));
+        }
+
+        private class TestBeatSyncedContainer : BeatSyncedContainer
+        {
+            private const int flash_layer_height = 150;
+
+            public new bool AllowMistimedEventFiring
+            {
+                get => base.AllowMistimedEventFiring;
+                set => base.AllowMistimedEventFiring = value;
+            }
 
             private readonly InfoString timingPointCount;
             private readonly InfoString currentTimingPoint;
@@ -64,13 +153,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             private readonly InfoString adjustedBeatLength;
             private readonly InfoString timeUntilNextBeat;
             private readonly InfoString timeSinceLastBeat;
+            private readonly InfoString currentTime;
 
             private readonly Box flashLayer;
 
-            [Resolved]
-            private MusicController musicController { get; set; }
-
-            public BeatContainer()
+            public TestBeatSyncedContainer()
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
@@ -82,7 +169,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         AutoSizeAxes = Axes.Both,
-                        Margin = new MarginPadding { Bottom = flash_layer_heigth },
+                        Margin = new MarginPadding { Bottom = flash_layer_height },
                         Children = new Drawable[]
                         {
                             new Box
@@ -98,6 +185,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 Direction = FillDirection.Vertical,
                                 Children = new Drawable[]
                                 {
+                                    currentTime = new InfoString(@"Current time"),
                                     timingPointCount = new InfoString(@"Timing points amount"),
                                     currentTimingPoint = new InfoString(@"Current timing point"),
                                     beatCount = new InfoString(@"Beats amount (in the current timing point)"),
@@ -116,7 +204,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         RelativeSizeAxes = Axes.X,
-                        Height = flash_layer_heigth,
+                        Height = flash_layer_height,
                         Children = new Drawable[]
                         {
                             new Box
@@ -133,8 +221,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                         }
                     }
                 };
+            }
 
-                Beatmap.ValueChanged += delegate
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Beatmap.BindValueChanged(_ =>
                 {
                     timingPointCount.Value = 0;
                     currentTimingPoint.Value = 0;
@@ -144,7 +237,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     adjustedBeatLength.Value = 0;
                     timeUntilNextBeat.Value = 0;
                     timeSinceLastBeat.Value = 0;
-                };
+                }, true);
             }
 
             private List<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.ToList();
@@ -164,7 +257,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (timingPoints.Count == 0) return 0;
 
                 if (timingPoints[^1] == current)
-                    return (int)Math.Ceiling((musicController.CurrentTrack.Length - current.Time) / current.BeatLength);
+                    return (int)Math.Ceiling((BeatSyncClock.CurrentTime - current.Time) / current.BeatLength);
 
                 return (int)Math.Ceiling((getNextTimingPoint(current).Time - current.Time) / current.BeatLength);
             }
@@ -174,7 +267,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                 base.Update();
                 timeUntilNextBeat.Value = TimeUntilNextBeat;
                 timeSinceLastBeat.Value = TimeSinceLastBeat;
+                currentTime.Value = BeatSyncClock.CurrentTime;
             }
+
+            public Action<int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes> NewBeat;
 
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
             {
@@ -187,7 +283,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 beatsPerMinute.Value = 60000 / timingPoint.BeatLength;
                 adjustedBeatLength.Value = timingPoint.BeatLength;
 
-                flashLayer.FadeOutFromOne(timingPoint.BeatLength);
+                flashLayer.FadeOutFromOne(timingPoint.BeatLength / 4);
+
+                NewBeat?.Invoke(beatIndex, timingPoint, effectPoint, amplitudes);
             }
         }
 
@@ -200,7 +298,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public double Value
             {
-                set => valueText.Text = $"{value:G}";
+                set => valueText.Text = $"{value:0.##}";
             }
 
             public InfoString(string header)

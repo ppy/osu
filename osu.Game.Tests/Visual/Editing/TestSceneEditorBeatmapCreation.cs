@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Tests.Resources;
 using SharpCompress.Archives;
@@ -55,9 +56,17 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestExitWithoutSave()
         {
-            AddStep("exit without save", () => Editor.Exit());
+            EditorBeatmap editorBeatmap = null;
+
+            AddStep("store editor beatmap", () => editorBeatmap = EditorBeatmap);
+            AddStep("exit without save", () =>
+            {
+                Editor.Exit();
+                DialogOverlay.CurrentDialog.PerformOkAction();
+            });
+
             AddUntilStep("wait for exit", () => !Editor.IsCurrentScreen());
-            AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID)?.DeletePending == true);
+            AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == editorBeatmap.BeatmapInfo.BeatmapSet.ID)?.DeletePending == true);
         }
 
         [Test]

@@ -49,31 +49,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            Room.Name.Value = "Test Room";
+            SelectedRoom.Value = new Room { Name = { Value = "Test Room" } };
         });
 
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("load match", () => LoadScreen(screen = new MultiplayerMatchSubScreen(Room)));
+            AddStep("load match", () => LoadScreen(screen = new MultiplayerMatchSubScreen(SelectedRoom.Value)));
             AddUntilStep("wait for load", () => screen.IsCurrentScreen());
-        }
-
-        [Test]
-        public void TestSettingValidity()
-        {
-            AddAssert("create button not enabled", () => !this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
-
-            AddStep("set playlist", () =>
-            {
-                Room.Playlist.Add(new PlaylistItem
-                {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                });
-            });
-
-            AddAssert("create button enabled", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
         }
 
         [Test]
@@ -81,7 +64,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set playlist", () =>
             {
-                Room.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo },
@@ -98,11 +81,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestSettingValidity()
+        {
+            AddAssert("create button not enabled", () => !this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
+
+            AddStep("set playlist", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                });
+            });
+
+            AddAssert("create button enabled", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
+        }
+
+        [Test]
         public void TestStartMatchWhileSpectating()
         {
             AddStep("set playlist", () =>
             {
-                Room.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo },
@@ -128,6 +128,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerSpectateButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
+
+            AddUntilStep("wait for spectating user state", () => Client.LocalUser?.State == MultiplayerUserState.Spectating);
 
             AddUntilStep("wait for ready button to be enabled", () => this.ChildrenOfType<MultiplayerReadyButton>().Single().ChildrenOfType<ReadyButton>().Single().Enabled.Value);
 

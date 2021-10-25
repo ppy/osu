@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Pooling;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Objects.Pooling;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -12,18 +12,13 @@ namespace osu.Game.Rulesets.Catch.UI
     /// A trail of the catcher.
     /// It also represents a hyper dash afterimage.
     /// </summary>
-    public class CatcherTrail : PoolableDrawable
+    public class CatcherTrail : PoolableDrawableWithLifetime<CatcherTrailEntry>
     {
-        public CatcherAnimationState AnimationState
-        {
-            set => body.AnimationState.Value = value;
-        }
-
         private readonly SkinnableCatcher body;
 
         public CatcherTrail()
         {
-            Size = new Vector2(CatcherArea.CATCHER_SIZE);
+            Size = new Vector2(Catcher.BASE_SIZE);
             Origin = Anchor.TopCentre;
             Blending = BlendingParameters.Additive;
             InternalChild = body = new SkinnableCatcher
@@ -34,10 +29,40 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        protected override void FreeAfterUse()
+        protected override void OnApply(CatcherTrailEntry entry)
         {
+            Position = new Vector2(entry.Position, 0);
+            Scale = entry.Scale;
+
+            body.AnimationState.Value = entry.CatcherState;
+
+            using (BeginAbsoluteSequence(entry.LifetimeStart, false))
+                applyTransforms(entry.Animation);
+        }
+
+        protected override void OnFree(CatcherTrailEntry entry)
+        {
+            ApplyTransformsAt(double.MinValue);
             ClearTransforms();
-            base.FreeAfterUse();
+        }
+
+        private void applyTransforms(CatcherTrailAnimation animation)
+        {
+            switch (animation)
+            {
+                case CatcherTrailAnimation.Dashing:
+                case CatcherTrailAnimation.HyperDashing:
+                    this.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
+                    break;
+
+                case CatcherTrailAnimation.HyperDashAfterImage:
+                    this.MoveToOffset(new Vector2(0, -10), 1200, Easing.In);
+                    this.ScaleTo(Scale * 0.95f).ScaleTo(Scale * 1.2f, 1200, Easing.In);
+                    this.FadeOut(1200);
+                    break;
+            }
+
+            Expire();
         }
     }
 }

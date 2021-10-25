@@ -14,9 +14,8 @@ namespace osu.Game.Localisation
         // [Description(@"اَلْعَرَبِيَّةُ")]
         // ar,
 
-        // TODO: Some accented glyphs are missing. Revisit when adding Inter.
-        // [Description(@"Беларуская мова")]
-        // be,
+        [Description(@"Беларуская мова")]
+        be,
 
         [Description(@"Български")]
         bg,
@@ -30,9 +29,8 @@ namespace osu.Game.Localisation
         [Description(@"Deutsch")]
         de,
 
-        // TODO: Some accented glyphs are missing. Revisit when adding Inter.
-        // [Description(@"Ελληνικά")]
-        // el,
+        [Description(@"Ελληνικά")]
+        el,
 
         [Description(@"español")]
         es,
@@ -88,15 +86,16 @@ namespace osu.Game.Localisation
         [Description(@"ไทย")]
         th,
 
-        [Description(@"Tagalog")]
-        tl,
+        // Tagalog has no associated localisations yet, and is not supported on Xamarin platforms or Windows versions <10.
+        // Can be revisited if localisations ever arrive.
+        //[Description(@"Tagalog")]
+        //tl,
 
         [Description(@"Türkçe")]
         tr,
 
-        // TODO: Some accented glyphs are missing. Revisit when adding Inter.
-        // [Description(@"Українська мова")]
-        // uk,
+        [Description(@"Українська мова")]
+        uk,
 
         [Description(@"Tiếng Việt")]
         vi,
@@ -104,8 +103,11 @@ namespace osu.Game.Localisation
         [Description(@"简体中文")]
         zh,
 
-        [Description(@"繁體中文（香港）")]
-        zh_hk,
+        // Traditional Chinese (Hong Kong) is listed in web sources but has no associated localisations,
+        // and was wrongly falling back to Simplified Chinese.
+        // Can be revisited if localisations ever arrive.
+        // [Description(@"繁體中文（香港）")]
+        // zh_hk,
 
         [Description(@"繁體中文（台灣）")]
         zh_tw

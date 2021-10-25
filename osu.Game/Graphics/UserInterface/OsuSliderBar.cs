@@ -3,17 +3,22 @@
 
 using System;
 using System.Globalization;
+using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Framework.Utils;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -34,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box rightBox;
         private readonly Container nubContainer;
 
-        public virtual string TooltipText { get; private set; }
+        public virtual LocalisableString TooltipText { get; private set; }
 
         /// <summary>
         /// Whether to format the tooltip as a percentage or the actual value.
@@ -50,34 +55,63 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
                 leftBox.Colour = value;
+            }
+        }
+
+        private Colour4 backgroundColour;
+
+        public Color4 BackgroundColour
+        {
+            get => backgroundColour;
+            set
+            {
+                backgroundColour = value;
                 rightBox.Colour = value;
             }
         }
 
         public OsuSliderBar()
         {
-            Height = 12;
-            RangePadding = 20;
+            Height = Nub.HEIGHT;
+            RangePadding = Nub.EXPANDED_SIZE / 2;
             Children = new Drawable[]
             {
-                leftBox = new Box
+                new Container
                 {
-                    Height = 2,
-                    EdgeSmoothness = new Vector2(0, 0.5f),
-                    Position = new Vector2(2, 0),
-                    RelativeSizeAxes = Axes.None,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                },
-                rightBox = new Box
-                {
-                    Height = 2,
-                    EdgeSmoothness = new Vector2(0, 0.5f),
-                    Position = new Vector2(-2, 0),
-                    RelativeSizeAxes = Axes.None,
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    Alpha = 0.5f,
+                    Padding = new MarginPadding { Horizontal = 2 },
+                    Child = new CircularContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Masking = true,
+                        CornerRadius = 5f,
+                        Children = new Drawable[]
+                        {
+                            leftBox = new Box
+                            {
+                                Height = 5,
+                                EdgeSmoothness = new Vector2(0, 0.5f),
+                                RelativeSizeAxes = Axes.None,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                            },
+                            rightBox = new Box
+                            {
+                                Height = 5,
+                                EdgeSmoothness = new Vector2(0, 0.5f),
+                                RelativeSizeAxes = Axes.None,
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Alpha = 0.5f,
+                            },
+                        },
+                    },
                 },
                 nubContainer = new Container
                 {
@@ -86,7 +120,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
-                        Expanded = true,
+                        Current = { Value = true }
                     },
                 },
                 new HoverClickSounds()
@@ -95,11 +129,12 @@ namespace osu.Game.Graphics.UserInterface
             Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio, [CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
         {
-            sample = audio.Samples.Get(@"UI/sliderbar-notch");
-            AccentColour = colours.Pink;
+            sample = audio.Samples.Get(@"UI/notch-tick");
+            AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
+            BackgroundColour = colourProvider?.Background5 ?? colours.Pink.Opacity(0.5f);
         }
 
         protected override void Update()
@@ -117,26 +152,25 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            Nub.Glowing = true;
+            updateGlow();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            Nub.Glowing = false;
+            updateGlow();
             base.OnHoverLost(e);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
-            Nub.Current.Value = true;
-            return base.OnMouseDown(e);
+            updateGlow();
+            base.OnDragEnd(e);
         }
 
-        protected override void OnMouseUp(MouseUpEvent e)
+        private void updateGlow()
         {
-            Nub.Current.Value = false;
-            base.OnMouseUp(e);
+            Nub.Glowing = IsHovered || IsDragged;
         }
 
         protected override void OnUserChange(T value)
@@ -148,7 +182,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void playSample(T value)
         {
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
+            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
                 return;
 
             if (value.Equals(lastSampleValue))
@@ -157,13 +191,15 @@ namespace osu.Game.Graphics.UserInterface
             lastSampleValue = value;
             lastSampleTime = Clock.CurrentTime;
 
-            var channel = sample.Play();
+            var channel = sample.GetChannel();
 
-            channel.Frequency.Value = 1 + NormalizedValue * 0.2f;
-            if (NormalizedValue == 0)
-                channel.Frequency.Value -= 0.4f;
-            else if (NormalizedValue == 1)
-                channel.Frequency.Value += 0.4f;
+            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + NormalizedValue * 0.2f;
+
+            // intentionally pitched down, even when hitting max.
+            if (NormalizedValue == 0 || NormalizedValue == 1)
+                channel.Frequency.Value -= 0.5f;
+
+            channel.Play();
         }
 
         private void updateTooltipText(T value)

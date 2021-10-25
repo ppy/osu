@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             spinnerBlink = source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value != true;
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
                 new Sprite
                 {
@@ -68,6 +68,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.TopLeft,
                         Scale = new Vector2(SPRITE_SCALE)
                     }
+                },
+                ApproachCircle = new Sprite
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.Centre,
+                    Texture = source.GetTexture("spinner-approachcircle"),
+                    Scale = new Vector2(SPRITE_SCALE * 1.86f),
+                    Y = SPINNER_Y_CENTRE,
                 }
             });
         }
@@ -81,10 +89,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             Spinner spinner = d.HitObject;
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                 this.FadeOut();
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2))
                 this.FadeInFromZero(spinner.TimeFadeIn / 2);
         }
 

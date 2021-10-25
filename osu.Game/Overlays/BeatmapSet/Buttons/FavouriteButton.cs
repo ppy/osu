@@ -7,11 +7,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osuTK;
 
@@ -28,13 +30,13 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
-        public string TooltipText
+        public LocalisableString TooltipText
         {
             get
             {
                 if (!Enabled.Value) return string.Empty;
 
-                return (favourited.Value ? "Unfavourite" : "Favourite") + " this beatmapset";
+                return favourited.Value ? BeatmapsetsStrings.ShowDetailsUnfavourite : BeatmapsetsStrings.ShowDetailsFavourite;
             }
         }
 

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -146,7 +147,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => source?.GetTexture(componentName, wrapModeS, wrapModeT);
             public ISample GetSample(ISampleInfo sampleInfo) => source?.GetSample(sampleInfo);
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source?.GetConfig<TLookup, TValue>(lookup);
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => source?.FindProvider(lookupFunction);
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : source?.FindProvider(lookupFunction);
+            public IEnumerable<ISkin> AllSources => new[] { this }.Concat(source?.AllSources ?? Enumerable.Empty<ISkin>());
 
             public void TriggerSourceChanged()
             {

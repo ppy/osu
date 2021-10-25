@@ -2,21 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Newtonsoft.Json;
 using osu.Game.Graphics;
+using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public abstract class ControlPoint : IComparable<ControlPoint>
+    public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>
     {
         /// <summary>
         /// The time at which the control point takes effect.
         /// </summary>
-        public double Time => controlPointGroup?.Time ?? 0;
+        [JsonIgnore]
+        public double Time { get; set; }
 
-        private ControlPointGroup controlPointGroup;
-
-        public void AttachGroup(ControlPointGroup pointGroup) => controlPointGroup = pointGroup;
+        public void AttachGroup(ControlPointGroup pointGroup) => Time = pointGroup.Time;
 
         public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
 
@@ -32,7 +33,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// Create an unbound copy of this control point.
         /// </summary>
-        public ControlPoint CreateCopy()
+        public ControlPoint DeepClone()
         {
             var copy = (ControlPoint)Activator.CreateInstance(GetType());
 
@@ -43,6 +44,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public virtual void CopyFrom(ControlPoint other)
         {
+            Time = other.Time;
         }
     }
 }

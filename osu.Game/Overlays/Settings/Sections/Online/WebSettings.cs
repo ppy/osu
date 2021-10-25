@@ -3,13 +3,15 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class WebSettings : SettingsSubsection
     {
-        protected override string Header => "Web";
+        protected override LocalisableString Header => OnlineSettingsStrings.WebHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -18,24 +20,24 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Warn about opening external links",
+                    LabelText = OnlineSettingsStrings.ExternalLinkWarning,
                     Current = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Prefer downloads without video",
+                    LabelText = OnlineSettingsStrings.PreferNoVideo,
                     Keywords = new[] { "no-video" },
                     Current = config.GetBindable<bool>(OsuSetting.PreferNoVideo)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Automatically download beatmaps when spectating",
+                    LabelText = OnlineSettingsStrings.AutomaticallyDownloadWhenSpectating,
                     Keywords = new[] { "spectator" },
                     Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show explicit content in search results",
+                    LabelText = OnlineSettingsStrings.ShowExplicitContent,
                     Keywords = new[] { "nsfw", "18+", "offensive" },
                     Current = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent),
                 }

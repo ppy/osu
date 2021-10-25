@@ -6,7 +6,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Users.Drawables
 {
@@ -68,11 +70,16 @@ namespace osu.Game.Users.Drawables
 
         private class ClickableArea : OsuClickableContainer
         {
-            private string tooltip = default_tooltip_text;
+            private LocalisableString tooltip = default_tooltip_text;
 
-            public override string TooltipText
+            public ClickableArea()
+                : base(HoverSampleSet.Submit)
             {
-                get => Enabled.Value ? tooltip : null;
+            }
+
+            public override LocalisableString TooltipText
+            {
+                get => Enabled.Value ? tooltip : default;
                 set => tooltip = value;
             }
 

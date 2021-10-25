@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
@@ -36,11 +36,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private IBindable<bool> operationInProgress;
 
-        private Sample sampleReadyCount;
+        private Sample sampleReady;
+        private Sample sampleReadyAll;
+        private Sample sampleUnready;
 
         private readonly ButtonWithTrianglesExposed button;
 
         private int countReady;
+
+        private ScheduledDelegate readySampleDelegate;
 
         public MultiplayerReadyButton()
         {
@@ -55,10 +59,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleReadyCount = audio.Samples.Get(@"SongSelect/select-difficulty");
-
             operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
             operationInProgress.BindValueChanged(_ => updateState());
+
+            sampleReady = audio.Samples.Get(@"Multiplayer/player-ready");
+            sampleReadyAll = audio.Samples.Get(@"Multiplayer/player-ready-all");
+            sampleUnready = audio.Samples.Get(@"Multiplayer/player-unready");
         }
 
         protected override void OnRoomUpdated()
@@ -72,25 +78,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             var localUser = Client.LocalUser;
 
-            if (localUser == null)
-                return;
+            int newCountReady = Room?.Users.Count(u => u.State == MultiplayerUserState.Ready) ?? 0;
+            int newCountTotal = Room?.Users.Count(u => u.State != MultiplayerUserState.Spectating) ?? 0;
 
-            Debug.Assert(Room != null);
-
-            int newCountReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
-            int newCountTotal = Room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
-
-            string countText = $"({newCountReady} / {newCountTotal} ready)";
-
-            switch (localUser.State)
+            switch (localUser?.State)
             {
-                case MultiplayerUserState.Idle:
+                default:
                     button.Text = "Ready";
                     updateButtonColour(true);
                     break;
 
                 case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
+                    string countText = $"({newCountReady} / {newCountTotal} ready)";
+
                     if (Room?.Host?.Equals(localUser) == true)
                     {
                         button.Text = $"Start match {countText}";
@@ -105,29 +106,34 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            bool enableButton = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
+            bool enableButton = Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
 
             // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.
-            if (localUser.State == MultiplayerUserState.Spectating)
+            if (localUser?.State == MultiplayerUserState.Spectating)
                 enableButton &= Room?.Host?.Equals(localUser) == true && newCountReady > 0;
 
             button.Enabled.Value = enableButton;
 
-            if (newCountReady != countReady)
-            {
-                countReady = newCountReady;
-                Scheduler.AddOnce(playSound);
-            }
-        }
-
-        private void playSound()
-        {
-            if (sampleReadyCount == null)
+            if (newCountReady == countReady)
                 return;
 
-            var channel = sampleReadyCount.GetChannel();
-            channel.Frequency.Value = 0.77f + countReady * 0.06f;
-            channel.Play();
+            readySampleDelegate?.Cancel();
+            readySampleDelegate = Schedule(() =>
+            {
+                if (newCountReady > countReady)
+                {
+                    if (newCountReady == newCountTotal)
+                        sampleReadyAll?.Play();
+                    else
+                        sampleReady?.Play();
+                }
+                else if (newCountReady < countReady)
+                {
+                    sampleUnready?.Play();
+                }
+
+                countReady = newCountReady;
+            });
         }
 
         private void updateButtonColour(bool green)

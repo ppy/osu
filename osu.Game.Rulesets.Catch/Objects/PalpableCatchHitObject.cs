@@ -1,9 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects
@@ -33,6 +34,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// <summary>
         /// The target fruit if we are to initiate a hyperdash.
         /// </summary>
+        [JsonIgnore]
         public CatchHitObject HyperDashTarget
         {
             get => hyperDashTarget;
@@ -43,6 +45,6 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        Color4 IHasComboInformation.GetComboColour(IReadOnlyList<Color4> comboColours) => comboColours[(IndexInBeatmap + 1) % comboColours.Count];
+        Color4 IHasComboInformation.GetComboColour(ISkin skin) => IHasComboInformation.GetSkinComboColour(this, skin, IndexInBeatmap + 1);
     }
 }

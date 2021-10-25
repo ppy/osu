@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -44,22 +45,62 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public readonly Bindable<HitObject> PlacementObject = new Bindable<HitObject>();
 
+        private readonly BeatmapInfo beatmapInfo;
         public readonly IBeatmap PlayableBeatmap;
 
+        /// <summary>
+        /// Whether at least one timing control point is present and providing timing information.
+        /// </summary>
+        public IBindable<bool> HasTiming => hasTiming;
+
+        private readonly Bindable<bool> hasTiming = new Bindable<bool>();
+
         [CanBeNull]
-        public readonly ISkin BeatmapSkin;
+        public readonly EditorBeatmapSkin BeatmapSkin;
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
+
+        [Resolved]
+        private EditorClock editorClock { get; set; }
 
         private readonly IBeatmapProcessor beatmapProcessor;
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null)
+        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
         {
             PlayableBeatmap = playableBeatmap;
-            BeatmapSkin = beatmapSkin;
+
+            // ensure we are not working with legacy control points.
+            // if we leave the legacy points around they will be applied over any local changes on
+            // ApplyDefaults calls. this should eventually be removed once the default logic is moved to the decoder/converter.
+            if (PlayableBeatmap.ControlPointInfo is LegacyControlPointInfo)
+            {
+                var newControlPoints = new ControlPointInfo();
+
+                foreach (var controlPoint in PlayableBeatmap.ControlPointInfo.AllControlPoints)
+                {
+                    switch (controlPoint)
+                    {
+                        case DifficultyControlPoint _:
+                        case SampleControlPoint _:
+                            // skip legacy types.
+                            continue;
+
+                        default:
+                            newControlPoints.Add(controlPoint.Time, controlPoint);
+                            break;
+                    }
+                }
+
+                playableBeatmap.ControlPointInfo = newControlPoints;
+            }
+
+            this.beatmapInfo = beatmapInfo ?? playableBeatmap.BeatmapInfo;
+
+            if (beatmapSkin is Skin skin)
+                BeatmapSkin = new EditorBeatmapSkin(skin);
 
             beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset?.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
 
@@ -69,11 +110,17 @@ namespace osu.Game.Screens.Edit
 
         public BeatmapInfo BeatmapInfo
         {
-            get => PlayableBeatmap.BeatmapInfo;
-            set => PlayableBeatmap.BeatmapInfo = value;
+            get => beatmapInfo;
+            set => throw new InvalidOperationException();
         }
 
-        public BeatmapMetadata Metadata => PlayableBeatmap.Metadata;
+        public BeatmapMetadata Metadata => beatmapInfo.Metadata;
+
+        public BeatmapDifficulty Difficulty
+        {
+            get => PlayableBeatmap.Difficulty;
+            set => PlayableBeatmap.Difficulty = value;
+        }
 
         public ControlPointInfo ControlPointInfo
         {
@@ -238,6 +285,8 @@ namespace osu.Game.Screens.Edit
 
             if (batchPendingUpdates.Count > 0)
                 UpdateState();
+
+            hasTiming.Value = !ReferenceEquals(ControlPointInfo.TimingPointAt(editorClock.CurrentTime), TimingControlPoint.DEFAULT);
         }
 
         protected override void UpdateState()
@@ -273,7 +322,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public void Clear() => RemoveRange(HitObjects.ToArray());
 
-        private void processHitObject(HitObject hitObject) => hitObject.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
+        private void processHitObject(HitObject hitObject) => hitObject.ApplyDefaults(ControlPointInfo, PlayableBeatmap.Difficulty);
 
         private void trackStartTime(HitObject hitObject)
         {

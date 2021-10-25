@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -94,6 +95,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Creates a <see cref="SelectionBlueprint{T}"/> for a specific item.
         /// </summary>
         /// <param name="item">The item to create the overlay for.</param>
+        [CanBeNull]
         protected virtual SelectionBlueprint<T> CreateBlueprintFor(T item) => null;
 
         protected virtual DragBox CreateDragBox(Action<RectangleF> performSelect) => new DragBox(performSelect);
@@ -108,9 +110,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             bool selectionPerformed = performMouseDownActions(e);
 
             // even if a selection didn't occur, a drag event may still move the selection.
-            prepareSelectionMovement();
+            bool movementPossible = prepareSelectionMovement();
 
-            return selectionPerformed || e.Button == MouseButton.Left;
+            return selectionPerformed || (e.Button == MouseButton.Left && movementPossible);
         }
 
         protected SelectionBlueprint<T> ClickedBlueprint { get; private set; }
@@ -226,11 +228,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public bool OnPressed(PlatformAction action)
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            switch (action.ActionType)
+            switch (e.Action)
             {
-                case PlatformActionType.SelectAll:
+                case PlatformAction.SelectAll:
                     SelectAll();
                     return true;
             }
@@ -238,7 +240,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public void OnReleased(PlatformAction action)
+        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
         }
 
@@ -425,19 +427,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Attempts to begin the movement of any selected blueprints.
         /// </summary>
-        private void prepareSelectionMovement()
+        /// <returns>Whether a movement is possible.</returns>
+        private bool prepareSelectionMovement()
         {
             if (!SelectionHandler.SelectedBlueprints.Any())
-                return;
+                return false;
 
             // Any selected blueprint that is hovered can begin the movement of the group, however only the first item (according to SortForMovement) is used for movement.
             // A special case is added for when a click selection occurred before the drag
             if (!clickSelectionBegan && !SelectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
-                return;
+                return false;
 
             // Movement is tracked from the blueprint of the earliest item, since it only makes sense to distance snap from that item
             movementBlueprints = SortForMovement(SelectionHandler.SelectedBlueprints).ToArray();
             movementBlueprintOriginalPositions = movementBlueprints.Select(m => m.ScreenSpaceSelectionPoint).ToArray();
+            return true;
         }
 
         /// <summary>

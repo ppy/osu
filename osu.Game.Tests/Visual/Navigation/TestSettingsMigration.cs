@@ -9,9 +9,12 @@ namespace osu.Game.Tests.Visual.Navigation
 {
     public class TestSettingsMigration : OsuGameTestScene
     {
-        public override void RecycleLocalStorage()
+        public override void RecycleLocalStorage(bool isDisposing)
         {
-            base.RecycleLocalStorage();
+            base.RecycleLocalStorage(isDisposing);
+
+            if (isDisposing)
+                return;
 
             using (var config = new OsuConfigManager(LocalStorage))
             {

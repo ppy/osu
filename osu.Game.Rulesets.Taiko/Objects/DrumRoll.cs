@@ -6,10 +6,10 @@ using System;
 using System.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osuTK;
 
@@ -58,14 +58,13 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
-            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
 
-            double scoringDistance = base_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
+            double scoringDistance = base_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
             Velocity = scoringDistance / timingPoint.BeatLength;
 
             tickSpacing = timingPoint.BeatLength / TickRate;
@@ -120,7 +119,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         double IHasDistance.Distance => Duration * Velocity;
 
         SliderPath IHasPath.Path
-            => new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / TaikoBeatmapConverter.LEGACY_VELOCITY_MULTIPLIER);
+            => new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER);
 
         #endregion
     }

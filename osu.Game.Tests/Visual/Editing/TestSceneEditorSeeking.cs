@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             beatmap.BeatmapInfo.BeatDivisor = 1;
 
-            beatmap.ControlPointInfo = new ControlPointInfo();
+            beatmap.ControlPointInfo.Clear();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
             beatmap.ControlPointInfo.Add(2000, new TimingControlPoint { BeatLength = 500 });
 
