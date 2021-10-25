@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -13,10 +15,14 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 
+
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHidden : ModHidden, IHidesApproachCircles
     {
+        [SettingSource("Don't fade out hit circles", "This makes the hidden mod only remove approach circles.")]
+        public Bindable<bool> NoHitCircles { get; } = new BindableBool(false);
+
         public override string Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => 1.06;
 
@@ -65,14 +71,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 case DrawableSliderTail _:
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        drawableObject.FadeOut(fadeDuration);
+                        if (!NoHitCircles.Value)
+                            drawableObject.FadeOut(fadeDuration);
 
                     break;
 
                 case DrawableSliderRepeat sliderRepeat:
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         // only apply to circle piece – reverse arrow is not affected by hidden.
-                        sliderRepeat.CirclePiece.FadeOut(fadeDuration);
+                        if (!NoHitCircles.Value)
+                            sliderRepeat.CirclePiece.FadeOut(fadeDuration);
 
                     break;
 
@@ -82,7 +90,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     if (increaseVisibility)
                     {
                         // only fade the circle piece (not the approach circle) for the increased visibility object.
-                        fadeTarget = circle.CirclePiece;
+                        if (!NoHitCircles.Value)
+                            fadeTarget = circle.CirclePiece;
                     }
                     else
                     {
@@ -92,18 +101,21 @@ namespace osu.Game.Rulesets.Osu.Mods
                     }
 
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        fadeTarget.FadeOut(fadeDuration);
+                        if (!NoHitCircles.Value)
+                            fadeTarget.FadeOut(fadeDuration);
                     break;
 
                 case DrawableSlider slider:
                     using (slider.BeginAbsoluteSequence(fadeStartTime))
-                        slider.Body.FadeOut(fadeDuration, Easing.Out);
+                        if (!NoHitCircles.Value)
+                            slider.Body.FadeOut(fadeDuration, Easing.Out);
 
                     break;
 
                 case DrawableSliderTick sliderTick:
                     using (sliderTick.BeginAbsoluteSequence(fadeStartTime))
-                        sliderTick.FadeOut(fadeDuration);
+                        if (!NoHitCircles.Value)
+                            sliderTick.FadeOut(fadeDuration);
 
                     break;
 
