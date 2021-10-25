@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -105,7 +106,7 @@ namespace osu.Game.Tests.Visual.Online
                             }
                             else
                             {
-                                getUser.TriggerFailure(new Exception());
+                                getUser.TriggerFailure(new WebException());
                             }
 
                             return true;
