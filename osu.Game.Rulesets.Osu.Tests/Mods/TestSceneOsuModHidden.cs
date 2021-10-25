@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void OuendanTwoHidden() => CreateModTest(new ModTestData
         {
-            Mod = new OsuModHidden { NoHitCircles = { Value = true } },
+            Mod = new OsuModHidden { OnlyFadeApproachCircles = { Value = true } },
             Autoplay = true,
             Beatmap = new Beatmap
             {

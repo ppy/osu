@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModHidden : ModHidden, IHidesApproachCircles
     {
         [SettingSource("Only fade approach circles", "The main object body will not fade when enabled.")]
-        public Bindable<bool> NoHitCircles { get; } = new BindableBool(false);
+        public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool(false);
 
         public override string Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => 1.06;
@@ -67,69 +67,90 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             (double fadeStartTime, double fadeDuration) = getFadeOutParameters(drawableOsuObject);
 
-            switch (drawableObject)
+            if (!OnlyFadeApproachCircles.Value)
             {
-                case DrawableSliderTail _:
-                    using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        if (!NoHitCircles.Value)
+                switch (drawableObject)
+                {
+                    case DrawableSliderTail _:
+                        using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                             drawableObject.FadeOut(fadeDuration);
 
-                    break;
+                        break;
 
-                case DrawableSliderRepeat sliderRepeat:
-                    using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        // only apply to circle piece – reverse arrow is not affected by hidden.
-                        if (!NoHitCircles.Value)
+                    case DrawableSliderRepeat sliderRepeat:
+                        using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
+                            // only apply to circle piece – reverse arrow is not affected by hidden.
                             sliderRepeat.CirclePiece.FadeOut(fadeDuration);
 
-                    break;
+                        break;
 
-                case DrawableHitCircle circle:
-                    Drawable fadeTarget = circle;
+                    case DrawableHitCircle circle:
+                        Drawable fadeTarget = circle;
 
-                    if (increaseVisibility)
-                    {
-                        // only fade the circle piece (not the approach circle) for the increased visibility object.
-                        if (!NoHitCircles.Value)
+                        if (increaseVisibility)
+                        {
+                            // only fade the circle piece (not the approach circle) for the increased visibility object.
                             fadeTarget = circle.CirclePiece;
-                    }
-                    else
-                    {
-                        // we don't want to see the approach circle
-                        using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-                            circle.ApproachCircle.Hide();
-                    }
+                        }
+                        else
+                        {
+                            // we don't want to see the approach circle
+                            using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
+                                circle.ApproachCircle.Hide();
+                        }
 
-                    using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        if (!NoHitCircles.Value)
+                        using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                             fadeTarget.FadeOut(fadeDuration);
-                    break;
+                        break;
 
-                case DrawableSlider slider:
-                    using (slider.BeginAbsoluteSequence(fadeStartTime))
-                        if (!NoHitCircles.Value)
+                    case DrawableSlider slider:
+                        using (slider.BeginAbsoluteSequence(fadeStartTime))
                             slider.Body.FadeOut(fadeDuration, Easing.Out);
 
-                    break;
+                        break;
 
-                case DrawableSliderTick sliderTick:
-                    using (sliderTick.BeginAbsoluteSequence(fadeStartTime))
-                        if (!NoHitCircles.Value)
+                    case DrawableSliderTick sliderTick:
+                        using (sliderTick.BeginAbsoluteSequence(fadeStartTime))
                             sliderTick.FadeOut(fadeDuration);
 
-                    break;
+                        break;
 
-                case DrawableSpinner spinner:
-                    // hide elements we don't care about.
-                    // todo: hide background
+                    case DrawableSpinner spinner:
+                        // hide elements we don't care about.
+                        // todo: hide background
 
-                    spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
-                    hideSpinnerApproachCircle(spinner);
+                        spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
+                        hideSpinnerApproachCircle(spinner);
 
-                    using (spinner.BeginAbsoluteSequence(fadeStartTime))
-                        spinner.FadeOut(fadeDuration);
+                        using (spinner.BeginAbsoluteSequence(fadeStartTime))
+                            spinner.FadeOut(fadeDuration);
 
-                    break;
+                        break;
+                }
+            } else
+            {
+                switch(drawableObject)
+                {
+                    case DrawableHitCircle circle:
+                        if (!increaseVisibility)
+                        {
+                            // we don't want to see the approach circle
+                            using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
+                                circle.ApproachCircle.Hide();
+                        }
+                        break;
+
+                    case DrawableSpinner spinner:
+                        // hide elements we don't care about.
+                        // todo: hide background
+
+                        spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
+                        hideSpinnerApproachCircle(spinner);
+                        break;
+
+                    default:
+                        break;
+                }
             }
         }
 
