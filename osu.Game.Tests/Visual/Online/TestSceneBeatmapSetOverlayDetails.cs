@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         OnlineInfo = new APIBeatmap
                         {
-                            Metrics = new BeatmapMetrics
+                            FailTimes = new APIFailTimes
                             {
                                 Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),

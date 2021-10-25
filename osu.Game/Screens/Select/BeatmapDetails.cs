@@ -43,7 +43,8 @@ namespace osu.Game.Screens.Select
 
         private BeatmapInfo beatmapInfo;
 
-        private BeatmapMetrics metrics;
+        private APIFailTimes failTimes;
+
         private int[] ratings;
 
         public BeatmapInfo BeatmapInfo
@@ -55,7 +56,7 @@ namespace osu.Game.Screens.Select
 
                 beatmapInfo = value;
 
-                metrics = beatmapInfo?.OnlineInfo?.Metrics;
+                failTimes = beatmapInfo?.OnlineInfo?.FailTimes;
                 ratings = beatmapInfo?.BeatmapSet?.Ratings;
 
                 Scheduler.AddOnce(updateStatistics);
@@ -182,7 +183,7 @@ namespace osu.Game.Screens.Select
             tags.Text = BeatmapInfo?.Metadata?.Tags;
 
             // metrics may have been previously fetched
-            if (ratings != null && metrics != null)
+            if (ratings != null && failTimes != null)
             {
                 updateMetrics();
                 return;
@@ -208,7 +209,7 @@ namespace osu.Game.Screens.Select
                         return;
 
                     ratings = res.BeatmapSet?.Ratings;
-                    metrics = res.Metrics;
+                    failTimes = res.FailTimes;
 
                     updateMetrics();
                 });
@@ -232,7 +233,7 @@ namespace osu.Game.Screens.Select
 
         private void updateMetrics()
         {
-            var hasMetrics = (metrics?.Retries?.Any() ?? false) || (metrics?.Fails?.Any() ?? false);
+            var hasMetrics = (failTimes?.Retries?.Any() ?? false) || (failTimes?.Fails?.Any() ?? false);
 
             if (ratings?.Any() ?? false)
             {
@@ -248,12 +249,12 @@ namespace osu.Game.Screens.Select
 
             if (hasMetrics)
             {
-                failRetryGraph.Metrics = metrics;
+                failRetryGraph.FailTimes = failTimes;
                 failRetryContainer.FadeIn(transition_duration);
             }
             else
             {
-                failRetryGraph.Metrics = new BeatmapMetrics
+                failRetryGraph.FailTimes = new APIFailTimes
                 {
                     Fails = new int[100],
                     Retries = new int[100],

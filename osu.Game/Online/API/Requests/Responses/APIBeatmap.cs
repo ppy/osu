@@ -69,7 +69,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public string DifficultyName { get; set; } = string.Empty;
 
         [JsonProperty(@"failtimes")]
-        public BeatmapMetrics? Metrics { get; set; }
+        public APIFailTimes? FailTimes { get; set; }
 
         [JsonProperty(@"max_combo")]
         public int? MaxCombo { get; set; }

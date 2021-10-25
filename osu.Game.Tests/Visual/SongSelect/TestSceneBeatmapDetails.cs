@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 StarDifficulty = 5.3f,
                 OnlineInfo = new APIBeatmap
                 {
-                    Metrics = new BeatmapMetrics
+                    FailTimes = new APIFailTimes
                     {
                         Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                         Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 StarDifficulty = 5.3f,
                 OnlineInfo = new APIBeatmap
                 {
-                    Metrics = new BeatmapMetrics
+                    FailTimes = new APIFailTimes
                     {
                         Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                         Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 StarDifficulty = 2.91f,
                 OnlineInfo = new APIBeatmap
                 {
-                    Metrics = new BeatmapMetrics
+                    FailTimes = new APIFailTimes
                     {
                         Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                         Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
