@@ -5,18 +5,30 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
+using osuTK.Graphics;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking, IHasMainCirclePiece
     {
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IBeatmap beatmap { get; set; }
+        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
 
         [CanBeNull]
@@ -45,8 +57,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuRulesetConfigManager rulesetConfig)
         {
+            rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
             Origin = Anchor.Centre;
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
@@ -69,11 +82,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
+         protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
+        }
         protected override void OnApply()
         {
             base.OnApply();
 
+            updateSnapColour();
             Position = HitObject.Position - DrawableSlider.Position;
         }
 
@@ -163,6 +183,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // If we're already snaking, interpolate to smooth out sharp curves (linear sliders, mainly).
                 Arrow.Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), Arrow.Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
+        }
+         private void updateSnapColour()
+        {
+            if (beatmap == null || HitObject == null) return;
+
+            int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
+
+            AccentColour.Value = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
         }
     }
 }
