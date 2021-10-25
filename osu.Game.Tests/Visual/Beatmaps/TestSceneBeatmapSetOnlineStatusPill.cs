@@ -28,6 +28,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             Spacing = new Vector2(0, 10),
             ChildrenEnumerable = Enum.GetValues(typeof(BeatmapSetOnlineStatus)).Cast<BeatmapSetOnlineStatus>().Select(status => new BeatmapSetOnlineStatusPill
             {
+                AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Status = status
@@ -41,8 +42,12 @@ namespace osu.Game.Tests.Visual.Beatmaps
         {
             AddStep("create themed content", () => CreateThemedContent(OverlayColourScheme.Red));
 
-            AddStep("set fixed width", () => statusPills.ForEach(pill => pill.FixedWidth = 90));
-            AddStep("unset fixed width", () => statusPills.ForEach(pill => pill.FixedWidth = null));
+            AddStep("set fixed width", () => statusPills.ForEach(pill =>
+            {
+                pill.AutoSizeAxes = Axes.Y;
+                pill.Width = 90;
+            }));
+            AddStep("unset fixed width", () => statusPills.ForEach(pill => pill.AutoSizeAxes = Axes.Both));
         }
     }
 }
