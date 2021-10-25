@@ -9,6 +9,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
@@ -47,7 +48,7 @@ namespace osu.Game.Beatmaps
         public BeatmapDifficulty BaseDifficulty { get; set; }
 
         [NotMapped]
-        public IBeatmapOnlineInfo OnlineInfo { get; set; }
+        public APIBeatmap OnlineInfo { get; set; }
 
         [NotMapped]
         public int? MaxCombo { get; set; }
