@@ -35,6 +35,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public int PassCount { get; }
 
-        BeatmapMetrics? Metrics { get; }
+        APIFailTimes? FailTimes { get; }
     }
 }

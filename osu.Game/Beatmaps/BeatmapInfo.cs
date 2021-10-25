@@ -216,7 +216,7 @@ namespace osu.Game.Beatmaps
         public int PassCount => OnlineInfo.PassCount;
 
         [JsonIgnore]
-        public BeatmapMetrics Metrics => OnlineInfo.Metrics;
+        public APIFailTimes FailTimes => OnlineInfo.FailTimes;
 
         #endregion
     }

@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Online
                                 SliderCount = 12,
                                 PlayCount = 222,
                                 PassCount = 21,
-                                Metrics = new BeatmapMetrics
+                                FailTimes = new APIFailTimes
                                 {
                                     Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                     Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
@@ -176,7 +176,7 @@ namespace osu.Game.Tests.Visual.Online
                                 SliderCount = 45,
                                 PlayCount = 567,
                                 PassCount = 89,
-                                Metrics = new BeatmapMetrics
+                                FailTimes = new APIFailTimes
                                 {
                                     Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                     Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
@@ -206,7 +206,7 @@ namespace osu.Game.Tests.Visual.Online
                         BaseDifficulty = new BeatmapDifficulty(),
                         OnlineInfo = new APIBeatmap
                         {
-                            Metrics = new BeatmapMetrics
+                            FailTimes = new APIFailTimes
                             {
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
@@ -292,7 +292,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     OnlineInfo = new APIBeatmap
                     {
-                        Metrics = new BeatmapMetrics
+                        FailTimes = new APIFailTimes
                         {
                             Fails = Enumerable.Range(1, 100).Select(j => j % 12 - 6).ToArray(),
                             Retries = Enumerable.Range(-2, 100).Select(j => j % 12 - 6).ToArray(),
