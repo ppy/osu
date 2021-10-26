@@ -74,6 +74,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                     using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
                         circle.ApproachCircle.Hide();
                 }
+                else if (drawableObject is DrawableSpinner spinner)
+                {
+                    spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
+                    hideSpinnerApproachCircle(spinner);
+                }
             }
 
             if (OnlyFadeApproachCircles.Value)
@@ -122,9 +127,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSpinner spinner:
                     // hide elements we don't care about.
                     // todo: hide background
-
-                    spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
-                    hideSpinnerApproachCircle(spinner);
 
                     using (spinner.BeginAbsoluteSequence(fadeStartTime))
                         spinner.FadeOut(fadeDuration);
