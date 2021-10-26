@@ -38,9 +38,6 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public APIBeatmapSet OnlineInfo { get; set; }
 
-        [NotMapped]
-        public BeatmapSetMetrics Metrics { get; set; }
-
         /// <summary>
         /// The maximum star difficulty of all beatmaps in this set.
         /// </summary>
@@ -117,7 +114,6 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public DateTimeOffset? LastUpdated => OnlineInfo.LastUpdated;
 
-        [NotMapped]
         [JsonIgnore]
         public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
 
@@ -172,6 +168,10 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         [JsonIgnore]
         public int? TrackId => OnlineInfo?.TrackId;
+
+        [NotMapped]
+        [JsonIgnore]
+        public int[] Ratings => OnlineInfo?.Ratings;
 
         #endregion
     }

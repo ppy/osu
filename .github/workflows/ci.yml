@@ -50,6 +50,48 @@ jobs:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
           path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
 
+  build-only-android:
+    name: Build only (Android)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install .NET 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Build
+        run: msbuild osu.Android.slnf /restore /p:Configuration=Debug
+
+  build-only-ios:
+    # While this workflow technically *can* run, it fails as iOS builds are blocked by multiple issues.
+    # See https://github.com/ppy/osu-framework/issues/4677 for the details.
+    # The job can be unblocked once those issues are resolved and game deployments can happen again.
+    if: false
+    name: Build only (iOS)
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install .NET 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+
+      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
+      # cannot accept .sln(f) files as arguments.
+      # Build just the main game for now.
+      - name: Build
+        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug
+
   inspect-code:
     name: Code Quality
     runs-on: ubuntu-latest
