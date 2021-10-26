@@ -114,7 +114,11 @@ namespace osu.Game.Screens.LLin.SideBar
 
         public void ShowComponent(Drawable d, bool allowHide = false)
         {
-            if (d == null) Hide();
+            if (d == null)
+            {
+                Hide();
+                return;
+            }
 
             if (!(d is ISidebarContent c))
                 throw new InvalidOperationException($"{d}不是{typeof(ISidebarContent)}");

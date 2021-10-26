@@ -922,14 +922,10 @@ namespace osu.Game.Screens.LLin
 
         private void makeActive(bool forceActive)
         {
-            //如果界面已隐藏，则显示FunctionControl
-            if (InterfacesHidden)
-            {
-                currentFunctionBar.ShowFunctionControlTemporary();
+            currentFunctionBar.ShowFunctionControlTemporary();
 
-                //如果不是强制显示并且已经锁定变更
-                if (!forceActive && lockButton.Bindable.Disabled) return;
-            }
+            //如果界面已隐藏、不是强制显示并且已经锁定变更
+            if (!forceActive && lockButton.Bindable.Disabled && InterfacesHidden) return;
 
             currentFunctionBar.Show();
             applyBackgroundBrightness();
