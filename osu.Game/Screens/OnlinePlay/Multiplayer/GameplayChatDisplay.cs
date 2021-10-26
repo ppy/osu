@@ -10,6 +10,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
+using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -75,6 +76,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             switch (e.Action)
             {
+                case GlobalAction.Back:
+                    if (Textbox.HasFocus)
+                    {
+                        Schedule(() => Textbox.KillFocus());
+                        return true;
+                    }
+
+                    break;
+
                 case GlobalAction.ToggleChatFocus:
                     if (Textbox.HasFocus)
                     {
