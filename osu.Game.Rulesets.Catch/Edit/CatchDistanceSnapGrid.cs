@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -63,9 +64,11 @@ namespace osu.Game.Rulesets.Catch.Edit
             for (int i = 0; i < velocities.Length; i++)
             {
                 double velocity = velocities[i];
+                var verticalPath = verticalPaths[i];
 
                 // The line ends at the top of the screen.
-                double endTime = hitObjectContainer.TimeAtPosition(-hitObjectContainer.DrawHeight, hitObjectContainer.Time.Current);
+                double topScreenTime = hitObjectContainer.TimeAtPosition(-hitObjectContainer.DrawHeight, hitObjectContainer.Time.Current);
+                double endTime = Math.Max(StartTime, topScreenTime);
 
                 float x = (float)((endTime - StartTime) * velocity);
                 float y = hitObjectContainer.PositionAtTime(endTime, StartTime);
@@ -74,7 +77,6 @@ namespace osu.Game.Rulesets.Catch.Edit
                 lineVertices[0] = new Vector2(StartX, startY);
                 lineVertices[1] = lineVertices[0] + new Vector2(x, y);
 
-                var verticalPath = verticalPaths[i];
                 verticalPath.Vertices = verticalLineVertices[i];
                 verticalPath.OriginPosition = verticalPath.PositionInBoundingBox(Vector2.Zero);
             }
