@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -26,6 +27,8 @@ namespace osu.Game.Rulesets.Catch.Edit
         public double StartTime { get; set; }
 
         public float StartX { get; set; }
+
+        private const double max_vertical_line_length_in_time = CatchPlayfield.WIDTH / Catcher.BASE_SPEED * 2;
 
         private readonly double[] velocities;
 
@@ -63,26 +66,41 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             base.Update();
 
-            float startY = hitObjectContainer.PositionAtTime(StartTime);
+            double currentTime = hitObjectContainer.Time.Current;
 
             for (int i = 0; i < velocities.Length; i++)
             {
                 double velocity = velocities[i];
-                var verticalPath = verticalPaths[i];
 
-                // The line ends at the top of the screen.
-                double topScreenTime = hitObjectContainer.TimeAtPosition(-hitObjectContainer.DrawHeight, hitObjectContainer.Time.Current);
-                double endTime = Math.Max(StartTime, topScreenTime);
+                // The line ends at the top of the playfield.
+                double endTime = hitObjectContainer.TimeAtPosition(-hitObjectContainer.DrawHeight, currentTime);
 
-                float x = (float)((endTime - StartTime) * velocity);
-                float y = hitObjectContainer.PositionAtTime(endTime, StartTime);
+                // Non-vertical lines are cut at the sides of the playfield.
+                // Vertical lines are cut at some reasonable length.
+                if (velocity > 0)
+                    endTime = Math.Min(endTime, StartTime + (CatchPlayfield.WIDTH - StartX) / velocity);
+                else if (velocity < 0)
+                    endTime = Math.Min(endTime, StartTime + StartX / -velocity);
+                else
+                    endTime = Math.Min(endTime, StartTime + max_vertical_line_length_in_time);
 
                 Vector2[] lineVertices = verticalLineVertices[i];
-                lineVertices[0] = new Vector2(StartX, startY);
-                lineVertices[1] = lineVertices[0] + new Vector2(x, y);
+                lineVertices[0] = calculatePosition(velocity, StartTime);
+                lineVertices[1] = calculatePosition(velocity, endTime);
 
+                var verticalPath = verticalPaths[i];
                 verticalPath.Vertices = verticalLineVertices[i];
                 verticalPath.OriginPosition = verticalPath.PositionInBoundingBox(Vector2.Zero);
+            }
+
+            Vector2 calculatePosition(double velocity, double time)
+            {
+                // Don't draw inverted lines.
+                time = Math.Max(time, StartTime);
+
+                float x = StartX + (float)((time - StartTime) * velocity);
+                float y = hitObjectContainer.PositionAtTime(time, currentTime);
+                return new Vector2(x, y);
             }
         }
 
