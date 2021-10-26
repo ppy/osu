@@ -57,8 +57,8 @@ namespace osu.Game.Tests.Visual.Editing
             moveMouseToObject(() => addedObject);
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
 
-            AddAssert("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
-            AddAssert("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Single().State == MenuState.Open);
+            AddUntilStep("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
+            AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Single().State == MenuState.Open);
         }
 
         [Test]
