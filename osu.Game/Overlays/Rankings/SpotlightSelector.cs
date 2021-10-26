@@ -175,18 +175,18 @@ namespace osu.Game.Overlays.Rankings
 
         private class SpotlightsDropdown : OsuDropdown<APISpotlight>
         {
-            private DropdownMenu menu;
+            private OsuDropdownMenu menu;
 
-            protected override DropdownMenu CreateMenu() => menu = base.CreateMenu().With(m => m.MaxHeight = 400);
+            protected override DropdownMenu CreateMenu() => menu = (OsuDropdownMenu)base.CreateMenu().With(m => m.MaxHeight = 400);
 
             protected override DropdownHeader CreateHeader() => new SpotlightsDropdownHeader();
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                // osu-web adds a 0.6 opacity container on top of the 0.5 base one when hovering, 0.8 on a single container here matches the resulting colour
-                AccentColour = colourProvider.Background6.Opacity(0.8f);
                 menu.BackgroundColour = colourProvider.Background5;
+                menu.HoverColour = colourProvider.Background4;
+                menu.SelectionColour = colourProvider.Background3;
                 Padding = new MarginPadding { Vertical = 20 };
             }
 
@@ -205,7 +205,8 @@ namespace osu.Game.Overlays.Rankings
                 private void load(OverlayColourProvider colourProvider)
                 {
                     BackgroundColour = colourProvider.Background6.Opacity(0.5f);
-                    BackgroundColourHover = colourProvider.Background5;
+                    // osu-web adds a 0.6 opacity container on top of the 0.5 base one when hovering, 0.8 on a single container here matches the resulting colour
+                    BackgroundColourHover = colourProvider.Background6.Opacity(0.8f);
                 }
             }
         }

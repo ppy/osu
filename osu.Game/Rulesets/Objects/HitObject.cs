@@ -67,7 +67,8 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
-        public SampleControlPoint SampleControlPoint;
+        public SampleControlPoint SampleControlPoint = SampleControlPoint.DEFAULT;
+        public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;
 
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
@@ -94,6 +95,12 @@ namespace osu.Game.Rulesets.Objects
 
                 foreach (var nested in nestedHitObjects)
                     nested.StartTime += offset;
+
+                if (DifficultyControlPoint != DifficultyControlPoint.DEFAULT)
+                    DifficultyControlPoint.Time = time.NewValue;
+
+                if (SampleControlPoint != SampleControlPoint.DEFAULT)
+                    SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
             };
         }
 
@@ -105,17 +112,26 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
+            var legacyInfo = controlPointInfo as LegacyControlPointInfo;
+
+            if (legacyInfo != null)
+            {
+                DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
+                DifficultyControlPoint.Time = StartTime;
+            }
+            else if (DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                DifficultyControlPoint = new DifficultyControlPoint();
+
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            if (controlPointInfo is LegacyControlPointInfo legacyInfo)
+            // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
+            if (legacyInfo != null)
             {
-                // This is done here since ApplyDefaultsToSelf may be used to determine the end time
-                SampleControlPoint = legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
+                SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
+                SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
             }
-            else
-            {
-                SampleControlPoint ??= SampleControlPoint.DEFAULT;
-            }
+            else if (SampleControlPoint == SampleControlPoint.DEFAULT)
+                SampleControlPoint = new SampleControlPoint();
 
             nestedHitObjects.Clear();
 

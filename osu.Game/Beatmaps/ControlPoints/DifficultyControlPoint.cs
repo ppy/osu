@@ -7,17 +7,20 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
+    /// <remarks>
+    /// Note that going forward, this control point type should always be assigned directly to HitObjects.
+    /// </remarks>
     public class DifficultyControlPoint : ControlPoint
     {
         public static readonly DifficultyControlPoint DEFAULT = new DifficultyControlPoint
         {
-            SpeedMultiplierBindable = { Disabled = true },
+            SliderVelocityBindable = { Disabled = true },
         };
 
         /// <summary>
-        /// The speed multiplier at this control point.
+        /// The slider velocity at this control point.
         /// </summary>
-        public readonly BindableDouble SpeedMultiplierBindable = new BindableDouble(1)
+        public readonly BindableDouble SliderVelocityBindable = new BindableDouble(1)
         {
             Precision = 0.01,
             Default = 1,
@@ -28,21 +31,21 @@ namespace osu.Game.Beatmaps.ControlPoints
         public override Color4 GetRepresentingColour(OsuColour colours) => colours.Lime1;
 
         /// <summary>
-        /// The speed multiplier at this control point.
+        /// The slider velocity at this control point.
         /// </summary>
-        public double SpeedMultiplier
+        public double SliderVelocity
         {
-            get => SpeedMultiplierBindable.Value;
-            set => SpeedMultiplierBindable.Value = value;
+            get => SliderVelocityBindable.Value;
+            set => SliderVelocityBindable.Value = value;
         }
 
         public override bool IsRedundant(ControlPoint existing)
             => existing is DifficultyControlPoint existingDifficulty
-               && SpeedMultiplier == existingDifficulty.SpeedMultiplier;
+               && SliderVelocity == existingDifficulty.SliderVelocity;
 
         public override void CopyFrom(ControlPoint other)
         {
-            SpeedMultiplier = ((DifficultyControlPoint)other).SpeedMultiplier;
+            SliderVelocity = ((DifficultyControlPoint)other).SliderVelocity;
 
             base.CopyFrom(other);
         }

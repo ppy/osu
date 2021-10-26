@@ -30,7 +30,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>, IPostImports<TModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : class, INamedFileInfo, new()
     {
@@ -116,7 +116,7 @@ namespace osu.Game.Database
         /// <param name="paths">One or more archive locations on disk.</param>
         public Task Import(params string[] paths)
         {
-            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
+            var notification = new ImportProgressNotification();
 
             PostNotification?.Invoke(notification);
 
@@ -125,7 +125,7 @@ namespace osu.Game.Database
 
         public Task Import(params ImportTask[] tasks)
         {
-            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
+            var notification = new ImportProgressNotification();
 
             PostNotification?.Invoke(notification);
 
@@ -462,10 +462,12 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
-            using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
-                ExportModelTo(retrievedItem, outputStream);
+            string filename = $"{getValidFilename(item.ToString())}{HandledExtensions.First()}";
 
-            exportStorage.OpenInNativeExplorer();
+            using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
+                ExportModelTo(retrievedItem, stream);
+
+            exportStorage.PresentFileExternally(filename);
         }
 
         /// <summary>

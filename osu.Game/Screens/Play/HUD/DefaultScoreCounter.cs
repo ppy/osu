@@ -11,7 +11,6 @@ namespace osu.Game.Screens.Play.HUD
     public class DefaultScoreCounter : GameplayScoreCounter, ISkinnableDrawable
     {
         public DefaultScoreCounter()
-            : base(6)
         {
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;

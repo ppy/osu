@@ -9,6 +9,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
@@ -16,7 +17,7 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo, IBeatmapOnlineInfo
     {
         public int ID { get; set; }
 
@@ -47,10 +48,7 @@ namespace osu.Game.Beatmaps
         public BeatmapDifficulty BaseDifficulty { get; set; }
 
         [NotMapped]
-        public BeatmapMetrics Metrics { get; set; }
-
-        [NotMapped]
-        public BeatmapOnlineInfo OnlineInfo { get; set; }
+        public APIBeatmap OnlineInfo { get; set; }
 
         [NotMapped]
         public int? MaxCombo { get; set; }
@@ -178,18 +176,48 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IHasOnlineID
 
-        public int? OnlineID => OnlineBeatmapID;
+        public int OnlineID => OnlineBeatmapID ?? -1;
 
         #endregion
 
         #region Implementation of IBeatmapInfo
 
+        [JsonIgnore]
         string IBeatmapInfo.DifficultyName => Version;
+
+        [JsonIgnore]
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
+
+        [JsonIgnore]
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
+
+        [JsonIgnore]
         IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
+
+        [JsonIgnore]
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+
+        [JsonIgnore]
         double IBeatmapInfo.StarRating => StarDifficulty;
+
+        #endregion
+
+        #region Implementation of IBeatmapOnlineInfo
+
+        [JsonIgnore]
+        public int CircleCount => OnlineInfo.CircleCount;
+
+        [JsonIgnore]
+        public int SliderCount => OnlineInfo.SliderCount;
+
+        [JsonIgnore]
+        public int PlayCount => OnlineInfo.PlayCount;
+
+        [JsonIgnore]
+        public int PassCount => OnlineInfo.PassCount;
+
+        [JsonIgnore]
+        public APIFailTimes FailTimes => OnlineInfo.FailTimes;
 
         #endregion
     }

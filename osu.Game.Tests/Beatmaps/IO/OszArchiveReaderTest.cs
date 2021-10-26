@@ -77,8 +77,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 var reader = new ZipArchiveReader(osz);
 
-                using (var stream = new StreamReader(
-                    reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
+                using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {
                     Assert.AreEqual("osu file format v13", stream.ReadLine()?.Trim());
                 }

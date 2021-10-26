@@ -58,75 +58,83 @@ namespace osu.Game.Tournament
 
         private void readBracket()
         {
-            if (storage.Exists(bracket_filename))
+            try
             {
-                using (Stream stream = storage.GetStream(bracket_filename, FileAccess.Read, FileMode.Open))
-                using (var sr = new StreamReader(stream))
-                    ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd(), new JsonPointConverter());
-            }
-
-            ladder ??= new LadderInfo();
-
-            ladder.Ruleset.Value = RulesetStore.GetRuleset(ladder.Ruleset.Value?.ShortName)
-                                   ?? RulesetStore.AvailableRulesets.First();
-
-            bool addedInfo = false;
-
-            // assign teams
-            foreach (var match in ladder.Matches)
-            {
-                match.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == match.Team1Acronym);
-                match.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == match.Team2Acronym);
-
-                foreach (var conditional in match.ConditionalMatches)
+                if (storage.Exists(bracket_filename))
                 {
-                    conditional.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == conditional.Team1Acronym);
-                    conditional.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == conditional.Team2Acronym);
-                    conditional.Round.Value = match.Round.Value;
+                    using (Stream stream = storage.GetStream(bracket_filename, FileAccess.Read, FileMode.Open))
+                    using (var sr = new StreamReader(stream))
+                        ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd(), new JsonPointConverter());
                 }
-            }
 
-            // assign progressions
-            foreach (var pair in ladder.Progressions)
-            {
-                var src = ladder.Matches.FirstOrDefault(p => p.ID == pair.SourceID);
-                var dest = ladder.Matches.FirstOrDefault(p => p.ID == pair.TargetID);
+                ladder ??= new LadderInfo();
 
-                if (src == null)
-                    continue;
+                ladder.Ruleset.Value = RulesetStore.GetRuleset(ladder.Ruleset.Value?.ShortName)
+                                       ?? RulesetStore.AvailableRulesets.First();
 
-                if (dest != null)
+                bool addedInfo = false;
+
+                // assign teams
+                foreach (var match in ladder.Matches)
                 {
-                    if (pair.Losers)
-                        src.LosersProgression.Value = dest;
-                    else
-                        src.Progression.Value = dest;
-                }
-            }
+                    match.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == match.Team1Acronym);
+                    match.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == match.Team2Acronym);
 
-            // link matches to rounds
-            foreach (var round in ladder.Rounds)
-            {
-                foreach (var id in round.Matches)
-                {
-                    var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
-
-                    if (found != null)
+                    foreach (var conditional in match.ConditionalMatches)
                     {
-                        found.Round.Value = round;
-                        if (round.StartDate.Value > found.Date.Value)
-                            found.Date.Value = round.StartDate.Value;
+                        conditional.Team1.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == conditional.Team1Acronym);
+                        conditional.Team2.Value = ladder.Teams.FirstOrDefault(t => t.Acronym.Value == conditional.Team2Acronym);
+                        conditional.Round.Value = match.Round.Value;
                     }
                 }
+
+                // assign progressions
+                foreach (var pair in ladder.Progressions)
+                {
+                    var src = ladder.Matches.FirstOrDefault(p => p.ID == pair.SourceID);
+                    var dest = ladder.Matches.FirstOrDefault(p => p.ID == pair.TargetID);
+
+                    if (src == null)
+                        continue;
+
+                    if (dest != null)
+                    {
+                        if (pair.Losers)
+                            src.LosersProgression.Value = dest;
+                        else
+                            src.Progression.Value = dest;
+                    }
+                }
+
+                // link matches to rounds
+                foreach (var round in ladder.Rounds)
+                {
+                    foreach (var id in round.Matches)
+                    {
+                        var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
+
+                        if (found != null)
+                        {
+                            found.Round.Value = round;
+                            if (round.StartDate.Value > found.Date.Value)
+                                found.Date.Value = round.StartDate.Value;
+                        }
+                    }
+                }
+
+                addedInfo |= addPlayers();
+                addedInfo |= addBeatmaps();
+
+                if (addedInfo)
+                    SaveChanges();
+
+                ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
             }
-
-            addedInfo |= addPlayers();
-            addedInfo |= addBeatmaps();
-
-            if (addedInfo)
-                SaveChanges();
-
-            ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
+            catch (Exception e)
+            {
+                taskCompletionSource.SetException(e);
+                return;
+            }
 
             Schedule(() =>
             {
