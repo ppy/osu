@@ -462,10 +462,12 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
-            using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
-                ExportModelTo(retrievedItem, outputStream);
+            string filename = $"{getValidFilename(item.ToString())}{HandledExtensions.First()}";
 
-            exportStorage.OpenInNativeExplorer();
+            using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
+                ExportModelTo(retrievedItem, stream);
+
+            exportStorage.PresentFileExternally(filename);
         }
 
         /// <summary>

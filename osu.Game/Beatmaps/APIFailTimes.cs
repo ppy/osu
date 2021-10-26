@@ -9,7 +9,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Beatmap metrics based on accumulated online data from community plays.
     /// </summary>
-    public class BeatmapMetrics
+    public class APIFailTimes
     {
         /// <summary>
         /// Points of failure on a relative time scale (usually 0..100).
