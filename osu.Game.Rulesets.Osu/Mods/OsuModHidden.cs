@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 
-
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHidden : ModHidden, IHidesApproachCircles
