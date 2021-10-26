@@ -460,7 +460,7 @@ namespace osu.Game.Beatmaps.Formats
             var curveData = pathData as IHasPathWithRepeats;
 
             writer.Write(FormattableString.Invariant($"{(curveData?.RepeatCount ?? 0) + 1},"));
-            writer.Write(FormattableString.Invariant($"{pathData.Path.Distance},"));
+            writer.Write(FormattableString.Invariant($"{pathData.Path.ExpectedDistance.Value ?? pathData.Path.Distance},"));
 
             if (curveData != null)
             {
