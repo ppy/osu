@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         private readonly List<Path> verticalPaths = new List<Path>();
 
-        private readonly List<List<Vector2>> verticalLineVertices = new List<List<Vector2>>();
+        private readonly List<Vector2[]> verticalLineVertices = new List<Vector2[]>();
 
         [Resolved]
         private Playfield playfield { get; set; }
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                     Alpha = 0.5f,
                 });
 
-                verticalLineVertices.Add(new List<Vector2> { Vector2.Zero, Vector2.Zero });
+                verticalLineVertices.Add(new[] { Vector2.Zero, Vector2.Zero });
             }
 
             AddRangeInternal(verticalPaths);
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                 float x = (float)((endTime - StartTime) * velocity);
                 float y = hitObjectContainer.PositionAtTime(endTime, StartTime);
 
-                List<Vector2> lineVertices = verticalLineVertices[i];
+                Vector2[] lineVertices = verticalLineVertices[i];
                 lineVertices[0] = new Vector2(StartX, startY);
                 lineVertices[1] = lineVertices[0] + new Vector2(x, y);
 
