@@ -154,6 +154,22 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             },
                             new Drawable[]
                             {
+                                new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Alpha = Room.MaxAttempts.Value != null ? 1 : 0,
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
+                                    {
+                                        new OverlinedHeader("Progress"),
+                                        new RoomLocalUserInfo(),
+                                    }
+                                },
+                            },
+                            new Drawable[]
+                            {
                                 new OverlinedHeader("Leaderboard")
                             },
                             new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
@@ -162,6 +178,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         },
                         RowDimensions = new[]
                         {
+                            new Dimension(GridSizeMode.AutoSize),
                             new Dimension(GridSizeMode.AutoSize),
                             new Dimension(GridSizeMode.AutoSize),
                             new Dimension(),
