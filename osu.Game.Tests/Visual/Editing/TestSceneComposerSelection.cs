@@ -5,7 +5,10 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
@@ -28,6 +31,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         private ComposeBlueprintContainer blueprintContainer
             => Editor.ChildrenOfType<ComposeBlueprintContainer>().First();
+
+        private ContextMenuContainer contextMenuContainer
+            => Editor.ChildrenOfType<ContextMenuContainer>().First();
 
         private void moveMouseToObject(Func<HitObject> targetFunc)
         {
@@ -52,18 +58,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
 
             AddAssert("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
-
-            AddStep("delete from context menu", () =>
-            {
-                var pos = blueprintContainer.SelectionBlueprints
-                                            .First(s => s.Item == addedObject)
-                                            .ChildrenOfType<HitCirclePiece>()
-                                            .First();
-
-                InputManager.MoveMouseTo(pos, new Vector2(50, 120));
-                InputManager.Click(MouseButton.Left);
-            });
-            AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count == 0);
+            AddAssert("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Single().State == MenuState.Open);
         }
 
         [Test]
