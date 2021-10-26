@@ -56,6 +56,11 @@ namespace osu.Game.Tests.Visual.Editing
 
             checkMutations();
 
+            // After placement these must be non-default as defaults are read-only.
+            AddAssert("Placed object has non-default control points", () =>
+                editorBeatmap.HitObjects[0].SampleControlPoint != SampleControlPoint.DEFAULT &&
+                editorBeatmap.HitObjects[0].DifficultyControlPoint != DifficultyControlPoint.DEFAULT);
+
             AddStep("Save", () => InputManager.Keys(PlatformAction.Save));
 
             checkMutations();
