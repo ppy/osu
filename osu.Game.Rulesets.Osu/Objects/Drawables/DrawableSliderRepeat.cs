@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
 
-            AccentColour.Value = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
+            AccentColour.Value = Color4.White;
         }
     }
 }

@@ -67,7 +67,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuRulesetConfigManager rulesetConfig)
         {
-            rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
             Origin = Anchor.Centre;
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
@@ -86,13 +85,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
             };
 
+            rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
         protected override void LoadComplete()
         {
             base.LoadComplete();
-             configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
+        }
+           protected override void OnApply()
+        {
+            base.OnApply();
+
+            updateSnapColour();
+            if (Slider != null)
+                Position = Slider.CurvePositionAt(HitObject.RepeatIndex % 2 == 0 ? 1 : 0);
         }
         protected override void UpdateInitialTransforms()
         {
@@ -129,22 +137,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered && timeOffset >= 0)
                 ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
-
-        protected override void OnApply()
-        {
-            base.OnApply();
-
-            updateSnapColour();
-            if (Slider != null)
-                Position = Slider.CurvePositionAt(HitObject.RepeatIndex % 2 == 0 ? 1 : 0);
-        }
            private void updateSnapColour()
         {
             if (beatmap == null || HitObject == null) return;
 
             int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
 
-            AccentColour.Value = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
+            AccentColour.Value = Color4.White;
         }
     }
 }

@@ -24,12 +24,10 @@ using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
-
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSlider : DrawableOsuHitObject
     {
-
         [Resolved]
         private OsuColour colours { get; set; }
 

@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuRulesetConfigManager rulesetConfig)
         {
-            rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
+            
             Origin = Anchor.Centre;
 
             InternalChildren = new Drawable[]
@@ -102,7 +102,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
 
             Size = HitArea.DrawSize;
-
+            
+            rulesetConfig?.BindWith(OsuRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
