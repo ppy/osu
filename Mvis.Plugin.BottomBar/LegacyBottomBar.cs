@@ -109,7 +109,7 @@ namespace Mvis.Plugin.BottomBar
         private void load()
         {
             LLin.OnIdle += Hide;
-            LLin.OnResumeFromIdle += Show;
+            LLin.OnActive += Show;
 
             progressBar.OnSeek = LLin.SeekTo;
         }

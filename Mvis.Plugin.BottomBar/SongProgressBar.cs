@@ -57,7 +57,7 @@ namespace Mvis.Plugin.BottomBar
                 if (IsHovered) showIndicators();
                 UpdateValue(fill.Width);
             };
-            mvis.OnResumeFromIdle += hideIndicators;
+            mvis.OnActive += hideIndicators;
 
             base.LoadComplete();
         }

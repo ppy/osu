@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Menu
 
         private void loadSoloSongSelect() => this.Push(consumeSongSelect());
 
-        private void onMvis() => this.Push(new OldMvisScreen());
+        private void onMvis() => this.Push(new LLinScreen());
 
         private void onImport() => this.Push(new FileImportScreen());
 

@@ -84,10 +84,8 @@ namespace Mvis.Plugin.StoryboardSupport
                 LLin.OnBeatmapChanged(refresh, this, true);
             }
 
-            if (LLin != null)
-                LLin.AddDrawableToProxy(epilepsyWarning);
-            else
-                AddInternal(epilepsyWarning);
+            AddInternal(epilepsyWarning);
+            LLin?.AddProxy(epilepsyWarning.CreateProxy());
         }
 
         private void onScreenResuming()
@@ -168,13 +166,13 @@ namespace Mvis.Plugin.StoryboardSupport
 
             if (prevProxy != null)
             {
-                LLin?.RemoveDrawableFromProxy(prevProxy);
+                LLin?.RemoveProxy(prevProxy);
                 prevProxy.Expire();
             }
 
             prevProxy = getProxy(newStoryboard);
 
-            if (prevProxy != null) LLin?.AddDrawableToProxy(prevProxy);
+            if (prevProxy != null) LLin?.AddProxy(prevProxy);
             prevProxy?.Show();
 
             if (LLin != null)

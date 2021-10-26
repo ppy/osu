@@ -18,6 +18,8 @@ namespace osu.Game.Screens.LLin.Misc
         private void load(MConfigManager config)
         {
             RelativeSizeAxes = Axes.Both;
+            State.Value = Visibility.Visible;
+
             Child = trianglesContainer = new Container
             {
                 Alpha = triangles_alpha,

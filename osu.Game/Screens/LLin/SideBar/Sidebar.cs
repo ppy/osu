@@ -24,7 +24,10 @@ namespace osu.Game.Screens.LLin.SideBar
         private IImplementLLin mvisScreen { get; set; }
 
         public readonly List<ISidebarContent> Components = new List<ISidebarContent>();
+
+        [CanBeNull]
         public TabControl Header;
+
         private const float duration = 400;
         private TabControlItem prevTab;
 
@@ -111,6 +114,8 @@ namespace osu.Game.Screens.LLin.SideBar
 
         public void ShowComponent(Drawable d, bool allowHide = false)
         {
+            if (d == null) Hide();
+
             if (!(d is ISidebarContent c))
                 throw new InvalidOperationException($"{d}不是{typeof(ISidebarContent)}");
 

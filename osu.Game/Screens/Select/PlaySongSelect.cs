@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Select
         }
 
         private void openInMvis() =>
-            this.Push(new OldMvisScreen());
+            this.Push(new LLinScreen());
 
         protected void PresentScore(ScoreInfo score) =>
             FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));

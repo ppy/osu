@@ -54,7 +54,7 @@ namespace osu.Game.Screens.LLin
         /// <summary>
         /// 从空闲状态退出时调用
         /// </summary>
-        public Action OnResumeFromIdle { get; set; }
+        public Action OnActive { get; set; }
 
         /// <summary>
         /// 拖动歌曲进度条时调用<br/><br/>
@@ -83,9 +83,16 @@ namespace osu.Game.Screens.LLin
         /// <summary>
         /// 注册插件KeyBind
         /// </summary>
-        /// <param name="plugin">要注册的插件</param>
-        /// <param name="keybind">要注册的KeyBind</param>
-        public void RegisterKeybind(LLinPlugin plugin, PluginKeybind keybind);
+        /// <param name="plugin">发起插件</param>
+        /// <param name="keybind">目标KeyBind</param>
+        public void RegisterPluginKeybind(LLinPlugin plugin, PluginKeybind keybind);
+
+        /// <summary>
+        /// 撤销一个插件的KeyBind绑定
+        /// </summary>
+        /// <param name="plugin">发起插件</param>
+        /// <param name="keybind">目标KeyBind, 如果是null则撤销该插件的所有按键绑定</param>
+        public void UnRegisterPluginKeybind(LLinPlugin plugin, PluginKeybind keybind = null);
 
         /// <summary>
         /// 获取当前播放器信息
@@ -98,19 +105,19 @@ namespace osu.Game.Screens.LLin
         #region Proxy功能实现
 
         /// <summary>
-        /// 添加一个Drawable到Proxy层
+        /// 添加一个Proxy
         /// </summary>
         /// <param name="d">要添加的Drawable</param>
-        public void AddDrawableToProxy(Drawable d);
+        public void AddProxy(Drawable d);
 
         /// <summary>
-        /// 从Proxy层移除一个Drawablw
+        /// 移除一个Proxy
         /// </summary>
         /// <param name="d">要移除的Drawable</param>
         /// <returns>
         /// true: 移除成功<br/>
         /// false: 移除出现异常</returns>
-        public bool RemoveDrawableFromProxy(Drawable d);
+        public bool RemoveProxy(Drawable d);
 
         #endregion
 

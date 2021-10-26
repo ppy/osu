@@ -54,7 +54,7 @@ namespace Mvis.Plugin.Sandbox
             if (LLin != null)
             {
                 LLin.OnIdle += () => idleAlpha.TriggerChange();
-                LLin.OnResumeFromIdle += () =>
+                LLin.OnActive += () =>
                 {
                     if (Value.Value)
                         this.FadeTo(1, 750, Easing.OutQuint);

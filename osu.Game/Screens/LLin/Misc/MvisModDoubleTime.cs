@@ -1,3 +1,4 @@
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Mods;
 
@@ -16,5 +17,10 @@ namespace osu.Game.Screens.LLin.Misc
             MaxValue = 2,
             MinValue = 0.1f
         };
+
+        public override void ApplyToTrack(ITrack track)
+        {
+            //不要应用到音轨，我们只希望这个Mod影响故事版Sample
+        }
     }
 }

@@ -85,7 +85,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
         private void load()
         {
             LLin.OnIdle += onIdle;
-            LLin.OnResumeFromIdle += resumeFromIdle;
+            LLin.OnActive += resumeFromIdle;
         }
 
         private void resumeFromIdle()
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar
             if (LLin != null)
             {
                 LLin.OnIdle -= onIdle;
-                LLin.OnResumeFromIdle -= resumeFromIdle;
+                LLin.OnActive -= resumeFromIdle;
             }
 
             base.Dispose(isDisposing);
