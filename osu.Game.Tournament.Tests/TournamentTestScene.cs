@@ -8,6 +8,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.IO;
@@ -160,7 +161,7 @@ namespace osu.Game.Tournament.Tests
                     Artist = "Test Artist",
                     ID = RNG.Next(0, 1000000)
                 },
-                OnlineInfo = new BeatmapOnlineInfo(),
+                OnlineInfo = new APIBeatmap(),
             };
 
         protected override ITestSceneTestRunner CreateRunner() => new TournamentTestSceneTestRunner();
