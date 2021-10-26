@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private IBindable<bool> isBreakTime;
         private PeriodTracker spinnerPeriods;
 
-        private float targetAlpha;
+        private float comboBasedAlpha;
 
         [SettingSource(
             "Hidden at combo",
@@ -76,15 +76,15 @@ namespace osu.Game.Rulesets.Osu.Mods
             currentCombo = scoreProcessor.Combo.GetBoundCopy();
             currentCombo.BindValueChanged(combo =>
             {
-                targetAlpha = Math.Max(min_alpha, 1 - (float)combo.NewValue / HiddenComboCount.Value);
+                comboBasedAlpha = Math.Max(min_alpha, 1 - (float)combo.NewValue / HiddenComboCount.Value);
             }, true);
         }
 
         public virtual void Update(Playfield playfield)
         {
-            var overrideAlpha = isBreakTime.Value || spinnerPeriods.IsInAny(playfield.Clock.CurrentTime);
-            var targetOverriddenAlpha = overrideAlpha ? 1 : targetAlpha;
-            playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetOverriddenAlpha, Math.Clamp(playfield.Time.Elapsed / transition_duration, 0, 1));
+            var shouldAlwaysShowCursor = isBreakTime.Value || spinnerPeriods.IsInAny(playfield.Clock.CurrentTime);
+            var targetAlpha = shouldAlwaysShowCursor ? 1 : comboBasedAlpha;
+            playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetAlpha, Math.Clamp(playfield.Time.Elapsed / transition_duration, 0, 1));
         }
     }
 
