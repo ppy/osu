@@ -108,11 +108,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             bool selectionPerformed = performMouseDownActions(e);
-
-            // even if a selection didn't occur, a drag event may still move the selection.
             bool movementPossible = prepareSelectionMovement();
 
-            return selectionPerformed || (e.Button == MouseButton.Left && movementPossible);
+            // check if selection has occurred
+            if (selectionPerformed)
+            {
+                // propagate right click to show context menu on selection
+                return e.Button != MouseButton.Right;
+            }
+
+            // even if a selection didn't occur, a drag event may still move the selection.
+            return e.Button == MouseButton.Left && movementPossible;
         }
 
         protected SelectionBlueprint<T> ClickedBlueprint { get; private set; }

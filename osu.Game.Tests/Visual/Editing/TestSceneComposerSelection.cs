@@ -43,6 +43,30 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestSelectAndShowContextMenu()
+        {
+            var addedObject = new HitCircle { StartTime = 100, Position = new Vector2(100, 100) };
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+
+            moveMouseToObject(() => addedObject);
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+
+            AddAssert("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
+
+            AddStep("delete from context menu", () =>
+            {
+                var pos = blueprintContainer.SelectionBlueprints
+                                            .First(s => s.Item == addedObject)
+                                            .ChildrenOfType<HitCirclePiece>()
+                                            .First();
+
+                InputManager.MoveMouseTo(pos, new Vector2(50, 120));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count == 0);
+        }
+
+        [Test]
         public void TestNudgeSelection()
         {
             HitCircle[] addedObjects = null;
