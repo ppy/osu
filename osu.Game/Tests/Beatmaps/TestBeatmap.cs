@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo.BeatmapSet.Metadata = BeatmapInfo.Metadata;
             BeatmapInfo.BeatmapSet.Beatmaps = new List<BeatmapInfo> { BeatmapInfo };
             BeatmapInfo.Length = 75000;
-            BeatmapInfo.OnlineInfo = new BeatmapOnlineInfo();
+            BeatmapInfo.OnlineInfo = new APIBeatmap();
             BeatmapInfo.BeatmapSet.OnlineInfo = new APIBeatmapSet
             {
                 Status = BeatmapSetOnlineStatus.Ranked,
