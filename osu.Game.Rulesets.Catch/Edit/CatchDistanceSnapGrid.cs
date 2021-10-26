@@ -17,6 +17,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
+    /// <summary>
+    /// The guide lines used in the osu!catch editor to compose patterns that can be caught with constant speed.
+    /// Currently, only forward placement (an object is snapped based on the previous object, not the opposite) is supported.
+    /// </summary>
     public class CatchDistanceSnapGrid : CompositeDrawable
     {
         public double StartTime { get; set; }
