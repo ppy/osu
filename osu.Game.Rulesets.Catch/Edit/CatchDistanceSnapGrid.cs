@@ -87,6 +87,16 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             double time = hitObjectContainer.TimeAtScreenSpacePosition(screenSpacePosition);
 
+            // If the cursor is below the distance snap grid, snap to the origin.
+            // Not returning `null` to retain the continuous snapping behavior when the cursor is slightly below the origin.
+            // This behavior is not currently visible in the editor because editor chooses the snap start time based on the mouse position.
+            if (time <= StartTime)
+            {
+                float y = hitObjectContainer.PositionAtTime(StartTime);
+                Vector2 originPosition = hitObjectContainer.ToScreenSpace(new Vector2(StartX, y));
+                return new SnapResult(originPosition, StartTime);
+            }
+
             return enumerateSnappingCandidates(time)
                    .OrderBy(pos => Vector2.DistanceSquared(screenSpacePosition, pos.ScreenSpacePosition))
                    .FirstOrDefault();
