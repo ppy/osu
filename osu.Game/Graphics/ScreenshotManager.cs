@@ -109,40 +109,42 @@ namespace osu.Game.Graphics
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
 
-                var fileName = getFileName();
-                if (fileName == null) return;
+                string filename = getFilename();
 
-                var stream = storage.GetStream(fileName, FileAccess.Write);
+                if (filename == null) return;
 
-                switch (screenshotFormat.Value)
+                using (var stream = storage.GetStream(filename, FileAccess.Write))
                 {
-                    case ScreenshotFormat.Png:
-                        await image.SaveAsPngAsync(stream).ConfigureAwait(false);
-                        break;
+                    switch (screenshotFormat.Value)
+                    {
+                        case ScreenshotFormat.Png:
+                            await image.SaveAsPngAsync(stream).ConfigureAwait(false);
+                            break;
 
-                    case ScreenshotFormat.Jpg:
-                        const int jpeg_quality = 92;
+                        case ScreenshotFormat.Jpg:
+                            const int jpeg_quality = 92;
 
-                        await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
-                        break;
+                            await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
+                            break;
 
-                    default:
-                        throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
+                        default:
+                            throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
+                    }
                 }
 
                 notificationOverlay.Post(new SimpleNotification
                 {
-                    Text = $"{fileName} saved!",
+                    Text = $"{filename} saved!",
                     Activated = () =>
                     {
-                        storage.PresentFileExternally(fileName);
+                        storage.PresentFileExternally(filename);
                         return true;
                     }
                 });
             }
         });
 
-        private string getFileName()
+        private string getFilename()
         {
             var dt = DateTime.Now;
             var fileExt = screenshotFormat.ToString().ToLowerInvariant();
