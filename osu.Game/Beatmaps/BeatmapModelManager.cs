@@ -123,15 +123,15 @@ namespace osu.Game.Beatmaps
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
             {
-                var existingOnlineId = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
+                var existingSetWithSameOnlineID = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
 
-                if (existingOnlineId != null)
+                if (existingSetWithSameOnlineID != null)
                 {
-                    Delete(existingOnlineId);
+                    Delete(existingSetWithSameOnlineID);
 
                     // in order to avoid a unique key constraint, immediately remove the online ID from the previous set.
-                    existingOnlineId.OnlineBeatmapSetID = null;
-                    foreach (var b in existingOnlineId.Beatmaps)
+                    existingSetWithSameOnlineID.OnlineBeatmapSetID = null;
+                    foreach (var b in existingSetWithSameOnlineID.Beatmaps)
                         b.OnlineBeatmapID = null;
 
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been deleted.");
@@ -192,6 +192,13 @@ namespace osu.Game.Beatmaps
         {
             var setInfo = beatmapInfo.BeatmapSet;
 
+            // Difficulty settings must be copied first due to the clone in `Beatmap<>.BeatmapInfo_Set`.
+            // This should hopefully be temporary, assuming said clone is eventually removed.
+            beatmapInfo.BaseDifficulty.CopyFrom(beatmapContent.Difficulty);
+
+            // All changes to metadata are made in the provided beatmapInfo, so this should be copied to the `IBeatmap` before encoding.
+            beatmapContent.BeatmapInfo = beatmapInfo;
+
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
@@ -202,7 +209,6 @@ namespace osu.Game.Beatmaps
                 using (ContextFactory.GetForWrite())
                 {
                     beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == beatmapInfo.ID);
-                    beatmapInfo.BaseDifficulty.CopyFrom(beatmapContent.Difficulty);
 
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 

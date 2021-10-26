@@ -90,6 +90,8 @@ namespace osu.Game
 
         private WikiOverlay wikiOverlay;
 
+        private ChangelogOverlay changelogOverlay;
+
         private SkinEditorOverlay skinEditor;
 
         private Container overlayContent;
@@ -209,13 +211,6 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (args?.Length > 0)
-            {
-                var paths = args.Where(a => !a.StartsWith('-')).ToArray();
-                if (paths.Length > 0)
-                    Task.Run(() => Import(paths));
-            }
-
             dependencies.CacheAs(this);
 
             dependencies.Cache(SentryLogger);
@@ -336,6 +331,17 @@ namespace osu.Game
                     ShowWiki(link.Argument);
                     break;
 
+                case LinkAction.OpenChangelog:
+                    if (string.IsNullOrEmpty(link.Argument))
+                        ShowChangelogListing();
+                    else
+                    {
+                        var changelogArgs = link.Argument.Split("/");
+                        ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
+                    }
+
+                    break;
+
                 default:
                     throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
             }
@@ -400,6 +406,18 @@ namespace osu.Game
         /// </summary>
         /// <param name="path">The wiki page to show</param>
         public void ShowWiki(string path) => waitForReady(() => wikiOverlay, _ => wikiOverlay.ShowPage(path));
+
+        /// <summary>
+        /// Show changelog listing overlay
+        /// </summary>
+        public void ShowChangelogListing() => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowListing());
+
+        /// <summary>
+        /// Show changelog's build as an overlay
+        /// </summary>
+        /// <param name="updateStream">The update stream name</param>
+        /// <param name="version">The build version of the update stream</param>
+        public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
 
         /// <summary>
         /// Present a beatmap at song select immediately.
@@ -536,6 +554,7 @@ namespace osu.Game
         {
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
+            Logger.Log($"Game-wide working beatmap updated to {beatmap.NewValue}");
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -624,7 +643,7 @@ namespace osu.Game
             SkinManager.PostNotification = n => Notifications.Post(n);
 
             BeatmapManager.PostNotification = n => Notifications.Post(n);
-            BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
+            BeatmapManager.PostImport = items => PresentBeatmap(items.First().Value);
 
             ScoreManager.PostNotification = n => Notifications.Post(n);
             ScoreManager.PostImport = items => PresentScore(items.First().Value);
@@ -638,9 +657,9 @@ namespace osu.Game
                 var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l);
 
                 if (combinations.Count == 0)
-                    return "none";
+                    return ToastStrings.NoKeyBound;
 
-                return string.Join(" or ", combinations);
+                return string.Join(" / ", combinations);
             };
 
             Container logoContainer;
@@ -769,7 +788,7 @@ namespace osu.Game
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
-            var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
@@ -842,6 +861,19 @@ namespace osu.Game
             {
                 if (mode.NewValue != OverlayActivation.All) CloseAllOverlays();
             };
+
+            // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
+            handleStartupImport();
+        }
+
+        private void handleStartupImport()
+        {
+            if (args?.Length > 0)
+            {
+                var paths = args.Where(a => !a.StartsWith('-')).ToArray();
+                if (paths.Length > 0)
+                    Task.Run(() => Import(paths));
+            }
         }
 
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
@@ -881,13 +913,15 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
+                    var logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
+
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
                         Icon = FontAwesome.Solid.EllipsisH,
                         Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
-                            Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
+                            Storage.GetStorageForDirectory(@"logs").PresentFileExternally(logFile);
                             return true;
                         }
                     }));

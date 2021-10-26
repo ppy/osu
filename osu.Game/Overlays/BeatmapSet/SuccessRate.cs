@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.BeatmapSet
             successRate.Length = rate;
             percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
-            Graph.Metrics = beatmapInfo?.Metrics;
+            Graph.FailTimes = beatmapInfo?.FailTimes;
         }
 
         public SuccessRate()
