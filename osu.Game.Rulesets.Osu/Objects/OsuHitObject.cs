@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public virtual Vector2 EndPosition => Position;
 
-        public virtual Vector2 StackedEndPosition => EndPosition + StackOffset;
+        public Vector2 StackedEndPosition => EndPosition + StackOffset;
 
         public readonly Bindable<int> StackHeightBindable = new Bindable<int>();
 
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => StackHeightBindable.Value = value;
         }
 
-        public Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
+        public virtual Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
 
         public double Radius => OBJECT_RADIUS * Scale;
 

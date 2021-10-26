@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public int MaximumBonusSpins { get; protected set; } = 1;
 
-        public override Vector2 StackedEndPosition => EndPosition;
+        public override Vector2 StackOffset => Vector2.Zero;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
