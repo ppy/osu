@@ -152,18 +152,23 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         private void updateDistanceSnapGrid()
         {
-            var sourceHitObject = getDistanceSnapGridSourceHitObject();
-
-            if (distanceSnapToggle.Value != TernaryState.True || sourceHitObject == null)
+            if (distanceSnapToggle.Value != TernaryState.True)
             {
                 distanceSnapGrid.Hide();
+                return;
             }
-            else
+
+            var sourceHitObject = getDistanceSnapGridSourceHitObject();
+
+            if (sourceHitObject == null)
             {
-                distanceSnapGrid.Show();
-                distanceSnapGrid.StartTime = sourceHitObject.GetEndTime();
-                distanceSnapGrid.StartX = sourceHitObject.EffectiveX;
+                distanceSnapGrid.Hide();
+                return;
             }
+
+            distanceSnapGrid.Show();
+            distanceSnapGrid.StartTime = sourceHitObject.GetEndTime();
+            distanceSnapGrid.StartX = sourceHitObject.EffectiveX;
         }
     }
 }
