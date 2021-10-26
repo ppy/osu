@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Catch.Edit
         protected override ComposeBlueprintContainer CreateBlueprintContainer() => new CatchBlueprintContainer(this);
 
         [CanBeNull]
-        private PalpableCatchHitObject getPreviousHitObject(double time)
+        private PalpableCatchHitObject getLastSnappableHitObject(double time)
         {
             var hitObject = EditorBeatmap.HitObjects.OfType<CatchHitObject>().LastOrDefault(h => h.GetEndTime() < time && !(h is BananaShower));
 
@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                         return null;
 
                     double minTime = EditorBeatmap.SelectedHitObjects.Min(hitObject => hitObject.StartTime);
-                    return getPreviousHitObject(minTime);
+                    return getLastSnappableHitObject(minTime);
 
                 case FruitCompositionTool _:
                 case JuiceStreamCompositionTool _:
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                     }
 
                     double timeAtCursor = ((CatchPlayfield)Playfield).TimeAtScreenSpacePosition(inputManager.CurrentState.Mouse.Position);
-                    return getPreviousHitObject(timeAtCursor);
+                    return getLastSnappableHitObject(timeAtCursor);
 
                 default:
                     return null;
