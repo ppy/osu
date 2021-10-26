@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Mvis
         {
             CollectionManager collectionManager;
             LLinPluginManager mvisPluginManager;
-            CustomStore customStore = dependencies.Get<CustomStore>() ?? new CustomStore(storage, gameBase);
+            CustomFontStore customStore = dependencies.Get<CustomFontStore>() ?? new CustomFontStore(storage, gameBase);
             dependencies.Cache(customStore);
 
             dependencies.Cache(collectionManager = new CollectionManager(LocalStorage));

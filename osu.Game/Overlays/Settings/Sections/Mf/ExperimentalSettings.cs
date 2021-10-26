@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager mConfig, OsuGame game, CustomStore customStorage)
+        private void load(MConfigManager mConfig, OsuGame game, CustomFontStore customStorage)
         {
             Children = new Drawable[]
             {

@@ -6,51 +6,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using M.Resources.Fonts;
 using osu.Framework;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Overlays.Settings.Sections.Mf;
-using osu.Game.Screens.LLin.Plugins;
 
-namespace osu.Game.Screens
+namespace osu.Game.Screens.LLin.Plugins
 {
-    internal class CustomStore : NamespacedResourceStore<byte[]>
+    internal class PluginStore : NamespacedResourceStore<byte[]>
     {
         private readonly OsuGameBase gameBase;
         private readonly Storage customStorage;
         private readonly Dictionary<Assembly, Type> loadedAssemblies = new Dictionary<Assembly, Type>();
-        private readonly Dictionary<Assembly, Type> loadedMvisPluginAssemblies = new Dictionary<Assembly, Type>();
-        private readonly Dictionary<Assembly, Type> loadedFontAssemblies = new Dictionary<Assembly, Type>();
 
-        public List<Font> ActiveFonts = new List<Font>();
         public List<LLinPluginProvider> LoadedPluginProviders = new List<LLinPluginProvider>();
-        public static bool CustomFontLoaded;
 
-        public CustomStore(Storage storage, OsuGameBase gameBase)
+        public PluginStore(Storage storage, OsuGameBase gameBase)
             : base(new StorageBackedResourceStore(storage), "custom")
         {
             this.gameBase = gameBase;
 
             customStorage = storage.GetStorageForDirectory("custom");
-
-            ActiveFonts.AddRange(new[]
-            {
-                new ExperimentalSettings.FakeFont(),
-                new ExperimentalSettings.FakeFont
-                {
-                    Name = "Noto fonts",
-                    Author = "Google",
-                    Homepage = "https://www.google.com/get/noto/",
-                    FamilyName = "Noto-CJK-Compatibility",
-                    LightAvaliable = false,
-                    MediumAvaliable = false,
-                    SemiBoldAvaliable = false,
-                    BoldAvaliable = false,
-                    BlackAvaliable = false
-                }
-            });
 
             prepareLoad();
         }
@@ -74,11 +50,10 @@ namespace osu.Game.Screens
         private void prepareLoad()
         {
             //获取custom下面所有以Font.dll、.Mvis.dll结尾的文件
-            var fonts = customStorage.GetFiles(".", "*.Font.dll");
             var legacyPlugins = customStorage.GetFiles(".", "Mvis.Plugin.*.dll");
             var plugins = customStorage.GetFiles(".", "LLin.Plugin.*.dll");
 
-            var assemblies = fonts.Concat(legacyPlugins).Concat(plugins);
+            var assemblies = legacyPlugins.Concat(plugins);
 
             try
             {
@@ -139,17 +114,8 @@ namespace osu.Game.Screens
                 {
                     //Logger.Log($"case: 尝试加载 {type}");
 
-                    if (type.IsSubclassOf(typeof(Font)))
-                    {
-                        loadedFontAssemblies[assembly] = type;
-                        loadedAssemblies[assembly] = type;
-                        addFont(type, assembly.FullName);
-                        continue;
-                    }
-
                     if (type.IsSubclassOf(typeof(LLinPluginProvider)))
                     {
-                        loadedMvisPluginAssemblies[assembly] = type;
                         loadedAssemblies[assembly] = type;
                         //Logger.Log($"{type}是插件Provider");
                         addMvisPlugin(type, assembly.FullName);
@@ -164,52 +130,6 @@ namespace osu.Game.Screens
             catch (Exception e)
             {
                 Logger.Error(e, $"载入 {assembly.FullName} 时出现了问题, 请联系你的插件提供方。");
-            }
-        }
-
-        /// <summary>
-        /// 向gameBase添加一个字体
-        /// </summary>
-        /// <param name="fontType">要添加的字体</param>
-        /// <param name="fullName">与fontType对应的Assembly的fullName</param>
-        private void addFont(Type fontType, string fullName)
-        {
-            try
-            {
-                var currentFontInfo = (Font)Activator.CreateInstance(fontType);
-
-                if (ActiveFonts.Any(f => f.FamilyName == currentFontInfo.FamilyName))
-                {
-                    //Logger.Log($"将跳过 {fullName}, 因为已经存在家族名为 {currentFontInfo.FamilyName} 的字体被加载", level: LogLevel.Important);
-                    return;
-                }
-
-                //加载字体
-                gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Regular");
-
-                if (currentFontInfo.LightAvaliable)
-                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Light");
-
-                if (currentFontInfo.MediumAvaliable)
-                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Medium");
-
-                if (currentFontInfo.SemiBoldAvaliable)
-                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-SemiBold");
-
-                if (currentFontInfo.BoldAvaliable)
-                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Bold");
-
-                if (currentFontInfo.BlackAvaliable)
-                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Black");
-
-                ActiveFonts.Add(currentFontInfo);
-
-                //设置CustomFontLoaded
-                CustomFontLoaded = true;
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, $"尝试添加字体{fullName}时出现了问题");
             }
         }
 

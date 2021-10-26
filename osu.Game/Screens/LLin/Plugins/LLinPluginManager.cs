@@ -35,9 +35,6 @@ namespace osu.Game.Screens.LLin.Plugins
         [Resolved]
         private Storage storage { get; set; }
 
-        [Resolved]
-        private CustomStore customStore { get; set; }
-
         [Resolved(canBeNull: true)]
         [CanBeNull]
         private DBusManager dBusManager { get; set; }
@@ -63,8 +60,11 @@ namespace osu.Game.Screens.LLin.Plugins
             InternalChild = (OsuMusicControllerWrapper)DefaultAudioController;
         }
 
+        [CanBeNull]
+        internal PluginStore PluginStore;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuGameBase gameBase, Storage storage)
         {
             try
             {
@@ -82,12 +82,25 @@ namespace osu.Game.Screens.LLin.Plugins
                 blockedProviders = new List<string>();
             }
 
-            foreach (var provider in customStore.LoadedPluginProviders)
+            try
             {
-                if (!blockedProviders.Contains(provider.GetType().Assembly.ToString()))
+                PluginStore = new PluginStore(storage, gameBase);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"未能初始化插件存储, 本次启动将不会加载任何插件！({e.Message})");
+                PluginStore = null;
+            }
+
+            if (PluginStore != null)
+            {
+                foreach (var provider in PluginStore.LoadedPluginProviders)
                 {
-                    AddPlugin(provider.CreatePlugin);
-                    providers.Add(provider);
+                    if (!blockedProviders.Contains(provider.GetType().Assembly.ToString()))
+                    {
+                        AddPlugin(provider.CreatePlugin);
+                        providers.Add(provider);
+                    }
                 }
             }
 
