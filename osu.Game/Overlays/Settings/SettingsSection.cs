@@ -12,7 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -31,9 +31,10 @@ namespace osu.Game.Overlays.Settings
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
         public virtual IEnumerable<string> FilterTerms => new[] { Header.ToString() };
 
-        private const int header_size = 26;
-        private const int margin = 20;
-        private const int border_size = 2;
+        public const int ITEM_SPACING = 14;
+
+        private const int header_size = 24;
+        private const int border_size = 4;
 
         public bool MatchingFilter
         {
@@ -54,8 +55,9 @@ namespace osu.Game.Overlays.Settings
             {
                 Margin = new MarginPadding
                 {
-                    Top = header_size
+                    Top = 36
                 },
+                Spacing = new Vector2(0, ITEM_SPACING),
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
@@ -63,14 +65,14 @@ namespace osu.Game.Overlays.Settings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             AddRangeInternal(new Drawable[]
             {
                 new Box
                 {
                     Name = "separator",
-                    Colour = new Color4(0, 0, 0, 255),
+                    Colour = colourProvider.Background6,
                     RelativeSizeAxes = Axes.X,
                     Height = border_size,
                 },
@@ -78,8 +80,8 @@ namespace osu.Game.Overlays.Settings
                 {
                     Padding = new MarginPadding
                     {
-                        Top = margin + border_size,
-                        Bottom = margin + 10,
+                        Top = 28,
+                        Bottom = 40,
                     },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -87,13 +89,11 @@ namespace osu.Game.Overlays.Settings
                     {
                         header = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: header_size),
+                            Font = OsuFont.TorusAlternate.With(size: header_size),
                             Text = Header,
-                            Colour = colours.Yellow,
                             Margin = new MarginPadding
                             {
-                                Left = SettingsPanel.CONTENT_MARGINS,
-                                Right = SettingsPanel.CONTENT_MARGINS
+                                Horizontal = SettingsPanel.CONTENT_MARGINS
                             }
                         },
                         FlowContent

@@ -17,7 +17,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
@@ -126,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = Header.HEIGHT,
-                            Child = searchTextBox = new LoungeSearchTextBox
+                            Child = searchTextBox = new SearchTextBox
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
@@ -290,7 +289,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             popoverContainer.HidePopover();
         }
 
-        public void Join(Room room, string password, Action<Room> onSuccess = null, Action<string> onFailure = null) => Schedule(() =>
+        public virtual void Join(Room room, string password, Action<Room> onSuccess = null, Action<string> onFailure = null) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
@@ -362,15 +361,5 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
 
         protected abstract ListingPollingComponent CreatePollingComponent();
-
-        private class LoungeSearchTextBox : SearchTextBox
-        {
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                BackgroundUnfocused = OsuColour.Gray(0.06f);
-                BackgroundFocused = OsuColour.Gray(0.12f);
-            }
-        }
     }
 }

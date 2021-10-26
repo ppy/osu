@@ -192,15 +192,15 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 var difficultyPoint = controlPoints.DifficultyPointAt(0);
                 Assert.AreEqual(0, difficultyPoint.Time);
-                Assert.AreEqual(1.0, difficultyPoint.SpeedMultiplier);
+                Assert.AreEqual(1.0, difficultyPoint.SliderVelocity);
 
                 difficultyPoint = controlPoints.DifficultyPointAt(48428);
                 Assert.AreEqual(0, difficultyPoint.Time);
-                Assert.AreEqual(1.0, difficultyPoint.SpeedMultiplier);
+                Assert.AreEqual(1.0, difficultyPoint.SliderVelocity);
 
                 difficultyPoint = controlPoints.DifficultyPointAt(116999);
                 Assert.AreEqual(116999, difficultyPoint.Time);
-                Assert.AreEqual(0.75, difficultyPoint.SpeedMultiplier, 0.1);
+                Assert.AreEqual(0.75, difficultyPoint.SliderVelocity, 0.1);
 
                 var soundPoint = controlPoints.SamplePointAt(0);
                 Assert.AreEqual(956, soundPoint.Time);
@@ -227,7 +227,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsTrue(effectPoint.KiaiMode);
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
 
-                effectPoint = controlPoints.EffectPointAt(119637);
+                effectPoint = controlPoints.EffectPointAt(116637);
                 Assert.AreEqual(95901, effectPoint.Time);
                 Assert.IsFalse(effectPoint.KiaiMode);
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
@@ -249,10 +249,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.EffectPoints.Count, Is.EqualTo(3));
                 Assert.That(controlPoints.SamplePoints.Count, Is.EqualTo(3));
 
-                Assert.That(controlPoints.DifficultyPointAt(500).SpeedMultiplier, Is.EqualTo(1.5).Within(0.1));
-                Assert.That(controlPoints.DifficultyPointAt(1500).SpeedMultiplier, Is.EqualTo(1.5).Within(0.1));
-                Assert.That(controlPoints.DifficultyPointAt(2500).SpeedMultiplier, Is.EqualTo(0.75).Within(0.1));
-                Assert.That(controlPoints.DifficultyPointAt(3500).SpeedMultiplier, Is.EqualTo(1.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(500).SliderVelocity, Is.EqualTo(1.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(1500).SliderVelocity, Is.EqualTo(1.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(2500).SliderVelocity, Is.EqualTo(0.75).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(3500).SliderVelocity, Is.EqualTo(1.5).Within(0.1));
 
                 Assert.That(controlPoints.EffectPointAt(500).KiaiMode, Is.True);
                 Assert.That(controlPoints.EffectPointAt(1500).KiaiMode, Is.True);
@@ -279,10 +279,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("timingpoint-speedmultiplier-reset.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var controlPoints = decoder.Decode(stream).ControlPointInfo;
+                var controlPoints = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
 
-                Assert.That(controlPoints.DifficultyPointAt(0).SpeedMultiplier, Is.EqualTo(0.5).Within(0.1));
-                Assert.That(controlPoints.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(0).SliderVelocity, Is.EqualTo(0.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1).Within(0.1));
             }
         }
 
@@ -394,12 +394,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("controlpoint-difficulty-multiplier.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var controlPointInfo = decoder.Decode(stream).ControlPointInfo;
+                var controlPointInfo = (LegacyControlPointInfo)decoder.Decode(stream).ControlPointInfo;
 
-                Assert.That(controlPointInfo.DifficultyPointAt(5).SpeedMultiplier, Is.EqualTo(1));
-                Assert.That(controlPointInfo.DifficultyPointAt(1000).SpeedMultiplier, Is.EqualTo(10));
-                Assert.That(controlPointInfo.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1.8518518518518519d));
-                Assert.That(controlPointInfo.DifficultyPointAt(3000).SpeedMultiplier, Is.EqualTo(0.5));
+                Assert.That(controlPointInfo.DifficultyPointAt(5).SliderVelocity, Is.EqualTo(1));
+                Assert.That(controlPointInfo.DifficultyPointAt(1000).SliderVelocity, Is.EqualTo(10));
+                Assert.That(controlPointInfo.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1.8518518518518519d));
+                Assert.That(controlPointInfo.DifficultyPointAt(3000).SliderVelocity, Is.EqualTo(0.5));
             }
         }
 
@@ -773,6 +773,23 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(seventh.ControlPoints[3].Type == null);
                 Assert.That(seventh.ControlPoints[4].Position, Is.EqualTo(new Vector2(410, 20)));
                 Assert.That(seventh.ControlPoints[4].Type == null);
+            }
+        }
+
+        [Test]
+        public void TestSliderLengthExtensionEdgeCase()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("duplicate-last-position-slider.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+
+                var path = ((IHasPath)decoded.HitObjects[0]).Path;
+
+                Assert.That(path.ExpectedDistance.Value, Is.EqualTo(2));
+                Assert.That(path.Distance, Is.EqualTo(1));
             }
         }
     }

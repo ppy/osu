@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -34,7 +35,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 BeatmapSet = new BeatmapSetInfo
                 {
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
+                    OnlineInfo = new APIBeatmapSet
+                    {
+                        Ratings = Enumerable.Range(0, 11).ToArray(),
+                    }
                 },
                 Version = "All Metrics",
                 Metadata = new BeatmapMetadata
@@ -50,11 +54,14 @@ namespace osu.Game.Tests.Visual.SongSelect
                     ApproachRate = 3.5f,
                 },
                 StarDifficulty = 5.3f,
-                Metrics = new BeatmapMetrics
+                OnlineInfo = new APIBeatmap
                 {
-                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                },
+                    FailTimes = new APIFailTimes
+                    {
+                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                    },
+                }
             });
         }
 
@@ -65,7 +72,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 BeatmapSet = new BeatmapSetInfo
                 {
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
+                    OnlineInfo = new APIBeatmapSet
+                    {
+                        Ratings = Enumerable.Range(0, 11).ToArray(),
+                    }
                 },
                 Version = "All Metrics",
                 Metadata = new BeatmapMetadata
@@ -80,11 +90,14 @@ namespace osu.Game.Tests.Visual.SongSelect
                     ApproachRate = 3.5f,
                 },
                 StarDifficulty = 5.3f,
-                Metrics = new BeatmapMetrics
+                OnlineInfo = new APIBeatmap
                 {
-                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                },
+                    FailTimes = new APIFailTimes
+                    {
+                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                    },
+                }
             });
         }
 
@@ -95,7 +108,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 BeatmapSet = new BeatmapSetInfo
                 {
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
+                    OnlineInfo = new APIBeatmapSet
+                    {
+                        Ratings = Enumerable.Range(0, 11).ToArray(),
+                    }
                 },
                 Version = "Only Ratings",
                 Metadata = new BeatmapMetadata
@@ -133,11 +149,14 @@ namespace osu.Game.Tests.Visual.SongSelect
                     ApproachRate = 7,
                 },
                 StarDifficulty = 2.91f,
-                Metrics = new BeatmapMetrics
+                OnlineInfo = new APIBeatmap
                 {
-                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                },
+                    FailTimes = new APIFailTimes
+                    {
+                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                    },
+                }
             });
         }
 

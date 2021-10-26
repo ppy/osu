@@ -64,6 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 
             int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
+            int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
             return new OsuDifficultyAttributes
@@ -78,6 +79,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 DrainRate = drainRate,
                 MaxCombo = maxCombo,
                 HitCircleCount = hitCirclesCount,
+                SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
                 Skills = skills
             };
@@ -105,8 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // For the time being, we will use the average clockrate for OD and AR attributes
             double baseClockRate = clock.GetAverageRate();
 
-            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / baseClockRate;
+            hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / baseClockRate;
             preempt = (int)IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / baseClockRate;
 
             return new Skill[]

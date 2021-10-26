@@ -39,17 +39,19 @@ namespace osu.Game.Online.API
             if (string.IsNullOrEmpty(username)) throw new ArgumentException("Missing username.");
             if (string.IsNullOrEmpty(password)) throw new ArgumentException("Missing password.");
 
-            using (var req = new AccessTokenRequestPassword(username, password)
+            var accessTokenRequest = new AccessTokenRequestPassword(username, password)
             {
                 Url = $@"{endpoint}/oauth/token",
                 Method = HttpMethod.Post,
                 ClientId = clientId,
                 ClientSecret = clientSecret
-            })
+            };
+
+            using (accessTokenRequest)
             {
                 try
                 {
-                    req.Perform();
+                    accessTokenRequest.Perform();
                 }
                 catch (Exception ex)
                 {
@@ -60,7 +62,7 @@ namespace osu.Game.Online.API
                     try
                     {
                         // attempt to decode a displayable error string.
-                        var error = JsonConvert.DeserializeObject<OAuthError>(req.GetResponseString() ?? string.Empty);
+                        var error = JsonConvert.DeserializeObject<OAuthError>(accessTokenRequest.GetResponseString() ?? string.Empty);
                         if (error != null)
                             throwableException = new APIException(error.UserDisplayableError, ex);
                     }
@@ -71,7 +73,7 @@ namespace osu.Game.Online.API
                     throw throwableException;
                 }
 
-                Token.Value = req.ResponseObject;
+                Token.Value = accessTokenRequest.ResponseObject;
             }
         }
 
@@ -79,17 +81,19 @@ namespace osu.Game.Online.API
         {
             try
             {
-                using (var req = new AccessTokenRequestRefresh(refresh)
+                var refreshRequest = new AccessTokenRequestRefresh(refresh)
                 {
                     Url = $@"{endpoint}/oauth/token",
                     Method = HttpMethod.Post,
                     ClientId = clientId,
                     ClientSecret = clientSecret
-                })
-                {
-                    req.Perform();
+                };
 
-                    Token.Value = req.ResponseObject;
+                using (refreshRequest)
+                {
+                    refreshRequest.Perform();
+
+                    Token.Value = refreshRequest.ResponseObject;
                     return true;
                 }
             }
