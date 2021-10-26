@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public float StartX { get; set; }
 
-        private const double max_vertical_line_length_in_time = CatchPlayfield.WIDTH / Catcher.BASE_SPEED * 2;
+        private const double max_vertical_line_length_in_time = CatchPlayfield.WIDTH / Catcher.BASE_WALK_SPEED;
 
         private readonly double[] velocities;
 
