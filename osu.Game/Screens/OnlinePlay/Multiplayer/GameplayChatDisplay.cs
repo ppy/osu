@@ -10,7 +10,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
-using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
