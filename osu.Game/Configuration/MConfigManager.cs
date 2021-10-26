@@ -80,6 +80,7 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.DBusAllowPost, true);
             SetDefault(MSetting.EnableTray, isLinuxPlatform);
             SetDefault(MSetting.EnableSystemNotifications, isLinuxPlatform);
+            SetDefault(MSetting.TrayIconName, "mfosu-panel");
 
             //Mpris
             SetDefault(MSetting.MprisUseAvatarlogoAsCover, true);
@@ -143,7 +144,8 @@ namespace osu.Game.Configuration
         DBusAllowPost,
         MprisUseAvatarlogoAsCover,
         EnableTray,
-        EnableSystemNotifications
+        EnableSystemNotifications,
+        TrayIconName
     }
 
     public enum GamemodeActivateCondition

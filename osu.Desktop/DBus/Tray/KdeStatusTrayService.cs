@@ -28,7 +28,15 @@ namespace osu.Desktop.DBus.Tray
             throw new InvalidOperationException("暂时不能修改");
         }
 
-        internal bool Set(string prop, object value) => KdeProperties.Set(prop, value);
+        internal bool Set(string prop, object value)
+        {
+            var result = KdeProperties.Set(prop, value);
+
+            if (result)
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(prop, value));
+
+            return result;
+        }
 
         public event Action<PropertyChanges> OnPropertiesChanged;
 
