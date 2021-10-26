@@ -49,15 +49,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            applyHiddenState(hitObject, true, OnlyFadeApproachCircles.Value);
+            applyHiddenState(hitObject, true);
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            applyHiddenState(hitObject, false, OnlyFadeApproachCircles.Value);
+            applyHiddenState(hitObject, false);
         }
 
-        private void applyHiddenState(DrawableHitObject drawableObject, bool hideApproachCircle, bool hideCirclePiece)
+        private void applyHiddenState(DrawableHitObject drawableObject, bool increaseVisibility)
         {
             if (!(drawableObject is DrawableOsuHitObject drawableOsuObject))
                 return;
@@ -65,6 +65,19 @@ namespace osu.Game.Rulesets.Osu.Mods
             OsuHitObject hitObject = drawableOsuObject.HitObject;
 
             (double fadeStartTime, double fadeDuration) = getFadeOutParameters(drawableOsuObject);
+
+            // process approach circle hiding first (to allow for early return below).
+            if (!increaseVisibility)
+            {
+                if (drawableObject is DrawableHitCircle circle)
+                {
+                    using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
+                        circle.ApproachCircle.Hide();
+                }
+            }
+
+            if (OnlyFadeApproachCircles.Value)
+                return;
 
             switch (drawableObject)
             {
@@ -84,16 +97,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableHitCircle circle:
                     Drawable fadeTarget = circle;
 
-                    if (hideApproachCircle)
+                    if (increaseVisibility)
                     {
                         // only fade the circle piece (not the approach circle) for the increased visibility object.
                         fadeTarget = circle.CirclePiece;
-                    }
-                    else
-                    {
-                        // we don't want to see the approach circle
-                        using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-                            circle.ApproachCircle.Hide();
                     }
 
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
