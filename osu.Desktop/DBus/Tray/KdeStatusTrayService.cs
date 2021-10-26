@@ -15,16 +15,20 @@ namespace osu.Desktop.DBus.Tray
 
         public Action WindowRaise { get; set; }
 
-        private readonly StatusNotifierProperties kdeProperties = new StatusNotifierProperties();
+        public readonly StatusNotifierProperties KdeProperties = new StatusNotifierProperties
+        {
+            Menu = CanonicalTrayService.PATH,
+            ItemIsMenu = true
+        };
 
-        public Task<object> GetAsync(string prop) => Task.FromResult(kdeProperties.Get(prop));
+        public Task<object> GetAsync(string prop) => Task.FromResult(KdeProperties.Get(prop));
 
         public Task SetAsync(string prop, object val)
         {
             throw new InvalidOperationException("暂时不能修改");
         }
 
-        internal bool Set(string prop, object value) => kdeProperties.Set(prop, value);
+        internal bool Set(string prop, object value) => KdeProperties.Set(prop, value);
 
         public event Action<PropertyChanges> OnPropertiesChanged;
 
@@ -36,7 +40,7 @@ namespace osu.Desktop.DBus.Tray
         #region KDE DBus
 
         Task<StatusNotifierProperties> IStatusNotifierItem.GetAllAsync()
-            => Task.FromResult(kdeProperties);
+            => Task.FromResult(KdeProperties);
 
         public Task ContextMenuAsync(int x, int y) => Task.CompletedTask;
 
@@ -107,52 +111,52 @@ namespace osu.Desktop.DBus.Tray
         }
 
         public Task<string> GetCategoryAsync()
-            => Task.FromResult(kdeProperties.Category);
+            => Task.FromResult(KdeProperties.Category);
 
         public Task<string> GetIdAsync()
-            => Task.FromResult(kdeProperties.Id);
+            => Task.FromResult(KdeProperties.Id);
 
         public Task<string> GetTitleAsync()
-            => Task.FromResult(kdeProperties.Title);
+            => Task.FromResult(KdeProperties.Title);
 
         public Task<string> GetStatusAsync()
-            => Task.FromResult(kdeProperties.Status);
+            => Task.FromResult(KdeProperties.Status);
 
         public Task<int> GetWindowIdAsync()
-            => Task.FromResult(kdeProperties.WindowId);
+            => Task.FromResult(KdeProperties.WindowId);
 
         public Task<string> GetIconThemePathAsync()
-            => Task.FromResult(kdeProperties.IconThemePath);
+            => Task.FromResult(KdeProperties.IconThemePath);
 
         public Task<ObjectPath> GetMenuAsync()
             => Task.FromResult(CanonicalTrayService.PATH);
 
         public Task<bool> GetItemIsMenuAsync()
-            => Task.FromResult(kdeProperties.ItemIsMenu);
+            => Task.FromResult(KdeProperties.ItemIsMenu);
 
         public Task<string> GetIconNameAsync()
-            => Task.FromResult(kdeProperties.IconName);
+            => Task.FromResult(KdeProperties.IconName);
 
         public Task<(int, int, byte[])[]> GetIconPixmapAsync()
-            => Task.FromResult(kdeProperties.IconPixmap);
+            => Task.FromResult(KdeProperties.IconPixmap);
 
         public Task<string> GetOverlayIconNameAsync()
-            => Task.FromResult(kdeProperties.OverlayIconName);
+            => Task.FromResult(KdeProperties.OverlayIconName);
 
         public Task<(int, int, byte[])[]> GetOverlayIconPixmapAsync()
-            => Task.FromResult(kdeProperties.OverlayIconPixmap);
+            => Task.FromResult(KdeProperties.OverlayIconPixmap);
 
         public Task<string> GetAttentionIconNameAsync()
-            => Task.FromResult(kdeProperties.AttentionIconName);
+            => Task.FromResult(KdeProperties.AttentionIconName);
 
         public Task<(int, int, byte[])[]> GetAttentionIconPixmapAsync()
-            => Task.FromResult(kdeProperties.AttentionIconPixmap);
+            => Task.FromResult(KdeProperties.AttentionIconPixmap);
 
         public Task<string> GetAttentionMovieNameAsync()
-            => Task.FromResult(kdeProperties.AttentionMovieName);
+            => Task.FromResult(KdeProperties.AttentionMovieName);
 
         public Task<(string, (int, int, byte[])[], string, string)> GetToolTipAsync()
-            => Task.FromResult(kdeProperties.ToolTip);
+            => Task.FromResult(KdeProperties.ToolTip);
 
         #endregion
     }

@@ -12,7 +12,7 @@ namespace osu.Desktop.DBus.Tray
 {
     /// <summary>
     /// todo: 找到文档并实现所有目前未实现的功能<br/>
-    /// https://github.com/gnustep/libs-dbuskit/blob/master/Bundles/DBusMenu/com.canonical.dbusmenu.xml<br/>
+    /// https://github.com/ubuntu/gnome-shell-extension-appindicator/blob/master/interfaces-xml/DBusMenu.xml<br/>
     /// <br/>
     /// 似乎dde不支持com.canonical.dbusmenu?<br/>
     /// https://github.com/linuxdeepin/dtkwidget/issues/85
