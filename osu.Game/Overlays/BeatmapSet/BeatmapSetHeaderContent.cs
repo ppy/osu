@@ -198,6 +198,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             onlineStatusPill = new BeatmapSetOnlineStatusPill
                             {
+                                AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 TextSize = 14,
@@ -220,7 +221,6 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OverlayColourProvider colourProvider)
         {
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
-            onlineStatusPill.BackgroundColour = colourProvider.Background6;
 
             State.BindValueChanged(_ => updateDownloadButtons());
 

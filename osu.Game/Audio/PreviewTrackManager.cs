@@ -43,11 +43,11 @@ namespace osu.Game.Audio
         }
 
         /// <summary>
-        /// Retrieves a <see cref="PreviewTrack"/> for a <see cref="BeatmapSetInfo"/>.
+        /// Retrieves a <see cref="PreviewTrack"/> for a <see cref="IBeatmapSetInfo"/>.
         /// </summary>
-        /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to retrieve the preview track for.</param>
+        /// <param name="beatmapSetInfo">The <see cref="IBeatmapSetInfo"/> to retrieve the preview track for.</param>
         /// <returns>The playable <see cref="PreviewTrack"/>.</returns>
-        public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo)
+        public PreviewTrack Get(IBeatmapSetInfo beatmapSetInfo)
         {
             var track = CreatePreviewTrack(beatmapSetInfo, trackStore);
 
@@ -91,7 +91,7 @@ namespace osu.Game.Audio
         /// <summary>
         /// Creates the <see cref="TrackManagerPreviewTrack"/>.
         /// </summary>
-        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) =>
+        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) =>
             new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
         public class TrackManagerPreviewTrack : PreviewTrack
@@ -99,10 +99,10 @@ namespace osu.Game.Audio
             [Resolved(canBeNull: true)]
             public IPreviewTrackOwner Owner { get; private set; }
 
-            private readonly BeatmapSetInfo beatmapSetInfo;
+            private readonly IBeatmapSetInfo beatmapSetInfo;
             private readonly ITrackStore trackManager;
 
-            public TrackManagerPreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
+            public TrackManagerPreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
             {
                 this.beatmapSetInfo = beatmapSetInfo;
                 this.trackManager = trackManager;
@@ -114,7 +114,7 @@ namespace osu.Game.Audio
                 Logger.Log($"A {nameof(PreviewTrack)} was created without a containing {nameof(IPreviewTrackOwner)}. An owner should be added for correct behaviour.");
             }
 
-            protected override Track GetTrack() => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3");
+            protected override Track GetTrack() => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineID}.mp3");
         }
 
         private class PreviewTrackStore : AudioCollectionManager<AdjustableAudioComponent>, ITrackStore
