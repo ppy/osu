@@ -7,9 +7,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo, IBeatmapOnlineInfo
     {
         public int ID { get; set; }
 
@@ -48,10 +48,7 @@ namespace osu.Game.Beatmaps
         public BeatmapDifficulty BaseDifficulty { get; set; }
 
         [NotMapped]
-        public BeatmapMetrics Metrics { get; set; }
-
-        [NotMapped]
-        public BeatmapOnlineInfo OnlineInfo { get; set; }
+        public APIBeatmap OnlineInfo { get; set; }
 
         [NotMapped]
         public int? MaxCombo { get; set; }
@@ -152,18 +149,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
 
-        public string[] SearchableTerms => new[]
-        {
-            Version
-        }.Concat(Metadata?.SearchableTerms ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
-
-        public override string ToString() => $"{Metadata ?? BeatmapSet?.Metadata} {versionString}".Trim();
-
-        public RomanisableString ToRomanisableString()
-        {
-            var metadata = (Metadata ?? BeatmapSet?.Metadata)?.ToRomanisableString() ?? new RomanisableString(null, null);
-            return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
-        }
+        public override string ToString() => this.GetDisplayTitle();
 
         public bool Equals(BeatmapInfo other)
         {
@@ -187,5 +173,52 @@ namespace osu.Game.Beatmaps
         /// Returns a shallow-clone of this <see cref="BeatmapInfo"/>.
         /// </summary>
         public BeatmapInfo Clone() => (BeatmapInfo)MemberwiseClone();
+
+        #region Implementation of IHasOnlineID
+
+        public int OnlineID => OnlineBeatmapID ?? -1;
+
+        #endregion
+
+        #region Implementation of IBeatmapInfo
+
+        [JsonIgnore]
+        string IBeatmapInfo.DifficultyName => Version;
+
+        [JsonIgnore]
+        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
+
+        [JsonIgnore]
+        IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
+
+        [JsonIgnore]
+        IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
+
+        [JsonIgnore]
+        IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+
+        [JsonIgnore]
+        double IBeatmapInfo.StarRating => StarDifficulty;
+
+        #endregion
+
+        #region Implementation of IBeatmapOnlineInfo
+
+        [JsonIgnore]
+        public int CircleCount => OnlineInfo.CircleCount;
+
+        [JsonIgnore]
+        public int SliderCount => OnlineInfo.SliderCount;
+
+        [JsonIgnore]
+        public int PlayCount => OnlineInfo.PlayCount;
+
+        [JsonIgnore]
+        public int PassCount => OnlineInfo.PassCount;
+
+        [JsonIgnore]
+        public APIFailTimes FailTimes => OnlineInfo.FailTimes;
+
+        #endregion
     }
 }

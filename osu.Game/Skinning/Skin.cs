@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
@@ -50,18 +51,25 @@ namespace osu.Game.Skinning
                 if (fileInfo == null)
                     continue;
 
-                var bytes = resources?.Files.Get(fileInfo.FileInfo.StoragePath);
+                byte[] bytes = resources?.Files.Get(fileInfo.FileInfo.StoragePath);
 
                 if (bytes == null)
                     continue;
 
-                string jsonContent = Encoding.UTF8.GetString(bytes);
-                var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
+                try
+                {
+                    string jsonContent = Encoding.UTF8.GetString(bytes);
+                    var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
 
-                if (deserializedContent == null)
-                    continue;
+                    if (deserializedContent == null)
+                        continue;
 
-                DrawableComponentInfo[skinnableTarget] = deserializedContent.ToArray();
+                    DrawableComponentInfo[skinnableTarget] = deserializedContent.ToArray();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to load skin configuration.");
+                }
             }
         }
 

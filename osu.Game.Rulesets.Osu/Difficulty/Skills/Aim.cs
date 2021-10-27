@@ -26,10 +26,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.database = database;
         }
 
-        protected override double SkillMultiplier => 26.25;
-        protected override double StrainDecayBase => 0.15;
+        private double currentStrain = 1;
 
-        protected override double StrainValueOf(int index, DifficultyHitObject current)
+        private double skillMultiplier => 26.25;
+        private double strainDecayBase => 0.15;
+
+        private double strainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -74,12 +76,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 calculateAimValue(0, distanceExp, 320) * 0.1);
         }
 
-        private double bothCalculate(double jumpDistanceExp, double travelDistanceExp, double circleTime, double sliderTime)
-        {
-            return jumpDistanceExp / circleTime
-                + (travelDistanceExp > 0 && sliderTime > 0 ? travelDistanceExp / sliderTime * 0.1 : 0) 
-                + Math.Sqrt(jumpDistanceExp * travelDistanceExp) / (circleTime + sliderTime);
-        }
+            double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
+            double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance);
 
         private double calculateAimValue(double result, double distanceExp, double strainTime)
         {
@@ -90,5 +88,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
+
+        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+
+        protected override double CalculateInitialStrain(double time) => currentStrain * strainDecay(time - Previous[0].StartTime);
+
+        protected override double StrainValueAt(DifficultyHitObject current)
+        {
+            currentStrain *= strainDecay(current.DeltaTime);
+            currentStrain += strainValueOf(current) * skillMultiplier;
+
+            return currentStrain;
+        }
     }
 }

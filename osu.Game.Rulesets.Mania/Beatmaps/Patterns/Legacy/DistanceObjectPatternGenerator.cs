@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             Debug.Assert(distanceData != null);
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
-            DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(hitObject.StartTime);
+            DifficultyControlPoint difficultyPoint = hitObject.DifficultyControlPoint;
 
             double beatLength;
 #pragma warning disable 618
@@ -55,13 +55,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 #pragma warning restore 618
                 beatLength = timingPoint.BeatLength * legacyDifficultyPoint.BpmMultiplier;
             else
-                beatLength = timingPoint.BeatLength / difficultyPoint.SpeedMultiplier;
+                beatLength = timingPoint.BeatLength / difficultyPoint.SliderVelocity;
 
             SpanCount = repeatsData?.SpanCount() ?? 1;
             StartTime = (int)Math.Round(hitObject.StartTime);
 
             // This matches stable's calculation.
-            EndTime = (int)Math.Floor(StartTime + distanceData.Distance * beatLength * SpanCount * 0.01 / beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier);
+            EndTime = (int)Math.Floor(StartTime + distanceData.Distance * beatLength * SpanCount * 0.01 / beatmap.Difficulty.SliderMultiplier);
 
             SegmentDuration = (EndTime - StartTime) / SpanCount;
         }
@@ -493,7 +493,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (!(HitObject is IHasPathWithRepeats curveData))
                 return null;
 
-            var index = SegmentDuration == 0 ? 0 : (time - StartTime) / SegmentDuration;
+            int index = SegmentDuration == 0 ? 0 : (time - StartTime) / SegmentDuration;
 
             // avoid slicing the list & creating copies, if at all possible.
             return index == 0 ? curveData.NodeSamples : curveData.NodeSamples.Skip(index).ToList();

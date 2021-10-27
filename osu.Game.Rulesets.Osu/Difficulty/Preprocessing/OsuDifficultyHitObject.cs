@@ -59,6 +59,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private void setDistances()
         {
+            // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
+            if (BaseObject is Spinner || lastObject is Spinner)
+                return;
+
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             // more hr buff for small cs.
             float scalingFactor = (float) Math.Pow(normalized_radius / (float)BaseObject.Radius, 1.15);
@@ -90,11 +94,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
-            // Don't need to jump to reach spinners
-            if (!(BaseObject is Spinner))
-                JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
 
-            if (lastLastObject != null)
+            if (lastLastObject != null && !(lastLastObject is Spinner))
             {
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastObject);
 
@@ -140,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Skip the head circle
             var scoringTimes = slider.NestedHitObjects.Skip(1).Select(t => t.StartTime);
-            foreach (var time in scoringTimes)
+            foreach (double time in scoringTimes)
                 computeVertex(time);
         }
 

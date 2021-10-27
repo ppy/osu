@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
+using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -109,6 +110,8 @@ namespace osu.Game.Tests.Beatmaps
         {
             var beatmap = GetBeatmap(name);
 
+            string beforeConversion = beatmap.Serialize();
+
             var converterResult = new Dictionary<HitObject, IEnumerable<HitObject>>();
 
             var working = new ConversionWorkingBeatmap(beatmap)
@@ -121,6 +124,10 @@ namespace osu.Game.Tests.Beatmaps
             };
 
             working.GetPlayableBeatmap(CreateRuleset().RulesetInfo, mods);
+
+            string afterConversion = beatmap.Serialize();
+
+            Assert.AreEqual(beforeConversion, afterConversion, "Conversion altered original beatmap");
 
             return new ConvertResult
             {
@@ -143,7 +150,7 @@ namespace osu.Game.Tests.Beatmaps
             using (var resStream = openResource($"{resource_namespace}.{name}{expected_conversion_suffix}.json"))
             using (var reader = new StreamReader(resStream))
             {
-                var contents = reader.ReadToEnd();
+                string contents = reader.ReadToEnd();
                 return JsonConvert.DeserializeObject<ConvertResult>(contents);
             }
         }
@@ -166,7 +173,7 @@ namespace osu.Game.Tests.Beatmaps
 
         private Stream openResource(string name)
         {
-            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path)).AsNonNull();
+            string localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path)).AsNonNull();
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 

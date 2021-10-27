@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Spectate
         private readonly IBindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
 
         private readonly Dictionary<int, User> userMap = new Dictionary<int, User>();
-        private readonly Dictionary<int, GameplayState> gameplayStates = new Dictionary<int, GameplayState>();
+        private readonly Dictionary<int, SpectatorGameplayState> gameplayStates = new Dictionary<int, SpectatorGameplayState>();
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Spectate
                 managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
                 managerUpdated.BindValueChanged(beatmapUpdated);
 
-                foreach (var (id, _) in userMap)
+                foreach ((int id, var _) in userMap)
                     spectatorClient.WatchUser(id);
             }));
         }
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Spectate
             if (!e.NewValue.TryGetTarget(out var beatmapSet))
                 return;
 
-            foreach (var (userId, _) in userMap)
+            foreach ((int userId, var _) in userMap)
             {
                 if (!playingUserStates.TryGetValue(userId, out var userState))
                     continue;
@@ -101,20 +101,20 @@ namespace osu.Game.Screens.Spectate
             switch (e.Action)
             {
                 case NotifyDictionaryChangedAction.Add:
-                    foreach (var (userId, state) in e.NewItems.AsNonNull())
+                    foreach ((int userId, var state) in e.NewItems.AsNonNull())
                         onUserStateAdded(userId, state);
                     break;
 
                 case NotifyDictionaryChangedAction.Remove:
-                    foreach (var (userId, _) in e.OldItems.AsNonNull())
+                    foreach ((int userId, var _) in e.OldItems.AsNonNull())
                         onUserStateRemoved(userId);
                     break;
 
                 case NotifyDictionaryChangedAction.Replace:
-                    foreach (var (userId, _) in e.OldItems.AsNonNull())
+                    foreach ((int userId, var _) in e.OldItems.AsNonNull())
                         onUserStateRemoved(userId);
 
-                    foreach (var (userId, state) in e.NewItems.AsNonNull())
+                    foreach ((int userId, var state) in e.NewItems.AsNonNull())
                         onUserStateAdded(userId, state);
                     break;
             }
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Spectate
             {
                 ScoreInfo = new ScoreInfo
                 {
-                    Beatmap = resolvedBeatmap,
+                    BeatmapInfo = resolvedBeatmap,
                     User = user,
                     Mods = spectatorState.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
                     Ruleset = resolvedRuleset.RulesetInfo,
@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Spectate
                 Replay = new Replay { HasReceivedAllFrames = false },
             };
 
-            var gameplayState = new GameplayState(score, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));
+            var gameplayState = new SpectatorGameplayState(score, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));
 
             gameplayStates[userId] = gameplayState;
             Schedule(() => StartGameplay(userId, gameplayState));
@@ -190,8 +190,8 @@ namespace osu.Game.Screens.Spectate
         /// Starts gameplay for a user.
         /// </summary>
         /// <param name="userId">The user to start gameplay for.</param>
-        /// <param name="gameplayState">The gameplay state.</param>
-        protected abstract void StartGameplay(int userId, [NotNull] GameplayState gameplayState);
+        /// <param name="spectatorGameplayState">The gameplay state.</param>
+        protected abstract void StartGameplay(int userId, [NotNull] SpectatorGameplayState spectatorGameplayState);
 
         /// <summary>
         /// Ends gameplay for a user.
@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Spectate
 
             if (spectatorClient != null)
             {
-                foreach (var (userId, _) in userMap)
+                foreach ((int userId, var _) in userMap)
                     spectatorClient.StopWatchingUser(userId);
             }
 

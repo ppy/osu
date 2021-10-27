@@ -18,17 +18,48 @@ namespace osu.Game.Beatmaps
     public class Beatmap<T> : IBeatmap<T>
         where T : HitObject
     {
-        public BeatmapInfo BeatmapInfo { get; set; } = new BeatmapInfo
+        private BeatmapDifficulty difficulty = new BeatmapDifficulty();
+
+        public BeatmapDifficulty Difficulty
         {
-            Metadata = new BeatmapMetadata
+            get => difficulty;
+            set
             {
-                Artist = @"Unknown",
-                Title = @"Unknown",
-                AuthorString = @"Unknown Creator",
-            },
-            Version = @"Normal",
-            BaseDifficulty = new BeatmapDifficulty()
-        };
+                difficulty = value;
+
+                if (beatmapInfo != null)
+                    beatmapInfo.BaseDifficulty = difficulty.Clone();
+            }
+        }
+
+        private BeatmapInfo beatmapInfo;
+
+        public BeatmapInfo BeatmapInfo
+        {
+            get => beatmapInfo;
+            set
+            {
+                beatmapInfo = value;
+
+                if (beatmapInfo?.BaseDifficulty != null)
+                    Difficulty = beatmapInfo.BaseDifficulty.Clone();
+            }
+        }
+
+        public Beatmap()
+        {
+            beatmapInfo = new BeatmapInfo
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Artist = @"Unknown",
+                    Title = @"Unknown",
+                    AuthorString = @"Unknown Creator",
+                },
+                Version = @"Normal",
+                BaseDifficulty = Difficulty,
+            };
+        }
 
         [JsonIgnore]
         public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
@@ -62,7 +93,7 @@ namespace osu.Game.Beatmaps
                                     if (t.Time > lastTime)
                                         return (beatLength: t.BeatLength, 0);
 
-                                    var nextTime = i == ControlPointInfo.TimingPoints.Count - 1 ? lastTime : ControlPointInfo.TimingPoints[i + 1].Time;
+                                    double nextTime = i == ControlPointInfo.TimingPoints.Count - 1 ? lastTime : ControlPointInfo.TimingPoints[i + 1].Time;
                                     return (beatLength: t.BeatLength, duration: nextTime - t.Time);
                                 })
                                 // Aggregate durations into a set of (beatLength, duration) tuples for each beat length

@@ -223,6 +223,41 @@ namespace osu.Game.Tests.Visual.Editing
             moveMouseToObject(() => addedObjects[2]);
             AddStep("click first", () => InputManager.Click(MouseButton.Left));
             assertSelectionIs(addedObjects.Take(3));
+
+            AddStep("release keys", () =>
+            {
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+        }
+
+        [Test]
+        public void TestRangeSelectAfterExternalSelection()
+        {
+            var addedObjects = new[]
+            {
+                new HitCircle { StartTime = 100 },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
+            };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
+
+            AddStep("select all without mouse", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            assertSelectionIs(addedObjects);
+
+            AddStep("hold down shift", () => InputManager.PressKey(Key.ShiftLeft));
+
+            moveMouseToObject(() => addedObjects[1]);
+            AddStep("click second object", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(addedObjects);
+
+            moveMouseToObject(() => addedObjects[3]);
+            AddStep("click fourth object", () => InputManager.Click(MouseButton.Left));
+            assertSelectionIs(addedObjects.Skip(1));
+
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
         }
 
         private void assertSelectionIs(IEnumerable<HitObject> hitObjects)

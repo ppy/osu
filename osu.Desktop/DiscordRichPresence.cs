@@ -140,10 +140,10 @@ namespace osu.Desktop
             switch (activity)
             {
                 case UserActivity.InGame game:
-                    return game.Beatmap.ToString();
+                    return game.BeatmapInfo.ToString();
 
                 case UserActivity.Editing edit:
-                    return edit.Beatmap.ToString();
+                    return edit.BeatmapInfo.ToString();
 
                 case UserActivity.InLobby lobby:
                     return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;

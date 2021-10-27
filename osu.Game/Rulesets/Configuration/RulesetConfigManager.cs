@@ -47,9 +47,34 @@ namespace osu.Game.Rulesets.Configuration
             }
         }
 
+        private readonly HashSet<TLookup> pendingWrites = new HashSet<TLookup>();
+
         protected override bool PerformSave()
         {
-            // do nothing, realm saves immediately
+            TLookup[] changed;
+
+            lock (pendingWrites)
+            {
+                changed = pendingWrites.ToArray();
+                pendingWrites.Clear();
+            }
+
+            if (realmFactory == null)
+                return true;
+
+            using (var context = realmFactory.CreateContext())
+            {
+                context.Write(realm =>
+                {
+                    foreach (var c in changed)
+                    {
+                        var setting = realm.All<RealmRulesetSetting>().First(s => s.RulesetID == rulesetId && s.Variant == variant && s.Key == c.ToString());
+
+                        setting.Value = ConfigStore[c].ToString();
+                    }
+                });
+            }
+
             return true;
         }
 
@@ -80,7 +105,8 @@ namespace osu.Game.Rulesets.Configuration
 
             bindable.ValueChanged += b =>
             {
-                realmFactory?.Context.Write(() => setting.Value = b.NewValue.ToString());
+                lock (pendingWrites)
+                    pendingWrites.Add(lookup);
             };
         }
     }

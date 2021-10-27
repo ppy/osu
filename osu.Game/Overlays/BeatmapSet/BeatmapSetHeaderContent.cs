@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapSet
         public readonly Details Details;
         public readonly BeatmapPicker Picker;
 
-        private readonly UpdateableBeatmapSetCover cover;
+        private readonly UpdateableOnlineBeatmapSetCover cover;
         private readonly Box coverGradient;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            cover = new UpdateableBeatmapSetCover
+                            cover = new UpdateableOnlineBeatmapSetCover
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Masking = true,
@@ -198,6 +198,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             onlineStatusPill = new BeatmapSetOnlineStatusPill
                             {
+                                AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 TextSize = 14,
@@ -211,7 +212,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Picker.Beatmap.ValueChanged += b =>
             {
-                Details.Beatmap = b.NewValue;
+                Details.BeatmapInfo = b.NewValue;
                 externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
             };
         }
@@ -220,7 +221,6 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OverlayColourProvider colourProvider)
         {
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
-            onlineStatusPill.BackgroundColour = colourProvider.Background6;
 
             State.BindValueChanged(_ => updateDownloadButtons());
 
@@ -266,7 +266,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             if (BeatmapSet.Value == null) return;
 
-            if ((BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false) && State.Value != DownloadState.LocallyAvailable)
+            if (BeatmapSet.Value.OnlineInfo.Availability.DownloadDisabled && State.Value != DownloadState.LocallyAvailable)
             {
                 downloadButtonsContainer.Clear();
                 return;

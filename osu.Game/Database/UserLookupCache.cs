@@ -37,7 +37,7 @@ namespace osu.Game.Database
         {
             var userLookupTasks = new List<Task<User>>();
 
-            foreach (var u in userIds)
+            foreach (int u in userIds)
             {
                 userLookupTasks.Add(GetUserAsync(u, token).ContinueWith(task =>
                 {
@@ -115,7 +115,7 @@ namespace osu.Game.Database
                     createNewTask();
             }
 
-            List<User> foundUsers = request.Result?.Users;
+            List<User> foundUsers = request.Response?.Users;
 
             if (foundUsers != null)
             {

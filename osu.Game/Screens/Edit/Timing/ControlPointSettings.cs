@@ -12,8 +12,6 @@ namespace osu.Game.Screens.Edit.Timing
         {
             new GroupSection(),
             new TimingSection(),
-            new DifficultySection(),
-            new SampleSection(),
             new EffectSection(),
         };
     }
