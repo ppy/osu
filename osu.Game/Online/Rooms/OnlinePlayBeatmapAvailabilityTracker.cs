@@ -32,7 +32,7 @@ namespace osu.Game.Online.Rooms
         /// </summary>
         public IBindable<BeatmapAvailability> Availability => availability;
 
-        private readonly Bindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>(BeatmapAvailability.LocallyAvailable());
+        private readonly Bindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>(BeatmapAvailability.NotDownloaded());
 
         private ScheduledDelegate progressUpdate;
 
