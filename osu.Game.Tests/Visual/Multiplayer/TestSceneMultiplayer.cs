@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -48,7 +49,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private TestMultiplayer multiplayerScreen;
         private TestMultiplayerClient client;
 
-        private TestRequestHandlingMultiplayerRoomManager roomManager => multiplayerScreen.RoomManager;
+        private TestMultiplayerRoomManager roomManager => multiplayerScreen.RoomManager;
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -624,9 +625,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
         {
-            public new TestRequestHandlingMultiplayerRoomManager RoomManager { get; private set; }
+            public new TestMultiplayerRoomManager RoomManager { get; private set; }
 
-            protected override RoomManager CreateRoomManager() => RoomManager = new TestRequestHandlingMultiplayerRoomManager();
+            protected override RoomManager CreateRoomManager() => RoomManager = new TestMultiplayerRoomManager();
         }
     }
 }

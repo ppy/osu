@@ -184,9 +184,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
         {
-            public new TestRequestHandlingMultiplayerRoomManager RoomManager { get; private set; }
+            public new TestMultiplayerRoomManager RoomManager { get; private set; }
 
-            protected override RoomManager CreateRoomManager() => RoomManager = new TestRequestHandlingMultiplayerRoomManager();
+            protected override RoomManager CreateRoomManager() => RoomManager = new TestMultiplayerRoomManager();
         }
     }
 }

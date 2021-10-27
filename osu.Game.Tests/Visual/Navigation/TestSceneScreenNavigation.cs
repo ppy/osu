@@ -461,10 +461,10 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public TestMultiplayer()
             {
-                Client = new TestMultiplayerClient((TestRequestHandlingMultiplayerRoomManager)RoomManager);
+                Client = new TestMultiplayerClient((TestMultiplayerRoomManager)RoomManager);
             }
 
-            protected override RoomManager CreateRoomManager() => new TestRequestHandlingMultiplayerRoomManager();
+            protected override RoomManager CreateRoomManager() => new TestMultiplayerRoomManager();
         }
     }
 }
