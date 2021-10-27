@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain = 1;
 
-        protected override double StrainValueOf(int index, DifficultyHitObject current)
+        protected double strainValueOf(int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(int index, DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += strainValueOf(current) * skillMultiplier;
+            currentStrain += strainValueOf(index, current) * skillMultiplier;
 
             return currentStrain;
         }

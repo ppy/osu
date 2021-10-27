@@ -28,8 +28,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double DifficultyMultiplier => 1.04;
         protected override int HistoryLength => 32;
 
-        protected override double SkillMultiplier => 1375;
-        protected override double StrainDecayBase => 0.3;
+        protected double skillMultiplier => 1375;
+        protected double strainDecayBase => 0.3;
 
         private readonly double greatWindow;
 
@@ -170,23 +170,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / strainTime;
         }
 
-        private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
+        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
         protected override double CalculateInitialStrain(double time) => (currentStrain * currentRhythm) * strainDecay(time - Previous[0].StartTime);
 
         protected override double StrainValueAt(int index, DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += strainValueOf(current) * SkillMultiplier;
+            currentStrain += strainValueOf(current) * skillMultiplier;
 
             currentRhythm = calculateRhythmBonus(current);
 
             return currentStrain * currentRhythm;
-        }
-
-        protected override double StrainValueOf(int index, DifficultyHitObject current)
-        {
-            throw new NotImplementedException();
         }
     }
 }
