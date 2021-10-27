@@ -52,15 +52,6 @@ namespace osu.Game.Online
             }
         }
 
-        /// <summary>
-        /// Checks that a database model matches the one expected to be downloaded.
-        /// </summary>
-        /// <example>
-        /// For online play, this could be used to check that the databased model matches the online beatmap.
-        /// </example>
-        /// <param name="databasedModel">The model in database.</param>
-        protected virtual bool VerifyDatabasedModel(ScoreInfo databasedModel) => true; // TODO: do we still need this?
-
         private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<ScoreInfo>>> weakRequest)
         {
             if (weakRequest.NewValue.TryGetTarget(out var request))
@@ -134,13 +125,7 @@ namespace osu.Game.Online
                     if (!checkEquality(item, TrackedItem))
                         return;
 
-                    if (!VerifyDatabasedModel(item))
-                    {
-                        UpdateState(DownloadState.NotDownloaded);
-                        return;
-                    }
-
-                    UpdateState(DownloadState.LocallyAvailable);
+                    UpdateState(DownloadState.NotDownloaded);
                 });
             }
         }
