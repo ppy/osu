@@ -57,14 +57,19 @@ namespace osu.Game.Rulesets.Catch.UI
         public bool CatchFruitOnPlate { get; set; } = true;
 
         /// <summary>
-        /// The relative space to cover in 1 millisecond. based on 1 game pixel per millisecond as in osu-stable.
+        /// The speed of the catcher when the catcher is dashing.
         /// </summary>
-        public const double BASE_SPEED = 1.0;
+        public const double BASE_DASH_SPEED = 1.0;
 
         /// <summary>
-        /// The current speed of the catcher.
+        /// The speed of the catcher when the catcher is not dashing.
         /// </summary>
-        public double Speed => (Dashing ? 1 : 0.5) * BASE_SPEED * hyperDashModifier;
+        public const double BASE_WALK_SPEED = 0.5;
+
+        /// <summary>
+        /// The current speed of the catcher with the hyper-dash modifier applied.
+        /// </summary>
+        public double Speed => (Dashing ? BASE_DASH_SPEED : BASE_WALK_SPEED) * hyperDashModifier;
 
         /// <summary>
         /// The amount by which caught fruit should be scaled down to fit on the plate.
@@ -230,7 +235,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 double positionDifference = target.EffectiveX - X;
                 var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
-                SetHyperDashState(Math.Abs(velocity), target.EffectiveX);
+                SetHyperDashState(Math.Abs(velocity) / BASE_DASH_SPEED, target.EffectiveX);
             }
             else
                 SetHyperDashState();
