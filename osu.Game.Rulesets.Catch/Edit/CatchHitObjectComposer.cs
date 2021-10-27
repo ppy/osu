@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Catch.Edit
             LayerBelowRuleset.Add(distanceSnapGrid = new CatchDistanceSnapGrid(new[]
             {
                 0.0,
-                Catcher.BASE_SPEED, -Catcher.BASE_SPEED,
-                Catcher.BASE_SPEED / 2, -Catcher.BASE_SPEED / 2,
+                Catcher.BASE_DASH_SPEED, -Catcher.BASE_DASH_SPEED,
+                Catcher.BASE_WALK_SPEED, -Catcher.BASE_WALK_SPEED,
             }));
         }
 
