@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double timing_threshold = 107;
 
         private readonly PreNoteDatabase database;
+        private double skillMultiplier => 26.25;
+        private double strainDecayBase => 0.15;
 
         public Aim(PreNoteDatabase database, Mod[] mods)
             : base(mods)
@@ -37,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double angleBonus = 1 + database.preSkills[0].GetAllStrainPeaks()[index] * 0.5;
             double sliderBonus = 1 + database.preSkills[1].GetAllStrainPeaks()[index] * 1;
-            double aimStrain = 0;
+            //double aimStrain = 0;
 
             //double result = 0;
 
@@ -95,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double CalculateInitialStrain(double time) => currentStrain * strainDecay(time - Previous[0].StartTime);
 
-        protected override double StrainValueAt(DifficultyHitObject current)
+        protected override double StrainValueAt(int index, DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
             currentStrain += strainValueOf(current) * skillMultiplier;
