@@ -136,7 +136,7 @@ namespace osu.Game.Online.Chat
                     // length > 3 since all these links need another argument to work
                     if (args.Length > 3 && args[1].EndsWith(websiteRootUrl, StringComparison.OrdinalIgnoreCase))
                     {
-                        string? mainArg = args[3];
+                        string mainArg = args[3];
 
                         switch (args[2])
                         {

@@ -156,7 +156,7 @@ namespace osu.Game.Database
 
                 void convertOnlineIDs<T>() where T : RealmObject
                 {
-                    string? className = typeof(T).Name.Replace(@"Realm", string.Empty);
+                    string className = typeof(T).Name.Replace(@"Realm", string.Empty);
 
                     // version was not bumped when the beatmap/ruleset models were added
                     // therefore we must manually check for their presence to avoid throwing on the `DynamicApi` calls.
