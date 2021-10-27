@@ -85,7 +85,7 @@ namespace osu.Game.Online.Chat
 
         private void postMessage(TextBox sender, bool newtext)
         {
-            var text = Textbox.Text.Trim();
+            string text = Textbox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
                 return;

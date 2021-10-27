@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual
         {
             var dependencyContainer = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            foreach (var (type, value) in CachedDependencies)
+            foreach ((var type, object value) in CachedDependencies)
                 dependencyContainer.CacheAs(type, value);
 
             return dependencyContainer;

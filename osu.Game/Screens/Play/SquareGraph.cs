@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            var max = values.Max();
+            int max = values.Max();
 
             float step = values.Length / (float)ColumnCount;
 

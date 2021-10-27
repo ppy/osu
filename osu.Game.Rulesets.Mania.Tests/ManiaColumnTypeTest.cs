@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private IEnumerable<ColumnType> getResults(StageDefinition definition)
         {
-            for (var i = 0; i < definition.Columns; i++)
+            for (int i = 0; i < definition.Columns; i++)
                 yield return definition.GetTypeOfColumn(i);
         }
     }

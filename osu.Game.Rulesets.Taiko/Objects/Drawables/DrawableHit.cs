@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 var corrected = samples.ToList();
 
-                for (var i = 0; i < corrected.Count; i++)
+                for (int i = 0; i < corrected.Count; i++)
                 {
                     var s = corrected[i];
 
@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             validActionPressed = HitActions.Contains(e.Action);
 
             // Only count this as handled if the new judgement is a hit
-            var result = UpdateResult(true);
+            bool result = UpdateResult(true);
             if (IsHit)
                 HitAction = e.Action;
 

@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Objects
 
                 for (double t = currentTimingPoint.Time; Precision.DefinitelyBigger(endTime, t); t += barLength, currentBeat++)
                 {
-                    var roundedTime = Math.Round(t, MidpointRounding.AwayFromZero);
+                    double roundedTime = Math.Round(t, MidpointRounding.AwayFromZero);
 
                     // in the case of some bar lengths, rounding errors can cause t to be slightly less than
                     // the expected whole number value due to floating point inaccuracies.

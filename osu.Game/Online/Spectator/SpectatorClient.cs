@@ -80,7 +80,7 @@ namespace osu.Game.Online.Spectator
                     watchingUsers.Clear();
 
                     // resubscribe to watched users.
-                    foreach (var userId in users)
+                    foreach (int userId in users)
                         WatchUser(userId);
 
                     // re-send state in case it wasn't received

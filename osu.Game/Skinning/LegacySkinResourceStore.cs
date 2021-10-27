@@ -26,9 +26,9 @@ namespace osu.Game.Skinning
             if (source.Files == null)
                 yield break;
 
-            foreach (var filename in base.GetFilenames(name))
+            foreach (string filename in base.GetFilenames(name))
             {
-                var path = getPathForFile(filename.ToStandardisedPath());
+                string path = getPathForFile(filename.ToStandardisedPath());
                 if (path != null)
                     yield return path;
             }

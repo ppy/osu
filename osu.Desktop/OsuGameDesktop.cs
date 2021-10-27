@@ -156,7 +156,7 @@ namespace osu.Desktop
         {
             lock (importableFiles)
             {
-                var firstExtension = Path.GetExtension(filePaths.First());
+                string firstExtension = Path.GetExtension(filePaths.First());
 
                 if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
 
@@ -177,7 +177,7 @@ namespace osu.Desktop
             {
                 Logger.Log($"Handling batch import of {importableFiles.Count} files");
 
-                var paths = importableFiles.ToArray();
+                string[] paths = importableFiles.ToArray();
                 importableFiles.Clear();
 
                 Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
