@@ -15,7 +15,7 @@ using osu.Game.Overlays.Notifications;
 namespace osu.Game.Database
 {
     public abstract class ModelDownloader<TModel> : IModelDownloader<TModel>
-        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>, IHasOnlineID
+        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>
     {
         public Action<Notification> PostNotification { protected get; set; }
 
@@ -30,7 +30,7 @@ namespace osu.Game.Database
         private readonly IModelManager<TModel> modelManager;
         private readonly IAPIProvider api;
 
-        private readonly List<ArchiveDownloadRequest<TModel>> currentDownloads = new List<ArchiveDownloadRequest<TModel>>();
+        protected readonly List<ArchiveDownloadRequest<TModel>> CurrentDownloads = new List<ArchiveDownloadRequest<TModel>>();
 
         protected ModelDownloader(IModelManager<TModel> modelManager, IAPIProvider api, IIpcHost importHost = null)
         {
@@ -74,7 +74,7 @@ namespace osu.Game.Database
                     if (!imported.Any())
                         downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
 
-                    currentDownloads.Remove(request);
+                    CurrentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
             };
 
@@ -86,7 +86,7 @@ namespace osu.Game.Database
                 return true;
             };
 
-            currentDownloads.Add(request);
+            CurrentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
             api.PerformAsync(request);
@@ -96,7 +96,7 @@ namespace osu.Game.Database
 
             void triggerFailure(Exception error)
             {
-                currentDownloads.Remove(request);
+                CurrentDownloads.Remove(request);
 
                 downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
 
@@ -107,7 +107,7 @@ namespace osu.Game.Database
             }
         }
 
-        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.OnlineID == model.OnlineID);
+        public abstract ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model);
 
         private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
 

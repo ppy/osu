@@ -16,5 +16,8 @@ namespace osu.Game.Scoring
         }
 
         protected override ArchiveDownloadRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, bool minimiseDownload) => new DownloadReplayRequest(score);
+
+        public override ArchiveDownloadRequest<ScoreInfo> GetExistingDownload(ScoreInfo model)
+            => CurrentDownloads.Find(r => r.Model.OnlineScoreID == model.OnlineScoreID);
     }
 }
