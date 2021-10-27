@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return taikoDifficultyHitObjects;
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, PrePerNoteStrainSkill[] preSkills, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods, Skills = skills };
@@ -167,6 +167,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (sr < 0) return sr;
 
             return 10.43 * Math.Log(sr / 8 + 1);
+        }
+
+        protected override PrePerNoteStrainSkill[] CreatePreloadedSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        {
+            return new PrePerNoteStrainSkill[] { };
         }
     }
 }

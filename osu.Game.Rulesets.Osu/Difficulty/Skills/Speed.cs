@@ -29,9 +29,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
 
-        private const double min_doubletap_nerf = 0.5; // minimum value (eventually on stacked)
+        private const double min_doubletap_nerf = 0; // minimum value (eventually on stacked)
         private const double max_doubletap_nerf = 1.0; // maximum value 
-        private const double threshold_doubletap_contributing = 1.5; // minimum distance not influenced (2.0 means it is not stacked at least)
+        private const double threshold_doubletap_contributing = 2.0; // minimum distance not influenced (2.0 means it is not stacked at least)
 
         private const double min_acute_stream_spam_nerf = 0.0; // minimum value (eventually on stacked)
         private const double max_acute_stream_spam_nerf = 1.0; // maximum value 
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             greatWindow = hitWindowGreat;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainValueOf(int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -54,32 +54,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuCurrent = (OsuDifficultyHitObject)current;
             var osuPrevious = Previous.Count > 0 ? (OsuDifficultyHitObject)Previous[0] : null;
 
+            double radius = ((OsuHitObject)osuCurrent.BaseObject).Radius;
             double distance = Math.Min(single_spacing_threshold, osuCurrent.TravelDistance + osuCurrent.JumpDistance);
             double strainTime = osuCurrent.StrainTime;
 
             double greatWindowFull = greatWindow * 2;
             double speedWindowRatio = strainTime / greatWindowFull;
 
+            //double nextStrainTime = strainTime;
+            double multiplier = min_doubletap_nerf +
+                Math.Clamp(distance / (radius * threshold_doubletap_contributing), 0.0, 1.0)
+                * (max_doubletap_nerf - min_doubletap_nerf);
+
             //Aim to nerf cheesy rhythms(Very fast consecutive doubles with large deltatimes between)
             if (osuPrevious != null && strainTime < greatWindowFull && osuPrevious.StrainTime > strainTime)
                 strainTime = Interpolation.Lerp(osuPrevious.StrainTime, strainTime, speedWindowRatio);
-
             //Cap deltatime to the OD 300 hitwindow.
             //0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
             strainTime /= Math.Clamp((strainTime / greatWindowFull) / 0.93, 0.92, 1);
 
-
-            double radius = ((OsuHitObject)osuCurrent.BaseObject).Radius;
+            //strainTime += (nextStrainTime - strainTime) * (1 - multiplier);
+            //strainTime = nextStrainTime;
 
             double speedBonus = 1.0;
             if (strainTime < min_speed_bonus)
             {
-                double multiplierSpeedBonus = min_doubletap_nerf +
-                    Math.Max(Math.Min(distance / (radius * threshold_doubletap_contributing), 1.0), 0.0)
-                    * (max_doubletap_nerf - min_doubletap_nerf); 
+                //double multiplierSpeedBonus = min_doubletap_nerf +
+                //    Math.Max(Math.Min(distance / (radius * threshold_doubletap_contributing), 1.0), 0.0)
+                //    * (max_doubletap_nerf - min_doubletap_nerf); 
                 
                 speedBonus = 1 + Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2)
-                            * multiplierSpeedBonus;
+                            * multiplier
+                            ;
             }
             double angleBonus = 1.0;
 
@@ -104,7 +110,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                             * Math.Sin((pi_over_2 - osuCurrent.Angle.Value) / pi_over_4)) * multiplierAngleBonus;
                     else
                         angleBonus = 1.28;
-                    //angleBonus *= multiplier;
                 }
             }
 

@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, PrePerNoteStrainSkill[] preSkills, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new CatchDifficultyAttributes { Mods = mods, Skills = skills };
@@ -78,6 +78,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 new Movement(mods, halfCatcherWidth, clockRate),
             };
+        }
+
+        protected override PrePerNoteStrainSkill[] CreatePreloadedSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        {
+            return new PrePerNoteStrainSkill[] { };
         }
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]

@@ -21,6 +21,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double StrainTime { get; private set; }
 
+        //public double StrainCircleTime { get; private set; }
+        //public double StrainSliderTime { get; private set; }
+
         /// <summary>
         /// Normalized distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
@@ -50,23 +53,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Capped to 25ms to prevent difficulty calculation breaking from simulatenous objects.
             StrainTime = Math.Max(DeltaTime, 25);
+            //StrainCircleTime = Math.Max(StrainTime - StrainSliderTime, 25);
+            //StrainSliderTime = Math.Max(StrainSliderTime, 0);
         }
 
         private void setDistances()
         {
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
-            float scalingFactor = normalized_radius / (float)BaseObject.Radius;
+            // more hr buff for small cs.
+            float scalingFactor = (float) Math.Pow(normalized_radius / (float)BaseObject.Radius, 1.15);
 
-            if (BaseObject.Radius < 30)
+            if (BaseObject.Radius < 35)
             {
-                float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
+                float smallCircleBonus = Math.Min(35 - (float)BaseObject.Radius, 0) / 40;
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
             if (lastObject is Slider lastSlider)
             {
+                // 36ms means the border minimum of 100 judgement. 
+                //double sliderTermPrevious = lastSlider.EndTime - lastSlider.StartTime;
+                //if(sliderTermPrevious >= 72)
+                //{
+                //    StrainSliderTime = sliderTermPrevious - 36;
+                //} else
+                //{
+                //    StrainSliderTime = sliderTermPrevious / 2;
+                //}
+
                 computeSliderCursorPosition(lastSlider);
                 TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
+            } else
+            {
+                //StrainSliderTime = 0;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);

@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainValueOf(int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
