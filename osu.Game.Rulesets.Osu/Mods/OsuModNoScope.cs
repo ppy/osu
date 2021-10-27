@@ -82,8 +82,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            var shouldAlwaysShowCursor = isBreakTime.Value || spinnerPeriods.IsInAny(playfield.Clock.CurrentTime);
-            var targetAlpha = shouldAlwaysShowCursor ? 1 : comboBasedAlpha;
+            bool shouldAlwaysShowCursor = isBreakTime.Value || spinnerPeriods.IsInAny(playfield.Clock.CurrentTime);
+            float targetAlpha = shouldAlwaysShowCursor ? 1 : comboBasedAlpha;
             playfield.Cursor.Alpha = (float)Interpolation.Lerp(playfield.Cursor.Alpha, targetAlpha, Math.Clamp(playfield.Time.Elapsed / transition_duration, 0, 1));
         }
     }
