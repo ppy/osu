@@ -73,19 +73,19 @@ namespace osu.Game.Tournament.Tests
                             {
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmap(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 12345672,
                                     Seed = { Value = 24 },
                                 },
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmap(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 1234567,
                                     Seed = { Value = 12 },
                                 },
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmap(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 1234567,
                                     Seed = { Value = 16 },
                                 }
@@ -99,19 +99,19 @@ namespace osu.Game.Tournament.Tests
                             {
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmap(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 234567,
                                     Seed = { Value = 3 },
                                 },
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmap(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 234567,
                                     Seed = { Value = 6 },
                                 },
                                 new SeedingBeatmap
                                 {
-                                    BeatmapInfo = CreateSampleBeatmap(),
+                                    Beatmap = CreateSampleBeatmap(),
                                     Score = 234567,
                                     Seed = { Value = 12 },
                                 }

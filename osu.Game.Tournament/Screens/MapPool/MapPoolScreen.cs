@@ -147,11 +147,11 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             if (map != null)
             {
-                if (e.Button == MouseButton.Left && map.BeatmapInfo.OnlineID > 0)
-                    addForBeatmap(map.BeatmapInfo.OnlineID);
+                if (e.Button == MouseButton.Left && map.Beatmap.OnlineID > 0)
+                    addForBeatmap(map.Beatmap.OnlineID);
                 else
                 {
-                    var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.BeatmapInfo.OnlineID);
+                    var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap.OnlineID);
 
                     if (existing != null)
                     {
@@ -179,7 +179,7 @@ namespace osu.Game.Tournament.Screens.MapPool
             if (CurrentMatch.Value == null)
                 return;
 
-            if (CurrentMatch.Value.Round.Value.Beatmaps.All(b => b.BeatmapInfo.OnlineID != beatmapId))
+            if (CurrentMatch.Value.Round.Value.Beatmaps.All(b => b.Beatmap.OnlineID != beatmapId))
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
 
@@ -245,7 +245,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                         flowCount = 1;
                     }
 
-                    currentFlow.Add(new TournamentBeatmapPanel(b.BeatmapInfo, b.Mods)
+                    currentFlow.Add(new TournamentBeatmapPanel(b.Beatmap, b.Mods)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,

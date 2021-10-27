@@ -40,7 +40,7 @@ namespace osu.Game.Tournament.Screens
         private void beatmapChanged(ValueChangedEvent<APIBeatmap> beatmap)
         {
             SongBar.FadeInFromZero(300, Easing.OutQuint);
-            SongBar.BeatmapInfo = beatmap.NewValue;
+            SongBar.Beatmap = beatmap.NewValue;
         }
     }
 }

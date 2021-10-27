@@ -22,21 +22,21 @@ namespace osu.Game.Tournament.Components
 {
     public class SongBar : CompositeDrawable
     {
-        private APIBeatmap beatmapInfo;
+        private APIBeatmap beatmap;
 
         public const float HEIGHT = 145 / 2f;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        public APIBeatmap BeatmapInfo
+        public APIBeatmap Beatmap
         {
             set
             {
-                if (beatmapInfo == value)
+                if (beatmap == value)
                     return;
 
-                beatmapInfo = value;
+                beatmap = value;
                 update();
             }
         }
@@ -95,18 +95,18 @@ namespace osu.Game.Tournament.Components
 
         private void update()
         {
-            if (beatmapInfo == null)
+            if (beatmap == null)
             {
                 flow.Clear();
                 return;
             }
 
-            double bpm = beatmapInfo.BPM; // TODO: check this works.
-            double length = beatmapInfo.Length;
+            double bpm = beatmap.BPM; // TODO: check this works.
+            double length = beatmap.Length;
             string hardRockExtra = "";
             string srExtra = "";
 
-            float ar = beatmapInfo.Difficulty.ApproachRate;
+            float ar = beatmap.Difficulty.ApproachRate;
 
             if ((mods & LegacyMods.HardRock) > 0)
             {
@@ -132,9 +132,9 @@ namespace osu.Game.Tournament.Components
                 default:
                     stats = new (string heading, string content)[]
                     {
-                        ("CS", $"{beatmapInfo.Difficulty.CircleSize:0.#}{hardRockExtra}"),
+                        ("CS", $"{beatmap.Difficulty.CircleSize:0.#}{hardRockExtra}"),
                         ("AR", $"{ar:0.#}{hardRockExtra}"),
-                        ("OD", $"{beatmapInfo.Difficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                        ("OD", $"{beatmap.Difficulty.OverallDifficulty:0.#}{hardRockExtra}"),
                     };
                     break;
 
@@ -142,15 +142,15 @@ namespace osu.Game.Tournament.Components
                 case 3:
                     stats = new (string heading, string content)[]
                     {
-                        ("OD", $"{beatmapInfo.Difficulty.OverallDifficulty:0.#}{hardRockExtra}"),
-                        ("HP", $"{beatmapInfo.Difficulty.DrainRate:0.#}{hardRockExtra}")
+                        ("OD", $"{beatmap.Difficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                        ("HP", $"{beatmap.Difficulty.DrainRate:0.#}{hardRockExtra}")
                     };
                     break;
 
                 case 2:
                     stats = new (string heading, string content)[]
                     {
-                        ("CS", $"{beatmapInfo.Difficulty.CircleSize:0.#}{hardRockExtra}"),
+                        ("CS", $"{beatmap.Difficulty.CircleSize:0.#}{hardRockExtra}"),
                         ("AR", $"{ar:0.#}"),
                     };
                     break;
@@ -186,7 +186,7 @@ namespace osu.Game.Tournament.Components
                                         Children = new Drawable[]
                                         {
                                             new DiffPiece(stats),
-                                            new DiffPiece(("Star Rating", $"{beatmapInfo.StarRating:0.#}{srExtra}"))
+                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating:0.#}{srExtra}"))
                                         }
                                     },
                                     new FillFlowContainer
@@ -229,7 +229,7 @@ namespace osu.Game.Tournament.Components
                         }
                     }
                 },
-                new TournamentBeatmapPanel(beatmapInfo)
+                new TournamentBeatmapPanel(beatmap)
                 {
                     RelativeSizeAxes = Axes.X,
                     Width = 0.5f,

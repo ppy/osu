@@ -193,7 +193,7 @@ namespace osu.Game.Tournament
         {
             var beatmapsRequiringPopulation = ladder.Rounds
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => string.IsNullOrEmpty(b.BeatmapInfo?.BeatmapSet?.Title) && b.ID > 0).ToList();
+                                                    .Where(b => string.IsNullOrEmpty(b.Beatmap?.BeatmapSet?.Title) && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -204,7 +204,7 @@ namespace osu.Game.Tournament
 
                 var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
                 API.Perform(req);
-                b.BeatmapInfo = req.Response ?? new APIBeatmap();
+                b.Beatmap = req.Response ?? new APIBeatmap();
 
                 updateLoadProgressMessage($"Populating round beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
@@ -220,7 +220,7 @@ namespace osu.Game.Tournament
             var beatmapsRequiringPopulation = ladder.Teams
                                                     .SelectMany(r => r.SeedingResults)
                                                     .SelectMany(r => r.Beatmaps)
-                                                    .Where(b => string.IsNullOrEmpty(b.BeatmapInfo?.BeatmapSet?.Title) && b.ID > 0).ToList();
+                                                    .Where(b => string.IsNullOrEmpty(b.Beatmap?.BeatmapSet?.Title) && b.ID > 0).ToList();
 
             if (beatmapsRequiringPopulation.Count == 0)
                 return false;
@@ -231,7 +231,7 @@ namespace osu.Game.Tournament
 
                 var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = b.ID });
                 API.Perform(req);
-                b.BeatmapInfo = req.Response ?? new APIBeatmap();
+                b.Beatmap = req.Response ?? new APIBeatmap();
 
                 updateLoadProgressMessage($"Populating seeding beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
             }
