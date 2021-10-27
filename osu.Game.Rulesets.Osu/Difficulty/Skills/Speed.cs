@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private const double min_doubletap_nerf = 0.5; // minimum value (eventually on stacked)
         private const double max_doubletap_nerf = 1.0; // maximum value 
-        private const double threshold_doubletap_contributing = 1.5; // minimum distance not influenced (2.0 means it is not stacked at least)
+        private const double threshold_doubletap_contributing = 2.0; // minimum distance not influenced (2.0 means it is not stacked at least)
 
         public Speed(Mod[] mods, double hitWindowGreat)
             : base(mods)
