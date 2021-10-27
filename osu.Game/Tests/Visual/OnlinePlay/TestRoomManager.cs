@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// <summary>
     /// A very simple <see cref="RoomManager"/> for use in online play test scenes.
     /// </summary>
-    public class TestRequestHandlingRoomManager : RoomManager
+    public class TestRoomManager : RoomManager
     {
         public Action<Room, string> JoinRoomRequested;
 

@@ -36,7 +36,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         private readonly Container content;
         private readonly Container drawableDependenciesContainer;
         private DelegatedDependencyContainer dependencies;
-        private TestRoomRequestsHandler requestsHandler;
 
         protected OnlinePlayTestScene()
         {
@@ -65,12 +64,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public override void SetUpSteps()
         {
             base.SetUpSteps();
-
-            AddStep("setup API", () =>
-            {
-                requestsHandler = new TestRoomRequestsHandler();
-                ((DummyAPIAccess)API).HandleRequest = request => requestsHandler.HandleRequest(request, API.LocalUser.Value, game);
-            });
+            AddStep("setup API", () => ((DummyAPIAccess)API).HandleRequest = request => OnlinePlayDependencies.RequestsHandler.HandleRequest(request, API.LocalUser.Value, game));
         }
 
         /// <summary>
