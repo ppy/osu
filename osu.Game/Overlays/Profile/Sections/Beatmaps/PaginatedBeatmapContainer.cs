@@ -60,12 +60,12 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         protected override APIRequest<List<APIBeatmapSet>> CreateRequest() =>
             new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
-        protected override Drawable CreateDrawableItem(APIBeatmapSet model) => !model.OnlineBeatmapSetID.HasValue
-            ? null
-            : new GridBeatmapPanel(model.ToBeatmapSet(Rulesets))
+        protected override Drawable CreateDrawableItem(APIBeatmapSet model) => model.OnlineID > 0
+            ? new GridBeatmapPanel(model.ToBeatmapSet(Rulesets))
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-            };
+            }
+            : null;
     }
 }

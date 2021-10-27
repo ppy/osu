@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestCatcherCatchWidth()
         {
-            var halfWidth = Catcher.CalculateCatchWidth(new BeatmapDifficulty { CircleSize = 0 }) / 2;
+            float halfWidth = Catcher.CalculateCatchWidth(new BeatmapDifficulty { CircleSize = 0 }) / 2;
             AddStep("catch fruit", () =>
             {
                 attemptCatch(new Fruit { X = -halfWidth + 1 });
@@ -237,7 +237,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void attemptCatch(Func<CatchHitObject> hitObject, int count)
         {
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
                 attemptCatch(hitObject(), out _, out _);
         }
 
@@ -290,7 +290,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 
-            public TestCatcher(DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty)
+            public TestCatcher(DroppedObjectContainer droppedObjectTarget, IBeatmapDifficultyInfo difficulty)
                 : base(droppedObjectTarget, difficulty)
             {
             }
@@ -298,7 +298,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public class TestKiaiFruit : Fruit
         {
-            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
             {
                 controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
                 base.ApplyDefaultsToSelf(controlPointInfo, difficulty);

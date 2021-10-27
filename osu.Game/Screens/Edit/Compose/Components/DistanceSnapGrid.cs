@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -54,15 +55,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
         private readonly double? endTime;
 
+        protected readonly HitObject ReferenceObject;
+
         /// <summary>
         /// Creates a new <see cref="DistanceSnapGrid"/>.
         /// </summary>
+        /// <param name="referenceObject">A reference object to gather relevant difficulty values from.</param>
         /// <param name="startPosition">The position at which the grid should start. The first tick is located one distance spacing length away from this point.</param>
         /// <param name="startTime">The snapping time at <see cref="StartPosition"/>.</param>
         /// <param name="endTime">The time at which the snapping grid should end. If null, the grid will continue until the bounds of the screen are exceeded.</param>
-        protected DistanceSnapGrid(Vector2 startPosition, double startTime, double? endTime = null)
+        protected DistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
         {
+            ReferenceObject = referenceObject;
             this.endTime = endTime;
+
             StartPosition = startPosition;
             StartTime = startTime;
 
@@ -80,7 +86,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateSpacing()
         {
-            DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(StartTime);
+            DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject);
 
             if (endTime == null)
                 MaxIntervals = int.MaxValue;
@@ -88,7 +94,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 // +1 is added since a snapped hitobject may have its start time slightly less than the snapped time due to floating point errors
                 double maxDuration = endTime.Value - StartTime + 1;
-                MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(StartTime, DistanceSpacing));
+                MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(ReferenceObject, DistanceSpacing));
             }
 
             gridCache.Invalidate();
@@ -126,8 +132,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected ColourInfo GetColourForIndexFromPlacement(int placementIndex)
         {
             var timingPoint = beatmap.ControlPointInfo.TimingPointAt(StartTime);
-            var beatLength = timingPoint.BeatLength / beatDivisor.Value;
-            var beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / beatLength);
+            double beatLength = timingPoint.BeatLength / beatDivisor.Value;
+            int beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / beatLength);
 
             var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 

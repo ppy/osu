@@ -564,23 +564,32 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddRepeatStep("click spectate button", () =>
+            AddUntilStep("wait for ready button to be enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+
+            AddStep("click ready button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
+                InputManager.MoveMouseTo(readyButton);
                 InputManager.Click(MouseButton.Left);
-            }, 2);
+            });
+
+            AddUntilStep("wait for player to be ready", () => client.Room?.Users[0].State == MultiplayerUserState.Ready);
+            AddUntilStep("wait for ready button to be enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+
+            AddStep("click start button", () => InputManager.Click(MouseButton.Left));
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
             // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
             for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
             {
-                var time = i;
+                double time = i;
                 AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.GameplayClock.CurrentTime > time);
             }
 
             AddUntilStep("wait for results", () => Stack.CurrentScreen is ResultsScreen);
         }
+
+        private MultiplayerReadyButton readyButton => this.ChildrenOfType<MultiplayerReadyButton>().Single();
 
         private void createRoom(Func<Room> room)
         {

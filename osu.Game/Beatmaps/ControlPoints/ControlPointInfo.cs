@@ -34,14 +34,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         private readonly SortedList<TimingControlPoint> timingPoints = new SortedList<TimingControlPoint>(Comparer<TimingControlPoint>.Default);
 
         /// <summary>
-        /// All difficulty points.
-        /// </summary>
-        [JsonProperty]
-        public IReadOnlyList<DifficultyControlPoint> DifficultyPoints => difficultyPoints;
-
-        private readonly SortedList<DifficultyControlPoint> difficultyPoints = new SortedList<DifficultyControlPoint>(Comparer<DifficultyControlPoint>.Default);
-
-        /// <summary>
         /// All effect points.
         /// </summary>
         [JsonProperty]
@@ -54,14 +46,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         [JsonIgnore]
         public IEnumerable<ControlPoint> AllControlPoints => Groups.SelectMany(g => g.ControlPoints).ToArray();
-
-        /// <summary>
-        /// Finds the difficulty control point that is active at <paramref name="time"/>.
-        /// </summary>
-        /// <param name="time">The time to find the difficulty control point at.</param>
-        /// <returns>The difficulty control point.</returns>
-        [NotNull]
-        public DifficultyControlPoint DifficultyPointAt(double time) => BinarySearchWithFallback(DifficultyPoints, time, DifficultyControlPoint.DEFAULT);
 
         /// <summary>
         /// Finds the effect control point that is active at <paramref name="time"/>.
@@ -100,7 +84,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             groups.Clear();
             timingPoints.Clear();
-            difficultyPoints.Clear();
             effectPoints.Clear();
         }
 
@@ -197,8 +180,8 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         private static double getClosestSnappedTime(TimingControlPoint timingPoint, double time, int beatDivisor)
         {
-            var beatLength = timingPoint.BeatLength / beatDivisor;
-            var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
+            double beatLength = timingPoint.BeatLength / beatDivisor;
+            int beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
 
             return timingPoint.Time + beatLengths * beatLength;
         }
@@ -277,10 +260,6 @@ namespace osu.Game.Beatmaps.ControlPoints
                 case EffectControlPoint _:
                     existing = EffectPointAt(time);
                     break;
-
-                case DifficultyControlPoint _:
-                    existing = DifficultyPointAt(time);
-                    break;
             }
 
             return newPoint?.IsRedundant(existing) == true;
@@ -298,9 +277,8 @@ namespace osu.Game.Beatmaps.ControlPoints
                     effectPoints.Add(typed);
                     break;
 
-                case DifficultyControlPoint typed:
-                    difficultyPoints.Add(typed);
-                    break;
+                default:
+                    throw new ArgumentException($"A control point of unexpected type {controlPoint.GetType()} was added to this {nameof(ControlPointInfo)}");
             }
         }
 
@@ -314,10 +292,6 @@ namespace osu.Game.Beatmaps.ControlPoints
 
                 case EffectControlPoint typed:
                     effectPoints.Remove(typed);
-                    break;
-
-                case DifficultyControlPoint typed:
-                    difficultyPoints.Remove(typed);
                     break;
             }
         }

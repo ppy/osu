@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Database;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Localisation;
@@ -27,19 +26,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             this.variant = variant;
 
-            FlowContent.Spacing = new Vector2(0, 1);
-            FlowContent.Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS };
+            FlowContent.Spacing = new Vector2(0, 3);
         }
 
         [BackgroundDependencyLoader]
         private void load(RealmContextFactory realmFactory)
         {
-            var rulesetId = Ruleset?.ID;
+            int? rulesetId = Ruleset?.ID;
 
             List<RealmKeyBinding> bindings;
 
-            using (var usage = realmFactory.GetForRead())
-                bindings = usage.Realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
+            using (var realm = realmFactory.CreateContext())
+                bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
@@ -60,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
     }
 
-    public class ResetButton : DangerousTriangleButton
+    public class ResetButton : DangerousSettingsButton
     {
         [BackgroundDependencyLoader]
         private void load()
@@ -75,5 +73,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             Content.CornerRadius = 5;
         }
+
+        // Empty FilterTerms so that the ResetButton is visible only when the whole subsection is visible.
+        public override IEnumerable<string> FilterTerms => Enumerable.Empty<string>();
     }
 }

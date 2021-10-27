@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Accuracy = 0.8,
                     MaxCombo = 500,
                     Combo = 250,
-                    Beatmap = beatmapInfo,
+                    BeatmapInfo = beatmapInfo,
                     User = new User { Username = "Test user" },
                     Date = DateTimeOffset.Now,
                     OnlineScoreID = 12345,

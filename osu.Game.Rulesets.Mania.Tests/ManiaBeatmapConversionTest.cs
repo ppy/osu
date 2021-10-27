@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         public int CompareTo(ConvertValue other)
         {
-            var result = StartTime.CompareTo(other.StartTime);
+            int result = StartTime.CompareTo(other.StartTime);
 
             if (result != 0)
                 return result;

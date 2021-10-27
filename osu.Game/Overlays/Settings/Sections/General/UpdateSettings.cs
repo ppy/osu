@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.OpenOsuFolder,
-                    Action = storage.OpenInNativeExplorer,
+                    Action = storage.PresentExternally,
                 });
 
                 Add(new SettingsButton

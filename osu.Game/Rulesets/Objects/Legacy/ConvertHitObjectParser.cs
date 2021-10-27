@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         if (i >= adds.Length)
                             break;
 
-                        int.TryParse(adds[i], out var sound);
+                        int.TryParse(adds[i], out int sound);
                         nodeSoundTypes[i] = (LegacyHitSoundType)sound;
                     }
                 }

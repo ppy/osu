@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
         {
-            var beatmap = score.ScoreInfo.Beatmap;
+            var beatmap = score.ScoreInfo.BeatmapInfo;
 
             Debug.Assert(beatmap.OnlineBeatmapID != null);
 

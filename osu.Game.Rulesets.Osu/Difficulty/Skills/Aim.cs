@@ -26,8 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.database = database;
         }
 
-        protected override double SkillMultiplier => 26.25;
-        protected override double StrainDecayBase => 0.15;
+        private double currentStrain = 1;
 
         protected override double StrainValueOf(int index, DifficultyHitObject current)
         {
@@ -38,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double angleBonus = 1 + database.preSkills[0].GetAllStrainPeaks()[index] * 0.5;
             double sliderBonus = 1 + database.preSkills[1].GetAllStrainPeaks()[index] * 1;
+            double aimStrain = 0;
 
             //double result = 0;
 
@@ -90,5 +90,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
+
+        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+
+        protected override double CalculateInitialStrain(double time) => currentStrain * strainDecay(time - Previous[0].StartTime);
+
+        protected override double StrainValueAt(DifficultyHitObject current)
+        {
+            currentStrain *= strainDecay(current.DeltaTime);
+            currentStrain += strainValueOf(current) * skillMultiplier;
+
+            return currentStrain;
+        }
     }
 }
