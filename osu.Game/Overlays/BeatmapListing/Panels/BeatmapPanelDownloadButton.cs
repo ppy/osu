@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -13,7 +14,7 @@ using osu.Game.Online;
 
 namespace osu.Game.Overlays.BeatmapListing.Panels
 {
-    public class BeatmapPanelDownloadButton : BeatmapDownloadTrackingComposite
+    public class BeatmapPanelDownloadButton : CompositeDrawable
     {
         protected bool DownloadEnabled => button.Enabled.Value;
 
@@ -26,16 +27,29 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         private readonly DownloadButton button;
         private Bindable<bool> noVideoSetting;
 
+        protected readonly BeatmapDownloadTracker DownloadTracker;
+
+        protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
+
+        private readonly BeatmapSetInfo beatmapSet;
+
         public BeatmapPanelDownloadButton(BeatmapSetInfo beatmapSet)
-            : base(beatmapSet)
         {
-            InternalChild = shakeContainer = new ShakeContainer
+            this.beatmapSet = beatmapSet;
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = button = new DownloadButton
+                shakeContainer = new ShakeContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Child = button = new DownloadButton
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 },
+                DownloadTracker = new BeatmapDownloadTracker(beatmapSet)
+                {
+                    State = { BindTarget = State }
+                }
             };
 
             button.Add(new DownloadProgressBar(beatmapSet)
@@ -50,7 +64,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         {
             base.LoadComplete();
 
-            button.State.BindTo(State);
+            ((IBindable<DownloadState>)button.State).BindTo(DownloadTracker.State);
             FinishTransforms(true);
         }
 
@@ -61,7 +75,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
             button.Action = () =>
             {
-                switch (State.Value)
+                switch (DownloadTracker.State.Value)
                 {
                     case DownloadState.Downloading:
                     case DownloadState.Importing:
@@ -73,16 +87,16 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         if (SelectedBeatmap.Value != null)
                             findPredicate = b => b.OnlineBeatmapID == SelectedBeatmap.Value.OnlineBeatmapID;
 
-                        game?.PresentBeatmap(BeatmapSet.Value, findPredicate);
+                        game?.PresentBeatmap(beatmapSet, findPredicate);
                         break;
 
                     default:
-                        beatmaps.Download(BeatmapSet.Value, noVideoSetting.Value);
+                        beatmaps.Download(beatmapSet, noVideoSetting.Value);
                         break;
                 }
             };
 
-            State.BindValueChanged(state =>
+            DownloadTracker.State.BindValueChanged(state =>
             {
                 switch (state.NewValue)
                 {
@@ -92,7 +106,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
 
                     default:
-                        if (BeatmapSet.Value?.OnlineInfo?.Availability.DownloadDisabled ?? false)
+                        if (beatmapSet.OnlineInfo?.Availability.DownloadDisabled ?? false)
                         {
                             button.Enabled.Value = false;
                             button.TooltipText = "this beatmap is currently not available for download.";
