@@ -35,6 +35,7 @@ namespace osu.Game.Beatmaps
         [NotNull]
         public List<BeatmapSetFileInfo> Files { get; set; } = new List<BeatmapSetFileInfo>();
 
+        // This field is temporary and only used by `APIBeatmapSet.ToBeatmapSet` (soon to be removed) and tests (to be updated to provide APIBeatmapSet instead).
         [NotMapped]
         public APIBeatmapSet OnlineInfo { get; set; }
 
