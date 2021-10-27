@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Play.HUD
         private void updateState()
         {
             // Don't display ever if the ruleset is not using a draining health display.
-            var showLayer = HealthProcessor is DrainingHealthProcessor && fadePlayfieldWhenHealthLow.Value && ShowHealth.Value;
+            bool showLayer = HealthProcessor is DrainingHealthProcessor && fadePlayfieldWhenHealthLow.Value && ShowHealth.Value;
             this.FadeTo(showLayer ? 1 : 0, fade_time, Easing.OutQuint);
         }
 

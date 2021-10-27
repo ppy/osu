@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         [BackgroundDependencyLoader]
         private void load(RealmContextFactory realmFactory)
         {
-            var rulesetId = Ruleset?.ID;
+            int? rulesetId = Ruleset?.ID;
 
             List<RealmKeyBinding> bindings;
 

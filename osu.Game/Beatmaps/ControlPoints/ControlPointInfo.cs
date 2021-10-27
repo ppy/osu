@@ -180,8 +180,8 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         private static double getClosestSnappedTime(TimingControlPoint timingPoint, double time, int beatDivisor)
         {
-            var beatLength = timingPoint.BeatLength / beatDivisor;
-            var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
+            double beatLength = timingPoint.BeatLength / beatDivisor;
+            int beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
 
             return timingPoint.Time + beatLengths * beatLength;
         }

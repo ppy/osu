@@ -93,6 +93,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestFocusLostOnBackKey()
+        {
+            setLocalUserPlaying(true);
+
+            assertChatFocused(false);
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            assertChatFocused(true);
+            AddStep("press escape", () => InputManager.Key(Key.Escape));
+            assertChatFocused(false);
+        }
+
+        [Test]
         public void TestFocusOnTabKeyWhenNotExpanded()
         {
             AddStep("set not expanded", () => chatDisplay.Expanded.Value = false);

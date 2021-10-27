@@ -295,7 +295,7 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[Colours]");
 
-            for (var i = 0; i < colours.Count; i++)
+            for (int i = 0; i < colours.Count; i++)
             {
                 var comboColour = colours[i];
 
@@ -460,7 +460,7 @@ namespace osu.Game.Beatmaps.Formats
             var curveData = pathData as IHasPathWithRepeats;
 
             writer.Write(FormattableString.Invariant($"{(curveData?.RepeatCount ?? 0) + 1},"));
-            writer.Write(FormattableString.Invariant($"{pathData.Path.Distance},"));
+            writer.Write(FormattableString.Invariant($"{pathData.Path.ExpectedDistance.Value ?? pathData.Path.Distance},"));
 
             if (curveData != null)
             {

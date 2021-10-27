@@ -119,6 +119,8 @@ namespace osu.Game.Rulesets.Objects
                 DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
                 DifficultyControlPoint.Time = StartTime;
             }
+            else if (DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                DifficultyControlPoint = new DifficultyControlPoint();
 
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
@@ -128,6 +130,8 @@ namespace osu.Game.Rulesets.Objects
                 SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
                 SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
             }
+            else if (SampleControlPoint == SampleControlPoint.DEFAULT)
+                SampleControlPoint = new SampleControlPoint();
 
             nestedHitObjects.Clear();
 

@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Play.HUD
             var winningBar = Team1Score.Value > Team2Score.Value ? score1Bar : score2Bar;
             var losingBar = Team1Score.Value <= Team2Score.Value ? score1Bar : score2Bar;
 
-            var diff = Math.Max(Team1Score.Value, Team2Score.Value) - Math.Min(Team1Score.Value, Team2Score.Value);
+            int diff = Math.Max(Team1Score.Value, Team2Score.Value) - Math.Min(Team1Score.Value, Team2Score.Value);
 
             losingBar.ResizeWidthTo(0, 400, Easing.OutQuint);
             winningBar.ResizeWidthTo(Math.Min(0.4f, MathF.Pow(diff / 1500000f, 0.5f) / 2), 400, Easing.OutQuint);

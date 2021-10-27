@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets
         {
             unchecked
             {
-                var hashCode = ID.HasValue ? ID.GetHashCode() : 0;
+                int hashCode = ID.HasValue ? ID.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (InstantiationInfo != null ? InstantiationInfo.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Name != null ? Name.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ Available.GetHashCode();

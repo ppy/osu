@@ -16,7 +16,7 @@ namespace osu.Game.Scoring
         {
             ScoreInfo = score;
 
-            var replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+            string replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
 
             if (replayFilename == null)
                 return;

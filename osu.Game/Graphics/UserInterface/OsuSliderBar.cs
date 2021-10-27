@@ -216,10 +216,10 @@ namespace osu.Game.Graphics.UserInterface
                 }
                 else
                 {
-                    var decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
+                    decimal decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
 
                     // Find the number of significant digits (we could have less than 5 after normalize())
-                    var significantDigits = findPrecision(decimalPrecision);
+                    int significantDigits = findPrecision(decimalPrecision);
 
                     TooltipText = floatValue.ToString($"N{significantDigits}");
                 }

@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            var gridSizeIndex = Array.IndexOf(grid_sizes, editorBeatmap.BeatmapInfo.GridSize);
+            int gridSizeIndex = Array.IndexOf(grid_sizes, editorBeatmap.BeatmapInfo.GridSize);
             if (gridSizeIndex >= 0)
                 currentGridSizeIndex = gridSizeIndex;
             updateSpacing();

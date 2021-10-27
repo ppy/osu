@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
                 var multiplayerUsers = new List<MultiplayerRoomUser>();
 
-                foreach (var user in users)
+                foreach (int user in users)
                 {
                     SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
                     var roomUser = OnlinePlayDependencies.Client.AddUser(new User { Id = user }, true);
