@@ -7,10 +7,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
@@ -234,11 +234,11 @@ namespace osu.Game.Tournament.Screens.Editors
                                 return;
                             }
 
-                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = Model.ID });
+                            var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = Model.ID });
 
                             req.Success += res =>
                             {
-                                Model.BeatmapInfo = res.ToBeatmapInfo(rulesets);
+                                Model.BeatmapInfo = res;
                                 updatePanel();
                             };
 

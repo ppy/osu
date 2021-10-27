@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
@@ -20,7 +21,7 @@ namespace osu.Game.Tournament.Components
 {
     public class TournamentBeatmapPanel : CompositeDrawable
     {
-        public readonly IBeatmapInfo BeatmapInfo;
+        public readonly APIBeatmap BeatmapInfo;
 
         private readonly string mod;
 
@@ -32,7 +33,7 @@ namespace osu.Game.Tournament.Components
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Box flash;
 
-        public TournamentBeatmapPanel(IBeatmapInfo beatmapInfo, string mod = null)
+        public TournamentBeatmapPanel(APIBeatmap beatmapInfo, string mod = null)
         {
             if (beatmapInfo == null) throw new ArgumentNullException(nameof(beatmapInfo));
 
@@ -62,7 +63,7 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
-                    BeatmapSet = BeatmapInfo.BeatmapSet as IBeatmapSetOnlineInfo,
+                    BeatmapSet = BeatmapInfo.BeatmapSet,
                 },
                 new FillFlowContainer
                 {

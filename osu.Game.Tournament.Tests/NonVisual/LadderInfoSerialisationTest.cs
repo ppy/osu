@@ -44,8 +44,8 @@ namespace osu.Game.Tournament.Tests.NonVisual
                     {
                         Beatmaps =
                         {
-                            new RoundBeatmap { BeatmapInfo = TournamentTestScene.CreateSampleBeatmapInfo() },
-                            new RoundBeatmap { BeatmapInfo = TournamentTestScene.CreateSampleBeatmapInfo() },
+                            new RoundBeatmap { BeatmapInfo = TournamentTestScene.CreateSampleBeatmap() },
+                            new RoundBeatmap { BeatmapInfo = TournamentTestScene.CreateSampleBeatmap() },
                         }
                     }
                 },
