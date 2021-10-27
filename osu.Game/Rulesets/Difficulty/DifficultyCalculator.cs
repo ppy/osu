@@ -18,11 +18,13 @@ namespace osu.Game.Rulesets.Difficulty
     {
         private readonly Ruleset ruleset;
         private readonly WorkingBeatmap beatmap;
+        protected readonly PreNoteDatabase database;
 
         protected DifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
         {
             this.ruleset = ruleset;
             this.beatmap = beatmap;
+            database = new PreNoteDatabase();
         }
 
         /// <summary>
@@ -56,25 +58,41 @@ namespace osu.Game.Rulesets.Difficulty
                     yield return Calculate(combination);
             }
         }
-
         private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
+            var preSkills = CreatePreloadedSkills(beatmap, mods, clockRate);
+
+
+
             var skills = CreateSkills(beatmap, mods, clockRate);
 
             if (!beatmap.HitObjects.Any())
-                return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
+                return CreateDifficultyAttributes(beatmap, mods, preSkills, skills, clockRate);
 
             var difficultyHitObjects = SortObjects(CreateDifficultyHitObjects(beatmap, clockRate)).ToList();
 
-            foreach (var hitObject in difficultyHitObjects)
+            for (int index = 0; index < difficultyHitObjects.Count; index++)
             {
-                foreach (var skill in skills)
+                var hitObject = difficultyHitObjects[index];
+
+                foreach (var preSkill in preSkills)
                 {
-                    skill.ProcessInternal(hitObject);
+                    preSkill.ProcessInternal(index, hitObject);
                 }
             }
 
-            return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
+            database.preSkills = preSkills;
+
+            for (int index = 0; index < difficultyHitObjects.Count; index++)
+            {
+                var hitObject = difficultyHitObjects[index];
+                foreach (var skill in skills)
+                {
+                    skill.ProcessInternal(index, hitObject);
+                }
+            }
+
+            return CreateDifficultyAttributes(beatmap, mods, preSkills, skills, clockRate);
         }
 
         /// <summary>
@@ -163,9 +181,10 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.</param>
         /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
+        /// <param name="preSkills">Thes skills which processed before calculating "skills".</param>
         /// <param name="skills">The skills which processed the beatmap.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
-        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
+        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, PrePerNoteStrainSkill[] preSkills, Skill[] skills, double clockRate);
 
         /// <summary>
         /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
@@ -183,5 +202,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="clockRate">Clockrate to calculate difficulty with.</param>
         /// <returns>The <see cref="Skill"/>s.</returns>
         protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
+        protected abstract PrePerNoteStrainSkill[] CreatePreloadedSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
+
     }
+
 }

@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             hand = rightHand ? 1 : 0;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainValueOf(int index, DifficultyHitObject current)
         {
             if (!(current.BaseObject is Hit))
             {
