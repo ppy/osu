@@ -101,12 +101,12 @@ namespace osu.Game.Tournament.Components
                 return;
             }
 
-            var bpm = beatmapInfo.BeatmapSet.OnlineInfo.BPM;
-            var length = beatmapInfo.Length;
+            double bpm = beatmapInfo.BeatmapSet.OnlineInfo.BPM;
+            double length = beatmapInfo.Length;
             string hardRockExtra = "";
             string srExtra = "";
 
-            var ar = beatmapInfo.BaseDifficulty.ApproachRate;
+            float ar = beatmapInfo.BaseDifficulty.ApproachRate;
 
             if ((mods & LegacyMods.HardRock) > 0)
             {
@@ -252,9 +252,9 @@ namespace osu.Game.Tournament.Components
                     s.Font = OsuFont.Torus.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, size: 15);
                 }
 
-                for (var i = 0; i < tuples.Length; i++)
+                for (int i = 0; i < tuples.Length; i++)
                 {
-                    var (heading, content) = tuples[i];
+                    (string heading, string content) = tuples[i];
 
                     if (i > 0)
                     {

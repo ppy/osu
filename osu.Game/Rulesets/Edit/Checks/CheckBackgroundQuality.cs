@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var backgroundFile = context.Beatmap.Metadata?.BackgroundFile;
+            string backgroundFile = context.Beatmap.Metadata?.BackgroundFile;
             if (backgroundFile == null)
                 yield break;
 

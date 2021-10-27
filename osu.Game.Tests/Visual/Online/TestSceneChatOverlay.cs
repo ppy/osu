@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -105,7 +106,7 @@ namespace osu.Game.Tests.Visual.Online
                             }
                             else
                             {
-                                getUser.TriggerFailure(new Exception());
+                                getUser.TriggerFailure(new WebException());
                             }
 
                             return true;
@@ -189,8 +190,8 @@ namespace osu.Game.Tests.Visual.Online
 
             for (int zeroBasedIndex = 0; zeroBasedIndex < 10; ++zeroBasedIndex)
             {
-                var oneBasedIndex = zeroBasedIndex + 1;
-                var targetNumberKey = oneBasedIndex % 10;
+                int oneBasedIndex = zeroBasedIndex + 1;
+                int targetNumberKey = oneBasedIndex % 10;
                 var targetChannel = channels[zeroBasedIndex];
                 AddStep($"Press Alt+{targetNumberKey}", () => pressChannelHotkey(targetNumberKey));
                 AddAssert($"Channel #{oneBasedIndex} is selected", () => currentChannel == targetChannel);

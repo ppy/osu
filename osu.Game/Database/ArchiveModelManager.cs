@@ -466,10 +466,12 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
-            using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
-                ExportModelTo(retrievedItem, outputStream);
+            string filename = $"{getValidFilename(item.ToString())}{HandledExtensions.First()}";
 
-            exportStorage.OpenInNativeExplorer();
+            using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
+                ExportModelTo(retrievedItem, stream);
+
+            exportStorage.PresentFileExternally(filename);
         }
 
         /// <summary>
@@ -681,7 +683,7 @@ namespace osu.Game.Database
         {
             MemoryStream hashable = new MemoryStream();
 
-            foreach (var file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
             {
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);

@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddRepeatStep("increment progress", () =>
             {
-                var progress = this.ChildrenOfType<ParticipantPanel>().Single().User.BeatmapAvailability.DownloadProgress ?? 0;
+                float progress = this.ChildrenOfType<ParticipantPanel>().Single().User.BeatmapAvailability.DownloadProgress ?? 0;
                 Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(progress + RNG.NextSingle(0.1f)));
             }, 25);
 
