@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch;
@@ -25,12 +26,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            Child = container = new RoomsContainer
+            Child = new PopoverContainer
             {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Width = 0.5f,
-                SelectedRoom = { BindTarget = SelectedRoom }
+
+                Child = container = new RoomsContainer
+                {
+                    SelectedRoom = { BindTarget = SelectedRoom }
+                }
             };
         });
 

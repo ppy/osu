@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 return;
 
             // Todo: This should probably not be done like this.
-            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (playableBeatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) / 2;
+            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (playableBeatmap.Difficulty.CircleSize - 5) / 5) / 2;
 
             foreach (var e in score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)))
             {
@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             // Likewise sin(pi/2)=1 and sin(3pi/2)=-1, whereas we actually want these values to appear on the bottom/top respectively, so the y-coordinate also needs to be inverted.
             //
             // We also need to apply the anti-clockwise rotation.
-            var rotatedAngle = finalAngle - MathUtils.DegreesToRadians(rotation);
+            double rotatedAngle = finalAngle - MathUtils.DegreesToRadians(rotation);
             var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
 
             Vector2 localCentre = new Vector2(points_per_dimension - 1) / 2;

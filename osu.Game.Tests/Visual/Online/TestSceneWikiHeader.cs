@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private bool checkBreadcrumb()
         {
-            var result = header.TabControlItems.Contains(wikiPageData.Value.Title);
+            bool result = header.TabControlItems.Contains(wikiPageData.Value.Title);
 
             if (wikiPageData.Value.Subtitle != null)
                 result = header.TabControlItems.Contains(wikiPageData.Value.Subtitle) && result;

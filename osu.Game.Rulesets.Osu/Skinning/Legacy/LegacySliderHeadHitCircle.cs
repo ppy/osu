@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [Resolved(canBeNull: true)]
         private DrawableHitObject drawableHitObject { get; set; }
 
-        private Drawable proxiedHitCircleOverlay;
+        private Drawable proxiedOverlayLayer;
 
         public LegacySliderHeadHitCircle()
             : base("sliderstartcircle")
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            proxiedHitCircleOverlay = HitCircleOverlay.CreateProxy();
+            proxiedOverlayLayer = OverlayLayer.CreateProxy();
 
             if (drawableHitObject != null)
             {
@@ -35,11 +35,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void onHitObjectApplied(DrawableHitObject drawableObject)
         {
-            Debug.Assert(proxiedHitCircleOverlay.Parent == null);
+            Debug.Assert(proxiedOverlayLayer.Parent == null);
 
             // see logic in LegacyReverseArrow.
             (drawableObject as DrawableSliderHead)?.DrawableSlider
-                                                  .OverlayElementContainer.Add(proxiedHitCircleOverlay.With(d => d.Depth = float.MinValue));
+                                                  .OverlayElementContainer.Add(proxiedOverlayLayer.With(d => d.Depth = float.MinValue));
         }
 
         protected override void Dispose(bool isDisposing)

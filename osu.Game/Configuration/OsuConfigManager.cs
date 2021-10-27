@@ -6,10 +6,13 @@ using System.Diagnostics;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
@@ -157,12 +160,12 @@ namespace osu.Game.Configuration
         public void Migrate()
         {
             // arrives as 2020.123.0
-            var rawVersion = Get<string>(OsuSetting.Version);
+            string rawVersion = Get<string>(OsuSetting.Version);
 
             if (rawVersion.Length < 6)
                 return;
 
-            var pieces = rawVersion.Split('.');
+            string[] pieces = rawVersion.Split('.');
 
             // on a fresh install or when coming from a non-release build, execution will end here.
             // we don't want to run migrations in such cases.
@@ -185,20 +188,54 @@ namespace osu.Game.Configuration
 
             return new TrackedSettings
             {
-                new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled", LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))),
-                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription(), $"cycle: {LookupKeyBindings(GlobalAction.ToggleInGameInterface)} quick view: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
-                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
-                new TrackedSetting<int>(OsuSetting.Skin, m =>
+                new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, disabledState => new SettingDescription(
+                    rawValue: !disabledState,
+                    name: GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons,
+                    value: disabledState ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(),
+                    shortcut: LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))
+                ),
+                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, visibilityMode => new SettingDescription(
+                    rawValue: visibilityMode,
+                    name: GameplaySettingsStrings.HUDVisibilityMode,
+                    value: visibilityMode.GetLocalisableDescription(),
+                    shortcut: new TranslatableString(@"_", @"{0}: {1} {2}: {3}",
+                        GlobalActionKeyBindingStrings.ToggleInGameInterface,
+                        LookupKeyBindings(GlobalAction.ToggleInGameInterface),
+                        GlobalActionKeyBindingStrings.HoldForHUD,
+                        LookupKeyBindings(GlobalAction.HoldForHUD)))
+                ),
+                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, scalingMode => new SettingDescription(
+                        rawValue: scalingMode,
+                        name: GraphicsSettingsStrings.ScreenScaling,
+                        value: scalingMode.GetLocalisableDescription()
+                    )
+                ),
+                new TrackedSetting<int>(OsuSetting.Skin, skin =>
                 {
-                    string skinName = LookupSkinName(m) ?? string.Empty;
-                    return new SettingDescription(skinName, "skin", skinName, $"random: {LookupKeyBindings(GlobalAction.RandomSkin)}");
-                })
+                    string skinName = LookupSkinName(skin) ?? string.Empty;
+
+                    return new SettingDescription(
+                        rawValue: skinName,
+                        name: SkinSettingsStrings.SkinSectionHeader,
+                        value: skinName,
+                        shortcut: new TranslatableString(@"_", @"{0}: {1}",
+                            GlobalActionKeyBindingStrings.RandomSkin,
+                            LookupKeyBindings(GlobalAction.RandomSkin))
+                    );
+                }),
+                new TrackedSetting<float>(OsuSetting.UIScale, scale => new SettingDescription(
+                        rawValue: scale,
+                        name: GraphicsSettingsStrings.UIScaling,
+                        value: $"{scale:N2}x"
+                        // TODO: implement lookup for framework platform key bindings
+                    )
+                ),
             };
         }
 
         public Func<int, string> LookupSkinName { private get; set; }
 
-        public Func<GlobalAction, string> LookupKeyBindings { get; set; }
+        public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; }
     }
 
     // IMPORTANT: These are used in user configuration files.

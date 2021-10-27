@@ -69,9 +69,9 @@ namespace osu.Game.Overlays.News.Sidebar
                 return;
             }
 
-            var currentYear = metadata.Value.CurrentYear;
+            int currentYear = metadata.Value.CurrentYear;
 
-            foreach (var y in metadata.Value.Years)
+            foreach (int y in metadata.Value.Years)
                 yearsFlow.Add(new YearButton(y, y == currentYear));
 
             Show();

@@ -53,7 +53,11 @@ namespace osu.Game.Tests.Visual.Settings
             };
 
             [SettingSource("Sample string", "Change something for a mod")]
-            public Bindable<string> StringBindable { get; } = new Bindable<string>();
+            public Bindable<string> StringBindable { get; } = new Bindable<string>
+            {
+                Default = string.Empty,
+                Value = "Sample text"
+            };
         }
 
         private enum TestEnum

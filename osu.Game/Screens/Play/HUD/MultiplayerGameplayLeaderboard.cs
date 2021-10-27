@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Play.HUD
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (var userId in e.OldItems.OfType<int>())
+                    foreach (int userId in e.OldItems.OfType<int>())
                     {
                         spectatorClient.StopWatchingUser(userId);
 

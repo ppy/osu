@@ -17,7 +17,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         protected override Drawable CreateControl() => new Sliderbar
         {
-            Margin = new MarginPadding { Top = 5, Bottom = 5 },
             RelativeSizeAxes = Axes.X
         };
 
@@ -29,7 +28,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 AccentColour = colours.Yellow;
                 Nub.AccentColour = colours.Yellow;
                 Nub.GlowingAccentColour = colours.YellowLighter;
-                Nub.GlowColour = colours.YellowDarker;
+                Nub.GlowColour = colours.YellowDark;
             }
         }
     }
