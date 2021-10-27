@@ -289,7 +289,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestSpectatingDuringGameplay()
         {
-            int[] players = new[] { PLAYER_1_ID, PLAYER_2_ID };
+            int[] players = { PLAYER_1_ID, PLAYER_2_ID };
 
             start(players);
             sendFrames(players, 300);
