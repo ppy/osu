@@ -14,7 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
-    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo, IBeatmapSetOnlineInfo
+    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
     {
         public int ID { get; set; }
 

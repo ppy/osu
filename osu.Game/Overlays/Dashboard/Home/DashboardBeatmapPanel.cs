@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Dashboard.Home
                                         RelativeSizeAxes = Axes.Both,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        BeatmapSet = SetInfo
+                                        OnlineInfo = SetInfo.OnlineInfo
                                     }
                                 },
                                 new Container

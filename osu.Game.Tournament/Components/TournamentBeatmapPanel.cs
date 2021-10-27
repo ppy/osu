@@ -62,7 +62,7 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
-                    BeatmapSet = BeatmapInfo.BeatmapSet as IBeatmapSetOnlineInfo,
+                    OnlineInfo = BeatmapInfo.BeatmapSet as IBeatmapSetOnlineInfo,
                 },
                 new FillFlowContainer
                 {
