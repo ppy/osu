@@ -302,7 +302,7 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 base.LoadComplete();
 
-                State.BindValueChanged(stateChanged, true);
+                DownloadTracker.State.BindValueChanged(stateChanged, true);
                 FinishTransforms(true);
             }
 
