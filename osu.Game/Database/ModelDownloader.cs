@@ -15,7 +15,7 @@ using osu.Game.Overlays.Notifications;
 namespace osu.Game.Database
 {
     public abstract class ModelDownloader<TModel> : IModelDownloader<TModel>
-        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>
+        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>, IHasOnlineID
     {
         public Action<Notification> PostNotification { protected get; set; }
 
@@ -107,7 +107,7 @@ namespace osu.Game.Database
             }
         }
 
-        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
+        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.OnlineID == model.OnlineID);
 
         private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
 
