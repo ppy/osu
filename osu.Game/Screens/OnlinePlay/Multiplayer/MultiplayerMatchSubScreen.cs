@@ -66,7 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             SelectedItem.BindTo(client.CurrentMatchPlayingItem);
 
-            BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
+            BeatmapAvailabilityTracker.Availability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
 
             client.LoadRequested += onLoadRequested;
@@ -362,7 +362,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onLoadRequested()
         {
-            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
+            if (BeatmapAvailabilityTracker.Availability.Value.State != DownloadState.LocallyAvailable)
                 return;
 
             // In the case of spectating, IMultiplayerClient.LoadRequested can be fired while the game is still spectating a previous session.

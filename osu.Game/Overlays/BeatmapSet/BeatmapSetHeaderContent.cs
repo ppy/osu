@@ -233,7 +233,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 Picker.BeatmapSet = rulesetSelector.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
                 cover.BeatmapSet = setInfo.NewValue;
 
-                downloadTracker?.Expire();
+                downloadTracker?.RemoveAndDisposeImmediately();
 
                 if (setInfo.NewValue == null)
                 {

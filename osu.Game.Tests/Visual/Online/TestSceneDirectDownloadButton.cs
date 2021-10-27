@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
@@ -145,7 +144,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             public new bool DownloadEnabled => base.DownloadEnabled;
 
-            public DownloadState DownloadState => this.ChildrenOfType<BeatmapDownloadTracker>().First().State.Value;
+            public DownloadState DownloadState => State.Value;
 
             public TestDownloadButton(BeatmapSetInfo beatmapSet)
                 : base(beatmapSet)
