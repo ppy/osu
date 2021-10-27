@@ -9,6 +9,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -24,6 +25,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Visual.Multiplayer;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK;
 using osuTK.Input;
 
@@ -459,9 +461,19 @@ namespace osu.Game.Tests.Visual.Navigation
             [Cached(typeof(MultiplayerClient))]
             public readonly TestMultiplayerClient Client;
 
+            [Cached]
+            public readonly TestRoomRequestsHandler RequestsHandler;
+
             public TestMultiplayer()
             {
                 Client = new TestMultiplayerClient((TestMultiplayerRoomManager)RoomManager);
+                RequestsHandler = new TestRoomRequestsHandler();
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(IAPIProvider api, OsuGameBase game)
+            {
+                ((DummyAPIAccess)api).HandleRequest = request => RequestsHandler.HandleRequest(request, api.LocalUser.Value, game);
             }
 
             protected override RoomManager CreateRoomManager() => new TestMultiplayerRoomManager();
