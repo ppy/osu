@@ -568,7 +568,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (Result != null && Result.HasResult)
             {
-                var endTime = HitObject.GetEndTime();
+                double endTime = HitObject.GetEndTime();
 
                 if (Result.TimeOffset + endTime > Time.Current)
                 {

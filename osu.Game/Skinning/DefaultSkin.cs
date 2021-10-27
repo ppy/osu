@@ -42,7 +42,7 @@ namespace osu.Game.Skinning
 
         public override ISample GetSample(ISampleInfo sampleInfo)
         {
-            foreach (var lookup in sampleInfo.LookupNames)
+            foreach (string lookup in sampleInfo.LookupNames)
             {
                 var sample = resources.AudioManager.Samples.Get(lookup);
                 if (sample != null)

@@ -93,7 +93,7 @@ namespace osu.Game.Beatmaps
                                     if (t.Time > lastTime)
                                         return (beatLength: t.BeatLength, 0);
 
-                                    var nextTime = i == ControlPointInfo.TimingPoints.Count - 1 ? lastTime : ControlPointInfo.TimingPoints[i + 1].Time;
+                                    double nextTime = i == ControlPointInfo.TimingPoints.Count - 1 ? lastTime : ControlPointInfo.TimingPoints[i + 1].Time;
                                     return (beatLength: t.BeatLength, duration: nextTime - t.Time);
                                 })
                                 // Aggregate durations into a set of (beatLength, duration) tuples for each beat length

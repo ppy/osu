@@ -40,7 +40,7 @@ namespace osu.Game.Tournament
 
                 if (reader.TokenType == JsonToken.PropertyName)
                 {
-                    var name = reader.Value?.ToString();
+                    string name = reader.Value?.ToString();
                     int? val = reader.ReadAsInt32();
 
                     if (val == null)

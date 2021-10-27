@@ -46,7 +46,7 @@ namespace osu.Game.Tournament.IPC
         [BackgroundDependencyLoader]
         private void load()
         {
-            var stablePath = stableInfo.StablePath ?? findStablePath();
+            string stablePath = stableInfo.StablePath ?? findStablePath();
             initialiseIPCStorage(stablePath);
         }
 
@@ -78,8 +78,8 @@ namespace osu.Game.Tournament.IPC
                             using (var stream = IPCStorage.GetStream(file_ipc_filename))
                             using (var sr = new StreamReader(stream))
                             {
-                                var beatmapId = int.Parse(sr.ReadLine().AsNonNull());
-                                var mods = int.Parse(sr.ReadLine().AsNonNull());
+                                int beatmapId = int.Parse(sr.ReadLine().AsNonNull());
+                                int mods = int.Parse(sr.ReadLine().AsNonNull());
 
                                 if (lastBeatmapId != beatmapId)
                                 {
@@ -187,10 +187,10 @@ namespace osu.Game.Tournament.IPC
         [CanBeNull]
         private string findStablePath()
         {
-            var stableInstallPath = findFromEnvVar() ??
-                                    findFromRegistry() ??
-                                    findFromLocalAppData() ??
-                                    findFromDotFolder();
+            string stableInstallPath = findFromEnvVar() ??
+                                       findFromRegistry() ??
+                                       findFromLocalAppData() ??
+                                       findFromDotFolder();
 
             Logger.Log($"Stable path for tourney usage: {stableInstallPath}");
             return stableInstallPath;

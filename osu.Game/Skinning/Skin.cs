@@ -51,7 +51,7 @@ namespace osu.Game.Skinning
                 if (fileInfo == null)
                     continue;
 
-                var bytes = resources?.Files.Get(fileInfo.FileInfo.StoragePath);
+                byte[] bytes = resources?.Files.Get(fileInfo.FileInfo.StoragePath);
 
                 if (bytes == null)
                     continue;

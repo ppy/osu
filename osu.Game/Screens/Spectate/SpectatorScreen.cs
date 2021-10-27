@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Spectate
                 managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
                 managerUpdated.BindValueChanged(beatmapUpdated);
 
-                foreach (var (id, _) in userMap)
+                foreach ((int id, var _) in userMap)
                     spectatorClient.WatchUser(id);
             }));
         }
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Spectate
             if (!e.NewValue.TryGetTarget(out var beatmapSet))
                 return;
 
-            foreach (var (userId, _) in userMap)
+            foreach ((int userId, var _) in userMap)
             {
                 if (!playingUserStates.TryGetValue(userId, out var userState))
                     continue;
@@ -101,20 +101,20 @@ namespace osu.Game.Screens.Spectate
             switch (e.Action)
             {
                 case NotifyDictionaryChangedAction.Add:
-                    foreach (var (userId, state) in e.NewItems.AsNonNull())
+                    foreach ((int userId, var state) in e.NewItems.AsNonNull())
                         onUserStateAdded(userId, state);
                     break;
 
                 case NotifyDictionaryChangedAction.Remove:
-                    foreach (var (userId, _) in e.OldItems.AsNonNull())
+                    foreach ((int userId, var _) in e.OldItems.AsNonNull())
                         onUserStateRemoved(userId);
                     break;
 
                 case NotifyDictionaryChangedAction.Replace:
-                    foreach (var (userId, _) in e.OldItems.AsNonNull())
+                    foreach ((int userId, var _) in e.OldItems.AsNonNull())
                         onUserStateRemoved(userId);
 
-                    foreach (var (userId, state) in e.NewItems.AsNonNull())
+                    foreach ((int userId, var state) in e.NewItems.AsNonNull())
                         onUserStateAdded(userId, state);
                     break;
             }
@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Spectate
 
             if (spectatorClient != null)
             {
-                foreach (var (userId, _) in userMap)
+                foreach ((int userId, var _) in userMap)
                     spectatorClient.StopWatchingUser(userId);
             }
 

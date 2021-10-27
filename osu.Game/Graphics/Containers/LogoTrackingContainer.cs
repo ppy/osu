@@ -109,7 +109,7 @@ namespace osu.Game.Graphics.Containers
                 {
                     double elapsedDuration = (double)(Time.Current - startTime);
 
-                    var amount = (float)Interpolation.ApplyEasing(easing, Math.Min(elapsedDuration / duration, 1));
+                    float amount = (float)Interpolation.ApplyEasing(easing, Math.Min(elapsedDuration / duration, 1));
 
                     // Interpolate the position of the logo, where amount 0 is where the logo was when it first began interpolating, and amount 1 is the target location.
                     Logo.Position = Vector2.Lerp(startPosition.Value, localPos, amount);
