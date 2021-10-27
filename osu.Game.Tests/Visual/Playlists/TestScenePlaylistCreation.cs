@@ -16,7 +16,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK.Input;
 
@@ -40,7 +39,7 @@ namespace osu.Game.Tests.Visual.Playlists
         public void SetupSteps()
         {
             AddStep("set room", () => SelectedRoom.Value = new Room());
-            AddStep("ensure has beatmap", () => manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait());
+            AddStep("ensure has beatmap", () => manager.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait());
             AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(SelectedRoom.Value)));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
@@ -57,7 +56,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 SelectedRoom.Value.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
                 SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                    Beatmap = { Value = CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 });
             });
@@ -75,7 +74,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 SelectedRoom.Value.Host.Value = API.LocalUser.Value;
                 SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                    Beatmap = { Value = CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 });
             });
@@ -94,13 +93,13 @@ namespace osu.Game.Tests.Visual.Playlists
         public void TestBeatmapUpdatedOnReImport()
         {
             BeatmapSetInfo importedSet = null;
-            TestBeatmap beatmap = null;
+            IBeatmap beatmap = null;
 
             // this step is required to make sure the further imports actually get online IDs.
             // all the playlist logic relies on online ID matching.
             AddStep("remove all matching online IDs", () =>
             {
-                beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo);
+                beatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
 
                 var existing = manager.QueryBeatmapSets(s => s.OnlineBeatmapSetID == beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID).ToList();
 
@@ -139,7 +138,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddAssert("match has altered beatmap", () => match.Beatmap.Value.Beatmap.Difficulty.CircleSize == 1);
 
-            AddStep("re-import original beatmap", () => manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait());
+            AddStep("re-import original beatmap", () => manager.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait());
 
             AddAssert("match has original beatmap", () => match.Beatmap.Value.Beatmap.Difficulty.CircleSize != 1);
         }
