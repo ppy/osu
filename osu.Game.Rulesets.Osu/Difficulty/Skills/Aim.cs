@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override int HistoryLength => 2;
 
         private const double wide_angle_multiplier = 1.5;
-        private const double acute_angle_multiplier = 1.5;
+        private const double acute_angle_multiplier = 2.0;
         private const double slider_multiplier = 1.5;
         private const double vel_change_multiplier = 0.75;
 
@@ -69,10 +69,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Precision.AlmostEquals(osuCurrObj.StrainTime, osuPrevObj.StrainTime, 10)) // If rhythms are the same.
             {
-                if (osuCurrObj.Angle != null && osuPrevObj.Angle != null)
+                if (osuCurrObj.Angle != null && osuPrevObj.Angle != null && osuLastObj.Angle != null)
                 {
                     double currAngle = osuCurrObj.Angle.Value;
                     double prevAngle = osuPrevObj.Angle.Value;
+                    double lastAngle = osuLastObj.Angle.Value;
 
                     // Rewarding angles, take the smaller velocity as base.
                     angleBonus = Math.Min(currVelocity, prevVelocity);
@@ -88,7 +89,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                             * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (100 - osuCurrObj.StrainTime) / 25)), 2) // scale buff from 150 bpm 1/4 to 200 bpm 1/4
                                             * Math.Pow(Math.Sin(Math.PI / 2 * (Math.Min(100, osuCurrObj.JumpDistance) - 50) / 50), 2); // Buff distance exceeding 50 (radius) up to 100 (diameter).
 
-                    wideAngleBonus *= angleBonus * (1 - Math.Pow(calcWideAngleBonus(prevAngle), 3)); // Penalize wide angles if they're repeated, reducing the penalty as the prevAngle gets more acute.
+                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(prevAngle), 3))); // Penalize wide angles if they're repeated, reducing the penalty as the prevAngle gets more acute.
+                    acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3))); // Penalize acute angles if they're repeated, reducing the penalty as the lastAngle gets more obtuse.
 
                     angleBonus = acuteAngleBonus * acute_angle_multiplier + wideAngleBonus * wide_angle_multiplier; // add the anglebuffs together.
                 }
