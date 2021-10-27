@@ -582,7 +582,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
             for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
             {
-                var time = i;
+                double time = i;
                 AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.GameplayClock.CurrentTime > time);
             }
 

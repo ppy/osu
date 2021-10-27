@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             base.SetUpSteps();
 
-            var expectedSampleNames = new[]
+            string[] expectedSampleNames = new[]
             {
                 string.Empty,
                 string.Empty,

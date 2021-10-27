@@ -226,9 +226,9 @@ namespace osu.Game.Rulesets.Catch.UI
             if (result.IsHit && hitObject.HyperDash)
             {
                 var target = hitObject.HyperDashTarget;
-                var timeDifference = target.StartTime - hitObject.StartTime;
+                double timeDifference = target.StartTime - hitObject.StartTime;
                 double positionDifference = target.EffectiveX - X;
-                var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
+                double velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
                 SetHyperDashState(Math.Abs(velocity), target.EffectiveX);
             }
@@ -266,7 +266,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <param name="targetPosition">When this catcher crosses this position, this catcher ends hyper-dashing.</param>
         public void SetHyperDashState(double modifier = 1, float targetPosition = -1)
         {
-            var wasHyperDashing = HyperDashing;
+            bool wasHyperDashing = HyperDashing;
 
             if (modifier <= 1 || X == targetPosition)
             {

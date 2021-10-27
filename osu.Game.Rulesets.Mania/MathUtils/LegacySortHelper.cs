@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
 
             while (i <= n / 2)
             {
-                var child = 2 * i;
+                int child = 2 * i;
 
                 if (child < n && comparer.Compare(keys[lo + child - 1], keys[lo + child]) < 0)
                 {

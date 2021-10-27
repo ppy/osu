@@ -103,7 +103,7 @@ namespace osu.Game.Audio.Effects
 
             ensureAttached();
 
-            var filterIndex = mixer.Effects.IndexOf(filter);
+            int filterIndex = mixer.Effects.IndexOf(filter);
 
             if (filterIndex < 0) return;
 

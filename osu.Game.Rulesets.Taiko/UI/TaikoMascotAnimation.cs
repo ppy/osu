@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                 if (skin == null) return;
 
-                foreach (var frameIndex in clear_animation_sequence)
+                foreach (int frameIndex in clear_animation_sequence)
                 {
                     var texture = getAnimationFrame(skin, TaikoMascotAnimationState.Clear, frameIndex);
 
