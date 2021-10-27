@@ -226,8 +226,30 @@ namespace osu.Game.Tournament
         {
             var req = new GetUserRequest(user.Id, Ruleset.Value);
 
-            req.Success += res =>
+            if (immediate)
             {
+                API.Perform(req);
+                populate();
+            }
+            else
+            {
+                req.Success += res => { populate(); };
+                req.Failure += _ =>
+                {
+                    user.Id = 1;
+                    failure?.Invoke();
+                };
+
+                API.Queue(req);
+            }
+
+            void populate()
+            {
+                var res = req.Response;
+
+                if (res == null)
+                    return;
+
                 user.Id = res.Id;
 
                 user.Username = res.Username;
@@ -236,18 +258,7 @@ namespace osu.Game.Tournament
                 user.Cover = res.Cover;
 
                 success?.Invoke();
-            };
-
-            req.Failure += _ =>
-            {
-                user.Id = 1;
-                failure?.Invoke();
-            };
-
-            if (immediate)
-                API.Perform(req);
-            else
-                API.Queue(req);
+            }
         }
 
         protected override void LoadComplete()
