@@ -87,10 +87,10 @@ namespace osu.Game.Tournament.IPC
 
                                     lastBeatmapId = beatmapId;
 
-                                    var existing = ladder.CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.BeatmapInfo != null);
+                                    var existing = ladder.CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.Beatmap != null);
 
                                     if (existing != null)
-                                        Beatmap.Value = existing.BeatmapInfo;
+                                        Beatmap.Value = existing.Beatmap;
                                     else
                                     {
                                         beatmapLookupRequest = new GetBeatmapRequest(new APIBeatmap { OnlineID = beatmapId });

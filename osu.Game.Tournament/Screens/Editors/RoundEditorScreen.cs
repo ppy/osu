@@ -226,9 +226,9 @@ namespace osu.Game.Tournament.Screens.Editors
                             Model.ID = id.NewValue ?? 0;
 
                             if (id.NewValue != id.OldValue)
-                                Model.BeatmapInfo = null;
+                                Model.Beatmap = null;
 
-                            if (Model.BeatmapInfo != null)
+                            if (Model.Beatmap != null)
                             {
                                 updatePanel();
                                 return;
@@ -238,13 +238,13 @@ namespace osu.Game.Tournament.Screens.Editors
 
                             req.Success += res =>
                             {
-                                Model.BeatmapInfo = res;
+                                Model.Beatmap = res;
                                 updatePanel();
                             };
 
                             req.Failure += _ =>
                             {
-                                Model.BeatmapInfo = null;
+                                Model.Beatmap = null;
                                 updatePanel();
                             };
 
@@ -259,9 +259,9 @@ namespace osu.Game.Tournament.Screens.Editors
                     {
                         drawableContainer.Clear();
 
-                        if (Model.BeatmapInfo != null)
+                        if (Model.Beatmap != null)
                         {
-                            drawableContainer.Child = new TournamentBeatmapPanel(Model.BeatmapInfo, Model.Mods)
+                            drawableContainer.Child = new TournamentBeatmapPanel(Model.Beatmap, Model.Mods)
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
