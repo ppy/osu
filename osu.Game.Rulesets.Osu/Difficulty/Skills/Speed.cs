@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Difficulty.Skills;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -27,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
         protected override int HistoryLength => 32;
+
         private const double min_doubletap_nerf = 0; // minimum value (eventually on stacked)
         private const double max_doubletap_nerf = 1.0; // maximum value 
         private const double threshold_doubletap_contributing = 2.0; // minimum distance not influenced (2.0 means it is not stacked at least)
@@ -34,10 +36,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected double strainDecayBase => 0.3;
 
         private readonly double greatWindow;
-
-        private const double min_doubletap_nerf = 0.5; // minimum value (eventually on stacked)
-        private const double max_doubletap_nerf = 1.0; // maximum value 
-        private const double threshold_doubletap_contributing = 2.0; // minimum distance not influenced (2.0 means it is not stacked at least)
 
         public Speed(Mod[] mods, double hitWindowGreat)
             : base(mods)
@@ -133,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
         }
 
-        private double strainValueOf(DifficultyHitObject current)
+        private double strainValueOf(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -158,7 +156,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double radius = ((OsuHitObject)osuCurrObj.BaseObject).Radius;
 
             // derive speedBonus for calculation
->>>>>>>>> Temporary merge branch 2
             double speedBonus = 1.0;
 
             if (strainTime < min_speed_bonus)
@@ -177,10 +174,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double CalculateInitialStrain(double time) => (currentStrain * currentRhythm) * strainDecay(time - Previous[0].StartTime);
 
-        protected override double StrainValueAt(int index, DifficultyHitObject current)
+        protected override double StrainValueAt(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += strainValueOf(current) * skillMultiplier;
+            currentStrain += strainValueOf(preSkills, index, current) * skillMultiplier;
 
             currentRhythm = calculateRhythmBonus(current);
 

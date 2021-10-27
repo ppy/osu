@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -18,27 +19,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
 
-        private readonly PreNoteDatabase database;
         private double skillMultiplier => 26.25;
         private double strainDecayBase => 0.15;
 
-        public Aim(PreNoteDatabase database, Mod[] mods)
+        public Aim(Mod[] mods)
             : base(mods)
         {
-            this.database = database;
         }
 
         private double currentStrain = 1;
 
-        protected double strainValueOf(int index, DifficultyHitObject current)
+        protected double strainValueOf(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
 
             var osuCurrent = (OsuDifficultyHitObject)current;
 
-            double angleBonus = 1 + database.preSkills[0].GetAllStrainPeaks()[index] * 0.5;
-            double sliderBonus = 1 + database.preSkills[1].GetAllStrainPeaks()[index] * 1;
+            double angleBonus = 1 + preSkills[0].GetAllStrainPeaks()[index] * 0.5;
+            double sliderBonus = 1 + preSkills[1].GetAllStrainPeaks()[index] * 1;
             //double aimStrain = 0;
 
             //double result = 0;
@@ -76,9 +75,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 calculateAimValue(0, distanceExp, 320) * 0.1);
         }
 
-            double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
-            double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance);
-
         private double calculateAimValue(double result, double distanceExp, double strainTime)
         {
             return Math.Max(
@@ -93,10 +89,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double CalculateInitialStrain(double time) => currentStrain * strainDecay(time - Previous[0].StartTime);
 
-        protected override double StrainValueAt(int index, DifficultyHitObject current)
+        protected override double StrainValueAt(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += strainValueOf(index, current) * skillMultiplier;
+            currentStrain += strainValueOf(preSkills, index, current) * skillMultiplier;
 
             return currentStrain;
         }
