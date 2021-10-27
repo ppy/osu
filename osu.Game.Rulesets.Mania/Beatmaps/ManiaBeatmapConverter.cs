@@ -42,8 +42,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
 
-            var roundedCircleSize = Math.Round(beatmap.Difficulty.CircleSize);
-            var roundedOverallDifficulty = Math.Round(beatmap.Difficulty.OverallDifficulty);
+            double roundedCircleSize = Math.Round(beatmap.Difficulty.CircleSize);
+            double roundedOverallDifficulty = Math.Round(beatmap.Difficulty.OverallDifficulty);
 
             if (IsForCurrentRuleset)
             {
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         public static int GetColumnCountForNonConvert(BeatmapInfo beatmapInfo)
         {
-            var roundedCircleSize = Math.Round(beatmapInfo.BaseDifficulty.CircleSize);
+            double roundedCircleSize = Math.Round(beatmapInfo.BaseDifficulty.CircleSize);
             return (int)Math.Max(1, roundedCircleSize);
         }
 

@@ -250,7 +250,7 @@ namespace osu.Game.Collections
         /// </summary>
         private void backgroundSave()
         {
-            var current = Interlocked.Increment(ref lastSave);
+            int current = Interlocked.Increment(ref lastSave);
             Task.Delay(100).ContinueWith(task =>
             {
                 if (current != lastSave)
@@ -270,7 +270,7 @@ namespace osu.Game.Collections
                 // This is NOT thread-safe!!
                 try
                 {
-                    var tempPath = Path.GetTempFileName();
+                    string tempPath = Path.GetTempFileName();
 
                     using (var ms = new MemoryStream())
                     {
@@ -296,8 +296,8 @@ namespace osu.Game.Collections
                         using (var fs = File.OpenWrite(tempPath))
                             ms.WriteTo(fs);
 
-                        var databasePath = storage.GetFullPath(database_name);
-                        var databaseBackupPath = storage.GetFullPath(database_backup_name);
+                        string databasePath = storage.GetFullPath(database_name);
+                        string databaseBackupPath = storage.GetFullPath(database_backup_name);
 
                         // Back up the existing database, clearing any existing backup.
                         if (File.Exists(databaseBackupPath))

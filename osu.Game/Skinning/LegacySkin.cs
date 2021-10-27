@@ -306,7 +306,7 @@ namespace osu.Game.Skinning
             => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
         private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
-            => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
+            => source.ImageLookups.TryGetValue(lookup, out string image) ? new Bindable<string>(image) : null;
 
         [CanBeNull]
         private IBindable<TValue> legacySettingLookup<TValue>(LegacySkinConfiguration.LegacySetting legacySetting)
@@ -326,7 +326,7 @@ namespace osu.Game.Skinning
         {
             try
             {
-                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
+                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out string val))
                 {
                     // special case for handling skins which use 1 or 0 to signify a boolean state.
                     if (typeof(TValue) == typeof(bool))
@@ -472,7 +472,7 @@ namespace osu.Game.Skinning
 
         public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
-            foreach (var name in getFallbackNames(componentName))
+            foreach (string name in getFallbackNames(componentName))
             {
                 float ratio = 2;
                 var texture = Textures?.Get($"{name}@2x", wrapModeS, wrapModeT);
@@ -504,7 +504,7 @@ namespace osu.Game.Skinning
                 lookupNames = sampleInfo.LookupNames.SelectMany(getFallbackNames);
             }
 
-            foreach (var lookup in lookupNames)
+            foreach (string lookup in lookupNames)
             {
                 var sample = Samples?.Get(lookup);
 
@@ -529,7 +529,7 @@ namespace osu.Game.Skinning
                 lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
             }
 
-            foreach (var l in lookupNames)
+            foreach (string l in lookupNames)
                 yield return l;
 
             // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.

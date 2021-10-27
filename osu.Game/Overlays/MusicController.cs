@@ -238,7 +238,7 @@ namespace osu.Game.Overlays
             if (beatmap.Disabled)
                 return PreviousTrackResult.None;
 
-            var currentTrackPosition = CurrentTrack.CurrentTime;
+            double currentTrackPosition = CurrentTrack.CurrentTime;
 
             if (currentTrackPosition >= restart_cutoff_point)
             {
@@ -329,8 +329,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     // figure out the best direction based on order in playlist.
-                    var last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = newWorking == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != newWorking.BeatmapSetInfo?.ID).Count();
+                    int last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
+                    int next = newWorking == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != newWorking.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }

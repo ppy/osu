@@ -57,7 +57,7 @@ namespace osu.Game.Online.Chat
                     break;
             }
 
-            var beatmapString = beatmapInfo.OnlineBeatmapID.HasValue ? $"[{api.WebsiteRootUrl}/b/{beatmapInfo.OnlineBeatmapID} {beatmapInfo}]" : beatmapInfo.ToString();
+            string beatmapString = beatmapInfo.OnlineBeatmapID.HasValue ? $"[{api.WebsiteRootUrl}/b/{beatmapInfo.OnlineBeatmapID} {beatmapInfo}]" : beatmapInfo.ToString();
 
             channelManager.PostMessage($"is {verb} {beatmapString}", true, target);
             Expire();

@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void createStateBindables()
         {
-            foreach (var sampleName in HitSampleInfo.AllAdditions)
+            foreach (string sampleName in HitSampleInfo.AllAdditions)
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
 
-            foreach (var (sampleName, bindable) in SelectionSampleStates)
+            foreach ((string sampleName, var bindable) in SelectionSampleStates)
             {
                 bindable.Value = GetStateFromSelection(SelectedItems, h => h.Samples.Any(s => s.Name == sampleName));
             }

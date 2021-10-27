@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             // to allow jumps and prevent too sharp turns during streams.
 
             // Allow maximum jump angle when jump distance is more than half of playfield diagonal length
-            var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * Math.Min(1f, distanceToPrev / (playfield_diagonal * 0.5f));
+            double randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * Math.Min(1f, distanceToPrev / (playfield_diagonal * 0.5f));
 
             current.AngleRad = (float)randomAngleRad + previous.AngleRad;
             if (current.AngleRad < 0)
@@ -171,11 +171,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Clamp slider position to the placement area
             // If the slider is larger than the playfield, force it to stay at the original position
-            var newX = possibleMovementBounds.Width < 0
+            float newX = possibleMovementBounds.Width < 0
                 ? objectInfo.PositionOriginal.X
                 : Math.Clamp(previousPosition.X, possibleMovementBounds.Left, possibleMovementBounds.Right);
 
-            var newY = possibleMovementBounds.Height < 0
+            float newY = possibleMovementBounds.Height < 0
                 ? objectInfo.PositionOriginal.Y
                 : Math.Clamp(previousPosition.Y, possibleMovementBounds.Top, possibleMovementBounds.Bottom);
 
@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             // Take the circle radius into account.
-            var radius = (float)slider.Radius;
+            float radius = (float)slider.Radius;
 
             minX -= radius;
             minY -= radius;

@@ -190,8 +190,8 @@ namespace osu.Game.Tests.Visual.Online
 
             for (int zeroBasedIndex = 0; zeroBasedIndex < 10; ++zeroBasedIndex)
             {
-                var oneBasedIndex = zeroBasedIndex + 1;
-                var targetNumberKey = oneBasedIndex % 10;
+                int oneBasedIndex = zeroBasedIndex + 1;
+                int targetNumberKey = oneBasedIndex % 10;
                 var targetChannel = channels[zeroBasedIndex];
                 AddStep($"Press Alt+{targetNumberKey}", () => pressChannelHotkey(targetNumberKey));
                 AddAssert($"Channel #{oneBasedIndex} is selected", () => currentChannel == targetChannel);

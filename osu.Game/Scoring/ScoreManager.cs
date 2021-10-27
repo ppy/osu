@@ -72,7 +72,7 @@ namespace osu.Game.Scoring
                 }
             }
 
-            var totalScores = await Task.WhenAll(scores.Select(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken))).ConfigureAwait(false);
+            long[] totalScores = await Task.WhenAll(scores.Select(s => GetTotalScoreAsync(s, cancellationToken: cancellationToken))).ConfigureAwait(false);
 
             return scores.Select((score, index) => (score, totalScore: totalScores[index]))
                          .OrderByDescending(g => g.totalScore)
