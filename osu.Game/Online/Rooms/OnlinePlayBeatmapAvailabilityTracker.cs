@@ -2,8 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -16,9 +17,12 @@ namespace osu.Game.Online.Rooms
     /// This differs from a regular download tracking composite as this accounts for the
     /// databased beatmap set's checksum, to disallow from playing with an altered version of the beatmap.
     /// </summary>
-    public class OnlinePlayBeatmapAvailabilityTracker : DownloadTrackingComposite<BeatmapSetInfo, BeatmapManager>
+    public class OnlinePlayBeatmapAvailabilityTracker : CompositeDrawable
     {
         public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
 
         /// <summary>
         /// The availability state of the currently selected playlist item.
@@ -28,6 +32,8 @@ namespace osu.Game.Online.Rooms
         private readonly Bindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>(BeatmapAvailability.LocallyAvailable());
 
         private ScheduledDelegate progressUpdate;
+
+        private BeatmapDownloadTracker downloadTracker;
 
         protected override void LoadComplete()
         {
@@ -40,58 +46,39 @@ namespace osu.Game.Online.Rooms
                 if (item.NewValue == null)
                     return;
 
-                Model.Value = item.NewValue.Beatmap.Value.BeatmapSet;
+                downloadTracker?.Expire();
+                downloadTracker = new BeatmapDownloadTracker(item.NewValue.Beatmap.Value.BeatmapSet);
+
+                downloadTracker.Progress.BindValueChanged(_ =>
+                {
+                    if (downloadTracker.State.Value != DownloadState.Downloading)
+                        return;
+
+                    // incoming progress changes are going to be at a very high rate.
+                    // we don't want to flood the network with this, so rate limit how often we send progress updates.
+                    if (progressUpdate?.Completed != false)
+                        progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
+                });
+
+                downloadTracker.State.BindValueChanged(_ => updateAvailability(), true);
+
+                AddInternal(downloadTracker);
             }, true);
-
-            Progress.BindValueChanged(_ =>
-            {
-                if (State.Value != DownloadState.Downloading)
-                    return;
-
-                // incoming progress changes are going to be at a very high rate.
-                // we don't want to flood the network with this, so rate limit how often we send progress updates.
-                if (progressUpdate?.Completed != false)
-                    progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
-            });
-
-            State.BindValueChanged(_ => updateAvailability(), true);
-        }
-
-        protected override bool VerifyDatabasedModel(BeatmapSetInfo databasedSet)
-        {
-            int beatmapId = SelectedItem.Value?.Beatmap.Value.OnlineID ?? -1;
-            string checksum = SelectedItem.Value?.Beatmap.Value.MD5Hash;
-
-            var matchingBeatmap = databasedSet.Beatmaps.FirstOrDefault(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
-
-            if (matchingBeatmap == null)
-            {
-                Logger.Log("The imported beatmap set does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
-                return false;
-            }
-
-            return true;
-        }
-
-        protected override bool IsModelAvailableLocally()
-        {
-            int onlineId = SelectedItem.Value.Beatmap.Value.OnlineID;
-            string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
-
-            var beatmap = Manager.QueryBeatmap(b => b.OnlineBeatmapID == onlineId && b.MD5Hash == checksum);
-            return beatmap?.BeatmapSet.DeletePending == false;
         }
 
         private void updateAvailability()
         {
-            switch (State.Value)
+            if (downloadTracker == null)
+                return;
+
+            switch (downloadTracker.State.Value)
             {
                 case DownloadState.NotDownloaded:
                     availability.Value = BeatmapAvailability.NotDownloaded();
                     break;
 
                 case DownloadState.Downloading:
-                    availability.Value = BeatmapAvailability.Downloading((float)Progress.Value);
+                    availability.Value = BeatmapAvailability.Downloading((float)downloadTracker.Progress.Value);
                     break;
 
                 case DownloadState.Importing:
@@ -99,12 +86,28 @@ namespace osu.Game.Online.Rooms
                     break;
 
                 case DownloadState.LocallyAvailable:
-                    availability.Value = BeatmapAvailability.LocallyAvailable();
+                    bool hashMatches = checkHashValidity();
+
+                    availability.Value = hashMatches ? BeatmapAvailability.LocallyAvailable() : BeatmapAvailability.NotDownloaded();
+
+                    // only display a message to the user if a download seems to have just completed.
+                    if (!hashMatches && downloadTracker.Progress.Value == 1)
+                        Logger.Log("The imported beatmap set does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
+
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(State));
+                    throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private bool checkHashValidity()
+        {
+            int onlineId = SelectedItem.Value.Beatmap.Value.OnlineID;
+            string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
+
+            var beatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == onlineId && b.MD5Hash == checksum);
+            return beatmap?.BeatmapSet.DeletePending == false;
         }
     }
 }
