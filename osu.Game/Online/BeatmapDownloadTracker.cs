@@ -34,7 +34,7 @@ namespace osu.Game.Online
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
             var beatmapSetInfo = new BeatmapSetInfo { OnlineBeatmapSetID = TrackedItem.OnlineID };
 
-            if ((TrackedItem as BeatmapSetInfo)?.ID > 0 || Manager?.IsAvailableLocally(beatmapSetInfo) == true)
+            if (Manager?.IsAvailableLocally(beatmapSetInfo) == true)
                 UpdateState(DownloadState.LocallyAvailable);
             else if (Manager != null)
                 attachDownload(Manager.GetExistingDownload(beatmapSetInfo));
@@ -122,10 +122,8 @@ namespace osu.Game.Online
             {
                 Schedule(() =>
                 {
-                    if (!checkEquality(item, TrackedItem))
-                        return;
-
-                    UpdateState(DownloadState.LocallyAvailable);
+                    if (checkEquality(item, TrackedItem))
+                        UpdateState(DownloadState.LocallyAvailable);
                 });
             }
         }

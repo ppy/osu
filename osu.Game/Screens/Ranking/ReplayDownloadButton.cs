@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Ranking
 
             Score.BindValueChanged(score =>
             {
-                downloadTracker?.Expire();
+                downloadTracker?.RemoveAndDisposeImmediately();
 
                 if (score.NewValue != null)
                 {

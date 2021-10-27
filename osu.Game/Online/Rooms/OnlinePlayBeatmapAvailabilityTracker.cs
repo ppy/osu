@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -17,9 +18,11 @@ namespace osu.Game.Online.Rooms
     /// This differs from a regular download tracking composite as this accounts for the
     /// databased beatmap set's checksum, to disallow from playing with an altered version of the beatmap.
     /// </summary>
-    public class OnlinePlayBeatmapAvailabilityTracker : CompositeDrawable
+    public sealed class OnlinePlayBeatmapAvailabilityTracker : CompositeDrawable
     {
         public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+
+        protected override bool RequiresChildrenUpdate => true;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -46,9 +49,10 @@ namespace osu.Game.Online.Rooms
                 if (item.NewValue == null)
                     return;
 
-                downloadTracker?.Expire();
-                downloadTracker = new BeatmapDownloadTracker(item.NewValue.Beatmap.Value.BeatmapSet);
+                downloadTracker?.RemoveAndDisposeImmediately();
 
+                downloadTracker = new BeatmapDownloadTracker(item.NewValue.Beatmap.Value.BeatmapSet);
+                downloadTracker.State.BindValueChanged(_ => updateAvailability());
                 downloadTracker.Progress.BindValueChanged(_ =>
                 {
                     if (downloadTracker.State.Value != DownloadState.Downloading)
@@ -59,8 +63,6 @@ namespace osu.Game.Online.Rooms
                     if (progressUpdate?.Completed != false)
                         progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
                 });
-
-                downloadTracker.State.BindValueChanged(_ => updateAvailability(), true);
 
                 AddInternal(downloadTracker);
             }, true);

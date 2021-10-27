@@ -36,6 +36,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         public BeatmapPanelDownloadButton(BeatmapSetInfo beatmapSet)
         {
             this.beatmapSet = beatmapSet;
+
             InternalChildren = new Drawable[]
             {
                 shakeContainer = new ShakeContainer
@@ -44,6 +45,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                     Child = button = new DownloadButton
                     {
                         RelativeSizeAxes = Axes.Both,
+                        State = { BindTarget = State }
                     },
                 },
                 DownloadTracker = new BeatmapDownloadTracker(beatmapSet)
@@ -58,14 +60,6 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 Origin = Anchor.BottomLeft,
                 Depth = -1,
             });
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            ((IBindable<DownloadState>)button.State).BindTo(DownloadTracker.State);
-            FinishTransforms(true);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -96,7 +90,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 }
             };
 
-            DownloadTracker.State.BindValueChanged(state =>
+            State.BindValueChanged(state =>
             {
                 switch (state.NewValue)
                 {
@@ -115,6 +109,12 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
                 }
             }, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            FinishTransforms(true);
         }
     }
 }

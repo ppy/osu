@@ -67,8 +67,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached]
         protected OnlinePlayBeatmapAvailabilityTracker BeatmapAvailabilityTracker { get; private set; }
 
-        protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapAvailabilityTracker.Availability;
-
         public readonly Room Room;
         private readonly bool allowEdit;
 
