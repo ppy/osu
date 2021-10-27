@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
                     // limit of 200bpm
                     angleBonus += Math.Sin(Math.Max((Math.PI / 2 - angle), 0))
                         * Math.Min((deltaTimeToBpm - 150), 50) / 50
-                        * 0.05
+                        * 0.1
                         ;
                 }
             }

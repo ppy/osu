@@ -21,29 +21,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
 
-        private double skillMultiplier => 1375;
-        private double strainDecayBase => 0.3;
-
         private double currentStrain = 1;
         private double currentRhythm = 1;
 
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
         protected override int HistoryLength => 32;
-
-        private const double min_speed_bonus = 75; // ~200BPM
-        private const double speed_balancing_factor = 40;
-
         private const double min_doubletap_nerf = 0; // minimum value (eventually on stacked)
         private const double max_doubletap_nerf = 1.0; // maximum value 
         private const double threshold_doubletap_contributing = 2.0; // minimum distance not influenced (2.0 means it is not stacked at least)
-
-        private const double min_acute_stream_spam_nerf = 0.0; // minimum value (eventually on stacked)
-        private const double max_acute_stream_spam_nerf = 1.0; // maximum value 
-        private const double threshold_acute_stream_spam_contributing = 2.0; // minimum distance not influenced (2.0 means it is not stacked at least)
+        protected double skillMultiplier => 1375;
+        protected double strainDecayBase => 0.3;
 
         private readonly double greatWindow;
 
+        private const double min_doubletap_nerf = 0.5; // minimum value (eventually on stacked)
+        private const double max_doubletap_nerf = 1.0; // maximum value 
+        private const double threshold_doubletap_contributing = 2.0; // minimum distance not influenced (2.0 means it is not stacked at least)
 
         public Speed(Mod[] mods, double hitWindowGreat)
             : base(mods)
@@ -160,13 +154,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
             strainTime /= Math.Clamp((strainTime / greatWindowFull) / 0.93, 0.92, 1);
 
+            double distance = Math.Min(single_spacing_threshold, osuCurrObj.TravelDistance + osuCurrObj.JumpDistance);
+            double radius = ((OsuHitObject)osuCurrObj.BaseObject).Radius;
+
             // derive speedBonus for calculation
+>>>>>>>>> Temporary merge branch 2
             double speedBonus = 1.0;
 
             if (strainTime < min_speed_bonus)
-                speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
+            {
+                double multiplierSpeedBonus = min_doubletap_nerf +
+                    Math.Max(Math.Min(distance / (radius * threshold_doubletap_contributing), 1.0), 0.0)
+                    * (max_doubletap_nerf - min_doubletap_nerf);
 
-            double distance = Math.Min(single_spacing_threshold, osuCurrObj.TravelDistance + osuCurrObj.JumpDistance);
+                speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2) * multiplierSpeedBonus;
+            }
 
             return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / strainTime;
         }
@@ -175,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double CalculateInitialStrain(double time) => (currentStrain * currentRhythm) * strainDecay(time - Previous[0].StartTime);
 
-        protected override double StrainValueAt(DifficultyHitObject current)
+        protected override double StrainValueAt(int index, DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
             currentStrain += strainValueOf(current) * skillMultiplier;

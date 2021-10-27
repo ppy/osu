@@ -110,11 +110,43 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="mods">The original list of <see cref="Mod"/>s.</param>
         private void preProcess(Mod[] mods)
+        private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
+            var preSkills = CreatePreloadedSkills(beatmap, mods, clockRate);
+
+
+
+            var skills = CreateSkills(beatmap, mods, clockRate);
 
             Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, playableMods);
+            if (!beatmap.HitObjects.Any())
+                return CreateDifficultyAttributes(beatmap, mods, preSkills, skills, clockRate);
 
+            var difficultyHitObjects = SortObjects(CreateDifficultyHitObjects(beatmap, clockRate)).ToList();
+
+            for (int index = 0; index < difficultyHitObjects.Count; index++)
+            {
+                var hitObject = difficultyHitObjects[index];
+
+                foreach (var preSkill in preSkills)
+                {
+                    preSkill.ProcessInternal(index, hitObject);
+                }
+            }
+
+            database.preSkills = preSkills;
+
+            for (int index = 0; index < difficultyHitObjects.Count; index++)
+            {
+                var hitObject = difficultyHitObjects[index];
+                foreach (var skill in skills)
+                {
+                    skill.ProcessInternal(index, hitObject);
+                }
+            }
+
+            return CreateDifficultyAttributes(beatmap, mods, preSkills, skills, clockRate);
             var track = new TrackVirtual(10000);
             playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             clockRate = track.Rate;
