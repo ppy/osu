@@ -43,6 +43,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
             AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).Result);
 
             AddStep("create leaderboard", () =>
