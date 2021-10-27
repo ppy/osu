@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tournament.Models
 {
@@ -10,7 +10,7 @@ namespace osu.Game.Tournament.Models
     {
         public int ID;
 
-        public BeatmapInfo BeatmapInfo;
+        public APIBeatmap BeatmapInfo;
 
         public long Score;
 

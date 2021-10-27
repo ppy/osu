@@ -11,10 +11,10 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Models;
 
@@ -93,8 +93,8 @@ namespace osu.Game.Tournament.IPC
                                         Beatmap.Value = existing.BeatmapInfo;
                                     else
                                     {
-                                        beatmapLookupRequest = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
-                                        beatmapLookupRequest.Success += b => Beatmap.Value = b.ToBeatmapInfo(Rulesets);
+                                        beatmapLookupRequest = new GetBeatmapRequest(new APIBeatmap { OnlineID = beatmapId });
+                                        beatmapLookupRequest.Success += b => Beatmap.Value = b;
                                         API.Queue(beatmapLookupRequest);
                                     }
                                 }
