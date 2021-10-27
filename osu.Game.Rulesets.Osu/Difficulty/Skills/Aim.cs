@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.0;
-        private const double slider_multiplier = 1.75;
+        private const double slider_multiplier = 1.5;
 
         private double currentStrain = 1;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Precision.AlmostEquals(osuCurrObj.StrainTime, osuPrevObj.StrainTime, 10)) // If rhythms are the same.
             {
-                if (osuCurrObj.Angle != null && osuPrevObj.Angle != null)
+                if (osuCurrObj.Angle != null && osuPrevObj.Angle != null && osuLastObj.Angle != null)
                 {
                     double currAngle = osuCurrObj.Angle.Value;
                     double prevAngle = osuPrevObj.Angle.Value;
