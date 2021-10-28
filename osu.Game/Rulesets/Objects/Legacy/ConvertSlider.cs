@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public double Distance => Path.Distance;
 
-        public List<IList<HitSampleInfo>> NodeSamples { get; set; }
+        public IList<IList<HitSampleInfo>> NodeSamples { get; set; }
         public int RepeatCount { get; set; }
 
         [JsonIgnore]

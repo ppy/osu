@@ -21,6 +21,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public IRoomManager RoomManager { get; }
         public OngoingOperationTracker OngoingOperationTracker { get; }
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker { get; }
+        public TestRoomRequestsHandler RequestsHandler { get; }
 
         /// <summary>
         /// All cached dependencies which are also <see cref="Drawable"/> components.
@@ -33,12 +34,14 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public OnlinePlayTestSceneDependencies()
         {
             SelectedRoom = new Bindable<Room>();
-            RoomManager = CreateRoomManager();
+            RequestsHandler = new TestRoomRequestsHandler();
             OngoingOperationTracker = new OngoingOperationTracker();
             AvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
+            RoomManager = CreateRoomManager();
 
             dependencies = new DependencyContainer(new CachedModelDependencyContainer<Room>(null) { Model = { BindTarget = SelectedRoom } });
 
+            CacheAs(RequestsHandler);
             CacheAs(SelectedRoom);
             CacheAs(RoomManager);
             CacheAs(OngoingOperationTracker);
@@ -71,6 +74,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 drawableComponents.Add(drawable);
         }
 
-        protected virtual IRoomManager CreateRoomManager() => new TestRequestHandlingRoomManager();
+        protected virtual IRoomManager CreateRoomManager() => new TestRoomManager();
     }
 }
