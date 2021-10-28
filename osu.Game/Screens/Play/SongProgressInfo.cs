@@ -132,31 +132,22 @@ namespace osu.Game.Screens.Play
             Anchor timeLeftOriginX = Anchor.x2;
             Anchor timeLeftOriginY = Anchor.y2;
 
-            // Current Time Text
-            // Rotation : Swap Left<->Right, Rotation : Swap Bottom<->Top
-            // -90, -180/180 : flip origin horizontally, 90, 180/-180 : flip origin vertically
+            // We use a proper maths modulus (negative % positive = positive) to make the if statements smaller
+            int parentRotationInQuarterTurnsModFour = parentRotationInQuarterTurns % 4;
+            if (parentRotationInQuarterTurnsModFour < 0) parentRotationInQuarterTurnsModFour += 4;
 
-            // Time Left Text
-            // Rotation : Swap Left<->Right, Rotation : Swap Bottom<->Top
-            // 90, 180/-180 : flip origin horizontally, -90, -180/180 : flip origin vertically
-            if (parentRotationInQuarterTurns == -1 || parentRotationInQuarterTurns == 2 || parentRotationInQuarterTurns == -2)
+            // 90 & 180: flip current time origin vertically, flip time left origin horizontally
+            if (parentRotationInQuarterTurnsModFour == 3 || parentRotationInQuarterTurnsModFour == 2)
             {
                 currentTimeOriginX = flipXAnchor(currentTimeOriginX);
                 timeLeftOriginY = flipYAnchor(timeLeftOriginY);
             }
 
-            if (parentRotationInQuarterTurns == 1 || parentRotationInQuarterTurns == 2 || parentRotationInQuarterTurns == -2)
+            // 270 & 180: flip current time origin horizontally, flip time left origin vertically
+            if (parentRotationInQuarterTurnsModFour == 1 || parentRotationInQuarterTurnsModFour == 2)
             {
                 currentTimeOriginY = flipYAnchor(currentTimeOriginY);
                 timeLeftOriginX = flipXAnchor(timeLeftOriginX);
-            }
-
-            // Non-centered text pokes out of the bounding box when the progress bar is horizontal
-            // So we center it when that happens
-            if (parentRotationInQuarterTurns == -1 || parentRotationInQuarterTurns == 1)
-            {
-                currentTimeOriginX = Anchor.x1;
-                timeLeftOriginX = Anchor.x1;
             }
 
             // If parent is flipped horizontally: flip origins horizontally
