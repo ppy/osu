@@ -12,6 +12,8 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressInfo : Container
     {
+        public SongProgress SongProgressParent;
+
         private OsuSpriteText timeCurrent;
         private OsuSpriteText timeLeft;
         private OsuSpriteText progress;

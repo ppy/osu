@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = info_height,
+                    SongProgressParent = this
                 },
                 graph = new SongProgressGraph
                 {
