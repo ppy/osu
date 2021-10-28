@@ -42,6 +42,44 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
+        public void TestCompleteProgress()
+        {
+            ProgressNotification notification = null;
+            AddStep("add progress notification", () =>
+            {
+                notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                };
+                notificationOverlay.Post(notification);
+                progressingNotifications.Add(notification);
+            });
+
+            AddUntilStep("wait completion", () => notification.State == ProgressNotificationState.Completed);
+        }
+
+        [Test]
+        public void TestCancelProgress()
+        {
+            ProgressNotification notification = null;
+            AddStep("add progress notification", () =>
+            {
+                notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                };
+                notificationOverlay.Post(notification);
+                progressingNotifications.Add(notification);
+            });
+
+            AddWaitStep("wait 3", 3);
+
+            AddStep("cancel notification", () => notification.State = ProgressNotificationState.Cancelled);
+        }
+
+        [Test]
         public void TestBasicFlow()
         {
             setState(Visibility.Visible);
@@ -138,7 +176,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
             {
                 if (n.Progress < 1)
-                    n.Progress += (float)(Time.Elapsed / 400) * RNG.NextSingle();
+                    n.Progress += (float)(Time.Elapsed / 2000);
                 else
                     n.State = ProgressNotificationState.Completed;
             }
