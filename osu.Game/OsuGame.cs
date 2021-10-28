@@ -158,6 +158,8 @@ namespace osu.Game
 
         private Bindable<int> configRuleset;
 
+        private Bindable<float> uiScale;
+
         private Bindable<int> configSkin;
 
         private readonly string[] args;
@@ -219,6 +221,7 @@ namespace osu.Game
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
+            uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
 
             var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
 
@@ -1022,24 +1025,21 @@ namespace osu.Game
 
         public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
+            const float adjustment_increment = 0.05f;
+
             switch (e.Action)
             {
                 case PlatformAction.ZoomIn:
-                    adjustUIScaling(1);
+                    uiScale.Value += adjustment_increment;
                     return true;
 
                 case PlatformAction.ZoomOut:
-                    adjustUIScaling(-1);
+                    uiScale.Value -= adjustment_increment;
                     return true;
 
                 case PlatformAction.ZoomDefault:
-                    LocalConfig.GetBindable<float>(OsuSetting.UIScale).SetDefault();
+                    uiScale.SetDefault();
                     return true;
-            }
-
-            void adjustUIScaling(int amount)
-            {
-                LocalConfig.SetValue(OsuSetting.UIScale, LocalConfig.Get<float>(OsuSetting.UIScale) + (0.05f * amount));
             }
 
             return base.OnPressed(e);
