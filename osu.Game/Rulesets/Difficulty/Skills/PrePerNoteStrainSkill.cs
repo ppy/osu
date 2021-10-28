@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double currentStrain = 0;
 
-        protected override void Process(int index, DifficultyHitObject current)
+        protected override void Process(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
-            var value = StrainValueOf(current);
+            var value = StrainValueOf(preSkills, index, current);
 
             if (StrainDecayBase >= 0.0)
                 currentStrain *= strainDecay(current.DeltaTime);
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             return 0;
         }
 
-        protected abstract double StrainValueOf(DifficultyHitObject current);
+        protected abstract double StrainValueOf(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current);
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
         public List<double> GetAllStrainPeaks()

@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double lastVelocity = -1;
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainValueOf(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             var osuCurrent = (OsuDifficultyHitObject)current;
             var result = 0.0;

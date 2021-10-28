@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Difficulty
             foreach (var hitObject in getDifficultyHitObjects())
             {
                 foreach (var preSkill in preSkills)
-                    preSkill.ProcessInternal(null, index, hitObject);
+                    preSkill.ProcessInternal(preSkills, index, hitObject);
 
                 index++;
             }
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Difficulty
             foreach (var hitObject in getDifficultyHitObjects())
             {
                 foreach (var preSkill in preSkills)
-                    preSkill.ProcessInternal(null, index, hitObject);
+                    preSkill.ProcessInternal(preSkills, index, hitObject);
 
                 index++;
             }
