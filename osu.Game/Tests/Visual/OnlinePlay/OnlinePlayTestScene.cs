@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
 
@@ -27,11 +28,14 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// </summary>
         protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies?.OnlinePlayDependencies;
 
-        private DelegatedDependencyContainer dependencies;
-
         protected override Container<Drawable> Content => content;
+
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
         private readonly Container content;
         private readonly Container drawableDependenciesContainer;
+        private DelegatedDependencyContainer dependencies;
 
         protected OnlinePlayTestScene()
         {
@@ -56,6 +60,12 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
             drawableDependenciesContainer.AddRange(OnlinePlayDependencies.DrawableComponents);
         });
+
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+            AddStep("setup API", () => ((DummyAPIAccess)API).HandleRequest = request => OnlinePlayDependencies.RequestsHandler.HandleRequest(request, API.LocalUser.Value, game));
+        }
 
         /// <summary>
         /// Creates the room dependencies. Called every <see cref="Setup"/>.

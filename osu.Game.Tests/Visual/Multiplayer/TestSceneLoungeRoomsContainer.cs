@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneLoungeRoomsContainer : OnlinePlayTestScene
     {
-        protected new TestRequestHandlingRoomManager RoomManager => (TestRequestHandlingRoomManager)base.RoomManager;
+        protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
         private RoomsContainer container;
 
