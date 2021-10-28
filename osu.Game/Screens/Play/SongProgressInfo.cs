@@ -78,6 +78,28 @@ namespace osu.Game.Screens.Play
                     },
                 }
             };
+
+            SongProgressParent.OnUpdate += songProgress =>
+            {
+                timeCurrent.Rotation = -songProgress.Rotation;
+                progress.Rotation = -songProgress.Rotation;
+                timeLeft.Rotation = -songProgress.Rotation;
+
+                bool flipVectors = (((int)Math.Floor(songProgress.Rotation / 90)) & 1) == 1;
+
+                if(!flipVectors)
+                {
+                    timeCurrent.Scale = new osuTK.Vector2 { X = Math.Sign(songProgress.Scale.X), Y = Math.Sign(songProgress.Scale.Y) };
+                    progress.Scale = new osuTK.Vector2 { X = Math.Sign(songProgress.Scale.X), Y = Math.Sign(songProgress.Scale.Y) };
+                    timeLeft.Scale = new osuTK.Vector2 { X = Math.Sign(songProgress.Scale.X), Y = Math.Sign(songProgress.Scale.Y) };
+                }
+                else
+                {
+                    timeCurrent.Scale = new osuTK.Vector2 { Y = Math.Sign(songProgress.Scale.X), X = Math.Sign(songProgress.Scale.Y) };
+                    progress.Scale = new osuTK.Vector2 { Y = Math.Sign(songProgress.Scale.X), X = Math.Sign(songProgress.Scale.Y) };
+                    timeLeft.Scale = new osuTK.Vector2 { Y = Math.Sign(songProgress.Scale.X), X = Math.Sign(songProgress.Scale.Y) };
+                }
+            };
         }
 
         protected override void Update()
