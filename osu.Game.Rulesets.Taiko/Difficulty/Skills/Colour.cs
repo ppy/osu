@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
         }
 
-        protected override double StrainValueOf(int index, DifficultyHitObject current)
+        protected override double StrainValueOf(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             // changing from/to a drum roll or a swell does not constitute a colour change.
             // hits spaced more than a second apart are also exempt from colour strain.
