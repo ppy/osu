@@ -14,11 +14,11 @@ using Newtonsoft.Json;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -51,7 +51,7 @@ namespace osu.Game.Skinning
 
         public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
 
-        protected override string[] HashableFileTypes => new[] { ".ini" };
+        protected override string[] HashableFileTypes => new[] { ".ini", ".json" };
 
         protected override string ImportFromStablePath => "Skins";
 
@@ -85,6 +85,27 @@ namespace osu.Game.Skinning
 
                 SourceChanged?.Invoke();
             };
+
+            // can be removed 20220420.
+            populateMissingHashes();
+        }
+
+        private void populateMissingHashes()
+        {
+            var skinsWithoutHashes = ModelStore.ConsumableItems.Where(i => i.Hash == null).ToArray();
+
+            foreach (SkinInfo skin in skinsWithoutHashes)
+            {
+                try
+                {
+                    Update(skin);
+                }
+                catch (Exception e)
+                {
+                    Delete(skin);
+                    Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
+                }
+            }
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osk";
@@ -128,28 +149,118 @@ namespace osu.Game.Skinning
             CurrentSkinInfo.Value = ModelStore.ConsumableItems.Single(i => i.ID == chosen.ID);
         }
 
-        protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
+        protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name ?? "No name" };
 
         private const string unknown_creator_string = "Unknown";
 
         protected override bool HasCustomHashFunction => true;
 
-        protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
+        protected override string ComputeHash(SkinInfo item)
         {
             var instance = GetSkin(item);
 
-            // in the case the skin has a skin.ini file, we are going to create a hash based on that.
-            // we don't want to do this in the case we don't have a skin.ini, as it would match only on the filename portion,
-            // causing potentially unique skin imports to be considered as a duplicate.
-            if (!string.IsNullOrEmpty(instance.Configuration.SkinInfo.Name))
-            {
-                // we need to populate early to create a hash based off skin.ini contents
-                populateMetadata(item, instance, reader?.Name);
+            // This function can be run on fresh import or save. The logic here ensures a skin.ini file is in a good state for both operations.
 
-                return item.ToString().ComputeSHA2Hash();
+            // `Skin` will parse the skin.ini and populate `Skin.Configuration` during construction above.
+            string skinIniSourcedName = instance.Configuration.SkinInfo.Name;
+            string skinIniSourcedCreator = instance.Configuration.SkinInfo.Creator;
+            string archiveName = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
+
+            bool isImport = item.ID == 0;
+
+            if (isImport)
+            {
+                item.Name = !string.IsNullOrEmpty(skinIniSourcedName) ? skinIniSourcedName : archiveName;
+                item.Creator = !string.IsNullOrEmpty(skinIniSourcedCreator) ? skinIniSourcedCreator : unknown_creator_string;
+
+                // For imports, we want to use the archive or folder name as part of the metadata, in addition to any existing skin.ini metadata.
+                // In an ideal world, skin.ini would be the only source of metadata, but a lot of skin creators and users don't update it when making modifications.
+                // In both of these cases, the expectation from the user is that the filename or folder name is displayed somewhere to identify the skin.
+                if (archiveName != item.Name)
+                    item.Name = $"{item.Name} [{archiveName}]";
             }
 
-            return base.ComputeHash(item, reader);
+            // By this point, the metadata in SkinInfo will be correct.
+            // Regardless of whether this is an import or not, let's write the skin.ini if non-existing or non-matching.
+            // This is (weirdly) done inside ComputeHash to avoid adding a new method to handle this case. After switching to realm it can be moved into another place.
+            if (skinIniSourcedName != item.Name)
+                updateSkinIniMetadata(item);
+
+            return base.ComputeHash(item);
+        }
+
+        private void updateSkinIniMetadata(SkinInfo item)
+        {
+            string nameLine = $"Name: {item.Name}";
+            string authorLine = $"Author: {item.Creator}";
+
+            var existingFile = item.Files.SingleOrDefault(f => f.Filename == "skin.ini");
+
+            if (existingFile != null)
+            {
+                List<string> outputLines = new List<string>();
+
+                bool addedName = false;
+                bool addedAuthor = false;
+
+                using (var stream = Files.Storage.GetStream(existingFile.FileInfo.StoragePath))
+                using (var sr = new StreamReader(stream))
+                {
+                    string line;
+
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        if (line.StartsWith("Name:", StringComparison.Ordinal))
+                        {
+                            outputLines.Add(nameLine);
+                            addedName = true;
+                        }
+                        else if (line.StartsWith("Author:", StringComparison.Ordinal))
+                        {
+                            outputLines.Add(authorLine);
+                            addedAuthor = true;
+                        }
+                        else
+                            outputLines.Add(line);
+                    }
+                }
+
+                if (!addedName || !addedAuthor)
+                {
+                    outputLines.AddRange(new[]
+                    {
+                        "[General]",
+                        nameLine,
+                        authorLine,
+                    });
+                }
+
+                using (Stream stream = new MemoryStream())
+                {
+                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    {
+                        foreach (string line in outputLines)
+                            sw.WriteLine(line);
+                    }
+
+                    ReplaceFile(item, existingFile, stream);
+                }
+            }
+            else
+            {
+                using (Stream stream = new MemoryStream())
+                {
+                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    {
+                        sw.WriteLine("[General]");
+                        sw.WriteLine(nameLine);
+                        sw.WriteLine(authorLine);
+                        sw.WriteLine("Version: latest");
+                    }
+
+                    AddFile(item, stream, "skin.ini");
+                }
+            }
         }
 
         protected override Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
@@ -158,30 +269,10 @@ namespace osu.Game.Skinning
 
             model.InstantiationInfo ??= instance.GetType().GetInvariantInstantiationInfo();
 
-            populateMetadata(model, instance, archive?.Name);
+            model.Name = instance.Configuration.SkinInfo.Name;
+            model.Creator = instance.Configuration.SkinInfo.Creator;
 
             return Task.CompletedTask;
-        }
-
-        private void populateMetadata(SkinInfo item, Skin instance, string archiveName)
-        {
-            if (!string.IsNullOrEmpty(instance.Configuration.SkinInfo.Name))
-            {
-                item.Name = instance.Configuration.SkinInfo.Name;
-                item.Creator = instance.Configuration.SkinInfo.Creator;
-            }
-            else
-            {
-                item.Name = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
-                item.Creator ??= unknown_creator_string;
-            }
-
-            // generally when importing from a folder, the ".osk" extension will not be present.
-            // if we ever need a more reliable method of determining this, the type of `ArchiveReader` can be checked.
-            bool isArchiveImport = archiveName?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true;
-
-            if (archiveName != null && !isArchiveImport && archiveName != item.Name)
-                item.Name = $"{item.Name} [{archiveName}]";
         }
 
         /// <summary>

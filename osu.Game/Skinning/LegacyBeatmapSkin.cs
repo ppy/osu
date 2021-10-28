@@ -50,7 +50,7 @@ namespace osu.Game.Skinning
         {
             switch (lookup)
             {
-                case LegacySkinConfiguration.LegacySetting s when s == LegacySkinConfiguration.LegacySetting.Version:
+                case SkinConfiguration.LegacySetting s when s == SkinConfiguration.LegacySetting.Version:
                     // For lookup simplicity, ignore beatmap-level versioning completely.
 
                     // If it is decided that we need this due to beatmaps somehow using it, the default (1.0 specified in LegacySkinDecoder.CreateTemplateObject)
