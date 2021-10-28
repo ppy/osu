@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             : base(hitObject, lastObject, clockRate)
         {
             // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
-            var scalingFactor = normalized_hitobject_radius / halfCatcherWidth;
+            float scalingFactor = normalized_hitobject_radius / halfCatcherWidth;
 
             NormalizedPosition = BaseObject.EffectiveX * scalingFactor;
             LastNormalizedPosition = LastObject.EffectiveX * scalingFactor;

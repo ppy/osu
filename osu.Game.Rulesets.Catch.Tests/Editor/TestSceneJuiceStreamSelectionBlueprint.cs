@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
             AddAssert("correct outline count", () =>
             {
-                var expected = hitObject.NestedHitObjects.Count(h => !(h is TinyDroplet));
+                int expected = hitObject.NestedHitObjects.Count(h => !(h is TinyDroplet));
                 return this.ChildrenOfType<FruitOutline>().Count() == expected;
             });
             AddAssert("correct vertex piece count", () =>

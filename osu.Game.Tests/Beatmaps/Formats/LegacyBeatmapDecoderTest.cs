@@ -775,5 +775,22 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(seventh.ControlPoints[4].Type == null);
             }
         }
+
+        [Test]
+        public void TestSliderLengthExtensionEdgeCase()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("duplicate-last-position-slider.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+
+                var path = ((IHasPath)decoded.HitObjects[0]).Path;
+
+                Assert.That(path.ExpectedDistance.Value, Is.EqualTo(2));
+                Assert.That(path.Distance, Is.EqualTo(1));
+            }
+        }
     }
 }

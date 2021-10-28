@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var maniaCurrent = (ManiaDifficultyHitObject)current;
-            var endTime = maniaCurrent.EndTime;
-            var column = maniaCurrent.BaseObject.Column;
+            double endTime = maniaCurrent.EndTime;
+            int column = maniaCurrent.BaseObject.Column;
 
             double holdFactor = 1.0; // Factor to all additional strains in case something else is held
             double holdAddition = 0; // Addition to the current note in case it's a hold and has to be released awkwardly

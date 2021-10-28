@@ -57,7 +57,7 @@ namespace osu.Game.Storyboards
 
             public int CompareTo(ICommand other)
             {
-                var result = StartTime.CompareTo(other.StartTime);
+                int result = StartTime.CompareTo(other.StartTime);
                 if (result != 0) return result;
 
                 return EndTime.CompareTo(other.EndTime);

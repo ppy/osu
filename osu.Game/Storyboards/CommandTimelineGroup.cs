@@ -65,7 +65,7 @@ namespace osu.Game.Storyboards
             {
                 // if the first alpha command starts at zero it should be given priority over anything else.
                 // this is due to it creating a state where the target is not present before that time, causing any other events to not be visible.
-                var earliestDisplay = EarliestDisplayedTime;
+                double? earliestDisplay = EarliestDisplayedTime;
                 if (earliestDisplay != null)
                     return earliestDisplay.Value;
 

@@ -7,10 +7,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
@@ -234,25 +234,25 @@ namespace osu.Game.Tournament.Screens.Editors
                             Model.ID = id.NewValue ?? 0;
 
                             if (id.NewValue != id.OldValue)
-                                Model.BeatmapInfo = null;
+                                Model.Beatmap = null;
 
-                            if (Model.BeatmapInfo != null)
+                            if (Model.Beatmap != null)
                             {
                                 updatePanel();
                                 return;
                             }
 
-                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = Model.ID });
+                            var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = Model.ID });
 
                             req.Success += res =>
                             {
-                                Model.BeatmapInfo = res.ToBeatmapInfo(rulesets);
+                                Model.Beatmap = res;
                                 updatePanel();
                             };
 
                             req.Failure += _ =>
                             {
-                                Model.BeatmapInfo = null;
+                                Model.Beatmap = null;
                                 updatePanel();
                             };
 
@@ -267,9 +267,9 @@ namespace osu.Game.Tournament.Screens.Editors
                     {
                         drawableContainer.Clear();
 
-                        if (Model.BeatmapInfo != null)
+                        if (Model.Beatmap != null)
                         {
-                            drawableContainer.Child = new TournamentBeatmapPanel(Model.BeatmapInfo, result.Mod.Value)
+                            drawableContainer.Child = new TournamentBeatmapPanel(Model.Beatmap, result.Mod.Value)
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,

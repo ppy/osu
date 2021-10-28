@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         private Vector2 getPositionForDivisor(int divisor)
         {
-            var relativePosition = (float)Math.Clamp(divisor, 0, 16) / 16;
+            float relativePosition = (float)Math.Clamp(divisor, 0, 16) / 16;
             var sliderDrawQuad = tickSliderBar.ScreenSpaceDrawQuad;
             return new Vector2(
                 sliderDrawQuad.TopLeft.X + sliderDrawQuad.Width * relativePosition,

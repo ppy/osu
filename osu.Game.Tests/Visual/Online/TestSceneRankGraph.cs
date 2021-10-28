@@ -24,10 +24,10 @@ namespace osu.Game.Tests.Visual.Online
         {
             RankGraph graph;
 
-            var data = new int[89];
-            var dataWithZeros = new int[89];
-            var smallData = new int[89];
-            var edgyData = new int[89];
+            int[] data = new int[89];
+            int[] dataWithZeros = new int[89];
+            int[] smallData = new int[89];
+            int[] edgyData = new int[89];
 
             for (int i = 0; i < 89; i++)
                 data[i] = dataWithZeros[i] = (i + 1) * 1000;

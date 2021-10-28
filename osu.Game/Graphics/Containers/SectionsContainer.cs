@@ -182,7 +182,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            var result = base.OnInvalidate(invalidation, source);
+            bool result = base.OnInvalidate(invalidation, source);
 
             if (source == InvalidationSource.Child && (invalidation & Invalidation.DrawSize) != 0)
             {
@@ -240,7 +240,7 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Height = expandableHeaderSize + fixedHeaderSize;
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
-                var smallestSectionHeight = Children.Count > 0 ? Children.Min(d => d.Height) : 0;
+                float smallestSectionHeight = Children.Count > 0 ? Children.Min(d => d.Height) : 0;
 
                 // scroll offset is our fixed header height if we have it plus 10% of content height
                 // plus 5% to fix floating point errors and to not have a section instantly unselect when scrolling upwards

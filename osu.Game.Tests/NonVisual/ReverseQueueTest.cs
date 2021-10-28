@@ -29,7 +29,7 @@ namespace osu.Game.Tests.NonVisual
             });
 
             int count = 0;
-            foreach (var unused in queue)
+            foreach (char unused in queue)
                 count++;
 
             Assert.AreEqual(0, count);
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.NonVisual
 
             // Assert correct item return and no longer in queue after dequeueing
             Assert.AreEqual('a', queue[5]);
-            var dequeuedItem = queue.Dequeue();
+            char dequeuedItem = queue.Dequeue();
 
             Assert.AreEqual('a', dequeuedItem);
             Assert.AreEqual(5, queue.Count);
@@ -133,7 +133,7 @@ namespace osu.Game.Tests.NonVisual
             int expectedValueIndex = 0;
 
             // Assert items are enumerated in correct order
-            foreach (var item in queue)
+            foreach (char item in queue)
             {
                 Assert.AreEqual(expectedValues[expectedValueIndex], item);
                 expectedValueIndex++;

@@ -62,12 +62,12 @@ namespace osu.Game.Screens.Ranking.Expanded
         {
             var beatmap = score.BeatmapInfo;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
-            var creator = metadata.Author?.Username;
+            string creator = metadata.Author?.Username;
 
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out var missCount) || missCount == 0),
+                new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out int missCount) || missCount == 0),
                 new PerformanceStatistic(score),
             };
 
