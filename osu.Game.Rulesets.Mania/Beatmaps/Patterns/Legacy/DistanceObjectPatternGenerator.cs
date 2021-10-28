@@ -488,7 +488,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Retrieves the list of node samples that occur at time greater than or equal to <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to retrieve node samples at.</param>
-        private List<IList<HitSampleInfo>> nodeSamplesAt(int time)
+        private IList<IList<HitSampleInfo>> nodeSamplesAt(int time)
         {
             if (!(HitObject is IHasPathWithRepeats curveData))
                 return null;
