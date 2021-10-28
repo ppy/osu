@@ -25,10 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double hitWindowGreat;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
-            : base(ruleset, beatmap)
-        {
-
-        }
+            : base(ruleset, beatmap) { }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, PrePerNoteStrainSkill[] preSkills, Skill[] skills, double clockRate)
         {

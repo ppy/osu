@@ -303,6 +303,5 @@ namespace osu.Game.Rulesets.Difficulty
             #endregion
         }
         protected abstract PrePerNoteStrainSkill[] CreatePreloadedSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
-
     }
 }
