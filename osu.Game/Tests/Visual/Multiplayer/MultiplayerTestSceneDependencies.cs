@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public TestMultiplayerClient Client { get; }
         public TestUserLookupCache LookupCache { get; }
         public TestSpectatorClient SpectatorClient { get; }
-        public new TestRequestHandlingMultiplayerRoomManager RoomManager => (TestRequestHandlingMultiplayerRoomManager)base.RoomManager;
+        public new TestMultiplayerRoomManager RoomManager => (TestMultiplayerRoomManager)base.RoomManager;
 
         public MultiplayerTestSceneDependencies()
         {
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             CacheAs<SpectatorClient>(SpectatorClient);
         }
 
-        protected override IRoomManager CreateRoomManager() => new TestRequestHandlingMultiplayerRoomManager();
+        protected override IRoomManager CreateRoomManager() => new TestMultiplayerRoomManager(RequestsHandler);
 
         protected virtual TestSpectatorClient CreateSpectatorClient() => new TestSpectatorClient();
     }
