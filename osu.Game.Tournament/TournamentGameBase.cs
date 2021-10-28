@@ -269,18 +269,19 @@ namespace osu.Game.Tournament
                                             ladder.Matches.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
                                         .ToList();
 
+            // Serialise before opening stream for writing, so if there's a failure it will leave the file in the previous state.
+            string serialisedLadder = JsonConvert.SerializeObject(ladder,
+                new JsonSerializerSettings
+                {
+                    Formatting = Formatting.Indented,
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DefaultValueHandling = DefaultValueHandling.Ignore,
+                    Converters = new JsonConverter[] { new JsonPointConverter() }
+                });
+
             using (var stream = storage.GetStream(bracket_filename, FileAccess.Write, FileMode.Create))
             using (var sw = new StreamWriter(stream))
-            {
-                sw.Write(JsonConvert.SerializeObject(ladder,
-                    new JsonSerializerSettings
-                    {
-                        Formatting = Formatting.Indented,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        DefaultValueHandling = DefaultValueHandling.Ignore,
-                        Converters = new JsonConverter[] { new JsonPointConverter() }
-                    }));
-            }
+                sw.Write(serialisedLadder);
         }
 
         protected override UserInputManager CreateUserInputManager() => new TournamentInputManager();
