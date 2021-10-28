@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 using System;
 
 namespace osu.Game.Screens.Play
@@ -52,7 +53,7 @@ namespace osu.Game.Screens.Play
             {
                 timeCurrent = new OsuSpriteText
                 {
-                    Origin = Anchor.Centre,
+                    Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Colour = colours.BlueLighter,
                     Font = OsuFont.Numeric,
@@ -70,7 +71,7 @@ namespace osu.Game.Screens.Play
                 },
                 timeLeft = new OsuSpriteText
                 {
-                    Origin = Anchor.Centre,
+                    Origin = Anchor.BottomRight,
                     Anchor = Anchor.BottomRight,
                     Colour = colours.BlueLighter,
                     Font = OsuFont.Numeric,
@@ -78,28 +79,6 @@ namespace osu.Game.Screens.Play
                     {
                         Right = margin,
                     },
-                }
-            };
-
-            SongProgressParent.OnUpdate += songProgress =>
-            {
-                timeCurrent.Rotation = -songProgress.Rotation;
-                progress.Rotation = -songProgress.Rotation;
-                timeLeft.Rotation = -songProgress.Rotation;
-
-                bool flipVectors = (((int)Math.Floor(songProgress.Rotation / 90)) & 1) == 1;
-
-                if (!flipVectors)
-                {
-                    timeCurrent.Scale = new osuTK.Vector2 { X = Math.Sign(songProgress.Scale.X), Y = Math.Sign(songProgress.Scale.Y) };
-                    progress.Scale = new osuTK.Vector2 { X = Math.Sign(songProgress.Scale.X), Y = Math.Sign(songProgress.Scale.Y) };
-                    timeLeft.Scale = new osuTK.Vector2 { X = Math.Sign(songProgress.Scale.X), Y = Math.Sign(songProgress.Scale.Y) };
-                }
-                else
-                {
-                    timeCurrent.Scale = new osuTK.Vector2 { Y = Math.Sign(songProgress.Scale.X), X = Math.Sign(songProgress.Scale.Y) };
-                    progress.Scale = new osuTK.Vector2 { Y = Math.Sign(songProgress.Scale.X), X = Math.Sign(songProgress.Scale.Y) };
-                    timeLeft.Scale = new osuTK.Vector2 { Y = Math.Sign(songProgress.Scale.X), X = Math.Sign(songProgress.Scale.Y) };
                 }
             };
         }
@@ -127,8 +106,103 @@ namespace osu.Game.Screens.Play
 
                 previousSecond = currentSecond;
             }
+
+            // Undo rotations done by the progress container
+            timeCurrent.Rotation = -songProgressParent.Rotation;
+            progress.Rotation = -songProgressParent.Rotation;
+            timeLeft.Rotation = -songProgressParent.Rotation;
+
+            // Undo flips done by the progress container
+            Vector2 textScale = new Vector2 { X = Math.Sign(songProgressParent.Scale.X), Y = Math.Sign(songProgressParent.Scale.Y) };
+
+            // If we are rotated 90 degrees in either direction,
+            // we need to swap horizontal flips with vertical flips and vice versa.
+            int parentRotationInQuarterTurns = (int)Math.Floor(songProgressParent.Rotation / 90);
+            if (parentRotationInQuarterTurns % 2 != 0)
+                textScale = new Vector2 { X = textScale.Y, Y = textScale.X };
+
+            timeCurrent.Scale = textScale;
+            progress.Scale = textScale;
+            timeLeft.Scale = textScale;
+
+            // Choose the correct origin based on rotation and flip
+            Anchor currentTimeOriginX = Anchor.x0;
+            Anchor currentTimeOriginY = Anchor.y2;
+
+            Anchor timeLeftOriginX = Anchor.x2;
+            Anchor timeLeftOriginY = Anchor.y2;
+
+            // Current Time Text
+            // Rotation : Swap Left<->Right, Rotation : Swap Bottom<->Top
+            // -90, -180/180 : flip origin horizontally, 90, 180/-180 : flip origin vertically
+
+            // Time Left Text
+            // Rotation : Swap Left<->Right, Rotation : Swap Bottom<->Top
+            // 90, 180/-180 : flip origin horizontally, -90, -180/180 : flip origin vertically
+            if (parentRotationInQuarterTurns == -1 || parentRotationInQuarterTurns == 2 || parentRotationInQuarterTurns == -2)
+            {
+                currentTimeOriginX = flipXAnchor(currentTimeOriginX);
+                timeLeftOriginY = flipYAnchor(timeLeftOriginY);
+            }
+
+            if (parentRotationInQuarterTurns == 1 || parentRotationInQuarterTurns == 2 || parentRotationInQuarterTurns == -2)
+            {
+                currentTimeOriginY = flipYAnchor(currentTimeOriginY);
+                timeLeftOriginX = flipXAnchor(timeLeftOriginX);
+            }
+
+            // Non-centered text pokes out of the bounding box when the progress bar is horizontal
+            // So we center it when that happens
+            if (parentRotationInQuarterTurns == -1 || parentRotationInQuarterTurns == 1)
+            {
+                currentTimeOriginX = Anchor.x1;
+                timeLeftOriginX = Anchor.x1;
+            }
+
+            // If parent is flipped horizontally: flip origins horizontally
+            if (textScale.X == -1)
+            {
+                currentTimeOriginX = flipXAnchor(currentTimeOriginX);
+                timeLeftOriginX = flipXAnchor(timeLeftOriginX);
+            }
+
+            // If parent is flipped vertically: flip origins vertically
+            if (textScale.Y == -1)
+            {
+                currentTimeOriginY = flipYAnchor(currentTimeOriginY);
+                timeLeftOriginY = flipYAnchor(timeLeftOriginY);
+            }
+
+            timeCurrent.Origin = currentTimeOriginX | currentTimeOriginY;
+            timeLeft.Origin = timeLeftOriginX | timeLeftOriginY;
         }
 
         private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
+
+        private Anchor flipXAnchor(Anchor anchor)
+        {
+            switch (anchor)
+            {
+                case Anchor.x0: return Anchor.x2;
+                case Anchor.x1: return Anchor.x1;
+                case Anchor.x2: return Anchor.x0;
+
+                // The only place this function is called is in this class, so this should never happen, but...
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private Anchor flipYAnchor(Anchor anchor)
+        {
+            switch (anchor)
+            {
+                case Anchor.y0: return Anchor.y2;
+                case Anchor.y1: return Anchor.y1;
+                case Anchor.y2: return Anchor.y0;
+
+                // The only place this function is called is in this class, so this should never happen, but...
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }
