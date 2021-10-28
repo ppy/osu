@@ -233,7 +233,7 @@ namespace osu.Game.Screens.Select
 
         private void updateMetrics()
         {
-            var hasMetrics = (failTimes?.Retries?.Any() ?? false) || (failTimes?.Fails?.Any() ?? false);
+            bool hasMetrics = (failTimes?.Retries?.Any() ?? false) || (failTimes?.Fails?.Any() ?? false);
 
             if (ratings?.Any() ?? false)
             {

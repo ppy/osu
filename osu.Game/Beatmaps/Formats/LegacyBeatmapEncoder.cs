@@ -295,7 +295,7 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[Colours]");
 
-            for (var i = 0; i < colours.Count; i++)
+            for (int i = 0; i < colours.Count; i++)
             {
                 var comboColour = colours[i];
 

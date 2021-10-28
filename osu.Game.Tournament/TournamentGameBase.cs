@@ -109,7 +109,7 @@ namespace osu.Game.Tournament
                 // link matches to rounds
                 foreach (var round in ladder.Rounds)
                 {
-                    foreach (var id in round.Matches)
+                    foreach (int id in round.Matches)
                     {
                         var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
 

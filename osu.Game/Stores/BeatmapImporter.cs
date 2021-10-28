@@ -123,7 +123,7 @@ namespace osu.Game.Stores
             // find any existing beatmaps in the database that have matching online ids
             List<RealmBeatmap> existingBeatmaps = new List<RealmBeatmap>();
 
-            foreach (var id in beatmapIds)
+            foreach (int id in beatmapIds)
                 existingBeatmaps.AddRange(realm.All<RealmBeatmap>().Where(b => b.OnlineID == id));
 
             if (existingBeatmaps.Any())

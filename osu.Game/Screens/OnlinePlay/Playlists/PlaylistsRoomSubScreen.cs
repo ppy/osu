@@ -37,6 +37,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private MatchLeaderboard leaderboard;
         private SelectionPollingComponent selectionPollingComponent;
 
+        private FillFlowContainer progressSection;
+
         public PlaylistsRoomSubScreen(Room room)
             : base(room, false) // Editing is temporarily not allowed.
         {
@@ -67,6 +69,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     Schedule(() => SelectedItem.Value = Room.Playlist.FirstOrDefault());
                 }
             }, true);
+
+            Room.MaxAttempts.BindValueChanged(attempts => progressSection.Alpha = Room.MaxAttempts.Value != null ? 1 : 0, true);
         }
 
         protected override Drawable CreateMainContent() => new GridContainer
@@ -154,6 +158,22 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             },
                             new Drawable[]
                             {
+                                progressSection = new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Alpha = 0,
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
+                                    {
+                                        new OverlinedHeader("Progress"),
+                                        new RoomLocalUserInfo(),
+                                    }
+                                },
+                            },
+                            new Drawable[]
+                            {
                                 new OverlinedHeader("Leaderboard")
                             },
                             new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
@@ -162,6 +182,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         },
                         RowDimensions = new[]
                         {
+                            new Dimension(GridSizeMode.AutoSize),
                             new Dimension(GridSizeMode.AutoSize),
                             new Dimension(GridSizeMode.AutoSize),
                             new Dimension(),

@@ -206,7 +206,7 @@ namespace osu.Game.Beatmaps
                     {
                         var decoder = Decoder.GetDecoder<Storyboard>(stream);
 
-                        var storyboardFilename = BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
+                        string storyboardFilename = BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
 
                         // todo: support loading from both set-wide storyboard *and* beatmap specific.
                         if (string.IsNullOrEmpty(storyboardFilename))

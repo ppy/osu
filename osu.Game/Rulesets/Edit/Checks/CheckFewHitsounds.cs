@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
 
             var hitObjectsByEndTime = hitObjectsIncludingNested.OrderBy(o => o.GetEndTime()).ToList();
-            var hitObjectCount = hitObjectsByEndTime.Count;
+            int hitObjectCount = hitObjectsByEndTime.Count;
 
             for (int i = 0; i < hitObjectCount; ++i)
             {
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         private IEnumerable<Issue> applyHitsoundUpdate(HitObject hitObject, bool isLastObject = false)
         {
-            var time = hitObject.GetEndTime();
+            double time = hitObject.GetEndTime();
             bool hasHitsound = hitObject.Samples.Any(isHitsound);
             bool couldHaveHitsound = hitObject.Samples.Any(isHitnormal);
 
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             // If there are no hitsounds we let the "No hitsounds" template take precedence.
             if (hasHitsound || (isLastObject && mapHasHitsounds))
             {
-                var timeWithoutHitsounds = time - lastHitsoundTime;
+                double timeWithoutHitsounds = time - lastHitsoundTime;
 
                 if (timeWithoutHitsounds > problem_threshold_time && objectsWithoutHitsounds > problem_threshold_objects)
                     yield return new IssueTemplateLongPeriodProblem(this).Create(lastHitsoundTime, timeWithoutHitsounds);
