@@ -91,26 +91,15 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             BeatmapSetInfo importedSet = null;
 
-            // this step is required to make sure the further imports actually get online IDs.
-            // all the playlist logic relies on online ID matching.
-            AddStep("remove all matching online IDs", () =>
-            {
-                var existing = manager.QueryBeatmapSets(s => s.OnlineBeatmapSetID == importedBeatmap.Value.OnlineBeatmapSetID).ToList();
-
-                foreach (var s in existing)
-                {
-                    s.OnlineBeatmapSetID = null;
-                    foreach (var b in s.Beatmaps)
-                        b.OnlineBeatmapID = null;
-                    manager.Update(s);
-                }
-            });
-
             AddStep("import altered beatmap", () =>
             {
                 IBeatmap beatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
 
                 beatmap.BeatmapInfo.BaseDifficulty.CircleSize = 1;
+
+                // intentionally increment online IDs to clash with import below.
+                beatmap.BeatmapInfo.OnlineBeatmapID++;
+                beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID++;
 
                 importedSet = manager.Import(beatmap.BeatmapInfo.BeatmapSet).Result.Value;
             });
