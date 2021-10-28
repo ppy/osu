@@ -14,10 +14,30 @@ namespace osu.Game.Skinning
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
+        public const decimal LATEST_VERSION = 2.7m;
+
         /// <summary>
         /// Whether to allow <see cref="DefaultComboColours"/> as a fallback list for when no combo colours are provided.
         /// </summary>
         internal bool AllowDefaultComboColoursFallback = true;
+
+        /// <summary>
+        /// Legacy version of this skin.
+        /// </summary>
+        public decimal? LegacyVersion { get; internal set; }
+
+        public enum LegacySetting
+        {
+            Version,
+            ComboPrefix,
+            ComboOverlap,
+            ScorePrefix,
+            ScoreOverlap,
+            HitCirclePrefix,
+            HitCircleOverlap,
+            AnimationFramerate,
+            LayeredHitSounds
+        }
 
         public static List<Color4> DefaultComboColours { get; } = new List<Color4>
         {
