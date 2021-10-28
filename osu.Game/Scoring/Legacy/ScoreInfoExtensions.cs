@@ -130,7 +130,7 @@ namespace osu.Game.Scoring.Legacy
 
         private static int? getCount(ScoreInfo scoreInfo, HitResult result)
         {
-            if (scoreInfo.Statistics.TryGetValue(result, out var existing))
+            if (scoreInfo.Statistics.TryGetValue(result, out int existing))
                 return existing;
 
             return null;

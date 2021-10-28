@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             foreach (var p in typeof(OsuIcon).GetProperties(BindingFlags.Public | BindingFlags.Static))
             {
-                var propValue = p.GetValue(null);
+                object propValue = p.GetValue(null);
                 Debug.Assert(propValue != null);
 
                 flow.Add(new Icon($"{nameof(OsuIcon)}.{p.Name}", (IconUsage)propValue));

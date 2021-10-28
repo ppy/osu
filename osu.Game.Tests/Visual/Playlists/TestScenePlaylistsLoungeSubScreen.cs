@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public class TestScenePlaylistsLoungeSubScreen : OnlinePlayTestScene
     {
-        protected new TestRequestHandlingRoomManager RoomManager => (TestRequestHandlingRoomManager)base.RoomManager;
+        protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
         private TestLoungeSubScreen loungeScreen;
 
