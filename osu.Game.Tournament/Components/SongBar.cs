@@ -101,7 +101,7 @@ namespace osu.Game.Tournament.Components
                 return;
             }
 
-            double bpm = beatmap.BPM; // TODO: check this works.
+            double bpm = beatmap.BPM;
             double length = beatmap.Length;
             string hardRockExtra = "";
             string srExtra = "";
