@@ -62,9 +62,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
 
                     if (i < j)
                     {
-                        T key = keys[i];
-                        keys[i] = keys[j];
-                        keys[j] = key;
+                        (keys[i], keys[j]) = (keys[j], keys[i]);
                     }
 
                     i++;
@@ -122,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
 
             while (i <= n / 2)
             {
-                var child = 2 * i;
+                int child = 2 * i;
 
                 if (child < n && comparer.Compare(keys[lo + child - 1], keys[lo + child]) < 0)
                 {
@@ -142,11 +140,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
         private static void swap(T[] a, int i, int j)
         {
             if (i != j)
-            {
-                T t = a[i];
-                a[i] = a[j];
-                a[j] = t;
-            }
+                (a[i], a[j]) = (a[j], a[i]);
         }
 
         private static void swapIfGreater(T[] keys, IComparer<T> comparer, int a, int b)
@@ -154,11 +148,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
             if (a != b)
             {
                 if (comparer.Compare(keys[a], keys[b]) > 0)
-                {
-                    T key = keys[a];
-                    keys[a] = keys[b];
-                    keys[b] = key;
-                }
+                    (keys[a], keys[b]) = (keys[b], keys[a]);
             }
         }
     }

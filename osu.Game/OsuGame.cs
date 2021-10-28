@@ -336,7 +336,7 @@ namespace osu.Game
                         ShowChangelogListing();
                     else
                     {
-                        var changelogArgs = link.Argument.Split("/");
+                        string[] changelogArgs = link.Argument.Split("/");
                         ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
                     }
 
@@ -622,7 +622,7 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
-                var cultureCode = language.ToCultureCode();
+                string cultureCode = language.ToCultureCode();
 
                 try
                 {
@@ -870,7 +870,7 @@ namespace osu.Game
         {
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith('-')).ToArray();
+                string[] paths = args.Where(a => !a.StartsWith('-')).ToArray();
                 if (paths.Length > 0)
                     Task.Run(() => Import(paths));
             }
@@ -913,13 +913,15 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
+                    string logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
+
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
                         Icon = FontAwesome.Solid.EllipsisH,
                         Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
-                            Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
+                            Storage.GetStorageForDirectory(@"logs").PresentFileExternally(logFile);
                             return true;
                         }
                     }));
@@ -1057,7 +1059,7 @@ namespace osu.Game
             ScreenOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
             overlayOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
 
-            var horizontalOffset = 0f;
+            float horizontalOffset = 0f;
 
             // Content.ToLocalSpace() is used instead of this.ToLocalSpace() to correctly calculate the offset with scaling modes active.
             // Content is a child of a scaling container with ScalingMode.Everything set, while the game itself is never scaled.

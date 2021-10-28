@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         private IList<string> getSampleNames(IList<HitSampleInfo> hitSampleInfo)
             => hitSampleInfo.Select(sample => sample.LookupNames.First()).ToList();
 
-        private IList<IList<string>> getNodeSampleNames(List<IList<HitSampleInfo>> hitSampleInfo)
+        private IList<IList<string>> getNodeSampleNames(IList<IList<HitSampleInfo>> hitSampleInfo)
             => hitSampleInfo?.Select(getSampleNames)
                             .ToList();
 

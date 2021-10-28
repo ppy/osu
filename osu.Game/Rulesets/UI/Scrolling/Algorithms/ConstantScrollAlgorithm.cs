@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
     {
         public double GetDisplayStartTime(double originTime, float offset, double timeRange, float scrollLength)
         {
-            var adjustedTime = TimeAt(-offset, originTime, timeRange, scrollLength);
+            double adjustedTime = TimeAt(-offset, originTime, timeRange, scrollLength);
             return adjustedTime - timeRange;
         }
 

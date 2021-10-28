@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         protected override UserGraphTooltipContent GetTooltipContent(int index, int rank)
         {
-            var days = ranked_days - index + 1;
+            int days = ranked_days - index + 1;
 
             return new UserGraphTooltipContent(
                 UsersStrings.ShowRankGlobalSimple,

@@ -47,7 +47,7 @@ namespace osu.Game.Online.Rooms
 
                 req.AddCursor(Cursor);
 
-                foreach (var (key, value) in IndexParams.Properties)
+                foreach ((string key, var value) in IndexParams.Properties)
                     req.AddParameter(key, value.ToString());
             }
 
