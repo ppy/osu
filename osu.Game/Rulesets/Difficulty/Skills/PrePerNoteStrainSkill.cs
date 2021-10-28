@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         protected override void Process(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
-            var value = StrainValueOf(preSkills, index, current);
+            double value = StrainValueOf(preSkills, index, current);
 
             if (StrainDecayBase >= 0.0)
                 currentStrain *= strainDecay(current.DeltaTime);

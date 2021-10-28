@@ -18,10 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         protected override double SkillMultiplier => 1;
 
         protected override double StrainDecayBase => 0.75;
-        public NoteVarianceAngle(IBeatmap beatmap, Mod[] mods, double clockRate) : base(beatmap, mods, clockRate)
-        {
-
-        }
+        public NoteVarianceAngle(IBeatmap beatmap, Mod[] mods, double clockRate) : base(beatmap, mods, clockRate) { }
 
         protected override double StrainValueOf(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
@@ -31,42 +28,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 
             double angleBonus = 0.0;
 
-            
-
             // 둔각보너스
             if(Previous.Count > 0)
             {
                 OsuDifficultyHitObject osuPast = (OsuDifficultyHitObject)Previous[0];
                 double lastAngle = osuPast.Angle ?? 0;
                 
-
                 angleBonus = 0.01 * Math.Max(Math.Sin(angle - angle_bonus_begin), 0);
 
-                // 각도 변화 값
-                // 각도가 자주 변화하면 보너스를 받도록 한다
                 // bonus for changing angles frequently
-                // 
                 double angleVariance = Math.Sin(Math.Max(Math.Abs(angle - lastAngle) - Math.PI / 2, 0)) * 0.1;
 
                 angleBonus += angleVariance;
 
-
-                // 150bpm 이상은 예각일때 보너스 제공
                 // bonus for acute bonus at least 150bpm
                 if (deltaTimeToBpm >= 150)
                 {
-                    // 스택된 예각 연타 너프
                     // nerf stacked acute stream
-
-                    // 200bpm까지 유효
-                    // limit of 200bpm
+                    // limited to 200bpm
                     angleBonus += Math.Sin(Math.Max((Math.PI / 2 - angle), 0))
                         * Math.Min((deltaTimeToBpm - 150), 50) / 50
-                        * 0.1
-                        ;
+                        * 0.1;
                 }
             }
 
+            // short stream nerf
             double radius = ((OsuHitObject)osuCurrent.BaseObject).Radius;
 
             double distance = osuCurrent.JumpDistance / (radius * 2);
