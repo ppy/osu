@@ -22,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistCreation : OnlinePlayTestScene
+    public class TestScenePlaylistsRoomCreation : OnlinePlayTestScene
     {
         private BeatmapManager manager;
         private RulesetStore rulesets;
