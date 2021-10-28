@@ -11,6 +11,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
@@ -23,6 +24,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Resources;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -176,17 +178,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
             [Cached(typeof(MultiplayerClient))]
             public readonly TestMultiplayerClient Client;
 
+            [Cached]
+            public readonly TestRoomRequestsHandler RequestsHandler = new TestRoomRequestsHandler();
+
             public DependenciesScreen(TestMultiplayerClient client)
             {
                 Client = client;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(IAPIProvider api, OsuGameBase game)
+            {
+                ((DummyAPIAccess)api).HandleRequest = request => RequestsHandler.HandleRequest(request, api.LocalUser.Value, game);
             }
         }
 
         private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
         {
-            public new TestRequestHandlingMultiplayerRoomManager RoomManager { get; private set; }
+            public new TestMultiplayerRoomManager RoomManager { get; private set; }
 
-            protected override RoomManager CreateRoomManager() => RoomManager = new TestRequestHandlingMultiplayerRoomManager();
+            protected override RoomManager CreateRoomManager() => RoomManager = new TestMultiplayerRoomManager();
         }
     }
 }
