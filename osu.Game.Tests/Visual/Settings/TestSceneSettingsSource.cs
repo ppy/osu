@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -57,6 +58,13 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 Default = string.Empty,
                 Value = "Sample text"
+            };
+
+            [SettingSource("Sample number textbox", "Textbox number entry", SettingControlType = typeof(SettingsNumberBox))]
+            public Bindable<int?> IntTextboxBindable { get; } = new Bindable<int?>
+            {
+                Default = null,
+                Value = null
             };
         }
 

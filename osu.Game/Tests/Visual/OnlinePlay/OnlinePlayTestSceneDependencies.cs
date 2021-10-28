@@ -34,10 +34,10 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public OnlinePlayTestSceneDependencies()
         {
             SelectedRoom = new Bindable<Room>();
-            RoomManager = CreateRoomManager();
+            RequestsHandler = new TestRoomRequestsHandler();
             OngoingOperationTracker = new OngoingOperationTracker();
             AvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
-            RequestsHandler = new TestRoomRequestsHandler();
+            RoomManager = CreateRoomManager();
 
             dependencies = new DependencyContainer(new CachedModelDependencyContainer<Room>(null) { Model = { BindTarget = SelectedRoom } });
 
