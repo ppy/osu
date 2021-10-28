@@ -16,6 +16,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public APIScoreInfo Score;
 
         public ScoreInfo CreateScoreInfo(RulesetStore rulesets)
+
         {
             var score = Score.CreateScoreInfo(rulesets);
             score.Position = Position;

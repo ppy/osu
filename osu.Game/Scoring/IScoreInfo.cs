@@ -5,38 +5,37 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Scoring
 {
     public interface IScoreInfo : IHasOnlineID<long>
     {
-        int TotalScore { get; set; }
+        User User { get; }
 
-        int MaxCombo { get; set; }
+        long TotalScore { get; }
 
-        User User { get; set; }
+        int MaxCombo { get; }
 
-        long OnlineScoreID { get; set; }
+        double Accuracy { get; }
 
-        bool Replay { get; set; }
+        bool HasReplay { get; }
 
-        DateTimeOffset Date { get; set; }
+        DateTimeOffset Date { get; }
 
-        BeatmapInfo BeatmapInfo { get; set; }
+        double? PP { get; }
 
-        double Accuracy { get; set; }
+        IBeatmapInfo Beatmap { get; }
 
-        double? PP { get; set; }
+        Dictionary<HitResult, int> Statistics { get; }
 
-        BeatmapMetadata Metadata { get; set; }
+        IRulesetInfo Ruleset { get; }
 
-        Dictionary<string, int> Statistics { get; set; }
+        public ScoreRank Rank { get; }
 
-        int OnlineRulesetID { get; set; }
-
-        string[] Mods { get; set; }
-
-        public ScoreRank Rank { get; set; }
+        // Mods is currently missing from this interface as the `IMod` class has properties which can't be fulfilled by `APIMod`,
+        // but also doesn't expose `Settings`. We can consider how to implement this in the future if required.
     }
 }

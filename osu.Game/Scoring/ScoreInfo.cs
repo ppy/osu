@@ -57,6 +57,7 @@ namespace osu.Game.Scoring
         public RulesetInfo Ruleset { get; set; }
 
         private APIMod[] localAPIMods;
+
         private Mod[] mods;
 
         [JsonIgnore]
@@ -160,7 +161,7 @@ namespace osu.Game.Scoring
         public DateTimeOffset Date { get; set; }
 
         [JsonProperty("statistics")]
-        public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
+        public Dictionary<HitResult, int> Statistics { get; set; } = new Dictionary<HitResult, int>();
 
         [JsonIgnore]
         [Column("Statistics")]
@@ -273,5 +274,9 @@ namespace osu.Game.Scoring
         }
 
         public long OnlineID => OnlineScoreID ?? -1;
+
+        IBeatmapInfo IScoreInfo.Beatmap => BeatmapInfo;
+        IRulesetInfo IScoreInfo.Ruleset => Ruleset;
+        bool IScoreInfo.HasReplay => Files.Any();
     }
 }
