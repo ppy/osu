@@ -8,7 +8,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -40,9 +39,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }
 
-        [SetUpSteps]
         public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
             AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).Result);
 
             AddStep("create leaderboard", () =>

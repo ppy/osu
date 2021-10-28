@@ -164,7 +164,7 @@ namespace osu.Game.Online.API.Requests.Responses
         IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxStarDifficulty => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxLength => throw new NotImplementedException();
-        double IBeatmapSetInfo.MaxBPM => throw new NotImplementedException();
+        double IBeatmapSetInfo.MaxBPM => BPM;
 
         #endregion
     }

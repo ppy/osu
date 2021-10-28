@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using static osu.Game.Skinning.LegacySkinConfiguration;
+using static osu.Game.Skinning.SkinConfiguration;
 
 namespace osu.Game.Skinning
 {
