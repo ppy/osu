@@ -54,7 +54,6 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             setupAndCreateRoom(room =>
             {
-                room.RoomID.Value = 1; // forces room creation.
                 room.Name.Value = "my awesome room";
                 room.Host.Value = API.LocalUser.Value;
                 room.RecentParticipants.Add(room.Host.Value);
@@ -83,13 +82,6 @@ namespace osu.Game.Tests.Visual.Playlists
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 });
             });
-
-            AddStep("move mouse to create button", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<PlaylistsRoomSettingsOverlay.CreateRoomButton>().Single());
-            });
-
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
 
             AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom.Value.Playlist[0]);
         }
@@ -143,13 +135,12 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private void setupAndCreateRoom(Action<Room> room)
         {
-            AddStep("setup room", () =>
-            {
-                room(SelectedRoom.Value);
+            AddStep("setup room", () => room(SelectedRoom.Value));
 
-                // if this isn't done the test will crash when a poll kicks in.
-                // probably not correct, but works for now.
-                OnlinePlayDependencies.RoomManager.CreateRoom(SelectedRoom.Value);
+            AddStep("click create button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<PlaylistsRoomSettingsOverlay.CreateRoomButton>().Single());
+                InputManager.Click(MouseButton.Left);
             });
         }
 
