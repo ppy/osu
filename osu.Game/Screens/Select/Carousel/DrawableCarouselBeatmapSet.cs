@@ -241,7 +241,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             TernaryState state;
 
-            var countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
+            int countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
 
             if (countExisting == beatmapSet.Beatmaps.Count)
                 state = TernaryState.True;

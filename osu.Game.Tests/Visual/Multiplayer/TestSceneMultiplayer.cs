@@ -17,6 +17,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
@@ -33,6 +34,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Users;
 using osuTK.Input;
 
@@ -48,7 +50,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private TestMultiplayer multiplayerScreen;
         private TestMultiplayerClient client;
 
-        private TestRequestHandlingMultiplayerRoomManager roomManager => multiplayerScreen.RoomManager;
+        private TestMultiplayerRoomManager roomManager => multiplayerScreen.RoomManager;
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -582,7 +584,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
             for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
             {
-                var time = i;
+                double time = i;
                 AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.GameplayClock.CurrentTime > time);
             }
 
@@ -616,17 +618,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
             [Cached(typeof(MultiplayerClient))]
             public readonly TestMultiplayerClient Client;
 
+            [Cached]
+            public readonly TestRoomRequestsHandler RequestsHandler = new TestRoomRequestsHandler();
+
             public DependenciesScreen(TestMultiplayerClient client)
             {
                 Client = client;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(IAPIProvider api, OsuGameBase game)
+            {
+                ((DummyAPIAccess)api).HandleRequest = request => RequestsHandler.HandleRequest(request, api.LocalUser.Value, game);
             }
         }
 
         private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
         {
-            public new TestRequestHandlingMultiplayerRoomManager RoomManager { get; private set; }
+            public new TestMultiplayerRoomManager RoomManager { get; private set; }
 
-            protected override RoomManager CreateRoomManager() => RoomManager = new TestRequestHandlingMultiplayerRoomManager();
+            protected override RoomManager CreateRoomManager() => RoomManager = new TestMultiplayerRoomManager();
         }
     }
 }

@@ -45,8 +45,8 @@ namespace osu.Game.Screens.Select.Details
                 {
                     var usableRange = Ratings.Skip(1).Take(rating_range); // adjust for API returning weird empty data at 0.
 
-                    var negativeCount = usableRange.Take(rating_range / 2).Sum();
-                    var totalCount = usableRange.Sum();
+                    int negativeCount = usableRange.Take(rating_range / 2).Sum();
+                    int totalCount = usableRange.Sum();
 
                     negativeRatings.Text = negativeCount.ToLocalisableString(@"N0");
                     positiveRatings.Text = (totalCount - negativeCount).ToLocalisableString(@"N0");

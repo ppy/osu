@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Resources
         /// <returns>A path to a copy of a beatmap archive (osz). Should be deleted after use.</returns>
         public static string GetQuickTestBeatmapForImport()
         {
-            var tempPath = getTempFilename();
+            string tempPath = getTempFilename();
             using (var stream = OpenResource("Archives/241526 Soleily - Renatus_virtual_quick.osz"))
             using (var newFile = File.Create(tempPath))
                 stream.CopyTo(newFile);
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Resources
         /// <returns>A path to a copy of a beatmap archive (osz). Should be deleted after use.</returns>
         public static string GetTestBeatmapForImport(bool virtualTrack = false)
         {
-            var tempPath = getTempFilename();
+            string tempPath = getTempFilename();
 
             using (var stream = GetTestBeatmapStream(virtualTrack))
             using (var newFile = File.Create(tempPath))

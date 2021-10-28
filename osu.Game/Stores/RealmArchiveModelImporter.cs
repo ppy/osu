@@ -426,7 +426,7 @@ namespace osu.Game.Stores
         {
             MemoryStream hashable = new MemoryStream();
 
-            foreach (var file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            foreach (string? file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
             {
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);

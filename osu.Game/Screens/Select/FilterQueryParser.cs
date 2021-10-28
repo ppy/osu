@@ -22,9 +22,9 @@ namespace osu.Game.Screens.Select
         {
             foreach (Match match in query_syntax_regex.Matches(query))
             {
-                var key = match.Groups["key"].Value.ToLower();
+                string key = match.Groups["key"].Value.ToLower();
                 var op = parseOperator(match.Groups["op"].Value);
-                var value = match.Groups["value"].Value;
+                string value = match.Groups["value"].Value;
 
                 if (tryParseKeywordCriteria(criteria, key, value, op))
                     query = query.Replace(match.ToString(), "");
@@ -310,10 +310,10 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateLengthRange(FilterCriteria criteria, Operator op, string val)
         {
-            if (!tryParseDoubleWithPoint(val.TrimEnd('m', 's', 'h'), out var length))
+            if (!tryParseDoubleWithPoint(val.TrimEnd('m', 's', 'h'), out double length))
                 return false;
 
-            var scale = getLengthScale(val);
+            int scale = getLengthScale(val);
             return tryUpdateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
         }
     }
