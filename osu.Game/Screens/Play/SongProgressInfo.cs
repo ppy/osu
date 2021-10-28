@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play
             {
                 timeCurrent = new OsuSpriteText
                 {
-                    Origin = Anchor.BottomLeft,
+                    Origin = Anchor.Centre,
                     Anchor = Anchor.BottomLeft,
                     Colour = colours.BlueLighter,
                     Font = OsuFont.Numeric,
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
                 },
                 timeLeft = new OsuSpriteText
                 {
-                    Origin = Anchor.BottomRight,
+                    Origin = Anchor.Centre,
                     Anchor = Anchor.BottomRight,
                     Colour = colours.BlueLighter,
                     Font = OsuFont.Numeric,
