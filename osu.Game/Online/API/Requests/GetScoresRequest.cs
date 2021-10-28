@@ -13,7 +13,7 @@ using System.Diagnostics;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetScoresRequest : APIRequest<APILegacyScores>
+    public class GetScoresRequest : APIRequest<APIScoresCollection>
     {
         private readonly BeatmapInfo beatmapInfo;
         private readonly BeatmapLeaderboardScope scope;
@@ -36,11 +36,11 @@ namespace osu.Game.Online.API.Requests
             Success += onSuccess;
         }
 
-        private void onSuccess(APILegacyScores r)
+        private void onSuccess(APIScoresCollection r)
         {
             Debug.Assert(ruleset.ID != null, "ruleset.ID != null");
 
-            foreach (APILegacyScoreInfo score in r.Scores)
+            foreach (APIScoreInfo score in r.Scores)
             {
                 score.BeatmapInfo = beatmapInfo;
                 score.OnlineRulesetID = ruleset.ID.Value;

@@ -15,7 +15,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APILegacyScoreInfo
+    public class APIScoreInfo
     {
         public ScoreInfo CreateScoreInfo(RulesetStore rulesets)
         {

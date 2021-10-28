@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private CancellationTokenSource loadCancellationSource;
 
-        protected APILegacyScores Scores
+        protected APIScoresCollection Scores
         {
             set => Schedule(() =>
             {
