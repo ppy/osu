@@ -64,7 +64,12 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public override void SetUpSteps()
         {
             base.SetUpSteps();
-            AddStep("setup API", () => ((DummyAPIAccess)API).HandleRequest = request => OnlinePlayDependencies.RequestsHandler.HandleRequest(request, API.LocalUser.Value, game));
+
+            AddStep("setup API", () =>
+            {
+                var handler = OnlinePlayDependencies.RequestsHandler;
+                ((DummyAPIAccess)API).HandleRequest = request => handler.HandleRequest(request, API.LocalUser.Value, game);
+            });
         }
 
         /// <summary>
