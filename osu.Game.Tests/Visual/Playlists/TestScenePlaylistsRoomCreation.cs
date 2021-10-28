@@ -15,6 +15,7 @@ using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -65,8 +66,31 @@ namespace osu.Game.Tests.Visual.Playlists
                 });
             });
 
+            AddUntilStep("Progress details are hidden", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent.Alpha == 0);
+
             AddStep("start match", () => match.ChildrenOfType<PlaylistsReadyButton>().First().TriggerClick());
             AddUntilStep("player loader loaded", () => Stack.CurrentScreen is PlayerLoader);
+        }
+
+        [Test]
+        public void TestAttemptLimitedMatch()
+        {
+            setupAndCreateRoom(room =>
+            {
+                room.RoomID.Value = 1; // forces room creation.
+                room.Name.Value = "my awesome room";
+                room.MaxAttempts.Value = 5;
+                room.Host.Value = API.LocalUser.Value;
+                room.RecentParticipants.Add(room.Host.Value);
+                room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
+                room.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap = { Value = importedBeatmap.Value.Beatmaps.First() },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                });
+            });
+
+            AddUntilStep("Progress details are visible", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent.Alpha == 1);
         }
 
         [Test]
