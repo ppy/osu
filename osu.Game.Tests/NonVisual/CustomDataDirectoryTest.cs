@@ -87,7 +87,7 @@ namespace osu.Game.Tests.NonVisual
                     File.WriteAllText(actualTestFile, "test");
 
                     var rulesetStorage = storage.GetStorageForDirectory("rulesets");
-                    var lookupPath = rulesetStorage.GetFiles(".").Single();
+                    string lookupPath = rulesetStorage.GetFiles(".").Single();
 
                     Assert.That(lookupPath, Is.EqualTo("test"));
                 }
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.NonVisual
 
                     Assert.That(osuStorage, Is.Not.Null);
 
-                    foreach (var file in osuStorage.IgnoreFiles)
+                    foreach (string file in osuStorage.IgnoreFiles)
                     {
                         // avoid touching realm files which may be a pipe and break everything.
                         // this is also done locally inside OsuStorage via the IgnoreFiles list.
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.NonVisual
                         Assert.That(storage.Exists(file), Is.False);
                     }
 
-                    foreach (var dir in osuStorage.IgnoreDirectories)
+                    foreach (string dir in osuStorage.IgnoreDirectories)
                     {
                         Assert.That(Directory.Exists(Path.Combine(originalDirectory, dir)));
                         Assert.That(storage.ExistsDirectory(dir), Is.False);

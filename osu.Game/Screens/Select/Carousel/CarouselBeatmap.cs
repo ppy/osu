@@ -57,9 +57,9 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (match)
             {
-                var terms = BeatmapInfo.GetSearchableTerms();
+                string[] terms = BeatmapInfo.GetSearchableTerms();
 
-                foreach (var criteriaTerm in criteria.SearchTerms)
+                foreach (string criteriaTerm in criteria.SearchTerms)
                     match &= terms.Any(term => term.Contains(criteriaTerm, StringComparison.InvariantCultureIgnoreCase));
 
                 // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 default:
                 case SortMode.Difficulty:
-                    var ruleset = BeatmapInfo.RulesetID.CompareTo(otherBeatmap.BeatmapInfo.RulesetID);
+                    int ruleset = BeatmapInfo.RulesetID.CompareTo(otherBeatmap.BeatmapInfo.RulesetID);
                     if (ruleset != 0) return ruleset;
 
                     return BeatmapInfo.StarDifficulty.CompareTo(otherBeatmap.BeatmapInfo.StarDifficulty);

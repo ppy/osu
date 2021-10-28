@@ -155,11 +155,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             static (double fadeStartTime, double fadeDuration) getParameters(OsuHitObject hitObject)
             {
-                var fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt + hitObject.TimeFadeIn;
-                var fadeOutDuration = hitObject.TimePreempt * fade_out_duration_multiplier;
+                double fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt + hitObject.TimeFadeIn;
+                double fadeOutDuration = hitObject.TimePreempt * fade_out_duration_multiplier;
 
                 // new duration from completed fade in to end (before fading out)
-                var longFadeDuration = hitObject.GetEndTime() - fadeOutStartTime;
+                double longFadeDuration = hitObject.GetEndTime() - fadeOutStartTime;
 
                 switch (hitObject)
                 {
@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         return (fadeOutStartTime, longFadeDuration);
 
                     case SliderTick _:
-                        var tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
+                        double tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
                         return (hitObject.StartTime - tickFadeOutDuration, tickFadeOutDuration);
 
                     case Spinner _:

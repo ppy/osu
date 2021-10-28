@@ -27,7 +27,7 @@ namespace osu.Game.Localisation
 
         public string Get(string lookup)
         {
-            var split = lookup.Split(':');
+            string[] split = lookup.Split(':');
 
             if (split.Length < 2)
                 return null;

@@ -22,7 +22,7 @@ namespace osu.Game.Beatmaps
 
             if (includeDifficultyName)
             {
-                var versionString = getVersionString(beatmapInfo);
+                string versionString = getVersionString(beatmapInfo);
                 return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
             }
 
