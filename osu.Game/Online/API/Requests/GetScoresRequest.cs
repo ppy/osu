@@ -38,20 +38,20 @@ namespace osu.Game.Online.API.Requests
 
         private void onSuccess(APIScoresCollection r)
         {
-            Debug.Assert(ruleset.ID != null, "ruleset.ID != null");
+            Debug.Assert(ruleset.OnlineID >= 0);
 
             foreach (APIScoreInfo score in r.Scores)
             {
-                score.BeatmapInfo = beatmapInfo;
-                score.OnlineRulesetID = ruleset.ID.Value;
+                score.Beatmap = beatmapInfo;
+                score.OnlineRulesetID = ruleset.OnlineID;
             }
 
             var userScore = r.UserScore;
 
             if (userScore != null)
             {
-                userScore.Score.BeatmapInfo = beatmapInfo;
-                userScore.Score.OnlineRulesetID = ruleset.ID.Value;
+                userScore.Score.Beatmap = beatmapInfo;
+                userScore.Score.OnlineRulesetID = ruleset.OnlineID;
             }
         }
 

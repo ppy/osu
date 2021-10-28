@@ -9,14 +9,71 @@ using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIScoreInfo
+    public class APIScoreInfo : IScoreInfo
     {
+        [JsonProperty(@"score")]
+        public long TotalScore { get; set; }
+
+        [JsonProperty(@"max_combo")]
+        public int MaxCombo { get; set; }
+
+        [JsonProperty(@"user")]
+        public User User { get; set; }
+
+        public bool HasReplay { get; set; }
+
+        [JsonProperty(@"id")]
+        public long OnlineID { get; set; }
+
+        [JsonProperty(@"replay")]
+        public bool Replay { get; set; }
+
+        [JsonProperty(@"created_at")]
+        public DateTimeOffset Date { get; set; }
+
+        [JsonProperty(@"beatmap")]
+        public IBeatmapInfo Beatmap { get; set; }
+
+        [JsonProperty("accuracy")]
+        public double Accuracy { get; set; }
+
+        [JsonProperty(@"pp")]
+        public double? PP { get; set; }
+
+        [JsonProperty(@"beatmapset")]
+        public APIBeatmapSet BeatmapSet
+        {
+            set
+            {
+                // in the deserialisation case we need to ferry this data across.
+                if (Beatmap is APIBeatmap apiBeatmap)
+                    apiBeatmap.BeatmapSet = value;
+            }
+        }
+
+        [JsonProperty("statistics")]
+        public Dictionary<string, int> Statistics { get; set; }
+
+        [JsonProperty(@"mode_int")]
+        public int OnlineRulesetID { get; set; }
+
+        [JsonProperty(@"mods")]
+        public string[] Mods { get; set; }
+
+        [JsonProperty("rank")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ScoreRank Rank { get; set; }
+
+        IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
+
+        // TODO: nuke
         public ScoreInfo CreateScoreInfo(RulesetStore rulesets)
         {
             var ruleset = rulesets.GetRuleset(OnlineRulesetID);
@@ -34,10 +91,10 @@ namespace osu.Game.Online.API.Requests.Responses
                 MaxCombo = MaxCombo,
                 User = User,
                 Accuracy = Accuracy,
-                OnlineScoreID = OnlineScoreID,
+                OnlineScoreID = OnlineID,
                 Date = Date,
                 PP = PP,
-                BeatmapInfo = BeatmapInfo,
+                BeatmapInfo = Beatmap.ToBeatmapInfo(rulesets),
                 RulesetID = OnlineRulesetID,
                 Hash = Replay ? "online" : string.Empty, // todo: temporary?
                 Rank = Rank,
@@ -81,57 +138,19 @@ namespace osu.Game.Online.API.Requests.Responses
             return scoreInfo;
         }
 
-        [JsonProperty(@"score")]
-        public int TotalScore { get; set; }
-
-        [JsonProperty(@"max_combo")]
-        public int MaxCombo { get; set; }
-
-        [JsonProperty(@"user")]
-        public User User { get; set; }
-
-        [JsonProperty(@"id")]
-        public long OnlineScoreID { get; set; }
-
-        [JsonProperty(@"replay")]
-        public bool Replay { get; set; }
-
-        [JsonProperty(@"created_at")]
-        public DateTimeOffset Date { get; set; }
-
-        [JsonProperty(@"beatmap")]
-        public BeatmapInfo BeatmapInfo { get; set; }
-
-        [JsonProperty("accuracy")]
-        public double Accuracy { get; set; }
-
-        [JsonProperty(@"pp")]
-        public double? PP { get; set; }
-
         [JsonProperty(@"beatmapset")]
-        public BeatmapMetadata Metadata
+        public APIBeatmapSet Metadata
         {
             set
             {
-                // extract the set ID to its correct place.
-                BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = value.ID };
-                value.ID = 0;
-
-                BeatmapInfo.Metadata = value;
+                // in the deserialisation case we need to ferry this data across.
+                if (Beatmap is APIBeatmap apiBeatmap)
+                    apiBeatmap.BeatmapSet = value;
             }
         }
 
-        [JsonProperty(@"statistics")]
-        public Dictionary<string, int> Statistics { get; set; }
+        public IRulesetInfo Ruleset => new RulesetInfo { ID = OnlineRulesetID };
 
-        [JsonProperty(@"mode_int")]
-        public int OnlineRulesetID { get; set; }
-
-        [JsonProperty(@"mods")]
-        public string[] Mods { get; set; }
-
-        [JsonProperty("rank")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ScoreRank Rank { get; set; }
+        Dictionary<HitResult, int> IScoreInfo.Statistics => new Dictionary<HitResult, int>(); // TODO: implement... maybe. hitresults have weird mappings per ruleset it would seem.
     }
 }
