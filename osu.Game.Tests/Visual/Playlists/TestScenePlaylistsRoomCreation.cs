@@ -77,7 +77,6 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             setupAndCreateRoom(room =>
             {
-                room.RoomID.Value = 1; // forces room creation.
                 room.Name.Value = "my awesome room";
                 room.MaxAttempts.Value = 5;
                 room.Host.Value = API.LocalUser.Value;
