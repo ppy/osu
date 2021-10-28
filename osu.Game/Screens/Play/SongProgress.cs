@@ -18,6 +18,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play
 {
+    [Cached]
     public class SongProgress : OverlayContainer, ISkinnableDrawable
     {
         public const float MAX_HEIGHT = info_height + bottom_bar_height + graph_height + handle_height;
@@ -94,7 +95,6 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = info_height,
-                    SongProgressParent = this
                 },
                 graph = new SongProgressGraph
                 {

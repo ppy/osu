@@ -12,8 +12,6 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressInfo : Container
     {
-        public SongProgress SongProgressParent;
-
         private OsuSpriteText timeCurrent;
         private OsuSpriteText timeLeft;
         private OsuSpriteText progress;
@@ -39,12 +37,16 @@ namespace osu.Game.Screens.Play
         }
 
         private GameplayClock gameplayClock;
+        private SongProgress songProgressParent;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, GameplayClock clock)
+        private void load(OsuColour colours, GameplayClock clock, SongProgress parent)
         {
             if (clock != null)
                 gameplayClock = clock;
+
+            if (parent != null)
+                songProgressParent = parent;
 
             Children = new Drawable[]
             {
