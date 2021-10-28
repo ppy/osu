@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Play
 
                 bool flipVectors = (((int)Math.Floor(songProgress.Rotation / 90)) & 1) == 1;
 
-                if(!flipVectors)
+                if (!flipVectors)
                 {
                     timeCurrent.Scale = new osuTK.Vector2 { X = Math.Sign(songProgress.Scale.X), Y = Math.Sign(songProgress.Scale.Y) };
                     progress.Scale = new osuTK.Vector2 { X = Math.Sign(songProgress.Scale.X), Y = Math.Sign(songProgress.Scale.Y) };
