@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.BeatmapSet
             BeatmapSet.BindValueChanged(setInfo =>
             {
                 Picker.BeatmapSet = rulesetSelector.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
-                cover.BeatmapSet = setInfo.NewValue;
+                cover.OnlineInfo = setInfo.NewValue?.OnlineInfo;
 
                 if (setInfo.NewValue == null)
                 {
