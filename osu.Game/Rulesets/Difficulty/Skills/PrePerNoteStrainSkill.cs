@@ -26,9 +26,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         public PrePerNoteStrainSkill(IBeatmap beatmap, Mod[] mods, double clockRate) : base(mods)
         {
-            //this.database = database;
             this.beatmap = beatmap;
-            strainPeaks.Add(0);
         }
 
         private double currentStrain = 0;
@@ -44,10 +42,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             currentStrain += value * SkillMultiplier;
 
             strainPeaks.Add(currentStrain);
-        }
-
-        public void addLastStrain()
-        {
         }
 
         public override double DifficultyValue()
