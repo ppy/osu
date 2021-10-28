@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             CacheAs<SpectatorClient>(SpectatorClient);
         }
 
-        protected override IRoomManager CreateRoomManager() => new TestMultiplayerRoomManager();
+        protected override IRoomManager CreateRoomManager() => new TestMultiplayerRoomManager(RequestsHandler);
 
         protected virtual TestSpectatorClient CreateSpectatorClient() => new TestSpectatorClient();
     }
