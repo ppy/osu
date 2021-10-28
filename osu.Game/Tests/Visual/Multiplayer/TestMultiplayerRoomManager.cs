@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
@@ -16,8 +15,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// </summary>
     public class TestMultiplayerRoomManager : MultiplayerRoomManager
     {
-        [Resolved]
-        private TestRoomRequestsHandler requestsHandler { get; set; }
+        private readonly TestRoomRequestsHandler requestsHandler;
+
+        public TestMultiplayerRoomManager(TestRoomRequestsHandler requestsHandler)
+        {
+            this.requestsHandler = requestsHandler;
+        }
 
         public IReadOnlyList<Room> ServerSideRooms => requestsHandler.ServerSideRooms;
 

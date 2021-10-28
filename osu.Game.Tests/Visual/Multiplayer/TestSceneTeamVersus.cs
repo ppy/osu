@@ -6,25 +6,19 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Online.API;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Resources;
-using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -35,9 +29,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
 
-        private DependenciesScreen dependenciesScreen;
-        private TestMultiplayer multiplayerScreen;
-        private TestMultiplayerClient client;
+        private TestMultiplayerScreenStack multiplayerScreenStack;
+
+        private TestMultiplayerClient client => multiplayerScreenStack.Client;
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -59,24 +53,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             });
 
-            AddStep("create multiplayer screen", () => multiplayerScreen = new TestMultiplayer());
-
-            AddStep("load dependencies", () =>
-            {
-                client = new TestMultiplayerClient(multiplayerScreen.RoomManager);
-
-                // The screen gets suspended so it stops receiving updates.
-                Child = client;
-
-                LoadScreen(dependenciesScreen = new DependenciesScreen(client));
-            });
-
-            AddUntilStep("wait for dependencies screen", () => Stack.CurrentScreen is DependenciesScreen);
-            AddUntilStep("wait for dependencies to start load", () => dependenciesScreen.LoadState > LoadState.NotLoaded);
-            AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
-
-            AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
-            AddUntilStep("wait for multiplayer to load", () => multiplayerScreen.IsLoaded);
+            AddStep("load multiplayer", () => LoadScreen(multiplayerScreenStack = new TestMultiplayerScreenStack()));
+            AddUntilStep("wait for multiplayer to load", () => multiplayerScreenStack.IsLoaded);
             AddUntilStep("wait for lounge to load", () => this.ChildrenOfType<MultiplayerLoungeSubScreen>().FirstOrDefault()?.IsLoaded == true);
         }
 
@@ -122,7 +100,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("press button", () =>
             {
-                InputManager.MoveMouseTo(multiplayerScreen.ChildrenOfType<TeamDisplay>().First());
+                InputManager.MoveMouseTo(multiplayerScreenStack.ChildrenOfType<TeamDisplay>().First());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("user on team 1", () => (client.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 1);
@@ -156,7 +134,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createRoom(Func<Room> room)
         {
-            AddStep("open room", () => multiplayerScreen.ChildrenOfType<LoungeSubScreen>().Single().Open(room()));
+            AddStep("open room", () => multiplayerScreenStack.ChildrenOfType<LoungeSubScreen>().Single().Open(room()));
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddWaitStep("wait for transition", 2);
@@ -168,36 +146,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for join", () => client.Room != null);
-        }
-
-        /// <summary>
-        /// Used for the sole purpose of adding <see cref="TestMultiplayerClient"/> as a resolvable dependency.
-        /// </summary>
-        private class DependenciesScreen : OsuScreen
-        {
-            [Cached(typeof(MultiplayerClient))]
-            public readonly TestMultiplayerClient Client;
-
-            [Cached]
-            public readonly TestRoomRequestsHandler RequestsHandler = new TestRoomRequestsHandler();
-
-            public DependenciesScreen(TestMultiplayerClient client)
-            {
-                Client = client;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(IAPIProvider api, OsuGameBase game)
-            {
-                ((DummyAPIAccess)api).HandleRequest = request => RequestsHandler.HandleRequest(request, api.LocalUser.Value, game);
-            }
-        }
-
-        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
-        {
-            public new TestMultiplayerRoomManager RoomManager { get; private set; }
-
-            protected override RoomManager CreateRoomManager() => RoomManager = new TestMultiplayerRoomManager();
         }
     }
 }
