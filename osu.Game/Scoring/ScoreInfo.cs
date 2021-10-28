@@ -19,7 +19,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>, IDeepCloneable<ScoreInfo>, IHasOnlineID<long>
+    public class ScoreInfo : IScoreInfo, IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>, IDeepCloneable<ScoreInfo>
     {
         public int ID { get; set; }
 
@@ -54,7 +54,7 @@ namespace osu.Game.Scoring
         public bool Passed { get; set; } = true;
 
         [JsonIgnore]
-        public virtual RulesetInfo Ruleset { get; set; }
+        public RulesetInfo Ruleset { get; set; }
 
         private APIMod[] localAPIMods;
         private Mod[] mods;
