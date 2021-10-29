@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Longer maps are worth more.
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2500.0) +
-                                 (totalHits > 2500 ? Math.Log10(totalHits / 2500.0) * 0.5 : 0.0);
+                                 (totalHits > 2500 ? Math.Log10(totalHits / 2500.0) * 0.4 : 0.0);
 
             aimValue *= lengthBonus;
 
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Longer maps are worth more.
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2500.0) +
-                                 (totalHits > 2500 ? Math.Log10(totalHits / 2500.0) * 0.5 : 0.0);
+                                 (totalHits > 2500 ? Math.Log10(totalHits / 2500.0) * 0.4 : 0.0);
             speedValue *= lengthBonus;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor = Attributes.ApproachRate - 10.33;
+                approachRateFactor = (Attributes.ApproachRate - 10.33) / 2; // nerf high AR
 
             double approachRateTotalHitsFactor = 1.0 / (1.0 + Math.Exp(-(0.007 * (totalHits - 400))));
 

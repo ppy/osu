@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var osuCurrent = (OsuDifficultyHitObject)current;
 
-            double angleBonus = preSkills[0].GetAllStrainPeaks()[index] * 0.5;
+            double angleBonus = preSkills[0].GetAllStrainPeaks()[index] * 0.4;
             double fingerControlBonus = preSkills[2].GetAllStrainPeaks()[index] * 0.005;
 
             double totalBonus = Math.Pow(
@@ -88,8 +88,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             //return aimValue;
             return
                 totalBonus *
-                (calculateAimValue(0, distanceExp, osuCurrent.StrainTime) * 0.8 +
-                calculateAimValue(0, distanceExp, 160) * 0.1);
+                (calculateAimValue(0, distanceExp, osuCurrent.StrainTime) * 0.9 +
+                calculateAimValue(0, distanceExp, 160) * 0.05);
         }
 
         private double calculateAimValue(double result, double distanceExp, double strainTime)

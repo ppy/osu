@@ -18,11 +18,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         protected override double SkillMultiplier => 1;
 
         protected override double StrainDecayBase => 0.75;
+
+        private const double min_doubletap_nerf = 0.0; // minimum value (eventually on stacked)
+        private const double max_doubletap_nerf = 1.0; // maximum value 
+        private const double threshold_doubletap_contributing = 2.0; // minimum distance not influenced (2.0 means it is not stacked at least)
+
         public NoteVarianceAngle(IBeatmap beatmap, Mod[] mods, double clockRate) : base(beatmap, mods, clockRate) { }
 
         protected override double StrainValueOf(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             OsuDifficultyHitObject osuCurrent = (OsuDifficultyHitObject)current;
+
+            if (osuCurrent.BaseObject is Spinner || osuCurrent.LastObject is Spinner)
+                return 0;
+
             double deltaTimeToBpm = 15000 / current.DeltaTime;
             double angle = osuCurrent.Angle ?? 0;
 
@@ -37,26 +46,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
                 angleBonus = 0.01 * Math.Max(Math.Sin(angle - angle_bonus_begin), 0);
 
                 // bonus for changing angles frequently
-                double angleVariance = Math.Sin(Math.Max(Math.Abs(angle - lastAngle) - Math.PI / 2, 0)) * 0.1;
+                double angleVariance = Math.Sin(Math.Max(Math.Abs(angle - lastAngle) - Math.PI / 2, 0)) * 0.10;
 
                 angleBonus += angleVariance;
 
                 // bonus for acute bonus at least 150bpm
-                if (deltaTimeToBpm >= 150)
+                if (deltaTimeToBpm >= 160)
                 {
-                    // nerf stacked acute stream
-                    // limited to 200bpm
+                    // limited to 210bpm
                     angleBonus += Math.Sin(Math.Max((Math.PI / 2 - angle), 0))
-                        * Math.Min((deltaTimeToBpm - 150), 50) / 50
-                        * 0.1;
+                        * Math.Min((deltaTimeToBpm - 160), 50) / 50
+                        * 0.05;
                 }
             }
 
             // short stream nerf
-            double radius = ((OsuHitObject)osuCurrent.BaseObject).Radius;
+            double distance = osuCurrent.JumpDistance + osuCurrent.TravelDistance;
+            double radius = ((OsuHitObject)osuCurrent.BaseObject).Radius * osuCurrent.ScalingFactor;
 
-            double distance = osuCurrent.JumpDistance / (radius * 2);
-            double multiplier = distance >= 1.0 ? 1.0 : Math.Max(distance, 0);
+            double multiplier = min_doubletap_nerf +
+                Math.Max(Math.Min(distance / (radius * threshold_doubletap_contributing), 1.0), 0.0)
+                * (max_doubletap_nerf - min_doubletap_nerf);
             angleBonus *= multiplier;
 
             return angleBonus;

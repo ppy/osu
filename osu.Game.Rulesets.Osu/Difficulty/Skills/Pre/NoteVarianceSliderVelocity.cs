@@ -27,36 +27,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             var osuCurrent = (OsuDifficultyHitObject)current;
             double result = 0.0;
-            //beatmap.BeatmapInfo.
 
-            //Console.WriteLine("sliderCount: " + beatmap.GetStatistics().ToString());
+            if (osuCurrent.BaseObject is Spinner || osuCurrent.LastObject is Spinner)
+                return 0;
 
-            //((OsuHitObject)current.BaseObject)
-
-            // 슬라이더 속도가 급변할 시 보너스를 준다.
             // The Bonus is given when the slider speed changes rapidly.
             if (osuCurrent.LastObject is Slider OsuSlider)
             {
-                double adaptedVelocity = Math.Max(OsuSlider.Velocity - 0.5, 0);
+                double adaptedVelocity = Math.Max(OsuSlider.Velocity - 0.4, 0);
 
                 if (lastVelocity >= 0)
-                {
-                    result = Math.Abs(adaptedVelocity - lastVelocity) * 2;
-                }
-                lastVelocity = adaptedVelocity;
+                    result = Math.Max(adaptedVelocity - lastVelocity, (lastVelocity - adaptedVelocity) / 2) * 2.5;
 
                 // default bonus for velocity
-                result += adaptedVelocity / 2;
+                result += adaptedVelocity / 3;
 
-                //if(result >= 0.5)
-                //{
-                //    result = 0.5;
-                //}
+                lastVelocity = adaptedVelocity;
             }
-
             return result;
         }
-
-
     }
 }

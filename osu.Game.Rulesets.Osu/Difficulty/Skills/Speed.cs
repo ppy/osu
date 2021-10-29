@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double rhythm_multiplier = 0.75;
         private const int history_time_max = 5000; // 5 seconds of calculatingRhythmBonus max.
         private const double min_speed_bonus = 75; // ~200BPM
-        private const double speed_balancing_factor = 40;
+        private const double speed_balancing_factor = 45;
 
         private double currentStrain = 1;
         private double currentRhythm = 1;
