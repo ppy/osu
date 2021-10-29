@@ -6,9 +6,11 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Queueing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -16,6 +18,8 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.Play;
+using osu.Game.Tests.Resources;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
@@ -24,14 +28,20 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
     {
         protected abstract QueueModes Mode { get; }
 
+        protected BeatmapInfo InitialBeatmap { get; private set; }
+        protected BeatmapInfo OtherBeatmap { get; private set; }
+
+        protected IScreen CurrentScreen => multiplayerScreenStack.CurrentScreen;
+        protected IScreen CurrentSubScreen => multiplayerScreenStack.MultiplayerScreen.CurrentSubScreen;
+
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
-        private ILive<BeatmapSetInfo> importedBeatmap;
+        private BeatmapSetInfo importedSet;
 
         private TestMultiplayerScreenStack multiplayerScreenStack;
 
-        private TestMultiplayerClient client => multiplayerScreenStack.Client;
-        private TestMultiplayerRoomManager roomManager => multiplayerScreenStack.RoomManager;
+        protected TestMultiplayerClient Client => multiplayerScreenStack.Client;
+        protected TestMultiplayerRoomManager RoomManager => multiplayerScreenStack.RoomManager;
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -49,18 +59,10 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
 
             AddStep("import beatmap", () =>
             {
-                var beatmap1 = CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-                beatmap1.Version = "1";
-
-                var beatmap2 = CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-                beatmap2.Version = "2";
-
-                // Move beatmap2 to beatmap1's set.
-                var beatmapSet = beatmap1.BeatmapSet;
-                beatmapSet.Beatmaps.Add(beatmap2);
-                beatmap2.BeatmapSet = beatmapSet;
-
-                importedBeatmap = beatmaps.Import(beatmapSet).Result;
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+                InitialBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
+                OtherBeatmap = importedSet.Beatmaps.Last(b => b.RulesetID == 0);
             });
 
             AddStep("load multiplayer", () => LoadScreen(multiplayerScreenStack = new TestMultiplayerScreenStack()));
@@ -76,8 +78,8 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
                 {
                     new PlaylistItem
                     {
-                        Beatmap = { Value = importedBeatmap.Value.Beatmaps.First() },
-                        Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                        Beatmap = { Value = InitialBeatmap },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
                     }
                 }
             }));
@@ -91,13 +93,33 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for join", () => client.Room != null);
+            AddUntilStep("wait for join", () => Client.Room != null);
         }
 
         [Test]
         public void TestCreatedWithCorrectMode()
         {
-            AddAssert("room created with correct mode", () => client.APIRoom?.QueueMode.Value == Mode);
+            AddAssert("room created with correct mode", () => Client.APIRoom?.QueueMode.Value == Mode);
+        }
+
+        protected void RunGameplay()
+        {
+            AddStep("click ready button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for ready", () => Client.LocalUser?.State == MultiplayerUserState.Ready);
+
+            AddStep("click ready button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for player", () => multiplayerScreenStack.CurrentScreen is Player player && player.IsLoaded);
+            AddStep("exit player", () => multiplayerScreenStack.MultiplayerScreen.MakeCurrent());
         }
     }
 }
