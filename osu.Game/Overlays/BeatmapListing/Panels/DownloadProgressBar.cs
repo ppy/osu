@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         private readonly ProgressBar progressBar;
         private readonly BeatmapDownloadTracker downloadTracker;
 
-        public DownloadProgressBar(BeatmapSetInfo beatmapSet)
+        public DownloadProgressBar(IBeatmapSetInfo beatmapSet)
         {
             InternalChildren = new Drawable[]
             {

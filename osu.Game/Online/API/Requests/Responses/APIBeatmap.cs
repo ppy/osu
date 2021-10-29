@@ -100,10 +100,10 @@ namespace osu.Game.Online.API.Requests.Responses
                 MaxCombo = MaxCombo,
                 BaseDifficulty = new BeatmapDifficulty
                 {
-                    DrainRate = drainRate,
-                    CircleSize = circleSize,
-                    ApproachRate = approachRate,
-                    OverallDifficulty = overallDifficulty,
+                    DrainRate = DrainRate,
+                    CircleSize = CircleSize,
+                    ApproachRate = ApproachRate,
+                    OverallDifficulty = OverallDifficulty,
                 },
                 OnlineInfo = this,
             };
