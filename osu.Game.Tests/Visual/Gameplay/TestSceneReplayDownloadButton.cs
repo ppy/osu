@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             return new APIScoreInfo
             {
                 OnlineID = 2553163309,
-                OnlineRulesetID = 0,
+                RulesetID = 0,
                 Replay = replayAvailable,
                 User = new User
                 {
