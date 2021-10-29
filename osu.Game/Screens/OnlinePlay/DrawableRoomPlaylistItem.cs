@@ -282,14 +282,15 @@ namespace osu.Game.Screens.OnlinePlay
             return true;
         }
 
-        private class PlaylistDownloadButton : BeatmapPanelDownloadButton
+        private sealed class PlaylistDownloadButton : BeatmapPanelDownloadButton
         {
             private readonly PlaylistItem playlistItem;
 
             [Resolved]
             private BeatmapManager beatmapManager { get; set; }
 
-            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+            // required for download tracking, as this button hides itself. can probably be removed with a bit of consideration.
+            public override bool IsPresent => true;
 
             public PlaylistDownloadButton(PlaylistItem playlistItem)
                 : base(playlistItem.Beatmap.Value.BeatmapSet)
@@ -300,10 +301,10 @@ namespace osu.Game.Screens.OnlinePlay
 
             protected override void LoadComplete()
             {
-                base.LoadComplete();
-
                 State.BindValueChanged(stateChanged, true);
-                FinishTransforms(true);
+
+                // base implementation calls FinishTransforms, so should be run after the above state update.
+                base.LoadComplete();
             }
 
             private void stateChanged(ValueChangedEvent<DownloadState> state)
