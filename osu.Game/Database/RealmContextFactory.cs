@@ -6,9 +6,11 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
+using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using Realms;
 
@@ -32,8 +34,9 @@ namespace osu.Game.Database
         /// Version history:
         /// 6  First tracked version (~20211018)
         /// 7  Changed OnlineID fields to non-nullable to add indexing support (20211018)
+        /// 8  Rebind scroll adjust keys to not have control modifier (20211029)
         /// </summary>
-        private const int schema_version = 7;
+        private const int schema_version = 8;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
@@ -148,6 +151,21 @@ namespace osu.Game.Database
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
         {
+            if (lastSchemaVersion < 8)
+            {
+                // Ctrl -/+ now adjusts UI scale so let's clear any bindings which overlap these combinations.
+                // New defaults will be populated by the key store afterwards.
+                var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
+
+                var increaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.IncreaseScrollSpeed);
+                if (increaseSpeedBinding != null && increaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Plus }))
+                    migration.NewRealm.Remove(increaseSpeedBinding);
+
+                var decreaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.DecreaseScrollSpeed);
+                if (decreaseSpeedBinding != null && decreaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Minus }))
+                    migration.NewRealm.Remove(decreaseSpeedBinding);
+            }
+
             if (lastSchemaVersion < 7)
             {
                 convertOnlineIDs<RealmBeatmap>();
