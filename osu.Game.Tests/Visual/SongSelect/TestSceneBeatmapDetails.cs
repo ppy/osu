@@ -200,6 +200,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("online ratings/retries/fails", () => details.BeatmapInfo = new BeatmapInfo
             {
                 OnlineBeatmapID = 162,
+                Ruleset = new OsuRuleset().RulesetInfo
             });
             AddStep("set online", () => api.SetState(APIState.Online));
             AddStep("set offline", () => api.SetState(APIState.Offline));
