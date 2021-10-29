@@ -588,7 +588,7 @@ namespace osu.Game.Screens.LLin
                 {
                     Size = new Vector2(50, 30),
                     Icon = FontAwesome.Solid.StepForward,
-                    Action = audioControlPlugin.NextTrack,
+                    Action = () => audioControlPlugin.NextTrack(),
                     Description = LLinBaseStrings.Next,
                     Type = FunctionType.Audio
                 },

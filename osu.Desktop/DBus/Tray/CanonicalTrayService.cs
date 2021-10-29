@@ -137,10 +137,7 @@ namespace osu.Desktop.DBus.Tray
                         if (entries.TryAdd(kvp.Key, kvp.Value))
                         {
                             //如果成功了，订阅OnPropertyChanged
-                            kvp.Value.OnPropertyChanged = () =>
-                            {
-                                triggerLayoutUpdate(kvp.Value);
-                            };
+                            kvp.Value.OnPropertyChanged = () => triggerLayoutUpdate(kvp.Value);
                         }
                     }
 

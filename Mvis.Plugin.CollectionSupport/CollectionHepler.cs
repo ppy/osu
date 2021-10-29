@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Beatmaps;
@@ -137,8 +138,11 @@ namespace Mvis.Plugin.CollectionSupport
 
         public void Play(WorkingBeatmap b) => changeBeatmap(b);
 
-        public void NextTrack() =>
+        public void NextTrack()
+        {
             changeBeatmap(getBeatmap(beatmapList, b.Value, true));
+            Logger.Log("NEXT TRACK");
+        }
 
         public void PrevTrack() =>
             changeBeatmap(getBeatmap(beatmapList, b.Value, true, -1));
