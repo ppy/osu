@@ -131,7 +131,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         private Drawable getRulesetIcon()
         {
-            int? onlineID = (ruleset ?? beatmapInfo.Ruleset)?.OnlineID;
+            int? onlineID = (ruleset ?? beatmapInfo.Ruleset).OnlineID;
 
             if (onlineID >= 0 && rulesets.GetRuleset(onlineID.Value)?.CreateInstance() is Ruleset rulesetInstance)
                 return rulesetInstance.CreateIcon();
