@@ -625,6 +625,10 @@ namespace osu.Game.Online.Multiplayer
                 int index = APIRoom.Playlist.Select((i, index) => (i, index)).Single(kvp => kvp.i.ID == item.ID).index;
                 APIRoom.Playlist.RemoveAt(index);
                 APIRoom.Playlist.Insert(index, playlistItem);
+
+                // If the current item changed, update the selected playlist item.
+                if (item.ID == Room.Settings.PlaylistItemId)
+                    CurrentMatchPlayingItem.Value = APIRoom.Playlist[index];
             }).ConfigureAwait(false);
         }
 
