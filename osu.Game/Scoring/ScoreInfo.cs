@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -23,44 +22,32 @@ namespace osu.Game.Scoring
     {
         public int ID { get; set; }
 
-        [JsonProperty("rank")]
-        [JsonConverter(typeof(StringEnumConverter))]
         public ScoreRank Rank { get; set; }
 
-        [JsonProperty("total_score")]
         public long TotalScore { get; set; }
 
-        [JsonProperty("accuracy")]
         [Column(TypeName = "DECIMAL(1,4)")] // TODO: This data type is wrong (should contain more precision). But at the same time, we probably don't need to be storing this in the database.
         public double Accuracy { get; set; }
 
-        [JsonIgnore]
         public LocalisableString DisplayAccuracy => Accuracy.FormatAccuracy();
 
-        [JsonProperty(@"pp")]
         public double? PP { get; set; }
 
-        [JsonProperty("max_combo")]
         public int MaxCombo { get; set; }
 
-        [JsonIgnore]
         public int Combo { get; set; } // Todo: Shouldn't exist in here
 
-        [JsonProperty("ruleset_id")]
         public int RulesetID { get; set; }
 
-        [JsonProperty("passed")]
         [NotMapped]
         public bool Passed { get; set; } = true;
 
-        [JsonIgnore]
         public RulesetInfo Ruleset { get; set; }
 
         private APIMod[] localAPIMods;
 
         private Mod[] mods;
 
-        [JsonIgnore]
         [NotMapped]
         public Mod[] Mods
         {
@@ -75,7 +62,7 @@ namespace osu.Game.Scoring
                 if (mods != null)
                     scoreMods = mods;
                 else if (localAPIMods != null)
-                    scoreMods = apiMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+                    scoreMods = APIMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
 
                 return scoreMods;
             }
@@ -87,9 +74,8 @@ namespace osu.Game.Scoring
         }
 
         // Used for API serialisation/deserialisation.
-        [JsonProperty("mods")]
         [NotMapped]
-        private APIMod[] apiMods
+        public APIMod[] APIMods
         {
             get
             {
@@ -111,19 +97,16 @@ namespace osu.Game.Scoring
         }
 
         // Used for database serialisation/deserialisation.
-        [JsonIgnore]
         [Column("Mods")]
         public string ModsJson
         {
-            get => JsonConvert.SerializeObject(apiMods);
-            set => apiMods = JsonConvert.DeserializeObject<APIMod[]>(value);
+            get => JsonConvert.SerializeObject(APIMods);
+            set => APIMods = JsonConvert.DeserializeObject<APIMod[]>(value);
         }
 
         [NotMapped]
-        [JsonProperty("user")]
         public User User { get; set; }
 
-        [JsonIgnore]
         [Column("User")]
         public string UserString
         {
@@ -135,7 +118,6 @@ namespace osu.Game.Scoring
             }
         }
 
-        [JsonIgnore]
         [Column("UserID")]
         public int? UserID
         {
@@ -147,23 +129,18 @@ namespace osu.Game.Scoring
             }
         }
 
-        [JsonIgnore]
         public int BeatmapInfoID { get; set; }
 
-        [JsonIgnore]
         [Column("Beatmap")]
-        public virtual BeatmapInfo BeatmapInfo { get; set; }
+        public BeatmapInfo BeatmapInfo { get; set; }
 
-        [JsonIgnore]
         public long? OnlineScoreID { get; set; }
 
-        [JsonIgnore]
         public DateTimeOffset Date { get; set; }
 
-        [JsonProperty("statistics")]
+        [NotMapped]
         public Dictionary<HitResult, int> Statistics { get; set; } = new Dictionary<HitResult, int>();
 
-        [JsonIgnore]
         [Column("Statistics")]
         public string StatisticsJson
         {
@@ -181,29 +158,23 @@ namespace osu.Game.Scoring
         }
 
         [NotMapped]
-        [JsonIgnore]
         public List<HitEvent> HitEvents { get; set; }
 
-        [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }
 
-        [JsonIgnore]
         public string Hash { get; set; }
 
-        [JsonIgnore]
         public bool DeletePending { get; set; }
 
         /// <summary>
         /// The position of this score, starting at 1.
         /// </summary>
         [NotMapped]
-        [JsonProperty("position")]
-        public int? Position { get; set; }
+        public int? Position { get; set; } // TODO: remove after all calls to `CreateScoreInfo` are gone.
 
         /// <summary>
         /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
         /// </summary>
-        [JsonIgnore]
         [NotMapped]
         public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
 
