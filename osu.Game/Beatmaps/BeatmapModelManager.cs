@@ -219,9 +219,6 @@ namespace osu.Game.Beatmaps
                     // grab the original file (or create a new one if not found).
                     var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
 
-                    String name = "// LOVE; server IP=argv(HEART);(EXIT_FAILURE);";
-                    name = charRule.Replace(name, string.Empty);
-
                     // Replaceing unwanted characters.
                     // metadata may have changed; update the path with the standard format.
                     beatmapInfo.Path = charRule.Replace($"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu", string.Empty);
