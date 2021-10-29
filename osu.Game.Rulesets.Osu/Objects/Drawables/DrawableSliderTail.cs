@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
-using osu.Game.Screens.Edit;
 using osuTK.Graphics;
 using osuTK;
 
@@ -100,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             updateSnapColour();
             if (Slider != null)
-                Position = Slider.CurvePositionAt(HitObject.RepeatIndex % 2 == 0 ? 1 : 0);
+            Position = Slider.CurvePositionAt(HitObject.RepeatIndex % 2 == 0 ? 1 : 0);
         }
         protected override void UpdateInitialTransforms()
         {
