@@ -55,7 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [CanBeNull]
         private IDisposable readyClickOperation;
 
-        private OsuButton addOrEditPlaylistButton;
+        public OsuButton AddOrEditPlaylistButton { get; private set; }
 
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
@@ -134,7 +134,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 new Drawable[] { new OverlinedHeader("Beatmap") },
                                 new Drawable[]
                                 {
-                                    addOrEditPlaylistButton = new PurpleTriangleButton
+                                    AddOrEditPlaylistButton = new PurpleTriangleButton
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Height = 40,
@@ -386,18 +386,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             switch (client.Room.Settings.QueueMode)
             {
                 case QueueModes.HostOnly:
-                    addOrEditPlaylistButton.Text = "Edit beatmap";
-                    addOrEditPlaylistButton.Alpha = client.Room.Host?.User?.Equals(client.LocalUser?.User) == true ? 1 : 0;
+                    AddOrEditPlaylistButton.Text = "Edit beatmap";
+                    AddOrEditPlaylistButton.Alpha = client.Room.Host?.User?.Equals(client.LocalUser?.User) == true ? 1 : 0;
                     break;
 
                 case QueueModes.FreeForAll:
                 case QueueModes.FairRotate:
-                    addOrEditPlaylistButton.Text = "Add beatmap";
-                    addOrEditPlaylistButton.Alpha = 1;
+                    AddOrEditPlaylistButton.Text = "Add beatmap";
+                    AddOrEditPlaylistButton.Alpha = 1;
                     break;
 
                 default:
-                    addOrEditPlaylistButton.Alpha = 0;
+                    AddOrEditPlaylistButton.Alpha = 0;
                     break;
             }
 
