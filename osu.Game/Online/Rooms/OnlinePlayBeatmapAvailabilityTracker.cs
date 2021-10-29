@@ -22,6 +22,7 @@ namespace osu.Game.Online.Rooms
     {
         public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
+        // Required to allow child components to update. Can potentially be replaced with a `CompositeComponent` class if or when we make one.
         protected override bool RequiresChildrenUpdate => true;
 
         [Resolved]
