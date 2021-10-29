@@ -192,14 +192,14 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             req.Success += r =>
             {
-                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, BeatmapInfo)).ToArray(), loadCancellationSource.Token)
                             .ContinueWith(ordered => Schedule(() =>
                             {
                                 if (loadCancellationSource.IsCancellationRequested)
                                     return;
 
                                 scoresCallback?.Invoke(ordered.Result);
-                                TopScore = r.UserScore?.CreateScoreInfo(rulesets);
+                                TopScore = r.UserScore?.CreateScoreInfo(rulesets, BeatmapInfo);
                             }), TaskContinuationOptions.OnlyOnRanToCompletion);
             };
 

@@ -39,7 +39,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset Date { get; set; }
 
         [JsonProperty(@"beatmap")]
-        public IBeatmapInfo Beatmap { get; set; }
+        public APIBeatmap Beatmap { get; set; }
 
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
@@ -71,10 +71,8 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonConverter(typeof(StringEnumConverter))]
         public ScoreRank Rank { get; set; }
 
-        IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
-
-        // TODO: nuke
-        public ScoreInfo CreateScoreInfo(RulesetStore rulesets)
+        // TODO: This function will eventually be going away.
+        public ScoreInfo CreateScoreInfo(RulesetStore rulesets, BeatmapInfo beatmap = null)
         {
             var ruleset = rulesets.GetRuleset(OnlineRulesetID);
 
@@ -94,13 +92,15 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineScoreID = OnlineID,
                 Date = Date,
                 PP = PP,
-                BeatmapInfo = Beatmap.ToBeatmapInfo(rulesets),
                 RulesetID = OnlineRulesetID,
                 Hash = Replay ? "online" : string.Empty, // todo: temporary?
                 Rank = Rank,
                 Ruleset = ruleset,
                 Mods = mods,
             };
+
+            if (beatmap != null)
+                scoreInfo.BeatmapInfo = beatmap;
 
             if (Statistics != null)
             {
@@ -138,18 +138,9 @@ namespace osu.Game.Online.API.Requests.Responses
             return scoreInfo;
         }
 
-        [JsonProperty(@"beatmapset")]
-        public APIBeatmapSet Metadata
-        {
-            set
-            {
-                // in the deserialisation case we need to ferry this data across.
-                if (Beatmap is APIBeatmap apiBeatmap)
-                    apiBeatmap.BeatmapSet = value;
-            }
-        }
-
         public IRulesetInfo Ruleset => new RulesetInfo { ID = OnlineRulesetID };
+
+        IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
 
         Dictionary<HitResult, int> IScoreInfo.Statistics => new Dictionary<HitResult, int>(); // TODO: implement... maybe. hitresults have weird mappings per ruleset it would seem.
     }
