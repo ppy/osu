@@ -52,6 +52,8 @@ namespace osu.Game.Rulesets.Difficulty
             if (!Beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(Beatmap, playableMods, preSkills, skills, clockRate);
 
+            
+
             int index = 0;
             foreach (var hitObject in getDifficultyHitObjects())
             {

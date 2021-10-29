@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor = (Attributes.ApproachRate - 10.33) / 3.35; // max 0.2
+                approachRateFactor = (Attributes.ApproachRate - 10.33) / 2; // nerf high AR
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor = 0.025 * (8.0 - Attributes.ApproachRate);
 

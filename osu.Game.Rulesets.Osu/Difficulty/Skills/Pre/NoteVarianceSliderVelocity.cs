@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -25,20 +26,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueOf(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             var osuCurrent = (OsuDifficultyHitObject)current;
-            var result = 0.0;
+            double result = 0.0;
+            //beatmap.BeatmapInfo.
+
+            //Console.WriteLine("sliderCount: " + beatmap.GetStatistics().ToString());
+
+            //((OsuHitObject)current.BaseObject)
 
             // 슬라이더 속도가 급변할 시 보너스를 준다.
             // The Bonus is given when the slider speed changes rapidly.
             if (osuCurrent.LastObject is Slider OsuSlider)
             {
+                double adaptedVelocity = Math.Max(OsuSlider.Velocity - 0.5, 0);
+
                 if (lastVelocity >= 0)
                 {
-                    result = Math.Max(OsuSlider.Velocity - lastVelocity, 0) * 1.2;
+                    result = Math.Abs(adaptedVelocity - lastVelocity) * 2;
                 }
-                lastVelocity = OsuSlider.Velocity;
+                lastVelocity = adaptedVelocity;
 
                 // default bonus for velocity
-                result += OsuSlider.Velocity / 5;
+                result += adaptedVelocity / 2;
 
                 //if(result >= 0.5)
                 //{
@@ -48,5 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return result;
         }
+
+
     }
 }

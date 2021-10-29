@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -22,9 +24,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplier => 26.25;
         private double strainDecayBase => 0.15;
 
-        public Aim(Mod[] mods)
+        private IBeatmap beatmap;
+        public Aim(IBeatmap beatmap, Mod[] mods)
             : base(mods)
         {
+            this.beatmap = beatmap;
         }
 
         private double currentStrain = 1;
@@ -36,7 +40,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var osuCurrent = (OsuDifficultyHitObject)current;
 
-            double angleBonus = 1 + preSkills[0].GetAllStrainPeaks()[index] * 0.5;
+            double angleBonus = preSkills[0].GetAllStrainPeaks()[index] * 0.5;
+            double fingerControlBonus = preSkills[2].GetAllStrainPeaks()[index] * 0.005;
+
+            double totalBonus = Math.Pow(
+                (Math.Pow(0.99 + angleBonus, 1.1)) *
+                (Math.Pow(0.99 + fingerControlBonus, 1.1))
+                , 1.0 / 1.1);
+
+
             double sliderBonus = 1 + preSkills[1].GetAllStrainPeaks()[index] * 1;
             //double aimStrain = 0;
 
@@ -60,6 +72,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
             double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance) * sliderBonus;
+            //double travelDistanceExp = 0;
+            //if (osuCurrent.LastObject is Slider OsuSlider)
+            //{
+            //    travelDistanceExp = applyDiminishingExp(calculateTravelDistanceNewer(OsuSlider) * osuCurrent.ScalingFactor) * sliderBonus;
+            //}
 
             // 320ms means almost 180bpm(90bpm) jump.
             // as a result, Slower jumps are buffed slightly.
@@ -70,9 +87,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             //return aimValue;
             return
-                angleBonus *
-                (calculateAimValue(0, distanceExp, osuCurrent.StrainTime) * 0.9 +
-                calculateAimValue(0, distanceExp, 320) * 0.1);
+                totalBonus *
+                (calculateAimValue(0, distanceExp, osuCurrent.StrainTime) * 0.8 +
+                calculateAimValue(0, distanceExp, 160) * 0.1);
         }
 
         private double calculateAimValue(double result, double distanceExp, double strainTime)
@@ -81,6 +98,73 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 result + distanceExp / Math.Max(strainTime, timing_threshold),
                 distanceExp / strainTime
             );
+        }
+
+        private float calculateTravelDistanceNewer(Slider OsuSlider)
+        {
+            var currentTimingPoint = beatmap.ControlPointInfo.TimingPointAt(OsuSlider.StartTime);
+
+            double radius = OsuSlider.Radius;
+            double sliderTickRate = beatmap.Difficulty.SliderTickRate;
+            double bpmToWhiteTick = 60000 / currentTimingPoint.BPM;
+
+            double spanDuration = OsuSlider.EndTime - OsuSlider.StartTime;
+            double timesOfTick = Math.Round(spanDuration / bpmToWhiteTick * sliderTickRate);
+            double spanPerTick = spanDuration / timesOfTick;
+
+            //Console.WriteLine(
+            //    "duration: " + spanDuration +
+            //    ", result: " + timesOfTick
+            //    );
+
+            float totalDistance = 0f;
+            bool plus = false; // ignoring first calculation
+            var pastPos = OsuSlider.StackedPosition;
+            double offset = OsuSlider.StartTime; 
+
+            double endTimeMinusOffset = spanDuration >= 72 ? 36 : spanDuration / 2;
+
+            while (offset + spanPerTick <= OsuSlider.EndTime + 1)
+            {
+                offset += spanPerTick;
+
+                var currentPos = OsuSlider.StackedPositionAt(offset);
+                var adaptedPos = calculateAdaptedPosition(pastPos, currentPos, radius);
+
+                float perDistance = (adaptedPos - pastPos).Length;
+
+                if (plus)
+                    totalDistance += perDistance;
+                else
+                    plus = true;
+                pastPos = adaptedPos;
+            }
+
+            if (plus) // adding last tick
+            {
+                var finishPos = OsuSlider.StackedPositionAt(OsuSlider.EndTime - endTimeMinusOffset);
+                var adaptedPos = calculateAdaptedPosition(pastPos, finishPos, radius);
+
+                float perDistance = (adaptedPos - pastPos).Length;
+
+                totalDistance += perDistance;
+            }
+
+            return totalDistance;
+        }
+
+        private Vector2 calculateAdaptedPosition(Vector2 pos, Vector2 pos2, double radius)
+        {
+            Vector2 distanceVec = (pos2 - pos);
+
+            double angle = Math.Atan2(distanceVec.Y, distanceVec.X);
+
+            Vector2 calculatedPos = pos2 + new Vector2(
+                (float)(-radius * Math.Cos(angle)),
+                (float)(-radius * Math.Sin(angle))
+            ) * Math.Min((float) radius / 2 * distanceVec.Length, 1);
+
+            return calculatedPos;
         }
 
         private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
@@ -51,6 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastLastObject = (OsuHitObject)lastLastObject;
             this.lastObject = (OsuHitObject)lastObject;
 
+
             setDistances();
 
             // Capped to 25ms to prevent difficulty calculation breaking from simulatenous objects.
@@ -67,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             // more hr buff for small cs.
-            ScalingFactor = (float) Math.Pow(normalized_radius / (float)BaseObject.Radius, 1.15);
+            ScalingFactor = (float) Math.Pow(normalized_radius / (float)BaseObject.Radius, 1.2);
 
             if (BaseObject.Radius < 35)
             {
@@ -87,6 +89,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 //    StrainSliderTime = sliderTermPrevious / 2;
                 //}
 
+                //lastSlider.TickDistance;
+
+                //Console.WriteLine(lastSlider.SpanDuration);
+                //Console.WriteLine(lastSlider.)
+                
                 computeSliderCursorPosition(lastSlider);
                 TravelDistance = lastSlider.LazyTravelDistance * ScalingFactor;
             } else
@@ -110,6 +117,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 Angle = Math.Abs(Math.Atan2(det, dot));
             }
+        }
+
+        private void getSliderTicksWithEnd(Slider slider)
+        {
+            //var list = new List<Vector2>();
+
+
         }
 
         private void computeSliderCursorPosition(Slider slider)

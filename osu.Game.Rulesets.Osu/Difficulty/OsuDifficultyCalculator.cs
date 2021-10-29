@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return new Skill[]
             {
-                new Aim(mods),
+                new Aim(beatmap, mods),
                 new Speed(mods, hitWindowGreat),
                 new Flashlight(mods)
             };
@@ -118,6 +118,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return new PrePerNoteStrainSkill[] {
                 new NoteVarianceAngle(beatmap, mods, clockRate),
                 new NoteVarianceSliderVelocity(beatmap, mods, clockRate),
+                new NoteVarianceFingerControl(beatmap, mods, clockRate),
             };
         }
 
