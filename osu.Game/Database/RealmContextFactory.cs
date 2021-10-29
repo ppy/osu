@@ -161,9 +161,9 @@ namespace osu.Game.Database
                 if (increaseSpeedBinding != null && increaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Plus }))
                     migration.NewRealm.Remove(increaseSpeedBinding);
 
-                var descreaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.DecreaseScrollSpeed);
-                if (descreaseSpeedBinding != null && descreaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Minus }))
-                    migration.NewRealm.Remove(descreaseSpeedBinding);
+                var decreaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.DecreaseScrollSpeed);
+                if (decreaseSpeedBinding != null && decreaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Minus }))
+                    migration.NewRealm.Remove(decreaseSpeedBinding);
             }
 
             if (lastSchemaVersion < 7)
