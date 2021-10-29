@@ -121,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                     {
                                                         new Section("Room name")
                                                         {
-                                                            Child = NameField = new SettingsTextBox
+                                                            Child = NameField = new OsuTextBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                         },
                                                         new Section("Allowed attempts (across all playlist items)")
                                                         {
-                                                            Child = MaxAttemptsField = new SettingsNumberTextBox
+                                                            Child = MaxAttemptsField = new OsuNumberBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                         new Section("Max participants")
                                                         {
                                                             Alpha = disabled_alpha,
-                                                            Child = MaxParticipantsField = new SettingsNumberTextBox
+                                                            Child = MaxParticipantsField = new OsuNumberBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
@@ -178,7 +178,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                         new Section("Password (optional)")
                                                         {
                                                             Alpha = disabled_alpha,
-                                                            Child = new SettingsPasswordTextBox
+                                                            Child = new OsuPasswordTextBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,

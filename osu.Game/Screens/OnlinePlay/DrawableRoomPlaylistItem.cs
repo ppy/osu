@@ -338,13 +338,14 @@ namespace osu.Game.Screens.OnlinePlay
 
             public PanelBackground()
             {
+                UpdateableBeatmapBackgroundSprite backgroundSprite;
+
                 InternalChildren = new Drawable[]
                 {
-                    new UpdateableBeatmapBackgroundSprite
+                    backgroundSprite = new UpdateableBeatmapBackgroundSprite
                     {
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fill,
-                        Beatmap = { BindTarget = Beatmap }
                     },
                     new FillFlowContainer
                     {
@@ -379,6 +380,10 @@ namespace osu.Game.Screens.OnlinePlay
                         }
                     }
                 };
+
+                // manual binding required as playlists don't expose IBeatmapInfo currently.
+                // may be removed in the future if this changes.
+                Beatmap.BindValueChanged(beatmap => backgroundSprite.Beatmap.Value = beatmap.NewValue);
             }
         }
     }

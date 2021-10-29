@@ -1,15 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using System.Linq;
-using osu.Framework.Extensions.LocalisationExtensions;
-using osu.Game.Beatmaps;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Select.Details
@@ -22,20 +21,20 @@ namespace osu.Game.Screens.Select.Details
         private readonly Container graphContainer;
         private readonly BarGraph graph;
 
-        private BeatmapSetMetrics metrics;
+        private int[] ratings;
 
-        public BeatmapSetMetrics Metrics
+        public int[] Ratings
         {
-            get => metrics;
+            get => ratings;
             set
             {
-                if (value == metrics) return;
+                if (value == ratings) return;
 
-                metrics = value;
+                ratings = value;
 
                 const int rating_range = 10;
 
-                if (metrics == null)
+                if (ratings == null)
                 {
                     negativeRatings.Text = 0.ToLocalisableString(@"N0");
                     positiveRatings.Text = 0.ToLocalisableString(@"N0");
@@ -44,15 +43,15 @@ namespace osu.Game.Screens.Select.Details
                 }
                 else
                 {
-                    var ratings = Metrics.Ratings.Skip(1).Take(rating_range); // adjust for API returning weird empty data at 0.
+                    var usableRange = Ratings.Skip(1).Take(rating_range); // adjust for API returning weird empty data at 0.
 
-                    var negativeCount = ratings.Take(rating_range / 2).Sum();
-                    var totalCount = ratings.Sum();
+                    int negativeCount = usableRange.Take(rating_range / 2).Sum();
+                    int totalCount = usableRange.Sum();
 
                     negativeRatings.Text = negativeCount.ToLocalisableString(@"N0");
                     positiveRatings.Text = (totalCount - negativeCount).ToLocalisableString(@"N0");
                     ratingsBar.Length = totalCount == 0 ? 0 : (float)negativeCount / totalCount;
-                    graph.Values = ratings.Take(rating_range).Select(r => (float)r);
+                    graph.Values = usableRange.Take(rating_range).Select(r => (float)r);
                 }
             }
         }

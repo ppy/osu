@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             get
             {
-                var index = skinItems.FindIndex(s => s.ID > 0);
+                int index = skinItems.FindIndex(s => s.ID > 0);
                 if (index < 0)
                     index = skinItems.Count;
 

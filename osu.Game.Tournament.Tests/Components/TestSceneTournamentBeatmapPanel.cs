@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -23,14 +22,13 @@ namespace osu.Game.Tournament.Tests.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = 1091460 });
+            var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = 1091460 });
             req.Success += success;
             api.Queue(req);
         }
 
-        private void success(APIBeatmap apiBeatmap)
+        private void success(APIBeatmap beatmap)
         {
-            var beatmap = apiBeatmap.ToBeatmapInfo(rulesets);
             Add(new TournamentBeatmapPanel(beatmap)
             {
                 Anchor = Anchor.Centre,

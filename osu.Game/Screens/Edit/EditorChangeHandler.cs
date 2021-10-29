@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Edit
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                     new LegacyBeatmapEncoder(editorBeatmap, editorBeatmap.BeatmapSkin).Encode(sw);
 
-                var newState = stream.ToArray();
+                byte[] newState = stream.ToArray();
 
                 // if the previous state is binary equal we don't need to push a new one, unless this is the initial state.
                 if (savedStates.Count > 0 && newState.SequenceEqual(savedStates[currentState])) return;

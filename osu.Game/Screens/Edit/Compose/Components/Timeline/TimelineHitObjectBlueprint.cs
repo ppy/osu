@@ -397,7 +397,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     if (hitObject.DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
                                         hitObject.DifficultyControlPoint = new DifficultyControlPoint();
 
-                                    var newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
+                                    double newVelocity = hitObject.DifficultyControlPoint.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
 
                                     if (Precision.AlmostEquals(newVelocity, hitObject.DifficultyControlPoint.SliderVelocity))
                                         return;
@@ -408,8 +408,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 else
                                 {
                                     // find the number of repeats which can fit in the requested time.
-                                    var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
-                                    var proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
+                                    double lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
+                                    int proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
 
                                     if (proposedCount == repeatHitObject.RepeatCount)
                                         return;
@@ -421,7 +421,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 break;
 
                             case IHasDuration endTimeHitObject:
-                                var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
+                                double snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
 
                                 if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
                                     return;

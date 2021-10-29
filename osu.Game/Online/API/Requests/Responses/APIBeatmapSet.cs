@@ -6,115 +6,132 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Users;
+
+#nullable enable
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIBeatmapSet : BeatmapMetadata // todo: this is a bit wrong...
+    public class APIBeatmapSet : IBeatmapSetOnlineInfo, IBeatmapSetInfo
     {
         [JsonProperty(@"covers")]
-        private BeatmapSetOnlineCovers covers { get; set; }
-
-        private int? onlineBeatmapSetID;
+        public BeatmapSetOnlineCovers Covers { get; set; }
 
         [JsonProperty(@"id")]
-        public int? OnlineBeatmapSetID
-        {
-            get => onlineBeatmapSetID;
-            set => onlineBeatmapSetID = value > 0 ? value : null;
-        }
+        public int OnlineID { get; set; }
 
         [JsonProperty(@"status")]
         public BeatmapSetOnlineStatus Status { get; set; }
 
         [JsonProperty(@"preview_url")]
-        private string preview { get; set; }
+        public string Preview { get; set; } = string.Empty;
 
         [JsonProperty(@"has_favourited")]
-        private bool hasFavourited { get; set; }
+        public bool HasFavourited { get; set; }
 
         [JsonProperty(@"play_count")]
-        private int playCount { get; set; }
+        public int PlayCount { get; set; }
 
         [JsonProperty(@"favourite_count")]
-        private int favouriteCount { get; set; }
+        public int FavouriteCount { get; set; }
 
         [JsonProperty(@"bpm")]
-        private double bpm { get; set; }
+        public double BPM { get; set; }
 
         [JsonProperty(@"nsfw")]
-        private bool hasExplicitContent { get; set; }
+        public bool HasExplicitContent { get; set; }
 
         [JsonProperty(@"video")]
-        private bool hasVideo { get; set; }
+        public bool HasVideo { get; set; }
 
         [JsonProperty(@"storyboard")]
-        private bool hasStoryboard { get; set; }
+        public bool HasStoryboard { get; set; }
 
         [JsonProperty(@"submitted_date")]
-        private DateTimeOffset submitted { get; set; }
+        public DateTimeOffset Submitted { get; set; }
 
         [JsonProperty(@"ranked_date")]
-        private DateTimeOffset? ranked { get; set; }
+        public DateTimeOffset? Ranked { get; set; }
 
         [JsonProperty(@"last_updated")]
-        private DateTimeOffset lastUpdated { get; set; }
+        public DateTimeOffset? LastUpdated { get; set; }
 
-        [JsonProperty(@"ratings")]
-        private int[] ratings { get; set; }
+        [JsonProperty("ratings")]
+        public int[] Ratings { get; set; } = Array.Empty<int>();
 
         [JsonProperty(@"track_id")]
-        private int? trackId { get; set; }
+        public int? TrackId { get; set; }
 
+        public string Title { get; set; } = string.Empty;
+
+        [JsonProperty("title_unicode")]
+        public string TitleUnicode { get; set; } = string.Empty;
+
+        public string Artist { get; set; } = string.Empty;
+
+        [JsonProperty("artist_unicode")]
+        public string ArtistUnicode { get; set; } = string.Empty;
+
+        public User? Author = new User();
+
+        /// <summary>
+        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// </summary>
         [JsonProperty(@"user_id")]
-        private int creatorId
+        public int AuthorID
         {
-            set => Author.Id = value;
+            get => Author?.Id ?? 1;
+            set
+            {
+                Author ??= new User();
+                Author.Id = value;
+            }
+        }
+
+        /// <summary>
+        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// </summary>
+        [JsonProperty(@"creator")]
+        public string AuthorString
+        {
+            get => Author?.Username ?? string.Empty;
+            set
+            {
+                Author ??= new User();
+                Author.Username = value;
+            }
         }
 
         [JsonProperty(@"availability")]
-        private BeatmapSetOnlineAvailability availability { get; set; }
+        public BeatmapSetOnlineAvailability Availability { get; set; }
 
         [JsonProperty(@"genre")]
-        private BeatmapSetOnlineGenre genre { get; set; }
+        public BeatmapSetOnlineGenre Genre { get; set; }
 
         [JsonProperty(@"language")]
-        private BeatmapSetOnlineLanguage language { get; set; }
+        public BeatmapSetOnlineLanguage Language { get; set; }
+
+        public string Source { get; set; } = string.Empty;
+
+        [JsonProperty(@"tags")]
+        public string Tags { get; set; } = string.Empty;
 
         [JsonProperty(@"beatmaps")]
-        private IEnumerable<APIBeatmap> beatmaps { get; set; }
+        public IEnumerable<APIBeatmap> Beatmaps { get; set; } = Array.Empty<APIBeatmap>();
 
         public virtual BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
         {
             var beatmapSet = new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = OnlineBeatmapSetID,
-                Metadata = this,
+                OnlineBeatmapSetID = OnlineID,
+                Metadata = metadata,
                 Status = Status,
-                Metrics = ratings == null ? null : new BeatmapSetMetrics { Ratings = ratings },
-                OnlineInfo = new BeatmapSetOnlineInfo
-                {
-                    Covers = covers,
-                    Preview = preview,
-                    PlayCount = playCount,
-                    FavouriteCount = favouriteCount,
-                    BPM = bpm,
-                    Status = Status,
-                    HasExplicitContent = hasExplicitContent,
-                    HasVideo = hasVideo,
-                    HasStoryboard = hasStoryboard,
-                    Submitted = submitted,
-                    Ranked = ranked,
-                    LastUpdated = lastUpdated,
-                    Availability = availability,
-                    HasFavourited = hasFavourited,
-                    Genre = genre,
-                    Language = language,
-                    TrackId = trackId
-                },
+                OnlineInfo = this
             };
 
-            beatmapSet.Beatmaps = beatmaps?.Select(b =>
+            beatmapSet.Beatmaps = Beatmaps.Select(b =>
             {
                 var beatmap = b.ToBeatmapInfo(rulesets);
                 beatmap.BeatmapSet = beatmapSet;
@@ -124,5 +141,31 @@ namespace osu.Game.Online.API.Requests.Responses
 
             return beatmapSet;
         }
+
+        private BeatmapMetadata metadata => new BeatmapMetadata
+        {
+            Title = Title,
+            TitleUnicode = TitleUnicode,
+            Artist = Artist,
+            ArtistUnicode = ArtistUnicode,
+            AuthorID = AuthorID,
+            Author = Author,
+            Source = Source,
+            Tags = Tags,
+        };
+
+        #region Implementation of IBeatmapSetInfo
+
+        IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
+
+        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => metadata;
+
+        DateTimeOffset IBeatmapSetInfo.DateAdded => throw new NotImplementedException();
+        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => throw new NotImplementedException();
+        double IBeatmapSetInfo.MaxStarDifficulty => throw new NotImplementedException();
+        double IBeatmapSetInfo.MaxLength => throw new NotImplementedException();
+        double IBeatmapSetInfo.MaxBPM => BPM;
+
+        #endregion
     }
 }

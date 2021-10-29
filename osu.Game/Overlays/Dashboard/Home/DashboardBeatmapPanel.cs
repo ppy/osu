@@ -77,12 +77,12 @@ namespace osu.Game.Overlays.Dashboard.Home
                                     RelativeSizeAxes = Axes.Both,
                                     Masking = true,
                                     CornerRadius = 6,
-                                    Child = new UpdateableBeatmapSetCover
+                                    Child = new UpdateableOnlineBeatmapSetCover
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        BeatmapSet = SetInfo
+                                        OnlineInfo = SetInfo.OnlineInfo
                                     }
                                 },
                                 new Container

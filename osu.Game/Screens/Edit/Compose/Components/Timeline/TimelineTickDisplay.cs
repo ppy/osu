@@ -104,10 +104,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             nextMinTick = null;
             nextMaxTick = null;
 
-            for (var i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
+            for (int i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
             {
                 var point = beatmap.ControlPointInfo.TimingPoints[i];
-                var until = i + 1 < beatmap.ControlPointInfo.TimingPoints.Count ? beatmap.ControlPointInfo.TimingPoints[i + 1].Time : working.Value.Track.Length;
+                double until = i + 1 < beatmap.ControlPointInfo.TimingPoints.Count ? beatmap.ControlPointInfo.TimingPoints[i + 1].Time : working.Value.Track.Length;
 
                 int beat = 0;
 
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                         int indexInBar = beat % ((int)point.TimeSignature * beatDivisor.Value);
 
-                        var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
+                        int divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
                         var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
 
                         // even though "bar lines" take up the full vertical space, we render them in two pieces because it allows for less anchor/origin churn.

@@ -117,9 +117,9 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 source.Text = b.NewValue?.Metadata.Source ?? string.Empty;
                 tags.Text = b.NewValue?.Metadata.Tags ?? string.Empty;
-                genre.Text = b.NewValue?.OnlineInfo?.Genre?.Name ?? string.Empty;
-                language.Text = b.NewValue?.OnlineInfo?.Language?.Name ?? string.Empty;
-                var setHasLeaderboard = b.NewValue?.OnlineInfo?.Status > 0;
+                genre.Text = b.NewValue?.OnlineInfo?.Genre.Name ?? string.Empty;
+                language.Text = b.NewValue?.OnlineInfo?.Language.Name ?? string.Empty;
+                bool setHasLeaderboard = b.NewValue?.OnlineInfo?.Status > 0;
                 successRate.Alpha = setHasLeaderboard ? 1 : 0;
                 notRankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;
                 Height = setHasLeaderboard ? 270 : base_height;

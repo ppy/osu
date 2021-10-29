@@ -362,8 +362,8 @@ namespace osu.Game.Overlays.Comments
 
         private void updateButtonsState()
         {
-            var loadedReplesCount = loadedReplies.Count;
-            var hasUnloadedReplies = loadedReplesCount != Comment.RepliesCount;
+            int loadedReplesCount = loadedReplies.Count;
+            bool hasUnloadedReplies = loadedReplesCount != Comment.RepliesCount;
 
             loadRepliesButton.FadeTo(hasUnloadedReplies && loadedReplesCount == 0 ? 1 : 0);
             showMoreButton.FadeTo(hasUnloadedReplies && loadedReplesCount > 0 ? 1 : 0);

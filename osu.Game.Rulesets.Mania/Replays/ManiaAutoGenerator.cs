@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             {
                 var currentObject = Beatmap.HitObjects[i];
                 var nextObjectInColumn = GetNextObject(i); // Get the next object that requires pressing the same button
-                var releaseTime = calculateReleaseTime(currentObject, nextObjectInColumn);
+                double releaseTime = calculateReleaseTime(currentObject, nextObjectInColumn);
 
                 yield return new HitPoint { Time = currentObject.StartTime, Column = currentObject.Column };
 

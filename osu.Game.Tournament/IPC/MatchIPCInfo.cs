@@ -3,14 +3,14 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tournament.IPC
 {
     public class MatchIPCInfo : Component
     {
-        public Bindable<BeatmapInfo> Beatmap { get; } = new Bindable<BeatmapInfo>();
+        public Bindable<APIBeatmap> Beatmap { get; } = new Bindable<APIBeatmap>();
         public Bindable<LegacyMods> Mods { get; } = new Bindable<LegacyMods>();
         public Bindable<TourneyState> State { get; } = new Bindable<TourneyState>();
         public Bindable<string> ChatChannel { get; } = new Bindable<string>();

@@ -180,11 +180,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             // Seek the master clock to the gameplay time.
             // This is chosen as the first available frame in the players' replays, which matches the seek by each individual SpectatorPlayer.
-            var startTime = instances.Where(i => i.Score != null)
-                                     .SelectMany(i => i.Score.Replay.Frames)
-                                     .Select(f => f.Time)
-                                     .DefaultIfEmpty(0)
-                                     .Min();
+            double startTime = instances.Where(i => i.Score != null)
+                                        .SelectMany(i => i.Score.Replay.Frames)
+                                        .Select(f => f.Time)
+                                        .DefaultIfEmpty(0)
+                                        .Min();
 
             masterClockContainer.Seek(startTime);
             masterClockContainer.Start();

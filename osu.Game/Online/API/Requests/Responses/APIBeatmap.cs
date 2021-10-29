@@ -6,12 +6,14 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 
+#nullable enable
+
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIBeatmap : BeatmapMetadata
+    public class APIBeatmap : IBeatmapInfo, IBeatmapOnlineInfo
     {
         [JsonProperty(@"id")]
-        public int OnlineBeatmapID { get; set; }
+        public int OnlineID { get; set; }
 
         [JsonProperty(@"beatmapset_id")]
         public int OnlineBeatmapSetID { get; set; }
@@ -19,20 +21,26 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"status")]
         public BeatmapSetOnlineStatus Status { get; set; }
 
+        [JsonProperty("checksum")]
+        public string Checksum { get; set; } = string.Empty;
+
+        [JsonProperty(@"user_id")]
+        public int AuthorID { get; set; }
+
         [JsonProperty(@"beatmapset")]
-        public APIBeatmapSet BeatmapSet { get; set; }
+        public APIBeatmapSet? BeatmapSet { get; set; }
 
         [JsonProperty(@"playcount")]
-        private int playCount { get; set; }
+        public int PlayCount { get; set; }
 
         [JsonProperty(@"passcount")]
-        private int passCount { get; set; }
+        public int PassCount { get; set; }
 
         [JsonProperty(@"mode_int")]
-        private int ruleset { get; set; }
+        public int RulesetID { get; set; }
 
         [JsonProperty(@"difficulty_rating")]
-        private double starDifficulty { get; set; }
+        public double StarRating { get; set; }
 
         [JsonProperty(@"drain")]
         private float drainRate { get; set; }
@@ -46,23 +54,32 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"accuracy")]
         private float overallDifficulty { get; set; }
 
+        [JsonIgnore]
+        public double Length { get; set; }
+
         [JsonProperty(@"total_length")]
-        private double length { get; set; }
+        private double lengthInSeconds
+        {
+            get => TimeSpan.FromMilliseconds(Length).TotalSeconds;
+            set => Length = TimeSpan.FromSeconds(value).TotalMilliseconds;
+        }
 
         [JsonProperty(@"count_circles")]
-        private int circleCount { get; set; }
+        public int CircleCount { get; set; }
 
         [JsonProperty(@"count_sliders")]
-        private int sliderCount { get; set; }
+        public int SliderCount { get; set; }
 
         [JsonProperty(@"version")]
-        private string version { get; set; }
+        public string DifficultyName { get; set; } = string.Empty;
 
         [JsonProperty(@"failtimes")]
-        private BeatmapMetrics metrics { get; set; }
+        public APIFailTimes? FailTimes { get; set; }
 
         [JsonProperty(@"max_combo")]
-        private int? maxCombo { get; set; }
+        public int? MaxCombo { get; set; }
+
+        public double BPM { get; set; }
 
         public virtual BeatmapInfo ToBeatmapInfo(RulesetStore rulesets)
         {
@@ -70,17 +87,17 @@ namespace osu.Game.Online.API.Requests.Responses
 
             return new BeatmapInfo
             {
-                Metadata = set?.Metadata ?? this,
-                Ruleset = rulesets.GetRuleset(ruleset),
-                StarDifficulty = starDifficulty,
-                OnlineBeatmapID = OnlineBeatmapID,
-                Version = version,
+                Metadata = set?.Metadata ?? new BeatmapMetadata(),
+                Ruleset = rulesets.GetRuleset(RulesetID),
+                StarDifficulty = StarRating,
+                OnlineBeatmapID = OnlineID,
+                Version = DifficultyName,
                 // this is actually an incorrect mapping (Length is calculated as drain length in lazer's import process, see BeatmapManager.calculateLength).
-                Length = TimeSpan.FromSeconds(length).TotalMilliseconds,
+                Length = Length,
                 Status = Status,
+                MD5Hash = Checksum,
                 BeatmapSet = set,
-                Metrics = metrics,
-                MaxCombo = maxCombo,
+                MaxCombo = MaxCombo,
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = drainRate,
@@ -88,14 +105,31 @@ namespace osu.Game.Online.API.Requests.Responses
                     ApproachRate = approachRate,
                     OverallDifficulty = overallDifficulty,
                 },
-                OnlineInfo = new BeatmapOnlineInfo
-                {
-                    PlayCount = playCount,
-                    PassCount = passCount,
-                    CircleCount = circleCount,
-                    SliderCount = sliderCount,
-                },
+                OnlineInfo = this,
             };
         }
+
+        #region Implementation of IBeatmapInfo
+
+        public IBeatmapMetadataInfo Metadata => (BeatmapSet as IBeatmapSetInfo)?.Metadata ?? new BeatmapMetadata();
+
+        public IBeatmapDifficultyInfo Difficulty => new BeatmapDifficulty
+        {
+            DrainRate = drainRate,
+            CircleSize = circleSize,
+            ApproachRate = approachRate,
+            OverallDifficulty = overallDifficulty,
+        };
+
+        IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
+
+        public string MD5Hash => Checksum;
+
+        public IRulesetInfo Ruleset => new RulesetInfo { ID = RulesetID };
+
+        [JsonIgnore]
+        public string Hash => throw new NotImplementedException();
+
+        #endregion
     }
 }

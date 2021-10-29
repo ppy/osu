@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
         protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)
         {
-            var time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
+            double time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
             var pos = column.ScreenSpacePositionAtTime(time);
 
             return new SnapResult(pos, time, column);
