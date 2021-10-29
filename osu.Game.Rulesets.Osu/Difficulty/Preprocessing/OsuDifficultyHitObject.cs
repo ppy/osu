@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double TravelDistance { get; private set; }
 
+        public float ScalingFactor { get; private set; }
+
         /// <summary>
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
         /// Calculated as the angle between the circles (current-2, current-1, current).
@@ -65,12 +67,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             // more hr buff for small cs.
-            float scalingFactor = (float) Math.Pow(normalized_radius / (float)BaseObject.Radius, 1.15);
+            ScalingFactor = (float) Math.Pow(normalized_radius / (float)BaseObject.Radius, 1.15);
 
             if (BaseObject.Radius < 35)
             {
                 float smallCircleBonus = Math.Min(35 - (float)BaseObject.Radius, 0) / 40;
-                scalingFactor *= 1 + smallCircleBonus;
+                ScalingFactor *= 1 + smallCircleBonus;
             }
 
             if (lastObject is Slider lastSlider)
@@ -86,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 //}
 
                 computeSliderCursorPosition(lastSlider);
-                TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
+                TravelDistance = lastSlider.LazyTravelDistance * ScalingFactor;
             } else
             {
                 //StrainSliderTime = 0;
@@ -94,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
-            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            JumpDistance = (BaseObject.StackedPosition * ScalingFactor - lastCursorPosition * ScalingFactor).Length;
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
             {
