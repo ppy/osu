@@ -7,7 +7,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
-using static osu.Game.Skinning.LegacySkinConfiguration;
+using static osu.Game.Skinning.SkinConfiguration;
 
 namespace osu.Game.Tests.Gameplay
 {

@@ -14,6 +14,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
     {
         private OsuSpriteText attemptDisplay;
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         public RoomLocalUserInfo()
         {
             AutoSizeAxes = Axes.Both;
@@ -54,6 +57,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 {
                     int remaining = MaxAttempts.Value.Value - UserScore.Value.PlaylistItemAttempts.Sum(a => a.Attempts);
                     attemptDisplay.Text += $" ({remaining} remaining)";
+
+                    if (remaining == 0)
+                        attemptDisplay.Colour = colours.RedLight;
                 }
             }
             else
