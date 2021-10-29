@@ -9,7 +9,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using System.Text;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -32,27 +31,6 @@ namespace osu.Game.Online.API.Requests
             this.scope = scope;
             this.ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
             this.mods = mods ?? Array.Empty<IMod>();
-
-            Success += onSuccess;
-        }
-
-        private void onSuccess(APIScoresCollection r)
-        {
-            Debug.Assert(ruleset.OnlineID >= 0);
-
-            foreach (APIScoreInfo score in r.Scores)
-            {
-                score.Beatmap = beatmapInfo;
-                score.OnlineRulesetID = ruleset.OnlineID;
-            }
-
-            var userScore = r.UserScore;
-
-            if (userScore != null)
-            {
-                userScore.Score.Beatmap = beatmapInfo;
-                userScore.Score.OnlineRulesetID = ruleset.OnlineID;
-            }
         }
 
         protected override string Target => $@"beatmaps/{beatmapInfo.OnlineBeatmapID}/scores{createQueryParameters()}";

@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (value?.Scores.Any() != true)
                     return;
 
-                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, Beatmap.Value)).ToArray(), loadCancellationSource.Token)
                             .ContinueWith(ordered => Schedule(() =>
                             {
                                 if (loadCancellationSource.IsCancellationRequested)
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 scoreTable.Show();
 
                                 var userScore = value.UserScore;
-                                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets);
+                                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets, Beatmap.Value);
 
                                 topScoresContainer.Add(new DrawableTopScore(topScore));
 
