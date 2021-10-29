@@ -12,7 +12,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// A representation of a collection of beatmap difficulties, generally packaged as an ".osz" archive.
     /// </summary>
-    public interface IBeatmapSetInfo : IHasOnlineID
+    public interface IBeatmapSetInfo : IHasOnlineID<int>
     {
         /// <summary>
         /// The date when this beatmap was imported.
