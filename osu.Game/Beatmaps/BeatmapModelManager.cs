@@ -7,16 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using osu.Framework.Audio.Track;
-using osu.Framework.Bindables;
-using osu.Framework.Extensions;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Logging;
-using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -190,6 +183,9 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
         public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin beatmapSkin = null)
         {
+            // Regex to clean map name from incompatible characters before exporting
+            Regex charRule = new Regex(@"[/\\<>|?*"":]+", RegexOptions.Multiline);
+
             var setInfo = beatmapInfo.BeatmapSet;
 
             // Difficulty settings must be copied first due to the clone in `Beatmap<>.BeatmapInfo_Set`.
@@ -215,8 +211,9 @@ namespace osu.Game.Beatmaps
                     // grab the original file (or create a new one if not found).
                     var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
 
+                    // Replaceing unwanted characters.
                     // metadata may have changed; update the path with the standard format.
-                    beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu";
+                    beatmapInfo.Path = charRule.Replace($"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu", string.Empty);
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 
                     // update existing or populate new file's filename.
