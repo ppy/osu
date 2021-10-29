@@ -132,9 +132,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private ScoreInfo getScoreInfo(bool replayAvailable)
         {
-            return new APILegacyScoreInfo
+            return new APIScoreInfo
             {
-                OnlineScoreID = 2553163309,
+                OnlineID = 2553163309,
                 OnlineRulesetID = 0,
                 Replay = replayAvailable,
                 User = new User
