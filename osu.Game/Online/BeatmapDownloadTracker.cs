@@ -31,25 +31,25 @@ namespace osu.Game.Online
         [BackgroundDependencyLoader(true)]
         private void load()
         {
+            if (Manager == null)
+                return;
+
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
             var beatmapSetInfo = new BeatmapSetInfo { OnlineBeatmapSetID = TrackedItem.OnlineID };
 
-            if (Manager?.IsAvailableLocally(beatmapSetInfo) == true)
+            if (Manager.IsAvailableLocally(beatmapSetInfo))
                 UpdateState(DownloadState.LocallyAvailable);
-            else if (Manager != null)
+            else
                 attachDownload(Manager.GetExistingDownload(beatmapSetInfo));
 
-            if (Manager != null)
-            {
-                managerDownloadBegan = Manager.DownloadBegan.GetBoundCopy();
-                managerDownloadBegan.BindValueChanged(downloadBegan);
-                managerDownloadFailed = Manager.DownloadFailed.GetBoundCopy();
-                managerDownloadFailed.BindValueChanged(downloadFailed);
-                managerUpdated = Manager.ItemUpdated.GetBoundCopy();
-                managerUpdated.BindValueChanged(itemUpdated);
-                managerRemoved = Manager.ItemRemoved.GetBoundCopy();
-                managerRemoved.BindValueChanged(itemRemoved);
-            }
+            managerDownloadBegan = Manager.DownloadBegan.GetBoundCopy();
+            managerDownloadBegan.BindValueChanged(downloadBegan);
+            managerDownloadFailed = Manager.DownloadFailed.GetBoundCopy();
+            managerDownloadFailed.BindValueChanged(downloadFailed);
+            managerUpdated = Manager.ItemUpdated.GetBoundCopy();
+            managerUpdated.BindValueChanged(itemUpdated);
+            managerRemoved = Manager.ItemRemoved.GetBoundCopy();
+            managerRemoved.BindValueChanged(itemRemoved);
         }
 
         private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> weakRequest)
