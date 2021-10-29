@@ -61,10 +61,12 @@ namespace osu.Game.Online.API.Requests.Responses
         public Dictionary<string, int> Statistics { get; set; }
 
         [JsonProperty(@"mode_int")]
-        public int OnlineRulesetID { get; set; }
+        public int RulesetID { get; set; }
 
         [JsonProperty(@"mods")]
-        public string[] Mods { get; set; }
+        private string[] mods { set => Mods = value.Select(acronym => new APIMod { Acronym = acronym }); }
+
+        public IEnumerable<APIMod> Mods { get; set; }
 
         [JsonProperty("rank")]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -78,14 +80,14 @@ namespace osu.Game.Online.API.Requests.Responses
         /// <returns></returns>
         public ScoreInfo CreateScoreInfo(RulesetStore rulesets, BeatmapInfo beatmap = null)
         {
-            var ruleset = rulesets.GetRuleset(OnlineRulesetID);
+            var ruleset = rulesets.GetRuleset(RulesetID);
 
             var rulesetInstance = ruleset.CreateInstance();
 
-            var mods = Mods != null ? Mods.Select(acronym => rulesetInstance.CreateModFromAcronym(acronym)).Where(m => m != null).ToArray() : Array.Empty<Mod>();
+            var modInstances = Mods != null ? Mods.Select(apiMod => rulesetInstance.CreateModFromAcronym(apiMod.Acronym)).Where(m => m != null).ToArray() : Array.Empty<Mod>();
 
             // all API scores provided by this class are considered to be legacy.
-            mods = mods.Append(rulesetInstance.CreateMod<ModClassic>()).ToArray();
+            modInstances = modInstances.Append(rulesetInstance.CreateMod<ModClassic>()).ToArray();
 
             var scoreInfo = new ScoreInfo
             {
@@ -96,11 +98,11 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineScoreID = OnlineID,
                 Date = Date,
                 PP = PP,
-                RulesetID = OnlineRulesetID,
+                RulesetID = RulesetID,
                 Hash = Replay ? "online" : string.Empty, // todo: temporary?
                 Rank = Rank,
                 Ruleset = ruleset,
-                Mods = mods,
+                Mods = modInstances,
             };
 
             if (beatmap != null)
@@ -142,7 +144,7 @@ namespace osu.Game.Online.API.Requests.Responses
             return scoreInfo;
         }
 
-        public IRulesetInfo Ruleset => new RulesetInfo { ID = OnlineRulesetID };
+        public IRulesetInfo Ruleset => new RulesetInfo { ID = RulesetID };
 
         IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
     }
