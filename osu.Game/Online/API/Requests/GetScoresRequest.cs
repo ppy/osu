@@ -14,15 +14,15 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetScoresRequest : APIRequest<APIScoresCollection>
     {
-        private readonly BeatmapInfo beatmapInfo;
+        private readonly IBeatmapInfo beatmapInfo;
         private readonly BeatmapLeaderboardScope scope;
-        private readonly RulesetInfo ruleset;
+        private readonly IRulesetInfo ruleset;
         private readonly IEnumerable<IMod> mods;
 
-        public GetScoresRequest(BeatmapInfo beatmapInfo, RulesetInfo ruleset, BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<IMod> mods = null)
+        public GetScoresRequest(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset, BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<IMod> mods = null)
         {
-            if (!beatmapInfo.OnlineBeatmapID.HasValue)
-                throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
+            if (beatmapInfo.OnlineID <= 0)
+                throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(IBeatmapInfo.OnlineID)}.");
 
             if (scope == BeatmapLeaderboardScope.Local)
                 throw new InvalidOperationException("Should not attempt to request online scores for a local scoped leaderboard");
@@ -33,7 +33,7 @@ namespace osu.Game.Online.API.Requests
             this.mods = mods ?? Array.Empty<IMod>();
         }
 
-        protected override string Target => $@"beatmaps/{beatmapInfo.OnlineBeatmapID}/scores{createQueryParameters()}";
+        protected override string Target => $@"beatmaps/{beatmapInfo.OnlineID}/scores{createQueryParameters()}";
 
         private string createQueryParameters()
         {
