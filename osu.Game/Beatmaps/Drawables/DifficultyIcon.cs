@@ -117,7 +117,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
-                    Icon = rulesets.GetRuleset((ruleset ?? beatmapInfo.Ruleset).OnlineID)?.CreateInstance()?.CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }
+                    Icon = getRulesetIcon()
                 },
             };
 
@@ -127,6 +127,16 @@ namespace osu.Game.Beatmaps.Drawables
                 difficultyBindable.Value = new StarDifficulty(beatmapInfo.StarRating, 0);
 
             difficultyBindable.BindValueChanged(difficulty => background.Colour = colours.ForStarDifficulty(difficulty.NewValue.Stars));
+        }
+
+        private Drawable getRulesetIcon()
+        {
+            int? onlineID = (ruleset ?? beatmapInfo.Ruleset)?.OnlineID;
+
+            if (onlineID >= 0 && rulesets.GetRuleset(onlineID.Value)?.CreateInstance() is Ruleset rulesetInstance)
+                return rulesetInstance.CreateIcon();
+
+            return new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
         }
 
         ITooltip<DifficultyIconTooltipContent> IHasCustomTooltip<DifficultyIconTooltipContent>.GetCustomTooltip() => new DifficultyIconTooltip();
