@@ -138,11 +138,7 @@ namespace Mvis.Plugin.CollectionSupport
 
         public void Play(WorkingBeatmap b) => changeBeatmap(b);
 
-        public void NextTrack()
-        {
-            changeBeatmap(getBeatmap(beatmapList, b.Value, true));
-            Logger.Log("NEXT TRACK");
-        }
+        public void NextTrack() => changeBeatmap(getBeatmap(beatmapList, b.Value, true));
 
         public void PrevTrack() =>
             changeBeatmap(getBeatmap(beatmapList, b.Value, true, -1));
