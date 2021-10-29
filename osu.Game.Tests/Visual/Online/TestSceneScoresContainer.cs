@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Scores;
@@ -61,10 +62,10 @@ namespace osu.Game.Tests.Visual.Online
                         },
                         Mods = new[]
                         {
-                            new OsuModDoubleTime().Acronym,
-                            new OsuModHidden().Acronym,
-                            new OsuModFlashlight().Acronym,
-                            new OsuModHardRock().Acronym,
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
+                            new APIMod { Acronym = new OsuModFlashlight().Acronym },
+                            new APIMod { Acronym = new OsuModHardRock().Acronym },
                         },
                         Rank = ScoreRank.XH,
                         PP = 200,
@@ -86,9 +87,9 @@ namespace osu.Game.Tests.Visual.Online
                         },
                         Mods = new[]
                         {
-                            new OsuModDoubleTime().Acronym,
-                            new OsuModHidden().Acronym,
-                            new OsuModFlashlight().Acronym,
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
+                            new APIMod { Acronym = new OsuModFlashlight().Acronym },
                         },
                         Rank = ScoreRank.S,
                         PP = 190,
@@ -110,8 +111,8 @@ namespace osu.Game.Tests.Visual.Online
                         },
                         Mods = new[]
                         {
-                            new OsuModDoubleTime().Acronym,
-                            new OsuModHidden().Acronym,
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
                         },
                         Rank = ScoreRank.B,
                         PP = 180,
@@ -133,7 +134,7 @@ namespace osu.Game.Tests.Visual.Online
                         },
                         Mods = new[]
                         {
-                            new OsuModDoubleTime().Acronym,
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
                         },
                         Rank = ScoreRank.C,
                         PP = 170,
@@ -226,10 +227,10 @@ namespace osu.Game.Tests.Visual.Online
                         },
                         Mods = new[]
                         {
-                            new OsuModDoubleTime().Acronym,
-                            new OsuModHidden().Acronym,
-                            new OsuModFlashlight().Acronym,
-                            new OsuModHardRock().Acronym,
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
+                            new APIMod { Acronym = new OsuModFlashlight().Acronym },
+                            new APIMod { Acronym = new OsuModHardRock().Acronym },
                         },
                         Rank = ScoreRank.XH,
                         PP = 200,
