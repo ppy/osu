@@ -9,7 +9,6 @@ using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
@@ -141,7 +140,5 @@ namespace osu.Game.Online.API.Requests.Responses
         public IRulesetInfo Ruleset => new RulesetInfo { ID = OnlineRulesetID };
 
         IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
-
-        Dictionary<HitResult, int> IScoreInfo.Statistics => new Dictionary<HitResult, int>(); // TODO: implement... maybe. hitresults have weird mappings per ruleset it would seem.
     }
 }
