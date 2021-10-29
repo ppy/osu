@@ -37,12 +37,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 
             double angleBonus = 0.0;
 
-            // 둔각보너스
+            
             if(Previous.Count > 0)
             {
                 OsuDifficultyHitObject osuPast = (OsuDifficultyHitObject)Previous[0];
                 double lastAngle = osuPast.Angle ?? 0;
-                
+
+                // obtuse bonus
                 angleBonus = 0.01 * Math.Max(Math.Sin(angle - angle_bonus_begin), 0);
 
                 // bonus for changing angles frequently
@@ -50,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 
                 angleBonus += angleVariance;
 
-                // bonus for acute bonus at least 150bpm
+                // bonus for acute bonus at least 160bpm
                 if (deltaTimeToBpm >= 160)
                 {
                     // limited to 210bpm
@@ -60,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
                 }
             }
 
-            // short stream nerf
+            // short (stacked) stream nerf
             double distance = osuCurrent.JumpDistance + osuCurrent.TravelDistance;
             double radius = ((OsuHitObject)osuCurrent.BaseObject).Radius * osuCurrent.ScalingFactor;
 

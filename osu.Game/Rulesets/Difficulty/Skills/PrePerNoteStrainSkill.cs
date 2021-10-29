@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             double value = StrainValueOf(preSkills, index, current);
 
+            // if the decaybase is smaller than 0, it meant previous notes does not affect next notes 
             if (StrainDecayBase >= 0.0)
                 currentStrain *= strainDecay(current.DeltaTime);
             else

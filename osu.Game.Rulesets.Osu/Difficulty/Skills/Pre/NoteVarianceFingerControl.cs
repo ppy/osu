@@ -39,8 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             double deltaTimeToBpm = 15000 / current.DeltaTime;
             double probablityAlternative = Math.Max((deltaTimeToBpm - 160.0), 0) / (210.0 - 160.0);
 
-
-            // short stream nerf
+            // short (stacked) stream nerf
             double distance = osuCurrent.JumpDistance + osuCurrent.TravelDistance;
             double radius = ((OsuHitObject)osuCurrent.LastObject).Radius * osuCurrent.ScalingFactor;
 

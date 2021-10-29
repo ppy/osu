@@ -52,8 +52,7 @@ namespace osu.Game.Rulesets.Difficulty
             if (!Beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(Beatmap, playableMods, preSkills, skills, clockRate);
 
-            
-
+            // calculating preSkills before calculating skills
             int index = 0;
             foreach (var hitObject in getDifficultyHitObjects())
             {
@@ -63,6 +62,7 @@ namespace osu.Game.Rulesets.Difficulty
                 index++;
             }
 
+            // calculating skills
             index = 0;
             foreach (var hitObject in getDifficultyHitObjects())
             {
@@ -88,6 +88,7 @@ namespace osu.Game.Rulesets.Difficulty
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
 
+            // calculating preSkills before calculating skills
             int index = 0;
             foreach (var hitObject in getDifficultyHitObjects())
             {
@@ -97,6 +98,7 @@ namespace osu.Game.Rulesets.Difficulty
                 index++;
             }
 
+            // calculating skills
             index = 0;
             foreach (var hitObject in getDifficultyHitObjects())
             {

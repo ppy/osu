@@ -160,6 +160,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (strainTime < min_speed_bonus)
             {
+                //We nerf short fast stream because it is easier to do doubletap.
+                //Although it is not best(ideal) solution, this nerfs some dt farming maps and doubletap maps.
                 double multiplierSpeedBonus = min_doubletap_nerf +
                     Math.Max(Math.Min(distance / (radius * threshold_doubletap_contributing), 1.0), 0.0)
                     * (max_doubletap_nerf - min_doubletap_nerf);

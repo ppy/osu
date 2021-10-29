@@ -79,26 +79,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (lastObject is Slider lastSlider)
             {
-                // 36ms means the border minimum of 100 judgement. 
-                //double sliderTermPrevious = lastSlider.EndTime - lastSlider.StartTime;
-                //if(sliderTermPrevious >= 72)
-                //{
-                //    StrainSliderTime = sliderTermPrevious - 36;
-                //} else
-                //{
-                //    StrainSliderTime = sliderTermPrevious / 2;
-                //}
-
-                //lastSlider.TickDistance;
-
-                //Console.WriteLine(lastSlider.SpanDuration);
-                //Console.WriteLine(lastSlider.)
-                
                 computeSliderCursorPosition(lastSlider);
                 TravelDistance = lastSlider.LazyTravelDistance * ScalingFactor;
-            } else
-            {
-                //StrainSliderTime = 0;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
@@ -117,13 +99,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 Angle = Math.Abs(Math.Atan2(det, dot));
             }
-        }
-
-        private void getSliderTicksWithEnd(Slider slider)
-        {
-            //var list = new List<Vector2>();
-
-
         }
 
         private void computeSliderCursorPosition(Slider slider)

@@ -40,9 +40,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var osuCurrent = (OsuDifficultyHitObject)current;
 
+            // The values 0.4, 0.005, and 1.0 are from sense fit to ideal pp result 
             double angleBonus = preSkills[0].GetAllStrainPeaks()[index] * 0.4;
+
+            // When you put this multiplier higher, this will act like speed bonus.
             double fingerControlBonus = preSkills[2].GetAllStrainPeaks()[index] * 0.005;
 
+            // When two values are both higher, you could get a lot of bonus.
+            // Remark things you want to check other pp result.
             double totalBonus = Math.Pow(
                 (Math.Pow(0.99 + angleBonus, 1.1)) *
                 (Math.Pow(0.99 + fingerControlBonus, 1.1))
@@ -50,10 +55,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
 
             double sliderBonus = 1 + preSkills[1].GetAllStrainPeaks()[index] * 1;
-            //double aimStrain = 0;
 
-            //double result = 0;
-
+            // Remarked because it is replaced to NoteVarianceAngle
             //if (Previous.Count > 0)
             //{
             //    var osuPrevious = (OsuDifficultyHitObject)Previous[0];
@@ -71,21 +74,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             //}
 
             double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
+            // multiplying sliderBonus
             double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance) * sliderBonus;
-            //double travelDistanceExp = 0;
-            //if (osuCurrent.LastObject is Slider OsuSlider)
-            //{
-            //    travelDistanceExp = applyDiminishingExp(calculateTravelDistanceNewer(OsuSlider) * osuCurrent.ScalingFactor) * sliderBonus;
-            //}
 
-            // 320ms means almost 180bpm(90bpm) jump.
-            // as a result, Slower jumps are buffed slightly.
-
-            //double aimValue = bothCalculate(jumpDistanceExp, travelDistanceExp, osuCurrent.StrainCircleTime, osuCurrent.StrainSliderTime);
-            //double aimSubValue = bothCalculate(jumpDistanceExp, travelDistanceExp, 320, 0);
             double distanceExp = jumpDistanceExp + travelDistanceExp + Math.Sqrt(jumpDistanceExp * travelDistanceExp);
 
-            //return aimValue;
+            // 320ms means almost 180bpm(90bpm) jump.
+            // As a result, Slower jumps are buffed slightly.
             return
                 totalBonus *
                 (calculateAimValue(0, distanceExp, osuCurrent.StrainTime) * 0.9 +
@@ -100,6 +95,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             );
         }
 
+        /// Testing newer travel distance calculation
+        /// It is not used
         private float calculateTravelDistanceNewer(Slider OsuSlider)
         {
             var currentTimingPoint = beatmap.ControlPointInfo.TimingPointAt(OsuSlider.StartTime);

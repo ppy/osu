@@ -107,6 +107,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Attributes.MaxCombo > 0)
                 aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
+            // only DT mods could get this high AR bonus.
+            // so this makes farm DT easier. 
+            // We nerf this to farm HR easier, DT harder.
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
                 approachRateFactor = (Attributes.ApproachRate - 10.33) / 2; // nerf high AR
@@ -152,9 +155,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Attributes.MaxCombo > 0)
                 speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
+            // Only DT mods could get this high AR bonus.
+            // So this makes farm DT easier. 
+            // We nerf this to farm HR easier, DT harder.
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor = (Attributes.ApproachRate - 10.33) / 2; // nerf high AR
+                approachRateFactor = (Attributes.ApproachRate - 10.33) / 2; 
 
             double approachRateTotalHitsFactor = 1.0 / (1.0 + Math.Exp(-(0.007 * (totalHits - 400))));
 
