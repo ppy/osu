@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Ranking
                 return null;
 
             getScoreRequest = new GetScoresRequest(Score.BeatmapInfo, Score.Ruleset);
-            getScoreRequest.Success += r => scoresCallback?.Invoke(r.Scores.Where(s => s.OnlineScoreID != Score.OnlineScoreID).Select(s => s.CreateScoreInfo(rulesets)));
+            getScoreRequest.Success += r => scoresCallback?.Invoke(r.Scores.Where(s => s.OnlineID != Score.OnlineScoreID).Select(s => s.CreateScoreInfo(rulesets, Beatmap.Value.BeatmapInfo)));
             return getScoreRequest;
         }
 
