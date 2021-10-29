@@ -32,12 +32,12 @@ namespace osu.Game.Online
         private void load()
         {
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
-            var beatmapSetInfo = new ScoreInfo { OnlineScoreID = TrackedItem.OnlineScoreID };
+            var scoreInfo = new ScoreInfo { OnlineScoreID = TrackedItem.OnlineScoreID };
 
-            if (TrackedItem.ID > 0 || Manager?.IsAvailableLocally(beatmapSetInfo) == true)
+            if (TrackedItem.ID > 0 || Manager?.IsAvailableLocally(scoreInfo) == true)
                 UpdateState(DownloadState.LocallyAvailable);
             else if (Manager != null)
-                attachDownload(Manager.GetExistingDownload(beatmapSetInfo));
+                attachDownload(Manager.GetExistingDownload(scoreInfo));
 
             if (Manager != null)
             {
