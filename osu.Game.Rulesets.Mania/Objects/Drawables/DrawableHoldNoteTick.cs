@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Time.Current < HitObject.StartTime)
                 return;
 
-            var startTime = holdStartTime?.Invoke();
+            double? startTime = holdStartTime?.Invoke();
 
             if (startTime == null || startTime > HitObject.StartTime)
                 ApplyResult(r => r.Type = r.Judgement.MinResult);

@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             var newEntry = new FollowPointLifetimeEntry(hitObject);
 
-            var index = lifetimeEntries.AddInPlace(newEntry, Comparer<FollowPointLifetimeEntry>.Create((e1, e2) =>
+            int index = lifetimeEntries.AddInPlace(newEntry, Comparer<FollowPointLifetimeEntry>.Create((e1, e2) =>
             {
                 int comp = e1.Start.StartTime.CompareTo(e2.Start.StartTime);
 

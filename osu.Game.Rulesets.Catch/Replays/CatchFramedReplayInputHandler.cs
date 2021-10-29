@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Replays
 
         public override void CollectPendingInputs(List<IInput> inputs)
         {
-            var position = Interpolation.ValueAt(CurrentTime, StartFrame.Position, EndFrame.Position, StartFrame.Time, EndFrame.Time);
+            float position = Interpolation.ValueAt(CurrentTime, StartFrame.Position, EndFrame.Position, StartFrame.Time, EndFrame.Time);
 
             inputs.Add(new CatchReplayState
             {

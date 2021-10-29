@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     return;
                 }
 
-                beatmapCover.BeatmapSet = value;
+                beatmapCover.OnlineInfo = value.OnlineInfo;
                 beatmapCover.FadeTo(0.1f, 200, Easing.OutQuint);
             }
         }

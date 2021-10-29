@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 base.LoadComplete();
 
                 var firstObj = beatmap.HitObjects[0];
-                var startDelay = firstObj.StartTime - firstObj.TimePreempt;
+                double startDelay = firstObj.StartTime - firstObj.TimePreempt;
 
                 using (BeginAbsoluteSequence(startDelay + break_close_late))
                     leaveBreak();

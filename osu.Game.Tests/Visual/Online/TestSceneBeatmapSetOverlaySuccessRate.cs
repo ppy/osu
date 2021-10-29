@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Screens.Select.Details;
@@ -59,17 +60,20 @@ namespace osu.Game.Tests.Visual.Online
             var secondBeatmap = createBeatmap();
 
             AddStep("set first set", () => successRate.BeatmapInfo = firstBeatmap);
-            AddAssert("ratings set", () => successRate.Graph.Metrics == firstBeatmap.Metrics);
+            AddAssert("ratings set", () => successRate.Graph.FailTimes == firstBeatmap.FailTimes);
 
             AddStep("set second set", () => successRate.BeatmapInfo = secondBeatmap);
-            AddAssert("ratings set", () => successRate.Graph.Metrics == secondBeatmap.Metrics);
+            AddAssert("ratings set", () => successRate.Graph.FailTimes == secondBeatmap.FailTimes);
 
             static BeatmapInfo createBeatmap() => new BeatmapInfo
             {
-                Metrics = new BeatmapMetrics
+                OnlineInfo = new APIBeatmap
                 {
-                    Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
-                    Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
+                    FailTimes = new APIFailTimes
+                    {
+                        Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
+                        Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
+                    }
                 }
             };
         }
@@ -79,13 +83,16 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set beatmap", () => successRate.BeatmapInfo = new BeatmapInfo
             {
-                Metrics = new BeatmapMetrics
+                OnlineInfo = new APIBeatmap
                 {
-                    Fails = Enumerable.Range(1, 100).ToArray(),
+                    FailTimes = new APIFailTimes
+                    {
+                        Fails = Enumerable.Range(1, 100).ToArray(),
+                    }
                 }
             });
-            AddAssert("graph max values correct",
-                () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 100));
+
+            AddAssert("graph max values correct", () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 100));
         }
 
         [Test]
@@ -93,11 +100,13 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set beatmap", () => successRate.BeatmapInfo = new BeatmapInfo
             {
-                Metrics = new BeatmapMetrics()
+                OnlineInfo = new APIBeatmap
+                {
+                    FailTimes = new APIFailTimes(),
+                }
             });
 
-            AddAssert("graph max values correct",
-                () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 0));
+            AddAssert("graph max values correct", () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 0));
         }
 
         private class GraphExposingSuccessRate : SuccessRate

@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = cover_width,
-                    BeatmapSet = mostPlayed.BeatmapSet,
+                    OnlineInfo = mostPlayed.BeatmapSet,
                 },
                 new Container
                 {

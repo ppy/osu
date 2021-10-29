@@ -32,7 +32,7 @@ namespace osu.Game.IO
             if (lineBuffer.Count > 0)
                 return lineBuffer.Peek();
 
-            var line = streamReader.ReadLine();
+            string line = streamReader.ReadLine();
             if (line != null)
                 lineBuffer.Enqueue(line);
             return line;
@@ -50,7 +50,7 @@ namespace osu.Game.IO
         /// </summary>
         public string ReadToEnd()
         {
-            var remainingText = streamReader.ReadToEnd();
+            string remainingText = streamReader.ReadToEnd();
             if (lineBuffer.Count == 0)
                 return remainingText;
 

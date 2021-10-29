@@ -49,7 +49,7 @@ namespace osu.Game.Overlays
 
             Progress.ValueChanged += p =>
             {
-                var target = p.NewValue * finalFillAlpha;
+                double target = p.NewValue * finalFillAlpha;
 
                 audioVolume.Value = 1 - target;
                 overlay.Alpha = (float)target;

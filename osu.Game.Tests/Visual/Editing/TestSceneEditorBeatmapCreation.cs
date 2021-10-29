@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 var setup = Editor.ChildrenOfType<SetupScreen>().First();
 
-                var temp = TestResources.GetTestBeatmapForImport();
+                string temp = TestResources.GetTestBeatmapForImport();
 
                 string extractedFolder = $"{temp}_extracted";
                 Directory.CreateDirectory(extractedFolder);

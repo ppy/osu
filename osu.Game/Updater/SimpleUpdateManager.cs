@@ -45,7 +45,7 @@ namespace osu.Game.Updater
                 // avoid any discrepancies due to build suffixes for now.
                 // eventually we will want to support release streams and consider these.
                 version = version.Split('-').First();
-                var latestTagName = latest.TagName.Split('-').First();
+                string latestTagName = latest.TagName.Split('-').First();
 
                 if (latestTagName != version)
                 {

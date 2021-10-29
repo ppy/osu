@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual
 
             void updateSizing()
             {
-                var autoSize = created.RelativeSizeAxes == Axes.None;
+                bool autoSize = created.RelativeSizeAxes == Axes.None;
 
                 foreach (var c in new[] { mainProvider, childContainer, skinProvider })
                 {
@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Visual
                 {
                     var match = Regex.Match(componentName, "-([0-9]*)");
 
-                    if (match.Length > 0 && int.TryParse(match.Groups[1].Value, out var number) && number < 60)
+                    if (match.Length > 0 && int.TryParse(match.Groups[1].Value, out int number) && number < 60)
                         return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"), wrapModeS, wrapModeT);
                 }
 

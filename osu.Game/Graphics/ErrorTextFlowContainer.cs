@@ -28,7 +28,7 @@ namespace osu.Game.Graphics
 
             if (errors == null) return;
 
-            foreach (var error in errors)
+            foreach (string error in errors)
                 errorDrawables.AddRange(AddParagraph(error, cp => cp.Colour = Color4.Red));
         }
     }

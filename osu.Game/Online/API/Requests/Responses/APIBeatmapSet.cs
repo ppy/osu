@@ -58,8 +58,8 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"last_updated")]
         public DateTimeOffset? LastUpdated { get; set; }
 
-        [JsonProperty(@"ratings")]
-        private int[] ratings { get; set; } = Array.Empty<int>();
+        [JsonProperty("ratings")]
+        public int[] Ratings { get; set; } = Array.Empty<int>();
 
         [JsonProperty(@"track_id")]
         public int? TrackId { get; set; }
@@ -119,7 +119,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public string Tags { get; set; } = string.Empty;
 
         [JsonProperty(@"beatmaps")]
-        private IEnumerable<APIBeatmap> beatmaps { get; set; } = Array.Empty<APIBeatmap>();
+        public IEnumerable<APIBeatmap> Beatmaps { get; set; } = Array.Empty<APIBeatmap>();
 
         public virtual BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
         {
@@ -128,11 +128,10 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineBeatmapSetID = OnlineID,
                 Metadata = metadata,
                 Status = Status,
-                Metrics = new BeatmapSetMetrics { Ratings = ratings },
                 OnlineInfo = this
             };
 
-            beatmapSet.Beatmaps = beatmaps.Select(b =>
+            beatmapSet.Beatmaps = Beatmaps.Select(b =>
             {
                 var beatmap = b.ToBeatmapInfo(rulesets);
                 beatmap.BeatmapSet = beatmapSet;
@@ -157,7 +156,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         #region Implementation of IBeatmapSetInfo
 
-        IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => beatmaps;
+        IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
 
         IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => metadata;
 
@@ -165,7 +164,7 @@ namespace osu.Game.Online.API.Requests.Responses
         IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxStarDifficulty => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxLength => throw new NotImplementedException();
-        double IBeatmapSetInfo.MaxBPM => throw new NotImplementedException();
+        double IBeatmapSetInfo.MaxBPM => BPM;
 
         #endregion
     }

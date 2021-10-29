@@ -18,10 +18,10 @@ namespace osu.Game.Rulesets.Objects
             // This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
             const double max_length = 100000;
 
-            var length = Math.Min(max_length, totalDistance);
+            double length = Math.Min(max_length, totalDistance);
             tickDistance = Math.Clamp(tickDistance, 0, length);
 
-            var minDistanceFromEnd = velocity * 10;
+            double minDistanceFromEnd = velocity * 10;
 
             yield return new SliderEventDescriptor
             {
@@ -34,10 +34,10 @@ namespace osu.Game.Rulesets.Objects
 
             if (tickDistance != 0)
             {
-                for (var span = 0; span < spanCount; span++)
+                for (int span = 0; span < spanCount; span++)
                 {
-                    var spanStartTime = startTime + span * spanDuration;
-                    var reversed = span % 2 == 1;
+                    double spanStartTime = startTime + span * spanDuration;
+                    bool reversed = span % 2 == 1;
 
                     var ticks = generateTicks(span, spanStartTime, spanDuration, reversed, length, tickDistance, minDistanceFromEnd, cancellationToken);
 
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Objects
         private static IEnumerable<SliderEventDescriptor> generateTicks(int spanIndex, double spanStartTime, double spanDuration, bool reversed, double length, double tickDistance,
                                                                         double minDistanceFromEnd, CancellationToken cancellationToken = default)
         {
-            for (var d = tickDistance; d <= length; d += tickDistance)
+            for (double d = tickDistance; d <= length; d += tickDistance)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -123,8 +123,8 @@ namespace osu.Game.Rulesets.Objects
                     break;
 
                 // Always generate ticks from the start of the path rather than the span to ensure that ticks in repeat spans are positioned identically to those in non-repeat spans
-                var pathProgress = d / length;
-                var timeProgress = reversed ? 1 - pathProgress : pathProgress;
+                double pathProgress = d / length;
+                double timeProgress = reversed ? 1 - pathProgress : pathProgress;
 
                 yield return new SliderEventDescriptor
                 {
