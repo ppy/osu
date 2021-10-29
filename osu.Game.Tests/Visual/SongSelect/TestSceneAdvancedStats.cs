@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance();
                 var difficultyAdjustMod = ruleset.CreateMod<ModDifficultyAdjust>();
-                difficultyAdjustMod.ReadFromDifficulty(advancedStats.BeatmapInfo.BaseDifficulty);
+                difficultyAdjustMod.ReadFromDifficulty(advancedStats.BeatmapInfo.Difficulty);
                 SelectedMods.Value = new[] { difficultyAdjustMod };
             });
 
@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance();
                 var difficultyAdjustMod = ruleset.CreateMod<OsuModDifficultyAdjust>();
-                var originalDifficulty = advancedStats.BeatmapInfo.BaseDifficulty;
+                var originalDifficulty = advancedStats.BeatmapInfo.Difficulty;
 
                 difficultyAdjustMod.ReadFromDifficulty(originalDifficulty);
                 difficultyAdjustMod.DrainRate.Value = originalDifficulty.DrainRate - 0.5f;
