@@ -623,11 +623,16 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(APIRoom != null);
 
                 int index = APIRoom.Playlist.Select((i, index) => (i, index)).Single(kvp => kvp.i.ID == item.ID).index;
+                var oldItem = APIRoom.Playlist[index];
+                if (oldItem.Equals(playlistItem))
+                    return;
+
+                // Replace the item.
                 APIRoom.Playlist.RemoveAt(index);
                 APIRoom.Playlist.Insert(index, playlistItem);
 
-                // If the current item changed, update the selected playlist item.
-                if (item.ID == Room.Settings.PlaylistItemId)
+                // If the currently-selected item was the one that got replaced, update the selected item to the new one.
+                if (CurrentMatchPlayingItem.Value == oldItem)
                     CurrentMatchPlayingItem.Value = APIRoom.Playlist[index];
             }).ConfigureAwait(false);
         }

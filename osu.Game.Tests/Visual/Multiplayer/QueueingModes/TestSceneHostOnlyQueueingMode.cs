@@ -17,9 +17,19 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
         protected override QueueModes Mode => QueueModes.HostOnly;
 
         [Test]
-        public void TestItemStillSelectedAfterChange()
+        public void TestItemStillSelectedAfterChangeToSameBeatmap()
+        {
+            selectNewItem(() => InitialBeatmap);
+
+            AddAssert("playlist item still selected", () => Client.CurrentMatchPlayingItem.Value == Client.APIRoom?.Playlist[0]);
+        }
+
+        [Test]
+        public void TestItemStillSelectedAfterChangeToOtherBeatmap()
         {
             selectNewItem(() => OtherBeatmap);
+
+            AddAssert("playlist item still selected", () => Client.CurrentMatchPlayingItem.Value == Client.APIRoom?.Playlist[0]);
         }
 
         [Test]
@@ -57,9 +67,11 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
 
             AddUntilStep("wait for song select", () => CurrentSubScreen is Screens.Select.SongSelect select && select.IsLoaded);
 
-            AddStep("select other beatmap", () => ((Screens.Select.SongSelect)CurrentSubScreen).FinaliseSelection(beatmap()));
+            BeatmapInfo otherBeatmap = null;
+            AddStep("select other beatmap", () => ((Screens.Select.SongSelect)CurrentSubScreen).FinaliseSelection(otherBeatmap = beatmap()));
+
             AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
-            AddUntilStep("selected item is new beatmap", () => Client.CurrentMatchPlayingItem.Value?.Beatmap.Value?.OnlineID == OtherBeatmap.OnlineID);
+            AddUntilStep("selected item is new beatmap", () => Client.CurrentMatchPlayingItem.Value?.Beatmap.Value?.OnlineID == otherBeatmap.OnlineID);
         }
     }
 }
