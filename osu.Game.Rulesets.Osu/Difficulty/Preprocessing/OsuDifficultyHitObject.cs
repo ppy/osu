@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double TravelDistance { get; private set; }
 
+        public float ScalingFactor { get; private set; }
+
         /// <summary>
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
         /// Calculated as the angle between the circles (current-2, current-1, current).
@@ -59,23 +61,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 return;
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
-            float scalingFactor = normalized_radius / (float)BaseObject.Radius;
+            ScalingFactor = normalized_radius / (float)BaseObject.Radius;
 
             if (BaseObject.Radius < 30)
             {
                 float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
-                scalingFactor *= 1 + smallCircleBonus;
+                ScalingFactor *= 1 + smallCircleBonus;
             }
 
             if (lastObject is Slider lastSlider)
             {
                 computeSliderCursorPosition(lastSlider);
-                TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
+                TravelDistance = lastSlider.LazyTravelDistance * ScalingFactor;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
-            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            JumpDistance = (BaseObject.StackedPosition * ScalingFactor - lastCursorPosition * ScalingFactor).Length;
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
             {
