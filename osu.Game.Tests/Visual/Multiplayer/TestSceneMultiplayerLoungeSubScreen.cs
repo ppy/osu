@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerLoungeSubScreen : OnlinePlayTestScene
     {
-        protected new TestRequestHandlingRoomManager RoomManager => (TestRequestHandlingRoomManager)base.RoomManager;
+        protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
         private LoungeSubScreen loungeScreen;
 

@@ -243,6 +243,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
             statusContainer.Add(new BeatmapSetOnlineStatusPill
             {
+                AutoSizeAxes = Axes.Both,
                 TextSize = 12,
                 TextPadding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,

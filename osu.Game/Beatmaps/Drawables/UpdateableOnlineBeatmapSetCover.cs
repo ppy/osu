@@ -9,11 +9,11 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class UpdateableBeatmapSetCover : ModelBackedDrawable<BeatmapSetInfo>
+    public class UpdateableOnlineBeatmapSetCover : ModelBackedDrawable<IBeatmapSetOnlineInfo>
     {
         private readonly BeatmapSetCoverType coverType;
 
-        public BeatmapSetInfo BeatmapSet
+        public IBeatmapSetOnlineInfo OnlineInfo
         {
             get => Model;
             set => Model = value;
@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps.Drawables
             set => base.Masking = value;
         }
 
-        public UpdateableBeatmapSetCover(BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover)
+        public UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover)
         {
             this.coverType = coverType;
 
@@ -43,12 +43,12 @@ namespace osu.Game.Beatmaps.Drawables
         protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
             => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad);
 
-        protected override Drawable CreateDrawable(BeatmapSetInfo model)
+        protected override Drawable CreateDrawable(IBeatmapSetOnlineInfo model)
         {
             if (model == null)
                 return null;
 
-            return new BeatmapSetCover(model, coverType)
+            return new OnlineBeatmapSetCover(model, coverType)
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,

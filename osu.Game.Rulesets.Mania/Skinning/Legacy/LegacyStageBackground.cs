@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 float rightLineWidth = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.RightLineWidth, columnIndex)?.Value ?? 1;
 
                 bool hasLeftLine = leftLineWidth > 0;
-                bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
+                bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
                                     || isLastColumn;
 
                 Color4 lineColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnLineColour, columnIndex)?.Value ?? Color4.White;

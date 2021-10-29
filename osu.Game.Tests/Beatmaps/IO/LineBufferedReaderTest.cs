@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 Assert.AreEqual("this line is gone", bufferedReader.ReadLine());
                 Assert.AreEqual("this one shouldn't be", bufferedReader.PeekLine());
 
-                var endingLines = bufferedReader.ReadToEnd().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] endingLines = bufferedReader.ReadToEnd().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 Assert.AreEqual(3, endingLines.Length);
                 Assert.AreEqual("this one shouldn't be", endingLines[0]);
                 Assert.AreEqual("these ones", endingLines[1]);

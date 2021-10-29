@@ -187,7 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             // Todo: FIX THIS
             var ruleset = rulesets.GetRuleset(0).CreateInstance();
 
-            var currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank;
+            int? currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank;
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);

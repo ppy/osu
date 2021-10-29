@@ -237,7 +237,7 @@ namespace osu.Game.Tournament
             {
                 Type = type;
                 BackgroundColour = OsuColour.Gray(0.2f);
-                Action = () => RequestSelection(type);
+                Action = () => RequestSelection?.Invoke(type);
 
                 RelativeSizeAxes = Axes.X;
             }

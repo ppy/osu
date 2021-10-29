@@ -31,7 +31,7 @@ namespace osu.Game.Tournament.Screens.Setup
                     return;
 
                 // box contains text
-                if (!int.TryParse(numberBox.Text, out var number))
+                if (!int.TryParse(numberBox.Text, out int number))
                 {
                     // at this point, the only reason we can arrive here is if the input number was too big to parse into an int
                     // so clamp to max allowed value

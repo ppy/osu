@@ -160,12 +160,12 @@ namespace osu.Game.Configuration
         public void Migrate()
         {
             // arrives as 2020.123.0
-            var rawVersion = Get<string>(OsuSetting.Version);
+            string rawVersion = Get<string>(OsuSetting.Version);
 
             if (rawVersion.Length < 6)
                 return;
 
-            var pieces = rawVersion.Split('.');
+            string[] pieces = rawVersion.Split('.');
 
             // on a fresh install or when coming from a non-release build, execution will end here.
             // we don't want to run migrations in such cases.
@@ -218,7 +218,9 @@ namespace osu.Game.Configuration
                         rawValue: skinName,
                         name: SkinSettingsStrings.SkinSectionHeader,
                         value: skinName,
-                        shortcut: $"{GlobalActionKeyBindingStrings.RandomSkin}: {LookupKeyBindings(GlobalAction.RandomSkin)}"
+                        shortcut: new TranslatableString(@"_", @"{0}: {1}",
+                            GlobalActionKeyBindingStrings.RandomSkin,
+                            LookupKeyBindings(GlobalAction.RandomSkin))
                     );
                 }),
                 new TrackedSetting<float>(OsuSetting.UIScale, scale => new SettingDescription(
