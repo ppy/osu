@@ -282,7 +282,7 @@ namespace osu.Game.Screens.OnlinePlay
             return true;
         }
 
-        private class PlaylistDownloadButton : BeatmapPanelDownloadButton
+        private sealed class PlaylistDownloadButton : BeatmapPanelDownloadButton
         {
             private readonly PlaylistItem playlistItem;
 
@@ -302,6 +302,8 @@ namespace osu.Game.Screens.OnlinePlay
             protected override void LoadComplete()
             {
                 State.BindValueChanged(stateChanged, true);
+
+                // base implementation calls FinishTransforms, so should be run after the above state update.
                 base.LoadComplete();
             }
 
