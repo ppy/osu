@@ -35,7 +35,6 @@ namespace osu.Game.Skinning
             : base(skin, resources)
         {
             this.resources = resources;
-            Configuration = new DefaultSkinConfiguration();
         }
 
         public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
