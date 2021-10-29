@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Edit
             if (toAdd.Count > 0)
             {
                 IBeatmap newBeatmap = readBeatmap(newState);
-                foreach (var i in toAdd)
+                foreach (int i in toAdd)
                     editorBeatmap.Insert(i, newBeatmap.HitObjects[i]);
             }
 

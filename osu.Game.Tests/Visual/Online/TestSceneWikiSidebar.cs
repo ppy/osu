@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Add TOC", () =>
             {
-                for (var i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++)
                     addTitle($"This is a very long title {i + 1}");
             });
         }
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Add TOC", () =>
             {
-                for (var i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++)
                     addTitle($"This is a very long title {i + 1}", i % 4 != 0);
             });
         }

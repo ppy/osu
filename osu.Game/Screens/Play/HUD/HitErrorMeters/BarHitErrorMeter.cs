@@ -157,11 +157,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             // max to avoid div-by-zero.
             maxHitWindow = Math.Max(1, windows.First().length);
 
-            for (var i = 0; i < windows.Length; i++)
+            for (int i = 0; i < windows.Length; i++)
             {
-                var (result, length) = windows[i];
+                (var result, double length) = windows[i];
 
-                var hitWindow = (float)(length / maxHitWindow);
+                float hitWindow = (float)(length / maxHitWindow);
 
                 colourBarsEarly.Add(createColourBar(result, hitWindow, i == 0));
                 colourBarsLate.Add(createColourBar(result, hitWindow, i == 0));

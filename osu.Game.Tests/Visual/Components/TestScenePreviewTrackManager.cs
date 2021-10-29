@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.Components
 
             public new PreviewTrack CurrentTrack => base.CurrentTrack;
 
-            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
+            protected override TrackManagerPreviewTrack CreatePreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
 
             public override bool UpdateSubTree()
             {
@@ -240,7 +240,7 @@ namespace osu.Game.Tests.Visual.Components
 
                 public new Track Track => base.Track;
 
-                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
+                public TestPreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
                     : base(beatmapSetInfo, trackManager)
                 {
                     this.trackManager = trackManager;

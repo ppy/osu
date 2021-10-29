@@ -14,7 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
-    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo, IBeatmapSetOnlineInfo
+    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
     {
         public int ID { get; set; }
 
@@ -35,11 +35,9 @@ namespace osu.Game.Beatmaps
         [NotNull]
         public List<BeatmapSetFileInfo> Files { get; set; } = new List<BeatmapSetFileInfo>();
 
+        // This field is temporary and only used by `APIBeatmapSet.ToBeatmapSet` (soon to be removed) and tests (to be updated to provide APIBeatmapSet instead).
         [NotMapped]
         public APIBeatmapSet OnlineInfo { get; set; }
-
-        [NotMapped]
-        public BeatmapSetMetrics Metrics { get; set; }
 
         /// <summary>
         /// The maximum star difficulty of all beatmaps in this set.
@@ -171,6 +169,10 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         [JsonIgnore]
         public int? TrackId => OnlineInfo?.TrackId;
+
+        [NotMapped]
+        [JsonIgnore]
+        public int[] Ratings => OnlineInfo?.Ratings;
 
         #endregion
     }
