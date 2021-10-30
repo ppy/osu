@@ -61,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             {
                 var beatmap = playlistItem?.Beatmap.Value;
 
-                if (background?.BeatmapInfo?.BeatmapSet?.OnlineInfo?.Covers?.Cover == beatmap?.BeatmapSet?.OnlineInfo?.Covers?.Cover)
+                if (background?.BeatmapInfo?.BeatmapSet?.OnlineInfo?.Covers.Cover == beatmap?.BeatmapSet?.OnlineInfo?.Covers.Cover)
                     return;
 
                 cancellationSource?.Cancel();
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         public override bool OnExiting(IScreen next)
         {
-            var result = base.OnExiting(next);
+            bool result = base.OnExiting(next);
             this.MoveToX(0);
             return result;
         }

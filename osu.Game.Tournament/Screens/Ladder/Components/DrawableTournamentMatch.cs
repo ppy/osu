@@ -208,7 +208,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             if (Match.Round.Value == null) return;
 
-            var instaWinAmount = Match.Round.Value.BestOf.Value / 2;
+            int instaWinAmount = Match.Round.Value.BestOf.Value / 2;
 
             Match.Completed.Value = Match.Round.Value.BestOf.Value > 0
                                     && (Match.Team1Score.Value + Match.Team2Score.Value >= Match.Round.Value.BestOf.Value || Match.Team1Score.Value > instaWinAmount || Match.Team2Score.Value > instaWinAmount);
@@ -243,8 +243,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 foreach (var conditional in Match.ConditionalMatches)
                 {
-                    var team1Match = conditional.Acronyms.Contains(Match.Team1Acronym);
-                    var team2Match = conditional.Acronyms.Contains(Match.Team2Acronym);
+                    bool team1Match = conditional.Acronyms.Contains(Match.Team1Acronym);
+                    bool team2Match = conditional.Acronyms.Contains(Match.Team2Acronym);
 
                     if (team1Match && team2Match)
                         Match.Date.Value = conditional.Date.Value;

@@ -291,7 +291,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<EpilepsyWarning>().Any() == warning);
+            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => (getWarning() != null) == warning);
 
             if (warning)
             {
@@ -335,11 +335,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddUntilStep("wait for epilepsy warning", () => loader.ChildrenOfType<EpilepsyWarning>().Single().Alpha > 0);
+            AddUntilStep("wait for epilepsy warning", () => getWarning().Alpha > 0);
+            AddUntilStep("warning is shown", () => getWarning().State.Value == Visibility.Visible);
+
             AddStep("exit early", () => loader.Exit());
 
+            AddUntilStep("warning is hidden", () => getWarning().State.Value == Visibility.Hidden);
             AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
         }
+
+        private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();
 
         private class TestPlayerLoader : PlayerLoader
         {

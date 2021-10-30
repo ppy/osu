@@ -18,7 +18,8 @@ namespace osu.Game.Models
         [PrimaryKey]
         public string ShortName { get; set; } = string.Empty;
 
-        public int? OnlineID { get; set; }
+        [Indexed]
+        public int OnlineID { get; set; } = -1;
 
         public string Name { get; set; } = string.Empty;
 
@@ -29,7 +30,7 @@ namespace osu.Game.Models
             ShortName = shortName;
             Name = name;
             InstantiationInfo = instantiationInfo;
-            OnlineID = onlineID;
+            OnlineID = onlineID ?? -1;
         }
 
         [UsedImplicitly]
@@ -39,7 +40,7 @@ namespace osu.Game.Models
 
         public RealmRuleset(int? onlineID, string name, string shortName, bool available)
         {
-            OnlineID = onlineID;
+            OnlineID = onlineID ?? -1;
             Name = name;
             ShortName = shortName;
             Available = available;

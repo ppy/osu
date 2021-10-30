@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
@@ -35,7 +36,7 @@ namespace osu.Game.Screens.Play
 
         private Container filters;
 
-        private Box failFlash;
+        private Box redFlashLayer;
 
         private Track track;
 
@@ -45,6 +46,9 @@ namespace osu.Game.Screens.Play
         private const float duration = 2500;
 
         private Sample failSample;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         protected override Container<Drawable> Content { get; } = new Container
         {
@@ -77,7 +81,7 @@ namespace osu.Game.Screens.Play
                     },
                 },
                 Content,
-                failFlash = new Box
+                redFlashLayer = new Box
                 {
                     Colour = Color4.Red,
                     RelativeSizeAxes = Axes.Both,
@@ -102,6 +106,7 @@ namespace osu.Game.Screens.Play
 
             this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
             {
+                RemoveFilters();
                 OnComplete?.Invoke();
             });
 
@@ -114,7 +119,8 @@ namespace osu.Game.Screens.Play
             applyToPlayfield(drawableRuleset.Playfield);
             drawableRuleset.Playfield.HitObjectContainer.FadeOut(duration / 2);
 
-            failFlash.FadeOutFromOne(1000);
+            if (config.Get<bool>(OsuSetting.FadePlayfieldWhenHealthLow))
+                redFlashLayer.FadeOutFromOne(1000);
 
             Content.Masking = true;
 
@@ -132,6 +138,9 @@ namespace osu.Game.Screens.Play
 
         public void RemoveFilters()
         {
+            if (filters.Parent == null)
+                return;
+
             RemoveInternal(filters);
             filters.Dispose();
 

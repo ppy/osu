@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     { PLAYER_2_ID, new ManualClock() }
                 };
 
-                foreach (var (userId, _) in clocks)
+                foreach ((int userId, var _) in clocks)
                 {
                     SpectatorClient.StartPlay(userId, 0);
                     OnlinePlayDependencies.Client.AddUser(new User { Id = userId });
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("add clock sources", () =>
             {
-                foreach (var (userId, clock) in clocks)
+                foreach ((int userId, var clock) in clocks)
                     leaderboard.AddClock(userId, clock);
             });
         }

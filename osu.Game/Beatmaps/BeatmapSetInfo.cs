@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Beatmaps
 {
@@ -26,8 +28,6 @@ namespace osu.Game.Beatmaps
 
         public DateTimeOffset DateAdded { get; set; }
 
-        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
-
         public BeatmapMetadata Metadata { get; set; }
 
         public List<BeatmapInfo> Beatmaps { get; set; }
@@ -35,11 +35,9 @@ namespace osu.Game.Beatmaps
         [NotNull]
         public List<BeatmapSetFileInfo> Files { get; set; } = new List<BeatmapSetFileInfo>();
 
+        // This field is temporary and only used by `APIBeatmapSet.ToBeatmapSet` (soon to be removed) and tests (to be updated to provide APIBeatmapSet instead).
         [NotMapped]
-        public BeatmapSetOnlineInfo OnlineInfo { get; set; }
-
-        [NotMapped]
-        public BeatmapSetMetrics Metrics { get; set; }
+        public APIBeatmapSet OnlineInfo { get; set; }
 
         /// <summary>
         /// The maximum star difficulty of all beatmaps in this set.
@@ -91,7 +89,7 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IHasOnlineID
 
-        public int? OnlineID => OnlineBeatmapSetID;
+        public int OnlineID => OnlineBeatmapSetID ?? -1;
 
         #endregion
 
@@ -100,6 +98,81 @@ namespace osu.Game.Beatmaps
         IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata;
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
         IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
+
+        #endregion
+
+        #region Delegation for IBeatmapSetOnlineInfo
+
+        [NotMapped]
+        [JsonIgnore]
+        public DateTimeOffset Submitted => OnlineInfo.Submitted;
+
+        [NotMapped]
+        [JsonIgnore]
+        public DateTimeOffset? Ranked => OnlineInfo.Ranked;
+
+        [NotMapped]
+        [JsonIgnore]
+        public DateTimeOffset? LastUpdated => OnlineInfo.LastUpdated;
+
+        [JsonIgnore]
+        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool HasExplicitContent => OnlineInfo.HasExplicitContent;
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool HasVideo => OnlineInfo.HasVideo;
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool HasStoryboard => OnlineInfo.HasStoryboard;
+
+        [NotMapped]
+        [JsonIgnore]
+        public BeatmapSetOnlineCovers Covers => OnlineInfo.Covers;
+
+        [NotMapped]
+        [JsonIgnore]
+        public string Preview => OnlineInfo.Preview;
+
+        [NotMapped]
+        [JsonIgnore]
+        public double BPM => OnlineInfo.BPM;
+
+        [NotMapped]
+        [JsonIgnore]
+        public int PlayCount => OnlineInfo.PlayCount;
+
+        [NotMapped]
+        [JsonIgnore]
+        public int FavouriteCount => OnlineInfo.FavouriteCount;
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool HasFavourited => OnlineInfo.HasFavourited;
+
+        [NotMapped]
+        [JsonIgnore]
+        public BeatmapSetOnlineAvailability Availability => OnlineInfo.Availability;
+
+        [NotMapped]
+        [JsonIgnore]
+        public BeatmapSetOnlineGenre Genre => OnlineInfo.Genre;
+
+        [NotMapped]
+        [JsonIgnore]
+        public BeatmapSetOnlineLanguage Language => OnlineInfo.Language;
+
+        [NotMapped]
+        [JsonIgnore]
+        public int? TrackId => OnlineInfo?.TrackId;
+
+        [NotMapped]
+        [JsonIgnore]
+        public int[] Ratings => OnlineInfo?.Ratings;
 
         #endregion
     }

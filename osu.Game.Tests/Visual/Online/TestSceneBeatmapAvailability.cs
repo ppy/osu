@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet;
 
 namespace osu.Game.Tests.Visual.Online
@@ -22,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set undownloadable beatmapset with link", () => container.BeatmapSet = new BeatmapSetInfo
             {
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     Availability = new BeatmapSetOnlineAvailability
                     {
@@ -40,7 +41,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set undownloadable beatmapset without link", () => container.BeatmapSet = new BeatmapSetInfo
             {
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     Availability = new BeatmapSetOnlineAvailability
                     {
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set parts-removed beatmapset with link", () => container.BeatmapSet = new BeatmapSetInfo
             {
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     Availability = new BeatmapSetOnlineAvailability
                     {
@@ -75,7 +76,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set normal beatmapset", () => container.BeatmapSet = new BeatmapSetInfo
             {
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     Availability = new BeatmapSetOnlineAvailability
                     {

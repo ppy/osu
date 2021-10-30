@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Menu
         private readonly Bindable<User> currentUser = new Bindable<User>();
         private FillFlowContainer fill;
 
-        private readonly List<Drawable> expendableText = new List<Drawable>();
+        private readonly List<ITextPart> expendableText = new List<ITextPart>();
 
         [CanBeNull]
         private Texture avatarTexture;
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Menu
 
             textFlow.AddText("这就是 osu!", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular));
 
-            expendableText.AddRange(textFlow.AddText("lazer", t =>
+            expendableText.Add(textFlow.AddText("lazer", t =>
             {
                 t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular);
                 t.Colour = colours.PinkLight;
@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Menu
                 t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold);
                 t.Colour = colours.Pink;
             });
-            expendableText.AddRange(textFlow.AddText("即将到来！", formatRegular));
+            expendableText.Add(textFlow.AddText("即将到来!", formatRegular));
             textFlow.AddText(".", formatRegular);
 
             textFlow.NewParagraph();
@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Menu
                     t.Font = t.Font.With(size: 20);
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
-                }).First();
+                }).Drawables.First();
 
                 if (IsLoaded)
                     animateHeart();
@@ -247,7 +247,9 @@ namespace osu.Game.Screens.Menu
                         .MoveToY(icon_y, 160, Easing.InQuart)
                         .FadeColour(Color4.White, 160);
 
-                    using (BeginDelayedSequence(520 + 160))
+                    //using (BeginDelayedSequence(520 + 160))
+                    fill.MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
+                    Schedule(() => expendableText.SelectMany(t => t.Drawables).ForEach(t =>
                     {
                         fill.MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
                         Schedule(() => expendableText.ForEach(t =>
@@ -255,7 +257,7 @@ namespace osu.Game.Screens.Menu
                             t.FadeOut(100);
                             t.ScaleTo(new Vector2(0, 1), 100, Easing.OutQuart);
                         }));
-                    }
+                    }));
                 }
 
                 supportFlow.FadeOut().Delay(2000).FadeIn(500);

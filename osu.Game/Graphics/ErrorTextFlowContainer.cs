@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
@@ -10,7 +10,7 @@ namespace osu.Game.Graphics
 {
     public class ErrorTextFlowContainer : OsuTextFlowContainer
     {
-        private readonly List<Drawable> errorDrawables = new List<Drawable>();
+        private readonly List<ITextPart> errorTextParts = new List<ITextPart>();
 
         public ErrorTextFlowContainer()
             : base(cp => cp.Font = cp.Font.With(size: 12))
@@ -19,7 +19,8 @@ namespace osu.Game.Graphics
 
         public void ClearErrors()
         {
-            errorDrawables.ForEach(d => d.Expire());
+            foreach (var textPart in errorTextParts)
+                RemovePart(textPart);
         }
 
         public void AddErrors(string[] errors)
@@ -28,8 +29,8 @@ namespace osu.Game.Graphics
 
             if (errors == null) return;
 
-            foreach (var error in errors)
-                errorDrawables.AddRange(AddParagraph(error, cp => cp.Colour = Color4.Red));
+            foreach (string error in errors)
+                errorTextParts.Add(AddParagraph(error, cp => cp.Colour = Color4.Red));
         }
     }
 }

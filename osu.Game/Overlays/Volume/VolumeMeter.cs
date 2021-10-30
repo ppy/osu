@@ -325,7 +325,7 @@ namespace osu.Game.Overlays.Volume
             delta *= accelerationModifier;
             accelerationModifier = Math.Min(max_acceleration, accelerationModifier * acceleration_multiplier);
 
-            var precision = Bindable.Precision;
+            double precision = Bindable.Precision;
 
             if (isPrecise)
             {

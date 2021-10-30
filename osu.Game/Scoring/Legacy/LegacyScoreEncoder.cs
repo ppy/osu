@@ -72,7 +72,7 @@ namespace osu.Game.Scoring.Legacy
 
         private byte[] createReplayData()
         {
-            var content = new ASCIIEncoding().GetBytes(replayStringContent);
+            byte[] content = new ASCIIEncoding().GetBytes(replayStringContent);
 
             using (var outStream = new MemoryStream())
             {

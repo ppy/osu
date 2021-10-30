@@ -16,8 +16,8 @@ namespace osu.Game.Overlays.BeatmapSet
     {
         private BeatmapSetInfo beatmapSet;
 
-        private bool downloadDisabled => BeatmapSet?.OnlineInfo.Availability?.DownloadDisabled ?? false;
-        private bool hasExternalLink => !string.IsNullOrEmpty(BeatmapSet?.OnlineInfo.Availability?.ExternalLink);
+        private bool downloadDisabled => BeatmapSet?.OnlineInfo.Availability.DownloadDisabled ?? false;
+        private bool hasExternalLink => !string.IsNullOrEmpty(BeatmapSet?.OnlineInfo.Availability.ExternalLink);
 
         private readonly LinkFlowContainer textContainer;
 

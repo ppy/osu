@@ -30,9 +30,9 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
-        where TFileModel : class, INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, IHasPrimaryKey, new()
     {
         private const int import_queue_request_concurrency = 1;
 
@@ -315,25 +315,29 @@ namespace osu.Game.Database
         /// <remarks>
         ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
         /// </remarks>
-        protected virtual string ComputeHash(TModel item, ArchiveReader reader = null)
+        protected virtual string ComputeHash(TModel item)
         {
-            if (reader != null)
-                // fast hashing for cases where the item's files may not be populated.
-                return computeHashFast(reader);
+            var hashableFiles = item.Files
+                                    .Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+                                    .OrderBy(f => f.Filename)
+                                    .ToArray();
 
-            // for now, concatenate all hashable files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
-
-            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
+            if (hashableFiles.Length > 0)
             {
-                using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
-                    s.CopyTo(hashable);
+                // for now, concatenate all hashable files in the set to create a unique hash.
+                MemoryStream hashable = new MemoryStream();
+
+                foreach (TFileModel file in hashableFiles)
+                {
+                    using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
+                        s.CopyTo(hashable);
+                }
+
+                if (hashable.Length > 0)
+                    return hashable.ComputeSHA2Hash();
             }
 
-            if (hashable.Length > 0)
-                return hashable.ComputeSHA2Hash();
-
-            return item.Hash;
+            return generateFallbackHash();
         }
 
         /// <summary>
@@ -393,7 +397,7 @@ namespace osu.Game.Database
                 LogForModel(item, @"Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
-                item.Hash = ComputeHash(item, archive);
+                item.Hash = ComputeHash(item);
 
                 await Populate(item, archive, cancellationToken).ConfigureAwait(false);
 
@@ -462,10 +466,12 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
-            using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
-                ExportModelTo(retrievedItem, outputStream);
+            string filename = $"{getValidFilename(item.ToString())}{HandledExtensions.First()}";
 
-            exportStorage.OpenInNativeExplorer();
+            using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
+                ExportModelTo(retrievedItem, stream);
+
+            exportStorage.PresentFileExternally(filename);
         }
 
         /// <summary>
@@ -514,9 +520,12 @@ namespace osu.Game.Database
                 {
                     Files.Dereference(file.FileInfo);
 
-                    // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
-                    // Definitely can be removed once we rework the database backend.
-                    usage.Context.Set<TFileModel>().Remove(file);
+                    if (file.ID > 0)
+                    {
+                        // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
+                        // Definitely can be removed once we rework the database backend.
+                        usage.Context.Set<TFileModel>().Remove(file);
+                    }
                 }
 
                 model.Files.Remove(file);
@@ -538,9 +547,10 @@ namespace osu.Game.Database
                     Filename = filename,
                     FileInfo = Files.Add(contents)
                 });
-
-                Update(model);
             }
+
+            if (model.ID > 0)
+                Update(model);
         }
 
         /// <summary>
@@ -673,7 +683,7 @@ namespace osu.Game.Database
         {
             MemoryStream hashable = new MemoryStream();
 
-            foreach (var file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
             {
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
@@ -682,7 +692,7 @@ namespace osu.Game.Database
             if (hashable.Length > 0)
                 return hashable.ComputeSHA2Hash();
 
-            return reader.Name.ComputeSHA2Hash();
+            return generateFallbackHash();
         }
 
         /// <summary>
@@ -894,6 +904,14 @@ namespace osu.Game.Database
         }
 
         #endregion
+
+        private static string generateFallbackHash()
+        {
+            // if a hash could no be generated from file content, presume a unique / new import.
+            // therefore, let's use a guaranteed unique hash.
+            // this doesn't follow the SHA2 hashing schema intentionally, so such entries on the data store can be identified.
+            return Guid.NewGuid().ToString();
+        }
 
         private string getValidFilename(string filename)
         {

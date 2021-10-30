@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets
         {
             unchecked
             {
-                var hashCode = ID.HasValue ? ID.GetHashCode() : 0;
+                int hashCode = ID.HasValue ? ID.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (InstantiationInfo != null ? InstantiationInfo.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Name != null ? Name.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ Available.GetHashCode();
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets
 
         #region Implementation of IHasOnlineID
 
-        public int? OnlineID => ID;
+        public int OnlineID => ID ?? -1;
 
         #endregion
     }
