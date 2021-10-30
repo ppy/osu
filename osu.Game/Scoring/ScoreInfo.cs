@@ -250,8 +250,12 @@ namespace osu.Game.Scoring
 
         #endregion
 
+        #region Implementation of IScoreInfo
+
         IBeatmapInfo IScoreInfo.Beatmap => BeatmapInfo;
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
         bool IScoreInfo.HasReplay => Files.Any();
+
+        #endregion
     }
 }
