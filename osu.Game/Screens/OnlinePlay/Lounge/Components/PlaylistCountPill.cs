@@ -4,6 +4,7 @@
 using System.Collections.Specialized;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -46,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void updateCount(object sender, NotifyCollectionChangedEventArgs e)
         {
             count.Clear();
-            count.AddText(Playlist.Count.ToString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
+            count.AddText(Playlist.Count.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
             count.AddText(" ");
             count.AddText("Beatmap".ToQuantity(Playlist.Count, ShowQuantityAs.None));
         }
