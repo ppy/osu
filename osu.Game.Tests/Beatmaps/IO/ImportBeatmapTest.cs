@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -517,6 +518,55 @@ namespace osu.Game.Tests.Beatmaps.IO
                     // check the newly "imported" beatmap has been reimported due to mismatch (even though hashes matched)
                     Assert.IsTrue(imported.ID != importedSecondTime.ID);
                     Assert.IsTrue(imported.Beatmaps.First().ID != importedSecondTime.Beatmaps.First().ID);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestExportWithInvalidCharacters()
+        {
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var metadata = new BeatmapMetadata
+                    {
+                        Artist = "Some\\Artist",
+                        AuthorString = "Some*Author",
+                        Title = "Some|Title"
+                    };
+
+                    var difficulty = new BeatmapDifficulty();
+
+                    var beatmapInfo = new BeatmapInfo
+                    {
+                        OnlineBeatmapID = 1,
+                        Metadata = metadata,
+                        BaseDifficulty = difficulty,
+                        Version = "<Some: REMIX>"
+                    };
+
+                    var beatmapToExport = new Beatmap
+                    {
+                        BeatmapInfo = beatmapInfo
+                    };
+
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    manager.Save(beatmapInfo, beatmapToExport);
+
+                    // Check that the new file is saved with valid characters
+                    Regex charRules = new Regex(@"[/\\<>|?*"":]+", RegexOptions.Multiline);
+                    Beatmap exportedMap = (Beatmap)manager.GetWorkingBeatmap(manager.QueryBeatmap(b => b.ID == beatmapToExport.BeatmapInfo.ID)).Beatmap;
+                    Assert.NotNull(exportedMap);
+                    Assert.IsFalse(charRules.IsMatch(exportedMap.BeatmapInfo.Path));
                 }
                 finally
                 {

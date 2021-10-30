@@ -466,7 +466,7 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
-            string filename = $"{getValidFilename(item.ToString())}{HandledExtensions.First()}";
+            string filename = $"{GetValidFilename(item.ToString())}{HandledExtensions.First()}";
 
             using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
                 ExportModelTo(retrievedItem, stream);
@@ -913,7 +913,7 @@ namespace osu.Game.Database
             return Guid.NewGuid().ToString();
         }
 
-        private string getValidFilename(string filename)
+        protected static string GetValidFilename(string filename)
         {
             foreach (char c in Path.GetInvalidFileNameChars())
                 filename = filename.Replace(c, '_');
