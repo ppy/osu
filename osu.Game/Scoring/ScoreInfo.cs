@@ -272,6 +272,10 @@ namespace osu.Game.Scoring
             return ReferenceEquals(this, other);
         }
 
+        #region Implementation of IHasOnlineID
+
         public long OnlineID => OnlineScoreID ?? -1;
+
+        #endregion
     }
 }
