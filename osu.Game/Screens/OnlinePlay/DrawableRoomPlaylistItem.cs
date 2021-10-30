@@ -111,7 +111,6 @@ namespace osu.Game.Screens.OnlinePlay
             beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString(), null, text =>
             {
                 text.Truncate = true;
-                text.RelativeSizeAxes = Axes.X;
             });
 
             authorText.Clear();
