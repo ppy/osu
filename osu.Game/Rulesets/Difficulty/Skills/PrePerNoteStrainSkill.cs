@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -9,6 +10,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 {
     public abstract class PrePerNoteStrainSkill : Skill
     {
+        protected virtual double DecayWeight => 0.9;
         protected readonly IBeatmap beatmap;
         protected readonly double clockRate;
         protected readonly List<double> strainPeaks = new List<double>();
@@ -47,7 +49,18 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         public override double DifficultyValue()
         {
-            return 0;
+            double difficulty = 0;
+            double weight = 1;
+
+            // Difficulty is the weighted sum of the highest strains from every section.
+            // We're sorting from highest to lowest strain.
+            foreach (double strain in GetAllStrainPeaks().AsEnumerable().OrderByDescending(d => d))
+            {
+                difficulty += strain * weight;
+                weight *= DecayWeight;
+            }
+
+            return difficulty;
         }
 
         protected abstract double StrainValueOf(PrePerNoteStrainSkill[] preSkills, int index, DifficultyHitObject current);
