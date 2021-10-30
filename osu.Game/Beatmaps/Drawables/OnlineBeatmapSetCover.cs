@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -29,26 +30,31 @@ namespace osu.Game.Beatmaps.Drawables
         {
             string resource = null;
 
+            Logger.Log($"封面： {set.Covers.Card}");
+
             switch (mfconfig.Get<bool>(MSetting.UseSayobot))
             {
                 case true:
+                    string targetID = set.Covers.Card;
+                    targetID = targetID.Replace("https://assets.ppy.sh/beatmaps/", "").Split('/')[0];
+
                     switch (type)
                     {
                         case BeatmapSetCoverType.Cover:
-                            resource = $"https://a.sayobot.cn/beatmaps/{set?.OnlineID}/covers/cover.jpg";
+                            resource = $"https://a.sayobot.cn/beatmaps/{targetID}/covers/cover.jpg";
                             break;
 
                         case BeatmapSetCoverType.Card:
-                            resource = $"https://a.sayobot.cn/beatmaps/{set?.OnlineID}/covers/cover.jpg";
+                            resource = $"https://a.sayobot.cn/beatmaps/{targetID}/covers/cover.jpg";
                             break;
 
                         case BeatmapSetCoverType.List:
-                            resource = $"https://a.sayobot.cn/beatmaps/{set?.OnlineID}/covers/cover.jpg";
+                            resource = $"https://a.sayobot.cn/beatmaps/{targetID}/covers/cover.jpg";
                             break;
                     }
+
                     break;
 
-                case false:
                 default:
                     switch (type)
                     {
@@ -64,6 +70,7 @@ namespace osu.Game.Beatmaps.Drawables
                             resource = set.Covers.List;
                             break;
                     }
+
                     break;
             }
 
@@ -76,6 +83,6 @@ namespace osu.Game.Beatmaps.Drawables
     {
         Cover,
         Card,
-        List,
+        List
     }
 }

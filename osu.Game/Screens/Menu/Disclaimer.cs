@@ -251,12 +251,8 @@ namespace osu.Game.Screens.Menu
                     fill.MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
                     Schedule(() => expendableText.SelectMany(t => t.Drawables).ForEach(t =>
                     {
-                        fill.MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
-                        Schedule(() => expendableText.ForEach(t =>
-                        {
-                            t.FadeOut(100);
-                            t.ScaleTo(new Vector2(0, 1), 100, Easing.OutQuart);
-                        }));
+                        t.FadeOut(100);
+                        t.ScaleTo(new Vector2(0, 1), 100, Easing.OutQuart);
                     }));
                 }
 

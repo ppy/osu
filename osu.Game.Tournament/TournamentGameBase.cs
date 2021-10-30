@@ -13,6 +13,7 @@ using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.IO;
@@ -55,11 +56,8 @@ namespace osu.Game.Tournament
 
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            BindableBool fakeConfig = new BindableBool();
             if (MenuCursorContainer.Cursor is MenuCursor cursor)
-                cursor.UseSystemCursor.BindTarget = fakeConfig;
-
-            fakeConfig.Value = true;
+                cursor.UseSystemCursor.Value = true;
 
             dependencies.CacheAs<Storage>(storage = new TournamentStorage(baseStorage));
             dependencies.CacheAs(storage);
