@@ -25,9 +25,6 @@ namespace osu.Game.Overlays.Music
         private TextFlowContainer text;
         private ITextPart titlePart;
 
-        private ILocalisedBindableString title;
-        private ILocalisedBindableString artist;
-
         private Color4 selectedColour;
         private Color4 artistColour;
 
@@ -45,16 +42,11 @@ namespace osu.Game.Overlays.Music
             selectedColour = colours.Yellow;
             artistColour = colours.Gray9;
             HandleColour = colours.Gray5;
-
-            title = localisation.GetLocalisedBindableString(new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title));
-            artist = localisation.GetLocalisedBindableString(new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            artist.BindValueChanged(_ => recreateText(), true);
 
             SelectedSet.BindValueChanged(set =>
             {
@@ -71,26 +63,31 @@ namespace osu.Game.Overlays.Music
                 s.FadeColour(SelectedSet.Value?.Equals(Model) == true ? selectedColour : Color4.White, instant ? 0 : FADE_DURATION);
         }
 
-        protected override Drawable CreateContent() => text = new OsuTextFlowContainer
+        protected override Drawable CreateContent()
         {
-            RelativeSizeAxes = Axes.X,
-            AutoSizeAxes = Axes.Y,
-        };
+            text = new OsuTextFlowContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+            };
 
-        private void recreateText()
-        {
-            text.Clear();
+            var title = new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title);
+            var artist = new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist);
 
-            // space after the title to put a space between the title and artist
-            titlePart = text.AddText(title.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
+            titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
             updateSelectionState(true);
+            titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
 
-            text.AddText(artist.Value, sprite =>
+            text.AddText(@"  "); // to separate the title from the artist.
+
+            text.AddText(artist, sprite =>
             {
                 sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
                 sprite.Colour = artistColour;
                 sprite.Padding = new MarginPadding { Top = 1 };
             });
+
+            return text;
         }
 
         protected override bool OnClick(ClickEvent e)
