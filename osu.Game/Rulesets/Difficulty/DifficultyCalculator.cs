@@ -28,13 +28,11 @@ namespace osu.Game.Rulesets.Difficulty
 
         private readonly Ruleset ruleset;
         private readonly WorkingBeatmap beatmap;
-        protected readonly PreNoteDatabase database;
 
         protected DifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
         {
             this.ruleset = ruleset;
             this.beatmap = beatmap;
-            database = new PreNoteDatabase();
         }
 
         /// <summary>
