@@ -3,11 +3,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace Mvis.Plugin.Example
 {
-    public class AnotherPlugin : MvisPlugin
+    public class AnotherPlugin : LLinPlugin
     {
         private OsuSpriteText text1;
 

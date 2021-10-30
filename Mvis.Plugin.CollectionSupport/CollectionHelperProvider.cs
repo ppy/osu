@@ -1,9 +1,9 @@
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace Mvis.Plugin.CollectionSupport
 {
-    public class CollectionHelperProvider : MvisPluginProvider
+    public class CollectionHelperProvider : LLinPluginProvider
     {
-        public override MvisPlugin CreatePlugin => new CollectionHelper();
+        public override LLinPlugin CreatePlugin => new CollectionHelper();
     }
 }

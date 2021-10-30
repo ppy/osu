@@ -16,12 +16,17 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// A user-presentable display title representing this beatmap, with localisation handling for potentially romanisable fields.
         /// </summary>
-        public static RomanisableString GetDisplayTitleRomanisable(this IBeatmapInfo beatmapInfo)
+        public static RomanisableString GetDisplayTitleRomanisable(this IBeatmapInfo beatmapInfo, bool includeDifficultyName = true)
         {
             var metadata = getClosestMetadata(beatmapInfo).GetDisplayTitleRomanisable();
-            var versionString = getVersionString(beatmapInfo);
 
-            return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
+            if (includeDifficultyName)
+            {
+                string versionString = getVersionString(beatmapInfo);
+                return new RomanisableString($"{metadata.GetPreferred(true)} {versionString}".Trim(), $"{metadata.GetPreferred(false)} {versionString}".Trim());
+            }
+
+            return new RomanisableString($"{metadata.GetPreferred(true)}".Trim(), $"{metadata.GetPreferred(false)}".Trim());
         }
 
         public static string[] GetSearchableTerms(this IBeatmapInfo beatmapInfo) => new[]

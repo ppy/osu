@@ -1,12 +1,12 @@
-using M.Resources.Localisation.Mvis;
-using M.Resources.Localisation.Mvis.Plugins;
+using M.Resources.Localisation.LLin;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
-using osu.Game.Screens.Mvis.SideBar.Settings.Items;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.SideBar.Settings.Items;
 
 namespace Mvis.Plugin.CloudMusicSupport.UI
 {
@@ -21,7 +21,7 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             {
                 new SettingsTogglePiece
                 {
-                    Description = MvisGenericStrings.EnablePlugin,
+                    Description = LLinGenericStrings.EnablePlugin,
                     Bindable = config.GetBindable<bool>(LyricSettings.EnablePlugin)
                 },
                 new SettingsTogglePiece
@@ -87,7 +87,7 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             });
         }
 
-        public LyricSidebarSection(MvisPlugin plugin)
+        public LyricSidebarSection(LLinPlugin plugin)
             : base(plugin)
         {
         }

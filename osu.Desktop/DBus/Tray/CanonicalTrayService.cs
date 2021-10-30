@@ -12,7 +12,7 @@ namespace osu.Desktop.DBus.Tray
 {
     /// <summary>
     /// todo: 找到文档并实现所有目前未实现的功能<br/>
-    /// https://github.com/gnustep/libs-dbuskit/blob/master/Bundles/DBusMenu/com.canonical.dbusmenu.xml<br/>
+    /// https://github.com/ubuntu/gnome-shell-extension-appindicator/blob/master/interfaces-xml/DBusMenu.xml<br/>
     /// <br/>
     /// 似乎dde不支持com.canonical.dbusmenu?<br/>
     /// https://github.com/linuxdeepin/dtkwidget/issues/85
@@ -111,17 +111,18 @@ namespace osu.Desktop.DBus.Tray
 
             try
             {
+                (uint menuRevision, (int, IDictionary<string, object>, object[])) result;
+
                 if (updatedEntries.Count != 0)
                 {
                     //Logger.Log("刷新DBus目录缓存", level: LogLevel.Verbose);
                     IDictionary<int, SimpleEntry> additDict;
                     //int addit;
 
-                    var result =
-                        (menuRevision, rootEntry.ToDbusObject(
-                            rootEntry.ChildId,
-                            dbusItemMaxOrder,
-                            out additDict));
+                    result = (menuRevision, rootEntry.ToDbusObject(
+                        rootEntry.ChildId,
+                        dbusItemMaxOrder,
+                        out additDict));
 
                     //缓存当前结果到cachedLayoutObject中
                     cachedLayoutObject = result;
@@ -136,21 +137,27 @@ namespace osu.Desktop.DBus.Tray
                         if (entries.TryAdd(kvp.Key, kvp.Value))
                         {
                             //如果成功了，订阅OnPropertyChanged
-                            kvp.Value.OnPropertyChanged = () =>
-                            {
-                                triggerLayoutUpdate(kvp.Value);
-                            };
+                            kvp.Value.OnPropertyChanged = () => triggerLayoutUpdate(kvp.Value);
                         }
                     }
 
                     //因为Layout已经更新，updatedEntries中现有的值已经不需要了，故对其清空
                     updatedEntries.Clear();
-
-                    return Task.FromResult(result);
                 }
 
-                //返回缓存的列表
-                return Task.FromResult(cachedLayoutObject);
+                //如果parentID是0
+                if (parentId == 0)
+                    //返回缓存的列表
+                    return Task.FromResult(cachedLayoutObject);
+
+                var target = entries.FirstOrDefault(e => e.Key == parentId).Value;
+
+                result = (menuRevision, target.ToDbusObject(
+                    target.ChildId,
+                    int.MinValue, //转换在上方已经完成了，因此在这里不要传递dbusItemMaxOrder
+                    out _)); //同上
+
+                return Task.FromResult(result);
             }
             catch (Exception e)
             {
@@ -161,7 +168,7 @@ namespace osu.Desktop.DBus.Tray
 
         public Task<(int, IDictionary<string, object>)[]> GetGroupPropertiesAsync(int[] ids, string[] propertyNames)
         {
-            //Logger.Log("方法被调用：GetGroupPropertiesAsync: ids:", level: LogLevel.Verbose);
+            Logger.Log("方法被调用：GetGroupPropertiesAsync: ids:", level: LogLevel.Verbose);
             //foreach (var id in ids) Logger.Log(id.ToString());
 
             try
@@ -239,7 +246,7 @@ namespace osu.Desktop.DBus.Tray
 
         public Task<bool> AboutToShowAsync(int id)
         {
-            //Logger.Log($"方法被调用: AboutToShowAsync id: {id}", level: LogLevel.Verbose);
+            Logger.Log($"方法被调用: AboutToShowAsync id: {id}", level: LogLevel.Verbose);
 
             var returnValue = updatedEntries.ContainsKey(id);
 

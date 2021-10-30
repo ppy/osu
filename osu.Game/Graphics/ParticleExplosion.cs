@@ -89,7 +89,7 @@ namespace osu.Game.Graphics
 
             protected override void Blit(Action<TexturedVertex2D> vertexAction)
             {
-                var time = currentTime - startTime;
+                double time = currentTime - startTime;
 
                 foreach (var p in parts)
                 {
@@ -136,7 +136,7 @@ namespace osu.Game.Graphics
 
             public Vector2 PositionAtTime(double time)
             {
-                var travelledDistance = distance * progressAtTime(time);
+                float travelledDistance = distance * progressAtTime(time);
                 return new Vector2(0.5f) + travelledDistance * new Vector2(MathF.Sin(direction), MathF.Cos(direction));
             }
 

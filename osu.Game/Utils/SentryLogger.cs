@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Net;
-using osu.Framework.Logging;
 using Sentry;
 
 namespace osu.Game.Utils

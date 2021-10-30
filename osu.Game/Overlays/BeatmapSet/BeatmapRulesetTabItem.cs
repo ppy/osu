@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
-                var beatmapsCount = setInfo.NewValue?.Beatmaps.Count(b => b.Ruleset.Equals(Value)) ?? 0;
+                int beatmapsCount = setInfo.NewValue?.Beatmaps.Count(b => b.Ruleset.Equals(Value)) ?? 0;
 
                 count.Text = beatmapsCount.ToString();
                 countContainer.FadeTo(beatmapsCount > 0 ? 1 : 0);

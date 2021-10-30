@@ -1,15 +1,12 @@
 using System;
-using osu.Framework.Configuration;
 using osu.Framework.Platform;
 
 namespace osu.Game.Screens.Mvis.Plugins.Config
 {
-    public abstract class PluginConfigManager<TLookup> : IniConfigManager<TLookup>, IPluginConfigManager
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public abstract class PluginConfigManager<TLookup> : osu.Game.Screens.LLin.Plugins.Config.PluginConfigManager<TLookup>
         where TLookup : struct, Enum
     {
-        protected abstract string ConfigName { get; }
-        protected override string Filename => $"custom/plugin-{ConfigName}.ini";
-
         protected PluginConfigManager(Storage storage)
             : base(storage)
         {

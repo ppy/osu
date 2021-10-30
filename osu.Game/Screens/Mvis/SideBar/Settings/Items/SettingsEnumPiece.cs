@@ -1,18 +1,10 @@
 using System;
-using System.Linq;
-using osu.Framework.Extensions;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
 {
-    public class SettingsEnumPiece<T> : SettingsListPiece<T>
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public class SettingsEnumPiece<T> : osu.Game.Screens.LLin.SideBar.Settings.Items.SettingsEnumPiece<T>
         where T : struct, Enum
     {
-        public SettingsEnumPiece()
-        {
-            var array = (T[])Enum.GetValues(typeof(T));
-            Values = array.ToList();
-        }
-
-        protected override string GetValueText(T newValue) => newValue.GetDescription();
     }
 }

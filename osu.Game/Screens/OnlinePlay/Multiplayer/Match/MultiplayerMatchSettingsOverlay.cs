@@ -153,7 +153,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             {
                                                                 new Section("Room name")
                                                                 {
-                                                                    Child = NameField = new SettingsTextBox
+                                                                    Child = NameField = new OsuTextBox
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
@@ -202,7 +202,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 new Section("Max participants")
                                                                 {
                                                                     Alpha = disabled_alpha,
-                                                                    Child = MaxParticipantsField = new SettingsNumberTextBox
+                                                                    Child = MaxParticipantsField = new OsuNumberBox
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 },
                                                                 new Section("Password (optional)")
                                                                 {
-                                                                    Child = PasswordTextBox = new SettingsPasswordTextBox
+                                                                    Child = PasswordTextBox = new OsuPasswordTextBox
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,

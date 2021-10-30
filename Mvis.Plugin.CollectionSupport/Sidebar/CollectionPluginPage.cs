@@ -1,6 +1,6 @@
 using System.Collections.Specialized;
 using System.Linq;
-using M.Resources.Localisation.Mvis.Plugins;
+using M.Resources.Localisation.LLin.Plugins;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,9 +8,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Mvis;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Types;
 using osuTK;
 using osuTK.Input;
 
@@ -22,7 +22,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private CollectionManager collectionManager { get; set; }
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementLLin mvisScreen { get; set; }
 
         private readonly CollectionHelper collectionHelper;
 
@@ -35,7 +35,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private OsuScrollContainer collectionScroll;
         private CollectionInfo info;
 
-        public CollectionPluginPage(MvisPlugin plugin)
+        public CollectionPluginPage(LLinPlugin plugin)
             : base(plugin)
         {
             Icon = FontAwesome.Solid.Check;
@@ -102,7 +102,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             selectedPanel.BindValueChanged(updateSelectedPanel);
 
             RefreshCollectionList();
-            mvisScreen.OnScreenResuming += RefreshCollectionList;
+            mvisScreen.Resuming += RefreshCollectionList;
         }
 
         private void OnCurrentCollectionChanged(ValueChangedEvent<BeatmapCollection> v)

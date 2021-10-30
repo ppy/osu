@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using M.Resources.Localisation.Mvis.Plugins;
+using M.Resources.Localisation.LLin.Plugins;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -16,8 +16,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis;
-using osu.Game.Screens.Mvis.Misc;
+using osu.Game.Screens.LLin;
+using osu.Game.Screens.LLin.Misc;
 using osuTK;
 
 namespace Mvis.Plugin.CollectionSupport.Sidebar

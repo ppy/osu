@@ -10,9 +10,9 @@ using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Game.Screens.Play;
 
 namespace Mvis.Plugin.StoryboardSupport
@@ -43,7 +43,7 @@ namespace Mvis.Plugin.StoryboardSupport
         [Resolved]
         private Bindable<WorkingBeatmap> currentBeatmap { get; set; }
 
-        public override int Version => 7;
+        public override int Version => 8;
 
         public BackgroundStoryBoardLoader()
         {
@@ -73,32 +73,30 @@ namespace Mvis.Plugin.StoryboardSupport
         [BackgroundDependencyLoader]
         private void load()
         {
-            var config = (SbLoaderConfigManager)DependenciesContainer.Get<MvisPluginManager>().GetConfigManager(this);
+            var config = (SbLoaderConfigManager)DependenciesContainer.Get<LLinPluginManager>().GetConfigManager(this);
             config.BindWith(SbLoaderSettings.EnableStoryboard, Value);
 
-            if (MvisScreen != null)
+            if (LLin != null)
             {
-                MvisScreen.OnScreenExiting += UnLoad;
-                MvisScreen.OnScreenSuspending += onScreenSuspending;
-                MvisScreen.OnScreenResuming += onScreenResuming;
-                MvisScreen.OnBeatmapChanged(refresh, this);
+                LLin.Exiting += UnLoad;
+                LLin.Suspending += onScreenSuspending;
+                LLin.Resuming += onScreenResuming;
+                LLin.OnBeatmapChanged(refresh, this, true);
             }
 
-            if (MvisScreen != null)
-                MvisScreen.AddDrawableToProxy(epilepsyWarning);
-            else
-                AddInternal(epilepsyWarning);
+            AddInternal(epilepsyWarning);
+            LLin?.AddProxy(epilepsyWarning.CreateProxy());
         }
 
         private void onScreenResuming()
         {
-            if (!Disabled.Value && ContentLoaded)
-                MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
+            if (!Disabled.Value && ContentLoaded && targetBeatmap.Storyboard.ReplacesBackground)
+                LLin?.RequestBlackBackground(this);
         }
 
         private void onScreenSuspending()
         {
-            MvisScreen.HideScreenBackground.Value = false;
+            LLin?.RequestNonBlackBackground(this);
         }
 
         protected override void OnValueChanged(ValueChangedEvent<bool> v)
@@ -161,26 +159,29 @@ namespace Mvis.Plugin.StoryboardSupport
             sbLoaded.Value = true;
             NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
 
-            if (MvisScreen != null)
-                MvisScreen.OnSeek += Seek;
+            if (LLin != null)
+                LLin.OnSeek += Seek;
 
             Value.TriggerChange();
 
             if (prevProxy != null)
             {
-                MvisScreen?.RemoveDrawableFromProxy(prevProxy);
+                LLin?.RemoveProxy(prevProxy);
                 prevProxy.Expire();
             }
 
             prevProxy = getProxy(newStoryboard);
 
-            if (prevProxy != null) MvisScreen?.AddDrawableToProxy(prevProxy);
+            if (prevProxy != null) LLin?.AddProxy(prevProxy);
             prevProxy?.Show();
 
-            if (MvisScreen != null)
+            if (LLin != null)
             {
-                MvisScreen.HideTriangles.Value = NeedToHideTriangles.Value;
-                MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
+                if (NeedToHideTriangles.Value) LLin.RequestCleanBackground(this);
+                else LLin.RequestNonCleanBackground(this);
+
+                if (targetBeatmap.Storyboard.ReplacesBackground) LLin.RequestBlackBackground(this);
+                else LLin.RequestNonBlackBackground(this);
             }
 
             if (targetBeatmap.BeatmapInfo.EpilepsyWarning)
@@ -196,12 +197,12 @@ namespace Mvis.Plugin.StoryboardSupport
 
             currentStoryboard = null;
 
-            if (MvisScreen != null)
+            if (LLin != null)
             {
-                MvisScreen.OnScreenSuspending -= onScreenSuspending;
-                MvisScreen.OnScreenResuming -= onScreenResuming;
-                MvisScreen.OnScreenExiting -= UnLoad;
-                MvisScreen.OnSeek -= Seek;
+                LLin.Suspending -= onScreenSuspending;
+                LLin.Resuming -= onScreenResuming;
+                LLin.Exiting -= UnLoad;
+                LLin.OnSeek -= Seek;
             }
 
             NeedToHideTriangles.Value = false;
@@ -217,10 +218,10 @@ namespace Mvis.Plugin.StoryboardSupport
 
         public override bool Disable()
         {
-            if (MvisScreen != null)
+            if (LLin != null)
             {
-                MvisScreen.HideTriangles.Value = false;
-                MvisScreen.HideScreenBackground.Value = false;
+                LLin.RequestNonCleanBackground(this);
+                LLin.RequestNonBlackBackground(this);
             }
 
             hideOrCancelLoadStoryboard(false);
@@ -230,10 +231,10 @@ namespace Mvis.Plugin.StoryboardSupport
 
         public override bool Enable()
         {
-            if (MvisScreen != null && ContentLoaded)
+            if (LLin != null && ContentLoaded)
             {
-                MvisScreen.HideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
-                MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
+                if (targetBeatmap.Storyboard.HasDrawable) LLin.RequestCleanBackground(this);
+                if (targetBeatmap.Storyboard.ReplacesBackground) LLin.RequestBlackBackground(this);
             }
 
             return base.Enable();

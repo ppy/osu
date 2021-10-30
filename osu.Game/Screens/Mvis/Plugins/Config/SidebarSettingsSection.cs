@@ -1,24 +1,14 @@
-using osu.Framework.Allocation;
-using osu.Game.Screens.Mvis.SideBar.Settings.Sections;
+using System;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace osu.Game.Screens.Mvis.Plugins.Config
 {
-    public abstract class PluginSidebarSettingsSection : Section
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public abstract class PluginSidebarSettingsSection : osu.Game.Screens.LLin.Plugins.Config.PluginSidebarSettingsSection
     {
-        private readonly MvisPlugin plugin;
-        protected IPluginConfigManager ConfigManager;
-
-        protected PluginSidebarSettingsSection(MvisPlugin plugin)
+        protected PluginSidebarSettingsSection(LLinPlugin plugin)
+            : base(plugin)
         {
-            this.plugin = plugin;
-            Title = plugin.Name;
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            ConfigManager = dependencies.Get<MvisPluginManager>().GetConfigManager(plugin);
-            return dependencies;
         }
     }
 }

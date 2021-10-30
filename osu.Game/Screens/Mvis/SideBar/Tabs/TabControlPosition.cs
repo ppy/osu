@@ -1,16 +1,12 @@
-using System.ComponentModel;
+using System;
 
 namespace osu.Game.Screens.Mvis.SideBar.Tabs
 {
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
     public enum TabControlPosition
     {
-        [Description("右侧")]
         Right,
-
-        [Description("左侧")]
         Left,
-
-        [Description("顶部")]
         Top
     }
 }

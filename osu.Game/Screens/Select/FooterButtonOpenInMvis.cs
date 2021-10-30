@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Select
             Alpha = 0;
             SelectedColour = new Color4(0, 86, 73, 255);
             DeselectedColour = SelectedColour.Opacity(0.5f);
-            Text = @"在Mvis中打开";
+            Text = @"在LLin中打开";
 
             config.BindWith(MSetting.OptUI, OptUIEnabled);
         }

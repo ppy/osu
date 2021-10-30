@@ -1,53 +1,9 @@
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+using System;
 
 namespace osu.Game.Screens.Mvis.Plugins.Types
 {
-    public abstract class BindableControlledPlugin : MvisPlugin
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public abstract class BindableControlledPlugin : osu.Game.Screens.LLin.Plugins.Types.BindableControlledPlugin
     {
-        [Resolved]
-        private MvisPluginManager manager { get; set; }
-
-        protected BindableBool Value = new BindableBool();
-        private bool mvisExiting;
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (MvisScreen != null)
-                MvisScreen.OnScreenExiting += () => mvisExiting = true;
-        }
-
-        protected override void LoadComplete()
-        {
-            Value.BindValueChanged(OnValueChanged, true);
-            base.LoadComplete();
-        }
-
-        protected virtual void OnValueChanged(ValueChangedEvent<bool> v)
-        {
-            if (Value.Value && !mvisExiting)
-                manager.ActivePlugin(this);
-            else
-                manager.DisablePlugin(this);
-        }
-
-        public override bool Disable()
-        {
-            Value.Value = false;
-            return base.Disable();
-        }
-
-        public override bool Enable()
-        {
-            Value.Value = true;
-            return base.Enable();
-        }
-
-        public override void UnLoad()
-        {
-            Value.UnbindAll();
-            base.UnLoad();
-        }
     }
 }

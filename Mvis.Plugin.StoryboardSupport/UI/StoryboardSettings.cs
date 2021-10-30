@@ -1,16 +1,16 @@
-using M.Resources.Localisation.Mvis;
+using M.Resources.Localisation.LLin;
 using Mvis.Plugin.StoryboardSupport.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
 
 namespace Mvis.Plugin.StoryboardSupport.UI
 {
     public class StoryboardSettings : PluginSettingsSubSection
     {
-        public StoryboardSettings(MvisPlugin plugin)
+        public StoryboardSettings(LLinPlugin plugin)
             : base(plugin)
         {
         }
@@ -24,7 +24,7 @@ namespace Mvis.Plugin.StoryboardSupport.UI
             {
                 new SettingsCheckbox
                 {
-                    LabelText = MvisGenericStrings.EnablePlugin,
+                    LabelText = LLinGenericStrings.EnablePlugin,
                     Current = config.GetBindable<bool>(SbLoaderSettings.EnableStoryboard)
                 },
             };

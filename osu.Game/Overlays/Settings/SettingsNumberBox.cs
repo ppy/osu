@@ -13,7 +13,6 @@ namespace osu.Game.Overlays.Settings
         protected override Drawable CreateControl() => new NumberControl
         {
             RelativeSizeAxes = Axes.X,
-            Margin = new MarginPadding { Top = 5 }
         };
 
         private sealed class NumberControl : CompositeDrawable, IHasCurrentValue<int?>
@@ -47,7 +46,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     int? value = null;
 
-                    if (int.TryParse(e.NewValue, out var intVal))
+                    if (int.TryParse(e.NewValue, out int intVal))
                         value = intVal;
 
                     current.Value = value;

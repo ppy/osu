@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected string StripComments(string line)
         {
-            var index = line.AsSpan().IndexOf("//".AsSpan());
+            int index = line.AsSpan().IndexOf("//".AsSpan());
             if (index > 0)
                 return line.Substring(0, index);
 
@@ -135,7 +135,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
         {
-            var split = line.Split(separator, 2);
+            string[] split = line.Split(separator, 2);
 
             return new KeyValuePair<string, string>
             (

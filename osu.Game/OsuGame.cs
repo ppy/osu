@@ -56,7 +56,7 @@ using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Localisation;
 using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
@@ -164,7 +164,7 @@ namespace osu.Game
 
         private OsuLogo osuLogo;
 
-        private MvisPluginManager mvisPlManager;
+        private LLinPluginManager mvisPlManager;
 
         private Bindable<GamemodeActivateCondition> gamemodeCondition;
 
@@ -174,6 +174,8 @@ namespace osu.Game
         private IntroScreen introScreen;
 
         private Bindable<int> configRuleset;
+
+        private Bindable<float> uiScale;
 
         private Bindable<int> configSkin;
 
@@ -230,20 +232,6 @@ namespace osu.Game
             stream.Dispose();
         }
 
-        private BindableFloat windowOpacity;
-
-        public void TransformWindowOpacity(float final, float duration = 0, Easing easing = Easing.None) =>
-            this.TransformBindableTo(windowOpacity, final, duration, easing);
-
-        public void TransformWindowOpacity(float final, double duration = 0, Easing easing = Easing.None) =>
-            this.TransformBindableTo(windowOpacity, final, duration, easing);
-
-        public void SetWindowOpacity(float value)
-        {
-            if (host.Window is SDL2DesktopWindow sdl2DesktopWindow)
-                sdl2DesktopWindow.Opacity = value;
-        }
-
         public void AddBlockingOverlay(OverlayContainer overlay)
         {
             if (!visibleBlockingOverlays.Contains(overlay))
@@ -283,10 +271,11 @@ namespace osu.Game
 
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
-            dependencies.Cache(mvisPlManager = new MvisPluginManager());
+            dependencies.Cache(mvisPlManager = new LLinPluginManager());
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
+            uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
 
             var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
 
@@ -410,7 +399,7 @@ namespace osu.Game
                         ShowChangelogListing();
                     else
                     {
-                        var changelogArgs = link.Argument.Split("/");
+                        string[] changelogArgs = link.Argument.Split("/");
                         ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
                     }
 
@@ -696,7 +685,7 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
-                var cultureCode = language.ToCultureCode();
+                string cultureCode = language.ToCultureCode();
 
                 try
                 {
@@ -731,9 +720,9 @@ namespace osu.Game
                 var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l);
 
                 if (combinations.Count == 0)
-                    return "无";
+                    return ToastStrings.NoKeyBound;
 
-                return string.Join(" 或 ", combinations);
+                return string.Join(" / ", combinations);
             };
 
             Container logoContainer;
@@ -807,18 +796,6 @@ namespace osu.Game
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
-
-            windowOpacity = new BindableFloat();
-
-            if (host.Window is SDL2DesktopWindow sdl2DesktopWindow)
-            {
-                windowOpacity.Value = MConfig.Get<bool>(MSetting.FadeInWindowWhenEntering)
-                    ? 0
-                    : 1;
-                windowOpacity.BindValueChanged(v => SetWindowOpacity(v.NewValue), true);
-
-                sdl2DesktopWindow.Visible = true;
-            }
 
             gamemodeCondition.BindValueChanged(v => gamemodeConditionChanged(v.NewValue));
 
@@ -963,7 +940,7 @@ namespace osu.Game
         {
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith('-')).ToArray();
+                string[] paths = args.Where(a => !a.StartsWith('-')).ToArray();
                 if (paths.Length > 0)
                     Task.Run(() => Import(paths));
             }
@@ -1006,13 +983,15 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
+                    string logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
+
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
                         Icon = FontAwesome.Solid.EllipsisH,
                         Text = "详细信息已被记录，点击此处查看日志",
                         Activated = () =>
                         {
-                            Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
+                            Storage.GetStorageForDirectory(@"logs").PresentFileExternally(logFile);
                             return true;
                         }
                     }));
@@ -1111,6 +1090,28 @@ namespace osu.Game
             return false;
         }
 
+        public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+        {
+            const float adjustment_increment = 0.05f;
+
+            switch (e.Action)
+            {
+                case PlatformAction.ZoomIn:
+                    uiScale.Value += adjustment_increment;
+                    return true;
+
+                case PlatformAction.ZoomOut:
+                    uiScale.Value -= adjustment_increment;
+                    return true;
+
+                case PlatformAction.ZoomDefault:
+                    uiScale.SetDefault();
+                    return true;
+            }
+
+            return base.OnPressed(e);
+        }
+
         #region Inactive audio dimming
 
         private readonly BindableDouble inactiveVolumeFade = new BindableDouble();
@@ -1150,7 +1151,7 @@ namespace osu.Game
             ScreenOffsetContainer.Padding = new MarginPadding { Top = ToolbarOffset };
             overlayOffsetContainer.Padding = new MarginPadding { Top = ToolbarOffset };
 
-            var horizontalOffset = 0f;
+            float horizontalOffset = 0f;
 
             // Content.ToLocalSpace() is used instead of this.ToLocalSpace() to correctly calculate the offset with scaling modes active.
             // Content is a child of a scaling container with ScalingMode.Everything set, while the game itself is never scaled.

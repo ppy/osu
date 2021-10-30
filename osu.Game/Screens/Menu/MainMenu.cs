@@ -20,7 +20,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Import;
-using osu.Game.Screens.Mvis;
+using osu.Game.Screens.LLin;
 using osuTK;
 using osuTK.Graphics;
 
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Menu
 
         private void loadSoloSongSelect() => this.Push(consumeSongSelect());
 
-        private void onMvis() => this.Push(new MvisScreen());
+        private void onMvis() => this.Push(new LLinScreen());
 
         private void onImport() => this.Push(new FileImportScreen());
 

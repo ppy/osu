@@ -11,9 +11,9 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Screens.Mvis;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Types;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 {
@@ -21,7 +21,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
     {
         private LoadingSpinner loading;
 
-        public LyricSidebarSectionContainer(MvisPlugin plugin)
+        public LyricSidebarSectionContainer(LLinPlugin plugin)
             : base(plugin)
         {
             Icon = FontAwesome.Solid.Music;
@@ -31,7 +31,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             => new LyricFunctionProvider(this);
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementLLin mvisScreen { get; set; }
 
         [Resolved]
         private Storage storage { get; set; }

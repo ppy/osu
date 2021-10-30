@@ -2,7 +2,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         };
 
         [BackgroundDependencyLoader]
-        private void load(MvisPluginManager manager)
+        private void load(LLinPluginManager manager)
         {
             foreach (var pl in manager.GetAllPlugins(false))
             {

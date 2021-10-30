@@ -1,37 +1,9 @@
-﻿using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osu.Game.Beatmaps;
+﻿using System;
 
 namespace osu.Game.Screens.Mvis.Misc
 {
-    public class BeatmapBackground : BufferedContainer
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public class BeatmapBackground : osu.Game.Screens.LLin.Misc.BeatmapBackground
     {
-        private readonly Sprite sprite;
-        private readonly WorkingBeatmap beatmap;
-
-        public BeatmapBackground(WorkingBeatmap beatmap = null)
-        {
-            this.beatmap = beatmap;
-            RelativeSizeAxes = Axes.Both;
-
-            CacheDrawnFrameBuffer = true;
-
-            Child = sprite = new Sprite
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fill,
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
-        }
     }
 }

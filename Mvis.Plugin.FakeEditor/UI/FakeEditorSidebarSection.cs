@@ -1,16 +1,16 @@
-using M.Resources.Localisation.Mvis;
+using M.Resources.Localisation.LLin;
 using Mvis.Plugin.FakeEditor.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
-using osu.Game.Screens.Mvis.SideBar.Settings.Items;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.SideBar.Settings.Items;
 
 namespace Mvis.Plugin.FakeEditor.UI
 {
     public class FakeEditorSidebarSection : PluginSidebarSettingsSection
     {
-        public FakeEditorSidebarSection(MvisPlugin plugin)
+        public FakeEditorSidebarSection(LLinPlugin plugin)
             : base(plugin)
         {
         }
@@ -26,7 +26,7 @@ namespace Mvis.Plugin.FakeEditor.UI
             {
                 new SettingsTogglePiece
                 {
-                    Description = MvisGenericStrings.EnablePlugin,
+                    Description = LLinGenericStrings.EnablePlugin,
                     Bindable = config.GetBindable<bool>(FakeEditorSetting.EnableFakeEditor)
                 }
             });

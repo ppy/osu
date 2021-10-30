@@ -50,6 +50,22 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "强制光标使用长拖尾",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.CursorTrailForceLong)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "隐藏300判定显示",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.NoDraw300)
+                },
+                new SettingsEnumDropdown<PlayfieldBorderStyle>
+                {
+                    LabelText = "游玩区域边框风格",
+                    Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
+                },
+                new OsuSpriteText
+                {
+                    Text = "CursorDance设置",
+                    Margin = new MarginPadding { Vertical = 15, Left = SettingsPanel.CONTENT_MARGINS },
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                },
                 new SettingsSlider<float, FramerateSlider>
                 {
                     LabelText = "回放帧率",
@@ -110,11 +126,6 @@ namespace osu.Game.Rulesets.Osu.UI
                 {
                     LabelText = "遇到边界时反弹",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.BorderBounce)
-                },
-                new SettingsEnumDropdown<PlayfieldBorderStyle>
-                {
-                    LabelText = "游玩区域边框风格",
-                    Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
                 },
                 new SettingsCheckbox
                 {
@@ -231,6 +242,22 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "滑条倍率",
                     Current = config.GetBindable<float>(OsuRulesetSetting.BezierSliderAggressiveness),
                     KeyboardStep = 1
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "跳过短滑条",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.SkipShortSlider)
+                },
+                new OsuSpriteText
+                {
+                    Text = "Linear 移动设置",
+                    Margin = new MarginPadding { Vertical = 15, Left = SettingsPanel.CONTENT_MARGINS },
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Wait for preempt",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.WaitForPreempt)
                 }
             };
         }

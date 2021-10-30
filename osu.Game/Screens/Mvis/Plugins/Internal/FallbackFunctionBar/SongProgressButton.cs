@@ -1,36 +1,14 @@
 using System;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics.Audio;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using IToggleableFunctionProvider = osu.Game.Screens.LLin.Plugins.Types.IToggleableFunctionProvider;
 
 namespace osu.Game.Screens.Mvis.Plugins.Internal.FallbackFunctionBar
 {
-    public class SongProgressButton : ToggleableBarButton
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public class SongProgressButton : osu.Game.Screens.LLin.Plugins.Internal.FallbackFunctionBar.SongProgressButton
     {
         public SongProgressButton(IToggleableFunctionProvider provider)
             : base(provider)
         {
-            Width = 120;
-        }
-
-        private string timeCurrent;
-        private string timeTotal;
-
-        [Resolved]
-        private MvisScreen mvisScreen { get; set; }
-
-        private DrawableTrack track => mvisScreen.CurrentTrack;
-
-        private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
-
-        protected override void Update()
-        {
-            base.Update();
-
-            int currentSecond = (int)Math.Floor(track.CurrentTime / 1000.0);
-            timeCurrent = formatTime(TimeSpan.FromSeconds(currentSecond));
-            timeTotal = formatTime(TimeSpan.FromMilliseconds(track.Length));
-            Title = $"{timeCurrent} / {timeTotal}";
         }
     }
 }

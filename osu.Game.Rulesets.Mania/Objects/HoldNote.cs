@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Mania.Objects
             }
         }
 
-        public List<IList<HitSampleInfo>> NodeSamples { get; set; }
+        public IList<IList<HitSampleInfo>> NodeSamples { get; set; }
 
         /// <summary>
         /// The head note of the hold.

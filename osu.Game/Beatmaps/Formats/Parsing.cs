@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps.Formats
 
         public static float ParseFloat(string input, float parseLimit = (float)MAX_PARSE_VALUE)
         {
-            var output = float.Parse(input, CultureInfo.InvariantCulture);
+            float output = float.Parse(input, CultureInfo.InvariantCulture);
 
             if (output < -parseLimit) throw new OverflowException("取值过低");
             if (output > parseLimit) throw new OverflowException("取值过高");
@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Formats
 
         public static double ParseDouble(string input, double parseLimit = MAX_PARSE_VALUE)
         {
-            var output = double.Parse(input, CultureInfo.InvariantCulture);
+            double output = double.Parse(input, CultureInfo.InvariantCulture);
 
             if (output < -parseLimit) throw new OverflowException("取值过低");
             if (output > parseLimit) throw new OverflowException("取值过高");
@@ -41,7 +41,7 @@ namespace osu.Game.Beatmaps.Formats
 
         public static int ParseInt(string input, int parseLimit = (int)MAX_PARSE_VALUE)
         {
-            var output = int.Parse(input, CultureInfo.InvariantCulture);
+            int output = int.Parse(input, CultureInfo.InvariantCulture);
 
             if (output < -parseLimit) throw new OverflowException("取值过低");
             if (output > parseLimit) throw new OverflowException("取值过高");

@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using M.Resources.Localisation.Mvis.Plugins;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using osu.Framework.Allocation;
@@ -14,7 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis;
+using osu.Game.Screens.LLin;
 using osuTK;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
@@ -95,7 +95,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         }
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementLLin mvisScreen { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()

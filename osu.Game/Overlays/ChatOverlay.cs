@@ -478,7 +478,7 @@ namespace osu.Game.Overlays
 
         private void postMessage(TextBox textbox, bool newText)
         {
-            var text = textbox.Text.Trim();
+            string text = textbox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
                 return;

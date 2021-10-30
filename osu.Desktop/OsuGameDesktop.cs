@@ -22,6 +22,8 @@ using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.IO;
@@ -130,7 +132,20 @@ namespace osu.Desktop
             dBusManagerContainer.NotificationAction += n => Notifications.Post(n);
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
+
+            MConfig.BindWith(MSetting.AllowWindowFadeEffect, allowWindowFade);
+
+            windowOpacity = new BindableFloat
+            {
+                Value = allowWindowFade.Value
+                    ? 0
+                    : 1
+            };
+
+            windowOpacity.BindValueChanged(v => SetWindowOpacity(v.NewValue), true);
         }
+
+        private readonly BindableBool allowWindowFade = new BindableBool();
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
         {
@@ -138,9 +153,21 @@ namespace osu.Desktop
 
             switch (newScreen)
             {
-                case IntroScreen _:
+                case IntroScreen introScreen:
+                    versionManager?.Show();
+
+                    if (!(lastScreen is Disclaimer) && allowWindowFade.Value)
+                        TransformWindowOpacity(0, introScreen.FadeOutTime - 1);
+
+                    break;
+
                 case MainMenu _:
                     versionManager?.Show();
+                    break;
+
+                case Disclaimer _:
+                    if (!(lastScreen is IntroScreen) && allowWindowFade.Value)
+                        TransformWindowOpacity(1, 300);
                     break;
 
                 default:
@@ -148,6 +175,8 @@ namespace osu.Desktop
                     break;
             }
         }
+
+        private BindableFloat windowOpacity;
 
         public override void SetHost(GameHost host)
         {
@@ -172,7 +201,7 @@ namespace osu.Desktop
         {
             lock (importableFiles)
             {
-                var firstExtension = Path.GetExtension(filePaths.First());
+                string firstExtension = Path.GetExtension(filePaths.First());
 
                 if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
 
@@ -193,11 +222,16 @@ namespace osu.Desktop
             {
                 Logger.Log($"Handling batch import of {importableFiles.Count} files");
 
-                var paths = importableFiles.ToArray();
+                string[] paths = importableFiles.ToArray();
                 importableFiles.Clear();
 
                 Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
             }
         }
+
+        public void TransformWindowOpacity(float final, double duration = 0, Easing easing = Easing.None) =>
+            this.TransformBindableTo(windowOpacity, final, duration, easing);
+
+        public void SetWindowOpacity(float value) => ((SDL2DesktopWindow)Window).Opacity = value;
     }
 }

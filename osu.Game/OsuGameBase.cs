@@ -207,7 +207,7 @@ namespace osu.Game
             InitialiseFonts();
 
             //CustomStore在字体后初始化，避免覆盖原有字体
-            var customStore = new CustomStore(Storage, this);
+            var customStore = new CustomFontStore(Storage, this);
             largeStore.AddStore(new TextureLoaderStore(customStore));
             dependencies.Cache(customStore);
 

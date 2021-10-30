@@ -2,8 +2,8 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
-using osu.Game.Screens.Mvis;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin;
+using osu.Game.Screens.LLin.Plugins.Types;
 
 namespace Mvis.Plugin.BottomBar.Buttons
 {
@@ -13,9 +13,9 @@ namespace Mvis.Plugin.BottomBar.Buttons
         private string timeTotal;
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementLLin mvis { get; set; }
 
-        private DrawableTrack track => mvisScreen.CurrentTrack;
+        private DrawableTrack track => mvis.CurrentTrack;
 
         private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
 

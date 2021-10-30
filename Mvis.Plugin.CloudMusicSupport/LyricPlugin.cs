@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using M.DBus.Tray;
-using M.Resources.Localisation.Mvis.Plugins;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.DBus;
 using Mvis.Plugin.CloudMusicSupport.Helper;
@@ -14,9 +14,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Audio;
@@ -29,7 +29,7 @@ namespace Mvis.Plugin.CloudMusicSupport
     public class LyricPlugin : BindableControlledPlugin, IProvideAudioControlPlugin
     {
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.TargetLayer"/>
+        /// 请参阅 <see cref="LLinPlugin.TargetLayer"/>
         /// </summary>
         public override TargetLayer Target => TargetLayer.Foreground;
 
@@ -45,13 +45,13 @@ namespace Mvis.Plugin.CloudMusicSupport
         public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
             => new LyricSidebarSection(this);
 
-        public override int Version => 7;
+        public override int Version => 8;
 
         private WorkingBeatmap currentWorkingBeatmap;
         private LyricLineHandler lrcLine;
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.CreateContent()"/>
+        /// 请参阅 <see cref="LLinPlugin.CreateContent()"/>
         /// </summary>
         protected override Drawable CreateContent() => lrcLine = new LyricLineHandler();
 
@@ -80,7 +80,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         public void RequestControl(Action onAllow)
         {
-            MvisScreen.RequestAudioControl(this,
+            LLin.RequestAudioControl(this,
                 CloudMusicStrings.AudioControlRequest,
                 () => IsEditing = false,
                 onAllow);
@@ -97,7 +97,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             set
             {
                 if (!value)
-                    MvisScreen.ReleaseAudioControlFrom(this);
+                    LLin.ReleaseAudioControlFrom(this);
             }
         }
 
@@ -125,7 +125,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         }
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.OnContentLoaded(Drawable)"/>
+        /// 请参阅 <see cref="LLinPlugin.OnContentLoaded(Drawable)"/>
         /// </summary>
         protected override bool OnContentLoaded(Drawable content) => true;
 
@@ -140,7 +140,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         [BackgroundDependencyLoader]
         private void load()
         {
-            var config = (LyricConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
+            var config = (LyricConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
 
             config.BindWith(LyricSettings.EnablePlugin, Value);
             config.BindWith(LyricSettings.LyricOffset, offset);
@@ -150,9 +150,9 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
 
-            if (MvisScreen != null)
+            if (LLin != null)
             {
-                MvisScreen.OnScreenExiting += onMvisExiting;
+                LLin.Exiting += onMvisExiting;
             }
         }
 
@@ -239,7 +239,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             this.MoveToX(0, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
 
-            MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
+            LLin?.OnBeatmapChanged(onBeatmapChanged, this, true);
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
@@ -292,7 +292,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             base.Update();
 
-            Padding = new MarginPadding { Bottom = (MvisScreen?.BottombarHeight ?? 0) + 20 };
+            Padding = new MarginPadding { Bottom = (LLin?.BottomBarHeight ?? 0) + 20 };
 
             if (ContentLoaded)
             {

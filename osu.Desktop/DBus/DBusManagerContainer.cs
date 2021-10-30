@@ -101,6 +101,8 @@ namespace osu.Desktop.DBus
         private Bindable<bool> enableTray;
         private Bindable<bool> enableSystemNotifications;
 
+        private Bindable<string> iconName;
+
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, Storage storage)
         {
@@ -114,7 +116,11 @@ namespace osu.Desktop.DBus
             DBusManager.GreetService.AllowPost = config.GetBindable<bool>(MSetting.DBusAllowPost);
             DBusManager.GreetService.OnMessageRecive = onMessageRevicedFromDBus;
 
-            void onDBusConnected()
+            iconName = config.GetBindable<string>(MSetting.TrayIconName);
+            enableTray = config.GetBindable<bool>(MSetting.EnableTray);
+            enableSystemNotifications = config.GetBindable<bool>(MSetting.EnableSystemNotifications);
+
+            void onDBusFirstConnected()
             {
                 DBusManager.RegisterNewObject(mprisService,
                     "org.mpris.MediaPlayer2.mfosu");
@@ -149,13 +155,17 @@ namespace osu.Desktop.DBus
                 enableTray.BindValueChanged(onEnableTrayChanged, true);
                 enableSystemNotifications.BindValueChanged(onEnableNotificationsChanged, true);
 
-                DBusManager.OnConnected -= onDBusConnected;
+                //bug: 一连接上就设置IconName会导致托盘图标不显示？
+                kdeTrayService.KdeProperties.IconName = iconName.Value;
+                iconName.BindValueChanged(v =>
+                {
+                    kdeTrayService.Set("IconName", v.NewValue);
+                });
+
+                DBusManager.OnConnected -= onDBusFirstConnected;
             }
 
-            enableTray = config.GetBindable<bool>(MSetting.EnableTray);
-            enableSystemNotifications = config.GetBindable<bool>(MSetting.EnableSystemNotifications);
-
-            DBusManager.OnConnected += onDBusConnected;
+            DBusManager.OnConnected += onDBusFirstConnected;
 
             api.LocalUser.BindValueChanged(onUserChanged, true);
             beatmap.BindValueChanged(onBeatmapChanged, true);

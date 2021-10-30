@@ -12,13 +12,13 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
 using osuTK.Graphics;
 
 namespace Mvis.Plugin.Example
 {
-    public class ExamplePlugin : MvisPlugin
+    public class ExamplePlugin : LLinPlugin
     {
         private OsuSpriteText text1;
         private OsuSpriteText text2;
@@ -26,7 +26,7 @@ namespace Mvis.Plugin.Example
         private OsuSpriteText text4;
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.TargetLayer"/>
+        /// 请参阅 <see cref="LLinPlugin.TargetLayer"/>
         /// </summary>
         public override TargetLayer Target => TargetLayer.Foreground;
 
@@ -74,7 +74,7 @@ namespace Mvis.Plugin.Example
         }
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.CreateContent()"/>
+        /// 请参阅 <see cref="LLinPlugin.CreateContent()"/>
         /// </summary>
         protected override Drawable CreateContent() => new FillFlowContainer
         {
@@ -112,14 +112,14 @@ namespace Mvis.Plugin.Example
         public Bindable<string> BindableString;
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.PostInit()"/>
+        /// 请参阅 <see cref="LLinPlugin.PostInit()"/>
         /// </summary>
         protected override bool PostInit()
         {
             Logger.Log($"插件{Name}开始加载前的准备!");
 
             //从MvisPluginManager获取自己的配置管理器
-            var config = (ExamplePluginConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
+            var config = (ExamplePluginConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
 
             //从配置管理器获取bindable，你也可以用config.BindWith()来将某一配置和现有的Bindable绑定。
             BindableString = config.GetBindable<string>(ExamplePluginSettings.KeyString);
@@ -129,7 +129,7 @@ namespace Mvis.Plugin.Example
         }
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.OnContentLoaded(Drawable)"/>
+        /// 请参阅 <see cref="LLinPlugin.OnContentLoaded(Drawable)"/>
         /// </summary>
         protected override bool OnContentLoaded(Drawable content)
         {
@@ -192,7 +192,7 @@ namespace Mvis.Plugin.Example
         }
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.Disable()"/>
+        /// 请参阅 <see cref="LLinPlugin.Disable()"/>
         /// </summary>
         public override bool Disable()
         {
@@ -202,7 +202,7 @@ namespace Mvis.Plugin.Example
         }
 
         /// <summary>
-        /// 请参阅 <see cref="MvisPlugin.Enable()"/>
+        /// 请参阅 <see cref="LLinPlugin.Enable()"/>
         /// </summary>
         public override bool Enable()
         {

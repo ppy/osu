@@ -1,7 +1,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Types;
 
 namespace Mvis.Plugin.Example.Sidebar
 {
@@ -9,14 +9,14 @@ namespace Mvis.Plugin.Example.Sidebar
     {
         private OsuSpriteText text;
 
-        public ExampleSidebarPage(MvisPlugin plugin)
+        public ExampleSidebarPage(LLinPlugin plugin)
             : base(plugin, 0.3f)
         {
         }
 
         public override IPluginFunctionProvider GetFunctionEntry() => null;
 
-        protected override void InitContent(MvisPlugin plugin)
+        protected override void InitContent(LLinPlugin plugin)
         {
             var pl = (ExamplePlugin)plugin;
 

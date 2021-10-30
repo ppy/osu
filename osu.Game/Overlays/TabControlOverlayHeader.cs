@@ -111,7 +111,7 @@ namespace osu.Game.Overlays
                     else
                     {
                         var localisableDescription = enumValue.GetLocalisableDescription();
-                        var nonLocalisableDescription = enumValue.GetDescription();
+                        string nonLocalisableDescription = enumValue.GetDescription();
 
                         // If localisable == non-localisable, then we must have a basic string, so .ToLower() is used.
                         Text.Text = localisableDescription.Equals(nonLocalisableDescription)

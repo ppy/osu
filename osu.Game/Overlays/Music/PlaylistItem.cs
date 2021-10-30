@@ -3,12 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -25,7 +23,7 @@ namespace osu.Game.Overlays.Music
         public Action<BeatmapSetInfo> RequestSelection;
 
         private TextFlowContainer text;
-        private IEnumerable<Drawable> titleSprites;
+        private ITextPart titlePart;
 
         private ILocalisedBindableString title;
         private ILocalisedBindableString artist;
@@ -63,9 +61,14 @@ namespace osu.Game.Overlays.Music
                 if (set.OldValue?.Equals(Model) != true && set.NewValue?.Equals(Model) != true)
                     return;
 
-                foreach (Drawable s in titleSprites)
-                    s.FadeColour(set.NewValue.Equals(Model) ? selectedColour : Color4.White, FADE_DURATION);
+                updateSelectionState(false);
             }, true);
+        }
+
+        private void updateSelectionState(bool instant)
+        {
+            foreach (Drawable s in titlePart.Drawables)
+                s.FadeColour(SelectedSet.Value?.Equals(Model) == true ? selectedColour : Color4.White, instant ? 0 : FADE_DURATION);
         }
 
         protected override Drawable CreateContent() => text = new OsuTextFlowContainer
@@ -79,10 +82,8 @@ namespace osu.Game.Overlays.Music
             text.Clear();
 
             // space after the title to put a space between the title and artist
-            titleSprites = text.AddText(title.Value + @"  ", sprite =>
-            {
-                sprite.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular);
-            }).OfType<SpriteText>();
+            titlePart = text.AddText(title.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
+            updateSelectionState(true);
 
             text.AddText(artist.Value, sprite =>
             {

@@ -60,7 +60,7 @@ namespace osu.Game.Graphics
 
                 case Typeface.Torus:
                 case Typeface.Custom:
-                    if (CustomStore.CustomFontLoaded)
+                    if (CustomFontStore.CustomFontLoaded)
                         return GetCustomTypeface();
 
                     return "Torus";

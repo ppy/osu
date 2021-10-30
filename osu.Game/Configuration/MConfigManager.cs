@@ -8,7 +8,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Screens.Mvis.SideBar.Tabs;
+using osu.Game.Screens.LLin.SideBar.Tabs;
 using osuTK.Graphics;
 
 namespace osu.Game.Configuration
@@ -61,11 +61,14 @@ namespace osu.Game.Configuration
             //实验性功能
             SetDefault(MSetting.CustomWindowIconPath, "");
             SetDefault(MSetting.UseCustomGreetingPicture, false);
-            SetDefault(MSetting.FadeOutWindowWhenExiting, false);
-            SetDefault(MSetting.FadeInWindowWhenEntering, false);
+            SetDefault(MSetting.AllowWindowFadeEffect, false);
             SetDefault(MSetting.UseSystemCursor, false);
             SetDefault(MSetting.PreferredFont, "Torus");
             SetDefault(MSetting.LoaderBackgroundColor, "#000000");
+
+            //Deprecated
+            SetDefault(MSetting.FadeOutWindowWhenExiting, false);
+            SetDefault(MSetting.FadeInWindowWhenEntering, false);
 
             //Gamemode集成
             SetDefault(MSetting.Gamemode, GamemodeActivateCondition.InGame);
@@ -77,9 +80,13 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.DBusAllowPost, true);
             SetDefault(MSetting.EnableTray, isLinuxPlatform);
             SetDefault(MSetting.EnableSystemNotifications, isLinuxPlatform);
+            SetDefault(MSetting.TrayIconName, "mfosu-panel");
 
             //Mpris
             SetDefault(MSetting.MprisUseAvatarlogoAsCover, true);
+
+            if (Get<bool>(MSetting.FadeOutWindowWhenExiting) || Get<bool>(MSetting.FadeInWindowWhenEntering))
+                SetValue(MSetting.AllowWindowFadeEffect, true);
         }
 
         public Color4 GetCustomLoaderColor()
@@ -123,6 +130,7 @@ namespace osu.Game.Configuration
         IntroLoadDirectToSongSelect,
         CustomWindowIconPath,
         UseCustomGreetingPicture,
+        AllowWindowFadeEffect,
         FadeOutWindowWhenExiting,
         FadeInWindowWhenEntering,
         UseSystemCursor,
@@ -136,7 +144,8 @@ namespace osu.Game.Configuration
         DBusAllowPost,
         MprisUseAvatarlogoAsCover,
         EnableTray,
-        EnableSystemNotifications
+        EnableSystemNotifications,
+        TrayIconName
     }
 
     public enum GamemodeActivateCondition

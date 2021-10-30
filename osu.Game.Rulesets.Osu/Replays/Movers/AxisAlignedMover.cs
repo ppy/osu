@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Replays.Movers
 {
-    public class AxisAlignedMover : DanceMover
+    public class AxisAlignedMover : Mover
     {
         private SliderPath path;
 

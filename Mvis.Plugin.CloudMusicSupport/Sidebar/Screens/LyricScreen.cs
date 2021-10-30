@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Screens.Mvis;
+using osu.Game.Screens.LLin;
 using osuTK;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
@@ -23,7 +23,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         protected LyricPlugin Plugin => plugin;
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementLLin mvisScreen { get; set; }
 
         protected readonly OsuScrollContainer LyricScroll;
         protected readonly FillFlowContainer<DrawableLyric> LyricFlow;

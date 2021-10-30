@@ -1,9 +1,9 @@
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace Mvis.Plugin.Sandbox
 {
-    public class SandboxPanelProvider : MvisPluginProvider
+    public class SandboxPanelProvider : LLinPluginProvider
     {
-        public override MvisPlugin CreatePlugin => new SandboxPanel();
+        public override LLinPlugin CreatePlugin => new SandboxPanel();
     }
 }

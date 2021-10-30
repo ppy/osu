@@ -1,12 +1,9 @@
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
+using System;
 
 namespace osu.Game.Screens.Mvis.Misc
 {
-    public class BlockMouseBox : Box
+    [Obsolete("原Mvis播放器现已移动至LLin(osu.Game.Screens.LLin)")]
+    public class BlockMouseBox : osu.Game.Screens.LLin.Misc.BlockMouseBox
     {
-        protected override bool OnClick(ClickEvent e) => true;
-        protected override bool OnMouseMove(MouseMoveEvent e) => true;
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
     }
 }

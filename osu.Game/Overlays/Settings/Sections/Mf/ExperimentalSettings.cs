@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager mConfig, OsuGame game, CustomStore customStorage)
+        private void load(MConfigManager mConfig, OsuGame game, CustomFontStore customStorage)
         {
             Children = new Drawable[]
             {
@@ -80,30 +80,16 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
             if (RuntimeInfo.IsDesktop)
             {
-                bool isSdlBackend = host.Window is SDL2DesktopWindow;
-                Bindable<bool> fadeOutWindowBindable;
-                Bindable<bool> fadeInWindowBindable;
-
                 Add(new ExperimentalSettingsSetupContainer("自定义窗口图标", MSetting.CustomWindowIconPath));
 
                 Add(new ExperimentalSettingsSetupContainer("加载页背景色(HEX颜色)", MSetting.LoaderBackgroundColor));
 
                 Add(new SettingsCheckbox
                 {
-                    LabelText = "退出时淡出窗口",
-                    TooltipText = isSdlBackend ? string.Empty : "仅当窗口后端为SDL2时可用",
-                    Current = fadeOutWindowBindable = mConfig.GetBindable<bool>(MSetting.FadeOutWindowWhenExiting),
+                    LabelText = "允许窗口淡入、淡出",
+                    TooltipText = "可能在Wayland上没有效果",
+                    Current = mConfig.GetBindable<bool>(MSetting.AllowWindowFadeEffect)
                 });
-
-                Add(new SettingsCheckbox
-                {
-                    LabelText = "启动时淡入窗口",
-                    TooltipText = isSdlBackend ? string.Empty : "仅当窗口后端为SDL2时可用",
-                    Current = fadeInWindowBindable = mConfig.GetBindable<bool>(MSetting.FadeInWindowWhenEntering),
-                });
-
-                fadeOutWindowBindable.Disabled = !isSdlBackend;
-                fadeInWindowBindable.Disabled = !isSdlBackend;
             }
 
             var fonts = customStorage.ActiveFonts;

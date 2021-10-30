@@ -3,8 +3,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis;
-using osu.Game.Screens.Mvis.Misc;
+using osu.Game.Screens.LLin;
+using osu.Game.Screens.LLin.Misc;
 
 namespace Mvis.Plugin.BottomBar
 {
@@ -17,7 +17,7 @@ namespace Mvis.Plugin.BottomBar
         private CustomColourProvider colourProvider { get; set; }
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementLLin mvis { get; set; }
 
         private const float idle_alpha = 0.5f;
 
@@ -52,12 +52,12 @@ namespace Mvis.Plugin.BottomBar
 
         protected override void LoadComplete()
         {
-            mvisScreen.OnIdle += () =>
+            mvis.OnIdle += () =>
             {
                 if (IsHovered) showIndicators();
                 UpdateValue(fill.Width);
             };
-            mvisScreen.OnResumeFromIdle += hideIndicators;
+            mvis.OnActive += hideIndicators;
 
             base.LoadComplete();
         }
@@ -89,7 +89,7 @@ namespace Mvis.Plugin.BottomBar
         {
             fill.Width = value;
 
-            if (mvisScreen.OverlaysHidden)
+            if (mvis.InterfacesHidden)
             {
                 songProgressIndicator.MoveToX(
                     getFinalPosX(songProgressIndicator, (value * UsableWidth) - (songProgressIndicator.Width / 2)),
@@ -116,7 +116,7 @@ namespace Mvis.Plugin.BottomBar
 
         protected override void Update()
         {
-            if (mvisScreen.OverlaysHidden)
+            if (mvis.InterfacesHidden)
             {
                 var indicatorX = indicator.X - 5;
                 var indicatorEnd = indicatorX + indicator.Width + 5;
@@ -144,7 +144,7 @@ namespace Mvis.Plugin.BottomBar
 
         private void showIndicators()
         {
-            if (!mvisScreen.OverlaysHidden) return;
+            if (!mvis.InterfacesHidden) return;
 
             indicator.Show();
             songProgressIndicator.Show();

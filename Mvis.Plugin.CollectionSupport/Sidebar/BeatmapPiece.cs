@@ -14,8 +14,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis;
-using osu.Game.Screens.Mvis.Misc;
+using osu.Game.Screens.LLin;
+using osu.Game.Screens.LLin.Misc;
 
 namespace Mvis.Plugin.CollectionSupport.Sidebar
 {

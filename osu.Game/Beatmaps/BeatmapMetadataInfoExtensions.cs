@@ -37,8 +37,8 @@ namespace osu.Game.Beatmaps
         public static RomanisableString GetDisplayTitleRomanisable(this IBeatmapMetadataInfo metadataInfo)
         {
             string author = string.IsNullOrEmpty(metadataInfo.Author) ? string.Empty : $"({metadataInfo.Author})";
-            var artistUnicode = string.IsNullOrEmpty(metadataInfo.ArtistUnicode) ? metadataInfo.Artist : metadataInfo.ArtistUnicode;
-            var titleUnicode = string.IsNullOrEmpty(metadataInfo.TitleUnicode) ? metadataInfo.Title : metadataInfo.TitleUnicode;
+            string artistUnicode = string.IsNullOrEmpty(metadataInfo.ArtistUnicode) ? metadataInfo.Artist : metadataInfo.ArtistUnicode;
+            string titleUnicode = string.IsNullOrEmpty(metadataInfo.TitleUnicode) ? metadataInfo.Title : metadataInfo.TitleUnicode;
 
             return new RomanisableString($"{artistUnicode} - {titleUnicode} {author}".Trim(), $"{metadataInfo.Artist} - {metadataInfo.Title} {author}".Trim());
         }

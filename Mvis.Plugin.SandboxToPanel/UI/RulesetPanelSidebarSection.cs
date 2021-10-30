@@ -1,19 +1,19 @@
 using System.Collections.Generic;
-using M.Resources.Localisation.Mvis;
-using M.Resources.Localisation.Mvis.Plugins;
+using M.Resources.Localisation.LLin;
+using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.Sandbox.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
-using osu.Game.Screens.Mvis.SideBar.Settings.Items;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.SideBar.Settings.Items;
 
 namespace Mvis.Plugin.Sandbox.UI
 {
     public class RulesetPanelSidebarSection : PluginSidebarSettingsSection
     {
-        public RulesetPanelSidebarSection(MvisPlugin plugin)
+        public RulesetPanelSidebarSection(LLinPlugin plugin)
             : base(plugin)
         {
             Title = "Sandbox";
@@ -37,7 +37,7 @@ namespace Mvis.Plugin.Sandbox.UI
             {
                 new SettingsTogglePiece
                 {
-                    Description = MvisGenericStrings.EnablePlugin,
+                    Description = LLinGenericStrings.EnablePlugin,
                     Bindable = config.GetBindable<bool>(SandboxSetting.EnableRulesetPanel)
                 },
                 new SettingsSliderPiece<float>

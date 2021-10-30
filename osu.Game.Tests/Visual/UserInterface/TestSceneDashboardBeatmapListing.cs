@@ -11,6 +11,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dashboard.Home;
 using osu.Game.Users;
+using System;
+using osu.Framework.Graphics.Shapes;
+using System.Collections.Generic;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -69,7 +73,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Id = 100
                     }
                 },
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     Covers = new BeatmapSetOnlineCovers
                     {
@@ -90,7 +94,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Id = 100
                     }
                 },
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     Covers = new BeatmapSetOnlineCovers
                     {
@@ -115,7 +119,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Id = 100
                     }
                 },
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     Covers = new BeatmapSetOnlineCovers
                     {
@@ -136,7 +140,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Id = 100
                     }
                 },
-                OnlineInfo = new BeatmapSetOnlineInfo
+                OnlineInfo = new APIBeatmapSet
                 {
                     Covers = new BeatmapSetOnlineCovers
                     {

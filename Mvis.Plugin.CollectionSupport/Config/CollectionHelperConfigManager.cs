@@ -1,5 +1,5 @@
 using osu.Framework.Platform;
-using osu.Game.Screens.Mvis.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins.Config;
 
 namespace Mvis.Plugin.CollectionSupport.Config
 {

@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
             {
                 SettingsCheckbox trayCheckbox;
-                AddRange(new[]
+                AddRange(new Drawable[]
                 {
                     trayCheckbox = new SettingsCheckbox
                     {
@@ -49,6 +49,11 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     {
                         LabelText = "允许通过DBus发送系统通知",
                         Current = config.GetBindable<bool>(MSetting.EnableSystemNotifications)
+                    },
+                    new SettingsTextBox
+                    {
+                        LabelText = "托盘图标名称",
+                        Current = config.GetBindable<string>(MSetting.TrayIconName)
                     }
                 });
 

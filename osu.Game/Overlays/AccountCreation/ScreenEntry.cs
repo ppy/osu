@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -37,7 +36,7 @@ namespace osu.Game.Overlays.AccountCreation
         private IAPIProvider api { get; set; }
 
         private ShakeContainer registerShake;
-        private IEnumerable<Drawable> characterCheckText;
+        private ITextPart characterCheckText;
 
         private OsuTextBox[] textboxes;
         private LoadingLayer loadingLayer;
@@ -143,7 +142,7 @@ namespace osu.Game.Overlays.AccountCreation
 
             characterCheckText = passwordDescription.AddText("密码要求至少长8个字符", cp => cp.Font = cp.Font.With(size: 16));
 
-            passwordTextBox.Current.ValueChanged += password => { characterCheckText.ForEach(s => s.Colour = password.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(password.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
+            passwordTextBox.Current.ValueChanged += password => { characterCheckText.Drawables.ForEach(s => s.Colour = password.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(password.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
         }
 
         public override void OnEntering(IScreen last)

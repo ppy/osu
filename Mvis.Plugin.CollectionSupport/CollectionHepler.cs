@@ -11,15 +11,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Config;
-using osu.Game.Screens.Mvis.Plugins.Types;
-using osu.Game.Screens.Mvis.SideBar.Settings.Items;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Config;
+using osu.Game.Screens.LLin.Plugins.Types;
+using osu.Game.Screens.LLin.SideBar.Settings.Items;
 
 namespace Mvis.Plugin.CollectionSupport
 {
@@ -63,7 +64,7 @@ namespace Mvis.Plugin.CollectionSupport
 
         protected override bool PostInit() => true;
 
-        public override int Version => 7;
+        public override int Version => 8;
 
         public override PluginSidebarPage CreateSidebarPage()
             => new CollectionPluginPage(this);
@@ -100,7 +101,7 @@ namespace Mvis.Plugin.CollectionSupport
         [BackgroundDependencyLoader]
         private void load()
         {
-            var config = (CollectionHelperConfigManager)DependenciesContainer.Get<MvisPluginManager>().GetConfigManager(this);
+            var config = (CollectionHelperConfigManager)DependenciesContainer.Get<LLinPluginManager>().GetConfigManager(this);
             config.BindWith(CollectionSettings.EnablePlugin, Value);
             b.BindValueChanged(v =>
             {
@@ -110,10 +111,10 @@ namespace Mvis.Plugin.CollectionSupport
 
             PluginManager.RegisterDBusObject(dBusObject = new CollectionDBusObject());
 
-            if (MvisScreen != null)
+            if (LLin != null)
             {
-                MvisScreen.OnScreenResuming += UpdateBeatmaps;
-                MvisScreen.OnScreenExiting += onMvisExiting;
+                LLin.Resuming += UpdateBeatmaps;
+                LLin.Exiting += onMvisExiting;
             }
         }
 
@@ -137,8 +138,7 @@ namespace Mvis.Plugin.CollectionSupport
 
         public void Play(WorkingBeatmap b) => changeBeatmap(b);
 
-        public void NextTrack() =>
-            changeBeatmap(getBeatmap(beatmapList, b.Value, true));
+        public void NextTrack() => changeBeatmap(getBeatmap(beatmapList, b.Value, true));
 
         public void PrevTrack() =>
             changeBeatmap(getBeatmap(beatmapList, b.Value, true, -1));
@@ -341,7 +341,7 @@ namespace Mvis.Plugin.CollectionSupport
             if (collectionManager != null)
                 collectionManager.Collections.CollectionChanged -= triggerRefresh;
 
-            if (MvisScreen != null) MvisScreen.OnScreenResuming -= UpdateBeatmaps;
+            if (LLin != null) LLin.Resuming -= UpdateBeatmaps;
 
             base.Dispose(isDisposing);
         }

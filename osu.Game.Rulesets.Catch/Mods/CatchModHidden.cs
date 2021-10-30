@@ -52,8 +52,8 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             var hitObject = drawable.HitObject;
 
-            var offset = hitObject.TimePreempt * fade_out_offset_multiplier;
-            var duration = offset - hitObject.TimePreempt * fade_out_duration_multiplier;
+            double offset = hitObject.TimePreempt * fade_out_offset_multiplier;
+            double duration = offset - hitObject.TimePreempt * fade_out_duration_multiplier;
 
             using (drawable.BeginAbsoluteSequence(hitObject.StartTime - offset))
                 drawable.FadeOut(duration);

@@ -1,8 +1,8 @@
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.LLin.Plugins;
+using osu.Game.Screens.LLin.Plugins.Types;
 using osuTK;
 
 namespace Mvis.Plugin.Example.Sidebar

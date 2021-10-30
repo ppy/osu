@@ -6,8 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis;
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin;
+using osu.Game.Screens.LLin.Plugins;
 using osuTK.Graphics;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
@@ -15,7 +15,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
     public class TrackTimeIndicator : CompositeDrawable
     {
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
+        private IImplementLLin mvisScreen { get; set; }
 
         [Resolved]
         private LyricSidebarSectionContainer sidebarPage { get; set; }
@@ -37,7 +37,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         [BackgroundDependencyLoader]
         private void load(CustomColourProvider provider)
         {
-            var config = (LyricConfigManager)Dependencies.Get<MvisPluginManager>()
+            var config = (LyricConfigManager)Dependencies.Get<LLinPluginManager>()
                                                          .GetConfigManager(sidebarPage.Plugin);
 
             BorderColour = provider.Content2;

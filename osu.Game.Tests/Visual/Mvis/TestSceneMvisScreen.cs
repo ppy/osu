@@ -13,8 +13,8 @@ using osu.Game.Input;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens;
-using osu.Game.Screens.Mvis;
-using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.LLin;
+using osu.Game.Screens.LLin.Plugins;
 
 namespace osu.Game.Tests.Visual.Mvis
 {
@@ -32,8 +32,6 @@ namespace osu.Game.Tests.Visual.Mvis
 
         private DependencyContainer dependencies;
 
-        private MvisScreen mvis;
-
         [Test]
         public void CreateMvisScreen()
         {
@@ -42,7 +40,7 @@ namespace osu.Game.Tests.Visual.Mvis
                 if (Stack.CurrentScreen != null)
                     Stack?.Exit();
 
-                LoadScreen(mvis = new MvisScreen());
+                LoadScreen(new LLinScreen());
             });
         }
 
@@ -53,12 +51,12 @@ namespace osu.Game.Tests.Visual.Mvis
         private void load(Storage storage, OsuGameBase gameBase)
         {
             CollectionManager collectionManager;
-            MvisPluginManager mvisPluginManager;
-            CustomStore customStore = dependencies.Get<CustomStore>() ?? new CustomStore(storage, gameBase);
+            LLinPluginManager mvisPluginManager;
+            CustomFontStore customStore = dependencies.Get<CustomFontStore>() ?? new CustomFontStore(storage, gameBase);
             dependencies.Cache(customStore);
 
             dependencies.Cache(collectionManager = new CollectionManager(LocalStorage));
-            dependencies.Cache(mvisPluginManager = new MvisPluginManager());
+            dependencies.Cache(mvisPluginManager = new LLinPluginManager());
             dependencies.Cache(GetContainingInputManager() ?? new LocalInputManager());
             mvisPluginManager.AddPlugin(new MvisTestsPlugin());
 
@@ -78,7 +76,7 @@ namespace osu.Game.Tests.Visual.Mvis
             });
         }
 
-        private class MvisTestsPlugin : MvisPlugin
+        private class MvisTestsPlugin : LLinPlugin
         {
             private OsuSpriteText songTitle;
             private OsuSpriteText songArtist;
@@ -101,7 +99,7 @@ namespace osu.Game.Tests.Visual.Mvis
 
             protected override void LoadComplete()
             {
-                MvisScreen.OnBeatmapChanged(b =>
+                LLin.OnBeatmapChanged(b =>
                 {
                     songTitle.Text = b.Metadata.TitleUnicode ?? b.Metadata.Title;
                     songArtist.Text = b.Metadata.ArtistUnicode ?? b.Metadata.Artist;
