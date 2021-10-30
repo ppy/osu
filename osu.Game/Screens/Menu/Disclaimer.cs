@@ -247,13 +247,15 @@ namespace osu.Game.Screens.Menu
                         .MoveToY(icon_y, 160, Easing.InQuart)
                         .FadeColour(Color4.White, 160);
 
-                    //using (BeginDelayedSequence(520 + 160))
-                    fill.MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
-                    Schedule(() => expendableText.SelectMany(t => t.Drawables).ForEach(t =>
+                    using (BeginDelayedSequence(520 + 160))
                     {
-                        t.FadeOut(100);
-                        t.ScaleTo(new Vector2(0, 1), 100, Easing.OutQuart);
-                    }));
+                        fill.MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
+                        Schedule(() => expendableText.SelectMany(t => t.Drawables).ForEach(t =>
+                        {
+                            t.FadeOut(100);
+                            t.ScaleTo(new Vector2(0, 1), 100, Easing.OutQuart);
+                        }));
+                    }
                 }
 
                 supportFlow.FadeOut().Delay(2000).FadeIn(500);
