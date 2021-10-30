@@ -52,6 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
                 angleBonus += angleVariance;
 
                 // bonus for acute bonus at least 160bpm
+                // 160bpm meant the bpm starting alternative to hit
                 if (deltaTimeToBpm >= 160)
                 {
                     // limited to 210bpm

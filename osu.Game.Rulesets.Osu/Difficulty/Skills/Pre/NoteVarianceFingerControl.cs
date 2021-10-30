@@ -32,10 +32,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             if (osuCurrent.BaseObject is Spinner || osuCurrent.LastObject is Spinner)
                 return 0;
 
-            // calculates the percentage of alternative.
-            // when bpm is 160, it gives 0.
-            // when bpm is 210, 1.
-            // as a result, when bpm is 210, we consider the note has 100% of percentage of alternative
+            // Calculates the percentage of alternative.
+            // 160bpm meant the bpm starting alternative to hit
+            // When bpm is 160, it gives 0.
+            // When bpm is 210, 1.
+            // As a result, when bpm is 210, we consider the note has 100% of percentage of alternative
+            // 
             double deltaTimeToBpm = 15000 / current.DeltaTime;
             double probablityAlternative = Math.Max((deltaTimeToBpm - 160.0), 0) / (210.0 - 160.0);
 
