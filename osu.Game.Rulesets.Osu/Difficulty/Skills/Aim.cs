@@ -55,22 +55,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double sliderBonus = 0.99 + preSkills[1].GetAllStrainPeaks()[index] * 1;
 
-            // Remarked because it is replaced to NoteVarianceAngle
-            //if (Previous.Count > 0)
-            //{
-            //    var osuPrevious = (OsuDifficultyHitObject)Previous[0];
+            double result = 0;
 
-            //    if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
-            //    {
-            //        const double scale = 90;
+            // 
+            if (Previous.Count > 0)
+            {
+                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
 
-            //        var angleBonus = Math.Sqrt(
-            //            Math.Max(osuPrevious.JumpDistance - scale, 0)
-            //            * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
-            //            * Math.Max(osuCurrent.JumpDistance - scale, 0));
-            //        result = 1.4 * applyDiminishingExp(Math.Max(0, angleBonus)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
-            //    }
-            //}
+                if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
+                {
+                    const double scale = 90;
+
+                    double angleBonus2 = Math.Sqrt(
+                        Math.Max(osuPrevious.JumpDistance - scale, 0)
+                        * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
+                        * Math.Max(osuCurrent.JumpDistance - scale, 0));
+                    result = 0.7 * applyDiminishingExp(Math.Max(0, angleBonus2)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
+                }
+            }
 
             double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
             // multiplying sliderBonus
@@ -82,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // As a result, Slower jumps are buffed slightly.
             return
                 totalBonus *
-                (calculateAimValue(0, distanceExp, osuCurrent.StrainTime) * 0.9 +
+                (calculateAimValue(result, distanceExp, osuCurrent.StrainTime) * 0.9 +
                 calculateAimValue(0, distanceExp, 160) * 0.05);
         }
 

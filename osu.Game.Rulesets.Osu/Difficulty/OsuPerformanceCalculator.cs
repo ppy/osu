@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 categoryRatings.Add("Accuracy", accuracyValue);
                 categoryRatings.Add("Flashlight", flashlightValue);
                 categoryRatings.Add("SVTotal", Attributes.SliderVelocityTotal);
+                categoryRatings.Add("FingerControl", Attributes.FingerControlTotal);
                 categoryRatings.Add("OD", Attributes.OverallDifficulty);
                 categoryRatings.Add("AR", Attributes.ApproachRate);
                 categoryRatings.Add("Max Combo", Attributes.MaxCombo);

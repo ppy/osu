@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
                 return 0;
 
             double deltaTimeToBpm = 15000 / current.DeltaTime;
-            double angle = osuCurrent.Angle ?? 0;
+            double angle = osuCurrent.Angle ?? angle_bonus_begin;
 
             double angleBonus = 0.0;
 
@@ -41,13 +41,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             if(Previous.Count > 0)
             {
                 OsuDifficultyHitObject osuPast = (OsuDifficultyHitObject)Previous[0];
-                double lastAngle = osuPast.Angle ?? 0;
+                double lastAngle = osuPast.Angle ?? angle_bonus_begin;
 
                 // obtuse bonus
                 angleBonus = 0.01 * Math.Max(Math.Sin(angle - angle_bonus_begin), 0);
 
                 // bonus for changing angles frequently
-                double angleVariance = Math.Sin(Math.Max(Math.Abs(angle - lastAngle) - Math.PI / 2, 0)) * 0.10;
+                double angleVariance = Math.Sin(Math.Max(Math.Abs(angle - lastAngle) - Math.PI / 2, 0)) * 0.1;
 
                 angleBonus += angleVariance;
 
