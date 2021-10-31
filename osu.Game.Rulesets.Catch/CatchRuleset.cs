@@ -134,6 +134,7 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModBeatCore(),
                         new CatchModFloatingFruits(),
                         new CatchModMuted(),
+                        new ModNoDrain()
                     };
 
                 default:
