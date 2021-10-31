@@ -31,11 +31,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private const float transition_duration = 100;
 
-        public override string Name => "No Scope";
+        public override string Name => "幽灵";
         public override string Acronym => "NS";
         public override ModType Type => ModType.Fun;
         public override IconUsage? Icon => FontAwesome.Solid.EyeSlash;
-        public override string Description => "Where's the cursor?";
+        public override string Description => "光标在哪里?";
         public override double ScoreMultiplier => 1;
 
         private BindableNumber<int> currentCombo;
