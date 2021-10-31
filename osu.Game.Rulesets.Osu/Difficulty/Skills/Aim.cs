@@ -53,8 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 (Math.Pow(0.99 + fingerControlBonus, 1.1))
                 , 1.0 / 1.1);
 
-
-            double sliderBonus = 1 + preSkills[1].GetAllStrainPeaks()[index] * 1;
+            double sliderBonus = 0.99 + preSkills[1].GetAllStrainPeaks()[index] * 1;
 
             // Remarked because it is replaced to NoteVarianceAngle
             //if (Previous.Count > 0)
