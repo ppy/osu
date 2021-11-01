@@ -43,8 +43,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),
-                Skills = skills,
-                CircleSize = beatmap.BeatmapInfo.BaseDifficulty.CircleSize
+                Skills = skills
             };
         }
 
