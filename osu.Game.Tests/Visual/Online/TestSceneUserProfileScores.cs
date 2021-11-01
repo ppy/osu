@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Online
                 Rank = ScoreRank.SH,
                 Beatmap = new APIBeatmap
                 {
-                    BeatmapSet =
+                    BeatmapSet = new APIBeatmapSet
                     {
                         Title = "JUSTadICE (TV Size)",
                         Artist = "Oomori Seiko",
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Online
                 Rank = ScoreRank.A,
                 Beatmap = new APIBeatmap
                 {
-                    BeatmapSet =
+                    BeatmapSet = new APIBeatmapSet
                     {
                         Title = "Triumph & Regret",
                         Artist = "typeMARS",
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Online
                 Rank = ScoreRank.S,
                 Beatmap = new APIBeatmap
                 {
-                    BeatmapSet =
+                    BeatmapSet = new APIBeatmapSet
                     {
                         Title = "Idolize",
                         Artist = "Creo",
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Online
                 Rank = ScoreRank.B,
                 Beatmap = new APIBeatmap
                 {
-                    BeatmapSet =
+                    BeatmapSet = new APIBeatmapSet
                     {
                         Title = "C18H27NO3(extend)",
                         Artist = "Team Grimoire",
