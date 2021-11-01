@@ -194,7 +194,7 @@ namespace osu.Game.Skinning
             string nameLine = $"Name: {item.Name}";
             string authorLine = $"Author: {item.Creator}";
 
-            var existingFile = item.Files.SingleOrDefault(f => f.Filename == "skin.ini");
+            var existingFile = item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase));
 
             if (existingFile != null)
             {
