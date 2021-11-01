@@ -9,11 +9,10 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using System.Text;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetScoresRequest : APIRequest<APILegacyScores>
+    public class GetScoresRequest : APIRequest<APIScoresCollection>
     {
         private readonly BeatmapInfo beatmapInfo;
         private readonly BeatmapLeaderboardScope scope;
@@ -32,27 +31,6 @@ namespace osu.Game.Online.API.Requests
             this.scope = scope;
             this.ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
             this.mods = mods ?? Array.Empty<IMod>();
-
-            Success += onSuccess;
-        }
-
-        private void onSuccess(APILegacyScores r)
-        {
-            Debug.Assert(ruleset.ID != null, "ruleset.ID != null");
-
-            foreach (APILegacyScoreInfo score in r.Scores)
-            {
-                score.BeatmapInfo = beatmapInfo;
-                score.OnlineRulesetID = ruleset.ID.Value;
-            }
-
-            var userScore = r.UserScore;
-
-            if (userScore != null)
-            {
-                userScore.Score.BeatmapInfo = beatmapInfo;
-                userScore.Score.OnlineRulesetID = ruleset.ID.Value;
-            }
         }
 
         protected override string Target => $@"beatmaps/{beatmapInfo.OnlineBeatmapID}/scores{createQueryParameters()}";
