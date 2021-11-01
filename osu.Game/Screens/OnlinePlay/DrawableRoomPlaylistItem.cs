@@ -96,6 +96,7 @@ namespace osu.Game.Screens.OnlinePlay
         }
 
         private ScheduledDelegate scheduledRefresh;
+        private PanelBackground panelBackground;
 
         private void scheduleRefresh()
         {
@@ -105,23 +106,25 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void refresh()
         {
-            difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(32) };
+            difficultyIconContainer.Child = new DifficultyIcon(Item.APIBeatmap, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(32) };
+
+            panelBackground.Beatmap.Value = Item.APIBeatmap;
 
             beatmapText.Clear();
-            beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString(), null, text =>
+            beatmapText.AddLink(Item.APIBeatmap.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.APIBeatmap.OnlineID.ToString(), null, text =>
             {
                 text.Truncate = true;
             });
 
             authorText.Clear();
 
-            if (Item.Beatmap?.Value?.Metadata?.Author != null)
+            if (Item.Beatmap.Value?.Metadata?.Author != null)
             {
                 authorText.AddText("mapped by ");
-                authorText.AddUserLink(Item.Beatmap.Value?.Metadata.Author);
+                authorText.AddUserLink(Item.APIBeatmap?.BeatmapSet?.Author);
             }
 
-            bool hasExplicitContent = Item.Beatmap.Value.BeatmapSet.OnlineInfo?.HasExplicitContent == true;
+            bool hasExplicitContent = Item.Beatmap.Value?.BeatmapSet.OnlineInfo?.HasExplicitContent == true;
             explicitContentPill.Alpha = hasExplicitContent ? 1 : 0;
 
             modDisplay.Current.Value = requiredMods.ToArray();
@@ -145,10 +148,9 @@ namespace osu.Game.Screens.OnlinePlay
                         Alpha = 0,
                         AlwaysPresent = true
                     },
-                    new PanelBackground
+                    panelBackground = new PanelBackground
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Beatmap = { BindTarget = beatmap }
                     },
                     new GridContainer
                     {
@@ -294,7 +296,7 @@ namespace osu.Game.Screens.OnlinePlay
             private const float width = 50;
 
             public PlaylistDownloadButton(PlaylistItem playlistItem)
-                : base(playlistItem.Beatmap.Value.BeatmapSet)
+                : base(playlistItem.APIBeatmap.BeatmapSet)
             {
                 this.playlistItem = playlistItem;
 
@@ -316,7 +318,7 @@ namespace osu.Game.Screens.OnlinePlay
                 {
                     case DownloadState.LocallyAvailable:
                         // Perform a local query of the beatmap by beatmap checksum, and reset the state if not matching.
-                        if (beatmapManager.QueryBeatmap(b => b.MD5Hash == playlistItem.Beatmap.Value.MD5Hash) == null)
+                        if (beatmapManager.QueryBeatmap(b => b.MD5Hash == playlistItem.APIBeatmap.MD5Hash) == null)
                             State.Value = DownloadState.NotDownloaded;
                         else
                         {
@@ -337,7 +339,7 @@ namespace osu.Game.Screens.OnlinePlay
         // For now, this is the same implementation as in PanelBackground, but supports a beatmap info rather than a working beatmap
         private class PanelBackground : Container // todo: should be a buffered container (https://github.com/ppy/osu-framework/issues/3222)
         {
-            public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+            public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
 
             public PanelBackground()
             {
