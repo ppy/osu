@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 OnlineID = 2553163309,
                 OnlineRulesetID = 0,
-                Replay = replayAvailable,
+                HasReplay = replayAvailable,
                 User = new User
                 {
                     Id = 39828,
