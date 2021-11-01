@@ -199,7 +199,7 @@ namespace osu.Game.Tests.Skins.IO
             return zipStream;
         }
 
-        private MemoryStream createOskWithIni(string name, string author, bool makeUnique = false, string iniFilename = "skin.ini")
+        private MemoryStream createOskWithIni(string name, string author, bool makeUnique = false, string iniFilename = @"skin.ini")
         {
             var zipStream = new MemoryStream();
             using var zip = ZipArchive.Create();
