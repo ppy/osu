@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
 using osuTK;
 using osuTK.Graphics;
@@ -59,9 +60,12 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             Schedule(() =>
             {
-                var beatmap = playlistItem?.Beatmap.Value;
+                var beatmap = playlistItem?.APIBeatmap;
 
-                if (background?.BeatmapInfo?.BeatmapSet?.OnlineInfo?.Covers.Cover == beatmap?.BeatmapSet?.OnlineInfo?.Covers.Cover)
+                string? lastCover = (background?.Beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.Covers.Cover;
+                string? newCover = beatmap?.BeatmapSet?.Covers.Cover;
+
+                if (lastCover == newCover)
                     return;
 
                 cancellationSource?.Cancel();
