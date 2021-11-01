@@ -3,19 +3,19 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
     public class DashboardNewBeatmapPanel : DashboardBeatmapPanel
     {
-        public DashboardNewBeatmapPanel(BeatmapSetInfo setInfo)
-            : base(setInfo)
+        public DashboardNewBeatmapPanel(APIBeatmapSet beatmapSet)
+            : base(beatmapSet)
         {
         }
 
-        protected override Drawable CreateInfo() => new DrawableDate(SetInfo.OnlineInfo.Ranked ?? DateTimeOffset.Now, 10, false)
+        protected override Drawable CreateInfo() => new DrawableDate(BeatmapSet.Ranked ?? DateTimeOffset.Now, 10, false)
         {
             Colour = ColourProvider.Foreground1
         };

@@ -19,8 +19,8 @@ namespace osu.Game.Beatmaps.Drawables
     /// </remarks>
     public class GroupedDifficultyIcon : DifficultyIcon
     {
-        public GroupedDifficultyIcon(List<BeatmapInfo> beatmaps, RulesetInfo ruleset, Color4 counterColour)
-            : base(beatmaps.OrderBy(b => b.StarDifficulty).Last(), ruleset, null, false)
+        public GroupedDifficultyIcon(IEnumerable<IBeatmapInfo> beatmaps, IRulesetInfo ruleset, Color4 counterColour)
+            : base(beatmaps.OrderBy(b => b.StarRating).Last(), ruleset, null, false)
         {
             AddInternal(new OsuSpriteText
             {
@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Drawables
                 Padding = new MarginPadding { Left = Size.X },
                 Margin = new MarginPadding { Left = 2, Right = 5 },
                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
-                Text = beatmaps.Count.ToString(),
+                Text = beatmaps.Count().ToString(),
                 Colour = counterColour,
             });
         }

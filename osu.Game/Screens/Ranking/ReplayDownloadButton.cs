@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
@@ -12,12 +13,16 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ReplayDownloadButton : DownloadTrackingComposite<ScoreInfo, ScoreManager>
+    public class ReplayDownloadButton : CompositeDrawable
     {
-        public Bindable<ScoreInfo> Score => Model;
+        public readonly Bindable<ScoreInfo> Score = new Bindable<ScoreInfo>();
+
+        protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
         private DownloadButton button;
         private ShakeContainer shakeContainer;
+
+        private ScoreDownloadTracker downloadTracker;
 
         private ReplayAvailability replayAvailability
         {
@@ -26,7 +31,7 @@ namespace osu.Game.Screens.Ranking
                 if (State.Value == DownloadState.LocallyAvailable)
                     return ReplayAvailability.Local;
 
-                if (!string.IsNullOrEmpty(Model.Value?.Hash))
+                if (!string.IsNullOrEmpty(Score.Value?.Hash))
                     return ReplayAvailability.Online;
 
                 return ReplayAvailability.NotAvailable;
@@ -34,8 +39,8 @@ namespace osu.Game.Screens.Ranking
         }
 
         public ReplayDownloadButton(ScoreInfo score)
-            : base(score)
         {
+            Score.Value = score;
             Size = new Vector2(50, 30);
         }
 
@@ -56,11 +61,11 @@ namespace osu.Game.Screens.Ranking
                 switch (State.Value)
                 {
                     case DownloadState.LocallyAvailable:
-                        game?.PresentScore(Model.Value, ScorePresentType.Gameplay);
+                        game?.PresentScore(Score.Value, ScorePresentType.Gameplay);
                         break;
 
                     case DownloadState.NotDownloaded:
-                        scores.Download(Model.Value, false);
+                        scores.Download(Score.Value, false);
                         break;
 
                     case DownloadState.Importing:
@@ -70,17 +75,25 @@ namespace osu.Game.Screens.Ranking
                 }
             };
 
-            State.BindValueChanged(state =>
+            Score.BindValueChanged(score =>
             {
-                button.State.Value = state.NewValue;
+                downloadTracker?.RemoveAndDisposeImmediately();
 
+                if (score.NewValue != null)
+                {
+                    AddInternal(downloadTracker = new ScoreDownloadTracker(score.NewValue)
+                    {
+                        State = { BindTarget = State }
+                    });
+                }
+
+                button.Enabled.Value = replayAvailability != ReplayAvailability.NotAvailable;
                 updateTooltip();
             }, true);
 
-            Model.BindValueChanged(_ =>
+            State.BindValueChanged(state =>
             {
-                button.Enabled.Value = replayAvailability != ReplayAvailability.NotAvailable;
-
+                button.State.Value = state.NewValue;
                 updateTooltip();
             }, true);
         }

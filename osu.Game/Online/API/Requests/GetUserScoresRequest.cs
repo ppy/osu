@@ -8,7 +8,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserScoresRequest : PaginatedAPIRequest<List<APILegacyScoreInfo>>
+    public class GetUserScoresRequest : PaginatedAPIRequest<List<APIScoreInfo>>
     {
         private readonly long userId;
         private readonly ScoreType type;
