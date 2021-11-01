@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double flashlightRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
 
+            double angleTotal = preSkills[0].DifficultyValue();
             double sliderVelocityTotal = preSkills[1].DifficultyValue();
             double fingerControlTotal = preSkills[2].DifficultyValue();
 
@@ -76,6 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimStrain = aimRating,
                 SpeedStrain = speedRating,
                 FlashlightRating = flashlightRating,
+                AngleTotal = angleTotal,
                 SliderVelocityTotal = sliderVelocityTotal,
                 FingerControlTotal = fingerControlTotal,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,

@@ -58,25 +58,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double result = 0;
 
             // 
-            if (Previous.Count > 0)
-            {
-                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
+            //if (Previous.Count > 0)
+            //{
+            //    var osuPrevious = (OsuDifficultyHitObject)Previous[0];
 
-                if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
-                {
-                    const double scale = 90;
+            //    if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
+            //    {
+            //        const double scale = 90;
 
-                    double angleBonus2 = Math.Sqrt(
-                        Math.Max(osuPrevious.JumpDistance - scale, 0)
-                        * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
-                        * Math.Max(osuCurrent.JumpDistance - scale, 0));
-                    result = 0.7 * applyDiminishingExp(Math.Max(0, angleBonus2)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
-                }
-            }
+            //        double angleBonus2 = Math.Sqrt(
+            //            Math.Max(osuPrevious.JumpDistance - scale, 0)
+            //            * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
+            //            * Math.Max(osuCurrent.JumpDistance - scale, 0));
+            //        result = 0.7 * applyDiminishingExp(Math.Max(0, angleBonus2)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
+            //    }
+            //}
 
             double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
             // multiplying sliderBonus
-            double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance) * sliderBonus;
+            double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance) * sliderBonus
+                ;
 
             double distanceExp = jumpDistanceExp + travelDistanceExp + Math.Sqrt(jumpDistanceExp * travelDistanceExp);
 

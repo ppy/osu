@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double FlashlightRating { get; set; }
         public double SliderVelocityTotal { get; set; }
         public double FingerControlTotal { get; set; }
+        public double AngleTotal { get; set; }
         public double ApproachRate { get; set; }
         public double OverallDifficulty { get; set; }
         public double DrainRate { get; set; }
