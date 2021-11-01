@@ -15,7 +15,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedProfileSubsection<APILegacyScoreInfo>
+    public class PaginatedScoreContainer : PaginatedProfileSubsection<APIScoreInfo>
     {
         private readonly ScoreType type;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             }
         }
 
-        protected override void OnItemsReceived(List<APILegacyScoreInfo> items)
+        protected override void OnItemsReceived(List<APIScoreInfo> items)
         {
             if (VisiblePages == 0)
                 drawableItemIndex = 0;
@@ -59,12 +59,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
+        protected override APIRequest<List<APIScoreInfo>> CreateRequest() =>
             new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
         private int drawableItemIndex;
 
-        protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
+        protected override Drawable CreateDrawableItem(APIScoreInfo model)
         {
             switch (type)
             {

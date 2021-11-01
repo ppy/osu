@@ -4,17 +4,17 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
     public class DashboardPopularBeatmapPanel : DashboardBeatmapPanel
     {
-        public DashboardPopularBeatmapPanel(BeatmapSetInfo setInfo)
-            : base(setInfo)
+        public DashboardPopularBeatmapPanel(APIBeatmapSet beatmapSet)
+            : base(beatmapSet)
         {
         }
 
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Dashboard.Home
                 new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 10, weight: FontWeight.Regular),
-                    Text = SetInfo.OnlineInfo.FavouriteCount.ToString()
+                    Text = BeatmapSet.FavouriteCount.ToString()
                 }
             }
         };

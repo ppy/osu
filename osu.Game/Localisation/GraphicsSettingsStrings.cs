@@ -119,6 +119,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ShowCursorInScreenshots => new TranslatableString(getKey(@"show_cursor_in_screenshots"), @"Show menu cursor in screenshots");
 
+        /// <summary>
+        /// "Video"
+        /// </summary>
+        public static LocalisableString VideoHeader => new TranslatableString(getKey(@"video_header"), @"Video");
+
+        /// <summary>
+        /// "Use hardware acceleration"
+        /// </summary>
+        public static LocalisableString UseHardwareAcceleration => new TranslatableString(getKey(@"use_hardware_acceleration"), @"Use hardware acceleration");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
