@@ -94,9 +94,6 @@ namespace osu.Game.Screens.Select.Details
             modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
             modSettingChangeTracker.SettingChanged += m =>
             {
-                if (!(m is IApplicableToDifficulty))
-                    return;
-
                 debouncedStatisticsUpdate?.Cancel();
                 debouncedStatisticsUpdate = Scheduler.AddDelayed(updateStatistics, 100);
             };
