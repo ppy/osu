@@ -16,9 +16,9 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// A user-presentable display title representing this beatmap, with localisation handling for potentially romanisable fields.
         /// </summary>
-        public static RomanisableString GetDisplayTitleRomanisable(this IBeatmapInfo beatmapInfo, bool includeDifficultyName = true)
+        public static RomanisableString GetDisplayTitleRomanisable(this IBeatmapInfo beatmapInfo, bool includeDifficultyName = true, bool includeCreator = true)
         {
-            var metadata = getClosestMetadata(beatmapInfo).GetDisplayTitleRomanisable();
+            var metadata = getClosestMetadata(beatmapInfo).GetDisplayTitleRomanisable(includeCreator);
 
             if (includeDifficultyName)
             {

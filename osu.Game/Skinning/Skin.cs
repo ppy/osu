@@ -93,7 +93,7 @@ namespace osu.Game.Skinning
 
         private Stream getConfigurationStream()
         {
-            string path = SkinInfo.Files.SingleOrDefault(f => f.Filename == "skin.ini")?.FileInfo.StoragePath;
+            string path = SkinInfo.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
             if (string.IsNullOrEmpty(path))
                 return null;

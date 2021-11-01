@@ -249,6 +249,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     downloadTracker = new BeatmapDownloadTracker(setInfo.NewValue);
                     downloadTracker.State.BindValueChanged(_ => updateDownloadButtons());
+                    AddInternal(downloadTracker);
 
                     fadeContent.FadeIn(500, Easing.OutQuint);
 

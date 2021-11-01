@@ -34,9 +34,9 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// A user-presentable display title representing this beatmap, with localisation handling for potentially romanisable fields.
         /// </summary>
-        public static RomanisableString GetDisplayTitleRomanisable(this IBeatmapMetadataInfo metadataInfo)
+        public static RomanisableString GetDisplayTitleRomanisable(this IBeatmapMetadataInfo metadataInfo, bool includeCreator = true)
         {
-            string author = string.IsNullOrEmpty(metadataInfo.Author) ? string.Empty : $"({metadataInfo.Author})";
+            string author = !includeCreator || string.IsNullOrEmpty(metadataInfo.Author) ? string.Empty : $"({metadataInfo.Author})";
             string artistUnicode = string.IsNullOrEmpty(metadataInfo.ArtistUnicode) ? metadataInfo.Artist : metadataInfo.ArtistUnicode;
             string titleUnicode = string.IsNullOrEmpty(metadataInfo.TitleUnicode) ? metadataInfo.Title : metadataInfo.TitleUnicode;
 
