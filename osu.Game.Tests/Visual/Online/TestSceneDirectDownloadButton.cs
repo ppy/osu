@@ -69,24 +69,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert($"button {(enabled ? "enabled" : "disabled")}", () => downloadButton.DownloadEnabled == enabled);
         }
 
-        private BeatmapSetInfo createSoleily()
-        {
-            return new BeatmapSetInfo
-            {
-                ID = 1,
-                OnlineBeatmapSetID = 241526,
-                OnlineInfo = new APIBeatmapSet
-                {
-                    Availability = new BeatmapSetOnlineAvailability
-                    {
-                        DownloadDisabled = false,
-                        ExternalLink = string.Empty,
-                    },
-                },
-            };
-        }
-
-        private void createButtonWithBeatmap(BeatmapSetInfo beatmap)
+        private void createButtonWithBeatmap(IBeatmapSetInfo beatmap)
         {
             AddStep("create button", () =>
             {
@@ -112,32 +95,47 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private BeatmapSetInfo getDownloadableBeatmapSet()
+        private IBeatmapSetInfo createSoleily()
         {
-            var normal = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).BeatmapSetInfo;
-            normal.OnlineInfo.HasVideo = true;
-            normal.OnlineInfo.HasStoryboard = true;
-
-            return normal;
+            return new APIBeatmapSet
+            {
+                OnlineID = 241526,
+                Availability = new BeatmapSetOnlineAvailability
+                {
+                    DownloadDisabled = false,
+                    ExternalLink = string.Empty,
+                },
+            };
         }
 
-        private BeatmapSetInfo getUndownloadableBeatmapSet()
+        private IBeatmapSetInfo getDownloadableBeatmapSet()
         {
-            var beatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).BeatmapSetInfo;
-            beatmap.Metadata.Artist = "test";
-            beatmap.Metadata.Title = "undownloadable";
-            beatmap.Metadata.AuthorString = "test";
+            var apiBeatmapSet = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).BeatmapSetInfo.OnlineInfo;
 
-            beatmap.OnlineInfo.HasVideo = true;
-            beatmap.OnlineInfo.HasStoryboard = true;
+            apiBeatmapSet.HasVideo = true;
+            apiBeatmapSet.HasStoryboard = true;
 
-            beatmap.OnlineInfo.Availability = new BeatmapSetOnlineAvailability
+            return apiBeatmapSet;
+        }
+
+        private IBeatmapSetInfo getUndownloadableBeatmapSet()
+        {
+            var apiBeatmapSet = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).BeatmapSetInfo.OnlineInfo;
+
+            apiBeatmapSet.Artist = "test";
+            apiBeatmapSet.Title = "undownloadable";
+            apiBeatmapSet.AuthorString = "test";
+
+            apiBeatmapSet.HasVideo = true;
+            apiBeatmapSet.HasStoryboard = true;
+
+            apiBeatmapSet.Availability = new BeatmapSetOnlineAvailability
             {
                 DownloadDisabled = true,
                 ExternalLink = "http://osu.ppy.sh",
             };
 
-            return beatmap;
+            return apiBeatmapSet;
         }
 
         private class TestDownloadButton : BeatmapPanelDownloadButton
@@ -146,7 +144,7 @@ namespace osu.Game.Tests.Visual.Online
 
             public DownloadState DownloadState => State.Value;
 
-            public TestDownloadButton(BeatmapSetInfo beatmapSet)
+            public TestDownloadButton(IBeatmapSetInfo beatmapSet)
                 : base(beatmapSet)
             {
             }

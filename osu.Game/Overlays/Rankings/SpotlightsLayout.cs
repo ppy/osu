@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Rankings
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(10),
-                    Children = response.BeatmapSets.Select(b => new GridBeatmapPanel(b.ToBeatmapSet(rulesets))
+                    Children = response.BeatmapSets.Select(b => new GridBeatmapPanel(b)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
