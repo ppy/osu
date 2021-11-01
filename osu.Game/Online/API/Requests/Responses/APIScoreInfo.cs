@@ -26,13 +26,11 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"user")]
         public User User { get; set; }
 
-        public bool HasReplay { get; set; }
-
         [JsonProperty(@"id")]
         public long OnlineID { get; set; }
 
         [JsonProperty(@"replay")]
-        public bool Replay { get; set; }
+        public bool HasReplay { get; set; }
 
         [JsonProperty(@"created_at")]
         public DateTimeOffset Date { get; set; }
@@ -97,7 +95,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 Date = Date,
                 PP = PP,
                 RulesetID = OnlineRulesetID,
-                Hash = Replay ? "online" : string.Empty, // todo: temporary?
+                Hash = HasReplay ? "online" : string.Empty, // todo: temporary?
                 Rank = Rank,
                 Ruleset = ruleset,
                 Mods = mods,
