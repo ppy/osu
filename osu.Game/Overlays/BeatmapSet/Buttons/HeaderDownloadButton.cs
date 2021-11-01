@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class HeaderDownloadButton : BeatmapDownloadTrackingComposite, IHasTooltip
+    public class HeaderDownloadButton : CompositeDrawable, IHasTooltip
     {
         private const int text_size = 12;
 
@@ -35,9 +35,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private ShakeContainer shakeContainer;
         private HeaderButton button;
 
+        private BeatmapDownloadTracker downloadTracker;
+        private readonly BeatmapSetInfo beatmapSet;
+
         public HeaderDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
-            : base(beatmapSet)
         {
+            this.beatmapSet = beatmapSet;
             this.noVideo = noVideo;
 
             Width = 120;
@@ -49,13 +52,17 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         {
             FillFlowContainer textSprites;
 
-            AddInternal(shakeContainer = new ShakeContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = 5,
-                Child = button = new HeaderButton { RelativeSizeAxes = Axes.Both },
-            });
+                shakeContainer = new ShakeContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 5,
+                    Child = button = new HeaderButton { RelativeSizeAxes = Axes.Both },
+                },
+                downloadTracker = new BeatmapDownloadTracker(beatmapSet),
+            };
 
             button.AddRange(new Drawable[]
             {
@@ -83,7 +90,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         },
                     }
                 },
-                new DownloadProgressBar(BeatmapSet.Value)
+                new DownloadProgressBar(beatmapSet)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -92,20 +99,20 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             button.Action = () =>
             {
-                if (State.Value != DownloadState.NotDownloaded)
+                if (downloadTracker.State.Value != DownloadState.NotDownloaded)
                 {
                     shakeContainer.Shake();
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet.Value, noVideo);
+                beatmaps.Download(beatmapSet, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);
             localUser.BindValueChanged(userChanged, true);
             button.Enabled.BindValueChanged(enabledChanged, true);
 
-            State.BindValueChanged(state =>
+            downloadTracker.State.BindValueChanged(state =>
             {
                 switch (state.NewValue)
                 {
@@ -161,7 +168,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private LocalisableString getVideoSuffixText()
         {
-            if (!BeatmapSet.Value.OnlineInfo.HasVideo)
+            if (!beatmapSet.OnlineInfo.HasVideo)
                 return string.Empty;
 
             return noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo;
