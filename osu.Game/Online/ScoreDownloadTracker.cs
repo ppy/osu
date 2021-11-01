@@ -122,10 +122,8 @@ namespace osu.Game.Online
             {
                 Schedule(() =>
                 {
-                    if (!checkEquality(item, TrackedItem))
-                        return;
-
-                    UpdateState(DownloadState.NotDownloaded);
+                    if (checkEquality(item, TrackedItem))
+                        UpdateState(DownloadState.LocallyAvailable);
                 });
             }
         }
