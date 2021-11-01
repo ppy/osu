@@ -14,11 +14,13 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
@@ -36,9 +38,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private HeaderButton button;
 
         private BeatmapDownloadTracker downloadTracker;
-        private readonly BeatmapSetInfo beatmapSet;
 
-        public HeaderDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
+        private readonly APIBeatmapSet beatmapSet;
+
+        public HeaderDownloadButton(APIBeatmapSet beatmapSet, bool noVideo = false)
         {
             this.beatmapSet = beatmapSet;
             this.noVideo = noVideo;
@@ -105,7 +108,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                beatmaps.Download(beatmapSet, noVideo);
+                beatmaps.Download(new BeatmapSetInfo { OnlineBeatmapSetID = beatmapSet.OnlineID }, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);
@@ -121,7 +124,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = Localisation.CommonStrings.Downloading,
+                                Text = CommonStrings.Downloading,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -132,7 +135,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = Localisation.CommonStrings.Importing,
+                                Text = CommonStrings.Importing,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -168,7 +171,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private LocalisableString getVideoSuffixText()
         {
-            if (!beatmapSet.OnlineInfo.HasVideo)
+            if (!beatmapSet.HasVideo)
                 return string.Empty;
 
             return noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo;

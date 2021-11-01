@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select
                 beatmapInfo = value;
 
                 failTimes = beatmapInfo?.OnlineInfo?.FailTimes;
-                ratings = beatmapInfo?.BeatmapSet?.Ratings;
+                ratings = beatmapInfo?.BeatmapSet?.OnlineInfo?.Ratings;
 
                 Scheduler.AddOnce(updateStatistics);
             }
@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Select
             source.Text = BeatmapInfo?.Metadata?.Source;
             tags.Text = BeatmapInfo?.Metadata?.Tags;
 
-            // metrics may have been previously fetched
+            // failTimes may have been previously fetched
             if (ratings != null && failTimes != null)
             {
                 updateMetrics();
