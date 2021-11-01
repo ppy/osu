@@ -11,6 +11,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.BeatmapListing.Panels
 {
@@ -21,7 +22,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         /// <summary>
         /// Currently selected beatmap. Used to present the correct difficulty after completing a download.
         /// </summary>
-        public readonly IBindable<BeatmapInfo> SelectedBeatmap = new Bindable<BeatmapInfo>();
+        public readonly IBindable<APIBeatmap> SelectedBeatmap = new Bindable<APIBeatmap>();
 
         private readonly ShakeContainer shakeContainer;
         private readonly DownloadButton button;
@@ -31,9 +32,9 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
-        private readonly BeatmapSetInfo beatmapSet;
+        private readonly IBeatmapSetInfo beatmapSet;
 
-        public BeatmapPanelDownloadButton(BeatmapSetInfo beatmapSet)
+        public BeatmapPanelDownloadButton(IBeatmapSetInfo beatmapSet)
         {
             this.beatmapSet = beatmapSet;
 
@@ -79,13 +80,13 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                     case DownloadState.LocallyAvailable:
                         Predicate<BeatmapInfo> findPredicate = null;
                         if (SelectedBeatmap.Value != null)
-                            findPredicate = b => b.OnlineBeatmapID == SelectedBeatmap.Value.OnlineBeatmapID;
+                            findPredicate = b => b.OnlineBeatmapID == SelectedBeatmap.Value.OnlineID;
 
                         game?.PresentBeatmap(beatmapSet, findPredicate);
                         break;
 
                     default:
-                        beatmaps.Download(beatmapSet, noVideoSetting.Value);
+                        beatmaps.Download(new BeatmapSetInfo { OnlineBeatmapSetID = beatmapSet.OnlineID }, noVideoSetting.Value);
                         break;
                 }
             };
@@ -100,7 +101,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
 
                     default:
-                        if (beatmapSet.OnlineInfo?.Availability.DownloadDisabled ?? false)
+                        if ((beatmapSet as IBeatmapSetOnlineInfo)?.Availability.DownloadDisabled == true)
                         {
                             button.Enabled.Value = false;
                             button.TooltipText = "this beatmap is currently not available for download.";
