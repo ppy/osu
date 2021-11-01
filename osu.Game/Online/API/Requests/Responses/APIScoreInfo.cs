@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
@@ -67,7 +68,8 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"mods")]
         private string[] mods { set => Mods = value.Select(acronym => new APIMod { Acronym = acronym }); }
 
-        public IEnumerable<APIMod> Mods { get; set; }
+        [NotNull]
+        public IEnumerable<APIMod> Mods { get; set; } = Array.Empty<APIMod>();
 
         [JsonProperty("rank")]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -85,7 +87,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             var rulesetInstance = ruleset.CreateInstance();
 
-            var modInstances = Mods != null ? Mods.Select(apiMod => rulesetInstance.CreateModFromAcronym(apiMod.Acronym)).Where(m => m != null).ToArray() : Array.Empty<Mod>();
+            var modInstances = Mods.Select(apiMod => rulesetInstance.CreateModFromAcronym(apiMod.Acronym)).Where(m => m != null).ToArray();
 
             // all API scores provided by this class are considered to be legacy.
             modInstances = modInstances.Append(rulesetInstance.CreateMod<ModClassic>()).ToArray();
