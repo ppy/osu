@@ -66,7 +66,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (value?.Scores.Any() != true)
                     return;
 
-                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, Beatmap.Value.ToBeatmapInfo(rulesets))).ToArray(), loadCancellationSource.Token)
+                // TODO: temporary. should be removed once `OrderByTotalScore` can accept `IScoreInfo`.
+                var beatmapInfo = new BeatmapInfo { MaxCombo = Beatmap.Value.MaxCombo };
+
+                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
                             .ContinueWith(ordered => Schedule(() =>
                             {
                                 if (loadCancellationSource.IsCancellationRequested)
@@ -78,7 +81,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 scoreTable.Show();
 
                                 var userScore = value.UserScore;
-                                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets, Beatmap.Value.ToBeatmapInfo(rulesets));
+                                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets, beatmapInfo);
 
                                 topScoresContainer.Add(new DrawableTopScore(topScore));
 
