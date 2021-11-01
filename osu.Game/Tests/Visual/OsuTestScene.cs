@@ -178,10 +178,10 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Returns a sample API Beatmap with BeatmapSet populated.
         /// </summary>
-        /// <param name="ruleset">The ruleset to create the sample model using.</param>
-        protected APIBeatmap CreateAPIBeatmap(RulesetInfo ruleset)
+        /// <param name="ruleset">The ruleset to create the sample model using. osu! ruleset will be used if not specified.</param>
+        protected APIBeatmap CreateAPIBeatmap(RulesetInfo ruleset = null)
         {
-            var beatmapSet = CreateAPIBeatmapSet(ruleset);
+            var beatmapSet = CreateAPIBeatmapSet(ruleset ?? Ruleset.Value);
 
             // Avoid circular reference.
             var beatmap = beatmapSet.Beatmaps.First();
@@ -196,10 +196,10 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Returns a sample API BeatmapSet with beatmaps populated.
         /// </summary>
-        /// <param name="ruleset">The ruleset to create the sample model using.</param>
-        protected APIBeatmapSet CreateAPIBeatmapSet(RulesetInfo ruleset)
+        /// <param name="ruleset">The ruleset to create the sample model using. osu! ruleset will be used if not specified.</param>
+        protected APIBeatmapSet CreateAPIBeatmapSet(RulesetInfo ruleset = null)
         {
-            var beatmap = CreateBeatmap(ruleset).BeatmapInfo;
+            var beatmap = CreateBeatmap(ruleset ?? Ruleset.Value).BeatmapInfo;
 
             return new APIBeatmapSet
             {
