@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -202,7 +203,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
-            var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            var beatmap = CreateAPIBeatmapSet();
 
             AddStep("import beatmap", () => manager.Import(beatmap.BeatmapSet).Wait());
 
@@ -223,11 +224,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestDownloadButtonVisibleInitiallyWhenBeatmapDoesNotExist()
         {
-            var byOnlineId = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            byOnlineId.BeatmapSet.OnlineBeatmapSetID = 1337; // Some random ID that does not exist locally.
+            var byOnlineId = CreateAPIBeatmapSet();
+            byOnlineId.OnlineID = 1337; // Some random ID that does not exist locally.
 
-            var byChecksum = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            byChecksum.MD5Hash = "1337"; // Some random checksum that does not exist locally.
+            var byChecksum = CreateAPIBeatmapSet();
+            byChecksum.Beatmaps.ForEach(b => b.Checksum = "1337"); // Some random checksum that does not exist locally.
 
             createPlaylist(byOnlineId, byChecksum);
 
@@ -237,8 +238,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestExplicitBeatmapItem()
         {
-            var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            beatmap.BeatmapSet.OnlineInfo.HasExplicitContent = true;
+            var beatmap = CreateAPIBeatmapSet();
+
+            beatmap.HasExplicitContent = true;
 
             createPlaylist(beatmap);
         }

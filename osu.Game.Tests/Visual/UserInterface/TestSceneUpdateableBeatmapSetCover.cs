@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("setup cover", () => Child = new UpdateableOnlineBeatmapSetCover(coverType)
             {
-                OnlineInfo = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet.OnlineInfo,
+                OnlineInfo = CreateAPIBeatmapSet(),
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
             });
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("setup covers", () =>
             {
-                BeatmapSetInfo setInfo = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+                var beatmapSet = CreateAPIBeatmapSet();
 
                 FillFlowContainer fillFlow;
 
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("setup cover", () => Child = updateableCover = new TestUpdateableOnlineBeatmapSetCover
             {
-                OnlineInfo = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet.OnlineInfo,
+                OnlineInfo = CreateAPIBeatmapSet(),
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
             });
