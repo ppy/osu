@@ -10,13 +10,13 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osuTK;
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapSetHeaderContent : CompositeDrawable
     {
-        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+        public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
         private const float transition_duration = 200;
         private const float buttons_height = 45;
@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.BeatmapInfo = b.NewValue;
-                externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
+                externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineID}";
             };
         }
 
@@ -231,7 +231,7 @@ namespace osu.Game.Overlays.BeatmapSet
             BeatmapSet.BindValueChanged(setInfo =>
             {
                 Picker.BeatmapSet = rulesetSelector.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
-                cover.OnlineInfo = setInfo.NewValue?.OnlineInfo;
+                cover.OnlineInfo = setInfo.NewValue;
 
                 downloadTracker?.RemoveAndDisposeImmediately();
 
@@ -255,14 +255,14 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     loading.Hide();
 
-                    title.Text = new RomanisableString(setInfo.NewValue.Metadata.TitleUnicode, setInfo.NewValue.Metadata.Title);
-                    artist.Text = new RomanisableString(setInfo.NewValue.Metadata.ArtistUnicode, setInfo.NewValue.Metadata.Artist);
+                    title.Text = new RomanisableString(setInfo.NewValue.TitleUnicode, setInfo.NewValue.Title);
+                    artist.Text = new RomanisableString(setInfo.NewValue.ArtistUnicode, setInfo.NewValue.Artist);
 
-                    explicitContentPill.Alpha = setInfo.NewValue.OnlineInfo.HasExplicitContent ? 1 : 0;
-                    featuredArtistPill.Alpha = setInfo.NewValue.OnlineInfo.TrackId != null ? 1 : 0;
+                    explicitContentPill.Alpha = setInfo.NewValue.HasExplicitContent ? 1 : 0;
+                    featuredArtistPill.Alpha = setInfo.NewValue.TrackId != null ? 1 : 0;
 
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
-                    onlineStatusPill.Status = setInfo.NewValue.OnlineInfo.Status;
+                    onlineStatusPill.Status = setInfo.NewValue.Status;
 
                     downloadButtonsContainer.FadeIn(transition_duration);
                     favouriteButton.FadeIn(transition_duration);
@@ -276,7 +276,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             if (BeatmapSet.Value == null) return;
 
-            if (BeatmapSet.Value.OnlineInfo.Availability.DownloadDisabled && downloadTracker.State.Value != DownloadState.LocallyAvailable)
+            if (BeatmapSet.Value.Availability.DownloadDisabled && downloadTracker.State.Value != DownloadState.LocallyAvailable)
             {
                 downloadButtonsContainer.Clear();
                 return;
@@ -302,7 +302,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 default:
                     downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value);
-                    if (BeatmapSet.Value.OnlineInfo.HasVideo)
+                    if (BeatmapSet.Value.HasVideo)
                         downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true));
                     break;
             }
