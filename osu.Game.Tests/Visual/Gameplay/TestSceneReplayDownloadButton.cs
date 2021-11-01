@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Ranking;
 using osuTK.Input;
 
@@ -136,6 +137,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 OnlineID = 2553163309,
                 OnlineRulesetID = 0,
+                Beatmap = CreateAPIBeatmapSet(new OsuRuleset().RulesetInfo).Beatmaps.First(),
                 HasReplay = replayAvailable,
                 User = new User
                 {
