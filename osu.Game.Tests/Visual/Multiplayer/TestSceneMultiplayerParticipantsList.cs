@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddRepeatStep("increment progress", () =>
             {
-                var progress = this.ChildrenOfType<ParticipantPanel>().Single().User.BeatmapAvailability.DownloadProgress ?? 0;
+                float progress = this.ChildrenOfType<ParticipantPanel>().Single().User.BeatmapAvailability.DownloadProgress ?? 0;
                 Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(progress + RNG.NextSingle(0.1f)));
             }, 25);
 
@@ -275,6 +275,68 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var state = i;
                 AddStep($"set state: {state}", () => Client.ChangeUserState(0, state));
             }
+
+            AddStep("set state: downloading", () => Client.ChangeUserBeatmapAvailability(0, BeatmapAvailability.Downloading(0)));
+
+            AddStep("set state: locally available", () => Client.ChangeUserBeatmapAvailability(0, BeatmapAvailability.LocallyAvailable()));
+        }
+
+        [Test]
+        public void TestModOverlap()
+        {
+            AddStep("add dummy mods", () =>
+            {
+                Client.ChangeUserMods(new Mod[]
+                {
+                    new OsuModNoFail(),
+                    new OsuModDoubleTime()
+                });
+            });
+
+            AddStep("add user with mods", () =>
+            {
+                Client.AddUser(new User
+                {
+                    Id = 0,
+                    Username = "Baka",
+                    RulesetsStatistics = new Dictionary<string, UserStatistics>
+                    {
+                        {
+                            Ruleset.Value.ShortName,
+                            new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
+                        }
+                    },
+                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                });
+                Client.ChangeUserMods(0, new Mod[]
+                {
+                    new OsuModHardRock(),
+                    new OsuModDoubleTime()
+                });
+            });
+
+            AddStep("set 0 ready", () => Client.ChangeState(MultiplayerUserState.Ready));
+
+            AddStep("set 1 spectate", () => Client.ChangeUserState(0, MultiplayerUserState.Spectating));
+
+            // Have to set back to idle due to status priority.
+            AddStep("set 0 no map, 1 ready", () =>
+            {
+                Client.ChangeState(MultiplayerUserState.Idle);
+                Client.ChangeBeatmapAvailability(BeatmapAvailability.NotDownloaded());
+                Client.ChangeUserState(0, MultiplayerUserState.Ready);
+            });
+
+            AddStep("set 0 downloading", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
+
+            AddStep("set 0 spectate", () => Client.ChangeUserState(0, MultiplayerUserState.Spectating));
+
+            AddStep("make both default", () =>
+            {
+                Client.ChangeBeatmapAvailability(BeatmapAvailability.LocallyAvailable());
+                Client.ChangeUserState(0, MultiplayerUserState.Idle);
+                Client.ChangeState(MultiplayerUserState.Idle);
+            });
         }
 
         private void createNewParticipantsList()

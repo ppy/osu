@@ -19,14 +19,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            Client.RoomUpdated += OnRoomUpdated;
-
-            Client.UserLeft += UserLeft;
-            Client.UserKicked += UserKicked;
-            Client.UserJoined += UserJoined;
+            Client.RoomUpdated += invokeOnRoomUpdated;
+            Client.UserLeft += invokeUserLeft;
+            Client.UserKicked += invokeUserKicked;
+            Client.UserJoined += invokeUserJoined;
 
             OnRoomUpdated();
         }
+
+        private void invokeOnRoomUpdated() => Scheduler.AddOnce(OnRoomUpdated);
+        private void invokeUserJoined(MultiplayerRoomUser user) => Scheduler.AddOnce(UserJoined, user);
+        private void invokeUserKicked(MultiplayerRoomUser user) => Scheduler.AddOnce(UserKicked, user);
+        private void invokeUserLeft(MultiplayerRoomUser user) => Scheduler.AddOnce(UserLeft, user);
 
         /// <summary>
         /// Invoked when a user has joined the room.
@@ -63,10 +67,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             if (Client != null)
             {
-                Client.UserLeft -= UserLeft;
-                Client.UserKicked -= UserKicked;
-                Client.UserJoined -= UserJoined;
-                Client.RoomUpdated -= OnRoomUpdated;
+                Client.RoomUpdated -= invokeOnRoomUpdated;
+                Client.UserLeft -= invokeUserLeft;
+                Client.UserKicked -= invokeUserKicked;
+                Client.UserJoined -= invokeUserJoined;
             }
 
             base.Dispose(isDisposing);

@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 var req = new GetBeatmapSetRequest(1);
                 api.Queue(req);
 
-                AddUntilStep("wait for api response", () => req.Result != null);
+                AddUntilStep("wait for api response", () => req.Response != null);
 
                 TestUpdateableBeatmapBackgroundSprite background = null;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Child = background = new TestUpdateableBeatmapBackgroundSprite
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Beatmap = { Value = new BeatmapInfo { BeatmapSet = req.Result?.ToBeatmapSet(rulesets) } }
+                        Beatmap = { Value = new BeatmapInfo { BeatmapSet = req.Response?.ToBeatmapSet(rulesets) } }
                     };
                 });
 

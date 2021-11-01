@@ -20,8 +20,8 @@ namespace osu.Game.Screens.Ranking.Statistics
         public UnstableRate(IEnumerable<HitEvent> hitEvents)
             : base("Unstable Rate")
         {
-            var timeOffsets = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit())
-                                       .Select(ev => ev.TimeOffset).ToArray();
+            double[] timeOffsets = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit())
+                                            .Select(ev => ev.TimeOffset).ToArray();
             Value = 10 * standardDeviation(timeOffsets);
         }
 
@@ -30,8 +30,8 @@ namespace osu.Game.Screens.Ranking.Statistics
             if (timeOffsets.Length == 0)
                 return double.NaN;
 
-            var mean = timeOffsets.Average();
-            var squares = timeOffsets.Select(offset => Math.Pow(offset - mean, 2)).Sum();
+            double mean = timeOffsets.Average();
+            double squares = timeOffsets.Select(offset => Math.Pow(offset - mean, 2)).Sum();
             return Math.Sqrt(squares / timeOffsets.Length);
         }
 

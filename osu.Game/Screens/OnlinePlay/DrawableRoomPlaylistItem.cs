@@ -108,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay
             difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods) { Size = new Vector2(32) };
 
             beatmapText.Clear();
-            beatmapText.AddLink(Item.Beatmap.Value.ToRomanisableString(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString(), null, text =>
+            beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString(), null, text =>
             {
                 text.Truncate = true;
                 text.RelativeSizeAxes = Axes.X;
@@ -333,13 +333,14 @@ namespace osu.Game.Screens.OnlinePlay
 
             public PanelBackground()
             {
+                UpdateableBeatmapBackgroundSprite backgroundSprite;
+
                 InternalChildren = new Drawable[]
                 {
-                    new UpdateableBeatmapBackgroundSprite
+                    backgroundSprite = new UpdateableBeatmapBackgroundSprite
                     {
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fill,
-                        Beatmap = { BindTarget = Beatmap }
                     },
                     new FillFlowContainer
                     {
@@ -374,6 +375,10 @@ namespace osu.Game.Screens.OnlinePlay
                         }
                     }
                 };
+
+                // manual binding required as playlists don't expose IBeatmapInfo currently.
+                // may be removed in the future if this changes.
+                Beatmap.BindValueChanged(beatmap => backgroundSprite.Beatmap.Value = beatmap.NewValue);
             }
         }
     }

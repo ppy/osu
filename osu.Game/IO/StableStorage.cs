@@ -34,7 +34,7 @@ namespace osu.Game.IO
 
         private string locateSongsDirectory()
         {
-            var configFile = GetFiles(".", $"osu!.{Environment.UserName}.cfg").SingleOrDefault();
+            string configFile = GetFiles(".", $"osu!.{Environment.UserName}.cfg").SingleOrDefault();
 
             if (configFile != null)
             {
@@ -47,7 +47,7 @@ namespace osu.Game.IO
                     {
                         if (!line.StartsWith("BeatmapDirectory", StringComparison.OrdinalIgnoreCase)) continue;
 
-                        var customDirectory = line.Split('=').LastOrDefault()?.Trim();
+                        string customDirectory = line.Split('=').LastOrDefault()?.Trim();
                         if (customDirectory != null && Path.IsPathFullyQualified(customDirectory))
                             return customDirectory;
 

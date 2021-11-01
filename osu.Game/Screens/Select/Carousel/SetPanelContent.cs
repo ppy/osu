@@ -60,6 +60,7 @@ namespace osu.Game.Screens.Select.Carousel
                         {
                             new BeatmapSetOnlineStatusPill
                             {
+                                AutoSizeAxes = Axes.Both,
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                                 Margin = new MarginPadding { Right = 5 },
@@ -86,7 +87,7 @@ namespace osu.Game.Screens.Select.Carousel
             var beatmaps = carouselSet.Beatmaps.ToList();
 
             return beatmaps.Count > maximum_difficulty_icons
-                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.Beatmap.Ruleset).Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Key))
+                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.BeatmapInfo.Ruleset).Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Key))
                 : beatmaps.Select(b => new FilterableDifficultyIcon(b));
         }
     }

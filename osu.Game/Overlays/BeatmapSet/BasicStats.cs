@@ -38,16 +38,16 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private BeatmapInfo beatmap;
+        private BeatmapInfo beatmapInfo;
 
-        public BeatmapInfo Beatmap
+        public BeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (value == beatmap) return;
+                if (value == beatmapInfo) return;
 
-                beatmap = value;
+                beatmapInfo = value;
 
                 updateDisplay();
             }
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             bpm.Value = BeatmapSet?.OnlineInfo?.BPM.ToLocalisableString(@"0.##") ?? (LocalisableString)"-";
 
-            if (beatmap == null)
+            if (beatmapInfo == null)
             {
                 length.Value = string.Empty;
                 circleCount.Value = string.Empty;
@@ -65,11 +65,11 @@ namespace osu.Game.Overlays.BeatmapSet
             }
             else
             {
-                length.TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(TimeSpan.FromMilliseconds(beatmap.Length).ToFormattedDuration());
-                length.Value = TimeSpan.FromMilliseconds(beatmap.Length).ToFormattedDuration();
+                length.TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(TimeSpan.FromMilliseconds(beatmapInfo.Length).ToFormattedDuration());
+                length.Value = TimeSpan.FromMilliseconds(beatmapInfo.Length).ToFormattedDuration();
 
-                circleCount.Value = beatmap.OnlineInfo.CircleCount.ToLocalisableString(@"N0");
-                sliderCount.Value = beatmap.OnlineInfo.SliderCount.ToLocalisableString(@"N0");
+                circleCount.Value = beatmapInfo.OnlineInfo.CircleCount.ToLocalisableString(@"N0");
+                sliderCount.Value = beatmapInfo.OnlineInfo.SliderCount.ToLocalisableString(@"N0");
             }
         }
 

@@ -8,7 +8,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -40,9 +39,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }
 
-        [SetUpSteps]
         public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
             AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).Result);
 
             AddStep("create leaderboard", () =>
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
                 var multiplayerUsers = new List<MultiplayerRoomUser>();
 
-                foreach (var user in users)
+                foreach (int user in users)
                 {
                     SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
                     multiplayerUsers.Add(OnlinePlayDependencies.Client.AddUser(new User { Id = user }, true));
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestUserQuit()
         {
-            foreach (var user in users)
+            foreach (int user in users)
                 AddStep($"mark user {user} quit", () => Client.RemoveUser(LookupCache.GetUserAsync(user).Result.AsNonNull()));
         }
 
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public void RandomlyUpdateState()
             {
-                foreach (var userId in PlayingUsers)
+                foreach (int userId in PlayingUsers)
                 {
                     if (RNG.NextBool())
                         continue;

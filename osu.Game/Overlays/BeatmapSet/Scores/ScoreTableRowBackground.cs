@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OverlayColourProvider colourProvider, IAPIProvider api)
         {
-            var isOwnScore = api.LocalUser.Value.Id == score.UserID;
+            bool isOwnScore = api.LocalUser.Value.Id == score.UserID;
 
             if (isOwnScore)
                 background.Colour = colours.GreenDarker;

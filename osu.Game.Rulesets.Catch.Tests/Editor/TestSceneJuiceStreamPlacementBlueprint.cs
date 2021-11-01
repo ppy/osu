@@ -4,9 +4,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
@@ -23,11 +23,12 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
         private JuiceStream lastObject => LastObject?.HitObject as JuiceStream;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override IBeatmap GetPlayableBeatmap()
         {
-            Beatmap.Value.BeatmapInfo.BaseDifficulty.SliderTickRate = 5;
-            Beatmap.Value.BeatmapInfo.BaseDifficulty.SliderMultiplier = velocity * 10;
+            var playable = base.GetPlayableBeatmap();
+            playable.Difficulty.SliderTickRate = 5;
+            playable.Difficulty.SliderMultiplier = velocity * 10;
+            return playable;
         }
 
         [Test]

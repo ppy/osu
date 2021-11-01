@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Skins
         {
             AddStep("Set user skin version 2.3", () => userSource.Configuration.LegacyVersion = 2.3m);
             AddStep("Set beatmap skin version null", () => beatmapSource.Configuration.LegacyVersion = null);
-            AddAssert("Check legacy version lookup", () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == 2.3m);
+            AddAssert("Check legacy version lookup", () => requester.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value == 2.3m);
         }
 
         [Test]
@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Skins
             // completely ignoring beatmap versions for simplicity.
             AddStep("Set user skin version 2.3", () => userSource.Configuration.LegacyVersion = 2.3m);
             AddStep("Set beatmap skin version null", () => beatmapSource.Configuration.LegacyVersion = 1.7m);
-            AddAssert("Check legacy version lookup", () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == 2.3m);
+            AddAssert("Check legacy version lookup", () => requester.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value == 2.3m);
         }
 
         [Test]
@@ -169,14 +169,14 @@ namespace osu.Game.Tests.Skins
             AddStep("Set user skin version 2.3", () => userSource.Configuration.LegacyVersion = null);
             AddStep("Set beatmap skin version null", () => beatmapSource.Configuration.LegacyVersion = null);
             AddAssert("Check legacy version lookup",
-                () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == LegacySkinConfiguration.LATEST_VERSION);
+                () => requester.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value == SkinConfiguration.LATEST_VERSION);
         }
 
         [Test]
         public void TestIniWithNoVersionFallsBackTo1()
         {
             AddStep("Parse skin with no version", () => userSource.Configuration = new LegacySkinDecoder().Decode(new LineBufferedReader(new MemoryStream())));
-            AddAssert("Check legacy version lookup", () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == 1.0m);
+            AddAssert("Check legacy version lookup", () => requester.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value == 1.0m);
         }
 
         public enum LookupType

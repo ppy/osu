@@ -66,8 +66,12 @@ namespace osu.Game.Beatmaps
             lock (workingCache)
             {
                 var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+
                 if (working != null)
+                {
+                    Logger.Log($"Invalidating working beatmap cache for {info}");
                     workingCache.Remove(working);
+                }
             }
         }
 
@@ -86,6 +90,7 @@ namespace osu.Game.Beatmaps
             lock (workingCache)
             {
                 var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+
                 if (working != null)
                     return working;
 
@@ -201,12 +206,14 @@ namespace osu.Game.Beatmaps
                     {
                         var decoder = Decoder.GetDecoder<Storyboard>(stream);
 
+                        string storyboardFilename = BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
+
                         // todo: support loading from both set-wide storyboard *and* beatmap specific.
-                        if (BeatmapSetInfo?.StoryboardFile == null)
+                        if (string.IsNullOrEmpty(storyboardFilename))
                             storyboard = decoder.Decode(stream);
                         else
                         {
-                            using (var secondaryStream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapSetInfo.StoryboardFile))))
+                            using (var secondaryStream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(storyboardFilename))))
                                 storyboard = decoder.Decode(stream, secondaryStream);
                         }
                     }

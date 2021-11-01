@@ -255,6 +255,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         private APIRequest getScoresRequest;
+        private ScheduledDelegate getScoresRequestCallback;
 
         protected abstract bool IsOnlineScope { get; }
 
@@ -282,13 +283,16 @@ namespace osu.Game.Online.Leaderboards
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
+            getScoresRequestCallback?.Cancel();
+            getScoresRequestCallback = null;
+
             pendingUpdateScores?.Cancel();
             pendingUpdateScores = Schedule(() =>
             {
                 PlaceholderState = PlaceholderState.Retrieving;
                 loading.Show();
 
-                getScoresRequest = FetchScores(scores => Schedule(() =>
+                getScoresRequest = FetchScores(scores => getScoresRequestCallback = Schedule(() =>
                 {
                     Scores = scores.ToArray();
                     PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
@@ -297,7 +301,7 @@ namespace osu.Game.Online.Leaderboards
                 if (getScoresRequest == null)
                     return;
 
-                getScoresRequest.Failure += e => Schedule(() =>
+                getScoresRequest.Failure += e => getScoresRequestCallback = Schedule(() =>
                 {
                     if (e is OperationCanceledException)
                         return;
@@ -346,8 +350,8 @@ namespace osu.Game.Online.Leaderboards
         {
             base.UpdateAfterChildren();
 
-            var fadeBottom = scrollContainer.Current + scrollContainer.DrawHeight;
-            var fadeTop = scrollContainer.Current + LeaderboardScore.HEIGHT;
+            float fadeBottom = scrollContainer.Current + scrollContainer.DrawHeight;
+            float fadeTop = scrollContainer.Current + LeaderboardScore.HEIGHT;
 
             if (!scrollContainer.IsScrolledToEnd())
                 fadeBottom -= LeaderboardScore.HEIGHT;
@@ -357,8 +361,8 @@ namespace osu.Game.Online.Leaderboards
 
             foreach (var c in scrollFlow.Children)
             {
-                var topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scrollFlow).Y;
-                var bottomY = topY + LeaderboardScore.HEIGHT;
+                float topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scrollFlow).Y;
+                float bottomY = topY + LeaderboardScore.HEIGHT;
 
                 bool requireTopFade = FadeTop && topY <= fadeTop;
                 bool requireBottomFade = FadeBottom && bottomY >= fadeBottom;

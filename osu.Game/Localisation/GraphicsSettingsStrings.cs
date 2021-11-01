@@ -105,6 +105,11 @@ namespace osu.Game.Localisation
         public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit lighting");
 
         /// <summary>
+        /// "Screenshots"
+        /// </summary>
+        public static LocalisableString Screenshots => new TranslatableString(getKey(@"screenshots"), @"Screenshots");
+
+        /// <summary>
         /// "Screenshot format"
         /// </summary>
         public static LocalisableString ScreenshotFormat => new TranslatableString(getKey(@"screenshot_format"), @"Screenshot format");
@@ -113,6 +118,16 @@ namespace osu.Game.Localisation
         /// "Show menu cursor in screenshots"
         /// </summary>
         public static LocalisableString ShowCursorInScreenshots => new TranslatableString(getKey(@"show_cursor_in_screenshots"), @"Show menu cursor in screenshots");
+
+        /// <summary>
+        /// "Video"
+        /// </summary>
+        public static LocalisableString VideoHeader => new TranslatableString(getKey(@"video_header"), @"Video");
+
+        /// <summary>
+        /// "Use hardware acceleration"
+        /// </summary>
+        public static LocalisableString UseHardwareAcceleration => new TranslatableString(getKey(@"use_hardware_acceleration"), @"Use hardware acceleration");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

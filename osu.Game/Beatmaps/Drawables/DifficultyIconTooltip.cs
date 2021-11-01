@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public void SetContent(DifficultyIconTooltipContent content)
         {
-            difficultyName.Text = content.Beatmap.Version;
+            difficultyName.Text = content.BeatmapInfo.DifficultyName;
 
             starDifficulty.UnbindAll();
             starDifficulty.BindTo(content.Difficulty);
@@ -109,12 +109,12 @@ namespace osu.Game.Beatmaps.Drawables
 
     internal class DifficultyIconTooltipContent
     {
-        public readonly BeatmapInfo Beatmap;
+        public readonly IBeatmapInfo BeatmapInfo;
         public readonly IBindable<StarDifficulty> Difficulty;
 
-        public DifficultyIconTooltipContent(BeatmapInfo beatmap, IBindable<StarDifficulty> difficulty)
+        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty)
         {
-            Beatmap = beatmap;
+            BeatmapInfo = beatmapInfo;
             Difficulty = difficulty;
         }
     }

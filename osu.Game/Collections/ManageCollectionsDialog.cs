@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Audio.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -19,6 +21,8 @@ namespace osu.Game.Collections
     {
         private const double enter_duration = 500;
         private const double exit_duration = 200;
+
+        private AudioFilter lowPassFilter;
 
         [Resolved(CanBeNull = true)]
         private CollectionManager collectionManager { get; set; }
@@ -36,7 +40,7 @@ namespace osu.Game.Collections
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             Children = new Drawable[]
             {
@@ -108,7 +112,8 @@ namespace osu.Game.Collections
                             },
                         }
                     }
-                }
+                },
+                lowPassFilter = new AudioFilter(audio.TrackMixer)
             };
         }
 
@@ -116,6 +121,7 @@ namespace osu.Game.Collections
         {
             base.PopIn();
 
+            lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
             this.FadeIn(enter_duration, Easing.OutQuint);
             this.ScaleTo(0.9f).Then().ScaleTo(1f, enter_duration, Easing.OutQuint);
         }
@@ -123,6 +129,8 @@ namespace osu.Game.Collections
         protected override void PopOut()
         {
             base.PopOut();
+
+            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
 
             this.FadeOut(exit_duration, Easing.OutQuint);
             this.ScaleTo(0.9f, exit_duration);

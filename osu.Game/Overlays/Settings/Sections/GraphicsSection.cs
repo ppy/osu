@@ -22,9 +22,10 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                new RendererSettings(),
                 new LayoutSettings(),
-                new DetailSettings(),
+                new RendererSettings(),
+                new VideoSettings(),
+                new ScreenshotSettings(),
             };
         }
     }
