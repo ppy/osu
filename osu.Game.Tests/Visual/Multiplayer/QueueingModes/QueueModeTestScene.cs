@@ -104,6 +104,8 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
 
         protected void RunGameplay()
         {
+            AddUntilStep("wait for idle", () => Client.LocalUser?.State == MultiplayerUserState.Idle);
+
             AddStep("click ready button", () =>
             {
                 InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
