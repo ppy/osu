@@ -175,6 +175,28 @@ namespace osu.Game.Tests.Visual
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
+        /// <summary>
+        /// Returns a sample API Beatmap with BeatmapSet populated.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to create the sample model using.</param>
+        protected APIBeatmap CreateAPIBeatmap(RulesetInfo ruleset)
+        {
+            var beatmapSet = CreateAPIBeatmapSet(ruleset);
+
+            // Avoid circular reference.
+            var beatmap = beatmapSet.Beatmaps.First();
+            beatmapSet.Beatmaps = Array.Empty<APIBeatmap>();
+
+            // Populate the set as that's generally what we expect from the API.
+            beatmap.BeatmapSet = beatmapSet;
+
+            return beatmap;
+        }
+
+        /// <summary>
+        /// Returns a sample API BeatmapSet with beatmaps populated.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to create the sample model using.</param>
         protected APIBeatmapSet CreateAPIBeatmapSet(RulesetInfo ruleset)
         {
             var beatmap = CreateBeatmap(ruleset).BeatmapInfo;
