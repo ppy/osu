@@ -92,6 +92,7 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
+                BeatmapInfo = Beatmap.ToBeatmapInfo(rulesets),
                 User = User,
                 Accuracy = Accuracy,
                 OnlineScoreID = OnlineID,
