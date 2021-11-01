@@ -35,11 +35,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (osuCurrent.LastObject is Slider OsuSlider)
             {
                 // We skip slow slider in calculation.
-                double adaptedVelocity = Math.Max(OsuSlider.Velocity - 0.4, 0);
+                double adaptedVelocity = Math.Max(OsuSlider.Velocity - 0.25, 0);
 
                 // because slowing slider is easier.
                 if (lastVelocity >= 0)
-                    result = Math.Max(adaptedVelocity - lastVelocity, (lastVelocity - adaptedVelocity) / 2) * 2.5;
+                    result = Math.Max(adaptedVelocity - lastVelocity, (lastVelocity - adaptedVelocity) / 2) * 1.5;
 
                 // default bonus for velocity
                 result += adaptedVelocity / 3;

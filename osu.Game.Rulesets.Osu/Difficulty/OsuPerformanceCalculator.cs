@@ -137,6 +137,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is important to also consider accuracy difficulty when doing that.
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
+            // Nerfs low acc records on slider maps under 99.5%.
+            // It's statistical value.
+            
+            double sliderVelocityBonusTotal = Math.Max(Attributes.SliderVelocityTotal * Math.Min(0.98 - accuracy, 0.04) * 200.0, 0) / 2.0
+                                                + Math.Max(Attributes.SliderVelocityTotal * Math.Min(0.94 - accuracy, 0.04) * 20.0, 0) / 2.0; 
+
+            // maximum 50%
+            if (aimValue / 2 > sliderVelocityBonusTotal)
+            {
+                aimValue -= sliderVelocityBonusTotal;
+            } else
+            {
+                aimValue /= 2;
+            }
+
+            //if (aimValue <= 0) aimValue = 0;
+
             return aimValue;
         }
 
@@ -224,10 +241,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Nerfs low acc records on slider maps under 99.5%.
             // It's statistical value.
-            double sliderVelocityBonusTotal = Math.Max(Attributes.SliderVelocityTotal * (0.995 - betterAccuracyPercentage) * 10.0, 0) / 2.0; // sum((1/2)^(n-1)) goes to 2. 
-            accuracyValue -= sliderVelocityBonusTotal;
+            //double sliderVelocityBonusTotal = Math.Max(Attributes.SliderVelocityTotal * (0.995 - betterAccuracyPercentage) * 50.0, 0) / 2.0; // sum((1/2)^(n-1)) goes to 2. 
+            //accuracyValue -= sliderVelocityBonusTotal;
 
-            if (accuracyValue <= 0) accuracyValue = 0;
+            //if (accuracyValue <= 0) accuracyValue = 0;
 
             return accuracyValue;
         }
