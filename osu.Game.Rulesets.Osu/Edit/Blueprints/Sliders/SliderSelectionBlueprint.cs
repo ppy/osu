@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -46,6 +47,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private BindableBeatDivisor beatDivisor { get; set; }
 
         public override Quad SelectionQuad => BodyPiece.ScreenSpaceDrawQuad;
 
@@ -173,6 +177,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (!IsSelected)
+                return false;
+
+            if (e.Key == Key.F && e.ControlPressed && e.ShiftPressed)
+            {
+                convertToStream();
+                return true;
+            }
+
+            return false;
+        }
+
         private int addControlPoint(Vector2 position)
         {
             position -= HitObject.Position;
@@ -234,9 +252,42 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             editorBeatmap?.Update(HitObject);
         }
 
+        private void convertToStream()
+        {
+            if (editorBeatmap == null || changeHandler == null || beatDivisor == null)
+                return;
+
+            var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(HitObject.StartTime);
+            double streamSpacing = timingPoint.BeatLength / beatDivisor.Value;
+
+            changeHandler.BeginChange();
+
+            int i = 0;
+            double time = HitObject.StartTime;
+
+            while (!Precision.DefinitelyBigger(time, HitObject.GetEndTime(), 1))
+            {
+                Vector2 position = HitObject.Position + HitObject.Path.PositionAt((time - HitObject.StartTime) / HitObject.Duration);
+                editorBeatmap.Add(new HitCircle
+                {
+                    StartTime = time,
+                    Position = position,
+                    NewCombo = i == 0 && HitObject.NewCombo
+                });
+
+                i += 1;
+                time = HitObject.StartTime + i * streamSpacing;
+            }
+
+            editorBeatmap.Remove(HitObject);
+
+            changeHandler.EndChange();
+        }
+
         public override MenuItem[] ContextMenuItems => new MenuItem[]
         {
             new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
+            new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream),
         };
 
         // Always refer to the drawable object's slider body so subsequent movement deltas are calculated with updated positions.
