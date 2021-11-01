@@ -30,9 +30,9 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>, IPresentImports<TModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
-        where TFileModel : class, INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, IHasPrimaryKey, new()
     {
         private const int import_queue_request_concurrency = 1;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Database
         /// <param name="paths">One or more archive locations on disk.</param>
         public Task Import(params string[] paths)
         {
-            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
+            var notification = new ImportProgressNotification();
 
             PostNotification?.Invoke(notification);
 
@@ -125,20 +125,20 @@ namespace osu.Game.Database
 
         public Task Import(params ImportTask[] tasks)
         {
-            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
+            var notification = new ImportProgressNotification();
 
             PostNotification?.Invoke(notification);
 
             return Import(notification, tasks);
         }
 
-        public async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public async Task<IEnumerable<ILive<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             if (tasks.Length == 0)
             {
                 notification.CompletionText = $"No {HumanisedModelName}s were found to import!";
                 notification.State = ProgressNotificationState.Completed;
-                return Enumerable.Empty<TModel>();
+                return Enumerable.Empty<ILive<TModel>>();
             }
 
             notification.Progress = 0;
@@ -146,7 +146,7 @@ namespace osu.Game.Database
 
             int current = 0;
 
-            var imported = new List<TModel>();
+            var imported = new List<ILive<TModel>>();
 
             bool isLowPriorityImport = tasks.Length > low_priority_import_batch_size;
 
@@ -197,15 +197,15 @@ namespace osu.Game.Database
             else
             {
                 notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First()}!"
+                    ? $"Imported {imported.First().Value}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
-                if (imported.Count > 0 && PresentImport != null)
+                if (imported.Count > 0 && PostImport != null)
                 {
                     notification.CompletionText += " Click to view.";
                     notification.CompletionClickAction = () =>
                     {
-                        PresentImport?.Invoke(imported);
+                        PostImport?.Invoke(imported);
                         return true;
                     };
                 }
@@ -224,11 +224,11 @@ namespace osu.Game.Database
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        public async Task<TModel> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<ILive<TModel>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            TModel import;
+            ILive<TModel> import;
             using (ArchiveReader reader = task.GetReader())
                 import = await Import(reader, lowPriority, cancellationToken).ConfigureAwait(false);
 
@@ -243,13 +243,13 @@ namespace osu.Game.Database
             }
             catch (Exception e)
             {
-                LogForModel(import, $@"Could not delete original file after import ({task})", e);
+                LogForModel(import?.Value, $@"Could not delete original file after import ({task})", e);
             }
 
             return import;
         }
 
-        public Action<IEnumerable<TModel>> PresentImport { protected get; set; }
+        public Action<IEnumerable<ILive<TModel>>> PostImport { protected get; set; }
 
         /// <summary>
         /// Silently import an item from an <see cref="ArchiveReader"/>.
@@ -257,7 +257,7 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public Task<TModel> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<ILive<TModel>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -268,7 +268,7 @@ namespace osu.Game.Database
                 model = CreateModel(archive);
 
                 if (model == null)
-                    return Task.FromResult<TModel>(null);
+                    return Task.FromResult<ILive<TModel>>(new EntityFrameworkLive<TModel>(null));
             }
             catch (TaskCanceledException)
             {
@@ -315,25 +315,29 @@ namespace osu.Game.Database
         /// <remarks>
         ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
         /// </remarks>
-        protected virtual string ComputeHash(TModel item, ArchiveReader reader = null)
+        protected virtual string ComputeHash(TModel item)
         {
-            if (reader != null)
-                // fast hashing for cases where the item's files may not be populated.
-                return computeHashFast(reader);
+            var hashableFiles = item.Files
+                                    .Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+                                    .OrderBy(f => f.Filename)
+                                    .ToArray();
 
-            // for now, concatenate all hashable files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
-
-            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
+            if (hashableFiles.Length > 0)
             {
-                using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
-                    s.CopyTo(hashable);
+                // for now, concatenate all hashable files in the set to create a unique hash.
+                MemoryStream hashable = new MemoryStream();
+
+                foreach (TFileModel file in hashableFiles)
+                {
+                    using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
+                        s.CopyTo(hashable);
+                }
+
+                if (hashable.Length > 0)
+                    return hashable.ComputeSHA2Hash();
             }
 
-            if (hashable.Length > 0)
-                return hashable.ComputeSHA2Hash();
-
-            return item.Hash;
+            return generateFallbackHash();
         }
 
         /// <summary>
@@ -343,7 +347,7 @@ namespace osu.Game.Database
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual async Task<TModel> Import(TModel item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) => await Task.Factory.StartNew(async () =>
+        public virtual async Task<ILive<TModel>> Import(TModel item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) => await Task.Factory.StartNew(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -369,7 +373,7 @@ namespace osu.Game.Database
                     {
                         LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
                         Undelete(existing);
-                        return existing;
+                        return existing.ToEntityFrameworkLive();
                     }
 
                     LogForModel(item, @"Found existing (optimised) but failed pre-check.");
@@ -393,7 +397,7 @@ namespace osu.Game.Database
                 LogForModel(item, @"Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
-                item.Hash = ComputeHash(item, archive);
+                item.Hash = ComputeHash(item);
 
                 await Populate(item, archive, cancellationToken).ConfigureAwait(false);
 
@@ -415,7 +419,7 @@ namespace osu.Game.Database
                                 // existing item will be used; rollback new import and exit early.
                                 rollback();
                                 flushEvents(true);
-                                return existing;
+                                return existing.ToEntityFrameworkLive();
                             }
 
                             LogForModel(item, @"Found existing but failed re-use check.");
@@ -448,7 +452,7 @@ namespace osu.Game.Database
             }
 
             flushEvents(true);
-            return item;
+            return item.ToEntityFrameworkLive();
         }, cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap().ConfigureAwait(false);
 
         /// <summary>
@@ -462,10 +466,12 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
-            using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
-                ExportModelTo(retrievedItem, outputStream);
+            string filename = $"{getValidFilename(item.ToString())}{HandledExtensions.First()}";
 
-            exportStorage.OpenInNativeExplorer();
+            using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
+                ExportModelTo(retrievedItem, stream);
+
+            exportStorage.PresentFileExternally(filename);
         }
 
         /// <summary>
@@ -514,9 +520,12 @@ namespace osu.Game.Database
                 {
                     Files.Dereference(file.FileInfo);
 
-                    // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
-                    // Definitely can be removed once we rework the database backend.
-                    usage.Context.Set<TFileModel>().Remove(file);
+                    if (file.ID > 0)
+                    {
+                        // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
+                        // Definitely can be removed once we rework the database backend.
+                        usage.Context.Set<TFileModel>().Remove(file);
+                    }
                 }
 
                 model.Files.Remove(file);
@@ -538,9 +547,10 @@ namespace osu.Game.Database
                     Filename = filename,
                     FileInfo = Files.Add(contents)
                 });
-
-                Update(model);
             }
+
+            if (model.ID > 0)
+                Update(model);
         }
 
         /// <summary>
@@ -673,7 +683,7 @@ namespace osu.Game.Database
         {
             MemoryStream hashable = new MemoryStream();
 
-            foreach (var file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
             {
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
@@ -682,7 +692,7 @@ namespace osu.Game.Database
             if (hashable.Length > 0)
                 return hashable.ComputeSHA2Hash();
 
-            return reader.Name.ComputeSHA2Hash();
+            return generateFallbackHash();
         }
 
         /// <summary>
@@ -894,6 +904,14 @@ namespace osu.Game.Database
         }
 
         #endregion
+
+        private static string generateFallbackHash()
+        {
+            // if a hash could no be generated from file content, presume a unique / new import.
+            // therefore, let's use a guaranteed unique hash.
+            // this doesn't follow the SHA2 hashing schema intentionally, so such entries on the data store can be identified.
+            return Guid.NewGuid().ToString();
+        }
 
         private string getValidFilename(string filename)
         {

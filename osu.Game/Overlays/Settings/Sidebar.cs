@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,22 +16,23 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>
+    public class Sidebar : Container<SidebarIconButton>, IStateful<ExpandedState>
     {
-        private readonly FillFlowContainer<SidebarButton> content;
-        public const float DEFAULT_WIDTH = Toolbar.Toolbar.HEIGHT * 1.4f;
+        private readonly Box background;
+        private readonly FillFlowContainer<SidebarIconButton> content;
+        public const float DEFAULT_WIDTH = 70;
         public const int EXPANDED_WIDTH = 200;
 
         public event Action<ExpandedState> StateChanged;
 
-        protected override Container<SidebarButton> Content => content;
+        protected override Container<SidebarIconButton> Content => content;
 
         public Sidebar()
         {
             RelativeSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     Colour = OsuColour.Gray(0.02f),
                     RelativeSizeAxes = Axes.Both,
@@ -39,7 +41,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     Children = new[]
                     {
-                        content = new FillFlowContainer<SidebarButton>
+                        content = new FillFlowContainer<SidebarIconButton>
                         {
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
@@ -50,6 +52,12 @@ namespace osu.Game.Overlays.Settings
                     }
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            background.Colour = colourProvider.Background5;
         }
 
         private ScheduledDelegate expandEvent;
@@ -80,8 +88,6 @@ namespace osu.Game.Overlays.Settings
         {
             public SidebarScrollContainer()
             {
-                Content.Anchor = Anchor.CentreLeft;
-                Content.Origin = Anchor.CentreLeft;
                 RelativeSizeAxes = Axes.Both;
                 ScrollbarVisible = false;
             }

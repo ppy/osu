@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (timeline != null)
             {
                 var timelineQuad = timeline.ScreenSpaceDrawQuad;
-                var mouseX = e.ScreenSpaceMousePosition.X;
+                float mouseX = e.ScreenSpaceMousePosition.X;
 
                 // scroll if in a drag and dragging outside visible extents
                 if (mouseX > timelineQuad.TopRight.X)

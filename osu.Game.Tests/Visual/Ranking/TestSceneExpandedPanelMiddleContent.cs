@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
-                Beatmap = createTestBeatmap(author)
+                BeatmapInfo = createTestBeatmap(author)
             }));
         }
 
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddStep("show excess mods score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo, true)
             {
-                Beatmap = createTestBeatmap(author)
+                BeatmapInfo = createTestBeatmap(author)
             }));
 
             AddAssert("mapper name present", () => this.ChildrenOfType<OsuSpriteText>().Any(spriteText => spriteText.Current.Value == "mapper_name"));
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
-                Beatmap = createTestBeatmap(null)
+                BeatmapInfo = createTestBeatmap(null)
             }));
 
             AddAssert("mapped by text not present", () =>
@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 showPanel(new TestScoreInfo(ruleset.RulesetInfo)
                 {
                     Mods = mods,
-                    Beatmap = beatmap,
+                    BeatmapInfo = beatmap,
                     Date = default,
                 });
             });

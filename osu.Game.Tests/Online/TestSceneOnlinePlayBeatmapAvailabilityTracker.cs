@@ -156,7 +156,7 @@ namespace osu.Game.Tests.Online
         {
             public TaskCompletionSource<bool> AllowImport = new TaskCompletionSource<bool>();
 
-            public Task<BeatmapSetInfo> CurrentImportTask { get; private set; }
+            public Task<ILive<BeatmapSetInfo>> CurrentImportTask { get; private set; }
 
             public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
                 : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
@@ -168,14 +168,14 @@ namespace osu.Game.Tests.Online
                 return new TestBeatmapModelManager(this, storage, contextFactory, rulesets, api, host);
             }
 
-            protected override BeatmapModelDownloader CreateBeatmapModelDownloader(BeatmapModelManager modelManager, IAPIProvider api, GameHost host)
+            protected override BeatmapModelDownloader CreateBeatmapModelDownloader(IBeatmapModelManager manager, IAPIProvider api, GameHost host)
             {
-                return new TestBeatmapModelDownloader(modelManager, api, host);
+                return new TestBeatmapModelDownloader(manager, api, host);
             }
 
             internal class TestBeatmapModelDownloader : BeatmapModelDownloader
             {
-                public TestBeatmapModelDownloader(BeatmapModelManager modelManager, IAPIProvider apiProvider, GameHost gameHost)
+                public TestBeatmapModelDownloader(IBeatmapModelManager modelManager, IAPIProvider apiProvider, GameHost gameHost)
                     : base(modelManager, apiProvider, gameHost)
                 {
                 }
@@ -194,7 +194,7 @@ namespace osu.Game.Tests.Online
                     this.testBeatmapManager = testBeatmapManager;
                 }
 
-                public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+                public override async Task<ILive<BeatmapSetInfo>> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
                 {
                     await testBeatmapManager.AllowImport.Task.ConfigureAwait(false);
                     return await (testBeatmapManager.CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken)).ConfigureAwait(false);

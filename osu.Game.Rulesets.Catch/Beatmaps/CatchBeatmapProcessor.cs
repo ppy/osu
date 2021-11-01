@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             palpableObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
-            double halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) / 2;
+            double halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.Difficulty) / 2;
 
             // Todo: This is wrong. osu!stable calculated hyperdashes using the full catcher size, excluding the margins.
             // This should theoretically cause impossible scenarios, but practically, likely due to the size of the playfield, it doesn't seem possible.
@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 int thisDirection = nextObject.EffectiveX > currentObject.EffectiveX ? 1 : -1;
                 double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
                 double distanceToNext = Math.Abs(nextObject.EffectiveX - currentObject.EffectiveX) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
-                float distanceToHyper = (float)(timeToNext * Catcher.BASE_SPEED - distanceToNext);
+                float distanceToHyper = (float)(timeToNext * Catcher.BASE_DASH_SPEED - distanceToNext);
 
                 if (distanceToHyper < 0)
                 {

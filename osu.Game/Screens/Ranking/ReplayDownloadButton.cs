@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, ScoreModelDownloader scores)
+        private void load(OsuGame game, ScoreManager scores)
         {
             InternalChild = shakeContainer = new ShakeContainer
             {
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Ranking
                         break;
 
                     case DownloadState.NotDownloaded:
-                        scores.Download(Model.Value);
+                        scores.Download(Model.Value, false);
                         break;
 
                     case DownloadState.Importing:

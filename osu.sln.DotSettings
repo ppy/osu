@@ -73,6 +73,7 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConvertToLocalFunction/@EntryIndexedValue">HINT</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConvertToStaticClass/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConvertToUsingDeclaration/@EntryIndexedValue">HINT</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConvertTypeCheckPatternToNullCheck/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=DoubleNegationOperator/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=EmptyGeneralCatchClause/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=EnforceDoWhileStatementBraces/@EntryIndexedValue">WARNING</s:String>
@@ -206,7 +207,7 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=StringLiteralTypo/@EntryIndexedValue">HINT</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=StringStartsWithIsCultureSpecific/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=StructCanBeMadeReadOnly/@EntryIndexedValue">WARNING</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=SuggestVarOrType_005FBuiltInTypes/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=SuggestVarOrType_005FBuiltInTypes/@EntryIndexedValue">SUGGESTION</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=SuggestVarOrType_005FSimpleTypes/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=SwitchStatementMissingSomeCases/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=TabsAndSpacesMismatch/@EntryIndexedValue">WARNING</s:String>
@@ -300,6 +301,9 @@
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_BEFORE_BINARY_OPSIGN/@EntryValue">True</s:Boolean>
 	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LIMIT/@EntryValue">200</s:Int64>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_OBJECT_AND_COLLECTION_INITIALIZER_STYLE/@EntryValue">CHOP_IF_LONG</s:String>
+	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForBuiltInTypes/@EntryValue">UseExplicitType</s:String>
+	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForOtherTypes/@EntryValue">UseVarWhenEvident</s:String>
+	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForSimpleTypes/@EntryValue">UseVarWhenEvident</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/EncapsulateField/MakeFieldPrivate/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/EncapsulateField/UseAutoProperty/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=AABB/@EntryIndexedValue">AABB</s:String>

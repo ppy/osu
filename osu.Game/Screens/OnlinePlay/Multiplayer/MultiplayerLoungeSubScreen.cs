@@ -79,11 +79,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             private void load()
             {
                 isConnected.BindTo(client.IsConnected);
-                isConnected.BindValueChanged(c => Scheduler.AddOnce(() =>
-                {
-                    if (isConnected.Value && IsLoaded)
-                        PollImmediately();
-                }), true);
+                isConnected.BindValueChanged(c => Scheduler.AddOnce(poll), true);
+            }
+
+            private void poll()
+            {
+                if (isConnected.Value && IsLoaded)
+                    PollImmediately();
             }
 
             protected override Task Poll()

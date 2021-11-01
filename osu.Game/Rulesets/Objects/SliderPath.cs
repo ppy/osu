@@ -280,6 +280,13 @@ namespace osu.Game.Rulesets.Objects
 
             if (ExpectedDistance.Value is double expectedDistance && calculatedLength != expectedDistance)
             {
+                // In osu-stable, if the last two control points of a slider are equal, extension is not performed.
+                if (ControlPoints.Count >= 2 && ControlPoints[^1].Position == ControlPoints[^2].Position && expectedDistance > calculatedLength)
+                {
+                    cumulativeLength.Add(calculatedLength);
+                    return;
+                }
+
                 // The last length is always incorrect
                 cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
 

@@ -11,5 +11,17 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap to lookup.</param>
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo);
+
+        /// <summary>
+        /// Invalidate a cache entry if it exists.
+        /// </summary>
+        /// <param name="beatmapSetInfo">The beatmap set info to invalidate any cached entries for.</param>
+        void Invalidate(BeatmapSetInfo beatmapSetInfo);
+
+        /// <summary>
+        /// Invalidate a cache entry if it exists.
+        /// </summary>
+        /// <param name="beatmapInfo">The beatmap info to invalidate any cached entries for.</param>
+        void Invalidate(BeatmapInfo beatmapInfo);
     }
 }

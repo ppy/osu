@@ -52,7 +52,7 @@ namespace osu.Game.Input.Bindings
         {
             if (ruleset == null || ruleset.ID.HasValue)
             {
-                var rulesetId = ruleset?.ID;
+                int? rulesetId = ruleset?.ID;
 
                 realmKeyBindings = realmFactory.Context.All<RealmKeyBinding>()
                                                .Where(b => b.RulesetID == rulesetId && b.Variant == variant);

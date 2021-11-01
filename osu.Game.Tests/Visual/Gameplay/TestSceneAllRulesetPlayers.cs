@@ -20,14 +20,15 @@ namespace osu.Game.Tests.Visual.Gameplay
     /// </summary>
     public abstract class TestSceneAllRulesetPlayers : RateAdjustedBeatmapTestScene
     {
-        protected Player Player;
+        protected Player Player { get; private set; }
+
+        protected OsuConfigManager Config { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            OsuConfigManager manager;
-            Dependencies.Cache(manager = new OsuConfigManager(LocalStorage));
-            manager.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
+            Dependencies.Cache(Config = new OsuConfigManager(LocalStorage));
+            Config.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
         }
 
         [Test]

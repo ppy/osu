@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
@@ -66,11 +69,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider? colourProvider, OsuColour colours)
         {
-            enabledColour = colours.BlueDark;
-            disabledColour = colours.Gray3;
+            enabledColour = colourProvider?.Highlight1 ?? colours.BlueDark;
+            disabledColour = colourProvider?.Background3 ?? colours.Gray3;
 
             switchContainer.Colour = enabledColour;
             fill.Colour = disabledColour;

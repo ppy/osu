@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             text.Text = string.Empty;
 
-            var usernames = user.NewValue?.PreviousUsernames;
+            string[] usernames = user.NewValue?.PreviousUsernames;
 
             if (usernames?.Any() ?? false)
             {

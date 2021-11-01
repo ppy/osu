@@ -20,6 +20,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -173,6 +174,56 @@ namespace osu.Game.Tests.Visual
         protected virtual Ruleset CreateRuleset() => null;
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
+
+        protected APIBeatmapSet CreateAPIBeatmapSet(RulesetInfo ruleset)
+        {
+            var beatmap = CreateBeatmap(ruleset).BeatmapInfo;
+
+            return new APIBeatmapSet
+            {
+                Covers = beatmap.BeatmapSet.Covers,
+                OnlineID = beatmap.BeatmapSet.OnlineID,
+                Status = beatmap.BeatmapSet.Status,
+                Preview = beatmap.BeatmapSet.Preview,
+                HasFavourited = beatmap.BeatmapSet.HasFavourited,
+                PlayCount = beatmap.BeatmapSet.PlayCount,
+                FavouriteCount = beatmap.BeatmapSet.FavouriteCount,
+                BPM = beatmap.BeatmapSet.BPM,
+                HasExplicitContent = beatmap.BeatmapSet.HasExplicitContent,
+                HasVideo = beatmap.BeatmapSet.HasVideo,
+                HasStoryboard = beatmap.BeatmapSet.HasStoryboard,
+                Submitted = beatmap.BeatmapSet.Submitted,
+                Ranked = beatmap.BeatmapSet.Ranked,
+                LastUpdated = beatmap.BeatmapSet.LastUpdated,
+                TrackId = beatmap.BeatmapSet.TrackId,
+                Title = beatmap.BeatmapSet.Metadata.Title,
+                TitleUnicode = beatmap.BeatmapSet.Metadata.TitleUnicode,
+                Artist = beatmap.BeatmapSet.Metadata.Artist,
+                ArtistUnicode = beatmap.BeatmapSet.Metadata.ArtistUnicode,
+                Author = beatmap.BeatmapSet.Metadata.Author,
+                AuthorID = beatmap.BeatmapSet.Metadata.AuthorID,
+                AuthorString = beatmap.BeatmapSet.Metadata.AuthorString,
+                Availability = beatmap.BeatmapSet.Availability,
+                Genre = beatmap.BeatmapSet.Genre,
+                Language = beatmap.BeatmapSet.Language,
+                Source = beatmap.BeatmapSet.Metadata.Source,
+                Tags = beatmap.BeatmapSet.Metadata.Tags,
+                Beatmaps = new[]
+                {
+                    new APIBeatmap
+                    {
+                        OnlineID = beatmap.OnlineID,
+                        OnlineBeatmapSetID = beatmap.BeatmapSet.OnlineID,
+                        Status = beatmap.Status,
+                        Checksum = beatmap.MD5Hash,
+                        AuthorID = beatmap.Metadata.AuthorID,
+                        RulesetID = beatmap.RulesetID,
+                        StarRating = beatmap.StarDifficulty,
+                        DifficultyName = beatmap.Version,
+                    }
+                }
+            };
+        }
 
         protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
             CreateWorkingBeatmap(CreateBeatmap(ruleset));

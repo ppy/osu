@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Online
                 MatchState = new TeamVersusRoomState()
             };
 
-            var serialized = MessagePackSerializer.Serialize(room);
+            byte[] serialized = MessagePackSerializer.Serialize(room);
 
             var deserialized = MessagePackSerializer.Deserialize<MultiplayerRoom>(serialized);
 
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Online
         {
             var state = new TeamVersusUserState();
 
-            var serialized = MessagePackSerializer.Serialize(typeof(MatchUserState), state);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(MatchUserState), state);
             var deserialized = MessagePackSerializer.Deserialize<MatchUserState>(serialized);
 
             Assert.IsTrue(deserialized is TeamVersusUserState);
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Online
             var state = new TeamVersusUserState();
 
             // SignalR serialises using the actual type, rather than a base specification.
-            var serialized = MessagePackSerializer.Serialize(typeof(TeamVersusUserState), state);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(TeamVersusUserState), state);
 
             // works with explicit type specified.
             MessagePackSerializer.Deserialize<TeamVersusUserState>(serialized);
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Online
             var state = new TeamVersusUserState();
 
             // SignalR serialises using the actual type, rather than a base specification.
-            var serialized = MessagePackSerializer.Serialize(typeof(TeamVersusUserState), state, SignalRUnionWorkaroundResolver.OPTIONS);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(TeamVersusUserState), state, SignalRUnionWorkaroundResolver.OPTIONS);
 
             // works with explicit type specified.
             MessagePackSerializer.Deserialize<TeamVersusUserState>(serialized);

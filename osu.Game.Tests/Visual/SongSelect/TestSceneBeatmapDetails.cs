@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -30,11 +31,14 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestAllMetrics()
         {
-            AddStep("all metrics", () => details.Beatmap = new BeatmapInfo
+            AddStep("all metrics", () => details.BeatmapInfo = new BeatmapInfo
             {
                 BeatmapSet = new BeatmapSetInfo
                 {
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
+                    OnlineInfo = new APIBeatmapSet
+                    {
+                        Ratings = Enumerable.Range(0, 11).ToArray(),
+                    }
                 },
                 Version = "All Metrics",
                 Metadata = new BeatmapMetadata
@@ -50,22 +54,28 @@ namespace osu.Game.Tests.Visual.SongSelect
                     ApproachRate = 3.5f,
                 },
                 StarDifficulty = 5.3f,
-                Metrics = new BeatmapMetrics
+                OnlineInfo = new APIBeatmap
                 {
-                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                },
+                    FailTimes = new APIFailTimes
+                    {
+                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                    },
+                }
             });
         }
 
         [Test]
         public void TestAllMetricsExceptSource()
         {
-            AddStep("all except source", () => details.Beatmap = new BeatmapInfo
+            AddStep("all except source", () => details.BeatmapInfo = new BeatmapInfo
             {
                 BeatmapSet = new BeatmapSetInfo
                 {
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
+                    OnlineInfo = new APIBeatmapSet
+                    {
+                        Ratings = Enumerable.Range(0, 11).ToArray(),
+                    }
                 },
                 Version = "All Metrics",
                 Metadata = new BeatmapMetadata
@@ -80,22 +90,28 @@ namespace osu.Game.Tests.Visual.SongSelect
                     ApproachRate = 3.5f,
                 },
                 StarDifficulty = 5.3f,
-                Metrics = new BeatmapMetrics
+                OnlineInfo = new APIBeatmap
                 {
-                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                },
+                    FailTimes = new APIFailTimes
+                    {
+                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                    },
+                }
             });
         }
 
         [Test]
         public void TestOnlyRatings()
         {
-            AddStep("ratings", () => details.Beatmap = new BeatmapInfo
+            AddStep("ratings", () => details.BeatmapInfo = new BeatmapInfo
             {
                 BeatmapSet = new BeatmapSetInfo
                 {
-                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
+                    OnlineInfo = new APIBeatmapSet
+                    {
+                        Ratings = Enumerable.Range(0, 11).ToArray(),
+                    }
                 },
                 Version = "Only Ratings",
                 Metadata = new BeatmapMetadata
@@ -117,7 +133,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestOnlyFailsAndRetries()
         {
-            AddStep("fails retries", () => details.Beatmap = new BeatmapInfo
+            AddStep("fails retries", () => details.BeatmapInfo = new BeatmapInfo
             {
                 Version = "Only Retries and Fails",
                 Metadata = new BeatmapMetadata
@@ -133,18 +149,21 @@ namespace osu.Game.Tests.Visual.SongSelect
                     ApproachRate = 7,
                 },
                 StarDifficulty = 2.91f,
-                Metrics = new BeatmapMetrics
+                OnlineInfo = new APIBeatmap
                 {
-                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                },
+                    FailTimes = new APIFailTimes
+                    {
+                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                    },
+                }
             });
         }
 
         [Test]
         public void TestNoMetrics()
         {
-            AddStep("no metrics", () => details.Beatmap = new BeatmapInfo
+            AddStep("no metrics", () => details.BeatmapInfo = new BeatmapInfo
             {
                 Version = "No Metrics",
                 Metadata = new BeatmapMetadata
@@ -166,13 +185,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestNullBeatmap()
         {
-            AddStep("null beatmap", () => details.Beatmap = null);
+            AddStep("null beatmap", () => details.BeatmapInfo = null);
         }
 
         [Test]
         public void TestOnlineMetrics()
         {
-            AddStep("online ratings/retries/fails", () => details.Beatmap = new BeatmapInfo
+            AddStep("online ratings/retries/fails", () => details.BeatmapInfo = new BeatmapInfo
             {
                 OnlineBeatmapID = 162,
             });

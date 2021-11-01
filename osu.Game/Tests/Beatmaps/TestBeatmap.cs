@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
@@ -15,6 +17,9 @@ namespace osu.Game.Tests.Beatmaps
 {
     public class TestBeatmap : Beatmap
     {
+        private static int onlineSetID;
+        private static int onlineBeatmapID;
+
         public TestBeatmap(RulesetInfo ruleset, bool withHitObjects = true)
         {
             var baseBeatmap = CreateBeatmap();
@@ -30,9 +35,11 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo.RulesetID = ruleset.ID ?? 0;
             BeatmapInfo.BeatmapSet.Metadata = BeatmapInfo.Metadata;
             BeatmapInfo.BeatmapSet.Beatmaps = new List<BeatmapInfo> { BeatmapInfo };
+            BeatmapInfo.BeatmapSet.OnlineBeatmapSetID = Interlocked.Increment(ref onlineSetID);
             BeatmapInfo.Length = 75000;
-            BeatmapInfo.OnlineInfo = new BeatmapOnlineInfo();
-            BeatmapInfo.BeatmapSet.OnlineInfo = new BeatmapSetOnlineInfo
+            BeatmapInfo.OnlineInfo = new APIBeatmap();
+            BeatmapInfo.OnlineBeatmapID = Interlocked.Increment(ref onlineBeatmapID);
+            BeatmapInfo.BeatmapSet.OnlineInfo = new APIBeatmapSet
             {
                 Status = BeatmapSetOnlineStatus.Ranked,
                 Covers = new BeatmapSetOnlineCovers

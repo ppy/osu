@@ -36,8 +36,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     "Soleily - Renatus (MMzz) [Muzukashii].osu",
                     "Soleily - Renatus (MMzz) [Oni].osu"
                 };
-                var maps = reader.Filenames.ToArray();
-                foreach (var map in expected)
+                string[] maps = reader.Filenames.ToArray();
+                foreach (string map in expected)
                     Assert.Contains(map, maps);
             }
         }
@@ -77,8 +77,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 var reader = new ZipArchiveReader(osz);
 
-                using (var stream = new StreamReader(
-                    reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
+                using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {
                     Assert.AreEqual("osu file format v13", stream.ReadLine()?.Trim());
                 }

@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
             AddAssert("correct outline count", () =>
             {
-                var expected = hitObject.NestedHitObjects.Count(h => !(h is TinyDroplet));
+                int expected = hitObject.NestedHitObjects.Count(h => !(h is TinyDroplet));
                 return this.ChildrenOfType<FruitOutline>().Count() == expected;
             });
             AddAssert("correct vertex piece count", () =>
@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
                 X = x,
                 Path = sliderPath,
             };
-            EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = velocity;
+            EditorBeatmap.Difficulty.SliderMultiplier = velocity;
             EditorBeatmap.Add(hitObject);
             EditorBeatmap.Update(hitObject);
             Assert.That(hitObject.Velocity, Is.EqualTo(velocity));

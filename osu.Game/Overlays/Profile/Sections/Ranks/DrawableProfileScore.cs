@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -78,7 +79,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Spacing = new Vector2(0, 2),
                                         Children = new Drawable[]
                                         {
-                                            new ScoreBeatmapMetadataContainer(Score.Beatmap),
+                                            new ScoreBeatmapMetadataContainer(Score.BeatmapInfo),
                                             new FillFlowContainer
                                             {
                                                 AutoSizeAxes = Axes.Both,
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                 {
                                                     new OsuSpriteText
                                                     {
-                                                        Text = $"{Score.Beatmap.Version}",
+                                                        Text = $"{Score.BeatmapInfo.Version}",
                                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                         Colour = colours.Yellow
                                                     },
@@ -245,30 +246,42 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private class ScoreBeatmapMetadataContainer : BeatmapMetadataContainer
         {
-            public ScoreBeatmapMetadataContainer(BeatmapInfo beatmap)
-                : base(beatmap)
+            public ScoreBeatmapMetadataContainer(IBeatmapInfo beatmapInfo)
+                : base(beatmapInfo)
             {
             }
 
-            protected override Drawable[] CreateText(BeatmapInfo beatmap) => new Drawable[]
+            protected override Drawable[] CreateText(IBeatmapInfo beatmapInfo)
             {
-                new OsuSpriteText
+                var metadata = beatmapInfo.Metadata;
+
+                Debug.Assert(metadata != null);
+
+                return new Drawable[]
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Text = new RomanisableString(
-                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} ",
-                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} "),
-                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
-                },
-                new OsuSpriteText
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Text = "by " + new RomanisableString(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
-                    Font = OsuFont.GetFont(size: 12, italics: true)
-                },
-            };
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Text = " by ",
+                        Font = OsuFont.GetFont(size: 12, italics: true)
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
+                        Font = OsuFont.GetFont(size: 12, italics: true)
+                    },
+                };
+            }
         }
     }
 }
