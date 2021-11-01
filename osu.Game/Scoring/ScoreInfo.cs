@@ -244,10 +244,18 @@ namespace osu.Game.Scoring
             return ReferenceEquals(this, other);
         }
 
+        #region Implementation of IHasOnlineID
+
         public long OnlineID => OnlineScoreID ?? -1;
+
+        #endregion
+
+        #region Implementation of IScoreInfo
 
         IBeatmapInfo IScoreInfo.Beatmap => BeatmapInfo;
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
         bool IScoreInfo.HasReplay => Files.Any();
+
+        #endregion
     }
 }
