@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.BeatmapSet
             if (BeatmapSet != null)
             {
                 Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps
-                                                            .Where(b => b.Ruleset?.OnlineID == ruleset.Value?.OnlineID)
+                                                            .Where(b => b.Ruleset.OnlineID == ruleset.Value?.OnlineID)
                                                             .OrderBy(b => b.StarRating)
                                                             .Select(b => new DifficultySelectorButton(b)
                                                             {
