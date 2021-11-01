@@ -17,6 +17,12 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
         protected override QueueModes Mode => QueueModes.HostOnly;
 
         [Test]
+        public void TestFirstItemSelectedByDefault()
+        {
+            AddAssert("first item selected", () => Client.CurrentMatchPlayingItem.Value == Client.APIRoom?.Playlist[0]);
+        }
+
+        [Test]
         public void TestItemStillSelectedAfterChangeToSameBeatmap()
         {
             selectNewItem(() => InitialBeatmap);
