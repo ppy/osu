@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new LayoutSettings(),
                 new RendererSettings(),
+                new VideoSettings(),
                 new ScreenshotSettings(),
             };
         }
