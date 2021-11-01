@@ -108,7 +108,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osk";
+        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == @".osk";
 
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.
@@ -149,9 +149,9 @@ namespace osu.Game.Skinning
             CurrentSkinInfo.Value = ModelStore.ConsumableItems.Single(i => i.ID == chosen.ID);
         }
 
-        protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name ?? "No name" };
+        protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name ?? @"No name" };
 
-        private const string unknown_creator_string = "Unknown";
+        private const string unknown_creator_string = @"Unknown";
 
         protected override bool HasCustomHashFunction => true;
 
@@ -164,7 +164,7 @@ namespace osu.Game.Skinning
             // `Skin` will parse the skin.ini and populate `Skin.Configuration` during construction above.
             string skinIniSourcedName = instance.Configuration.SkinInfo.Name;
             string skinIniSourcedCreator = instance.Configuration.SkinInfo.Creator;
-            string archiveName = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
+            string archiveName = item.Name.Replace(@".osk", string.Empty, StringComparison.OrdinalIgnoreCase);
 
             bool isImport = item.ID == 0;
 
@@ -177,7 +177,7 @@ namespace osu.Game.Skinning
                 // In an ideal world, skin.ini would be the only source of metadata, but a lot of skin creators and users don't update it when making modifications.
                 // In both of these cases, the expectation from the user is that the filename or folder name is displayed somewhere to identify the skin.
                 if (archiveName != item.Name)
-                    item.Name = $"{item.Name} [{archiveName}]";
+                    item.Name = @$"{item.Name} [{archiveName}]";
             }
 
             // By this point, the metadata in SkinInfo will be correct.
@@ -191,10 +191,10 @@ namespace osu.Game.Skinning
 
         private void updateSkinIniMetadata(SkinInfo item)
         {
-            string nameLine = $"Name: {item.Name}";
-            string authorLine = $"Author: {item.Creator}";
+            string nameLine = @$"Name: {item.Name}";
+            string authorLine = @$"Author: {item.Creator}";
 
-            var existingFile = item.Files.SingleOrDefault(f => f.Filename == "skin.ini");
+            var existingFile = item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase));
 
             if (existingFile != null)
             {
@@ -210,12 +210,12 @@ namespace osu.Game.Skinning
 
                     while ((line = sr.ReadLine()) != null)
                     {
-                        if (line.StartsWith("Name:", StringComparison.Ordinal))
+                        if (line.StartsWith(@"Name:", StringComparison.Ordinal))
                         {
                             outputLines.Add(nameLine);
                             addedName = true;
                         }
-                        else if (line.StartsWith("Author:", StringComparison.Ordinal))
+                        else if (line.StartsWith(@"Author:", StringComparison.Ordinal))
                         {
                             outputLines.Add(authorLine);
                             addedAuthor = true;
@@ -229,7 +229,7 @@ namespace osu.Game.Skinning
                 {
                     outputLines.AddRange(new[]
                     {
-                        "[General]",
+                        @"[General]",
                         nameLine,
                         authorLine,
                     });
@@ -252,13 +252,13 @@ namespace osu.Game.Skinning
                 {
                     using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                     {
-                        sw.WriteLine("[General]");
+                        sw.WriteLine(@"[General]");
                         sw.WriteLine(nameLine);
                         sw.WriteLine(authorLine);
-                        sw.WriteLine("Version: latest");
+                        sw.WriteLine(@"Version: latest");
                     }
 
-                    AddFile(item, stream, "skin.ini");
+                    AddFile(item, stream, @"skin.ini");
                 }
             }
         }
@@ -295,7 +295,7 @@ namespace osu.Game.Skinning
             // if the user is attempting to save one of the default skin implementations, create a copy first.
             CurrentSkinInfo.Value = Import(new SkinInfo
             {
-                Name = skin.SkinInfo.Name + " (modified)",
+                Name = skin.SkinInfo.Name + @" (modified)",
                 Creator = skin.SkinInfo.Creator,
                 InstantiationInfo = skin.SkinInfo.InstantiationInfo,
             }).Result.Value;
@@ -312,7 +312,7 @@ namespace osu.Game.Skinning
 
                 using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(json)))
                 {
-                    string filename = $"{drawableInfo.Key}.json";
+                    string filename = @$"{drawableInfo.Key}.json";
 
                     var oldFile = skin.SkinInfo.Files.FirstOrDefault(f => f.Filename == filename);
 

@@ -6,20 +6,20 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
     public abstract class DrawableBeatmapList : CompositeDrawable
     {
-        private readonly List<BeatmapSetInfo> beatmaps;
+        private readonly List<APIBeatmapSet> beatmapSets;
 
-        protected DrawableBeatmapList(List<BeatmapSetInfo> beatmaps)
+        protected DrawableBeatmapList(List<APIBeatmapSet> beatmapSets)
         {
-            this.beatmaps = beatmaps;
+            this.beatmapSets = beatmapSets;
         }
 
         [BackgroundDependencyLoader]
@@ -46,11 +46,11 @@ namespace osu.Game.Overlays.Dashboard.Home
                 }
             };
 
-            flow.AddRange(beatmaps.Select(CreateBeatmapPanel));
+            flow.AddRange(beatmapSets.Select(CreateBeatmapPanel));
         }
 
         protected abstract string Title { get; }
 
-        protected abstract DashboardBeatmapPanel CreateBeatmapPanel(BeatmapSetInfo setInfo);
+        protected abstract DashboardBeatmapPanel CreateBeatmapPanel(APIBeatmapSet beatmapSet);
     }
 }

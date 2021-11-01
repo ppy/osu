@@ -26,13 +26,11 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"user")]
         public User User { get; set; }
 
-        public bool HasReplay { get; set; }
-
         [JsonProperty(@"id")]
         public long OnlineID { get; set; }
 
         [JsonProperty(@"replay")]
-        public bool Replay { get; set; }
+        public bool HasReplay { get; set; }
 
         [JsonProperty(@"created_at")]
         public DateTimeOffset Date { get; set; }
@@ -52,8 +50,11 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 // in the deserialisation case we need to ferry this data across.
-                if (Beatmap is APIBeatmap apiBeatmap)
-                    apiBeatmap.BeatmapSet = value;
+                // the order of properties returned by the API guarantees that the beatmap is populated by this point.
+                if (!(Beatmap is APIBeatmap apiBeatmap))
+                    throw new InvalidOperationException("Beatmap set metadata arrived before beatmap metadata in response");
+
+                apiBeatmap.BeatmapSet = value;
             }
         }
 
@@ -91,13 +92,14 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
+                BeatmapInfo = Beatmap.ToBeatmapInfo(rulesets),
                 User = User,
                 Accuracy = Accuracy,
                 OnlineScoreID = OnlineID,
                 Date = Date,
                 PP = PP,
                 RulesetID = OnlineRulesetID,
-                Hash = Replay ? "online" : string.Empty, // todo: temporary?
+                Hash = HasReplay ? "online" : string.Empty, // todo: temporary?
                 Rank = Rank,
                 Ruleset = ruleset,
                 Mods = mods,
