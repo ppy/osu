@@ -81,34 +81,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public double BPM { get; set; }
 
-        public virtual BeatmapInfo ToBeatmapInfo(RulesetStore rulesets)
-        {
-            var set = BeatmapSet?.ToBeatmapSet(rulesets);
-
-            return new BeatmapInfo
-            {
-                Metadata = set?.Metadata ?? new BeatmapMetadata(),
-                Ruleset = rulesets.GetRuleset(RulesetID),
-                StarDifficulty = StarRating,
-                OnlineBeatmapID = OnlineID,
-                Version = DifficultyName,
-                // this is actually an incorrect mapping (Length is calculated as drain length in lazer's import process, see BeatmapManager.calculateLength).
-                Length = Length,
-                Status = Status,
-                MD5Hash = Checksum,
-                BeatmapSet = set,
-                MaxCombo = MaxCombo,
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    DrainRate = DrainRate,
-                    CircleSize = CircleSize,
-                    ApproachRate = ApproachRate,
-                    OverallDifficulty = OverallDifficulty,
-                },
-                OnlineInfo = this,
-            };
-        }
-
         #region Implementation of IBeatmapInfo
 
         public IBeatmapMetadataInfo Metadata => (BeatmapSet as IBeatmapSetInfo)?.Metadata ?? new BeatmapMetadata();
