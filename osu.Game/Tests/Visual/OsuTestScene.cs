@@ -203,21 +203,14 @@ namespace osu.Game.Tests.Visual
 
             return new APIBeatmapSet
             {
-                Covers = beatmap.BeatmapSet.Covers,
                 OnlineID = beatmap.BeatmapSet.OnlineID,
-                Status = beatmap.BeatmapSet.Status,
-                Preview = beatmap.BeatmapSet.Preview,
-                HasFavourited = beatmap.BeatmapSet.HasFavourited,
-                PlayCount = beatmap.BeatmapSet.PlayCount,
-                FavouriteCount = beatmap.BeatmapSet.FavouriteCount,
-                BPM = beatmap.BeatmapSet.BPM,
-                HasExplicitContent = beatmap.BeatmapSet.HasExplicitContent,
-                HasVideo = beatmap.BeatmapSet.HasVideo,
-                HasStoryboard = beatmap.BeatmapSet.HasStoryboard,
-                Submitted = beatmap.BeatmapSet.Submitted,
-                Ranked = beatmap.BeatmapSet.Ranked,
-                LastUpdated = beatmap.BeatmapSet.LastUpdated,
-                TrackId = beatmap.BeatmapSet.TrackId,
+                Status = BeatmapSetOnlineStatus.Ranked,
+                Covers = new BeatmapSetOnlineCovers
+                {
+                    Cover = "https://assets.ppy.sh/beatmaps/163112/covers/cover.jpg",
+                    Card = "https://assets.ppy.sh/beatmaps/163112/covers/card.jpg",
+                    List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg"
+                },
                 Title = beatmap.BeatmapSet.Metadata.Title,
                 TitleUnicode = beatmap.BeatmapSet.Metadata.TitleUnicode,
                 Artist = beatmap.BeatmapSet.Metadata.Artist,
@@ -225,9 +218,6 @@ namespace osu.Game.Tests.Visual
                 Author = beatmap.BeatmapSet.Metadata.Author,
                 AuthorID = beatmap.BeatmapSet.Metadata.AuthorID,
                 AuthorString = beatmap.BeatmapSet.Metadata.AuthorString,
-                Availability = beatmap.BeatmapSet.Availability,
-                Genre = beatmap.BeatmapSet.Genre,
-                Language = beatmap.BeatmapSet.Language,
                 Source = beatmap.BeatmapSet.Metadata.Source,
                 Tags = beatmap.BeatmapSet.Metadata.Tags,
                 Beatmaps = new[]

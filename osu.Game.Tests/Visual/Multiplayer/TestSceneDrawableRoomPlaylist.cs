@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -203,7 +203,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
-            var beatmap = CreateAPIBeatmapSet();
+            var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
 
             AddStep("import beatmap", () => manager.Import(beatmap.BeatmapSet).Wait());
 
@@ -224,11 +224,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestDownloadButtonVisibleInitiallyWhenBeatmapDoesNotExist()
         {
-            var byOnlineId = CreateAPIBeatmapSet();
+            var byOnlineId = CreateAPIBeatmap();
             byOnlineId.OnlineID = 1337; // Some random ID that does not exist locally.
 
-            var byChecksum = CreateAPIBeatmapSet();
-            byChecksum.Beatmaps.ForEach(b => b.Checksum = "1337"); // Some random checksum that does not exist locally.
+            var byChecksum = CreateAPIBeatmap();
+            byChecksum.Checksum = "1337"; // Some random checksum that does not exist locally.
 
             createPlaylist(byOnlineId, byChecksum);
 
@@ -238,9 +238,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestExplicitBeatmapItem()
         {
-            var beatmap = CreateAPIBeatmapSet();
+            var beatmap = CreateAPIBeatmap();
 
-            beatmap.HasExplicitContent = true;
+            Debug.Assert(beatmap.BeatmapSet != null);
+
+            beatmap.BeatmapSet.HasExplicitContent = true;
 
             createPlaylist(beatmap);
         }
@@ -312,7 +314,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
         }
 
-        private void createPlaylist(params BeatmapInfo[] beatmaps)
+        private void createPlaylist(params IBeatmapInfo[] beatmaps)
         {
             AddStep("create playlist", () =>
             {
