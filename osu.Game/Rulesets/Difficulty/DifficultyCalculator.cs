@@ -58,6 +58,11 @@ namespace osu.Game.Rulesets.Difficulty
             return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
         }
 
+        /// <summary>
+        /// Calculates the difficulty of the beatmap and returns a set of <see cref="TimedDifficultyAttributes"/> representing the difficulty at every relevant time value in the beatmap.
+        /// </summary>
+        /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <returns>The set of <see cref="TimedDifficultyAttributes"/>.</returns>
         public List<TimedDifficultyAttributes> CalculateTimed(params Mod[] mods)
         {
             preProcess(mods);
