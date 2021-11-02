@@ -25,8 +25,8 @@ namespace osu.Game.Overlays.Music
         private TextFlowContainer text;
         private ITextPart titlePart;
 
-        private Color4 selectedColour;
-        private Color4 artistColour;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public PlaylistItem(BeatmapSetInfo item)
             : base(item)
@@ -37,10 +37,8 @@ namespace osu.Game.Overlays.Music
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationManager localisation)
+        private void load()
         {
-            selectedColour = colours.Yellow;
-            artistColour = colours.Gray9;
             HandleColour = colours.Gray5;
         }
 
@@ -60,16 +58,18 @@ namespace osu.Game.Overlays.Music
         private void updateSelectionState(bool instant)
         {
             foreach (Drawable s in titlePart.Drawables)
-                s.FadeColour(SelectedSet.Value?.Equals(Model) == true ? selectedColour : Color4.White, instant ? 0 : FADE_DURATION);
+                s.FadeColour(SelectedSet.Value?.Equals(Model) == true ? colours.Yellow : Color4.White, instant ? 0 : FADE_DURATION);
         }
 
-        protected override Drawable CreateContent()
+        protected override Drawable CreateContent() => text = new OsuTextFlowContainer
         {
-            text = new OsuTextFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-            };
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+        };
+
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
 
             var title = new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title);
             var artist = new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist);
@@ -83,11 +83,9 @@ namespace osu.Game.Overlays.Music
             text.AddText(artist, sprite =>
             {
                 sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
-                sprite.Colour = artistColour;
+                sprite.Colour = colours.Gray9;
                 sprite.Padding = new MarginPadding { Top = 1 };
             });
-
-            return text;
         }
 
         protected override bool OnClick(ClickEvent e)
