@@ -107,7 +107,7 @@ namespace osu.Game.Online.API
             WebRequest = CreateWebRequest();
             WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
-            if (API.IsLoggedIn)
+            if (!string.IsNullOrEmpty(API.AccessToken))
                 WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
 
             if (isFailing) return;
