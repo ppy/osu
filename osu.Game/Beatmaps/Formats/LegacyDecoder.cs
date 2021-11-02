@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseStreamInto(LineBufferedReader stream, T output)
         {
-            Section section = Section.None;
+            Section section = Section.General;
 
             string line;
 
