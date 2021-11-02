@@ -15,6 +15,7 @@ using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -65,8 +66,30 @@ namespace osu.Game.Tests.Visual.Playlists
                 });
             });
 
+            AddUntilStep("Progress details are hidden", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent.Alpha == 0);
+
             AddStep("start match", () => match.ChildrenOfType<PlaylistsReadyButton>().First().TriggerClick());
             AddUntilStep("player loader loaded", () => Stack.CurrentScreen is PlayerLoader);
+        }
+
+        [Test]
+        public void TestAttemptLimitedMatch()
+        {
+            setupAndCreateRoom(room =>
+            {
+                room.Name.Value = "my awesome room";
+                room.MaxAttempts.Value = 5;
+                room.Host.Value = API.LocalUser.Value;
+                room.RecentParticipants.Add(room.Host.Value);
+                room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
+                room.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap = { Value = importedBeatmap.Value.Beatmaps.First() },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                });
+            });
+
+            AddUntilStep("Progress details are visible", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent.Alpha == 1);
         }
 
         [Test]
@@ -91,26 +114,15 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             BeatmapSetInfo importedSet = null;
 
-            // this step is required to make sure the further imports actually get online IDs.
-            // all the playlist logic relies on online ID matching.
-            AddStep("remove all matching online IDs", () =>
-            {
-                var existing = manager.QueryBeatmapSets(s => s.OnlineBeatmapSetID == importedBeatmap.Value.OnlineBeatmapSetID).ToList();
-
-                foreach (var s in existing)
-                {
-                    s.OnlineBeatmapSetID = null;
-                    foreach (var b in s.Beatmaps)
-                        b.OnlineBeatmapID = null;
-                    manager.Update(s);
-                }
-            });
-
             AddStep("import altered beatmap", () =>
             {
                 IBeatmap beatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
 
                 beatmap.BeatmapInfo.BaseDifficulty.CircleSize = 1;
+
+                // intentionally increment online IDs to clash with import below.
+                beatmap.BeatmapInfo.OnlineBeatmapID++;
+                beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID++;
 
                 importedSet = manager.Import(beatmap.BeatmapInfo.BeatmapSet).Result.Value;
             });
@@ -144,10 +156,7 @@ namespace osu.Game.Tests.Visual.Playlists
             });
         }
 
-        private void importBeatmap()
-        {
-            AddStep("import beatmap", () => importedBeatmap = manager.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Result);
-        }
+        private void importBeatmap() => AddStep("import beatmap", () => importedBeatmap = manager.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Result);
 
         private class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
         {

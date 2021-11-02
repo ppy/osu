@@ -76,7 +76,7 @@ namespace osu.Game.Tournament.Components
                     {
                         new TournamentSpriteText
                         {
-                            Text = Beatmap.GetDisplayTitleRomanisable(false),
+                            Text = Beatmap.GetDisplayTitleRomanisable(false, false),
                             Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                         },
                         new FillFlowContainer
