@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
 
                     default:
-                        beatmaps.Download(new BeatmapSetInfo { OnlineBeatmapSetID = beatmapSet.OnlineID }, noVideoSetting.Value);
+                        beatmaps.Download(beatmapSet, noVideoSetting.Value);
                         break;
                 }
             };

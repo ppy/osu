@@ -231,6 +231,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }
                 }
             });
+
+            AddAssert("Check participant count correct", () => client.APIRoom?.ParticipantCount.Value == 1);
+            AddAssert("Check participant list contains user", () => client.APIRoom?.RecentParticipants.Count(u => u.Id == API.LocalUser.Value.Id) == 1);
         }
 
         [Test]
@@ -290,6 +293,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddUntilStep("wait for join", () => client.Room != null);
+
+            AddAssert("Check participant count correct", () => client.APIRoom?.ParticipantCount.Value == 1);
+            AddAssert("Check participant list contains user", () => client.APIRoom?.RecentParticipants.Count(u => u.Id == API.LocalUser.Value.Id) == 1);
         }
 
         [Test]
