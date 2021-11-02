@@ -247,12 +247,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             FinishTransforms(true);
         }
 
-        private LocalisableString createArtistText()
-        {
-            var romanisableArtist = new RomanisableString(beatmapSet.ArtistUnicode, beatmapSet.Artist);
-            return BeatmapsetsStrings.ShowDetailsByArtist(romanisableArtist);
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
             updateState();
@@ -263,6 +257,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             updateState();
             base.OnHoverLost(e);
+        }
+
+        private LocalisableString createArtistText()
+        {
+            var romanisableArtist = new RomanisableString(beatmapSet.ArtistUnicode, beatmapSet.Artist);
+            return BeatmapsetsStrings.ShowDetailsByArtist(romanisableArtist);
         }
 
         private void updateState()
