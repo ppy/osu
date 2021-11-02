@@ -18,11 +18,11 @@ namespace osu.Game.Skinning
 
         public int ID { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
+
+        public string Creator { get; set; } = string.Empty;
 
         public string Hash { get; set; }
-
-        public string Creator { get; set; }
 
         public string InstantiationInfo { get; set; }
 

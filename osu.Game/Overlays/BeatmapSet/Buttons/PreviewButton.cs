@@ -8,9 +8,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
 
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         public IBindable<bool> Playing => playButton.Playing;
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             get => playButton.BeatmapSet;
             set => playButton.BeatmapSet = value;

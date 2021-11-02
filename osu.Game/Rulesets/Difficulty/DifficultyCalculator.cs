@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Difficulty
                 // Apply the rest of the remaining mods recursively.
                 for (int i = 0; i < remainingMods.Length; i++)
                 {
-                    var (nextSet, nextCount) = flatten(remainingMods.Span[i]);
+                    (var nextSet, int nextCount) = flatten(remainingMods.Span[i]);
 
                     // Check if any mods in the next set are incompatible with any of the current set.
                     if (currentSet.SelectMany(m => m.IncompatibleMods).Any(c => nextSet.Any(c.IsInstanceOfType)))
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Difficulty
 
                 foreach (var nested in multi.Mods)
                 {
-                    var (nestedSet, nestedCount) = flatten(nested);
+                    (var nestedSet, int nestedCount) = flatten(nested);
                     set = set.Concat(nestedSet);
                     count += nestedCount;
                 }

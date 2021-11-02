@@ -301,7 +301,7 @@ namespace osu.Game.Screens.Edit
 
             editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) =>
             {
-                var hasObjects = editorBeatmap.SelectedHitObjects.Count > 0;
+                bool hasObjects = editorBeatmap.SelectedHitObjects.Count > 0;
 
                 cutMenuItem.Action.Disabled = !hasObjects;
                 copyMenuItem.Action.Disabled = !hasObjects;

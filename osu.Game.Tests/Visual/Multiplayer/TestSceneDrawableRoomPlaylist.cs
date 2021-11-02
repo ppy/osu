@@ -38,8 +38,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-
-            manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait();
         }
 
         [Test]
@@ -204,7 +202,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
-            createPlaylist(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo);
+            var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+
+            AddStep("import beatmap", () => manager.Import(beatmap.BeatmapSet).Wait());
+
+            createPlaylist(beatmap);
 
             assertDownloadButtonVisible(false);
 

@@ -97,5 +97,10 @@ namespace osu.Game.Beatmaps
         /// Non-null only if the track is linked to a featured artist track entry.
         /// </summary>
         int? TrackId { get; }
+
+        /// <summary>
+        /// Total vote counts of user ratings on a scale of 0..10 where 0 is unused (probably will be fixed at API?).
+        /// </summary>
+        int[]? Ratings { get; }
     }
 }

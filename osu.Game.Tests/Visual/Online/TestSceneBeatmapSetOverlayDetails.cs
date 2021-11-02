@@ -39,29 +39,26 @@ namespace osu.Game.Tests.Visual.Online
             var secondSet = createSet();
 
             AddStep("set first set", () => details.BeatmapSet = firstSet);
-            AddAssert("ratings set", () => details.Ratings.Metrics == firstSet.Metrics);
+            AddAssert("ratings set", () => details.Ratings.Ratings == firstSet.Ratings);
 
             AddStep("set second set", () => details.BeatmapSet = secondSet);
-            AddAssert("ratings set", () => details.Ratings.Metrics == secondSet.Metrics);
+            AddAssert("ratings set", () => details.Ratings.Ratings == secondSet.Ratings);
 
-            static BeatmapSetInfo createSet() => new BeatmapSetInfo
+            static APIBeatmapSet createSet() => new APIBeatmapSet
             {
-                Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).Select(_ => RNG.Next(10)).ToArray() },
-                Beatmaps = new List<BeatmapInfo>
+                Beatmaps = new List<APIBeatmap>
                 {
-                    new BeatmapInfo
+                    new APIBeatmap
                     {
-                        Metrics = new BeatmapMetrics
+                        FailTimes = new APIFailTimes
                         {
                             Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
                             Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
                         },
                     }
                 },
-                OnlineInfo = new APIBeatmapSet
-                {
-                    Status = BeatmapSetOnlineStatus.Ranked
-                }
+                Ratings = Enumerable.Range(0, 11).Select(_ => RNG.Next(10)).ToArray(),
+                Status = BeatmapSetOnlineStatus.Ranked
             };
         }
 

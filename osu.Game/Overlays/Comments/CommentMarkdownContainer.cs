@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override float GetFontSizeByLevel(int level)
             {
-                var defaultFontSize = base.GetFontSizeByLevel(6);
+                float defaultFontSize = base.GetFontSizeByLevel(6);
 
                 switch (level)
                 {
