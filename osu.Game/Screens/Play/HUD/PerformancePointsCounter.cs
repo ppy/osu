@@ -48,9 +48,6 @@ namespace osu.Game.Screens.Play.HUD
         [CanBeNull]
         private GameplayState gameplayState { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private GameplayClock gameplayClock { get; set; }
-
         [CanBeNull]
         private List<TimedDifficultyAttributes> timedAttributes;
 
@@ -136,12 +133,10 @@ namespace osu.Game.Screens.Play.HUD
         [CanBeNull]
         private DifficultyAttributes getAttributeAtTime(JudgementResult judgement)
         {
-            if (timedAttributes == null || timedAttributes.Count == 0 || gameplayClock == null)
+            if (timedAttributes == null || timedAttributes.Count == 0)
                 return null;
 
-            double judgementTime = judgement.HitObject.GetEndTime() / gameplayClock.TrueGameplayRate;
-
-            int attribIndex = timedAttributes.BinarySearch(new TimedDifficultyAttributes(judgementTime, null));
+            int attribIndex = timedAttributes.BinarySearch(new TimedDifficultyAttributes(judgement.HitObject.GetEndTime(), null));
             if (attribIndex < 0)
                 attribIndex = ~attribIndex - 1;
 
