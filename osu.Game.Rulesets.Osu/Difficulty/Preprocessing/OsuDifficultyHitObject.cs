@@ -83,19 +83,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
+            Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
+            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+
             if (lastObject is Slider lastSlider)
             {
                 computeSliderCursorPosition(lastSlider);
                 TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
                 TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
                 MovementTime = Math.Max(StrainTime - TravelTime, min_delta_time);
-                MovementDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
+
+                // Jump distance from the slider tail to the next object, as opposed to the lazy position of JumpDistance.
+                float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
+
+                // For hitobjects which continue in the direction of the slider, the player will normally follow through the slider,
+                // such that they're not jumping from the lazy position but rather from very close to (or the end of) the slider.
+                // In such cases, a leniency is applied by also considering the jump distance from the tail of the slider, and taking the minimum jump distance.
+                MovementDistance = Math.Min(JumpDistance, tailJumpDistance);
             }
-
-            Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
-
-            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-            MovementDistance = Math.Min(JumpDistance, MovementDistance);
+            else
+            {
+                MovementTime = StrainTime;
+                MovementDistance = JumpDistance;
+            }
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
             {
