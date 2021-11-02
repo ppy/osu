@@ -194,7 +194,7 @@ namespace osu.Game.Skinning
             string nameLine = @$"Name: {item.Name}";
             string authorLine = @$"Author: {item.Creator}";
 
-            var newLines = new[]
+            string[] newLines =
             {
                 @"// The following content was automatically added by osu! during import, based on filename / folder metadata.",
                 @"[General]",
