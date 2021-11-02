@@ -45,11 +45,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestAddNullUser()
+        public void TestAddUnresolvedUser()
         {
             AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 1);
 
-            AddStep("add non-resolvable user", () => Client.AddNullUser());
+            AddStep("add non-resolvable user", () => Client.TestAddUnresolvedUser());
             AddAssert("null user added", () => Client.Room.AsNonNull().Users.Count(u => u.User == null) == 1);
 
             AddUntilStep("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
