@@ -38,17 +38,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuLastObj = (OsuDifficultyHitObject)Previous[0];
             var osuLastLastObj = (OsuDifficultyHitObject)Previous[1];
 
-            double currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime; // Start with the base distance / time
+            // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
+            double currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
 
-            if (osuLastObj.BaseObject is Slider) // If object is a slider
+            // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
+            if (osuLastObj.BaseObject is Slider)
             {
-                double movementVelocity = osuCurrObj.MovementDistance / osuCurrObj.MovementTime; // calculate the movement velocity from slider end to next note
-                double travelVelocity = osuCurrObj.TravelDistance / osuCurrObj.TravelTime; // calculate the slider velocity from slider head to lazy end.
+                double movementVelocity = osuCurrObj.MovementDistance / osuCurrObj.MovementTime; // calculate the movement velocity from slider end to current object
+                double travelVelocity = osuCurrObj.TravelDistance / osuCurrObj.TravelTime; // calculate the slider velocity from slider head to slider end.
 
                 currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }
 
-            double prevVelocity = osuLastObj.JumpDistance / osuLastObj.StrainTime; // do the same for the previous velocity.
+            // As above, do the same for the previous hitobject.
+            double prevVelocity = osuLastObj.JumpDistance / osuLastObj.StrainTime;
 
             if (osuLastLastObj.BaseObject is Slider)
             {
@@ -59,7 +62,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             double angleBonus = 0;
-
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
             if (Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime) < 1.25 * Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime)) // If rhythms are the same.
