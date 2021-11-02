@@ -401,7 +401,11 @@ namespace osu.Game.Online.Multiplayer
         {
             Debug.Assert(APIRoom != null);
 
-            APIRoom.RecentParticipants.Add(user.User);
+            APIRoom.RecentParticipants.Add(user.User ?? new User
+            {
+                Id = user.UserID,
+                Username = "[Unresolved]"
+            });
             APIRoom.ParticipantCount.Value++;
         }
 
