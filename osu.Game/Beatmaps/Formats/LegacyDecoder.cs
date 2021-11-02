@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseStreamInto(LineBufferedReader stream, T output)
         {
-            Section section = Section.None;
+            Section section = Section.General;
 
             string line;
 
@@ -47,10 +47,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (line.StartsWith('[') && line.EndsWith(']'))
                 {
                     if (!Enum.TryParse(line[1..^1], out section))
-                    {
                         Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
-                        section = Section.None;
-                    }
 
                     OnBeginNewSection(section);
                     continue;
@@ -148,7 +145,6 @@ namespace osu.Game.Beatmaps.Formats
 
         protected enum Section
         {
-            None,
             General,
             Editor,
             Metadata,

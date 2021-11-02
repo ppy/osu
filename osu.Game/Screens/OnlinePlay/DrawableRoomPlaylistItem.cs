@@ -248,10 +248,7 @@ namespace osu.Game.Screens.OnlinePlay
         protected virtual IEnumerable<Drawable> CreateButtons() =>
             new Drawable[]
             {
-                new PlaylistDownloadButton(Item)
-                {
-                    Size = new Vector2(50, 30)
-                },
+                new PlaylistDownloadButton(Item),
                 new PlaylistRemoveButton
                 {
                     Size = new Vector2(30, 30),
@@ -282,28 +279,33 @@ namespace osu.Game.Screens.OnlinePlay
             return true;
         }
 
-        private class PlaylistDownloadButton : BeatmapPanelDownloadButton
+        private sealed class PlaylistDownloadButton : BeatmapPanelDownloadButton
         {
             private readonly PlaylistItem playlistItem;
 
             [Resolved]
             private BeatmapManager beatmapManager { get; set; }
 
-            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+            // required for download tracking, as this button hides itself. can probably be removed with a bit of consideration.
+            public override bool IsPresent => true;
+
+            private const float width = 50;
 
             public PlaylistDownloadButton(PlaylistItem playlistItem)
                 : base(playlistItem.Beatmap.Value.BeatmapSet)
             {
                 this.playlistItem = playlistItem;
+
+                Size = new Vector2(width, 30);
                 Alpha = 0;
             }
 
             protected override void LoadComplete()
             {
-                base.LoadComplete();
-
                 State.BindValueChanged(stateChanged, true);
-                FinishTransforms(true);
+
+                // base implementation calls FinishTransforms, so should be run after the above state update.
+                base.LoadComplete();
             }
 
             private void stateChanged(ValueChangedEvent<DownloadState> state)
@@ -315,12 +317,16 @@ namespace osu.Game.Screens.OnlinePlay
                         if (beatmapManager.QueryBeatmap(b => b.MD5Hash == playlistItem.Beatmap.Value.MD5Hash) == null)
                             State.Value = DownloadState.NotDownloaded;
                         else
-                            this.FadeTo(0, 500);
+                        {
+                            this.FadeTo(0, 500)
+                                .ResizeWidthTo(0, 500, Easing.OutQuint);
+                        }
 
                         break;
 
                     default:
-                        this.FadeTo(1, 500);
+                        this.ResizeWidthTo(width, 500, Easing.OutQuint)
+                            .FadeTo(1, 500);
                         break;
                 }
             }

@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -12,13 +13,22 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing.Panels
 {
-    public class DownloadProgressBar : BeatmapDownloadTrackingComposite
+    public class DownloadProgressBar : CompositeDrawable
     {
         private readonly ProgressBar progressBar;
+        private readonly BeatmapDownloadTracker downloadTracker;
 
-        public DownloadProgressBar(BeatmapSetInfo beatmapSet)
-            : base(beatmapSet)
+        public DownloadProgressBar(IBeatmapSetInfo beatmapSet)
         {
+            InternalChildren = new Drawable[]
+            {
+                progressBar = new ProgressBar(false)
+                {
+                    Height = 0,
+                    Alpha = 0,
+                },
+                downloadTracker = new BeatmapDownloadTracker(beatmapSet),
+            };
             AddInternal(progressBar = new ProgressBar(false)
             {
                 Height = 0,
@@ -34,9 +44,9 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         {
             progressBar.FillColour = colours.Blue;
             progressBar.BackgroundColour = Color4.Black.Opacity(0.7f);
-            progressBar.Current = Progress;
+            progressBar.Current.BindTarget = downloadTracker.Progress;
 
-            State.BindValueChanged(state =>
+            downloadTracker.State.BindValueChanged(state =>
             {
                 switch (state.NewValue)
                 {

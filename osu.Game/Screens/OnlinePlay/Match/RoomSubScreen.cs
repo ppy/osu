@@ -65,9 +65,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
         [Cached]
-        protected OnlinePlayBeatmapAvailabilityTracker BeatmapAvailabilityTracker { get; private set; }
+        private OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker { get; set; }
 
-        protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapAvailabilityTracker.Availability;
+        protected IBindable<BeatmapAvailability> BeatmapAvailability => beatmapAvailabilityTracker.Availability;
 
         public readonly Room Room;
         private readonly bool allowEdit;
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             Padding = new MarginPadding { Top = Header.HEIGHT };
 
-            BeatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
+            beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
                 SelectedItem = { BindTarget = SelectedItem }
             };
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             InternalChildren = new Drawable[]
             {
-                BeatmapAvailabilityTracker,
+                beatmapAvailabilityTracker,
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,

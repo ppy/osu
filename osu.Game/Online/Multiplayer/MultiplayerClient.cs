@@ -148,6 +148,10 @@ namespace osu.Game.Online.Multiplayer
                 {
                     Room = joinedRoom;
                     APIRoom = room;
+
+                    Debug.Assert(LocalUser != null);
+                    addUserToAPIRoom(LocalUser);
+
                     foreach (var user in joinedRoom.Users)
                         updateUserPlayingState(user.UserID, user.State);
 
@@ -372,6 +376,8 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Add(user);
 
+                addUserToAPIRoom(user);
+
                 UserJoined?.Invoke(user);
                 RoomUpdated?.Invoke();
             });
@@ -391,6 +397,18 @@ namespace osu.Game.Online.Multiplayer
             return handleUserLeft(user, UserKicked);
         }
 
+        private void addUserToAPIRoom(MultiplayerRoomUser user)
+        {
+            Debug.Assert(APIRoom != null);
+
+            APIRoom.RecentParticipants.Add(user.User ?? new User
+            {
+                Id = user.UserID,
+                Username = "[Unresolved]"
+            });
+            APIRoom.ParticipantCount.Value++;
+        }
+
         private Task handleUserLeft(MultiplayerRoomUser user, Action<MultiplayerRoomUser>? callback)
         {
             if (Room == null)
@@ -403,6 +421,10 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Remove(user);
                 PlayingUserIds.Remove(user.UserID);
+
+                Debug.Assert(APIRoom != null);
+                APIRoom.RecentParticipants.RemoveAll(u => u.Id == user.UserID);
+                APIRoom.ParticipantCount.Value--;
 
                 callback?.Invoke(user);
                 RoomUpdated?.Invoke();

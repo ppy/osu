@@ -30,6 +30,24 @@ namespace osu.Game.Tests.Skins.IO
         });
 
         [Test]
+        public Task TestSingleImportWeirdIniFileCase() => runSkinTest(async osu =>
+        {
+            var import1 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOskWithIni("test skin", "skinner", iniFilename: "Skin.InI"), "skin.osk"));
+
+            // When the import filename doesn't match, it should be appended (and update the skin.ini).
+            assertCorrectMetadata(import1, "test skin [skin]", "skinner", osu);
+        });
+
+        [Test]
+        public Task TestSingleImportMissingSectionHeader() => runSkinTest(async osu =>
+        {
+            var import1 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOskWithIni("test skin", "skinner", includeSectionHeader: false), "skin.osk"));
+
+            // When the import filename doesn't match, it should be appended (and update the skin.ini).
+            assertCorrectMetadata(import1, "test skin [skin]", "skinner", osu);
+        });
+
+        [Test]
         public Task TestSingleImportMatchingFilename() => runSkinTest(async osu =>
         {
             var import1 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOskWithIni("test skin", "skinner"), "test skin.osk"));
@@ -190,21 +208,23 @@ namespace osu.Game.Tests.Skins.IO
             return zipStream;
         }
 
-        private MemoryStream createOskWithIni(string name, string author, bool makeUnique = false)
+        private MemoryStream createOskWithIni(string name, string author, bool makeUnique = false, string iniFilename = @"skin.ini", bool includeSectionHeader = true)
         {
             var zipStream = new MemoryStream();
             using var zip = ZipArchive.Create();
-            zip.AddEntry("skin.ini", generateSkinIni(name, author, makeUnique));
+            zip.AddEntry(iniFilename, generateSkinIni(name, author, makeUnique, includeSectionHeader));
             zip.SaveTo(zipStream);
             return zipStream;
         }
 
-        private MemoryStream generateSkinIni(string name, string author, bool makeUnique = true)
+        private MemoryStream generateSkinIni(string name, string author, bool makeUnique = true, bool includeSectionHeader = true)
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
 
-            writer.WriteLine("[General]");
+            if (includeSectionHeader)
+                writer.WriteLine("[General]");
+
             writer.WriteLine($"Name: {name}");
             writer.WriteLine($"Author: {author}");
 

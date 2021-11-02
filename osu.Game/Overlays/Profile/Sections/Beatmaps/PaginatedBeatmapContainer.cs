@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
         protected override Drawable CreateDrawableItem(APIBeatmapSet model) => model.OnlineID > 0
-            ? new GridBeatmapPanel(model.ToBeatmapSet(Rulesets))
+            ? new GridBeatmapPanel(model)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
