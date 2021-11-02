@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                beatmaps.Download(new BeatmapSetInfo { OnlineBeatmapSetID = beatmapSet.OnlineID }, noVideo);
+                beatmaps.Download(beatmapSet, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);
