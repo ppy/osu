@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return roomUser;
         }
 
-        public void AddNullUser() => addUser(new MultiplayerRoomUser(TestUserLookupCache.NULL_USER_ID));
+        public void TestAddUnresolvedUser() => addUser(new MultiplayerRoomUser(TestUserLookupCache.UNRESOLVED_USER_ID));
 
         private void addUser(MultiplayerRoomUser user)
         {
