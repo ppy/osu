@@ -194,73 +194,77 @@ namespace osu.Game.Skinning
             string nameLine = @$"Name: {item.Name}";
             string authorLine = @$"Author: {item.Creator}";
 
+            var newLines = new[]
+            {
+                @"// The following content was automatically added by osu! during import, based on filename / folder metadata.",
+                @"[General]",
+                nameLine,
+                authorLine,
+            };
+
             var existingFile = item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase));
 
-            if (existingFile != null)
+            if (existingFile == null)
             {
-                List<string> outputLines = new List<string>();
+                // In the case a skin doesn't have a skin.ini yet, let's create one.
+                writeNewSkinIni();
+                return;
+            }
 
-                bool addedName = false;
-                bool addedAuthor = false;
-
-                using (var stream = Files.Storage.GetStream(existingFile.FileInfo.StoragePath))
-                using (var sr = new StreamReader(stream))
+            using (Stream stream = new MemoryStream())
+            {
+                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                 {
-                    string line;
-
-                    while ((line = sr.ReadLine()) != null)
+                    using (var existingStream = Files.Storage.GetStream(existingFile.FileInfo.StoragePath))
+                    using (var sr = new StreamReader(existingStream))
                     {
-                        if (line.StartsWith(@"Name:", StringComparison.Ordinal))
-                        {
-                            outputLines.Add(nameLine);
-                            addedName = true;
-                        }
-                        else if (line.StartsWith(@"Author:", StringComparison.Ordinal))
-                        {
-                            outputLines.Add(authorLine);
-                            addedAuthor = true;
-                        }
-                        else
-                            outputLines.Add(line);
-                    }
-                }
-
-                if (!addedName || !addedAuthor)
-                {
-                    outputLines.AddRange(new[]
-                    {
-                        @"[General]",
-                        nameLine,
-                        authorLine,
-                    });
-                }
-
-                using (Stream stream = new MemoryStream())
-                {
-                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    {
-                        foreach (string line in outputLines)
+                        string line;
+                        while ((line = sr.ReadLine()) != null)
                             sw.WriteLine(line);
                     }
 
-                    ReplaceFile(item, existingFile, stream);
+                    sw.WriteLine();
+
+                    foreach (string line in newLines)
+                        sw.WriteLine(line);
+                }
+
+                ReplaceFile(item, existingFile, stream);
+
+                // can be removed 20220502.
+                if (!ensureIniWasUpdated(item))
+                {
+                    Logger.Log($"Skin {item}'s skin.ini had issues and has been removed. Please report this and provide the problematic skin.", LoggingTarget.Database, LogLevel.Important);
+
+                    DeleteFile(item, item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase)));
+                    writeNewSkinIni();
                 }
             }
-            else
+
+            void writeNewSkinIni()
             {
                 using (Stream stream = new MemoryStream())
                 {
                     using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                     {
-                        sw.WriteLine(@"[General]");
-                        sw.WriteLine(nameLine);
-                        sw.WriteLine(authorLine);
-                        sw.WriteLine(@"Version: latest");
+                        foreach (string line in newLines)
+                            sw.WriteLine(line);
                     }
 
                     AddFile(item, stream, @"skin.ini");
                 }
             }
+        }
+
+        private bool ensureIniWasUpdated(SkinInfo item)
+        {
+            // This is a final consistency check to ensure that hash computation doesn't enter an infinite loop.
+            // With other changes to the surrounding code this should never be hit, but until we are 101% sure that there
+            // are no other cases let's avoid a hard startup crash by bailing and alerting.
+
+            var instance = GetSkin(item);
+
+            return instance.Configuration.SkinInfo.Name == item.Name;
         }
 
         protected override Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
