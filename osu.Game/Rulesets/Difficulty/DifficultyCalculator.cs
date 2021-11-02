@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                     skill.ProcessInternal(hitObject);
 
-                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
 
             return attribs;

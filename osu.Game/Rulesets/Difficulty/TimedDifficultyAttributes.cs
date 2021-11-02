@@ -11,7 +11,14 @@ namespace osu.Game.Rulesets.Difficulty
     /// </summary>
     public class TimedDifficultyAttributes : IComparable<TimedDifficultyAttributes>
     {
+        /// <summary>
+        /// The non-clock adjusted time value at which the attributes take effect.
+        /// </summary>
         public readonly double Time;
+
+        /// <summary>
+        /// The attributes.
+        /// </summary>
         public readonly DifficultyAttributes Attributes;
 
         public TimedDifficultyAttributes(double time, DifficultyAttributes attributes)
