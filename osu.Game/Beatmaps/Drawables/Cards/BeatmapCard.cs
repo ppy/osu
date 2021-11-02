@@ -94,10 +94,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        mainContentBackground = new BeatmapCardContentBackground
+                        mainContentBackground = new BeatmapCardContentBackground(beatmapSet)
                         {
                             RelativeSizeAxes = Axes.Both,
-                            BeatmapSet = beatmapSet,
                         },
                         new FillFlowContainer
                         {
