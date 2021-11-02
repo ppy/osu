@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
         {
-            ScoreInfo = new ScoreInfo { User = new User { Username = "osu!salad!" } },
+            ScoreInfo = new ScoreInfo { User = new User { Username = "osu!salad" } },
             Replay = new CatchAutoGenerator(beatmap).Generate(),
         };
     }
