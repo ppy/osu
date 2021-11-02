@@ -105,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void refresh()
         {
-            difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods) { Size = new Vector2(32) };
+            difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(32) };
 
             beatmapText.Clear();
             beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString(), null, text =>
