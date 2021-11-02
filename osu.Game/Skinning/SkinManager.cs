@@ -198,48 +198,30 @@ namespace osu.Game.Skinning
 
             if (existingFile != null)
             {
-                List<string> outputLines = new List<string>();
+                List<string> additionalLines = new List<string>();
 
-                bool addedName = false;
-                bool addedAuthor = false;
-
-                using (var stream = Files.Storage.GetStream(existingFile.FileInfo.StoragePath))
-                using (var sr = new StreamReader(stream))
+                additionalLines.AddRange(new[]
                 {
-                    string line;
-
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        if (line.StartsWith(@"Name:", StringComparison.Ordinal))
-                        {
-                            outputLines.Add(nameLine);
-                            addedName = true;
-                        }
-                        else if (line.StartsWith(@"Author:", StringComparison.Ordinal))
-                        {
-                            outputLines.Add(authorLine);
-                            addedAuthor = true;
-                        }
-                        else
-                            outputLines.Add(line);
-                    }
-                }
-
-                if (!addedName || !addedAuthor)
-                {
-                    outputLines.AddRange(new[]
-                    {
-                        @"[General]",
-                        nameLine,
-                        authorLine,
-                    });
-                }
+                    @"",
+                    @"// The following content was automatically added by osu! during import, based on filename / folder metadata.",
+                    @"[General]",
+                    nameLine,
+                    authorLine,
+                });
 
                 using (Stream stream = new MemoryStream())
                 {
                     using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                     {
-                        foreach (string line in outputLines)
+                        using (var existingStream = Files.Storage.GetStream(existingFile.FileInfo.StoragePath))
+                        using (var sr = new StreamReader(existingStream))
+                        {
+                            string line;
+                            while ((line = sr.ReadLine()) != null)
+                                sw.WriteLine(line);
+                        }
+
+                        foreach (string line in additionalLines)
                             sw.WriteLine(line);
                     }
 
