@@ -31,18 +31,18 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestAddAndRemoveItem()
         {
-            foreach (var item in items.Skip(1))
+            foreach (string item in items.Skip(1))
                 AddStep($"Add {item} item", () => header.AddItem(item));
 
-            foreach (var item in items.Reverse().SkipLast(3))
+            foreach (string item in items.Reverse().SkipLast(3))
                 AddStep($"Remove {item} item", () => header.RemoveItem(item));
 
             AddStep("Clear items", () => header.ClearItems());
 
-            foreach (var item in items)
+            foreach (string item in items)
                 AddStep($"Add {item} item", () => header.AddItem(item));
 
-            foreach (var item in items)
+            foreach (string item in items)
                 AddStep($"Remove {item} item", () => header.RemoveItem(item));
         }
 

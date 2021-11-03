@@ -66,7 +66,7 @@ namespace osu.Game.Skinning
         {
             Debug.Assert(currentConfig != null);
 
-            foreach (var line in pendingLines)
+            foreach (string line in pendingLines)
             {
                 var pair = SplitKeyVal(line);
 

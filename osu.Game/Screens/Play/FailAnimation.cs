@@ -10,6 +10,7 @@ using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -83,7 +84,7 @@ namespace osu.Game.Screens.Play
                 Content,
                 redFlashLayer = new Box
                 {
-                    Colour = Color4.Red,
+                    Colour = Color4.Red.Opacity(0.6f),
                     RelativeSizeAxes = Axes.Both,
                     Blending = BlendingParameters.Additive,
                     Depth = float.MinValue,
@@ -106,6 +107,7 @@ namespace osu.Game.Screens.Play
 
             this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
             {
+                RemoveFilters();
                 OnComplete?.Invoke();
             });
 
@@ -137,6 +139,9 @@ namespace osu.Game.Screens.Play
 
         public void RemoveFilters()
         {
+            if (filters.Parent == null)
+                return;
+
             RemoveInternal(filters);
             filters.Dispose();
 

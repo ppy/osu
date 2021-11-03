@@ -49,7 +49,7 @@ namespace osu.Game.Tests.NonVisual
             for (int i = 0; i * beat_length_denominator < barLines.Count; i++)
             {
                 var barLine = barLines[i * beat_length_denominator];
-                var expectedTime = beat_length_numerator * (int)signature * i;
+                int expectedTime = beat_length_numerator * (int)signature * i;
 
                 // every seventh bar's start time should be at least greater than the whole number we expect.
                 // It cannot be less, as that can affect overlapping scroll algorithms

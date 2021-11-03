@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Objects.Types
         /// n-1: The last repeat.<br />
         /// n: The last node.
         /// </summary>
-        List<IList<HitSampleInfo>> NodeSamples { get; }
+        IList<IList<HitSampleInfo>> NodeSamples { get; }
     }
 
     public static class HasRepeatsExtensions

@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.BeatmapSet
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.BeatmapSet
     public class LeaderboardModSelector : CompositeDrawable
     {
         public readonly BindableList<IMod> SelectedMods = new BindableList<IMod>();
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public readonly Bindable<IRulesetInfo> Ruleset = new Bindable<IRulesetInfo>();
 
         private readonly FillFlowContainer<ModButton> modsContainer;
 
@@ -45,7 +46,10 @@ namespace osu.Game.Overlays.BeatmapSet
             Ruleset.BindValueChanged(onRulesetChanged, true);
         }
 
-        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        private void onRulesetChanged(ValueChangedEvent<IRulesetInfo> ruleset)
         {
             SelectedMods.Clear();
             modsContainer.Clear();
@@ -54,7 +58,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 return;
 
             modsContainer.Add(new ModButton(new ModNoMod()));
-            modsContainer.AddRange(ruleset.NewValue.CreateInstance().AllMods.Where(m => m.UserPlayable).Select(m => new ModButton(m)));
+            modsContainer.AddRange(rulesets.GetRuleset(ruleset.NewValue.OnlineID).CreateInstance().AllMods.Where(m => m.UserPlayable).Select(m => new ModButton(m)));
 
             modsContainer.ForEach(button =>
             {

@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             for (int i = 0; i < preset_count; i++)
             {
-                var rotationValue = i * 90;
+                int rotationValue = i * 90;
 
                 var rotationPreset = new RotationButton(rotationValue)
                 {

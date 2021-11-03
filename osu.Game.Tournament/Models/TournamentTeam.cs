@@ -36,10 +36,10 @@ namespace osu.Game.Tournament.Models
         {
             get
             {
-                var ranks = Players.Select(p => p.Statistics?.GlobalRank)
-                                   .Where(i => i.HasValue)
-                                   .Select(i => i.Value)
-                                   .ToArray();
+                int[] ranks = Players.Select(p => p.Statistics?.GlobalRank)
+                                     .Where(i => i.HasValue)
+                                     .Select(i => i.Value)
+                                     .ToArray();
 
                 if (ranks.Length == 0)
                     return 0;

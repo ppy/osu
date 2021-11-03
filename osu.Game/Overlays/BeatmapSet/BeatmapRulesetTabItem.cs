@@ -1,22 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
-using System.Linq;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapRulesetTabItem : OverlayRulesetTabItem
     {
-        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+        public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
-                var beatmapsCount = setInfo.NewValue?.Beatmaps.Count(b => b.Ruleset.Equals(Value)) ?? 0;
+                int beatmapsCount = setInfo.NewValue?.Beatmaps.Count(b => b.Ruleset.OnlineID == Value.OnlineID) ?? 0;
 
                 count.Text = beatmapsCount.ToString();
                 countContainer.FadeTo(beatmapsCount > 0 ? 1 : 0);

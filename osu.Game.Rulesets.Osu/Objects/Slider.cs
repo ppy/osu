@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal double LazyTravelTime;
 
-        public List<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
+        public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
         [JsonIgnore]
         public IList<HitSampleInfo> TailSamples { get; private set; }
@@ -157,8 +157,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.CreateNestedHitObjects(cancellationToken);
 
-            foreach (var e in
-                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
+            var sliderEvents = SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken);
+
+            foreach (var e in sliderEvents)
             {
                 switch (e.Type)
                 {

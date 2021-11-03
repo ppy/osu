@@ -2,16 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Overlays.Profile.Sections.Ranks;
-using osu.Framework.Graphics;
-using osu.Game.Scoring;
-using osu.Framework.Graphics.Containers;
-using osuTK;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Overlays;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Profile.Sections.Ranks;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Scoring;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -19,79 +19,79 @@ namespace osu.Game.Tests.Visual.Online
     {
         public TestSceneUserProfileScores()
         {
-            var firstScore = new ScoreInfo
+            var firstScore = new APIScoreInfo
             {
                 PP = 1047.21,
                 Rank = ScoreRank.SH,
-                BeatmapInfo = new BeatmapInfo
+                Beatmap = new APIBeatmap
                 {
-                    Metadata = new BeatmapMetadata
+                    BeatmapSet = new APIBeatmapSet
                     {
                         Title = "JUSTadICE (TV Size)",
-                        Artist = "Oomori Seiko"
+                        Artist = "Oomori Seiko",
                     },
-                    Version = "Extreme"
+                    DifficultyName = "Extreme"
                 },
                 Date = DateTimeOffset.Now,
-                Mods = new Mod[]
+                Mods = new[]
                 {
-                    new OsuModHidden(),
-                    new OsuModHardRock(),
-                    new OsuModDoubleTime()
+                    new APIMod { Acronym = new OsuModHidden().Acronym },
+                    new APIMod { Acronym = new OsuModHardRock().Acronym },
+                    new APIMod { Acronym = new OsuModDoubleTime().Acronym },
                 },
                 Accuracy = 0.9813
             };
 
-            var secondScore = new ScoreInfo
+            var secondScore = new APIScoreInfo
             {
                 PP = 134.32,
                 Rank = ScoreRank.A,
-                BeatmapInfo = new BeatmapInfo
+                Beatmap = new APIBeatmap
                 {
-                    Metadata = new BeatmapMetadata
+                    BeatmapSet = new APIBeatmapSet
                     {
                         Title = "Triumph & Regret",
-                        Artist = "typeMARS"
+                        Artist = "typeMARS",
                     },
-                    Version = "[4K] Regret"
+                    DifficultyName = "[4K] Regret"
                 },
                 Date = DateTimeOffset.Now,
-                Mods = new Mod[]
+                Mods = new[]
                 {
-                    new OsuModHardRock(),
-                    new OsuModDoubleTime(),
+                    new APIMod { Acronym = new OsuModHardRock().Acronym },
+                    new APIMod { Acronym = new OsuModDoubleTime().Acronym },
                 },
                 Accuracy = 0.998546
             };
 
-            var thirdScore = new ScoreInfo
+            var thirdScore = new APIScoreInfo
             {
                 PP = 96.83,
                 Rank = ScoreRank.S,
-                BeatmapInfo = new BeatmapInfo
+                Beatmap = new APIBeatmap
                 {
-                    Metadata = new BeatmapMetadata
+                    BeatmapSet = new APIBeatmapSet
                     {
                         Title = "Idolize",
-                        Artist = "Creo"
+                        Artist = "Creo",
                     },
-                    Version = "Insane"
+                    DifficultyName = "Insane"
                 },
                 Date = DateTimeOffset.Now,
                 Accuracy = 0.9726
             };
 
-            var noPPScore = new ScoreInfo
+            var noPPScore = new APIScoreInfo
             {
                 Rank = ScoreRank.B,
-                BeatmapInfo = new BeatmapInfo
+                Beatmap = new APIBeatmap
                 {
-                    Metadata = new BeatmapMetadata
+                    BeatmapSet = new APIBeatmapSet
                     {
                         Title = "C18H27NO3(extend)",
-                        Artist = "Team Grimoire"
+                        Artist = "Team Grimoire",
                     },
-                    Version = "[4K] Cataclysmic Hypernova"
+                    DifficultyName = "[4K] Cataclysmic Hypernova"
                 },
                 Date = DateTimeOffset.Now,
                 Accuracy = 0.55879

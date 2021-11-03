@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
 
-            foreach (var line in yamlFrontMatterBlock.Lines)
+            foreach (object line in yamlFrontMatterBlock.Lines)
             {
                 switch (line.ToString())
                 {

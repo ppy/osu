@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             base.SetUpSteps();
 
-            var expectedSampleNames = new[]
+            string[] expectedSampleNames =
             {
                 string.Empty,
                 string.Empty,
@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 HitSampleInfo.HIT_WHISTLE,
                 HitSampleInfo.HIT_WHISTLE,
             };
+
             var actualSampleNames = new List<string>();
 
             // due to pooling we can't access all samples right away due to object re-use,

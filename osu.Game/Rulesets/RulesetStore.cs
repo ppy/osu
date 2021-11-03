@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets
 
             var rulesets = rulesetStorage.GetFiles(".", $"{ruleset_library_prefix}.*.dll");
 
-            foreach (var ruleset in rulesets.Where(f => !f.Contains("Tests")))
+            foreach (string ruleset in rulesets.Where(f => !f.Contains("Tests")))
                 loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
         }
 
@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets
         {
             try
             {
-                var files = Directory.GetFiles(RuntimeInfo.StartupDirectory, $"{ruleset_library_prefix}.*.dll");
+                string[] files = Directory.GetFiles(RuntimeInfo.StartupDirectory, $"{ruleset_library_prefix}.*.dll");
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets
 
         private void loadRulesetFromFile(string file)
         {
-            var filename = Path.GetFileNameWithoutExtension(file);
+            string filename = Path.GetFileNameWithoutExtension(file);
 
             if (loadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
                 return;

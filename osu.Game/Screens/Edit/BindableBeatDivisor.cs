@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit
         {
             int beat = index % beatDivisor;
 
-            foreach (var divisor in BindableBeatDivisor.VALID_DIVISORS)
+            foreach (int divisor in BindableBeatDivisor.VALID_DIVISORS)
             {
                 if ((beat * divisor) % beatDivisor == 0)
                     return divisor;

@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.Containers
 
         public void Select(T item)
         {
-            var newIndex = IndexOf(item);
+            int newIndex = IndexOf(item);
 
             if (newIndex < 0)
                 setSelected(null);
