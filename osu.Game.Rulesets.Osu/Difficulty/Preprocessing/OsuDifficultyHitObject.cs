@@ -100,21 +100,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 for (int i = 1; i < lastSlider.NestedHitObjects.Count; i++)
                 {
-                    Vector2 currSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, currSliderPosition);
+                    var currSliderObj = (OsuHitObject)lastSlider.NestedHitObjects[i];
+
+                    Vector2 currSlider = Vector2.Subtract(currSliderObj.StackedPosition, currSliderPosition);
                     double currSliderLength = currSlider.Length * scalingFactor;
 
-                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderEndCircle && !((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat))
+                    if (currSliderObj is SliderEndCircle && !(currSliderObj is SliderRepeat))
                     {
-                        Vector2 possSlider = Vector2.Subtract((Vector2)lastSlider.LazyEndPosition, currSliderPosition);
-                        if (possSlider.Length < currSlider.Length)
-                            currSlider = possSlider; // Take the least distance from slider end vs lazy end.
+                        Vector2 lazySlider = Vector2.Subtract((Vector2)lastSlider.LazyEndPosition, currSliderPosition);
+                        if (lazySlider.Length < currSlider.Length)
+                            currSlider = lazySlider; // Take the least distance from slider end vs lazy end.
 
                         currSliderLength = currSlider.Length * scalingFactor;
                     }
 
-                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderTick)
+                    if (currSliderObj is SliderTick)
                     {
-                        if (currSliderLength > 120)
+                        if (currSliderLength > 120) // 120 is used here as 120 = 2.4 * radius, which means that the cursor assumes the position of least movement required to reach the active tick window.
                         {
                             currSliderPosition = Vector2.Add(currSliderPosition, Vector2.Multiply(currSlider, (float)((currSliderLength - 120) / currSliderLength)));
                             currSliderLength *= (currSliderLength - 120) / currSliderLength;
@@ -122,9 +124,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         else
                             currSliderLength = 0;
                     }
-                    else if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
+                    else if (currSliderObj is SliderRepeat)
                     {
-                        if (currSliderLength > 50)
+                        if (currSliderLength > 50) // 50 is used here as 50 = radius. This is a way to reward motion of back and forths sliders where we assume the player moves to atleast the rim of the hitcircle.
                         {
                             currSliderPosition = Vector2.Add(currSliderPosition, Vector2.Multiply(currSlider, (float)((currSliderLength - 50) / currSliderLength)));
                             currSliderLength *= (currSliderLength - 50) / currSliderLength;
@@ -134,16 +136,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     }
                     else
                     {
-                        if (currSliderLength > 0)
-                        {
-                            currSliderPosition = Vector2.Add(currSliderPosition, Vector2.Multiply(currSlider, (float)((currSliderLength - 0) / currSliderLength)));
-                            currSliderLength *= (currSliderLength - 0) / currSliderLength;
-                        }
-                        else
-                            currSliderLength = 0;
+                        currSliderPosition = Vector2.Add(currSliderPosition, currSlider);
                     }
 
-                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
+                    if (currSliderObj is SliderRepeat)
                         repeatCount++;
 
                     TravelDistance += currSliderLength;
