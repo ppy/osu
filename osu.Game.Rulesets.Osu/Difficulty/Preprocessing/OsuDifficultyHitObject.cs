@@ -157,7 +157,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // For hitobjects which continue in the direction of the slider, the player will normally follow through the slider,
                 // such that they're not jumping from the lazy position but rather from very close to (or the end of) the slider.
                 // In such cases, a leniency is applied by also considering the jump distance from the tail of the slider, and taking the minimum jump distance.
-                MovementDistance = Math.Min(JumpDistance, tailJumpDistance);
+                // Additional distance is removed based on position of jump relative to slider follow circle radius.
+                // JumpDistance is 50 since follow radius = 1.4 * radius. tailJumpDistance is 120 since the full distance of radial leniency is still possible.
+                MovementDistance = Math.Max(0, Math.Min(JumpDistance - 50, tailJumpDistance - 120));
             }
             else
             {
