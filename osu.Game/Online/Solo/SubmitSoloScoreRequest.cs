@@ -16,13 +16,13 @@ namespace osu.Game.Online.Solo
 
         private readonly int beatmapId;
 
-        private readonly ScoreInfo scoreInfo;
+        private readonly SubmittableScore score;
 
         public SubmitSoloScoreRequest(int beatmapId, long scoreId, ScoreInfo scoreInfo)
         {
             this.beatmapId = beatmapId;
             this.scoreId = scoreId;
-            this.scoreInfo = scoreInfo;
+            score = new SubmittableScore(scoreInfo);
         }
 
         protected override WebRequest CreateWebRequest()
@@ -32,7 +32,7 @@ namespace osu.Game.Online.Solo
             req.ContentType = "application/json";
             req.Method = HttpMethod.Put;
 
-            req.AddRaw(JsonConvert.SerializeObject(scoreInfo, new JsonSerializerSettings
+            req.AddRaw(JsonConvert.SerializeObject(score, new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));

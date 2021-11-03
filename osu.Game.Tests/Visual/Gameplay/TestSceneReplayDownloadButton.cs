@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Ranking;
 using osuTK.Input;
 
@@ -132,11 +133,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private ScoreInfo getScoreInfo(bool replayAvailable)
         {
-            return new APILegacyScoreInfo
+            return new APIScoreInfo
             {
-                OnlineScoreID = 2553163309,
-                OnlineRulesetID = 0,
-                Replay = replayAvailable,
+                OnlineID = 2553163309,
+                RulesetID = 0,
+                Beatmap = CreateAPIBeatmapSet(new OsuRuleset().RulesetInfo).Beatmaps.First(),
+                HasReplay = replayAvailable,
                 User = new User
                 {
                     Id = 39828,

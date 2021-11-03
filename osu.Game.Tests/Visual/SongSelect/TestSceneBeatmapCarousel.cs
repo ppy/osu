@@ -15,6 +15,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
@@ -684,6 +685,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     set.Beatmaps.Add(new BeatmapInfo
                     {
                         Version = $"Stars: {i}",
+                        Ruleset = new OsuRuleset().RulesetInfo,
                         StarDifficulty = i,
                     });
                 }
@@ -868,6 +870,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     OnlineBeatmapID = id++ * 10,
                     Version = version,
                     StarDifficulty = diff,
+                    Ruleset = new OsuRuleset().RulesetInfo,
                     BaseDifficulty = new BeatmapDifficulty
                     {
                         OverallDifficulty = diff,

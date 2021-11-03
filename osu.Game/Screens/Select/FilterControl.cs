@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Select
         {
             Debug.Assert(ruleset.Value.ID != null);
 
-            var query = searchTextBox.Text;
+            string query = searchTextBox.Text;
 
             var criteria = new FilterCriteria
             {

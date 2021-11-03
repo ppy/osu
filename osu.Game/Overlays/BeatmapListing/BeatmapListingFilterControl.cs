@@ -12,9 +12,9 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
-using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
@@ -206,7 +206,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             getSetsRequest.Success += response =>
             {
-                var sets = response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList();
+                var sets = response.BeatmapSets.ToList();
 
                 // If the previous request returned a null cursor, the API is indicating we can't paginate further (maybe there are no more beatmaps left).
                 if (sets.Count == 0 || response.Cursor == null)
@@ -289,7 +289,7 @@ namespace osu.Game.Overlays.BeatmapListing
             /// Contains the beatmap sets returned from API.
             /// Valid for read if and only if <see cref="Type"/> is <see cref="SearchResultType.ResultsReturned"/>.
             /// </summary>
-            public List<BeatmapSetInfo> Results { get; private set; }
+            public List<APIBeatmapSet> Results { get; private set; }
 
             /// <summary>
             /// Contains the names of supporter-only filters requested by the user.
@@ -297,7 +297,7 @@ namespace osu.Game.Overlays.BeatmapListing
             /// </summary>
             public List<LocalisableString> SupporterOnlyFiltersUsed { get; private set; }
 
-            public static SearchResult ResultsReturned(List<BeatmapSetInfo> results) => new SearchResult
+            public static SearchResult ResultsReturned(List<APIBeatmapSet> results) => new SearchResult
             {
                 Type = SearchResultType.ResultsReturned,
                 Results = results
