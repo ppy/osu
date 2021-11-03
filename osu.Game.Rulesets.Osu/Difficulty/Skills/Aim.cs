@@ -102,16 +102,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
             {
-                prevVelocity = (osuPrevObj.JumpDistance + osuPrevObj.TravelDistance) / osuPrevObj.StrainTime; // We want to use the average velocity when awarding differences, not necessarily combined.
+                prevVelocity = (osuLastObj.JumpDistance + osuLastObj.TravelDistance) / osuLastObj.StrainTime; // We want to use the average velocity when awarding differences, not necessarily combined.
                 currVelocity = (osuCurrObj.JumpDistance + osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
 
                 velChangeBonus = Math.Max(Math.Abs(prevVelocity - currVelocity) // reward for % distance slowed down compared to previous, paying attention to not award overlap
                                           * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, osuCurrObj.JumpDistance / 100)), 2) // do not award overlap
                                           * Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2), // scale with ratio of difference compared to max
-                                          Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuPrevObj.StrainTime), Math.Abs(prevVelocity - currVelocity)) // reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
+                                          Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity)) // reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
                                           * Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2)); // scale with ratio of difference compared to max
 
-                velChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuPrevObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuPrevObj.StrainTime), 2); // penalize for rhythm changes.
+                velChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2); // penalize for rhythm changes.
             }
 
             if (osuCurrObj.TravelTime != 0)
