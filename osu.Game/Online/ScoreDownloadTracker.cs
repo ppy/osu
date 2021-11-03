@@ -35,7 +35,11 @@ namespace osu.Game.Online
                 return;
 
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
-            var scoreInfo = new ScoreInfo { OnlineScoreID = TrackedItem.OnlineScoreID };
+            var scoreInfo = new ScoreInfo
+            {
+                ID = TrackedItem.ID,
+                OnlineScoreID = TrackedItem.OnlineScoreID
+            };
 
             if (Manager.IsAvailableLocally(scoreInfo))
                 UpdateState(DownloadState.LocallyAvailable);
