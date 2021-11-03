@@ -5,10 +5,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Select.Details;
 
@@ -23,16 +23,16 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Bar successRate;
         private readonly Container percentContainer;
 
-        private BeatmapInfo beatmapInfo;
+        private APIBeatmap beatmap;
 
-        public BeatmapInfo BeatmapInfo
+        public APIBeatmap Beatmap
         {
-            get => beatmapInfo;
+            get => beatmap;
             set
             {
-                if (value == beatmapInfo) return;
+                if (value == beatmap) return;
 
-                beatmapInfo = value;
+                beatmap = value;
 
                 updateDisplay();
             }
@@ -40,15 +40,15 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            int passCount = beatmapInfo?.OnlineInfo?.PassCount ?? 0;
-            int playCount = beatmapInfo?.OnlineInfo?.PlayCount ?? 0;
+            int passCount = beatmap?.PassCount ?? 0;
+            int playCount = beatmap?.PlayCount ?? 0;
 
-            var rate = playCount != 0 ? (float)passCount / playCount : 0;
+            float rate = playCount != 0 ? (float)passCount / playCount : 0;
             successPercent.Text = rate.ToLocalisableString(@"0.#%");
             successRate.Length = rate;
             percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
-            Graph.Metrics = beatmapInfo?.Metrics;
+            Graph.FailTimes = beatmap?.FailTimes;
         }
 
         public SuccessRate()

@@ -289,7 +289,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestSpectatingDuringGameplay()
         {
-            var players = new[] { PLAYER_1_ID, PLAYER_2_ID };
+            int[] players = { PLAYER_1_ID, PLAYER_2_ID };
 
             start(players);
             sendFrames(players, 300);
@@ -326,7 +326,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             for (int count = 3; count >= 0; count--)
             {
-                var id = PLAYER_1_ID + count;
+                int id = PLAYER_1_ID + count;
 
                 end(id);
                 AddUntilStep($"{id} area grayed", () => getInstance(id).Colour != Color4.White);

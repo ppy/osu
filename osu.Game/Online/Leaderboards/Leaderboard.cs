@@ -350,8 +350,8 @@ namespace osu.Game.Online.Leaderboards
         {
             base.UpdateAfterChildren();
 
-            var fadeBottom = scrollContainer.Current + scrollContainer.DrawHeight;
-            var fadeTop = scrollContainer.Current + LeaderboardScore.HEIGHT;
+            float fadeBottom = scrollContainer.Current + scrollContainer.DrawHeight;
+            float fadeTop = scrollContainer.Current + LeaderboardScore.HEIGHT;
 
             if (!scrollContainer.IsScrolledToEnd())
                 fadeBottom -= LeaderboardScore.HEIGHT;
@@ -361,8 +361,8 @@ namespace osu.Game.Online.Leaderboards
 
             foreach (var c in scrollFlow.Children)
             {
-                var topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scrollFlow).Y;
-                var bottomY = topY + LeaderboardScore.HEIGHT;
+                float topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scrollFlow).Y;
+                float bottomY = topY + LeaderboardScore.HEIGHT;
 
                 bool requireTopFade = FadeTop && topY <= fadeTop;
                 bool requireBottomFade = FadeBottom && bottomY >= fadeBottom;

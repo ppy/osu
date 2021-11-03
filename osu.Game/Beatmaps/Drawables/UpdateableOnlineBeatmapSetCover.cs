@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.Drawables
     {
         private readonly BeatmapSetCoverType coverType;
 
-        public IBeatmapSetOnlineInfo BeatmapSet
+        public IBeatmapSetOnlineInfo OnlineInfo
         {
             get => Model;
             set => Model = value;

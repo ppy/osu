@@ -84,7 +84,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             {
                 for (int i = 0; i < userCount; ++i)
                 {
-                    var userId = Client.Room?.Users[i].UserID ?? throw new AssertionException("Room cannot be null!");
+                    int userId = Client.Room?.Users[i].UserID ?? throw new AssertionException("Room cannot be null!");
                     Client.ChangeUserState(userId, state);
                 }
             });

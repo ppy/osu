@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Edit
             if (e.ControlPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
-            if (checkLeftToggleFromKey(e.Key, out var leftIndex))
+            if (checkLeftToggleFromKey(e.Key, out int leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
 
@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Edit
                 }
             }
 
-            if (checkRightToggleFromKey(e.Key, out var rightIndex))
+            if (checkRightToggleFromKey(e.Key, out int rightIndex))
             {
                 var item = togglesCollection.ElementAtOrDefault(rightIndex);
 

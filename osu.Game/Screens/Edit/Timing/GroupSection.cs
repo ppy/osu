@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Edit.Timing
                 if (!isNew)
                     return;
 
-                if (double.TryParse(sender.Text, out var newTime))
+                if (double.TryParse(sender.Text, out double newTime))
                 {
                     changeSelectedGroupTime(newTime);
                 }

@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     int? value = null;
 
-                    if (int.TryParse(e.NewValue, out var intVal))
+                    if (int.TryParse(e.NewValue, out int intVal))
                         value = intVal;
 
                     current.Value = value;

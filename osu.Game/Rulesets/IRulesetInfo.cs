@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets
     /// <summary>
     /// A representation of a ruleset's metadata.
     /// </summary>
-    public interface IRulesetInfo : IHasOnlineID
+    public interface IRulesetInfo : IHasOnlineID<int>
     {
         /// <summary>
         /// The user-exposed name of this ruleset.

@@ -9,21 +9,18 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
-using osu.Game.Tests.Visual.Multiplayer;
 using osuTK;
 using osuTK.Input;
 
@@ -333,12 +330,12 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestPushMatchSubScreenAndPressBackButtonImmediately()
         {
-            TestMultiplayer multiplayer = null;
+            TestMultiplayerScreenStack multiplayerScreenStack = null;
 
-            PushAndConfirm(() => multiplayer = new TestMultiplayer());
+            PushAndConfirm(() => multiplayerScreenStack = new TestMultiplayerScreenStack());
 
-            AddUntilStep("wait for lounge", () => multiplayer.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
-            AddStep("open room", () => multiplayer.ChildrenOfType<LoungeSubScreen>().Single().Open());
+            AddUntilStep("wait for lounge", () => multiplayerScreenStack.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
+            AddStep("open room", () => multiplayerScreenStack.ChildrenOfType<LoungeSubScreen>().Single().Open());
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
             AddWaitStep("wait two frames", 2);
         }
@@ -452,19 +449,6 @@ namespace osu.Game.Tests.Visual.Navigation
             public BeatmapOptionsOverlay BeatmapOptionsOverlay => BeatmapOptions;
 
             protected override bool DisplayStableImportPrompt => false;
-        }
-
-        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
-        {
-            [Cached(typeof(MultiplayerClient))]
-            public readonly TestMultiplayerClient Client;
-
-            public TestMultiplayer()
-            {
-                Client = new TestMultiplayerClient((TestRequestHandlingMultiplayerRoomManager)RoomManager);
-            }
-
-            protected override RoomManager CreateRoomManager() => new TestRequestHandlingMultiplayerRoomManager();
         }
     }
 }
