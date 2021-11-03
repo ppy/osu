@@ -39,9 +39,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        private readonly TestRequestHandlingMultiplayerRoomManager roomManager;
+        private readonly TestMultiplayerRoomManager roomManager;
 
-        public TestMultiplayerClient(TestRequestHandlingMultiplayerRoomManager roomManager)
+        public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
         {
             this.roomManager = roomManager;
         }
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return roomUser;
         }
 
-        public void AddNullUser() => addUser(new MultiplayerRoomUser(TestUserLookupCache.NULL_USER_ID));
+        public void TestAddUnresolvedUser() => addUser(new MultiplayerRoomUser(TestUserLookupCache.UNRESOLVED_USER_ID));
 
         private void addUser(MultiplayerRoomUser user)
         {

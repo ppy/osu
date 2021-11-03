@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps
 
             var stringBuilder = new StringBuilder(str.Length);
 
-            foreach (var c in str)
+            foreach (char c in str)
             {
                 if (IsRomanised(c))
                     stringBuilder.Append(c);

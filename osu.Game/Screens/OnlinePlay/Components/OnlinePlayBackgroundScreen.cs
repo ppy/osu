@@ -95,7 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         public override bool OnExiting(IScreen next)
         {
-            var result = base.OnExiting(next);
+            bool result = base.OnExiting(next);
             this.MoveToX(0);
             return result;
         }

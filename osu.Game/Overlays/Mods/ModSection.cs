@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Mods
 
             if (ToggleKeys != null)
             {
-                var index = Array.IndexOf(ToggleKeys, e.Key);
+                int index = Array.IndexOf(ToggleKeys, e.Key);
                 if (index > -1 && index < Buttons.Count)
                     Buttons[index].SelectNext(e.ShiftPressed ? -1 : 1);
             }
@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.Mods
         {
             foreach (var mod in newSelectedMods)
             {
-                var index = Array.FindIndex(button.Mods, m1 => mod.GetType() == m1.GetType());
+                int index = Array.FindIndex(button.Mods, m1 => mod.GetType() == m1.GetType());
                 if (index < 0)
                     continue;
 
