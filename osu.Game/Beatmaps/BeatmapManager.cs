@@ -114,7 +114,8 @@ namespace osu.Game.Beatmaps
         /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null) => beatmapModelManager.Save(info, beatmapContent, beatmapSkin);
+        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null) =>
+            beatmapModelManager.Save(info, beatmapContent, beatmapSkin);
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
