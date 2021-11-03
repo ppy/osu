@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor = 0.1 * (8.0 - Attributes.ApproachRate);
 
-            aimValue *= 1.0 + approachRateFactor;
+            aimValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
             if (mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * Attributes.DrainRate * Attributes.DrainRate);
@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Attributes.ApproachRate > 10.33)
                 approachRateFactor = 0.3 * (Attributes.ApproachRate - 10.33);
 
-            speedValue *= 1.0 + approachRateFactor;
+            speedValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
             if (mods.Any(m => m is OsuModBlinds))
             {
