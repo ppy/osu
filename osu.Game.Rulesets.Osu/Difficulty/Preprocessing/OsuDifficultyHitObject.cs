@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
     {
         private const int normalized_radius = 50; // Change radius to 50 to make 100 the diameter. Easier for mental maths.
         private const int min_delta_time = 25;
+        private const int minimum_slider_radius = normalized_radius * 2.4;
 
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 
@@ -116,20 +117,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                     if (currSliderObj is SliderTick)
                     {
-                        if (currSliderLength > 120) // 120 is used here as 120 = 2.4 * radius, which means that the cursor assumes the position of least movement required to reach the active tick window.
+                        if (currSliderLength > minimum_slider_radius) // minimum_slider_radius is used here as 120 = 2.4 * radius, which means that the cursor assumes the position of least movement required to reach the active tick window.
                         {
-                            currSliderPosition = Vector2.Add(currSliderPosition, Vector2.Multiply(currSlider, (float)((currSliderLength - 120) / currSliderLength)));
-                            currSliderLength *= (currSliderLength - 120) / currSliderLength;
+                            currSliderPosition = Vector2.Add(currSliderPosition, Vector2.Multiply(currSlider, (float)((currSliderLength - minimum_slider_radius) / currSliderLength)));
+                            currSliderLength *= (currSliderLength - minimum_slider_radius) / currSliderLength;
                         }
                         else
                             currSliderLength = 0;
                     }
                     else if (currSliderObj is SliderRepeat)
                     {
-                        if (currSliderLength > 50) // 50 is used here as 50 = radius. This is a way to reward motion of back and forths sliders where we assume the player moves to atleast the rim of the hitcircle.
+                        if (currSliderLength > normalized_radius) // normalized_radius is used here as 50 = radius. This is a way to reward motion of back and forths sliders where we assume the player moves to atleast the rim of the hitcircle.
                         {
-                            currSliderPosition = Vector2.Add(currSliderPosition, Vector2.Multiply(currSlider, (float)((currSliderLength - 50) / currSliderLength)));
-                            currSliderLength *= (currSliderLength - 50) / currSliderLength;
+                            currSliderPosition = Vector2.Add(currSliderPosition, Vector2.Multiply(currSlider, (float)((currSliderLength - normalized_radius) / currSliderLength)));
+                            currSliderLength *= (currSliderLength - normalized_radius) / currSliderLength;
                         }
                         else
                             currSliderLength = 0;
@@ -154,8 +155,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // such that they're not jumping from the lazy position but rather from very close to (or the end of) the slider.
                 // In such cases, a leniency is applied by also considering the jump distance from the tail of the slider, and taking the minimum jump distance.
                 // Additional distance is removed based on position of jump relative to slider follow circle radius.
-                // JumpDistance is 50 since follow radius = 1.4 * radius. tailJumpDistance is 120 since the full distance of radial leniency is still possible.
-                MovementDistance = Math.Max(0, Math.Min(JumpDistance - 50, tailJumpDistance - 120));
+                // JumpDistance is normalized_radius because lazyCursorPos uses a tighter 1.4 followCircle. tailJumpDistance is minimum_slider_radius since the full distance of radial leniency is still possible.
+                MovementDistance = Math.Max(0, Math.Min(JumpDistance - normalized_radius, tailJumpDistance - 120));
             }
             else
             {
