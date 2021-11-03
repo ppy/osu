@@ -68,6 +68,36 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }),
                         createLoungeRoom(new Room
                         {
+                            Name = { Value = "Multiplayer room" },
+                            Status = { Value = new RoomStatusOpen() },
+                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                            Type = { Value = MatchType.HeadToHead },
+                            Playlist =
+                            {
+                                new PlaylistItem
+                                {
+                                    Beatmap =
+                                    {
+                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
+                                        {
+                                            BeatmapInfo =
+                                            {
+                                                StarDifficulty = 2.5,
+                                                Metadata =
+                                                {
+                                                    Artist = "very very very very very very very very very long artist",
+                                                    ArtistUnicode = "very very very very very very very very very long artist",
+                                                    Title = "very very very very very very very very very very very long title",
+                                                    TitleUnicode = "very very very very very very very very very very very long title",
+                                                }
+                                            }
+                                        }.BeatmapInfo,
+                                    }
+                                }
+                            }
+                        }),
+                        createLoungeRoom(new Room
+                        {
                             Name = { Value = "Playlist room with multiple beatmaps" },
                             Status = { Value = new RoomStatusPlaying() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
