@@ -181,8 +181,11 @@ namespace osu.Game.Screens.OnlinePlay
                                     {
                                         beatmapText = new LinkFlowContainer(fontParameters)
                                         {
-                                            AutoSizeAxes = Axes.Y,
                                             RelativeSizeAxes = Axes.X,
+                                            // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
+                                            // TODO: remove when text/link flow can support truncation with ellipsis natively.
+                                            Height = OsuFont.DEFAULT_FONT_SIZE,
+                                            Masking = true
                                         },
                                         new FillFlowContainer
                                         {
