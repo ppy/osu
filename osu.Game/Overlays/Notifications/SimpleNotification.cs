@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -15,9 +16,9 @@ namespace osu.Game.Overlays.Notifications
 {
     public class SimpleNotification : Notification
     {
-        private string text = string.Empty;
+        private LocalisableString text;
 
-        public string Text
+        public LocalisableString Text
         {
             get => text;
             set
