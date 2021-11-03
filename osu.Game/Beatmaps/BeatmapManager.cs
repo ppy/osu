@@ -249,6 +249,23 @@ namespace osu.Game.Beatmaps
 
         public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
 
+        // Temporary method until this class supports IBeatmapSetInfo or otherwise.
+        public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false)
+        {
+            return beatmapModelDownloader.Download(new BeatmapSetInfo
+            {
+                OnlineBeatmapSetID = model.OnlineID,
+                Metadata = new BeatmapMetadata
+                {
+                    Title = model.Metadata?.Title,
+                    Artist = model.Metadata?.Artist,
+                    TitleUnicode = model.Metadata?.TitleUnicode,
+                    ArtistUnicode = model.Metadata?.ArtistUnicode,
+                    Author = new User { Username = model.Metadata?.Author },
+                }
+            }, minimiseDownloadSize);
+        }
+
         public bool Download(BeatmapSetInfo model, bool minimiseDownloadSize = false)
         {
             return beatmapModelDownloader.Download(model, minimiseDownloadSize);

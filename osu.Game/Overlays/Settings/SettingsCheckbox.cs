@@ -16,8 +16,7 @@ namespace osu.Game.Overlays.Settings
         public override LocalisableString LabelText
         {
             get => labelText;
-            // checkbox doesn't properly support localisation yet.
-            set => ((OsuCheckbox)Control).LabelText = (labelText = value).ToString();
+            set => ((OsuCheckbox)Control).LabelText = labelText = value;
         }
     }
 }
