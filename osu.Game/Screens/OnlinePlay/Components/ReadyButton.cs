@@ -3,13 +3,15 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public abstract class ReadyButton : TriangleButton
+    public abstract class ReadyButton : TriangleButton, IHasTooltip
     {
         public new readonly BindableBool Enabled = new BindableBool();
 
@@ -24,6 +26,18 @@ namespace osu.Game.Screens.OnlinePlay.Components
             Enabled.BindValueChanged(_ => updateState(), true);
         }
 
-        private void updateState() => base.Enabled.Value = availability.Value.State == DownloadState.LocallyAvailable && Enabled.Value;
+        private void updateState() =>
+            base.Enabled.Value = availability.Value.State == DownloadState.LocallyAvailable && Enabled.Value;
+
+        public virtual LocalisableString TooltipText
+        {
+            get
+            {
+                if (Enabled.Value)
+                    return string.Empty;
+
+                return "Beatmap not downloaded";
+            }
+        }
     }
 }

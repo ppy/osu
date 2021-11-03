@@ -119,6 +119,42 @@ namespace osu.Game.Graphics
         }
 
         /// <summary>
+        /// Retrieves a colour for the given <see cref="BeatmapSetOnlineStatus"/>.
+        /// A <see langword="null"/> value indicates that a "background" shade from the local <see cref="OverlayColourProvider"/>
+        /// (or another fallback colour) should be used.
+        /// </summary>
+        /// <remarks>
+        /// Sourced from web: https://github.com/ppy/osu-web/blob/007eebb1916ed5cb6a7866d82d8011b1060a945e/resources/assets/less/layout.less#L36-L50
+        /// </remarks>
+        public static Color4? ForBeatmapSetOnlineStatus(BeatmapSetOnlineStatus status)
+        {
+            switch (status)
+            {
+                case BeatmapSetOnlineStatus.Ranked:
+                case BeatmapSetOnlineStatus.Approved:
+                    return Color4Extensions.FromHex(@"b3ff66");
+
+                case BeatmapSetOnlineStatus.Loved:
+                    return Color4Extensions.FromHex(@"ff66ab");
+
+                case BeatmapSetOnlineStatus.Qualified:
+                    return Color4Extensions.FromHex(@"66ccff");
+
+                case BeatmapSetOnlineStatus.Pending:
+                    return Color4Extensions.FromHex(@"ffd966");
+
+                case BeatmapSetOnlineStatus.WIP:
+                    return Color4Extensions.FromHex(@"ff9966");
+
+                case BeatmapSetOnlineStatus.Graveyard:
+                    return Color4.Black;
+
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
         /// Returns a foreground text colour that is supposed to contrast well with
         /// the supplied <paramref name="backgroundColour"/>.
         /// </summary>

@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             showOverlay();
 
-            var retryCount = 0;
+            int retryCount = 0;
 
             AddRepeatStep("Add retry", () =>
             {

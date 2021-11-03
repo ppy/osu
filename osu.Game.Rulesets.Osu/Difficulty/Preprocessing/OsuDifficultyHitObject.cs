@@ -39,12 +39,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed since the end time of the Previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// Milliseconds elapsed since the end time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
         public double MovementTime { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed since from the start time of the Previous <see cref="OsuDifficultyHitObject"/> to the end time of the same Previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/> to the end time of the same previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
         public double TravelTime { get; private set; }
 
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastLastObject = (OsuHitObject)lastLastObject;
             this.lastObject = (OsuHitObject)lastObject;
 
-            // Capped to 25ms to prevent difficulty calculation breaking from simulatenous objects.
+            // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, min_delta_time);
 
             setDistances(clockRate);
@@ -83,12 +83,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
+            Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
+            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+
             if (lastObject is Slider lastSlider)
             {
                 computeSliderCursorPosition(lastSlider);
                 TravelDistance = 0;
                 TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
-                MovementTime = Math.Max(StrainTime - lastSlider.LazyTravelTime / clockRate, min_delta_time);
+                MovementTime = Math.Max(StrainTime - TravelTime, min_delta_time);
                 MovementDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
 
                 int repeatCount = 0;
@@ -147,12 +150,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 }
 
                 TravelDistance *= Math.Pow(1 + repeatCount / 2.5, 1.0 / 2.5); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
+
+                // Jump distance from the slider tail to the next object, as opposed to the lazy position of JumpDistance.
+                float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
+
+                // For hitobjects which continue in the direction of the slider, the player will normally follow through the slider,
+                // such that they're not jumping from the lazy position but rather from very close to (or the end of) the slider.
+                // In such cases, a leniency is applied by also considering the jump distance from the tail of the slider, and taking the minimum jump distance.
+                MovementDistance = Math.Min(JumpDistance, tailJumpDistance);
             }
-
-            Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
-
-            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-            MovementDistance = Math.Max(0, Math.Min(JumpDistance - 50, MovementDistance - 120)); // radius for jumpdistance is within 50 of maximum possible sliderLeniency, 120 for movement distance.
+            else
+            {
+                MovementTime = StrainTime;
+                MovementDistance = JumpDistance;
+            }
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
             {
@@ -202,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Skip the head circle
             var scoringTimes = slider.NestedHitObjects.Skip(1).Select(t => t.StartTime);
-            foreach (var time in scoringTimes)
+            foreach (double time in scoringTimes)
                 computeVertex(time);
         }
 

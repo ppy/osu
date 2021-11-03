@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
 
         private void updateBreakTime()
         {
-            var time = Clock.CurrentTime;
+            double time = Clock.CurrentTime;
 
             isBreakTime.Value = breaks?.IsInAny(time) == true
                                 || time < gameplayStartTime

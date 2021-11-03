@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -15,19 +13,11 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// <summary>
     /// A very simple <see cref="RoomManager"/> for use in online play test scenes.
     /// </summary>
-    public class TestRequestHandlingRoomManager : RoomManager
+    public class TestRoomManager : RoomManager
     {
         public Action<Room, string> JoinRoomRequested;
 
         private int currentRoomId;
-
-        private readonly TestRoomRequestsHandler handler = new TestRoomRequestsHandler();
-
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuGameBase game)
-        {
-            ((DummyAPIAccess)api).HandleRequest = request => handler.HandleRequest(request, api.LocalUser.Value, game);
-        }
 
         public override void JoinRoom(Room room, string password = null, Action<Room> onSuccess = null, Action<string> onError = null)
         {

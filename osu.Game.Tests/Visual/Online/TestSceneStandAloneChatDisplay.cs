@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var indices = chatDisplay.FillFlow.OfType<DrawableChannel.DaySeparator>().Select(ds => chatDisplay.FillFlow.IndexOf(ds));
 
-                foreach (var i in indices)
+                foreach (int i in indices)
                 {
                     if (i < chatDisplay.FillFlow.Count && chatDisplay.FillFlow[i + 1] is DrawableChannel.DaySeparator)
                         return false;

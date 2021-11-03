@@ -183,7 +183,7 @@ namespace osu.Game.Screens.Edit
         public void Add(HitObject hitObject)
         {
             // Preserve existing sorting order in the beatmap
-            var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
+            int insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
             Insert(insertionIndex + 1, hitObject);
         }
 
@@ -332,7 +332,7 @@ namespace osu.Game.Screens.Edit
                 // For now we'll remove and re-add the hitobject. This is not optimal and can be improved if required.
                 mutableHitObjects.Remove(hitObject);
 
-                var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
+                int insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
                 mutableHitObjects.Insert(insertionIndex + 1, hitObject);
 
                 Update(hitObject);

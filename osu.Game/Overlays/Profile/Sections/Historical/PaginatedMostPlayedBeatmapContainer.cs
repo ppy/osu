@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest() =>
             new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
 
-        protected override Drawable CreateDrawableItem(APIUserMostPlayedBeatmap model) =>
-            new DrawableMostPlayedBeatmap(model.GetBeatmapInfo(Rulesets), model.PlayCount);
+        protected override Drawable CreateDrawableItem(APIUserMostPlayedBeatmap mostPlayed) =>
+            new DrawableMostPlayedBeatmap(mostPlayed);
     }
 }

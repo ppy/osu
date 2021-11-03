@@ -72,11 +72,11 @@ namespace osu.Game.Overlays.Wiki
 
             Debug.Assert(panelsNode.Length > 1);
 
-            var i = 0;
+            int i = 0;
 
             while (i < panelsNode.Length)
             {
-                var isFullWidth = panelsNode[i].HasClass("wiki-main-page-panel--full");
+                bool isFullWidth = panelsNode[i].HasClass("wiki-main-page-panel--full");
 
                 if (isFullWidth)
                 {

@@ -2,18 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
     public class DrawablePopularBeatmapList : DrawableBeatmapList
     {
-        public DrawablePopularBeatmapList(List<BeatmapSetInfo> beatmaps)
-            : base(beatmaps)
+        public DrawablePopularBeatmapList(List<APIBeatmapSet> beatmapSets)
+            : base(beatmapSets)
         {
         }
 
-        protected override DashboardBeatmapPanel CreateBeatmapPanel(BeatmapSetInfo setInfo) => new DashboardPopularBeatmapPanel(setInfo);
+        protected override DashboardBeatmapPanel CreateBeatmapPanel(APIBeatmapSet beatmapSet) => new DashboardPopularBeatmapPanel(beatmapSet);
 
         protected override string Title => "Popular Beatmaps";
     }

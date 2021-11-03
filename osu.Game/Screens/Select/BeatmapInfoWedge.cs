@@ -257,6 +257,7 @@ namespace osu.Game.Screens.Select
                             },
                             StatusPill = new BeatmapSetOnlineStatusPill
                             {
+                                AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 Shear = -wedged_container_shear,

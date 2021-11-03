@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             base.Update();
 
             // Remove any auxiliary hit notes that were spawned during a drum roll but subsequently rewound.
-            for (var i = AliveInternalChildren.Count - 1; i >= 0; i--)
+            for (int i = AliveInternalChildren.Count - 1; i >= 0; i--)
             {
                 var flyingHit = (DrawableFlyingHit)AliveInternalChildren[i];
                 if (Time.Current <= flyingHit.HitObject.StartTime)

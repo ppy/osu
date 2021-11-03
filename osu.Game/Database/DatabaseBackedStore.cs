@@ -27,7 +27,7 @@ namespace osu.Game.Database
 
                 if (context.Entry(obj).State != EntityState.Detached) return;
 
-                var id = obj.ID;
+                int id = obj.ID;
                 var foundObject = lookupSource?.SingleOrDefault(t => t.ID == id) ?? context.Find<T>(id);
                 if (foundObject != null)
                     obj = foundObject;

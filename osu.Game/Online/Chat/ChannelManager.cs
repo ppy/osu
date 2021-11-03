@@ -218,7 +218,7 @@ namespace osu.Game.Online.Chat
             if (target == null)
                 return;
 
-            var parameters = text.Split(' ', 2);
+            string[] parameters = text.Split(' ', 2);
             string command = parameters[0];
             string content = parameters.Length == 2 ? parameters[1] : string.Empty;
 
@@ -306,7 +306,7 @@ namespace osu.Game.Online.Chat
         {
             var req = new ListChannelsRequest();
 
-            var joinDefaults = JoinedChannels.Count == 0;
+            bool joinDefaults = JoinedChannels.Count == 0;
 
             req.Success += channels =>
             {

@@ -8,9 +8,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,9 +24,9 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         public PreviewTrack Preview { get; private set; }
 
-        private BeatmapSetInfo beatmapSet;
+        private APIBeatmapSet beatmapSet;
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             get => beatmapSet;
             set
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             }
         }
 
-        public PlayButton(BeatmapSetInfo setInfo = null)
+        public PlayButton(APIBeatmapSet setInfo = null)
         {
             BeatmapSet = setInfo;
             AddRange(new Drawable[]

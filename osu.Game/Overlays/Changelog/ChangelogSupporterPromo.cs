@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -166,12 +165,12 @@ namespace osu.Game.Overlays.Changelog
             {
             }
 
-            protected override DrawableLinkCompiler CreateLinkCompiler(IEnumerable<SpriteText> parts) => new SupporterPromoLinkCompiler(parts);
+            protected override DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new SupporterPromoLinkCompiler(textPart);
 
             private class SupporterPromoLinkCompiler : DrawableLinkCompiler
             {
-                public SupporterPromoLinkCompiler(IEnumerable<Drawable> parts)
-                    : base(parts)
+                public SupporterPromoLinkCompiler(ITextPart part)
+                    : base(part)
                 {
                 }
 

@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                     case TaikoSkinComponents.TaikoExplosionOk:
                     case TaikoSkinComponents.TaikoExplosionGreat:
-                        var hitName = getHitName(taikoComponent.Component);
+                        string hitName = getHitName(taikoComponent.Component);
                         var hitSprite = this.GetAnimation(hitName, true, false);
 
                         if (hitSprite != null)
@@ -162,10 +162,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             {
                 get
                 {
-                    foreach (var name in base.LookupNames)
+                    foreach (string name in base.LookupNames)
                         yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
 
-                    foreach (var name in base.LookupNames)
+                    foreach (string name in base.LookupNames)
                         yield return name;
                 }
             }

@@ -289,7 +289,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             popoverContainer.HidePopover();
         }
 
-        public void Join(Room room, string password, Action<Room> onSuccess = null, Action<string> onFailure = null) => Schedule(() =>
+        public virtual void Join(Room room, string password, Action<Room> onSuccess = null, Action<string> onFailure = null) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
