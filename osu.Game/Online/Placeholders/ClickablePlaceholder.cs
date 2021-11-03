@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 
@@ -12,7 +13,7 @@ namespace osu.Game.Online.Placeholders
     {
         public Action Action;
 
-        public ClickablePlaceholder(string actionMessage, IconUsage icon)
+        public ClickablePlaceholder(LocalisableString actionMessage, IconUsage icon)
         {
             OsuTextFlowContainer textFlow;
 

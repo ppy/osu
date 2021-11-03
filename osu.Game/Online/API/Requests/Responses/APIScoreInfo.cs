@@ -37,6 +37,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset Date { get; set; }
 
         [JsonProperty(@"beatmap")]
+        [CanBeNull]
         public APIBeatmap Beatmap { get; set; }
 
         [JsonProperty("accuracy")]
@@ -46,6 +47,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public double? PP { get; set; }
 
         [JsonProperty(@"beatmapset")]
+        [CanBeNull]
         public APIBeatmapSet BeatmapSet
         {
             set
@@ -96,7 +98,7 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
-                BeatmapInfo = Beatmap.ToBeatmapInfo(rulesets),
+                BeatmapInfo = Beatmap?.ToBeatmapInfo(rulesets),
                 User = User,
                 Accuracy = Accuracy,
                 OnlineScoreID = OnlineID,
