@@ -7,12 +7,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -58,23 +56,14 @@ namespace osu.Game.Graphics.Containers
             AddText(text.Substring(previousLinkEnd));
         }
 
-        public void AddLink(string text, string url, Action<SpriteText> creationParameters = null) =>
+        public void AddLink(LocalisableString text, string url, Action<SpriteText> creationParameters = null) =>
             createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.External, url), url);
 
-        public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        public void AddLink(LocalisableString text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.Custom, string.Empty), tooltipText, action);
 
-        public void AddLink(string text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(action, argument), tooltipText);
-
         public void AddLink(LocalisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
-        {
-            var spriteText = new OsuSpriteText { Text = text };
-
-            AddText(spriteText, creationParameters);
-            RemoveInternal(spriteText); // TODO: temporary, will go away when TextParts support localisation properly.
-            createLink(new TextPartManual(spriteText.Yield()), new LinkDetails(action, argument), tooltipText);
-        }
+            => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(action, argument), tooltipText);
 
         public void AddLink(IEnumerable<SpriteText> text, LinkAction action, string linkArgument, string tooltipText = null)
         {

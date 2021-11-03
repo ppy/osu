@@ -5,6 +5,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Game.Online.API;
+using osu.Game.Online.Solo;
 using osu.Game.Scoring;
 
 namespace osu.Game.Online.Rooms
@@ -14,14 +15,14 @@ namespace osu.Game.Online.Rooms
         private readonly long scoreId;
         private readonly long roomId;
         private readonly long playlistItemId;
-        private readonly ScoreInfo scoreInfo;
+        private readonly SubmittableScore score;
 
         public SubmitRoomScoreRequest(long scoreId, long roomId, long playlistItemId, ScoreInfo scoreInfo)
         {
             this.scoreId = scoreId;
             this.roomId = roomId;
             this.playlistItemId = playlistItemId;
-            this.scoreInfo = scoreInfo;
+            score = new SubmittableScore(scoreInfo);
         }
 
         protected override WebRequest CreateWebRequest()
@@ -31,7 +32,7 @@ namespace osu.Game.Online.Rooms
             req.ContentType = "application/json";
             req.Method = HttpMethod.Put;
 
-            req.AddRaw(JsonConvert.SerializeObject(scoreInfo, new JsonSerializerSettings
+            req.AddRaw(JsonConvert.SerializeObject(score, new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));
