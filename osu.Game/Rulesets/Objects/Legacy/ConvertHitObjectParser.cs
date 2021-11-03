@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         if (i >= adds.Length)
                             break;
 
-                        int.TryParse(adds[i], out var sound);
+                        int.TryParse(adds[i], out int sound);
                         nodeSoundTypes[i] = (LegacyHitSoundType)sound;
                     }
                 }
@@ -408,7 +408,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
         protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
-                                                  List<IList<HitSampleInfo>> nodeSamples);
+                                                  IList<IList<HitSampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
@@ -481,7 +481,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// </summary>
             /// <remarks>
             /// Layered hit samples are automatically added in all modes (except osu!mania), but can be disabled
-            /// using the <see cref="LegacySkinConfiguration.LegacySetting.LayeredHitSounds"/> skin config option.
+            /// using the <see cref="SkinConfiguration.LegacySetting.LayeredHitSounds"/> skin config option.
             /// </remarks>
             public readonly bool IsLayered;
 

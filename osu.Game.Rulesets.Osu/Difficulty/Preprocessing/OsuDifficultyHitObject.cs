@@ -39,12 +39,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed since the end time of the Previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// Milliseconds elapsed since the end time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
         public double MovementTime { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed since from the start time of the Previous <see cref="OsuDifficultyHitObject"/> to the end time of the same Previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/> to the end time of the same previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
         public double TravelTime { get; private set; }
 
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastLastObject = (OsuHitObject)lastLastObject;
             this.lastObject = (OsuHitObject)lastObject;
 
-            // Capped to 25ms to prevent difficulty calculation breaking from simulatenous objects.
+            // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, min_delta_time);
 
             setDistances(clockRate);
@@ -83,53 +83,87 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
+            Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
+            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+
             if (lastObject is Slider lastSlider)
             {
                 computeSliderCursorPosition(lastSlider);
                 TravelDistance = 0;
                 TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
-                MovementTime = Math.Max(StrainTime - lastSlider.LazyTravelTime / clockRate, min_delta_time);
+                MovementTime = Math.Max(StrainTime - TravelTime, min_delta_time);
                 MovementDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
 
                 int repeatCount = 0;
 
+                Vector2 currSliderPosition = ((OsuHitObject)lastSlider.NestedHitObjects[0]).StackedPosition;
+
                 for (int i = 1; i < lastSlider.NestedHitObjects.Count; i++)
                 {
-                    Vector2 currSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition);
+                    Vector2 currSlider = Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[i]).StackedPosition, currSliderPosition);
+                    double currSliderLength = currSlider.Length * scalingFactor;
 
-                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat && (OsuHitObject)lastSlider.NestedHitObjects[i - 1] is SliderRepeat)
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderEndCircle && !((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat))
                     {
-                        repeatCount++;
-                        TravelDistance += Math.Max(0, currSlider.Length * scalingFactor - 240); // remove 240 distance to avoid buffing overlapping followcircles.
+                        Vector2 possSlider = Vector2.Subtract((Vector2)lastSlider.LazyEndPosition, currSliderPosition);
+                        if (possSlider.Length < currSlider.Length)
+                            currSlider = possSlider; // Take the least distance from slider end vs lazy end.
+
+                        currSliderLength = currSlider.Length * scalingFactor;
+                    }
+
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderTick)
+                    {
+                        if (currSliderLength > 120)
+                        {
+                            currSliderPosition = Vector2.Add(currSliderPosition, Vector2.Multiply(currSlider, (float)((currSliderLength - 120) / currSliderLength)));
+                            currSliderLength *= (currSliderLength - 120) / currSliderLength;
+                        }
+                        else
+                            currSliderLength = 0;
                     }
                     else if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
                     {
-                        repeatCount++;
-                        TravelDistance += Math.Max(0, currSlider.Length * scalingFactor - 120); // remove 120 distance to avoid buffing overlapping followcircles.
-                    }
-                    else if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderEndCircle)
-                    {
-                        Vector2 possSlider = Vector2.Subtract((Vector2)lastSlider.LazyEndPosition, ((OsuHitObject)lastSlider.NestedHitObjects[i - 1]).StackedPosition);
-                        TravelDistance += Math.Min(possSlider.Length, currSlider.Length) * scalingFactor; // Take the least distance from slider end vs lazy end.
+                        if (currSliderLength > 50)
+                        {
+                            currSliderPosition = Vector2.Add(currSliderPosition, Vector2.Multiply(currSlider, (float)((currSliderLength - 50) / currSliderLength)));
+                            currSliderLength *= (currSliderLength - 50) / currSliderLength;
+                        }
+                        else
+                            currSliderLength = 0;
                     }
                     else
-                        TravelDistance += Math.Max(0, currSlider.Length * scalingFactor - 100); // remove 100 distance to avoid buffing overlapping ticks, mostly needed to prevent buffing slow sliders with high tick rate.
+                    {
+                        if (currSliderLength > 0)
+                        {
+                            currSliderPosition = Vector2.Add(currSliderPosition, Vector2.Multiply(currSlider, (float)((currSliderLength - 0) / currSliderLength)));
+                            currSliderLength *= (currSliderLength - 0) / currSliderLength;
+                        }
+                        else
+                            currSliderLength = 0;
+                    }
+
+                    if ((OsuHitObject)lastSlider.NestedHitObjects[i] is SliderRepeat)
+                        repeatCount++;
+
+                    TravelDistance += currSliderLength;
                 }
 
-                if (repeatCount == 0)
-                {
-                    TravelDistance = Math.Max(TravelDistance, scalingFactor * // idea here is to prevent ticks from dropping difficulty of slider by removing distance in calculation.
-                                              Math.Min(Vector2.Subtract(((OsuHitObject)lastSlider.NestedHitObjects[lastSlider.NestedHitObjects.Count - 1]).StackedPosition, ((OsuHitObject)lastSlider.NestedHitObjects[0]).StackedPosition).Length,
-                                                       Vector2.Subtract((Vector2)lastSlider.LazyEndPosition, ((OsuHitObject)lastSlider.NestedHitObjects[0]).StackedPosition).Length));
-                }
-                else
-                    TravelDistance *= Math.Pow(1 + repeatCount / 2.0, 1.0 / 2.0); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
+                TravelDistance *= Math.Pow(1 + repeatCount / 2.5, 1.0 / 2.5); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
+
+                // Jump distance from the slider tail to the next object, as opposed to the lazy position of JumpDistance.
+                float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
+
+                // For hitobjects which continue in the direction of the slider, the player will normally follow through the slider,
+                // such that they're not jumping from the lazy position but rather from very close to (or the end of) the slider.
+                // In such cases, a leniency is applied by also considering the jump distance from the tail of the slider, and taking the minimum jump distance.
+                MovementDistance = Math.Min(JumpDistance, tailJumpDistance);
             }
-
-            Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
-
-            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-            MovementDistance = Math.Max(0, Math.Min(JumpDistance - 50, MovementDistance - 120)); // radius for jumpdistance is within 50 of maximum possible sliderLeniency, 120 for movement distance.
+            else
+            {
+                MovementTime = StrainTime;
+                MovementDistance = JumpDistance;
+            }
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
             {
@@ -179,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Skip the head circle
             var scoringTimes = slider.NestedHitObjects.Skip(1).Select(t => t.StartTime);
-            foreach (var time in scoringTimes)
+            foreach (double time in scoringTimes)
                 computeVertex(time);
         }
 

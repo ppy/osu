@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -88,7 +89,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select EZ mod", () =>
             {
-                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance();
+                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
                 SelectedMods.Value = new[] { ruleset.CreateMod<ModEasy>() };
             });
 
@@ -105,7 +106,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select HR mod", () =>
             {
-                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance();
+                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
                 SelectedMods.Value = new[] { ruleset.CreateMod<ModHardRock>() };
             });
 
@@ -122,9 +123,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select unchanged Difficulty Adjust mod", () =>
             {
-                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance();
+                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
                 var difficultyAdjustMod = ruleset.CreateMod<ModDifficultyAdjust>();
-                difficultyAdjustMod.ReadFromDifficulty(advancedStats.BeatmapInfo.BaseDifficulty);
+                difficultyAdjustMod.ReadFromDifficulty(advancedStats.BeatmapInfo.Difficulty);
                 SelectedMods.Value = new[] { difficultyAdjustMod };
             });
 
@@ -141,9 +142,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select changed Difficulty Adjust mod", () =>
             {
-                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance();
+                var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
                 var difficultyAdjustMod = ruleset.CreateMod<OsuModDifficultyAdjust>();
-                var originalDifficulty = advancedStats.BeatmapInfo.BaseDifficulty;
+                var originalDifficulty = advancedStats.BeatmapInfo.Difficulty;
 
                 difficultyAdjustMod.ReadFromDifficulty(originalDifficulty);
                 difficultyAdjustMod.DrainRate.Value = originalDifficulty.DrainRate - 0.5f;

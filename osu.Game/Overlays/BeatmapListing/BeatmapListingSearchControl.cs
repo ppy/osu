@@ -8,12 +8,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -49,17 +49,17 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<SearchExplicit> ExplicitContent => explicitContentFilter.Current;
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             set
             {
-                if (value == null || string.IsNullOrEmpty(value.OnlineInfo.Covers.Cover))
+                if (value == null || string.IsNullOrEmpty(value.Covers.Cover))
                 {
                     beatmapCover.FadeOut(600, Easing.OutQuint);
                     return;
                 }
 
-                beatmapCover.BeatmapSet = value;
+                beatmapCover.OnlineInfo = value;
                 beatmapCover.FadeTo(0.1f, 200, Easing.OutQuint);
             }
         }

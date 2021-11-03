@@ -79,9 +79,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             {
                 case IHasDistance distanceData:
                 {
-                    if (shouldConvertSliderToHits(obj, beatmap, distanceData, out var taikoDuration, out var tickSpacing))
+                    if (shouldConvertSliderToHits(obj, beatmap, distanceData, out int taikoDuration, out double tickSpacing))
                     {
-                        List<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
+                        IList<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
 
                         int i = 0;
 

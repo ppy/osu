@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Scores;
@@ -43,11 +44,11 @@ namespace osu.Game.Tests.Visual.Online
                 }
             };
 
-            var allScores = new APILegacyScores
+            var allScores = new APIScoresCollection
             {
-                Scores = new List<APILegacyScoreInfo>
+                Scores = new List<APIScoreInfo>
                 {
-                    new APILegacyScoreInfo
+                    new APIScoreInfo
                     {
                         User = new User
                         {
@@ -61,10 +62,10 @@ namespace osu.Game.Tests.Visual.Online
                         },
                         Mods = new[]
                         {
-                            new OsuModDoubleTime().Acronym,
-                            new OsuModHidden().Acronym,
-                            new OsuModFlashlight().Acronym,
-                            new OsuModHardRock().Acronym,
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
+                            new APIMod { Acronym = new OsuModFlashlight().Acronym },
+                            new APIMod { Acronym = new OsuModHardRock().Acronym },
                         },
                         Rank = ScoreRank.XH,
                         PP = 200,
@@ -72,7 +73,7 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 1234567890,
                         Accuracy = 1,
                     },
-                    new APILegacyScoreInfo
+                    new APIScoreInfo
                     {
                         User = new User
                         {
@@ -86,9 +87,9 @@ namespace osu.Game.Tests.Visual.Online
                         },
                         Mods = new[]
                         {
-                            new OsuModDoubleTime().Acronym,
-                            new OsuModHidden().Acronym,
-                            new OsuModFlashlight().Acronym,
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
+                            new APIMod { Acronym = new OsuModFlashlight().Acronym },
                         },
                         Rank = ScoreRank.S,
                         PP = 190,
@@ -96,7 +97,7 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 1234789,
                         Accuracy = 0.9997,
                     },
-                    new APILegacyScoreInfo
+                    new APIScoreInfo
                     {
                         User = new User
                         {
@@ -110,8 +111,8 @@ namespace osu.Game.Tests.Visual.Online
                         },
                         Mods = new[]
                         {
-                            new OsuModDoubleTime().Acronym,
-                            new OsuModHidden().Acronym,
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
                         },
                         Rank = ScoreRank.B,
                         PP = 180,
@@ -119,7 +120,7 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 12345678,
                         Accuracy = 0.9854,
                     },
-                    new APILegacyScoreInfo
+                    new APIScoreInfo
                     {
                         User = new User
                         {
@@ -133,7 +134,7 @@ namespace osu.Game.Tests.Visual.Online
                         },
                         Mods = new[]
                         {
-                            new OsuModDoubleTime().Acronym,
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
                         },
                         Rank = ScoreRank.C,
                         PP = 170,
@@ -141,7 +142,7 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 1234567,
                         Accuracy = 0.8765,
                     },
-                    new APILegacyScoreInfo
+                    new APIScoreInfo
                     {
                         User = new User
                         {
@@ -162,9 +163,9 @@ namespace osu.Game.Tests.Visual.Online
                 }
             };
 
-            var myBestScore = new APILegacyUserTopScoreInfo
+            var myBestScore = new APIScoreWithPosition
             {
-                Score = new APILegacyScoreInfo
+                Score = new APIScoreInfo
                 {
                     User = new User
                     {
@@ -185,9 +186,9 @@ namespace osu.Game.Tests.Visual.Online
                 Position = 1337,
             };
 
-            var myBestScoreWithNullPosition = new APILegacyUserTopScoreInfo
+            var myBestScoreWithNullPosition = new APIScoreWithPosition
             {
-                Score = new APILegacyScoreInfo
+                Score = new APIScoreInfo
                 {
                     User = new User
                     {
@@ -208,11 +209,11 @@ namespace osu.Game.Tests.Visual.Online
                 Position = null,
             };
 
-            var oneScore = new APILegacyScores
+            var oneScore = new APIScoresCollection
             {
-                Scores = new List<APILegacyScoreInfo>
+                Scores = new List<APIScoreInfo>
                 {
-                    new APILegacyScoreInfo
+                    new APIScoreInfo
                     {
                         User = new User
                         {
@@ -226,10 +227,10 @@ namespace osu.Game.Tests.Visual.Online
                         },
                         Mods = new[]
                         {
-                            new OsuModDoubleTime().Acronym,
-                            new OsuModHidden().Acronym,
-                            new OsuModFlashlight().Acronym,
-                            new OsuModHardRock().Acronym,
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
+                            new APIMod { Acronym = new OsuModFlashlight().Acronym },
+                            new APIMod { Acronym = new OsuModHardRock().Acronym },
                         },
                         Rank = ScoreRank.XH,
                         PP = 200,
@@ -273,7 +274,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestScoresContainer : ScoresContainer
         {
-            public new APILegacyScores Scores
+            public new APIScoresCollection Scores
             {
                 set => base.Scores = value;
             }

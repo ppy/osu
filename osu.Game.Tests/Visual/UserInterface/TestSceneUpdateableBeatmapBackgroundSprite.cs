@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
@@ -24,7 +25,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private BeatmapSetInfo testBeatmap;
         private IAPIProvider api;
-        private RulesetStore rulesets;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -33,7 +33,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void load(OsuGameBase osu, IAPIProvider api, RulesetStore rulesets)
         {
             this.api = api;
-            this.rulesets = rulesets;
 
             testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu).Result;
         }
@@ -81,7 +80,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Child = background = new TestUpdateableBeatmapBackgroundSprite
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Beatmap = { Value = new BeatmapInfo { BeatmapSet = req.Response?.ToBeatmapSet(rulesets) } }
+                        Beatmap = { Value = new APIBeatmap { BeatmapSet = req.Response } }
                     };
                 });
 

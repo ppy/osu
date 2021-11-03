@@ -140,7 +140,7 @@ namespace osu.Game.Overlays
 
         private void showParentPage()
         {
-            var parentPath = string.Join("/", path.Value.Split('/').SkipLast(1));
+            string parentPath = string.Join("/", path.Value.Split('/').SkipLast(1));
             ShowPage(parentPath);
         }
 
