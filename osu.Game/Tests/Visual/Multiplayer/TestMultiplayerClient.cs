@@ -280,7 +280,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             var apiSet = new APIBeatmapSet
             {
                 OnlineID = set.OnlineID,
-                Beatmaps = set.Beatmaps.Select(b => new APIBeatmap { OnlineID = b.OnlineID })
+                Beatmaps = set.Beatmaps.Select(b => new APIBeatmap { OnlineID = b.OnlineID }).ToArray(),
             };
 
             return Task.FromResult(apiSet);
