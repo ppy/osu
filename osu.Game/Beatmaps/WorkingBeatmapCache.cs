@@ -149,7 +149,7 @@ namespace osu.Game.Beatmaps
 
             protected override Texture GetBackground()
             {
-                if (Metadata?.BackgroundFile == null)
+                if (string.IsNullOrEmpty(Metadata?.BackgroundFile))
                     return null;
 
                 try
