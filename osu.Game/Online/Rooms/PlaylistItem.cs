@@ -43,7 +43,7 @@ namespace osu.Game.Online.Rooms
         public readonly BindableList<Mod> RequiredMods = new BindableList<Mod>();
 
         [JsonProperty("beatmap")]
-        public APIBeatmap APIBeatmap { get; set; }
+        private APIBeatmap apiBeatmap { get; set; }
 
         private APIMod[] allowedModsBacking;
 
@@ -71,7 +71,7 @@ namespace osu.Game.Online.Rooms
 
         public void MapObjects(RulesetStore rulesets)
         {
-            Beatmap.Value ??= APIBeatmap;
+            Beatmap.Value ??= apiBeatmap;
             Ruleset.Value ??= rulesets.GetRuleset(RulesetID);
 
             Ruleset rulesetInstance = Ruleset.Value.CreateInstance();
