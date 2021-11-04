@@ -262,7 +262,8 @@ namespace osu.Game.Beatmaps
                     Artist = model.Metadata?.Artist ?? string.Empty,
                     TitleUnicode = model.Metadata?.TitleUnicode ?? string.Empty,
                     ArtistUnicode = model.Metadata?.ArtistUnicode ?? string.Empty,
-                    Author = new APIUser { Username = model.Metadata?.Author },
+                    AuthorString = model.Metadata?.Author.Username ?? string.Empty,
+                    AuthorID = model.Metadata?.Author.OnlineID ?? 1,
                 }
             }, minimiseDownloadSize);
         }
