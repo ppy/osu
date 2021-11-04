@@ -13,12 +13,13 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Containers;
 using JetBrains.Annotations;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users
 {
     public abstract class UserPanel : OsuClickableContainer, IHasContextMenu
     {
-        public readonly User User;
+        public readonly APIUser User;
 
         /// <summary>
         /// Perform an action in addition to showing the user's profile.
@@ -30,7 +31,7 @@ namespace osu.Game.Users
 
         protected Drawable Background { get; private set; }
 
-        protected UserPanel(User user)
+        protected UserPanel(APIUser user)
             : base(HoverSampleSet.Submit)
         {
             if (user == null)

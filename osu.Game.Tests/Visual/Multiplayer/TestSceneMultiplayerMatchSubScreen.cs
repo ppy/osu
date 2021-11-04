@@ -9,6 +9,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -18,7 +19,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
-using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("join other user (ready)", () =>
             {
-                Client.AddUser(new User { Id = PLAYER_1_ID });
+                Client.AddUser(new APIUser { Id = PLAYER_1_ID });
                 Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready);
             });
 

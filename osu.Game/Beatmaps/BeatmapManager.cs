@@ -18,10 +18,10 @@ using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Create a new <see cref="WorkingBeatmap"/>.
         /// </summary>
-        public WorkingBeatmap CreateNew(RulesetInfo ruleset, User user)
+        public WorkingBeatmap CreateNew(RulesetInfo ruleset, APIUser user)
         {
             var metadata = new BeatmapMetadata
             {
@@ -262,7 +262,7 @@ namespace osu.Game.Beatmaps
                     Artist = model.Metadata?.Artist ?? string.Empty,
                     TitleUnicode = model.Metadata?.TitleUnicode ?? string.Empty,
                     ArtistUnicode = model.Metadata?.ArtistUnicode ?? string.Empty,
-                    Author = new User { Username = model.Metadata?.Author },
+                    Author = new APIUser { Username = model.Metadata?.Author },
                 }
             }, minimiseDownloadSize);
         }
