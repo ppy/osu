@@ -4,12 +4,12 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
-using osu.Game.Users;
 
 namespace osu.Game.Tournament.Tests.Components
 {
@@ -18,20 +18,20 @@ namespace osu.Game.Tournament.Tests.Components
         private readonly Channel testChannel = new Channel();
         private readonly Channel testChannel2 = new Channel();
 
-        private readonly User admin = new User
+        private readonly APIUser admin = new APIUser
         {
             Username = "HappyStick",
             Id = 2,
             Colour = "f2ca34"
         };
 
-        private readonly User redUser = new User
+        private readonly APIUser redUser = new APIUser
         {
             Username = "BanchoBot",
             Id = 3,
         };
 
-        private readonly User blueUser = new User
+        private readonly APIUser blueUser = new APIUser
         {
             Username = "Zallius",
             Id = 4,
@@ -57,11 +57,11 @@ namespace osu.Game.Tournament.Tests.Components
             {
                 Team1 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<User> { redUser } }
+                    Value = new TournamentTeam { Players = new BindableList<APIUser> { redUser } }
                 },
                 Team2 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<User> { blueUser } }
+                    Value = new TournamentTeam { Players = new BindableList<APIUser> { blueUser } }
                 }
             };
 

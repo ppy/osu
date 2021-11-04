@@ -11,8 +11,8 @@ using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Chat.Tabs;
-using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
@@ -91,7 +91,7 @@ namespace osu.Game.Online.Chat
         /// Opens a new private channel.
         /// </summary>
         /// <param name="user">The user the private channel is opened with.</param>
-        public void OpenPrivateChannel(User user)
+        public void OpenPrivateChannel(APIUser user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));

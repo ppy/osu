@@ -10,10 +10,10 @@ using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Background
 {
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.Background
             AddStep($"set background mode to {source}", () => config.SetValue(OsuSetting.MenuBackgroundSource, source));
 
         private void setSupporter(bool isSupporter) =>
-            AddStep($"set supporter {isSupporter}", () => ((DummyAPIAccess)API).LocalUser.Value = new User
+            AddStep($"set supporter {isSupporter}", () => ((DummyAPIAccess)API).LocalUser.Value = new APIUser
             {
                 IsSupporter = isSupporter,
                 Id = API.LocalUser.Value.Id + 1,

@@ -17,6 +17,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
@@ -32,7 +33,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Spectate;
 using osu.Game.Tests.Resources;
-using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -129,12 +129,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void addRandomPlayer()
         {
             int randomUser = RNG.Next(200000, 500000);
-            client.AddUser(new User { Id = randomUser, Username = $"user {randomUser}" });
+            client.AddUser(new APIUser { Id = randomUser, Username = $"user {randomUser}" });
         }
 
         private void removeLastUser()
         {
-            User lastUser = client.Room?.Users.Last().User;
+            APIUser lastUser = client.Room?.Users.Last().User;
 
             if (lastUser == null || lastUser == client.LocalUser?.User)
                 return;
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void kickLastUser()
         {
-            User lastUser = client.Room?.Users.Last().User;
+            APIUser lastUser = client.Room?.Users.Last().User;
 
             if (lastUser == null || lastUser == client.LocalUser?.User)
                 return;
@@ -414,7 +414,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("join other user (ready, host)", () =>
             {
-                client.AddUser(new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Other" });
+                client.AddUser(new APIUser { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Other" });
                 client.TransferHost(MultiplayerTestScene.PLAYER_1_ID);
                 client.ChangeUserState(MultiplayerTestScene.PLAYER_1_ID, MultiplayerUserState.Ready);
             });
@@ -454,7 +454,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("join other user (ready, host)", () =>
             {
-                client.AddUser(new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Other" });
+                client.AddUser(new APIUser { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Other" });
                 client.TransferHost(MultiplayerTestScene.PLAYER_1_ID);
                 client.ChangeUserState(MultiplayerTestScene.PLAYER_1_ID, MultiplayerUserState.Ready);
             });

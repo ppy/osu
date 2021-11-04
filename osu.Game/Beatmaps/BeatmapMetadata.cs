@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 #nullable enable
 
@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
         public List<BeatmapSetInfo> BeatmapSets { get; set; } = new List<BeatmapSetInfo>();
 
         /// <summary>
-        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// Helper property to deserialize a username to <see cref="APIUser"/>.
         /// </summary>
         [JsonProperty(@"user_id")]
         [Column("AuthorID")]
@@ -45,13 +45,13 @@ namespace osu.Game.Beatmaps
             get => Author?.Id ?? 1;
             set
             {
-                Author ??= new User();
+                Author ??= new APIUser();
                 Author.Id = value;
             }
         }
 
         /// <summary>
-        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// Helper property to deserialize a username to <see cref="APIUser"/>.
         /// </summary>
         [JsonProperty(@"creator")]
         [Column("Author")]
@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps
             get => Author?.Username ?? string.Empty;
             set
             {
-                Author ??= new User();
+                Author ??= new APIUser();
                 Author.Username = value;
             }
         }
@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps
         /// The author of the beatmaps in this set.
         /// </summary>
         [JsonIgnore]
-        public User? Author;
+        public APIUser? Author;
 
         public string Source { get; set; } = string.Empty;
 
