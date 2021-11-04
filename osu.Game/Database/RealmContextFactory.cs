@@ -35,8 +35,9 @@ namespace osu.Game.Database
         /// 6  First tracked version (~20211018)
         /// 7  Changed OnlineID fields to non-nullable to add indexing support (20211018)
         /// 8  Rebind scroll adjust keys to not have control modifier (20211029)
+        /// 9  Converted BeatmapMetadata.Author from string to RealmUser (20211104)
         /// </summary>
-        private const int schema_version = 8;
+        private const int schema_version = 9;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
@@ -151,6 +152,29 @@ namespace osu.Game.Database
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
         {
+            if (lastSchemaVersion < 9)
+            {
+                // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
+                string className = nameof(RealmBeatmapMetadata).Replace(@"Realm", string.Empty);
+
+                var oldItems = migration.OldRealm.DynamicApi.All(className);
+                var newItems = migration.NewRealm.All<RealmBeatmapMetadata>();
+
+                int itemCount = newItems.Count();
+
+                for (int i = 0; i < itemCount; i++)
+                {
+                    dynamic? oldItem = oldItems.ElementAt(i);
+                    var newItem = newItems.ElementAt(i);
+
+                    string username = oldItem.Author;
+                    newItem.Author = new RealmUser
+                    {
+                        Username = username
+                    };
+                }
+            }
+
             if (lastSchemaVersion < 8)
             {
                 // Ctrl -/+ now adjusts UI scale so let's clear any bindings which overlap these combinations.
