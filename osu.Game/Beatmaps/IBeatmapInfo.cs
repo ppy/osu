@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The metadata representing this beatmap. May be shared between multiple beatmaps.
         /// </summary>
-        IBeatmapMetadataInfo? Metadata { get; }
+        IBeatmapMetadataInfo Metadata { get; }
 
         /// <summary>
         /// The difficulty settings for this beatmap.
