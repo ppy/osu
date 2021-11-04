@@ -67,8 +67,9 @@ namespace osu.Game.Screens.Play.HUD
         private bool isValid;
         private void setValid(bool valid)
         {
-            isValid = valid;
+            if (isValid == valid) return;
             DrawableCount.FadeTo(isValid ? 1 : alpha_when_invalid, 1000, Easing.OutQuint);
+            isValid = valid;
         }
 
         private void onJudgementAdded(JudgementResult judgement)
