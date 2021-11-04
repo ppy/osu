@@ -9,6 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users.Drawables
 {
@@ -33,7 +34,7 @@ namespace osu.Game.Users.Drawables
             set => clickableArea.TooltipText = value ? (user?.Username ?? string.Empty) : default_tooltip_text;
         }
 
-        private readonly User user;
+        private readonly APIUser user;
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
@@ -45,7 +46,7 @@ namespace osu.Game.Users.Drawables
         /// If <see cref="OpenOnClick"/> is <c>true</c>, clicking will open the user's profile.
         /// </summary>
         /// <param name="user">The user. A null value will get a placeholder avatar.</param>
-        public ClickableAvatar(User user = null)
+        public ClickableAvatar(APIUser user = null)
         {
             this.user = user;
 

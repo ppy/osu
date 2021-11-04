@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 using osuTK;
 
@@ -17,13 +17,13 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// </summary>
     public class ExpandedPanelTopContent : CompositeDrawable
     {
-        private readonly User user;
+        private readonly APIUser user;
 
         /// <summary>
         /// Creates a new <see cref="ExpandedPanelTopContent"/>.
         /// </summary>
-        /// <param name="user">The <see cref="User"/> to display.</param>
-        public ExpandedPanelTopContent(User user)
+        /// <param name="user">The <see cref="APIUser"/> to display.</param>
+        public ExpandedPanelTopContent(APIUser user)
         {
             this.user = user;
             Anchor = Anchor.TopCentre;

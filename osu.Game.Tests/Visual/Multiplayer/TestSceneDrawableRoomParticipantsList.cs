@@ -5,10 +5,10 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
-using osu.Game.Users;
 using osu.Game.Users.Drawables;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Name = { Value = "test room" },
                 Host =
                 {
-                    Value = new User
+                    Value = new APIUser
                     {
                         Id = 2,
                         Username = "peppy",
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addUser(int id)
         {
-            SelectedRoom.Value.RecentParticipants.Add(new User
+            SelectedRoom.Value.RecentParticipants.Add(new APIUser
             {
                 Id = id,
                 Username = $"User {id}"

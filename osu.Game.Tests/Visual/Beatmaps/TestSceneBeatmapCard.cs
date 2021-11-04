@@ -13,8 +13,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Users;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             Title = "undownloadable beatmap",
             Artist = "test",
             Source = "more tests",
-            Author = new User
+            Author = new APIUser
             {
                 Username = "BanchoBot",
                 Id = 3,
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 OnlineID = 1,
                 Title = "many difficulties beatmap",
                 Artist = "test",
-                Author = new User
+                Author = new APIUser
                 {
                     Username = "BanchoBot",
                     Id = 3,

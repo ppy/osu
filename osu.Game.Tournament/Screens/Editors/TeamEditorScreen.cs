@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -199,14 +200,14 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 public void CreateNew()
                 {
-                    var user = new User();
+                    var user = new APIUser();
                     team.Players.Add(user);
                     flow.Add(new PlayerRow(team, user));
                 }
 
                 public class PlayerRow : CompositeDrawable
                 {
-                    private readonly User user;
+                    private readonly APIUser user;
 
                     [Resolved]
                     protected IAPIProvider API { get; private set; }
@@ -218,7 +219,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private readonly Container drawableContainer;
 
-                    public PlayerRow(TournamentTeam team, User user)
+                    public PlayerRow(TournamentTeam team, APIUser user)
                     {
                         this.user = user;
 

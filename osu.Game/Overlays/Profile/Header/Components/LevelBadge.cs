@@ -11,14 +11,14 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class LevelBadge : CompositeDrawable, IHasTooltip
     {
-        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
         public LocalisableString TooltipText { get; private set; }
 
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             User.BindValueChanged(user => updateLevel(user.NewValue));
         }
 
-        private void updateLevel(User user)
+        private void updateLevel(APIUser user)
         {
             levelText.Text = user?.Statistics?.Level.Current.ToString() ?? "0";
             TooltipText = UsersStrings.ShowStatsLevel(user?.Statistics?.Level.Current.ToString());

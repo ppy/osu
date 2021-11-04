@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
-using osu.Game.Users;
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.API;
@@ -11,12 +10,13 @@ using System.Collections.Generic;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Game.Resources.Localisation.Web;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class PaginatedRecentActivityContainer : PaginatedProfileSubsection<APIRecentActivity>
     {
-        public PaginatedRecentActivityContainer(Bindable<User> user)
+        public PaginatedRecentActivityContainer(Bindable<APIUser> user)
             : base(user, missingText: EventsStrings.Empty)
         {
             ItemsPerPage = 10;
