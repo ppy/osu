@@ -27,6 +27,7 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay
         private ExplicitContentBeatmapPill explicitContentPill;
         private ModDisplay modDisplay;
 
-        private readonly Bindable<BeatmapInfo> beatmap = new Bindable<BeatmapInfo>();
+        private readonly Bindable<IBeatmapInfo> beatmap = new Bindable<IBeatmapInfo>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
 
@@ -106,12 +107,12 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void refresh()
         {
-            difficultyIconContainer.Child = new DifficultyIcon(Item.APIBeatmap, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(32) };
+            difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(32) };
 
-            panelBackground.Beatmap.Value = Item.APIBeatmap;
+            panelBackground.Beatmap.Value = Item.Beatmap.Value;
 
             beatmapText.Clear();
-            beatmapText.AddLink(Item.APIBeatmap.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.APIBeatmap.OnlineID.ToString(), null, text =>
+            beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineID.ToString(), null, text =>
             {
                 text.Truncate = true;
             });
@@ -121,10 +122,10 @@ namespace osu.Game.Screens.OnlinePlay
             if (Item.Beatmap.Value?.Metadata?.Author != null)
             {
                 authorText.AddText("mapped by ");
-                authorText.AddUserLink(Item.APIBeatmap?.BeatmapSet?.Author);
+                authorText.AddUserLink(new User { Username = Item.Beatmap.Value.Metadata.Author });
             }
 
-            bool hasExplicitContent = Item.Beatmap.Value?.BeatmapSet.OnlineInfo?.HasExplicitContent == true;
+            bool hasExplicitContent = (Item.Beatmap.Value.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
             explicitContentPill.Alpha = hasExplicitContent ? 1 : 0;
 
             modDisplay.Current.Value = requiredMods.ToArray();
@@ -296,7 +297,7 @@ namespace osu.Game.Screens.OnlinePlay
             private const float width = 50;
 
             public PlaylistDownloadButton(PlaylistItem playlistItem)
-                : base(playlistItem.APIBeatmap.BeatmapSet)
+                : base(playlistItem.Beatmap.Value.BeatmapSet)
             {
                 this.playlistItem = playlistItem;
 
@@ -318,7 +319,7 @@ namespace osu.Game.Screens.OnlinePlay
                 {
                     case DownloadState.LocallyAvailable:
                         // Perform a local query of the beatmap by beatmap checksum, and reset the state if not matching.
-                        if (beatmapManager.QueryBeatmap(b => b.MD5Hash == playlistItem.APIBeatmap.MD5Hash) == null)
+                        if (beatmapManager.QueryBeatmap(b => b.MD5Hash == playlistItem.Beatmap.Value.MD5Hash) == null)
                             State.Value = DownloadState.NotDownloaded;
                         else
                         {

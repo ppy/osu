@@ -18,6 +18,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.Settings;
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Play
         private Container beatmapPanelContainer;
         private TriangleButton watchButton;
         private SettingsCheckbox automaticDownload;
-        private BeatmapSetInfo onlineBeatmap;
+        private APIBeatmapSet onlineBeatmap;
 
         /// <summary>
         /// The player's immediate online gameplay state.
@@ -222,8 +223,8 @@ namespace osu.Game.Screens.Play
             onlineBeatmapRequest = new GetBeatmapSetRequest(state.BeatmapID.Value, BeatmapSetLookupType.BeatmapId);
             onlineBeatmapRequest.Success += res => Schedule(() =>
             {
-                onlineBeatmap = res.ToBeatmapSet(rulesets);
-                beatmapPanelContainer.Child = new GridBeatmapPanel(res);
+                onlineBeatmap = res;
+                beatmapPanelContainer.Child = new GridBeatmapPanel(onlineBeatmap);
                 checkForAutomaticDownload();
             });
 
@@ -238,10 +239,13 @@ namespace osu.Game.Screens.Play
             if (!automaticDownload.Current.Value)
                 return;
 
-            if (beatmaps.IsAvailableLocally(onlineBeatmap))
+            // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
+            var beatmapSetInfo = new BeatmapSetInfo { OnlineBeatmapSetID = onlineBeatmap.OnlineID };
+
+            if (beatmaps.IsAvailableLocally(beatmapSetInfo))
                 return;
 
-            beatmaps.Download(onlineBeatmap);
+            beatmaps.Download(beatmapSetInfo);
         }
 
         public override bool OnExiting(IScreen next)
