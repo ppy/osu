@@ -23,10 +23,10 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("set metadata", () =>
             {
                 editorBeatmap.Metadata.Artist = "Example Artist";
-                editorBeatmap.Metadata.ArtistUnicode = null;
+                editorBeatmap.Metadata.ArtistUnicode = string.Empty;
 
                 editorBeatmap.Metadata.Title = "Example Title";
-                editorBeatmap.Metadata.TitleUnicode = null;
+                editorBeatmap.Metadata.TitleUnicode = string.Empty;
             });
 
             createSection();
@@ -44,10 +44,10 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("set metadata", () =>
             {
                 editorBeatmap.Metadata.ArtistUnicode = "＊なみりん";
-                editorBeatmap.Metadata.Artist = null;
+                editorBeatmap.Metadata.Artist = string.Empty;
 
                 editorBeatmap.Metadata.TitleUnicode = "コイシテイク・プラネット";
-                editorBeatmap.Metadata.Title = null;
+                editorBeatmap.Metadata.Title = string.Empty;
             });
 
             createSection();
@@ -86,10 +86,10 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("set metadata", () =>
             {
                 editorBeatmap.Metadata.ArtistUnicode = "＊なみりん";
-                editorBeatmap.Metadata.Artist = null;
+                editorBeatmap.Metadata.Artist = string.Empty;
 
                 editorBeatmap.Metadata.TitleUnicode = "コイシテイク・プラネット";
-                editorBeatmap.Metadata.Title = null;
+                editorBeatmap.Metadata.Title = string.Empty;
             });
 
             createSection();
