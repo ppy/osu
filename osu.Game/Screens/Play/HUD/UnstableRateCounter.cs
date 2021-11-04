@@ -100,14 +100,11 @@ namespace osu.Game.Screens.Play.HUD
 
 
         protected override OsuSpriteText CreateSpriteText()
-            => base.CreateSpriteText().With(s => {
+            => base.CreateSpriteText().With(s =>
+            {
                 s.Font = s.Font.With(size: 12f, fixedWidth: true);
                 s.Alpha = alpha_when_invalid;
             });
-
-
-
-        
 
         protected override void Dispose(bool isDisposing)
         {

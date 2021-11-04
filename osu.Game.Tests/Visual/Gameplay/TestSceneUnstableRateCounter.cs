@@ -46,8 +46,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private double prev;
 
-
-
         public TestSceneUnstableRateCounter()
         {
             Score score = new Score
@@ -57,10 +55,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             gameplayState = new GameplayState(null, null, null, score);
             scoreProcessor.NewJudgement += result => scoreProcessor.PopulateScore(score.ScoreInfo);
         }
-
-
-
-
 
         [SetUpSteps]
         public void SetUp()
@@ -72,7 +66,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestBasic()
         {
             AddStep("Create Display", () => recreateDisplay(new OsuHitWindows(), 5));
-
 
             AddRepeatStep("Set UR to 250ms", () => setUR(25), 20);
 
@@ -133,11 +126,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-
-
-
-
-
         private void newJudgement(double offset = 0, HitResult result = HitResult.Perfect)
         {
             scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = drawableRuleset.HitWindows }, new Judgement())
@@ -158,12 +146,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
             prev = placement;
         }
-
-
-
-
-
-
 
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
         private class TestDrawableRuleset : DrawableRuleset
