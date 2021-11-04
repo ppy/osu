@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestBackgroundNotSet()
         {
-            beatmap.Metadata.BackgroundFile = null;
+            beatmap.Metadata.BackgroundFile = string.Empty;
 
             var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
             var issues = check.Run(context).ToList();

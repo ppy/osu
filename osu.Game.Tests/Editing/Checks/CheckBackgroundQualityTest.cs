@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Editing.Checks
         public void TestMissing()
         {
             // While this is a problem, it is out of scope for this check and is caught by a different one.
-            beatmap.Metadata.BackgroundFile = null;
+            beatmap.Metadata.BackgroundFile = string.Empty;
             var context = getContext(null, System.Array.Empty<byte>());
 
             Assert.That(check.Run(context), Is.Empty);
