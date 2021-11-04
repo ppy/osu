@@ -240,8 +240,8 @@ namespace osu.Game.Stores
                         ArtistUnicode = decoded.Metadata.ArtistUnicode,
                         Author =
                         {
-                            OnlineID = decoded.Metadata.AuthorID,
-                            Username = decoded.Metadata.AuthorString
+                            OnlineID = decoded.Metadata.Author.Id,
+                            Username = decoded.Metadata.Author.Username
                         },
                         Source = decoded.Metadata.Source,
                         Tags = decoded.Metadata.Tags,

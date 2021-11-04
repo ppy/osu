@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Setup
 
                 Empty(),
 
-                creatorTextBox = createTextBox<LabelledTextBox>("Creator", metadata.AuthorString),
+                creatorTextBox = createTextBox<LabelledTextBox>("Creator", metadata.Author.Username),
                 difficultyTextBox = createTextBox<LabelledTextBox>("Difficulty Name", Beatmap.BeatmapInfo.Version),
                 sourceTextBox = createTextBox<LabelledTextBox>("Source", metadata.Source),
                 tagsTextBox = createTextBox<LabelledTextBox>("Tags", metadata.Tags)
