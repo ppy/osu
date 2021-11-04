@@ -33,8 +33,6 @@ namespace osu.Game.Users
 
         public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
-        //public Team Team;
-
         [JsonProperty(@"profile_colour")]
         public string Colour;
 
