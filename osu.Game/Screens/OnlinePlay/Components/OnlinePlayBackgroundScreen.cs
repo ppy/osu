@@ -60,8 +60,10 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             Schedule(() =>
             {
+                var beatmap = playlistItem?.Beatmap.Value;
+
                 string? lastCover = (background?.Beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.Covers.Cover;
-                string? newCover = (background?.Beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.Covers.Cover;
+                string? newCover = (beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.Covers.Cover;
 
                 if (lastCover == newCover)
                     return;
