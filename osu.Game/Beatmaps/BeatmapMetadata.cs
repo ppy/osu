@@ -49,7 +49,7 @@ namespace osu.Game.Beatmaps
         [Column("AuthorID")]
         public int AuthorID
         {
-            get => Author.Id;
+            get => Author.Id; // This should not be used, but is required to make EF work correctly.
             set => Author.Id = value;
         }
 
@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps
         [Column("Author")]
         public string AuthorString
         {
-            get => Author.Username;
+            get => Author.Username; // This should not be used, but is required to make EF work correctly.
             set => Author.Username = value;
         }
 
