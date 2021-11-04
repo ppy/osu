@@ -12,9 +12,9 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
@@ -35,7 +35,7 @@ namespace osu.Game.Online.Chat
         private Bindable<bool> notifyOnUsername;
         private Bindable<bool> notifyOnPrivateMessage;
 
-        private readonly IBindable<User> localUser = new Bindable<User>();
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
         private readonly IBindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         [BackgroundDependencyLoader]

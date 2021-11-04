@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Users;
 using osuTK.Graphics;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -50,7 +51,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     new APIScoreInfo
                     {
-                        User = new User
+                        User = new APIUser
                         {
                             Id = 6602580,
                             Username = @"waaiiru",
@@ -75,7 +76,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     new APIScoreInfo
                     {
-                        User = new User
+                        User = new APIUser
                         {
                             Id = 4608074,
                             Username = @"Skycries",
@@ -99,7 +100,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     new APIScoreInfo
                     {
-                        User = new User
+                        User = new APIUser
                         {
                             Id = 1014222,
                             Username = @"eLy",
@@ -122,7 +123,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     new APIScoreInfo
                     {
-                        User = new User
+                        User = new APIUser
                         {
                             Id = 1541390,
                             Username = @"Toukai",
@@ -144,7 +145,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     new APIScoreInfo
                     {
-                        User = new User
+                        User = new APIUser
                         {
                             Id = 7151382,
                             Username = @"Mayuri Hana",
@@ -167,7 +168,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Score = new APIScoreInfo
                 {
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 7151382,
                         Username = @"Mayuri Hana",
@@ -190,7 +191,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Score = new APIScoreInfo
                 {
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 7151382,
                         Username = @"Mayuri Hana",
@@ -215,7 +216,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     new APIScoreInfo
                     {
-                        User = new User
+                        User = new APIUser
                         {
                             Id = 6602580,
                             Username = @"waaiiru",

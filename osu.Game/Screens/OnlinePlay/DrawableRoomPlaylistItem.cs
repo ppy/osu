@@ -20,6 +20,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.BeatmapListing.Panels;
@@ -27,7 +28,6 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay
             if (!string.IsNullOrEmpty(Item.Beatmap.Value?.Metadata.Author))
             {
                 authorText.AddText("mapped by ");
-                authorText.AddUserLink(new User { Username = Item.Beatmap.Value.Metadata.Author });
+                authorText.AddUserLink(new APIUser { Username = Item.Beatmap.Value.Metadata.Author });
             }
 
             bool hasExplicitContent = (Item.Beatmap.Value.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;

@@ -17,8 +17,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -217,14 +217,14 @@ namespace osu.Game.Overlays.Chat
 
         private class MessageSender : OsuClickableContainer, IHasContextMenu
         {
-            private readonly User sender;
+            private readonly APIUser sender;
 
             private Action startChatAction;
 
             [Resolved]
             private IAPIProvider api { get; set; }
 
-            public MessageSender(User sender)
+            public MessageSender(APIUser sender)
             {
                 this.sender = sender;
             }
@@ -240,7 +240,7 @@ namespace osu.Game.Overlays.Chat
             {
                 get
                 {
-                    if (sender.Equals(User.SYSTEM_USER))
+                    if (sender.Equals(APIUser.SYSTEM_USER))
                         return Array.Empty<MenuItem>();
 
                     List<MenuItem> items = new List<MenuItem>
