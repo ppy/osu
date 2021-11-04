@@ -645,12 +645,19 @@ namespace osu.Game.Online.Multiplayer
 
             RoomUpdated?.Invoke();
 
-            GetOnlineBeatmapSet(settings.BeatmapID, cancellationToken).ContinueWith(set => Schedule(() =>
+            GetOnlineBeatmapSet(settings.BeatmapID, cancellationToken).ContinueWith(task => Schedule(() =>
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                updatePlaylist(settings, set.Result);
+                APIBeatmapSet beatmapSet = task.Result;
+
+                // The incoming response is deserialised without circular reference handling currently.
+                // Because we require using metadata from this instance, populate the nested beatmaps' sets manually here.
+                foreach (var b in beatmapSet.Beatmaps)
+                    b.BeatmapSet = beatmapSet;
+
+                updatePlaylist(settings, beatmapSet);
             }), TaskContinuationOptions.OnlyOnRanToCompletion);
         }, cancellationToken);
 
@@ -664,7 +671,6 @@ namespace osu.Game.Online.Multiplayer
             var beatmap = beatmapSet.Beatmaps.Single(b => b.OnlineID == settings.BeatmapID);
 
             beatmap.Checksum = settings.BeatmapChecksum;
-            beatmap.BeatmapSet = beatmapSet;
 
             var ruleset = Rulesets.GetRuleset(settings.RulesetID).CreateInstance();
             var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
