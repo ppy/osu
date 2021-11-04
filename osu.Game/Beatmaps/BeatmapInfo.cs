@@ -186,7 +186,7 @@ namespace osu.Game.Beatmaps
         string IBeatmapInfo.DifficultyName => Version;
 
         [JsonIgnore]
-        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
+        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata ?? BeatmapSet.Metadata;
 
         [JsonIgnore]
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
