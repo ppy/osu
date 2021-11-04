@@ -119,7 +119,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             authorText.Clear();
 
-            if (Item.Beatmap.Value?.Metadata?.Author != null)
+            if (!string.IsNullOrEmpty(Item.Beatmap.Value?.Metadata.Author))
             {
                 authorText.AddText("mapped by ");
                 authorText.AddUserLink(new User { Username = Item.Beatmap.Value.Metadata.Author });
