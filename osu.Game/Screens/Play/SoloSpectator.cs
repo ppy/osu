@@ -240,13 +240,10 @@ namespace osu.Game.Screens.Play
             if (!automaticDownload.Current.Value)
                 return;
 
-            // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
-            var beatmapSetInfo = new BeatmapSetInfo { OnlineBeatmapSetID = beatmapSet.OnlineID };
-
-            if (beatmaps.IsAvailableLocally(beatmapSetInfo))
+            if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineBeatmapSetID = beatmapSet.OnlineID }))
                 return;
 
-            beatmaps.Download(beatmapSetInfo);
+            beatmaps.Download(beatmapSet);
         }
 
         public override bool OnExiting(IScreen next)
