@@ -384,7 +384,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     statusText.Text = "Currently playing ";
                     beatmapText.AddLink(item.NewValue.Beatmap.Value.GetDisplayTitleRomanisable(),
                         LinkAction.OpenBeatmap,
-                        item.NewValue.Beatmap.Value.OnlineBeatmapID.ToString(),
+                        item.NewValue.Beatmap.Value.OnlineID.ToString(),
                         creationParameters: s =>
                         {
                             s.Truncate = true;
