@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             string filename = GetFilename(context.Beatmap);
 
-            if (filename == null)
+            if (string.IsNullOrEmpty(filename))
             {
                 yield return new IssueTemplateNoneSet(this).Create(TypeOfFile);
 
