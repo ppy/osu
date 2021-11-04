@@ -77,8 +77,8 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                string backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
-                if (backgroundPath == null)
+                string backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile.ToLowerInvariant();
+                if (string.IsNullOrEmpty(backgroundPath))
                     return false;
 
                 return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
