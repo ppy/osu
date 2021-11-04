@@ -1,24 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osuTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Framework.Bindables;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -26,8 +26,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private const int spacing = 15;
 
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        public readonly Bindable<APIBeatmap> Beatmap = new Bindable<APIBeatmap>();
+        private readonly Bindable<IRulesetInfo> ruleset = new Bindable<IRulesetInfo>();
         private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Global);
         private readonly IBindable<User> user = new Bindable<User>();
 
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private CancellationTokenSource loadCancellationSource;
 
-        protected APILegacyScores Scores
+        protected APIScoresCollection Scores
         {
             set => Schedule(() =>
             {
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (value?.Scores.Any() != true)
                     return;
 
-                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, Beatmap.Value.ToBeatmapInfo(rulesets))).ToArray(), loadCancellationSource.Token)
                             .ContinueWith(ordered => Schedule(() =>
                             {
                                 if (loadCancellationSource.IsCancellationRequested)
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 scoreTable.Show();
 
                                 var userScore = value.UserScore;
-                                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets);
+                                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets, Beatmap.Value.ToBeatmapInfo(rulesets));
 
                                 topScoresContainer.Add(new DrawableTopScore(topScore));
 
@@ -200,11 +200,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             user.BindValueChanged(onUserChanged, true);
         }
 
-        private void onBeatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
+        private void onBeatmapChanged(ValueChangedEvent<APIBeatmap> beatmap)
         {
             var beatmapRuleset = beatmap.NewValue?.Ruleset;
 
-            if (ruleset.Value?.Equals(beatmapRuleset) ?? false)
+            if (ruleset.Value?.OnlineID == beatmapRuleset?.OnlineID)
             {
                 modSelector.DeselectAll();
                 ruleset.TriggerChange();
@@ -232,7 +232,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             noScoresPlaceholder.Hide();
 
-            if (Beatmap.Value?.OnlineBeatmapID.HasValue != true || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending)
+            if (Beatmap.Value == null || Beatmap.Value.OnlineID <= 0 || (Beatmap.Value?.BeatmapSet as IBeatmapSetOnlineInfo)?.Status <= BeatmapSetOnlineStatus.Pending)
             {
                 Scores = null;
                 Hide();

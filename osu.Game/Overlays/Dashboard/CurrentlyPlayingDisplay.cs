@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Dashboard
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (var id in e.NewItems.OfType<int>().ToArray())
+                    foreach (int id in e.NewItems.OfType<int>().ToArray())
                     {
                         users.GetUserAsync(id).ContinueWith(u =>
                         {
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Dashboard
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (var u in e.OldItems.OfType<int>())
+                    foreach (int u in e.OldItems.OfType<int>())
                         userFlow.FirstOrDefault(card => card.User.Id == u)?.Expire();
                     break;
 

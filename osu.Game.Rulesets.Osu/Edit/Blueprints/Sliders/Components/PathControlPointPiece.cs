@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             Vector2[] oldControlPoints = slider.Path.ControlPoints.Select(cp => cp.Position).ToArray();
             var oldPosition = slider.Position;
-            var oldStartTime = slider.StartTime;
+            double oldStartTime = slider.StartTime;
 
             if (ControlPoint == slider.Path.ControlPoints[0])
             {
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             if (!slider.Path.HasValidLength)
             {
-                for (var i = 0; i < slider.Path.ControlPoints.Count; i++)
+                for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
                     slider.Path.ControlPoints[i].Position = oldControlPoints[i];
 
                 slider.Position = oldPosition;

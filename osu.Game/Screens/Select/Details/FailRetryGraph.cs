@@ -27,9 +27,9 @@ namespace osu.Game.Screens.Select.Details
 
                 failTimes = value;
 
-                var retries = FailTimes?.Retries ?? Array.Empty<int>();
-                var fails = FailTimes?.Fails ?? Array.Empty<int>();
-                var retriesAndFails = sumRetriesAndFails(retries, fails);
+                int[] retries = FailTimes?.Retries ?? Array.Empty<int>();
+                int[] fails = FailTimes?.Fails ?? Array.Empty<int>();
+                int[] retriesAndFails = sumRetriesAndFails(retries, fails);
 
                 float maxValue = retriesAndFails.Any() ? retriesAndFails.Max() : 0;
                 failGraph.MaxValue = maxValue;
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Select.Details
 
         private int[] sumRetriesAndFails(int[] retries, int[] fails)
         {
-            var result = new int[Math.Max(retries.Length, fails.Length)];
+            int[] result = new int[Math.Max(retries.Length, fails.Length)];
 
             for (int i = 0; i < retries.Length; ++i)
                 result[i] = retries[i];

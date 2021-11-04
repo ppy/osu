@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
-using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -158,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                         if (hasNumber)
                         {
-                            var legacyVersion = skin.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value;
+                            decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
 
                             if (legacyVersion >= 2.0m)
                                 // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.

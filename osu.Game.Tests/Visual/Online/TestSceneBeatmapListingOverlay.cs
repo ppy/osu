@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
 
-            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 10).ToArray()));
+            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
 
             AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
 

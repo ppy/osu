@@ -15,8 +15,8 @@ namespace osu.Game.Overlays.Dashboard.Friends
         {
             Clear();
 
-            var userCount = users.Count;
-            var onlineUsersCount = users.Count(user => user.IsOnline);
+            int userCount = users.Count;
+            int onlineUsersCount = users.Count(user => user.IsOnline);
 
             AddItem(new FriendStream(OnlineStatus.All, userCount));
             AddItem(new FriendStream(OnlineStatus.Online, onlineUsersCount));

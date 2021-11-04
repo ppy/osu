@@ -5,19 +5,19 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapAvailability : Container
     {
-        private BeatmapSetInfo beatmapSet;
+        private APIBeatmapSet beatmapSet;
 
-        private bool downloadDisabled => BeatmapSet?.OnlineInfo.Availability.DownloadDisabled ?? false;
-        private bool hasExternalLink => !string.IsNullOrEmpty(BeatmapSet?.OnlineInfo.Availability.ExternalLink);
+        private bool downloadDisabled => BeatmapSet?.Availability.DownloadDisabled ?? false;
+        private bool hasExternalLink => !string.IsNullOrEmpty(BeatmapSet?.Availability.ExternalLink);
 
         private readonly LinkFlowContainer textContainer;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             get => beatmapSet;
 
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 textContainer.NewParagraph();
                 textContainer.NewParagraph();
-                textContainer.AddLink("Check here for more information.", BeatmapSet.OnlineInfo.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 10));
+                textContainer.AddLink("Check here for more information.", BeatmapSet.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 10));
             }
         }
     }

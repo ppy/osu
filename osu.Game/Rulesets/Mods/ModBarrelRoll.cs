@@ -49,8 +49,8 @@ namespace osu.Game.Rulesets.Mods
             // scale the playfield to allow all hitobjects to stay within the visible region.
 
             var playfieldSize = drawableRuleset.Playfield.DrawSize;
-            var minSide = MathF.Min(playfieldSize.X, playfieldSize.Y);
-            var maxSide = MathF.Max(playfieldSize.X, playfieldSize.Y);
+            float minSide = MathF.Min(playfieldSize.X, playfieldSize.Y);
+            float maxSide = MathF.Max(playfieldSize.X, playfieldSize.Y);
             drawableRuleset.Playfield.Scale = new Vector2(minSide / maxSide);
         }
     }

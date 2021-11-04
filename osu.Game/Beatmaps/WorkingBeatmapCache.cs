@@ -149,7 +149,7 @@ namespace osu.Game.Beatmaps
 
             protected override Texture GetBackground()
             {
-                if (Metadata?.BackgroundFile == null)
+                if (string.IsNullOrEmpty(Metadata?.BackgroundFile))
                     return null;
 
                 try
@@ -165,7 +165,7 @@ namespace osu.Game.Beatmaps
 
             protected override Track GetBeatmapTrack()
             {
-                if (Metadata?.AudioFile == null)
+                if (string.IsNullOrEmpty(Metadata?.AudioFile))
                     return null;
 
                 try
@@ -181,7 +181,7 @@ namespace osu.Game.Beatmaps
 
             protected override Waveform GetWaveform()
             {
-                if (Metadata?.AudioFile == null)
+                if (string.IsNullOrEmpty(Metadata?.AudioFile))
                     return null;
 
                 try
@@ -206,7 +206,7 @@ namespace osu.Game.Beatmaps
                     {
                         var decoder = Decoder.GetDecoder<Storyboard>(stream);
 
-                        var storyboardFilename = BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
+                        string storyboardFilename = BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
 
                         // todo: support loading from both set-wide storyboard *and* beatmap specific.
                         if (string.IsNullOrEmpty(storyboardFilename))

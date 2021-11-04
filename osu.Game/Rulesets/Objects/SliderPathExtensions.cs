@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Objects
 
             PathType? lastType = null;
 
-            for (var i = 0; i < points.Length; i++)
+            for (int i = 0; i < points.Length; i++)
             {
                 var p = points[i];
                 p.Position -= positionalOffset;

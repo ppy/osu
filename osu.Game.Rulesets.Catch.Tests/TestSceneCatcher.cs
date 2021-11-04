@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestCatcherCatchWidth()
         {
-            var halfWidth = Catcher.CalculateCatchWidth(new BeatmapDifficulty { CircleSize = 0 }) / 2;
+            float halfWidth = Catcher.CalculateCatchWidth(new BeatmapDifficulty { CircleSize = 0 }) / 2;
             AddStep("catch fruit", () =>
             {
                 attemptCatch(new Fruit { X = -halfWidth + 1 });
@@ -237,7 +237,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void attemptCatch(Func<CatchHitObject> hitObject, int count)
         {
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
                 attemptCatch(hitObject(), out _, out _);
         }
 

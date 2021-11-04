@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Menu
             else
             {
                 const int quick_appear = 350;
-                var initialMovementTime = logo.Alpha > 0.2f ? quick_appear : 0;
+                int initialMovementTime = logo.Alpha > 0.2f ? quick_appear : 0;
 
                 logo.MoveTo(new Vector2(0.5f), initialMovementTime, Easing.OutQuint);
 

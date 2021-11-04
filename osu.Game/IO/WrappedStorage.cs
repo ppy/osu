@@ -60,7 +60,7 @@ namespace osu.Game.IO
         {
             string localRoot = GetFullPath(string.Empty);
 
-            foreach (var path in paths)
+            foreach (string path in paths)
                 yield return Path.GetRelativePath(localRoot, UnderlyingStorage.GetFullPath(path));
         }
 
