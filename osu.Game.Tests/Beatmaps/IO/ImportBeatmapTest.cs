@@ -846,6 +846,42 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
+        // TODO: needs to be pulled across to realm implementation when this file is nuked.
+        [Test]
+        public void TestSaveRemovesInvalidCharactersFromPath()
+        {
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
+
+                    var beatmap = working.Beatmap;
+
+                    beatmap.BeatmapInfo.Version = "difficulty";
+                    beatmap.BeatmapInfo.Metadata = new BeatmapMetadata
+                    {
+                        Artist = "Artist/With\\Slashes",
+                        Title = "Title",
+                        AuthorString = "mapper",
+                    };
+
+                    manager.Save(beatmap.BeatmapInfo, working.Beatmap);
+
+                    Assert.AreEqual("Artist_With_Slashes - Title (mapper) [difficulty].osu", beatmap.BeatmapInfo.Path);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         [Test]
         public void TestCreateNewEmptyBeatmap()
         {
