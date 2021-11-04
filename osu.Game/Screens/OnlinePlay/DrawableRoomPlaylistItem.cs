@@ -27,6 +27,7 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay
         private ExplicitContentBeatmapPill explicitContentPill;
         private ModDisplay modDisplay;
 
-        private readonly Bindable<BeatmapInfo> beatmap = new Bindable<BeatmapInfo>();
+        private readonly Bindable<IBeatmapInfo> beatmap = new Bindable<IBeatmapInfo>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
 
@@ -96,6 +97,7 @@ namespace osu.Game.Screens.OnlinePlay
         }
 
         private ScheduledDelegate scheduledRefresh;
+        private PanelBackground panelBackground;
 
         private void scheduleRefresh()
         {
@@ -105,23 +107,25 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void refresh()
         {
-            difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(32) };
+            difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(32) };
+
+            panelBackground.Beatmap.Value = Item.Beatmap.Value;
 
             beatmapText.Clear();
-            beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString(), null, text =>
+            beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineID.ToString(), null, text =>
             {
                 text.Truncate = true;
             });
 
             authorText.Clear();
 
-            if (Item.Beatmap?.Value?.Metadata?.Author != null)
+            if (!string.IsNullOrEmpty(Item.Beatmap.Value?.Metadata.Author))
             {
                 authorText.AddText("mapped by ");
-                authorText.AddUserLink(Item.Beatmap.Value?.Metadata.Author);
+                authorText.AddUserLink(new User { Username = Item.Beatmap.Value.Metadata.Author });
             }
 
-            bool hasExplicitContent = Item.Beatmap.Value.BeatmapSet.OnlineInfo?.HasExplicitContent == true;
+            bool hasExplicitContent = (Item.Beatmap.Value.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
             explicitContentPill.Alpha = hasExplicitContent ? 1 : 0;
 
             modDisplay.Current.Value = requiredMods.ToArray();
@@ -145,10 +149,9 @@ namespace osu.Game.Screens.OnlinePlay
                         Alpha = 0,
                         AlwaysPresent = true
                     },
-                    new PanelBackground
+                    panelBackground = new PanelBackground
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Beatmap = { BindTarget = beatmap }
                     },
                     new GridContainer
                     {
@@ -337,7 +340,7 @@ namespace osu.Game.Screens.OnlinePlay
         // For now, this is the same implementation as in PanelBackground, but supports a beatmap info rather than a working beatmap
         private class PanelBackground : Container // todo: should be a buffered container (https://github.com/ppy/osu-framework/issues/3222)
         {
-            public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+            public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
 
             public PanelBackground()
             {
