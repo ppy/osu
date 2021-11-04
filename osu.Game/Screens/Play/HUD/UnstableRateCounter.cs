@@ -76,7 +76,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onJudgementChanged(JudgementResult judgement)
         {
-
             if (gameplayState == null)
             {
                 isValid = false;
@@ -98,7 +97,6 @@ namespace osu.Game.Screens.Play.HUD
             return count.ToLocalisableString("0.00 UR");
         }
 
-
         protected override OsuSpriteText CreateSpriteText()
             => base.CreateSpriteText().With(s =>
             {
@@ -115,7 +113,5 @@ namespace osu.Game.Screens.Play.HUD
 
             loadCancellationSource?.Cancel();
         }
-
-
     }
 }

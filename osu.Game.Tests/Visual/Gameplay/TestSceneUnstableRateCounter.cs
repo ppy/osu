@@ -40,7 +40,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(GameplayState))]
         private GameplayState gameplayState;
 
-
         [Cached(typeof(DrawableRuleset))]
         private TestDrawableRuleset drawableRuleset = new TestDrawableRuleset();
 
@@ -137,7 +136,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void setUR(double UR = 0, HitResult result = HitResult.Perfect)
         {
-
             double placement = prev > 0 ? -UR : UR;
             scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = drawableRuleset.HitWindows }, new Judgement())
             {
