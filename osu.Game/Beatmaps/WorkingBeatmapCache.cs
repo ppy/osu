@@ -165,7 +165,7 @@ namespace osu.Game.Beatmaps
 
             protected override Track GetBeatmapTrack()
             {
-                if (Metadata?.AudioFile == null)
+                if (string.IsNullOrEmpty(Metadata?.AudioFile))
                     return null;
 
                 try
@@ -181,7 +181,7 @@ namespace osu.Game.Beatmaps
 
             protected override Waveform GetWaveform()
             {
-                if (Metadata?.AudioFile == null)
+                if (string.IsNullOrEmpty(Metadata?.AudioFile))
                     return null;
 
                 try
