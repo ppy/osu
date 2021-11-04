@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (selectionPerformed)
             {
                 // only unmodified right click should show context menu
-                var shouldShowContextMenu = e.Button == MouseButton.Right && !e.ShiftPressed && !e.AltPressed && !e.SuperPressed;
+                bool shouldShowContextMenu = e.Button == MouseButton.Right && !e.ShiftPressed && !e.AltPressed && !e.SuperPressed;
 
                 // stop propagation if not showing context menu
                 return !shouldShowContextMenu;
