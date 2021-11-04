@@ -258,10 +258,10 @@ namespace osu.Game.Beatmaps
                 OnlineBeatmapSetID = model.OnlineID,
                 Metadata = new BeatmapMetadata
                 {
-                    Title = model.Metadata?.Title,
-                    Artist = model.Metadata?.Artist,
-                    TitleUnicode = model.Metadata?.TitleUnicode,
-                    ArtistUnicode = model.Metadata?.ArtistUnicode,
+                    Title = model.Metadata?.Title ?? string.Empty,
+                    Artist = model.Metadata?.Artist ?? string.Empty,
+                    TitleUnicode = model.Metadata?.TitleUnicode ?? string.Empty,
+                    ArtistUnicode = model.Metadata?.ArtistUnicode ?? string.Empty,
                     Author = new User { Username = model.Metadata?.Author },
                 }
             }, minimiseDownloadSize);
