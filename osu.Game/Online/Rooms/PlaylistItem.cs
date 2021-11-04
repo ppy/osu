@@ -69,7 +69,7 @@ namespace osu.Game.Online.Rooms
             Ruleset.BindValueChanged(ruleset => RulesetID = ruleset.NewValue?.ID ?? 0);
         }
 
-        public void MapObjects(BeatmapManager beatmaps, RulesetStore rulesets)
+        public void MapObjects(RulesetStore rulesets)
         {
             Beatmap.Value ??= APIBeatmap;
             Ruleset.Value ??= rulesets.GetRuleset(RulesetID);
