@@ -23,9 +23,9 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.37" />
     <PackageReference Include="Humanizer" Version="2.11.10" />
     <PackageReference Include="MessagePack" Version="2.3.85" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="5.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="5.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
@@ -36,10 +36,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Realm" Version="10.6.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2021.1026.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.1103.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2021.1026.0" />
-    <PackageReference Include="Sentry" Version="3.9.4" />
-    <PackageReference Include="SharpCompress" Version="0.29.0" />
+    <PackageReference Include="Sentry" Version="3.10.0" />
+    <PackageReference Include="SharpCompress" Version="0.30.0" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="TagLibSharp" Version="2.2.0" />

@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -54,6 +55,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     ApproachRate = 3.5f,
                 },
                 StarDifficulty = 5.3f,
+                Ruleset = new OsuRuleset().RulesetInfo,
                 OnlineInfo = new APIBeatmap
                 {
                     FailTimes = new APIFailTimes
@@ -90,6 +92,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     ApproachRate = 3.5f,
                 },
                 StarDifficulty = 5.3f,
+                Ruleset = new OsuRuleset().RulesetInfo,
                 OnlineInfo = new APIBeatmap
                 {
                     FailTimes = new APIFailTimes
@@ -119,6 +122,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Source = "osu!",
                     Tags = "this beatmap has ratings metrics but not retries or fails",
                 },
+                Ruleset = new OsuRuleset().RulesetInfo,
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     CircleSize = 6,
@@ -148,6 +152,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     OverallDifficulty = 6,
                     ApproachRate = 7,
                 },
+                Ruleset = new OsuRuleset().RulesetInfo,
                 StarDifficulty = 2.91f,
                 OnlineInfo = new APIBeatmap
                 {
@@ -171,6 +176,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Source = "osu!",
                     Tags = "this beatmap has no metrics",
                 },
+                Ruleset = new OsuRuleset().RulesetInfo,
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     CircleSize = 5,
@@ -194,6 +200,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("online ratings/retries/fails", () => details.BeatmapInfo = new BeatmapInfo
             {
                 OnlineBeatmapID = 162,
+                Ruleset = new OsuRuleset().RulesetInfo
             });
             AddStep("set online", () => api.SetState(APIState.Online));
             AddStep("set offline", () => api.SetState(APIState.Offline));

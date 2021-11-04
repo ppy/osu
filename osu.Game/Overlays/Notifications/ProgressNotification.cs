@@ -4,11 +4,16 @@
 using System;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
@@ -16,7 +21,9 @@ namespace osu.Game.Overlays.Notifications
 {
     public class ProgressNotification : Notification, IHasCompletionTarget
     {
-        public string Text
+        private const float loading_spinner_size = 22;
+
+        public LocalisableString Text
         {
             set => Schedule(() => textDrawable.Text = value);
         }
@@ -65,22 +72,45 @@ namespace osu.Game.Overlays.Notifications
 
         private void updateState()
         {
+            const double colour_fade_duration = 200;
+
             switch (state)
             {
                 case ProgressNotificationState.Queued:
                     Light.Colour = colourQueued;
                     Light.Pulsate = false;
                     progressBar.Active = false;
+
+                    iconBackground.FadeColour(ColourInfo.GradientVertical(colourQueued, colourQueued.Lighten(0.5f)), colour_fade_duration);
+                    loadingSpinner.Show();
                     break;
 
                 case ProgressNotificationState.Active:
                     Light.Colour = colourActive;
                     Light.Pulsate = true;
                     progressBar.Active = true;
+
+                    iconBackground.FadeColour(ColourInfo.GradientVertical(colourActive, colourActive.Lighten(0.5f)), colour_fade_duration);
+                    loadingSpinner.Show();
                     break;
 
                 case ProgressNotificationState.Cancelled:
                     cancellationTokenSource.Cancel();
+
+                    iconBackground.FadeColour(ColourInfo.GradientVertical(Color4.Gray, Color4.Gray.Lighten(0.5f)), colour_fade_duration);
+                    loadingSpinner.Hide();
+
+                    var icon = new SpriteIcon
+                    {
+                        Icon = FontAwesome.Solid.Ban,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(loading_spinner_size),
+                    };
+
+                    IconContent.Add(icon);
+
+                    icon.FadeInFromZero(200, Easing.OutQuint);
 
                     Light.Colour = colourCancelled;
                     Light.Pulsate = false;
@@ -88,6 +118,7 @@ namespace osu.Game.Overlays.Notifications
                     break;
 
                 case ProgressNotificationState.Completed:
+                    loadingSpinner.Hide();
                     NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
                     this.FadeOut(200).Finally(d => Completed());
                     break;
@@ -115,15 +146,13 @@ namespace osu.Game.Overlays.Notifications
         private Color4 colourActive;
         private Color4 colourCancelled;
 
+        private Box iconBackground;
+        private LoadingSpinner loadingSpinner;
+
         private readonly TextFlowContainer textDrawable;
 
         public ProgressNotification()
         {
-            IconContent.Add(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-            });
-
             Content.Add(textDrawable = new OsuTextFlowContainer
             {
                 Colour = OsuColour.Gray(128),
@@ -138,6 +167,9 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.X,
             });
 
+            // make some extra space for the progress bar.
+            IconContent.Margin = new MarginPadding { Bottom = 5 };
+
             State = ProgressNotificationState.Queued;
 
             // don't close on click by default.
@@ -150,6 +182,19 @@ namespace osu.Game.Overlays.Notifications
             colourQueued = colours.YellowDark;
             colourActive = colours.Blue;
             colourCancelled = colours.Red;
+
+            IconContent.AddRange(new Drawable[]
+            {
+                iconBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                },
+                loadingSpinner = new LoadingSpinner
+                {
+                    Size = new Vector2(loading_spinner_size),
+                }
+            });
         }
 
         public override void Close()

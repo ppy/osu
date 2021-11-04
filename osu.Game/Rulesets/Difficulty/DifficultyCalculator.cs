@@ -58,6 +58,11 @@ namespace osu.Game.Rulesets.Difficulty
             return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
         }
 
+        /// <summary>
+        /// Calculates the difficulty of the beatmap and returns a set of <see cref="TimedDifficultyAttributes"/> representing the difficulty at every relevant time value in the beatmap.
+        /// </summary>
+        /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <returns>The set of <see cref="TimedDifficultyAttributes"/>.</returns>
         public List<TimedDifficultyAttributes> CalculateTimed(params Mod[] mods)
         {
             preProcess(mods);
@@ -77,7 +82,7 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                     skill.ProcessInternal(hitObject);
 
-                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
 
             return attribs;
@@ -158,7 +163,7 @@ namespace osu.Game.Rulesets.Difficulty
                 // Apply the rest of the remaining mods recursively.
                 for (int i = 0; i < remainingMods.Length; i++)
                 {
-                    var (nextSet, nextCount) = flatten(remainingMods.Span[i]);
+                    (var nextSet, int nextCount) = flatten(remainingMods.Span[i]);
 
                     // Check if any mods in the next set are incompatible with any of the current set.
                     if (currentSet.SelectMany(m => m.IncompatibleMods).Any(c => nextSet.Any(c.IsInstanceOfType)))
@@ -185,7 +190,7 @@ namespace osu.Game.Rulesets.Difficulty
 
                 foreach (var nested in multi.Mods)
                 {
-                    var (nestedSet, nestedCount) = flatten(nested);
+                    (var nestedSet, int nestedCount) = flatten(nested);
                     set = set.Concat(nestedSet);
                     count += nestedCount;
                 }

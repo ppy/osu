@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select.Carousel
                     return string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.Author:
-                    return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
+                    return string.Compare(BeatmapSet.Metadata.Author?.Username, otherSet.BeatmapSet.Metadata.Author?.Username, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.Source:
                     return string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
@@ -95,8 +95,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private int compareUsingAggregateMax(CarouselBeatmapSet other, Func<BeatmapInfo, double> func)
         {
-            var ourBeatmaps = ValidBeatmaps.Any();
-            var otherBeatmaps = other.ValidBeatmaps.Any();
+            bool ourBeatmaps = ValidBeatmaps.Any();
+            bool otherBeatmaps = other.ValidBeatmaps.Any();
 
             if (!ourBeatmaps && !otherBeatmaps) return 0;
             if (!ourBeatmaps) return -1;

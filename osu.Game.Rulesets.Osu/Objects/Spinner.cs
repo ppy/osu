@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -30,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// Number of spins available to give bonus, beyond <see cref="SpinsRequired"/>.
         /// </summary>
         public int MaximumBonusSpins { get; protected set; } = 1;
+
+        public override Vector2 StackOffset => Vector2.Zero;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {

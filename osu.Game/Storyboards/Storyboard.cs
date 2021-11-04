@@ -77,8 +77,8 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                var backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
-                if (backgroundPath == null)
+                string backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile.ToLowerInvariant();
+                if (string.IsNullOrEmpty(backgroundPath))
                     return false;
 
                 return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
@@ -91,7 +91,7 @@ namespace osu.Game.Storyboards
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
         {
             Drawable drawable = null;
-            var storyboardPath = BeatmapInfo.BeatmapSet?.Files.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            string storyboardPath = BeatmapInfo.BeatmapSet?.Files.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
             if (storyboardPath != null)
                 drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };

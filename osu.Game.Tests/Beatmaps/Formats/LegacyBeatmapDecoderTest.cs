@@ -673,6 +673,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(first.ControlPoints[1].Position, Is.EqualTo(new Vector2(161, -244)));
                 Assert.That(first.ControlPoints[1].Type, Is.EqualTo(null));
 
+                // ReSharper disable once HeuristicUnreachableCode
+                // weird one, see https://youtrack.jetbrains.com/issue/RIDER-70159.
                 Assert.That(first.ControlPoints[2].Position, Is.EqualTo(new Vector2(376, -3)));
                 Assert.That(first.ControlPoints[2].Type, Is.EqualTo(PathType.Bezier));
                 Assert.That(first.ControlPoints[3].Position, Is.EqualTo(new Vector2(68, 15)));

@@ -287,7 +287,7 @@ namespace osu.Game.Screens.Ranking
                 detachedPanelContainer.Add(expandedPanel);
 
                 // Move into its original location in the local container first, then to the final location.
-                var origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos).X;
+                float origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos).X;
                 expandedPanel.MoveToX(origLocation)
                              .Then()
                              .MoveToX(StatisticsPanel.SIDE_PADDING, 150, Easing.OutQuint);

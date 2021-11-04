@@ -189,7 +189,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestCriteriaMatchingArtistWithNullUnicodeName(string artistName, bool filtered)
         {
             var exampleBeatmapInfo = getExampleBeatmap();
-            exampleBeatmapInfo.Metadata.ArtistUnicode = null;
+            exampleBeatmapInfo.Metadata.ArtistUnicode = string.Empty;
 
             var criteria = new FilterCriteria
             {

@@ -7,11 +7,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -57,40 +56,26 @@ namespace osu.Game.Graphics.Containers
             AddText(text.Substring(previousLinkEnd));
         }
 
-        public void AddLink(string text, string url, Action<SpriteText> creationParameters = null) =>
-            createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.External, url), url);
+        public void AddLink(LocalisableString text, string url, Action<SpriteText> creationParameters = null) =>
+            createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.External, url), url);
 
-        public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.Custom, string.Empty), tooltipText, action);
-
-        public void AddLink(string text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), new LinkDetails(action, argument), tooltipText);
+        public void AddLink(LocalisableString text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
+            => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.Custom, string.Empty), tooltipText, action);
 
         public void AddLink(LocalisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
-        {
-            var spriteText = new OsuSpriteText { Text = text };
-
-            AddText(spriteText, creationParameters);
-            createLink(spriteText.Yield(), new LinkDetails(action, argument), tooltipText);
-        }
+            => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(action, argument), tooltipText);
 
         public void AddLink(IEnumerable<SpriteText> text, LinkAction action, string linkArgument, string tooltipText = null)
         {
-            foreach (var t in text)
-                AddArbitraryDrawable(t);
-
-            createLink(text, new LinkDetails(action, linkArgument), tooltipText);
+            createLink(new TextPartManual(text), new LinkDetails(action, linkArgument), tooltipText);
         }
 
         public void AddUserLink(User user, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "view profile");
+            => createLink(CreateChunkFor(user.Username, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "view profile");
 
-        private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
+        private void createLink(ITextPart textPart, LinkDetails link, LocalisableString tooltipText, Action action = null)
         {
-            var linkCompiler = CreateLinkCompiler(drawables.OfType<SpriteText>());
-            linkCompiler.RelativeSizeAxes = Axes.Both;
-            linkCompiler.TooltipText = tooltipText;
-            linkCompiler.Action = () =>
+            Action onClickAction = () =>
             {
                 if (action != null)
                     action();
@@ -101,10 +86,41 @@ namespace osu.Game.Graphics.Containers
                     host.OpenUrlExternally(link.Argument);
             };
 
-            AddInternal(linkCompiler);
+            AddPart(new TextLink(textPart, tooltipText, onClickAction));
         }
 
-        protected virtual DrawableLinkCompiler CreateLinkCompiler(IEnumerable<SpriteText> parts) => new DrawableLinkCompiler(parts);
+        private class TextLink : TextPart
+        {
+            private readonly ITextPart innerPart;
+            private readonly LocalisableString tooltipText;
+            private readonly Action action;
+
+            public TextLink(ITextPart innerPart, LocalisableString tooltipText, Action action)
+            {
+                this.innerPart = innerPart;
+                this.tooltipText = tooltipText;
+                this.action = action;
+            }
+
+            protected override IEnumerable<Drawable> CreateDrawablesFor(TextFlowContainer textFlowContainer)
+            {
+                var linkFlowContainer = (LinkFlowContainer)textFlowContainer;
+
+                innerPart.RecreateDrawablesFor(linkFlowContainer);
+                var drawables = innerPart.Drawables.ToList();
+
+                drawables.Add(linkFlowContainer.CreateLinkCompiler(innerPart).With(c =>
+                {
+                    c.RelativeSizeAxes = Axes.Both;
+                    c.TooltipText = tooltipText;
+                    c.Action = action;
+                }));
+
+                return drawables;
+            }
+        }
+
+        protected virtual DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new DrawableLinkCompiler(textPart);
 
         // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
         // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for the compilers to be relative size in the flow's auto-size axes - an unsupported operation.

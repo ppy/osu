@@ -88,7 +88,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
         /// <returns>A bindable that is updated to contain the star difficulty when it becomes available. Will be null while in an initial calculating state (but not during updates to ruleset and mods if a stale value is already propagated).</returns>
-        public IBindable<StarDifficulty?> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
+        public IBindable<StarDifficulty?> GetBindableDifficulty([NotNull] IBeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
         {
             var bindable = createBindable(beatmapInfo, currentRuleset.Value, currentMods.Value, cancellationToken);
 
@@ -99,42 +99,45 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> with a given <see cref="RulesetInfo"/> and <see cref="Mod"/> combination.
+        /// Retrieves a bindable containing the star difficulty of a <see cref="IBeatmapInfo"/> with a given <see cref="RulesetInfo"/> and <see cref="Mod"/> combination.
         /// </summary>
         /// <remarks>
         /// The bindable will not update to follow the currently-selected ruleset and mods or its settings.
         /// </remarks>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
-        /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to get the difficulty with. If <c>null</c>, the <paramref name="beatmapInfo"/>'s ruleset is used.</param>
+        /// <param name="beatmapInfo">The <see cref="IBeatmapInfo"/> to get the difficulty of.</param>
+        /// <param name="rulesetInfo">The <see cref="IRulesetInfo"/> to get the difficulty with. If <c>null</c>, the <paramref name="beatmapInfo"/>'s ruleset is used.</param>
         /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with. If <c>null</c>, no mods will be assumed.</param>
-        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
+        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="IBeatmapInfo"/>.</param>
         /// <returns>A bindable that is updated to contain the star difficulty when it becomes available. Will be null while in an initial calculating state.</returns>
-        public IBindable<StarDifficulty?> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods,
+        public IBindable<StarDifficulty?> GetBindableDifficulty([NotNull] IBeatmapInfo beatmapInfo, [CanBeNull] IRulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods,
                                                                 CancellationToken cancellationToken = default)
             => createBindable(beatmapInfo, rulesetInfo, mods, cancellationToken);
 
         /// <summary>
-        /// Retrieves the difficulty of a <see cref="BeatmapInfo"/>.
+        /// Retrieves the difficulty of a <see cref="IBeatmapInfo"/>.
         /// </summary>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
-        /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to get the difficulty with.</param>
+        /// <param name="beatmapInfo">The <see cref="IBeatmapInfo"/> to get the difficulty of.</param>
+        /// <param name="rulesetInfo">The <see cref="IRulesetInfo"/> to get the difficulty with.</param>
         /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops computing the star difficulty.</param>
         /// <returns>The <see cref="StarDifficulty"/>.</returns>
-        public virtual Task<StarDifficulty> GetDifficultyAsync([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null,
+        public virtual Task<StarDifficulty> GetDifficultyAsync([NotNull] IBeatmapInfo beatmapInfo, [CanBeNull] IRulesetInfo rulesetInfo = null,
                                                                [CanBeNull] IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
         {
             // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
             rulesetInfo ??= beatmapInfo.Ruleset;
 
+            var localBeatmapInfo = beatmapInfo as BeatmapInfo;
+            var localRulesetInfo = rulesetInfo as RulesetInfo;
+
             // Difficulty can only be computed if the beatmap and ruleset are locally available.
-            if (beatmapInfo.ID == 0 || rulesetInfo.ID == null)
+            if (localBeatmapInfo == null || localBeatmapInfo.ID == 0 || localRulesetInfo == null)
             {
                 // If not, fall back to the existing star difficulty (e.g. from an online source).
-                return Task.FromResult(new StarDifficulty(beatmapInfo.StarDifficulty, beatmapInfo.MaxCombo ?? 0));
+                return Task.FromResult(new StarDifficulty(beatmapInfo.StarRating, (beatmapInfo as IBeatmapOnlineInfo)?.MaxCombo ?? 0));
             }
 
-            return GetAsync(new DifficultyCacheLookup(beatmapInfo, rulesetInfo, mods), cancellationToken);
+            return GetAsync(new DifficultyCacheLookup(localBeatmapInfo, localRulesetInfo, mods), cancellationToken);
         }
 
         protected override Task<StarDifficulty> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken token = default)
@@ -227,12 +230,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Creates a new <see cref="BindableStarDifficulty"/> and triggers an initial value update.
         /// </summary>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> that star difficulty should correspond to.</param>
-        /// <param name="initialRulesetInfo">The initial <see cref="RulesetInfo"/> to get the difficulty with.</param>
+        /// <param name="beatmapInfo">The <see cref="IBeatmapInfo"/> that star difficulty should correspond to.</param>
+        /// <param name="initialRulesetInfo">The initial <see cref="IRulesetInfo"/> to get the difficulty with.</param>
         /// <param name="initialMods">The initial <see cref="Mod"/>s to get the difficulty with.</param>
-        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
+        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="IBeatmapInfo"/>.</param>
         /// <returns>The <see cref="BindableStarDifficulty"/>.</returns>
-        private BindableStarDifficulty createBindable([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo initialRulesetInfo, [CanBeNull] IEnumerable<Mod> initialMods,
+        private BindableStarDifficulty createBindable([NotNull] IBeatmapInfo beatmapInfo, [CanBeNull] IRulesetInfo initialRulesetInfo, [CanBeNull] IEnumerable<Mod> initialMods,
                                                       CancellationToken cancellationToken)
         {
             var bindable = new BindableStarDifficulty(beatmapInfo, cancellationToken);
@@ -244,12 +247,12 @@ namespace osu.Game.Beatmaps
         /// Updates the value of a <see cref="BindableStarDifficulty"/> with a given ruleset + mods.
         /// </summary>
         /// <param name="bindable">The <see cref="BindableStarDifficulty"/> to update.</param>
-        /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to update with.</param>
+        /// <param name="rulesetInfo">The <see cref="IRulesetInfo"/> to update with.</param>
         /// <param name="mods">The <see cref="Mod"/>s to update with.</param>
         /// <param name="cancellationToken">A token that may be used to cancel this update.</param>
-        private void updateBindable([NotNull] BindableStarDifficulty bindable, [CanBeNull] RulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
+        private void updateBindable([NotNull] BindableStarDifficulty bindable, [CanBeNull] IRulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
-            // GetDifficultyAsync will fall back to existing data from BeatmapInfo if not locally available
+            // GetDifficultyAsync will fall back to existing data from IBeatmapInfo if not locally available
             // (contrary to GetAsync)
             GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, mods, cancellationToken)
                 .ContinueWith(t =>
@@ -343,10 +346,10 @@ namespace osu.Game.Beatmaps
 
         private class BindableStarDifficulty : Bindable<StarDifficulty?>
         {
-            public readonly BeatmapInfo BeatmapInfo;
+            public readonly IBeatmapInfo BeatmapInfo;
             public readonly CancellationToken CancellationToken;
 
-            public BindableStarDifficulty(BeatmapInfo beatmapInfo, CancellationToken cancellationToken)
+            public BindableStarDifficulty(IBeatmapInfo beatmapInfo, CancellationToken cancellationToken)
             {
                 BeatmapInfo = beatmapInfo;
                 CancellationToken = cancellationToken;
