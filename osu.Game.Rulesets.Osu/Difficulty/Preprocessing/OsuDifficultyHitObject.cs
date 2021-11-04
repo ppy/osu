@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
@@ -108,6 +109,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                     if (currSliderObj is SliderEndCircle && !(currSliderObj is SliderRepeat))
                     {
+                        // Calculated above/
+                        Debug.Assert(lastSlider.LazyEndPosition != null);
+
                         Vector2 lazySlider = Vector2.Subtract((Vector2)lastSlider.LazyEndPosition, currSliderPosition);
                         if (lazySlider.Length < currSlider.Length)
                             currSlider = lazySlider; // Take the least distance from slider end vs lazy end.
