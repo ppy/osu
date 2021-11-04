@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Totally. Delete it.",
-                    Action = () => manager.Delete(beatmap),
+                    Action = () => manager?.Delete(beatmap),
                 },
                 new PopupDialogCancelButton
                 {
