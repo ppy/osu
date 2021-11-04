@@ -17,6 +17,7 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
@@ -653,15 +654,17 @@ namespace osu.Game.Online.Multiplayer
             }), TaskContinuationOptions.OnlyOnRanToCompletion);
         }, cancellationToken);
 
-        private void updatePlaylist(MultiplayerRoomSettings settings, BeatmapSetInfo beatmapSet)
+        private void updatePlaylist(MultiplayerRoomSettings settings, APIBeatmapSet beatmapSet)
         {
             if (Room == null || !Room.Settings.Equals(settings))
                 return;
 
             Debug.Assert(APIRoom != null);
 
-            var beatmap = beatmapSet.Beatmaps.Single(b => b.OnlineBeatmapID == settings.BeatmapID);
-            beatmap.MD5Hash = settings.BeatmapChecksum;
+            var beatmap = beatmapSet.Beatmaps.Single(b => b.OnlineID == settings.BeatmapID);
+
+            beatmap.Checksum = settings.BeatmapChecksum;
+            beatmap.BeatmapSet = beatmapSet;
 
             var ruleset = Rulesets.GetRuleset(settings.RulesetID).CreateInstance();
             var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
@@ -694,12 +697,12 @@ namespace osu.Game.Online.Multiplayer
         }
 
         /// <summary>
-        /// Retrieves a <see cref="BeatmapSetInfo"/> from an online source.
+        /// Retrieves a <see cref="APIBeatmapSet"/> from an online source.
         /// </summary>
         /// <param name="beatmapId">The beatmap set ID.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
-        /// <returns>The <see cref="BeatmapSetInfo"/> retrieval task.</returns>
-        protected abstract Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
+        /// <returns>The <see cref="APIBeatmapSet"/> retrieval task.</returns>
+        protected abstract Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.
