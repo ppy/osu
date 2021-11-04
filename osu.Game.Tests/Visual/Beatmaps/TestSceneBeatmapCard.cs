@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             HasVideo = true,
             HasStoryboard = true,
             Covers = new BeatmapSetOnlineCovers(),
-            Beatmaps = new List<APIBeatmap>
+            Beatmaps = new[]
             {
                 new APIBeatmap
                 {
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 HasVideo = true,
                 HasStoryboard = true,
                 Covers = new BeatmapSetOnlineCovers(),
-                Beatmaps = beatmaps,
+                Beatmaps = beatmaps.ToArray(),
             };
         }
 

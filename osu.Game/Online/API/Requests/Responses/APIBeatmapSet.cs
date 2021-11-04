@@ -119,7 +119,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public string Tags { get; set; } = string.Empty;
 
         [JsonProperty(@"beatmaps")]
-        public IEnumerable<APIBeatmap> Beatmaps { get; set; } = Array.Empty<APIBeatmap>();
+        public APIBeatmap[] Beatmaps { get; set; } = Array.Empty<APIBeatmap>();
 
         public virtual BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
         {
@@ -128,7 +128,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineBeatmapSetID = OnlineID,
                 Metadata = metadata,
                 Status = Status,
-                OnlineInfo = this
             };
 
             beatmapSet.Beatmaps = Beatmaps.Select(b =>

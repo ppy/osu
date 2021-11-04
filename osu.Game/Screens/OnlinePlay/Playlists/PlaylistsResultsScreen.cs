@@ -169,7 +169,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
         private void performSuccessCallback([NotNull] Action<IEnumerable<ScoreInfo>> callback, [NotNull] List<MultiplayerScore> scores, [CanBeNull] MultiplayerScores pivot = null)
         {
-            var scoreInfos = scores.Select(s => s.CreateScoreInfo(playlistItem)).ToArray();
+            var scoreInfos = scores.Select(s => s.CreateScoreInfo(playlistItem, Beatmap.Value.BeatmapInfo)).ToArray();
 
             // Score panels calculate total score before displaying, which can take some time. In order to count that calculation as part of the loading spinner display duration,
             // calculate the total scores locally before invoking the success callback.

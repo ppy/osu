@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -223,11 +224,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestDownloadButtonVisibleInitiallyWhenBeatmapDoesNotExist()
         {
-            var byOnlineId = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            byOnlineId.BeatmapSet.OnlineBeatmapSetID = 1337; // Some random ID that does not exist locally.
+            var byOnlineId = CreateAPIBeatmap();
+            byOnlineId.OnlineID = 1337; // Some random ID that does not exist locally.
 
-            var byChecksum = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            byChecksum.MD5Hash = "1337"; // Some random checksum that does not exist locally.
+            var byChecksum = CreateAPIBeatmap();
+            byChecksum.Checksum = "1337"; // Some random checksum that does not exist locally.
 
             createPlaylist(byOnlineId, byChecksum);
 
@@ -237,8 +238,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestExplicitBeatmapItem()
         {
-            var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            beatmap.BeatmapSet.OnlineInfo.HasExplicitContent = true;
+            var beatmap = CreateAPIBeatmap();
+
+            Debug.Assert(beatmap.BeatmapSet != null);
+
+            beatmap.BeatmapSet.HasExplicitContent = true;
 
             createPlaylist(beatmap);
         }
@@ -310,7 +314,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
         }
 
-        private void createPlaylist(params BeatmapInfo[] beatmaps)
+        private void createPlaylist(params IBeatmapInfo[] beatmaps)
         {
             AddStep("create playlist", () =>
             {
