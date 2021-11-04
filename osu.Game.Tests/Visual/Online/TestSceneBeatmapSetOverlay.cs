@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Online
                     Ratings = Enumerable.Range(0, 11).ToArray(),
                     HasStoryboard = true,
                     Covers = new BeatmapSetOnlineCovers(),
-                    Beatmaps = new List<APIBeatmap>
+                    Beatmaps = new[]
                     {
                         new APIBeatmap
                         {
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Online
 
                 var set = getBeatmapSet();
 
-                set.Beatmaps = beatmaps;
+                set.Beatmaps = beatmaps.ToArray();
 
                 overlay.ShowBeatmapSet(set);
             });
@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             }
 
-            set.Beatmaps = beatmaps;
+            set.Beatmaps = beatmaps.ToArray();
 
             return set;
         }
