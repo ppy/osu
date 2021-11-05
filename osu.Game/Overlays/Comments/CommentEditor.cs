@@ -198,8 +198,6 @@ namespace osu.Game.Overlays.Comments
                 IdleColour = colourProvider.Light4;
                 HoverColour = colourProvider.Light3;
                 blockedBackground.Colour = colourProvider.Background5;
-
-                drawableText.Text = text;
             }
 
             protected override void LoadComplete()
@@ -237,6 +235,7 @@ namespace osu.Game.Overlays.Comments
                         Origin = Anchor.Centre,
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                         Margin = new MarginPadding { Horizontal = 20 },
+                        Text = text,
                     }
                 }
             };
