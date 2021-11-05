@@ -209,15 +209,15 @@ namespace osu.Game.Database
 
                 case 9:
                     // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
-                    var oldItems = migration.OldRealm.DynamicApi.All(getMappedOrOriginalName(typeof(RealmBeatmapMetadata)));
-                    var newItems = migration.NewRealm.All<RealmBeatmapMetadata>();
+                    var oldMetadata = migration.OldRealm.DynamicApi.All(getMappedOrOriginalName(typeof(RealmBeatmapMetadata)));
+                    var newMetadata = migration.NewRealm.All<RealmBeatmapMetadata>();
 
-                    int itemCount = newItems.Count();
+                    int itemCount = newMetadata.Count();
 
                     for (int i = 0; i < itemCount; i++)
                     {
-                        dynamic? oldItem = oldItems.ElementAt(i);
-                        var newItem = newItems.ElementAt(i);
+                        dynamic? oldItem = oldMetadata.ElementAt(i);
+                        var newItem = newMetadata.ElementAt(i);
 
                         string username = oldItem.Author;
                         newItem.Author = new RealmUser
