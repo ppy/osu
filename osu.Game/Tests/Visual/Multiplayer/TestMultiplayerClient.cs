@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Multiplayer.Queueing;
@@ -63,7 +64,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return roomUser;
         }
 
-        public void AddNullUser() => addUser(new MultiplayerRoomUser(TestUserLookupCache.NULL_USER_ID));
+        public void TestAddUnresolvedUser() => addUser(new MultiplayerRoomUser(TestUserLookupCache.UNRESOLVED_USER_ID));
 
         private void addUser(MultiplayerRoomUser user)
         {
@@ -308,18 +309,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return ((IMultiplayerClient)this).PlaylistItemRemoved(item);
         }
 
-        protected override Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
+        protected override Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
         {
             Debug.Assert(Room != null);
 
             var apiRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == Room.RoomID);
-            var set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
-                      ?? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId)?.BeatmapSet;
+            IBeatmapSetInfo? set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
+                                   ?? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId)?.BeatmapSet;
 
             if (set == null)
                 throw new InvalidOperationException("Beatmap not found.");
 
-            return Task.FromResult(set);
+            var apiSet = new APIBeatmapSet
+            {
+                OnlineID = set.OnlineID,
+                Beatmaps = set.Beatmaps.Select(b => new APIBeatmap { OnlineID = b.OnlineID }).ToArray(),
+            };
+
+            return Task.FromResult(apiSet);
         }
 
         private async Task changeMatchType(MatchType type)

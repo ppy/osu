@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -52,8 +53,13 @@ namespace osu.Game.Online.Rooms
 
                 downloadTracker?.RemoveAndDisposeImmediately();
 
+                Debug.Assert(item.NewValue.Beatmap.Value.BeatmapSet != null);
+
                 downloadTracker = new BeatmapDownloadTracker(item.NewValue.Beatmap.Value.BeatmapSet);
-                downloadTracker.State.BindValueChanged(_ => updateAvailability());
+
+                AddInternal(downloadTracker);
+
+                downloadTracker.State.BindValueChanged(_ => updateAvailability(), true);
                 downloadTracker.Progress.BindValueChanged(_ =>
                 {
                     if (downloadTracker.State.Value != DownloadState.Downloading)
@@ -63,9 +69,7 @@ namespace osu.Game.Online.Rooms
                     // we don't want to flood the network with this, so rate limit how often we send progress updates.
                     if (progressUpdate?.Completed != false)
                         progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
-                });
-
-                AddInternal(downloadTracker);
+                }, true);
             }, true);
         }
 

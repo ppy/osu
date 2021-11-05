@@ -466,7 +466,7 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
-            string filename = $"{getValidFilename(item.ToString())}{HandledExtensions.First()}";
+            string filename = $"{GetValidFilename(item.ToString())}{HandledExtensions.First()}";
 
             using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
                 ExportModelTo(retrievedItem, stream);
@@ -913,9 +913,15 @@ namespace osu.Game.Database
             return Guid.NewGuid().ToString();
         }
 
-        private string getValidFilename(string filename)
+        private readonly char[] invalidFilenameCharacters = Path.GetInvalidFileNameChars()
+                                                                // Backslash is added to avoid issues when exporting to zip.
+                                                                // See SharpCompress filename normalisation https://github.com/adamhathcock/sharpcompress/blob/a1e7c0068db814c9aa78d86a94ccd1c761af74bd/src/SharpCompress/Writers/Zip/ZipWriter.cs#L143.
+                                                                .Append('\\')
+                                                                .ToArray();
+
+        protected string GetValidFilename(string filename)
         {
-            foreach (char c in Path.GetInvalidFileNameChars())
+            foreach (char c in invalidFilenameCharacters)
                 filename = filename.Replace(c, '_');
             return filename;
         }

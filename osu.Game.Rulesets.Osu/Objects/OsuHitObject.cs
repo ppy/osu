@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => StackHeightBindable.Value = value;
         }
 
-        public Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
+        public virtual Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
 
         public double Radius => OBJECT_RADIUS * Scale;
 

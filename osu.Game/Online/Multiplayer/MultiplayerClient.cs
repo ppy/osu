@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer.Queueing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
@@ -148,6 +149,10 @@ namespace osu.Game.Online.Multiplayer
                 {
                     Room = joinedRoom;
                     APIRoom = room;
+
+                    Debug.Assert(LocalUser != null);
+                    addUserToAPIRoom(LocalUser);
+
                     foreach (var user in joinedRoom.Users)
                         updateUserPlayingState(user.UserID, user.State);
 
@@ -358,6 +363,8 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Add(user);
 
+                addUserToAPIRoom(user);
+
                 UserJoined?.Invoke(user);
                 RoomUpdated?.Invoke();
             });
@@ -377,6 +384,18 @@ namespace osu.Game.Online.Multiplayer
             return handleUserLeft(user, UserKicked);
         }
 
+        private void addUserToAPIRoom(MultiplayerRoomUser user)
+        {
+            Debug.Assert(APIRoom != null);
+
+            APIRoom.RecentParticipants.Add(user.User ?? new User
+            {
+                Id = user.UserID,
+                Username = "[Unresolved]"
+            });
+            APIRoom.ParticipantCount.Value++;
+        }
+
         private Task handleUserLeft(MultiplayerRoomUser user, Action<MultiplayerRoomUser>? callback)
         {
             if (Room == null)
@@ -389,6 +408,10 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Remove(user);
                 PlayingUserIds.Remove(user.UserID);
+
+                Debug.Assert(APIRoom != null);
+                APIRoom.RecentParticipants.RemoveAll(u => u.Id == user.UserID);
+                APIRoom.ParticipantCount.Value--;
 
                 callback?.Invoke(user);
                 RoomUpdated?.Invoke();
@@ -667,20 +690,17 @@ namespace osu.Game.Online.Multiplayer
             CurrentMatchPlayingItem.Value = APIRoom.Playlist.SingleOrDefault(p => p.ID == settings.PlaylistItemId);
         }, cancellationToken);
 
-        /// <summary>
-        /// Retrieves a <see cref="BeatmapSetInfo"/> from an online source.
-        /// </summary>
-        /// <param name="beatmapId">The beatmap set ID.</param>
-        /// <param name="cancellationToken">A token to cancel the request.</param>
-        /// <returns>The <see cref="BeatmapSetInfo"/> retrieval task.</returns>
-        protected abstract Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
-
         private async Task<PlaylistItem> createPlaylistItem(APIPlaylistItem item)
         {
             var set = await GetOnlineBeatmapSet(item.BeatmapID).ConfigureAwait(false);
 
-            var beatmap = set.Beatmaps.Single(b => b.OnlineBeatmapID == item.BeatmapID);
-            beatmap.MD5Hash = item.BeatmapChecksum;
+            // The incoming response is deserialised without circular reference handling currently.
+            // Because we require using metadata from this instance, populate the nested beatmaps' sets manually here.
+            foreach (var b in set.Beatmaps)
+                b.BeatmapSet = set;
+
+            var beatmap = set.Beatmaps.Single(b => b.OnlineID == item.BeatmapID);
+            beatmap.Checksum = item.BeatmapChecksum;
 
             var ruleset = Rulesets.GetRuleset(item.RulesetID);
             var rulesetInstance = ruleset.CreateInstance();
@@ -698,6 +718,14 @@ namespace osu.Game.Online.Multiplayer
 
             return playlistItem;
         }
+
+        /// <summary>
+        /// Retrieves a <see cref="APIBeatmapSet"/> from an online source.
+        /// </summary>
+        /// <param name="beatmapId">The beatmap set ID.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The <see cref="APIBeatmapSet"/> retrieval task.</returns>
+        protected abstract Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.
