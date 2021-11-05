@@ -42,7 +42,7 @@ namespace osu.Game.Overlays
 
         public void ShowUser(string username) => ShowUser(new APIUser { Username = username });
 
-        public void ShowUser(APIUser user, bool fetchOnline = true)
+        public void ShowUser(IUser user)
         {
             if (user == APIUser.SYSTEM_USER)
                 return;
@@ -116,19 +116,20 @@ namespace osu.Game.Overlays
                 }
             };
 
-            if (fetchOnline)
-            {
-                userReq = user.Id > 1 ? new GetUserRequest(user.Id) : new GetUserRequest(user.Username);
-                userReq.Success += userLoadComplete;
-                API.Queue(userReq);
-            }
-            else
+            sectionsContainer.ScrollToTop();
+
+            // Check arbitrarily whether this user has already been populated.
+            // This is only generally used by tests, but should be quite safe unless we want to force a refresh on loading a previous user in the future.
+            if (user is APIUser apiUser && apiUser.JoinDate != default)
             {
                 userReq = null;
-                userLoadComplete(user);
+                userLoadComplete(apiUser);
+                return;
             }
 
-            sectionsContainer.ScrollToTop();
+            userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID) : new GetUserRequest(user.Username);
+            userReq.Success += userLoadComplete;
+            API.Queue(userReq);
         }
 
         private void userLoadComplete(APIUser user)
