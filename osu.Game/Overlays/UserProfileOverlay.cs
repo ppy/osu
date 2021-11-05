@@ -14,6 +14,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -38,10 +39,6 @@ namespace osu.Game.Overlays
 
         protected override Color4 BackgroundColour => ColourProvider.Background6;
 
-        public void ShowUser(int userId) => ShowUser(new APIUser { Id = userId });
-
-        public void ShowUser(string username) => ShowUser(new APIUser { Username = username });
-
         public void ShowUser(IUser user)
         {
             if (user == APIUser.SYSTEM_USER)
@@ -49,7 +46,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (user.Id == Header?.User.Value?.Id)
+            if (user.OnlineID == Header?.User.Value?.Id)
                 return;
 
             if (sectionsContainer != null)

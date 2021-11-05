@@ -66,7 +66,7 @@ namespace osu.Game.Users.Drawables
         private void openProfile()
         {
             if (user?.Id > 1)
-                game?.ShowUser(user.Id);
+                game?.ShowUser(user);
         }
 
         private class ClickableArea : OsuClickableContainer
