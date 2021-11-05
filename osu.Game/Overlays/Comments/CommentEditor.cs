@@ -187,6 +187,8 @@ namespace osu.Game.Overlays.Comments
                 AutoSizeAxes = Axes.Both;
                 LoadingAnimationSize = new Vector2(10);
 
+                // ReSharper disable once PossibleNullReferenceException
+                // see https://youtrack.jetbrains.com/issue/RSRP-486768
                 drawableText.Text = text;
             }
 

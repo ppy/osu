@@ -39,6 +39,8 @@ namespace osu.Game.Overlays.Changelog
 
             Build.ValueChanged += showBuild;
 
+            // ReSharper disable once PossibleNullReferenceException
+            // see https://youtrack.jetbrains.com/issue/RSRP-486768
             Streams.Current.ValueChanged += e =>
             {
                 if (e.NewValue?.LatestBuild != null && !e.NewValue.Equals(Build.Value?.UpdateStream))
