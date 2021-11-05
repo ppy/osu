@@ -408,7 +408,7 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Ruleset = ruleset;
 
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
-                    beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
+                    beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate(null).StarRating ?? 0;
                     beatmap.BeatmapInfo.Length = calculateLength(beatmap);
                     beatmap.BeatmapInfo.BPM = 60000 / beatmap.GetMostCommonBeatLength();
 

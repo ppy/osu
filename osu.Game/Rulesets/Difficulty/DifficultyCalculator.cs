@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
@@ -39,10 +40,11 @@ namespace osu.Game.Rulesets.Difficulty
         /// Calculates the difficulty of the beatmap using a specific mod combination.
         /// </summary>
         /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
-        public DifficultyAttributes Calculate(params Mod[] mods)
+        public DifficultyAttributes Calculate(IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
-            preProcess(mods);
+            preProcess(mods, cancellationToken);
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
 
@@ -62,10 +64,11 @@ namespace osu.Game.Rulesets.Difficulty
         /// Calculates the difficulty of the beatmap and returns a set of <see cref="TimedDifficultyAttributes"/> representing the difficulty at every relevant time value in the beatmap.
         /// </summary>
         /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The set of <see cref="TimedDifficultyAttributes"/>.</returns>
-        public List<TimedDifficultyAttributes> CalculateTimed(params Mod[] mods)
+        public List<TimedDifficultyAttributes> CalculateTimed(IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
-            preProcess(mods);
+            preProcess(mods, cancellationToken);
 
             var attribs = new List<TimedDifficultyAttributes>();
 
@@ -99,7 +102,7 @@ namespace osu.Game.Rulesets.Difficulty
                 if (combination is MultiMod multi)
                     yield return Calculate(multi.Mods);
                 else
-                    yield return Calculate(combination);
+                    yield return Calculate(new[] { combination });
             }
         }
 
@@ -112,11 +115,12 @@ namespace osu.Game.Rulesets.Difficulty
         /// Performs required tasks before every calculation.
         /// </summary>
         /// <param name="mods">The original list of <see cref="Mod"/>s.</param>
-        private void preProcess(Mod[] mods)
+        /// <param name="cancellationToken">The cancellation cancellationToken.</param>
+        private void preProcess(IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
 
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, playableMods);
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, playableMods, cancellationToken: cancellationToken);
 
             var track = new TrackVirtual(10000);
             playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
