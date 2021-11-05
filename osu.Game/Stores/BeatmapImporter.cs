@@ -284,7 +284,7 @@ namespace osu.Game.Stores
             decoded.BeatmapInfo.Ruleset = rulesetInstance.RulesetInfo;
 
             // TODO: this should be done in a better place once we actually need to dynamically update it.
-            beatmap.StarRating = rulesetInstance.CreateDifficultyCalculator(new DummyConversionBeatmap(decoded)).Calculate().StarRating;
+            beatmap.StarRating = rulesetInstance.CreateDifficultyCalculator(new DummyConversionBeatmap(decoded)).Calculate(null).StarRating;
             beatmap.Length = calculateLength(decoded);
             beatmap.BPM = 60000 / decoded.GetMostCommonBeatLength();
         }

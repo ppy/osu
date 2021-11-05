@@ -147,13 +147,13 @@ namespace osu.Game.Beatmaps
                 if (CheckExists(lookup, out var existing))
                     return existing;
 
-                return computeDifficulty(lookup);
+                return computeDifficulty(lookup, token);
             }, token, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
         public Task<List<TimedDifficultyAttributes>> GetTimedDifficultyAttributesAsync(WorkingBeatmap beatmap, Ruleset ruleset, Mod[] mods, CancellationToken token = default)
         {
-            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods),
+            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods, token),
                 token,
                 TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
                 updateScheduler);
@@ -270,8 +270,9 @@ namespace osu.Game.Beatmaps
         /// Computes the difficulty defined by a <see cref="DifficultyCacheLookup"/> key, and stores it to the timed cache.
         /// </summary>
         /// <param name="key">The <see cref="DifficultyCacheLookup"/> that defines the computation parameters.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The <see cref="StarDifficulty"/>.</returns>
-        private StarDifficulty computeDifficulty(in DifficultyCacheLookup key)
+        private StarDifficulty computeDifficulty(in DifficultyCacheLookup key, CancellationToken cancellationToken = default)
         {
             // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
             var beatmapInfo = key.BeatmapInfo;
@@ -283,7 +284,7 @@ namespace osu.Game.Beatmaps
                 Debug.Assert(ruleset != null);
 
                 var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
-                var attributes = calculator.Calculate(key.OrderedMods);
+                var attributes = calculator.Calculate(key.OrderedMods, cancellationToken);
 
                 return new StarDifficulty(attributes);
             }
