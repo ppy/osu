@@ -175,6 +175,8 @@ namespace osu.Game.Overlays.Comments
 
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
+            private readonly string text;
+
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
 
@@ -184,12 +186,10 @@ namespace osu.Game.Overlays.Comments
 
             public CommitButton(string text)
             {
+                this.text = text;
+
                 AutoSizeAxes = Axes.Both;
                 LoadingAnimationSize = new Vector2(10);
-
-                // ReSharper disable once PossibleNullReferenceException
-                // see https://youtrack.jetbrains.com/issue/RSRP-486768
-                drawableText.Text = text;
             }
 
             [BackgroundDependencyLoader]
@@ -198,6 +198,8 @@ namespace osu.Game.Overlays.Comments
                 IdleColour = colourProvider.Light4;
                 HoverColour = colourProvider.Light3;
                 blockedBackground.Colour = colourProvider.Background5;
+
+                drawableText.Text = text;
             }
 
             protected override void LoadComplete()
@@ -234,7 +236,7 @@ namespace osu.Game.Overlays.Comments
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Horizontal = 20 }
+                        Margin = new MarginPadding { Horizontal = 20 },
                     }
                 }
             };

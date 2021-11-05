@@ -38,14 +38,6 @@ namespace osu.Game.Overlays.Changelog
             };
 
             Build.ValueChanged += showBuild;
-
-            // ReSharper disable once PossibleNullReferenceException
-            // see https://youtrack.jetbrains.com/issue/RSRP-486768
-            Streams.Current.ValueChanged += e =>
-            {
-                if (e.NewValue?.LatestBuild != null && !e.NewValue.Equals(Build.Value?.UpdateStream))
-                    Build.Value = e.NewValue.LatestBuild;
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -75,29 +67,40 @@ namespace osu.Game.Overlays.Changelog
 
         protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/changelog");
 
-        protected override Drawable CreateContent() => new Container
+        protected override Drawable CreateContent()
         {
-            RelativeSizeAxes = Axes.X,
-            AutoSizeAxes = Axes.Y,
-            Children = new Drawable[]
+            var content = new Container
             {
-                streamsBackground = new Box
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding
+                    streamsBackground = new Box
                     {
-                        Horizontal = 65,
-                        Vertical = 20
+                        RelativeSizeAxes = Axes.Both
                     },
-                    Child = Streams = new ChangelogUpdateStreamControl()
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding
+                        {
+                            Horizontal = 65,
+                            Vertical = 20
+                        },
+                        Child = Streams = new ChangelogUpdateStreamControl()
+                    }
                 }
-            }
-        };
+            };
+
+            Streams.Current.ValueChanged += e =>
+            {
+                if (e.NewValue?.LatestBuild != null && !e.NewValue.Equals(Build.Value?.UpdateStream))
+                    Build.Value = e.NewValue.LatestBuild;
+            };
+
+            return content;
+        }
 
         protected override OverlayTitle CreateTitle() => new ChangelogHeaderTitle();
 
