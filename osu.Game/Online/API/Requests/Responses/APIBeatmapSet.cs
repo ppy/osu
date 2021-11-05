@@ -128,7 +128,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineBeatmapSetID = OnlineID,
                 Metadata = metadata,
                 Status = Status,
-                OnlineInfo = this
             };
 
             beatmapSet.Beatmaps = Beatmaps.Select(b =>

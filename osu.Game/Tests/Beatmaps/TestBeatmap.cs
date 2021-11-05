@@ -39,16 +39,6 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo.Length = 75000;
             BeatmapInfo.OnlineInfo = new APIBeatmap();
             BeatmapInfo.OnlineBeatmapID = Interlocked.Increment(ref onlineBeatmapID);
-            BeatmapInfo.BeatmapSet.OnlineInfo = new APIBeatmapSet
-            {
-                Status = BeatmapSetOnlineStatus.Ranked,
-                Covers = new BeatmapSetOnlineCovers
-                {
-                    Cover = "https://assets.ppy.sh/beatmaps/163112/covers/cover.jpg",
-                    Card = "https://assets.ppy.sh/beatmaps/163112/covers/card.jpg",
-                    List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg"
-                }
-            };
         }
 
         protected virtual Beatmap CreateBeatmap() => createTestBeatmap();
