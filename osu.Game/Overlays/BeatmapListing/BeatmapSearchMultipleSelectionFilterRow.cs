@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.BeatmapListing
         public BeatmapSearchMultipleSelectionFilterRow(LocalisableString header)
             : base(header)
         {
+            // ReSharper disable once PossibleNullReferenceException
+            // see https://youtrack.jetbrains.com/issue/RSRP-486768
             Current.BindTo(filter.Current);
         }
 
