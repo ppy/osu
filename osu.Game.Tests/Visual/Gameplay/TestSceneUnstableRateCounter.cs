@@ -1,21 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 
@@ -26,22 +19,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(ScoreProcessor))]
         private TestScoreProcessor scoreProcessor = new TestScoreProcessor();
 
-        [Cached(typeof(GameplayState))]
-        private GameplayState gameplayState;
+        private readonly OsuHitWindows hitWindows = new OsuHitWindows();
 
-        private OsuHitWindows hitWindows = new OsuHitWindows();
+        private UnstableRateCounter counter;
 
         private double prev;
-
-        public TestSceneUnstableRateCounter()
-        {
-            Score score = new Score
-            {
-                ScoreInfo = new ScoreInfo(),
-            };
-            gameplayState = new GameplayState(null, null, null, score);
-            scoreProcessor.NewJudgement += result => scoreProcessor.PopulateScore(score.ScoreInfo);
-        }
 
         [SetUpSteps]
         public void SetUp()
@@ -52,41 +34,38 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestBasic()
         {
-            AddStep("Create Display", () => recreateDisplay());
+            AddStep("Create Display", recreateDisplay);
 
-            AddRepeatStep("Set UR to 250", () => setUR(25), 20);
+            // Needs multiples 2 by the nature of UR, and went for 4 to be safe.
+            // Creates a 250 UR by placing a +25ms then a -25ms judgement, which then results in a 250 UR
+            AddRepeatStep("Set UR to 250", () => applyJudgement(25, true), 4);
 
-            AddStep("Reset UR", () =>
+            AddUntilStep("UR = 250", () => counter.Current.Value == 250.0);
+
+            AddRepeatStep("Revert UR", () =>
             {
-                scoreProcessor.Reset();
-                recreateDisplay();
-            });
+                scoreProcessor.RevertResult(
+                    new JudgementResult(new HitCircle { HitWindows = hitWindows }, new Judgement())
+                    {
+                        TimeOffset = 25,
+                        Type = HitResult.Perfect,
+                    });
+            }, 4);
 
-            AddRepeatStep("Set UR to 100", () => setUR(10), 20);
+            AddUntilStep("UR is 0", () => counter.Current.Value == 0.0);
+            AddUntilStep("Counter is invalid", () => counter.Child.Alpha == 0.3f);
 
-            AddStep("Reset UR", () =>
-            {
-                scoreProcessor.Reset();
-                recreateDisplay();
-            });
-
-            AddRepeatStep("Set UR to 0 (+50ms offset)", () => newJudgement(50), 10);
-
-            AddStep("Reset UR", () =>
-            {
-                scoreProcessor.Reset();
-                recreateDisplay();
-            });
-
-            AddRepeatStep("Set UR to 0 (-50 offset)", () => newJudgement(-50), 10);
-
-            AddRepeatStep("Random Judgements", () => newJudgement(), 20);
+            //Sets a UR of 0 by creating 10 10ms offset judgements. Since average = offset, UR = 0
+            AddRepeatStep("Set UR to 0", () => applyJudgement(10, false), 10);
+            //Applies a UR of 100 by creating 10 -10ms offset judgements. At the 10th judgement, offset should be 100.
+            AddRepeatStep("Bring UR to 100", () => applyJudgement(-10, false), 10);
         }
+
         private void recreateDisplay()
         {
             Clear();
 
-            Add(new UnstableRateCounter
+            Add(counter = new UnstableRateCounter
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -94,24 +73,21 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void newJudgement(double offset = 0, HitResult result = HitResult.Perfect)
+        private void applyJudgement(double offsetMs, bool alt)
         {
-            scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = hitWindows }, new Judgement())
-            {
-                TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
-                Type = result,
-            });
-        }
+            double placement = offsetMs;
 
-        private void setUR(double UR = 0, HitResult result = HitResult.Perfect)
-        {
-            double placement = prev > 0 ? -UR : UR;
+            if (alt)
+            {
+                placement = prev > 0 ? -offsetMs : offsetMs;
+                prev = placement;
+            }
+
             scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = hitWindows }, new Judgement())
             {
                 TimeOffset = placement,
-                Type = result,
+                Type = HitResult.Perfect,
             });
-            prev = placement;
         }
 
         private class TestScoreProcessor : ScoreProcessor
