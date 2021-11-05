@@ -27,14 +27,14 @@ namespace osu.Game.Database
 
         private readonly Bindable<WeakReference<ArchiveDownloadRequest<TModel>>> downloadFailed = new Bindable<WeakReference<ArchiveDownloadRequest<TModel>>>();
 
-        private readonly IModelManager<TModel> modelManager;
+        private readonly IModelImporter<TModel> importer;
         private readonly IAPIProvider api;
 
         protected readonly List<ArchiveDownloadRequest<TModel>> CurrentDownloads = new List<ArchiveDownloadRequest<TModel>>();
 
-        protected ModelDownloader(IModelManager<TModel> modelManager, IAPIProvider api, IIpcHost importHost = null)
+        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider api, IIpcHost importHost = null)
         {
-            this.modelManager = modelManager;
+            this.importer = importer;
             this.api = api;
         }
 
@@ -68,7 +68,7 @@ namespace osu.Game.Database
                 Task.Factory.StartNew(async () =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    var imported = await modelManager.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
+                    var imported = await importer.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
 
                     // for now a failed import will be marked as a failed download for simplicity.
                     if (!imported.Any())
@@ -103,7 +103,7 @@ namespace osu.Game.Database
                 notification.State = ProgressNotificationState.Cancelled;
 
                 if (!(error is OperationCanceledException))
-                    Logger.Error(error, $"{modelManager.HumanisedModelName.Titleize()} download failed!");
+                    Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} download failed!");
             }
         }
 
