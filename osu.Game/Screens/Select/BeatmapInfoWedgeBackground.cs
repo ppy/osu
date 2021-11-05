@@ -27,9 +27,8 @@ namespace osu.Game.Screens.Select
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = new BufferedContainer
+            InternalChild = new BufferedContainer(cachedFrameBuffer: true)
             {
-                CacheDrawnFrameBuffer = true,
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
