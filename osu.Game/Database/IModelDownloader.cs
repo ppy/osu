@@ -11,8 +11,9 @@ namespace osu.Game.Database
     /// Represents a <see cref="IModelManager{TModel}"/> that can download new models from an external source.
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
-    public interface IModelDownloader<TModel> : IPostNotifications
-        where TModel : class
+    /// <typeparam name="T">The model's interface type.</typeparam>
+    public interface IModelDownloader<TModel, in T> : IPostNotifications
+        where TModel : class, T
     {
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> download begins.
@@ -32,7 +33,7 @@ namespace osu.Game.Database
         /// <param name="model">The <stypeparamref name="TModel"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle..</param>
         /// <returns>Whether the download was started.</returns>
-        bool Download(TModel model, bool minimiseDownloadSize);
+        bool Download(T model, bool minimiseDownloadSize);
 
         /// <summary>
         /// Gets an existing <typeparamref name="TModel"/> download request if it exists.
