@@ -79,7 +79,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool IsBNG;
 
         [JsonProperty(@"is_bot")]
-        public bool IsBot;
+        public bool IsBot { get; set; }
 
         [JsonProperty(@"is_active")]
         public bool Active;

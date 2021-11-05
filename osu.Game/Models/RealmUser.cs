@@ -11,5 +11,7 @@ namespace osu.Game.Models
         public int OnlineID { get; set; } = 1;
 
         public string Username { get; set; }
+
+        public bool IsBot => false;
     }
 }
