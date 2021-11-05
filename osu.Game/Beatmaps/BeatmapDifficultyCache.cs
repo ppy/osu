@@ -131,7 +131,7 @@ namespace osu.Game.Beatmaps
             var localRulesetInfo = rulesetInfo as RulesetInfo;
 
             // Difficulty can only be computed if the beatmap and ruleset are locally available.
-            if (localBeatmapInfo == null || localRulesetInfo == null)
+            if (localBeatmapInfo == null || localBeatmapInfo.ID == 0 || localRulesetInfo == null)
             {
                 // If not, fall back to the existing star difficulty (e.g. from an online source).
                 return Task.FromResult(new StarDifficulty(beatmapInfo.StarRating, (beatmapInfo as IBeatmapOnlineInfo)?.MaxCombo ?? 0));

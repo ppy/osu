@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Screens.OnlinePlay.Components
@@ -69,24 +68,14 @@ namespace osu.Game.Screens.OnlinePlay.Components
             }
             else
             {
-                textFlow.AddLink(new[]
-                {
-                    new OsuSpriteText
-                    {
-                        Text = new RomanisableString(beatmap.Value.Metadata.ArtistUnicode, beatmap.Value.Metadata.Artist),
-                        Font = OsuFont.GetFont(size: TextSize),
-                    },
-                    new OsuSpriteText
-                    {
-                        Text = " - ",
-                        Font = OsuFont.GetFont(size: TextSize),
-                    },
-                    new OsuSpriteText
-                    {
-                        Text = new RomanisableString(beatmap.Value.Metadata.TitleUnicode, beatmap.Value.Metadata.Title),
-                        Font = OsuFont.GetFont(size: TextSize),
-                    }
-                }, LinkAction.OpenBeatmap, beatmap.Value.OnlineID.ToString(), "Open beatmap");
+                var metadataInfo = beatmap.Value.Metadata;
+
+                string artistUnicode = string.IsNullOrEmpty(metadataInfo.ArtistUnicode) ? metadataInfo.Artist : metadataInfo.ArtistUnicode;
+                string titleUnicode = string.IsNullOrEmpty(metadataInfo.TitleUnicode) ? metadataInfo.Title : metadataInfo.TitleUnicode;
+
+                var title = new RomanisableString($"{artistUnicode} - {titleUnicode}".Trim(), $"{metadataInfo.Artist} - {metadataInfo.Title}".Trim());
+
+                textFlow.AddLink(title, LinkAction.OpenBeatmap, beatmap.Value.OnlineID.ToString(), "Open beatmap");
             }
         }
     }

@@ -1,15 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -35,9 +34,9 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("load multiple rulesets beatmapset", () =>
             {
-                selector.BeatmapSet = new BeatmapSetInfo
+                selector.BeatmapSet = new APIBeatmapSet
                 {
-                    Beatmaps = enabledRulesets.Select(r => new BeatmapInfo { Ruleset = r }).ToList()
+                    Beatmaps = enabledRulesets.Select(r => new APIBeatmap { RulesetID = r.OnlineID }).ToArray()
                 };
             });
 
@@ -53,13 +52,13 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("load single ruleset beatmapset", () =>
             {
-                selector.BeatmapSet = new BeatmapSetInfo
+                selector.BeatmapSet = new APIBeatmapSet
                 {
-                    Beatmaps = new List<BeatmapInfo>
+                    Beatmaps = new[]
                     {
-                        new BeatmapInfo
+                        new APIBeatmap
                         {
-                            Ruleset = enabledRuleset
+                            RulesetID = enabledRuleset.OnlineID
                         }
                     }
                 };
@@ -71,10 +70,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestEmptyBeatmapSet()
         {
-            AddStep("load empty beatmapset", () => selector.BeatmapSet = new BeatmapSetInfo
-            {
-                Beatmaps = new List<BeatmapInfo>()
-            });
+            AddStep("load empty beatmapset", () => selector.BeatmapSet = new APIBeatmapSet());
 
             AddAssert("no ruleset selected", () => selector.SelectedTab == null);
             AddAssert("all rulesets disabled", () => selector.TabContainer.TabItems.All(t => !t.Enabled.Value));

@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
         {
-            ScoreInfo = new ScoreInfo { User = new User { Username = "osu!topus!" } },
+            ScoreInfo = new ScoreInfo { User = new User { Username = "osu!topus" } },
             Replay = new ManiaAutoGenerator((ManiaBeatmap)beatmap).Generate(),
         };
     }

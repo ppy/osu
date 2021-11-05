@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -16,6 +15,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Users;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -26,9 +26,9 @@ namespace osu.Game.Overlays.BeatmapSet
         private UpdateableAvatar avatar;
         private FillFlowContainer fields;
 
-        private BeatmapSetInfo beatmapSet;
+        private APIBeatmapSet beatmapSet;
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             get => beatmapSet;
             set
@@ -78,30 +78,28 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            avatar.User = BeatmapSet?.Metadata.Author;
+            avatar.User = BeatmapSet?.Author;
 
             fields.Clear();
             if (BeatmapSet == null)
                 return;
 
-            var online = BeatmapSet.OnlineInfo;
-
             fields.Children = new Drawable[]
             {
-                new Field("mapped by", BeatmapSet.Metadata.Author, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
-                new Field("submitted", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
+                new Field("mapped by", BeatmapSet.Author, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
+                new Field("submitted", BeatmapSet.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
                 {
                     Margin = new MarginPadding { Top = 5 },
                 },
             };
 
-            if (online.Ranked.HasValue)
+            if (BeatmapSet.Ranked.HasValue)
             {
-                fields.Add(new Field(online.Status.ToString().ToLowerInvariant(), online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field(BeatmapSet.Status.ToString().ToLowerInvariant(), BeatmapSet.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
-            else if (online.LastUpdated.HasValue)
+            else if (BeatmapSet.LastUpdated.HasValue)
             {
-                fields.Add(new Field("last updated", online.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field("last updated", BeatmapSet.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
         }
 

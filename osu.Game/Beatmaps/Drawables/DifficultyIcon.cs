@@ -60,8 +60,9 @@ namespace osu.Game.Beatmaps.Drawables
         /// <param name="ruleset">The ruleset to show the difficulty with.</param>
         /// <param name="mods">The mods to show the difficulty with.</param>
         /// <param name="shouldShowTooltip">Whether to display a tooltip when hovered.</param>
-        public DifficultyIcon([NotNull] IBeatmapInfo beatmapInfo, [CanBeNull] IRulesetInfo ruleset, [CanBeNull] IReadOnlyList<Mod> mods, bool shouldShowTooltip = true)
-            : this(beatmapInfo, shouldShowTooltip)
+        /// <param name="performBackgroundDifficultyLookup">Whether to perform difficulty lookup (including calculation if necessary).</param>
+        public DifficultyIcon([NotNull] IBeatmapInfo beatmapInfo, [CanBeNull] IRulesetInfo ruleset, [CanBeNull] IReadOnlyList<Mod> mods, bool shouldShowTooltip = true, bool performBackgroundDifficultyLookup = true)
+            : this(beatmapInfo, shouldShowTooltip, performBackgroundDifficultyLookup)
         {
             this.ruleset = ruleset ?? beatmapInfo.Ruleset;
             this.mods = mods ?? Array.Empty<Mod>();

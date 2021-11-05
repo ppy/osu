@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             return new APIScoreInfo
             {
                 OnlineID = 2553163309,
-                OnlineRulesetID = 0,
+                RulesetID = 0,
                 Beatmap = CreateAPIBeatmapSet(new OsuRuleset().RulesetInfo).Beatmaps.First(),
                 HasReplay = replayAvailable,
                 User = new User
