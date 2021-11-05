@@ -168,15 +168,15 @@ namespace osu.Game.Tests.Online
                 return new TestBeatmapModelManager(this, storage, contextFactory, rulesets, api, host);
             }
 
-            protected override BeatmapModelDownloader CreateBeatmapModelDownloader(IBeatmapModelManager manager, IAPIProvider api, GameHost host)
+            protected override BeatmapModelDownloader CreateBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> manager, IAPIProvider api, GameHost host)
             {
                 return new TestBeatmapModelDownloader(manager, api, host);
             }
 
             internal class TestBeatmapModelDownloader : BeatmapModelDownloader
             {
-                public TestBeatmapModelDownloader(IBeatmapModelManager modelManager, IAPIProvider apiProvider, GameHost gameHost)
-                    : base(modelManager, apiProvider, gameHost)
+                public TestBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> importer, IAPIProvider apiProvider, GameHost gameHost)
+                    : base(importer, apiProvider, gameHost)
                 {
                 }
 

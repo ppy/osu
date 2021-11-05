@@ -10,7 +10,7 @@ namespace osu.Game.Scoring
 {
     public class ScoreModelDownloader : ModelDownloader<ScoreInfo>
     {
-        public ScoreModelDownloader(ScoreModelManager scoreManager, IAPIProvider api, IIpcHost importHost = null)
+        public ScoreModelDownloader(IModelImporter<ScoreInfo> scoreManager, IAPIProvider api, IIpcHost importHost = null)
             : base(scoreManager, api, importHost)
         {
         }
