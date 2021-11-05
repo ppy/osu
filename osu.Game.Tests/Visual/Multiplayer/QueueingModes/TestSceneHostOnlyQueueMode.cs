@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
         {
             RunGameplay();
 
-            BeatmapInfo firstBeatmap = null;
+            IBeatmapInfo firstBeatmap = null;
             AddStep("get first playlist item beatmap", () => firstBeatmap = Client.APIRoom?.Playlist[0].Beatmap.Value);
 
             selectNewItem(() => OtherBeatmap);
