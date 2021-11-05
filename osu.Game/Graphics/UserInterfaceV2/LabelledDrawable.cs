@@ -168,7 +168,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 descriptionText.Text = value;
 
-                if (value == default)
+                if (!string.IsNullOrEmpty(value.ToString()))
                     descriptionText.Show();
                 else
                     descriptionText.Hide();
