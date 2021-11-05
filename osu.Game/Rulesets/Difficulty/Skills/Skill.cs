@@ -36,12 +36,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             Previous = new ReverseQueue<DifficultyHitObject>(HistoryLength + 1);
         }
 
-        internal void ProcessInternal(DifficultyHitObject current)
+        internal void ProcessInternal(PreStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             while (Previous.Count > HistoryLength)
                 Previous.Dequeue();
 
-            Process(current);
+            Process(preSkills, index, current);
 
             Previous.Enqueue(current);
         }
@@ -49,8 +49,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/>.
         /// </summary>
+        /// <param name="preSkills"></param>
+        /// <param name="index"></param>
         /// <param name="current">The <see cref="DifficultyHitObject"/> to process.</param>
-        protected abstract void Process(DifficultyHitObject current);
+        protected abstract void Process(PreStrainSkill[] preSkills, int index, DifficultyHitObject current);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.

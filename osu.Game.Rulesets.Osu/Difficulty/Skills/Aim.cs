@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplier => 23.25;
         private double strainDecayBase => 0.15;
 
-        private double strainValueOf(DifficultyHitObject current)
+        private double strainValueOf(PreStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || Previous.Count <= 1 || Previous[0].BaseObject is Spinner)
                 return 0;
@@ -110,10 +111,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double CalculateInitialStrain(double time) => currentStrain * strainDecay(time - Previous[0].StartTime);
 
-        protected override double StrainValueAt(DifficultyHitObject current)
+        protected override double StrainValueAt(PreStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += strainValueOf(current) * skillMultiplier;
+            currentStrain += strainValueOf(preSkills, index, current) * skillMultiplier;
 
             return currentStrain;
         }

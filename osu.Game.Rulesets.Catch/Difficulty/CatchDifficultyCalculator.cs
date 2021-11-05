@@ -80,6 +80,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             };
         }
 
+        protected override PreStrainSkill[] CreatePreSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        {
+            return new PreStrainSkill[]
+            {
+
+            };
+        }
+
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
             new CatchModDoubleTime(),

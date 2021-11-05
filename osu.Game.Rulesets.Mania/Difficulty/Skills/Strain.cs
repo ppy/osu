@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             overallStrain = 1;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double StrainValueOf(PreStrainSkill[] preSkills, int index, DifficultyHitObject current)
         {
             var maniaCurrent = (ManiaDifficultyHitObject)current;
             double endTime = maniaCurrent.EndTime;

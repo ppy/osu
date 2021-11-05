@@ -44,15 +44,28 @@ namespace osu.Game.Rulesets.Difficulty
         {
             preProcess(mods);
 
+            var preSkills = CreatePreSkills(Beatmap, playableMods, clockRate);
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
 
             if (!Beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
 
+            int index = 0;
+            foreach (var hitObject in getDifficultyHitObjects())
+            {
+                foreach (var preSkill in preSkills)
+                    preSkill.ProcessInternal(preSkills, index, hitObject);
+
+                index++;
+            }
+
+            index = 0;
             foreach (var hitObject in getDifficultyHitObjects())
             {
                 foreach (var skill in skills)
-                    skill.ProcessInternal(hitObject);
+                    skill.ProcessInternal(preSkills, index, hitObject);
+
+                index++;
             }
 
             return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
@@ -72,17 +85,29 @@ namespace osu.Game.Rulesets.Difficulty
             if (!Beatmap.HitObjects.Any())
                 return attribs;
 
+            var preSkills = CreatePreSkills(Beatmap, playableMods, clockRate);
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
 
+            int index = 0;
+            foreach (var hitObject in getDifficultyHitObjects())
+            {
+                foreach (var preSkill in preSkills)
+                    preSkill.ProcessInternal(preSkills, index, hitObject);
+
+                index++;
+            }
+
+            index = 0;
             foreach (var hitObject in getDifficultyHitObjects())
             {
                 progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
 
                 foreach (var skill in skills)
-                    skill.ProcessInternal(hitObject);
+                    skill.ProcessInternal(preSkills, index, hitObject);
 
                 attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+                index++;
             }
 
             return attribs;
@@ -231,6 +256,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="clockRate">Clockrate to calculate difficulty with.</param>
         /// <returns>The <see cref="Skill"/>s.</returns>
         protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
+        protected abstract PreStrainSkill[] CreatePreSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
 
         /// <summary>
         /// Used to calculate timed difficulty attributes, where only a subset of hitobjects should be visible at any point in time.

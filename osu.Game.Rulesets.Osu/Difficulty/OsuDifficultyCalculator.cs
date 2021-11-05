@@ -114,6 +114,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
         }
 
+        protected override PreStrainSkill[] CreatePreSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        {
+            return new PreStrainSkill[]
+            {
+
+            };
+        }
+
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
             new OsuModDoubleTime(),

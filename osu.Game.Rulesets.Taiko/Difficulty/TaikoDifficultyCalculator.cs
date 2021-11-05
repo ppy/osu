@@ -37,6 +37,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             new Stamina(mods, false),
         };
 
+        protected override PreStrainSkill[] CreatePreSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        {
+            return new PreStrainSkill[]
+            {
+
+            };
+        }
+
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
             new TaikoModDoubleTime(),
