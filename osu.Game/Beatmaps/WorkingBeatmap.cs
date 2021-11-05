@@ -81,7 +81,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public virtual IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
+        public virtual IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
         {
             using (var cancellationSource = createCancellationTokenSource(timeout))
             {
@@ -105,7 +105,7 @@ namespace osu.Game.Beatmaps
                 }
 
                 // Convert
-                IBeatmap converted = converter.Convert(cancellationSource.Token);
+                IBeatmap converted = converter.Convert(cancellationToken != CancellationToken.None ? cancellationToken : cancellationSource.Token);
 
                 // Apply conversion mods to the result
                 foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
@@ -143,7 +143,7 @@ namespace osu.Game.Beatmaps
                         if (cancellationSource.IsCancellationRequested)
                             throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
-                        obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, cancellationSource.Token);
+                        obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, cancellationToken != CancellationToken.None ? cancellationToken : cancellationSource.Token);
                     }
                 }
                 catch (OperationCanceledException)
@@ -167,6 +167,7 @@ namespace osu.Game.Beatmaps
                 foreach (var mod in mods.OfType<IApplicableToBeatmap>())
                 {
                     cancellationSource.Token.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
                     mod.ApplyToBeatmap(converted);
                 }
 
