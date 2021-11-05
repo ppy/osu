@@ -29,6 +29,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplier => 23.25;
         private double strainDecayBase => 0.15;
 
+        private double calculateDefaultVelocity(double distance, double strainTime)
+        {
+            double defaultCalculation = distance / strainTime;
+
+            // 166.7 means 90bpm jump.
+            double staticJumpCalculation = distance / 166.7;
+             
+            return defaultCalculation * 0.9 + staticJumpCalculation * 0.05;
+        }
+
         private double strainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || Previous.Count <= 1 || Previous[0].BaseObject is Spinner)
@@ -39,24 +49,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuLastLastObj = (OsuDifficultyHitObject)Previous[1];
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
+            double currVelocity = calculateDefaultVelocity(osuCurrObj.JumpDistance, osuCurrObj.StrainTime);
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider)
             {
-                double movementVelocity = osuCurrObj.MovementDistance / osuCurrObj.MovementTime; // calculate the movement velocity from slider end to current object
-                double travelVelocity = osuCurrObj.TravelDistance / osuCurrObj.TravelTime; // calculate the slider velocity from slider head to slider end.
+                double movementVelocity = calculateDefaultVelocity(osuCurrObj.MovementDistance, osuCurrObj.MovementTime); // calculate the movement velocity from slider end to current object
+                double travelVelocity = calculateDefaultVelocity(osuCurrObj.TravelDistance, osuCurrObj.TravelTime); // calculate the slider velocity from slider head to slider end.
 
                 currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }
 
             // As above, do the same for the previous hitobject.
-            double prevVelocity = osuLastObj.JumpDistance / osuLastObj.StrainTime;
+            double prevVelocity = calculateDefaultVelocity(osuLastObj.JumpDistance, osuLastObj.StrainTime);
 
             if (osuLastLastObj.BaseObject is Slider)
             {
-                double movementVelocity = osuLastObj.MovementDistance / osuLastObj.MovementTime;
-                double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+                double movementVelocity = calculateDefaultVelocity(osuLastObj.MovementDistance, osuLastObj.MovementTime);
+                double travelVelocity = calculateDefaultVelocity(osuLastObj.TravelDistance, osuLastObj.TravelTime);
 
                 prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
             }
