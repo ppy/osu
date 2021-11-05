@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using osu.Framework.Bindables;
 using osu.Game.IO;
 
 namespace osu.Game.Database
@@ -18,16 +17,14 @@ namespace osu.Game.Database
         where TModel : class
     {
         /// <summary>
-        /// A bindable which contains a weak reference to the last item that was updated.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// Fired when an item is updated.
         /// </summary>
-        IBindable<WeakReference<TModel>> ItemUpdated { get; }
+        Action<TModel> ItemUpdated { get; set; }
 
         /// <summary>
-        /// A bindable which contains a weak reference to the last item that was removed.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// Fired when an item is removed.
         /// </summary>
-        IBindable<WeakReference<TModel>> ItemRemoved { get; }
+        Action<TModel> ItemRemoved { get; set; }
 
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
