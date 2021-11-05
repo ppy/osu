@@ -3,7 +3,6 @@
 
 using System;
 using osu.Game.Online.API;
-using osu.Framework.Bindables;
 
 namespace osu.Game.Database
 {
@@ -18,13 +17,13 @@ namespace osu.Game.Database
         /// Fired when a <typeparamref name="TModel"/> download begins.
         /// This is NOT run on the update thread and should be scheduled.
         /// </summary>
-        IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadBegan { get; }
+        Action<ArchiveDownloadRequest<TModel>> DownloadBegan { get; set; }
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> download is interrupted, either due to user cancellation or failure.
         /// This is NOT run on the update thread and should be scheduled.
         /// </summary>
-        IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadFailed { get; }
+        Action<ArchiveDownloadRequest<TModel>> DownloadFailed { get; set; }
 
         /// <summary>
         /// Begin a download for the requested <typeparamref name="TModel"/>.

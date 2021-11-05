@@ -206,17 +206,11 @@ namespace osu.Game
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
             // needs to be done here rather than inside SkinManager to ensure thread safety of CurrentSkinInfo.
-            SkinManager.ItemRemoved.BindValueChanged(weakRemovedInfo =>
+            SkinManager.ItemRemoved += item => Schedule(() =>
             {
-                if (weakRemovedInfo.NewValue.TryGetTarget(out var removedInfo))
-                {
-                    Schedule(() =>
-                    {
-                        // check the removed skin is not the current user choice. if it is, switch back to default.
-                        if (removedInfo.ID == SkinManager.CurrentSkinInfo.Value.ID)
-                            SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
-                    });
-                }
+                // check the removed skin is not the current user choice. if it is, switch back to default.
+                if (item.ID == SkinManager.CurrentSkinInfo.Value.ID)
+                    SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
             });
 
             EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
@@ -246,17 +240,8 @@ namespace osu.Game
                 return ScoreManager.QueryScores(s => beatmapIds.Contains(s.BeatmapInfo.ID)).ToList();
             }
 
-            BeatmapManager.ItemRemoved.BindValueChanged(i =>
-            {
-                if (i.NewValue.TryGetTarget(out var item))
-                    ScoreManager.Delete(getBeatmapScores(item), true);
-            });
-
-            BeatmapManager.ItemUpdated.BindValueChanged(i =>
-            {
-                if (i.NewValue.TryGetTarget(out var item))
-                    ScoreManager.Undelete(getBeatmapScores(item), true);
-            });
+            BeatmapManager.ItemRemoved += item => ScoreManager.Delete(getBeatmapScores(item), true);
+            BeatmapManager.ItemUpdated += item => ScoreManager.Undelete(getBeatmapScores(item), true);
 
             dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
             AddInternal(difficultyCache);

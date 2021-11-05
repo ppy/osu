@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -101,12 +100,20 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Fired when a single difficulty has been hidden.
         /// </summary>
-        public IBindable<WeakReference<BeatmapInfo>> BeatmapHidden => beatmapModelManager.BeatmapHidden;
+        public Action<BeatmapInfo> BeatmapHidden
+        {
+            get => beatmapModelManager.BeatmapHidden;
+            set => beatmapModelManager.BeatmapHidden = value;
+        }
 
         /// <summary>
         /// Fired when a single difficulty has been restored.
         /// </summary>
-        public IBindable<WeakReference<BeatmapInfo>> BeatmapRestored => beatmapModelManager.BeatmapRestored;
+        public Action<BeatmapInfo> BeatmapRestored
+        {
+            get => beatmapModelManager.BeatmapRestored;
+            set => beatmapModelManager.BeatmapRestored = value;
+        }
 
         /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
@@ -198,9 +205,17 @@ namespace osu.Game.Beatmaps
             return beatmapModelManager.IsAvailableLocally(model);
         }
 
-        public IBindable<WeakReference<BeatmapSetInfo>> ItemUpdated => beatmapModelManager.ItemUpdated;
+        public Action<BeatmapSetInfo> ItemUpdated
+        {
+            get => beatmapModelManager.ItemUpdated;
+            set => beatmapModelManager.ItemUpdated = value;
+        }
 
-        public IBindable<WeakReference<BeatmapSetInfo>> ItemRemoved => beatmapModelManager.ItemRemoved;
+        public Action<BeatmapSetInfo> ItemRemoved
+        {
+            get => beatmapModelManager.ItemRemoved;
+            set => beatmapModelManager.ItemRemoved = value;
+        }
 
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {
@@ -246,9 +261,17 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelDownloader<BeatmapSetInfo>
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadBegan => beatmapModelDownloader.DownloadBegan;
+        public Action<ArchiveDownloadRequest<BeatmapSetInfo>> DownloadBegan
+        {
+            get => beatmapModelDownloader.DownloadBegan;
+            set => beatmapModelDownloader.DownloadBegan = value;
+        }
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
+        public Action<ArchiveDownloadRequest<BeatmapSetInfo>> DownloadFailed
+        {
+            get => beatmapModelDownloader.DownloadFailed;
+            set => beatmapModelDownloader.DownloadFailed = value;
+        }
 
         // Temporary method until this class supports IBeatmapSetInfo or otherwise.
         public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false)

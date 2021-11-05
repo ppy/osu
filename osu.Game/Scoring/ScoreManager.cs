@@ -246,9 +246,17 @@ namespace osu.Game.Scoring
 
         #region Implementation of IModelManager<ScoreInfo>
 
-        public IBindable<WeakReference<ScoreInfo>> ItemUpdated => scoreModelManager.ItemUpdated;
+        public Action<ScoreInfo> ItemUpdated
+        {
+            get => scoreModelManager.ItemUpdated;
+            set => scoreModelManager.ItemUpdated = value;
+        }
 
-        public IBindable<WeakReference<ScoreInfo>> ItemRemoved => scoreModelManager.ItemRemoved;
+        public Action<ScoreInfo> ItemRemoved
+        {
+            get => scoreModelManager.ItemRemoved;
+            set => scoreModelManager.ItemRemoved = value;
+        }
 
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {
@@ -350,9 +358,17 @@ namespace osu.Game.Scoring
 
         #region Implementation of IModelDownloader<ScoreInfo>
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<ScoreInfo>>> DownloadBegan => scoreModelDownloader.DownloadBegan;
+        public Action<ArchiveDownloadRequest<ScoreInfo>> DownloadBegan
+        {
+            get => scoreModelDownloader.DownloadBegan;
+            set => scoreModelDownloader.DownloadBegan = value;
+        }
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<ScoreInfo>>> DownloadFailed => scoreModelDownloader.DownloadFailed;
+        public Action<ArchiveDownloadRequest<ScoreInfo>> DownloadFailed
+        {
+            get => scoreModelDownloader.DownloadFailed;
+            set => scoreModelDownloader.DownloadFailed = value;
+        }
 
         public bool Download(ScoreInfo model, bool minimiseDownloadSize)
         {

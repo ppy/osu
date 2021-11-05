@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 
@@ -23,11 +22,6 @@ namespace osu.Game.Online
         {
         }
 
-        private IBindable<WeakReference<BeatmapSetInfo>>? managerUpdated;
-        private IBindable<WeakReference<BeatmapSetInfo>>? managerRemoved;
-        private IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>>? managerDownloadBegan;
-        private IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>>? managerDownloadFailed;
-
         [BackgroundDependencyLoader(true)]
         private void load()
         {
@@ -42,39 +36,23 @@ namespace osu.Game.Online
             else
                 attachDownload(Manager.GetExistingDownload(beatmapSetInfo));
 
-            managerDownloadBegan = Manager.DownloadBegan.GetBoundCopy();
-            managerDownloadBegan.BindValueChanged(downloadBegan);
-            managerDownloadFailed = Manager.DownloadFailed.GetBoundCopy();
-            managerDownloadFailed.BindValueChanged(downloadFailed);
-            managerUpdated = Manager.ItemUpdated.GetBoundCopy();
-            managerUpdated.BindValueChanged(itemUpdated);
-            managerRemoved = Manager.ItemRemoved.GetBoundCopy();
-            managerRemoved.BindValueChanged(itemRemoved);
+            Manager.DownloadBegan += downloadBegan;
+            Manager.DownloadFailed += downloadFailed;
+            Manager.ItemUpdated += itemUpdated;
+            Manager.ItemRemoved += itemRemoved;
         }
 
-        private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> weakRequest)
+        private void downloadBegan(ArchiveDownloadRequest<BeatmapSetInfo> request) => Schedule(() =>
         {
-            if (weakRequest.NewValue.TryGetTarget(out var request))
-            {
-                Schedule(() =>
-                {
-                    if (checkEquality(request.Model, TrackedItem))
-                        attachDownload(request);
-                });
-            }
-        }
+            if (checkEquality(request.Model, TrackedItem))
+                attachDownload(request);
+        });
 
-        private void downloadFailed(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> weakRequest)
+        private void downloadFailed(ArchiveDownloadRequest<BeatmapSetInfo> request) => Schedule(() =>
         {
-            if (weakRequest.NewValue.TryGetTarget(out var request))
-            {
-                Schedule(() =>
-                {
-                    if (checkEquality(request.Model, TrackedItem))
-                        attachDownload(null);
-                });
-            }
-        }
+            if (checkEquality(request.Model, TrackedItem))
+                attachDownload(null);
+        });
 
         private void attachDownload(ArchiveDownloadRequest<BeatmapSetInfo>? request)
         {
@@ -116,29 +94,17 @@ namespace osu.Game.Online
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void itemUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
+        private void itemUpdated(BeatmapSetInfo item) => Schedule(() =>
         {
-            if (weakItem.NewValue.TryGetTarget(out var item))
-            {
-                Schedule(() =>
-                {
-                    if (checkEquality(item, TrackedItem))
-                        UpdateState(DownloadState.LocallyAvailable);
-                });
-            }
-        }
+            if (checkEquality(item, TrackedItem))
+                UpdateState(DownloadState.LocallyAvailable);
+        });
 
-        private void itemRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
+        private void itemRemoved(BeatmapSetInfo item) => Schedule(() =>
         {
-            if (weakItem.NewValue.TryGetTarget(out var item))
-            {
-                Schedule(() =>
-                {
-                    if (checkEquality(item, TrackedItem))
-                        UpdateState(DownloadState.NotDownloaded);
-                });
-            }
-        }
+            if (checkEquality(item, TrackedItem))
+                UpdateState(DownloadState.NotDownloaded);
+        });
 
         private bool checkEquality(IBeatmapSetInfo x, IBeatmapSetInfo y) => x.OnlineID == y.OnlineID;
 
@@ -148,6 +114,14 @@ namespace osu.Game.Online
         {
             base.Dispose(isDisposing);
             attachDownload(null);
+
+            if (Manager != null)
+            {
+                Manager.DownloadBegan -= downloadBegan;
+                Manager.DownloadFailed -= downloadFailed;
+                Manager.ItemUpdated -= itemUpdated;
+                Manager.ItemRemoved -= itemRemoved;
+            }
         }
 
         #endregion
