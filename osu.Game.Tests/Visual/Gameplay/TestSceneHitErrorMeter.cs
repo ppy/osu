@@ -235,10 +235,17 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override IEnumerable<HitObject> Objects => new[] { new HitCircle { HitWindows = HitWindows } };
 
-#pragma warning disable 67
-            public override event Action<JudgementResult> NewResult;
-            public override event Action<JudgementResult> RevertResult;
-#pragma warning restore 67
+            public override event Action<JudgementResult> NewResult
+            {
+                add => throw new InvalidOperationException();
+                remove => throw new InvalidOperationException();
+            }
+
+            public override event Action<JudgementResult> RevertResult
+            {
+                add => throw new InvalidOperationException();
+                remove => throw new InvalidOperationException();
+            }
 
             public override Playfield Playfield { get; }
             public override Container Overlays { get; }
