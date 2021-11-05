@@ -16,7 +16,7 @@ namespace osu.Game.Online
         [Resolved(CanBeNull = true)]
         protected ScoreManager? Manager { get; private set; }
 
-        private ArchiveDownloadRequest<ScoreInfo>? attachedRequest;
+        private ArchiveDownloadRequest<IScoreInfo>? attachedRequest;
 
         public ScoreDownloadTracker(ScoreInfo trackedItem)
             : base(trackedItem)
@@ -25,8 +25,8 @@ namespace osu.Game.Online
 
         private IBindable<WeakReference<ScoreInfo>>? managerUpdated;
         private IBindable<WeakReference<ScoreInfo>>? managerRemoved;
-        private IBindable<WeakReference<ArchiveDownloadRequest<ScoreInfo>>>? managerDownloadBegan;
-        private IBindable<WeakReference<ArchiveDownloadRequest<ScoreInfo>>>? managerDownloadFailed;
+        private IBindable<WeakReference<ArchiveDownloadRequest<IScoreInfo>>>? managerDownloadBegan;
+        private IBindable<WeakReference<ArchiveDownloadRequest<IScoreInfo>>>? managerDownloadFailed;
 
         [BackgroundDependencyLoader(true)]
         private void load()
@@ -56,7 +56,7 @@ namespace osu.Game.Online
             managerRemoved.BindValueChanged(itemRemoved);
         }
 
-        private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<ScoreInfo>>> weakRequest)
+        private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<IScoreInfo>>> weakRequest)
         {
             if (weakRequest.NewValue.TryGetTarget(out var request))
             {
@@ -68,7 +68,7 @@ namespace osu.Game.Online
             }
         }
 
-        private void downloadFailed(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<ScoreInfo>>> weakRequest)
+        private void downloadFailed(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<IScoreInfo>>> weakRequest)
         {
             if (weakRequest.NewValue.TryGetTarget(out var request))
             {
@@ -80,7 +80,7 @@ namespace osu.Game.Online
             }
         }
 
-        private void attachDownload(ArchiveDownloadRequest<ScoreInfo>? request)
+        private void attachDownload(ArchiveDownloadRequest<IScoreInfo>? request)
         {
             if (attachedRequest != null)
             {
@@ -144,7 +144,7 @@ namespace osu.Game.Online
             }
         }
 
-        private bool checkEquality(ScoreInfo x, ScoreInfo y) => x.OnlineScoreID == y.OnlineScoreID;
+        private bool checkEquality(IScoreInfo x, IScoreInfo y) => x.OnlineID == y.OnlineID;
 
         #region Disposal
 
