@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
                     Current = 727,
                     Progress = 69,
                 },
-                RankHistory = new APIUser.RankHistoryData
+                RankHistory = new APIRankHistory
                 {
                     Mode = @"osu",
                     Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Online
             },
             Title = "osu!volunteer",
             Colour = "ff0000",
-            Achievements = Array.Empty<APIUser.UserAchievement>(),
+            Achievements = Array.Empty<APIUserAchievement>(),
         };
 
         public TestSceneUserProfileOverlay()

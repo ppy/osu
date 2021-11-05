@@ -7,7 +7,6 @@ using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osu.Game.Utils;
-using static osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Users
 {
@@ -35,7 +34,7 @@ namespace osu.Game.Users
         public int? CountryRank;
 
         // populated via User model, as that's where the data currently lives.
-        public RankHistoryData RankHistory;
+        public APIRankHistory RankHistory;
 
         [JsonProperty(@"pp")]
         public decimal? PP;
