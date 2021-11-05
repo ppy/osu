@@ -339,4 +339,3 @@ inspectcode
 
 # Fody (pulled in by Realm) - schema file
 FodyWeavers.xsd
-/osu.Game/FodyWeavers.xml
