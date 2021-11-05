@@ -4,10 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -18,8 +16,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
-using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
@@ -28,19 +24,17 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        protected override bool IsRollingProportional => true;
-
         protected override double RollingDuration => 750;
 
         private const float alpha_when_invalid = 0.3f;
 
-        private List<double> hitList = new List<double>();
+        private readonly List<double> hitOffsets = new List<double>();
 
+        //May be able to remove the CanBeNull as ScoreProcessor should exist everywhere, for example, in the skin editor it is cached.
         [CanBeNull]
         [Resolved(CanBeNull = true)]
         private ScoreProcessor scoreProcessor { get; set; }
 
-        private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
         public UnstableRateCounter()
         {
             Current.Value = 0.0;
@@ -56,17 +50,18 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            if (scoreProcessor != null)
-            {
-                scoreProcessor.NewJudgement += onJudgementAdded;
-                scoreProcessor.JudgementReverted += onJudgementChanged;
-            }
+            if (scoreProcessor == null) return;
+
+            scoreProcessor.NewJudgement += onJudgementAdded;
+            scoreProcessor.JudgementReverted += onJudgementReverted;
         }
 
-        private bool isValid = false;
+        private bool isValid;
+
         private void setValid(bool valid)
         {
             if (isValid == valid) return;
+
             DrawableCount.FadeTo(valid ? 1 : alpha_when_invalid, 1000, Easing.OutQuint);
             isValid = valid;
         }
@@ -75,39 +70,46 @@ namespace osu.Game.Screens.Play.HUD
         {
             if (!(judgement.HitObject.HitWindows is HitWindows.EmptyHitWindows) && judgement.IsHit)
             {
-                hitList.Add(judgement.TimeOffset);
+                hitOffsets.Add(judgement.TimeOffset);
             }
-            updateUR();
+
+            updateUr();
         }
 
-        // Only populate via the score if the user has moved the current location.
-        private void onJudgementChanged(JudgementResult judgement)
+        // If a judgement was reverted successfully, remove the item from the hitOffsets list.
+        private void onJudgementReverted(JudgementResult judgement)
         {
-            ScoreInfo currentScore = new ScoreInfo();
-            scoreProcessor.PopulateScore(currentScore);
-            hitList = currentScore.HitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit())
-                                            .Select(ev => ev.TimeOffset).ToList<double>();
-            updateUR();
+            //Score Processor Conditions to revert
+            if (judgement.FailedAtJudgement || !judgement.Type.IsScorable())
+                return;
+            //UR Conditions to Revert
+            if (judgement.HitObject.HitWindows is HitWindows.EmptyHitWindows || !judgement.IsHit)
+                return;
+
+            hitOffsets.RemoveAt(hitOffsets.Count - 1);
+            updateUr();
         }
 
-        private void updateUR()
+        private void updateUr()
         {
-            if (hitList.Count > 1)
+            // At Count = 0, we get NaN, While we are allowing count = 1, it will be 0 since average = offset.
+            if (hitOffsets.Count > 0)
             {
-                double mean = hitList.Average();
-                double squares = hitList.Select(offset => Math.Pow(offset - mean, 2)).Sum();
-                Current.Value = Math.Sqrt(squares / hitList.Count) * 10;
+                double mean = hitOffsets.Average();
+                double squares = hitOffsets.Select(offset => Math.Pow(offset - mean, 2)).Sum();
+                Current.Value = Math.Sqrt(squares / hitOffsets.Count) * 10;
                 setValid(true);
             }
             else
             {
+                Current.Value = 0;
                 setValid(false);
             }
         }
 
         protected override LocalisableString FormatCount(double count)
         {
-            return count.ToString("0.00");
+            return count.ToString("0.00 UR");
         }
 
         protected override IHasText CreateText() => new TextComponent
@@ -119,12 +121,10 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (scoreProcessor != null)
-            {
-                scoreProcessor.NewJudgement -= onJudgementAdded;
-                scoreProcessor.JudgementReverted -= onJudgementChanged;
-            }
-            loadCancellationSource?.Cancel();
+            if (scoreProcessor == null) return;
+
+            scoreProcessor.NewJudgement -= onJudgementAdded;
+            scoreProcessor.JudgementReverted -= onJudgementReverted;
         }
 
         private class TextComponent : CompositeDrawable, IHasText
@@ -132,11 +132,12 @@ namespace osu.Game.Screens.Play.HUD
             public LocalisableString Text
             {
                 get => intPart.Text;
-                set {
+                set
+                {
                     //Not too sure about this, is there a better way to go about doing this?
                     splitValue = value.ToString().Split('.');
                     intPart.Text = splitValue[0];
-                    decimalPart.Text = $".{splitValue[1]} UR";
+                    decimalPart.Text = splitValue[1];
                 }
             }
 
@@ -158,6 +159,14 @@ namespace osu.Game.Screens.Play.HUD
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = OsuFont.Numeric.With(size: 8, fixedWidth: true),
+                            Text = ".",
+                            Padding = new MarginPadding { Bottom = 1.5f },
                         },
                         decimalPart = new OsuSpriteText
                         {
