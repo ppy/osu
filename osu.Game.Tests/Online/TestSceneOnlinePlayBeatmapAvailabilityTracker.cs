@@ -180,7 +180,7 @@ namespace osu.Game.Tests.Online
                 {
                 }
 
-                protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
+                protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize)
                     => new TestDownloadRequest(set);
             }
 
@@ -202,12 +202,12 @@ namespace osu.Game.Tests.Online
             }
         }
 
-        private class TestDownloadRequest : ArchiveDownloadRequest<BeatmapSetInfo>
+        private class TestDownloadRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
         {
             public new void SetProgress(float progress) => base.SetProgress(progress);
             public new void TriggerSuccess(string filename) => base.TriggerSuccess(filename);
 
-            public TestDownloadRequest(BeatmapSetInfo model)
+            public TestDownloadRequest(IBeatmapSetInfo model)
                 : base(model)
             {
             }

@@ -14,23 +14,24 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Database
 {
-    public abstract class ModelDownloader<TModel> : IModelDownloader<TModel>
-        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>
+    public abstract class ModelDownloader<TModel, T> : IModelDownloader<T>
+        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>, T
+        where T : class
     {
         public Action<Notification> PostNotification { protected get; set; }
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadBegan => downloadBegan;
+        public IBindable<WeakReference<ArchiveDownloadRequest<T>>> DownloadBegan => downloadBegan;
 
-        private readonly Bindable<WeakReference<ArchiveDownloadRequest<TModel>>> downloadBegan = new Bindable<WeakReference<ArchiveDownloadRequest<TModel>>>();
+        private readonly Bindable<WeakReference<ArchiveDownloadRequest<T>>> downloadBegan = new Bindable<WeakReference<ArchiveDownloadRequest<T>>>();
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadFailed => downloadFailed;
+        public IBindable<WeakReference<ArchiveDownloadRequest<T>>> DownloadFailed => downloadFailed;
 
-        private readonly Bindable<WeakReference<ArchiveDownloadRequest<TModel>>> downloadFailed = new Bindable<WeakReference<ArchiveDownloadRequest<TModel>>>();
+        private readonly Bindable<WeakReference<ArchiveDownloadRequest<T>>> downloadFailed = new Bindable<WeakReference<ArchiveDownloadRequest<T>>>();
 
         private readonly IModelImporter<TModel> importer;
         private readonly IAPIProvider api;
 
-        protected readonly List<ArchiveDownloadRequest<TModel>> CurrentDownloads = new List<ArchiveDownloadRequest<TModel>>();
+        protected readonly List<ArchiveDownloadRequest<T>> CurrentDownloads = new List<ArchiveDownloadRequest<T>>();
 
         protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider api, IIpcHost importHost = null)
         {
@@ -39,14 +40,14 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Creates the download request for this <typeparamref name="TModel"/>.
+        /// Creates the download request for this <typeparamref name="T"/>.
         /// </summary>
-        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="T"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
-        protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool minimiseDownloadSize);
+        protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model, bool minimiseDownloadSize);
 
-        public bool Download(TModel model, bool minimiseDownloadSize = false)
+        public bool Download(T model, bool minimiseDownloadSize = false)
         {
             if (!canDownload(model)) return false;
 
@@ -72,7 +73,7 @@ namespace osu.Game.Database
 
                     // for now a failed import will be marked as a failed download for simplicity.
                     if (!imported.Any())
-                        downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+                        downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
 
                     CurrentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
@@ -91,14 +92,14 @@ namespace osu.Game.Database
 
             api.PerformAsync(request);
 
-            downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+            downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
             return true;
 
             void triggerFailure(Exception error)
             {
                 CurrentDownloads.Remove(request);
 
-                downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+                downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
 
                 notification.State = ProgressNotificationState.Cancelled;
 
@@ -107,9 +108,9 @@ namespace osu.Game.Database
             }
         }
 
-        public abstract ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model);
+        public abstract ArchiveDownloadRequest<T> GetExistingDownload(T model);
 
-        private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
+        private bool canDownload(T model) => GetExistingDownload(model) == null && api != null;
 
         private class DownloadNotification : ProgressNotification
         {
