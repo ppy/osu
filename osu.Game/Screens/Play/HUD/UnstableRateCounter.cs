@@ -21,7 +21,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -64,11 +63,11 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private bool isValid;
+        private bool isValid = false;
         private void setValid(bool valid)
         {
             if (isValid == valid) return;
-            DrawableCount.FadeTo(isValid ? 1 : alpha_when_invalid, 1000, Easing.OutQuint);
+            DrawableCount.FadeTo(valid ? 1 : alpha_when_invalid, 1000, Easing.OutQuint);
             isValid = valid;
         }
 
@@ -81,7 +80,7 @@ namespace osu.Game.Screens.Play.HUD
             updateUR();
         }
 
-        // Only populate via the score if the user has moved the current location. 
+        // Only populate via the score if the user has moved the current location.
         private void onJudgementChanged(JudgementResult judgement)
         {
             ScoreInfo currentScore = new ScoreInfo();
@@ -93,7 +92,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateUR()
         {
-            if (hitList.Count > 0)
+            if (hitList.Count > 1)
             {
                 double mean = hitList.Average();
                 double squares = hitList.Select(offset => Math.Pow(offset - mean, 2)).Sum();
@@ -152,7 +151,6 @@ namespace osu.Game.Screens.Play.HUD
                 InternalChild = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    //Spacing = new Vector2(2),
                     Children = new Drawable[]
                     {
                         intPart = new OsuSpriteText
@@ -165,7 +163,6 @@ namespace osu.Game.Screens.Play.HUD
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Text = @" UR",
                             Font = OsuFont.Numeric.With(size: 8, fixedWidth: true),
                             Padding = new MarginPadding { Bottom = 1.5f },
                         }
