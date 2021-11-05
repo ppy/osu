@@ -212,9 +212,9 @@ namespace osu.Game.Database
                     var oldMetadata = migration.OldRealm.DynamicApi.All(getMappedOrOriginalName(typeof(RealmBeatmapMetadata)));
                     var newMetadata = migration.NewRealm.All<RealmBeatmapMetadata>();
 
-                    int itemCount = newMetadata.Count();
+                    int metadataCount = newMetadata.Count();
 
-                    for (int i = 0; i < itemCount; i++)
+                    for (int i = 0; i < metadataCount; i++)
                     {
                         dynamic? oldItem = oldMetadata.ElementAt(i);
                         var newItem = newMetadata.ElementAt(i);
