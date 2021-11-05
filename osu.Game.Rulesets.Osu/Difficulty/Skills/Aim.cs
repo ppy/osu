@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // 166.7 means 90bpm jump.
             double staticJumpCalculation = distance / 166.7;
              
-            return defaultCalculation * 0.9 + staticJumpCalculation * 0.05;
+            return defaultCalculation * 0.9 + staticJumpCalculation * 0.1;
         }
 
         private double strainValueOf(DifficultyHitObject current)
