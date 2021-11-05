@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : IModelDownloader<BeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
+    public class BeatmapManager : IModelDownloader<IBeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         private readonly BeatmapModelManager beatmapModelManager;
         private readonly BeatmapModelDownloader beatmapModelDownloader;
@@ -246,33 +246,16 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelDownloader<BeatmapSetInfo>
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadBegan => beatmapModelDownloader.DownloadBegan;
+        public IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> DownloadBegan => beatmapModelDownloader.DownloadBegan;
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
+        public IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
 
-        // Temporary method until this class supports IBeatmapSetInfo or otherwise.
         public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false)
-        {
-            return beatmapModelDownloader.Download(new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = model.OnlineID,
-                Metadata = new BeatmapMetadata
-                {
-                    Title = model.Metadata?.Title ?? string.Empty,
-                    Artist = model.Metadata?.Artist ?? string.Empty,
-                    TitleUnicode = model.Metadata?.TitleUnicode ?? string.Empty,
-                    ArtistUnicode = model.Metadata?.ArtistUnicode ?? string.Empty,
-                    Author = new User { Username = model.Metadata?.Author },
-                }
-            }, minimiseDownloadSize);
-        }
-
-        public bool Download(BeatmapSetInfo model, bool minimiseDownloadSize = false)
         {
             return beatmapModelDownloader.Download(model, minimiseDownloadSize);
         }
 
-        public ArchiveDownloadRequest<BeatmapSetInfo> GetExistingDownload(BeatmapSetInfo model)
+        public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model)
         {
             return beatmapModelDownloader.GetExistingDownload(model);
         }
