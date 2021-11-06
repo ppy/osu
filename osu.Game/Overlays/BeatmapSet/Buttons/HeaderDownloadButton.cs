@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -45,8 +46,11 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             RelativeSizeAxes = Axes.Y;
         }
 
+        [Resolved]
+        private MConfigManager mConfig { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, BeatmapManager beatmaps, MConfigManager mfconfig)
+        private void load(IAPIProvider api, BeatmapManager beatmaps)
         {
             FillFlowContainer textSprites;
 
@@ -99,7 +103,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet.Value, noVideo);
+                if (mConfig.Get<bool>(MSetting.UseSayobot))
+                    beatmaps.SayoDownload(BeatmapSet.Value, noVideo, false);
+                else
+                    beatmaps.Download(BeatmapSet.Value, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);
@@ -108,6 +115,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             State.BindValueChanged(state =>
             {
+                Logger.Log($"State: {state.OldValue} -> {state.NewValue}");
+
                 switch (state.NewValue)
                 {
                     case DownloadState.Downloading:

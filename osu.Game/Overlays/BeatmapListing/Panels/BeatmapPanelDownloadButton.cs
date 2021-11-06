@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, BeatmapManager beatmaps, OsuConfigManager osuConfig, MConfigManager mfconfig)
+        private void load(OsuGame game, BeatmapManager beatmaps, OsuConfigManager osuConfig, MConfigManager mConfig)
         {
             noVideoSetting = osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
@@ -77,7 +77,10 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
 
                     default:
-                        beatmaps.Download(BeatmapSet.Value, noVideoSetting.Value);
+                        if (mConfig.Get<bool>(MSetting.UseSayobot))
+                            beatmaps.SayoDownload(BeatmapSet.Value, noVideoSetting.Value, false);
+                        else
+                            beatmaps.Download(BeatmapSet.Value, noVideoSetting.Value);
                         break;
                 }
             };

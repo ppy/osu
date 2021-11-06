@@ -27,6 +27,7 @@ namespace osu.Game.Configuration
             base.InitialiseDefaults();
 
             //Other Settings
+            SetDefault(MSetting.UseSayobot, false);
             SetDefault(MSetting.DoNotShowDisclaimer, false);
 
             //UI Settings
@@ -110,6 +111,7 @@ namespace osu.Game.Configuration
     {
         OptUI,
         TrianglesEnabled,
+        UseSayobot,
         MvisBgBlur,
         MvisStoryboardProxy,
         MvisIdleBgDim,

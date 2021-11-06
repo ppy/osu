@@ -15,6 +15,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Database.Sayo;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
@@ -29,10 +30,11 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : IModelDownloader<BeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IWorkingBeatmapCache, IDisposable
+    public class BeatmapManager : IModelDownloader<BeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IWorkingBeatmapCache, IDisposable, ISayoModelDownloader<BeatmapSetInfo>
     {
         private readonly BeatmapModelManager beatmapModelManager;
         private readonly BeatmapModelDownloader beatmapModelDownloader;
+        private readonly SayoBeatmapModelDownloader sayoBeatmapModelDownloader;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue onlineBeatmapLookupQueue;
@@ -43,6 +45,8 @@ namespace osu.Game.Beatmaps
             beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, api, host);
             beatmapModelDownloader = CreateBeatmapModelDownloader(beatmapModelManager, api, host);
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, resources, new FileStore(contextFactory, storage).Store, defaultBeatmap, host);
+
+            sayoBeatmapModelDownloader = new SayoBeatmapModelDownloader(beatmapModelManager, api, host);
 
             workingBeatmapCache.BeatmapManager = beatmapModelManager;
             beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
@@ -173,6 +177,7 @@ namespace osu.Game.Beatmaps
             {
                 beatmapModelManager.PostNotification = value;
                 beatmapModelDownloader.PostNotification = value;
+                sayoBeatmapModelDownloader.PostNotification = value;
             }
         }
 
@@ -239,6 +244,19 @@ namespace osu.Game.Beatmaps
         public void Undelete(BeatmapSetInfo item)
         {
             beatmapModelManager.Undelete(item);
+        }
+
+        #endregion
+
+        #region Implementation of ISayoModelDownloader<BeatmapSetInfo>
+
+        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> SayoDownloadBegan => sayoBeatmapModelDownloader.SayoDownloadBegan;
+
+        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> SayoDownloadFailed => sayoBeatmapModelDownloader.SayoDownloadBegan;
+
+        public bool SayoDownload(BeatmapSetInfo model, bool noVideo, bool mini)
+        {
+            return sayoBeatmapModelDownloader.SayoDownload(model, noVideo, mini);
         }
 
         #endregion

@@ -30,24 +30,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             string resource = null;
 
-            Logger.Log($"封面： {set.Covers.Card}");
-
-            switch (type)
-            {
-                case BeatmapSetCoverType.Cover:
-                    resource = set.Covers.Cover;
-                    break;
-
-                case BeatmapSetCoverType.Card:
-                    resource = set.Covers.Card;
-                    break;
-
-                case BeatmapSetCoverType.List:
-                    resource = set.Covers.List;
-                    break;
-            }
-
-            /*switch (mfconfig.Get<bool>(MSetting.UseSayobot))
+            switch (mfconfig.Get<bool>(MSetting.UseSayobot))
             {
                 case true:
                     string targetID = set.Covers.Card;
@@ -87,7 +70,7 @@ namespace osu.Game.Beatmaps.Drawables
                     }
 
                     break;
-            }*/
+            }
 
             if (resource != null)
                 Texture = textures.Get(resource);

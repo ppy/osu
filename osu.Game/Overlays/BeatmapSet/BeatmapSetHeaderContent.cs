@@ -3,14 +3,12 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -54,11 +52,9 @@ namespace osu.Game.Overlays.BeatmapSet
         [Resolved]
         private BeatmapRulesetSelector rulesetSelector { get; set; }
 
-        private readonly BindableBool useSayobot = new BindableBool();
-        private readonly ExternalLinkButton externalLink;
-
         public BeatmapSetHeaderContent()
         {
+            ExternalLinkButton externalLink;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             InternalChild = new Container
@@ -217,22 +213,13 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.BeatmapInfo = b.NewValue;
-                externalLink.Link = SelectServer(b.NewValue);
+                externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
             };
-        }
-
-        protected virtual string SelectServer(BeatmapInfo b)
-        {
-            return $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
         }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
         {
-            useSayobot.ValueChanged += _ =>
-            {
-                externalLink.Link = SelectServer(Details.BeatmapInfo);
-            };
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
 
             State.BindValueChanged(_ => updateDownloadButtons());
