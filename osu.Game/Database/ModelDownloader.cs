@@ -19,9 +19,9 @@ namespace osu.Game.Database
     {
         public Action<Notification> PostNotification { protected get; set; }
 
-        public Action<ArchiveDownloadRequest<T>> DownloadBegan { get; set; }
+        public event Action<ArchiveDownloadRequest<T>> DownloadBegan;
 
-        public Action<ArchiveDownloadRequest<T>> DownloadFailed { get; set; }
+        public event Action<ArchiveDownloadRequest<T>> DownloadFailed;
 
         private readonly IModelImporter<TModel> importer;
         private readonly IAPIProvider api;

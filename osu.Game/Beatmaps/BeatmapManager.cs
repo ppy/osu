@@ -205,16 +205,16 @@ namespace osu.Game.Beatmaps
             return beatmapModelManager.IsAvailableLocally(model);
         }
 
-        public Action<BeatmapSetInfo> ItemUpdated
+        public event Action<BeatmapSetInfo> ItemUpdated
         {
-            get => beatmapModelManager.ItemUpdated;
-            set => beatmapModelManager.ItemUpdated = value;
+            add => beatmapModelManager.ItemUpdated += value;
+            remove => beatmapModelManager.ItemUpdated -= value;
         }
 
-        public Action<BeatmapSetInfo> ItemRemoved
+        public event Action<BeatmapSetInfo> ItemRemoved
         {
-            get => beatmapModelManager.ItemRemoved;
-            set => beatmapModelManager.ItemRemoved = value;
+            add => beatmapModelManager.ItemRemoved += value;
+            remove => beatmapModelManager.ItemRemoved -= value;
         }
 
         public Task ImportFromStableAsync(StableStorage stableStorage)
@@ -261,16 +261,16 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelDownloader<BeatmapSetInfo>
 
-        public Action<ArchiveDownloadRequest<IBeatmapSetInfo>> DownloadBegan
+        public event Action<ArchiveDownloadRequest<IBeatmapSetInfo>> DownloadBegan
         {
-            get => beatmapModelDownloader.DownloadBegan;
-            set => beatmapModelDownloader.DownloadBegan = value;
+            add => beatmapModelDownloader.DownloadBegan += value;
+            remove => beatmapModelDownloader.DownloadBegan -= value;
         }
 
-        public Action<ArchiveDownloadRequest<IBeatmapSetInfo>> DownloadFailed
+        public event Action<ArchiveDownloadRequest<IBeatmapSetInfo>> DownloadFailed
         {
-            get => beatmapModelDownloader.DownloadFailed;
-            set => beatmapModelDownloader.DownloadFailed = value;
+            add => beatmapModelDownloader.DownloadFailed += value;
+            remove => beatmapModelDownloader.DownloadFailed -= value;
         }
 
         public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false)
