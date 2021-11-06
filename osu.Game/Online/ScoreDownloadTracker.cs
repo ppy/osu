@@ -15,7 +15,7 @@ namespace osu.Game.Online
         [Resolved(CanBeNull = true)]
         protected ScoreManager? Manager { get; private set; }
 
-        private ArchiveDownloadRequest<ScoreInfo>? attachedRequest;
+        private ArchiveDownloadRequest<IScoreInfo>? attachedRequest;
 
         public ScoreDownloadTracker(ScoreInfo trackedItem)
             : base(trackedItem)
@@ -46,19 +46,19 @@ namespace osu.Game.Online
             Manager.ItemRemoved += itemRemoved;
         }
 
-        private void downloadBegan(ArchiveDownloadRequest<ScoreInfo> request) => Schedule(() =>
+        private void downloadBegan(ArchiveDownloadRequest<IScoreInfo> request) => Schedule(() =>
         {
             if (checkEquality(request.Model, TrackedItem))
                 attachDownload(request);
         });
 
-        private void downloadFailed(ArchiveDownloadRequest<ScoreInfo> request) => Schedule(() =>
+        private void downloadFailed(ArchiveDownloadRequest<IScoreInfo> request) => Schedule(() =>
         {
             if (checkEquality(request.Model, TrackedItem))
                 attachDownload(null);
         });
 
-        private void attachDownload(ArchiveDownloadRequest<ScoreInfo>? request)
+        private void attachDownload(ArchiveDownloadRequest<IScoreInfo>? request)
         {
             if (attachedRequest != null)
             {
@@ -110,7 +110,7 @@ namespace osu.Game.Online
                 UpdateState(DownloadState.LocallyAvailable);
         });
 
-        private bool checkEquality(ScoreInfo x, ScoreInfo y) => x.OnlineScoreID == y.OnlineScoreID;
+        private bool checkEquality(IScoreInfo x, IScoreInfo y) => x.OnlineID == y.OnlineID;
 
         #region Disposal
 

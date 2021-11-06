@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : IModelDownloader<BeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IWorkingBeatmapCache, IDisposable
+    public class BeatmapManager : IModelDownloader<IBeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         private readonly BeatmapModelManager beatmapModelManager;
         private readonly BeatmapModelDownloader beatmapModelDownloader;
@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected virtual BeatmapModelDownloader CreateBeatmapModelDownloader(IBeatmapModelManager modelManager, IAPIProvider api, GameHost host)
+        protected virtual BeatmapModelDownloader CreateBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> modelManager, IAPIProvider api, GameHost host)
         {
             return new BeatmapModelDownloader(modelManager, api, host);
         }
@@ -261,41 +261,24 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelDownloader<BeatmapSetInfo>
 
-        public Action<ArchiveDownloadRequest<BeatmapSetInfo>> DownloadBegan
+        public Action<ArchiveDownloadRequest<IBeatmapSetInfo>> DownloadBegan
         {
             get => beatmapModelDownloader.DownloadBegan;
             set => beatmapModelDownloader.DownloadBegan = value;
         }
 
-        public Action<ArchiveDownloadRequest<BeatmapSetInfo>> DownloadFailed
+        public Action<ArchiveDownloadRequest<IBeatmapSetInfo>> DownloadFailed
         {
             get => beatmapModelDownloader.DownloadFailed;
             set => beatmapModelDownloader.DownloadFailed = value;
         }
 
-        // Temporary method until this class supports IBeatmapSetInfo or otherwise.
         public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false)
-        {
-            return beatmapModelDownloader.Download(new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = model.OnlineID,
-                Metadata = new BeatmapMetadata
-                {
-                    Title = model.Metadata?.Title ?? string.Empty,
-                    Artist = model.Metadata?.Artist ?? string.Empty,
-                    TitleUnicode = model.Metadata?.TitleUnicode ?? string.Empty,
-                    ArtistUnicode = model.Metadata?.ArtistUnicode ?? string.Empty,
-                    Author = new User { Username = model.Metadata?.Author },
-                }
-            }, minimiseDownloadSize);
-        }
-
-        public bool Download(BeatmapSetInfo model, bool minimiseDownloadSize = false)
         {
             return beatmapModelDownloader.Download(model, minimiseDownloadSize);
         }
 
-        public ArchiveDownloadRequest<BeatmapSetInfo> GetExistingDownload(BeatmapSetInfo model)
+        public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model)
         {
             return beatmapModelDownloader.GetExistingDownload(model);
         }

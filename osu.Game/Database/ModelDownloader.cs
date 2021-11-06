@@ -13,35 +13,36 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Database
 {
-    public abstract class ModelDownloader<TModel> : IModelDownloader<TModel>
-        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>
+    public abstract class ModelDownloader<TModel, T> : IModelDownloader<T>
+        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>, T
+        where T : class
     {
         public Action<Notification> PostNotification { protected get; set; }
 
-        public Action<ArchiveDownloadRequest<TModel>> DownloadBegan { get; set; }
+        public Action<ArchiveDownloadRequest<T>> DownloadBegan { get; set; }
 
-        public Action<ArchiveDownloadRequest<TModel>> DownloadFailed { get; set; }
+        public Action<ArchiveDownloadRequest<T>> DownloadFailed { get; set; }
 
-        private readonly IModelManager<TModel> modelManager;
+        private readonly IModelImporter<TModel> importer;
         private readonly IAPIProvider api;
 
-        protected readonly List<ArchiveDownloadRequest<TModel>> CurrentDownloads = new List<ArchiveDownloadRequest<TModel>>();
+        protected readonly List<ArchiveDownloadRequest<T>> CurrentDownloads = new List<ArchiveDownloadRequest<T>>();
 
-        protected ModelDownloader(IModelManager<TModel> modelManager, IAPIProvider api, IIpcHost importHost = null)
+        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider api, IIpcHost importHost = null)
         {
-            this.modelManager = modelManager;
+            this.importer = importer;
             this.api = api;
         }
 
         /// <summary>
-        /// Creates the download request for this <typeparamref name="TModel"/>.
+        /// Creates the download request for this <typeparamref name="T"/>.
         /// </summary>
-        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="T"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
-        protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool minimiseDownloadSize);
+        protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model, bool minimiseDownloadSize);
 
-        public bool Download(TModel model, bool minimiseDownloadSize = false)
+        public bool Download(T model, bool minimiseDownloadSize = false)
         {
             if (!canDownload(model)) return false;
 
@@ -63,7 +64,7 @@ namespace osu.Game.Database
                 Task.Factory.StartNew(async () =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    var imported = await modelManager.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
+                    var imported = await importer.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
 
                     // for now a failed import will be marked as a failed download for simplicity.
                     if (!imported.Any())
@@ -98,13 +99,13 @@ namespace osu.Game.Database
                 notification.State = ProgressNotificationState.Cancelled;
 
                 if (!(error is OperationCanceledException))
-                    Logger.Error(error, $"{modelManager.HumanisedModelName.Titleize()} download failed!");
+                    Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} download failed!");
             }
         }
 
-        public abstract ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model);
+        public abstract ArchiveDownloadRequest<T> GetExistingDownload(T model);
 
-        private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
+        private bool canDownload(T model) => GetExistingDownload(model) == null && api != null;
 
         private class DownloadNotification : ProgressNotification
         {
