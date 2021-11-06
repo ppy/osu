@@ -19,12 +19,12 @@ namespace osu.Game.Database
         /// <summary>
         /// Fired when an item is updated.
         /// </summary>
-        Action<TModel> ItemUpdated { get; set; }
+        event Action<TModel> ItemUpdated;
 
         /// <summary>
         /// Fired when an item is removed.
         /// </summary>
-        Action<TModel> ItemRemoved { get; set; }
+        event Action<TModel> ItemRemoved;
 
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.

@@ -62,13 +62,13 @@ namespace osu.Game.Database
         /// Fired when a new or updated <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public Action<TModel> ItemUpdated { get; set; }
+        public event Action<TModel> ItemUpdated;
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> is removed from the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public Action<TModel> ItemRemoved { get; set; }
+        public event Action<TModel> ItemRemoved;
 
         public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
 

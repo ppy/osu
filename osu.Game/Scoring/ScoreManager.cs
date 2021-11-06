@@ -246,16 +246,16 @@ namespace osu.Game.Scoring
 
         #region Implementation of IModelManager<ScoreInfo>
 
-        public Action<ScoreInfo> ItemUpdated
+        public event Action<ScoreInfo> ItemUpdated
         {
-            get => scoreModelManager.ItemUpdated;
-            set => scoreModelManager.ItemUpdated = value;
+            add => scoreModelManager.ItemUpdated += value;
+            remove => scoreModelManager.ItemUpdated -= value;
         }
 
-        public Action<ScoreInfo> ItemRemoved
+        public event Action<ScoreInfo> ItemRemoved
         {
-            get => scoreModelManager.ItemRemoved;
-            set => scoreModelManager.ItemRemoved = value;
+            add => scoreModelManager.ItemRemoved += value;
+            remove => scoreModelManager.ItemRemoved -= value;
         }
 
         public Task ImportFromStableAsync(StableStorage stableStorage)
@@ -358,16 +358,16 @@ namespace osu.Game.Scoring
 
         #region Implementation of IModelDownloader<IScoreInfo>
 
-        public Action<ArchiveDownloadRequest<IScoreInfo>> DownloadBegan
+        public event Action<ArchiveDownloadRequest<IScoreInfo>> DownloadBegan
         {
-            get => scoreModelDownloader.DownloadBegan;
-            set => scoreModelDownloader.DownloadBegan = value;
+            add => scoreModelDownloader.DownloadBegan += value;
+            remove => scoreModelDownloader.DownloadBegan -= value;
         }
 
-        public Action<ArchiveDownloadRequest<IScoreInfo>> DownloadFailed
+        public event Action<ArchiveDownloadRequest<IScoreInfo>> DownloadFailed
         {
-            get => scoreModelDownloader.DownloadFailed;
-            set => scoreModelDownloader.DownloadFailed = value;
+            add => scoreModelDownloader.DownloadFailed += value;
+            remove => scoreModelDownloader.DownloadFailed -= value;
         }
 
         public bool Download(IScoreInfo model, bool minimiseDownloadSize) =>
