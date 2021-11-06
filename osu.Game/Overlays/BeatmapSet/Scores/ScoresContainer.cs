@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,8 +67,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (value?.Scores.Any() != true)
                     return;
 
+                var apiBeatmap = Beatmap.Value;
+
+                Debug.Assert(apiBeatmap != null);
+
                 // TODO: temporary. should be removed once `OrderByTotalScore` can accept `IScoreInfo`.
-                var beatmapInfo = new BeatmapInfo { MaxCombo = Beatmap.Value.MaxCombo };
+                var beatmapInfo = new BeatmapInfo
+                {
+                    MaxCombo = apiBeatmap.MaxCombo,
+                    Status = apiBeatmap.Status
+                };
 
                 scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
                             .ContinueWith(ordered => Schedule(() =>
@@ -77,7 +86,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                                 var topScore = ordered.Result.First();
 
-                                scoreTable.DisplayScores(ordered.Result, topScore.BeatmapInfo?.Status.GrantsPerformancePoints() == true);
+                                scoreTable.DisplayScores(ordered.Result, apiBeatmap.Status.GrantsPerformancePoints());
                                 scoreTable.Show();
 
                                 var userScore = value.UserScore;
