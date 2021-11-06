@@ -3,11 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Rulesets;
 using osu.Game.Users;
 
 #nullable enable
@@ -120,27 +118,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"beatmaps")]
         public APIBeatmap[] Beatmaps { get; set; } = Array.Empty<APIBeatmap>();
-
-        public virtual BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
-        {
-            var beatmapSet = new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = OnlineID,
-                Metadata = metadata,
-                Status = Status,
-                OnlineInfo = this
-            };
-
-            beatmapSet.Beatmaps = Beatmaps.Select(b =>
-            {
-                var beatmap = b.ToBeatmapInfo(rulesets);
-                beatmap.BeatmapSet = beatmapSet;
-                beatmap.Metadata = beatmapSet.Metadata;
-                return beatmap;
-            }).ToList();
-
-            return beatmapSet;
-        }
 
         private BeatmapMetadata metadata => new BeatmapMetadata
         {

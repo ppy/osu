@@ -98,7 +98,7 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
-                BeatmapInfo = Beatmap?.ToBeatmapInfo(rulesets),
+                BeatmapInfo = beatmap,
                 User = User,
                 Accuracy = Accuracy,
                 OnlineScoreID = OnlineID,
@@ -110,9 +110,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 Ruleset = ruleset,
                 Mods = modInstances,
             };
-
-            if (beatmap != null)
-                scoreInfo.BeatmapInfo = beatmap;
 
             if (Statistics != null)
             {
