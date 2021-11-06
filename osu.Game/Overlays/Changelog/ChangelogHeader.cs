@@ -75,34 +75,29 @@ namespace osu.Game.Overlays.Changelog
 
         protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/changelog");
 
-        protected override Drawable CreateContent()
+        protected override Drawable CreateContent() => new Container
         {
-            var content = new Container
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Children = new Drawable[]
+                streamsBackground = new Box
                 {
-                    streamsBackground = new Box
+                    RelativeSizeAxes = Axes.Both
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding
                     {
-                        RelativeSizeAxes = Axes.Both
+                        Horizontal = 65,
+                        Vertical = 20
                     },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding
-                        {
-                            Horizontal = 65,
-                            Vertical = 20
-                        },
-                        Child = Streams = new ChangelogUpdateStreamControl { Current = currentStream },
-                    }
+                    Child = Streams = new ChangelogUpdateStreamControl { Current = currentStream },
                 }
-            };
-
-            return content;
-        }
+            }
+        };
 
         protected override OverlayTitle CreateTitle() => new ChangelogHeaderTitle();
 
