@@ -14,49 +14,42 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Database
 {
-    public abstract class ModelDownloader<TModel> : IModelDownloader<TModel>
-        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>
+    public abstract class ModelDownloader<TModel, T> : IModelDownloader<T>
+        where TModel : class, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>, T
+        where T : class
     {
         public Action<Notification> PostNotification { protected get; set; }
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadBegan => downloadBegan;
+        public IBindable<WeakReference<ArchiveDownloadRequest<T>>> DownloadBegan => downloadBegan;
 
-        private readonly Bindable<WeakReference<ArchiveDownloadRequest<TModel>>> downloadBegan = new Bindable<WeakReference<ArchiveDownloadRequest<TModel>>>();
+        private readonly Bindable<WeakReference<ArchiveDownloadRequest<T>>> downloadBegan = new Bindable<WeakReference<ArchiveDownloadRequest<T>>>();
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadFailed => downloadFailed;
+        public IBindable<WeakReference<ArchiveDownloadRequest<T>>> DownloadFailed => downloadFailed;
 
-        private readonly Bindable<WeakReference<ArchiveDownloadRequest<TModel>>> downloadFailed = new Bindable<WeakReference<ArchiveDownloadRequest<TModel>>>();
+        private readonly Bindable<WeakReference<ArchiveDownloadRequest<T>>> downloadFailed = new Bindable<WeakReference<ArchiveDownloadRequest<T>>>();
 
-        private readonly IModelManager<TModel> modelManager;
+        private readonly IModelImporter<TModel> importer;
         private readonly IAPIProvider api;
 
-        private readonly List<ArchiveDownloadRequest<TModel>> currentDownloads = new List<ArchiveDownloadRequest<TModel>>();
+        protected readonly List<ArchiveDownloadRequest<T>> CurrentDownloads = new List<ArchiveDownloadRequest<T>>();
 
-        protected ModelDownloader(IModelManager<TModel> modelManager, IAPIProvider api, IIpcHost importHost = null)
+        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider api, IIpcHost importHost = null)
         {
-            this.modelManager = modelManager;
+            this.importer = importer;
             this.api = api;
         }
 
         /// <summary>
-        /// Creates the download request for this <typeparamref name="TModel"/>.
+        /// Creates the download request for this <typeparamref name="T"/>.
         /// </summary>
-        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="T"/> to be downloaded.</param>
         /// <param name="useSayobot">Decides whether to use sayobot to download.</param>
         /// <param name="noVideo">Whether this download should be optimised for slow connections. Generally means Videos are not included in the download bundle.</param>
-        /// <param name="isMini">Whether this downlaod should be optimised for very slow connections. Generally means any extra files are not included in the download bundle.</param>
+        /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
-        protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool isMini, bool useSayobot, bool noVideo);
+        protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model, bool minimiseDownloadSize, bool useSayobot, bool noVideo);
 
-        /// <summary>
-        /// Begin a download for the requested <typeparamref name="TModel"/>.
-        /// </summary>
-        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
-        /// <param name="minimiseDownloadSize">Upstream arg</param>
-        /// <param name="useSayobot">Decides whether to use sayobot to download.</param>
-        /// <param name="noVideo">Whether this download should be optimised for slow connections. Generally means Videos are not included in the download bundle.</param>
-        /// <returns>Whether the download was started.</returns>
-        public bool Download(TModel model, bool minimiseDownloadSize, bool useSayobot, bool noVideo)
+        public bool Download(T model, bool minimiseDownloadSize = false, bool useSayobot = false, bool noVideo = false)
         {
             if (!canDownload(model)) return false;
 
@@ -78,13 +71,13 @@ namespace osu.Game.Database
                 Task.Factory.StartNew(async () =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    var imported = await modelManager.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
+                    var imported = await importer.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
 
                     // for now a failed import will be marked as a failed download for simplicity.
                     if (!imported.Any())
-                        downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+                        downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
 
-                    currentDownloads.Remove(request);
+                    CurrentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
             };
 
@@ -96,32 +89,32 @@ namespace osu.Game.Database
                 return true;
             };
 
-            currentDownloads.Add(request);
+            CurrentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
             api.PerformAsync(request);
 
-            downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+            downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
             return true;
 
             void triggerFailure(Exception error)
             {
-                currentDownloads.Remove(request);
+                CurrentDownloads.Remove(request);
 
-                downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+                downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
 
-                downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+                downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
 
                 notification.State = ProgressNotificationState.Cancelled;
 
                 if (!(error is OperationCanceledException))
-                    Logger.Error(error, $"{modelManager.HumanisedModelName.Titleize()}下载失败!");
+                    Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} 下载失败!");
             }
         }
 
-        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
+        public abstract ArchiveDownloadRequest<T> GetExistingDownload(T model);
 
-        private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
+        private bool canDownload(T model) => GetExistingDownload(model) == null && api != null;
 
         private class DownloadNotification : ProgressNotification
         {

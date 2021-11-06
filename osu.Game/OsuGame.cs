@@ -496,11 +496,15 @@ namespace osu.Game
         /// <item>first beatmap from any ruleset.</item>
         /// </list>
         /// </remarks>
-        public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
+        public void PresentBeatmap(IBeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            var databasedSet = beatmap.OnlineBeatmapSetID != null
-                ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
-                : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
+            BeatmapSetInfo databasedSet = null;
+
+            if (beatmap.OnlineID > 0)
+                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineID);
+
+            if (beatmap is BeatmapSetInfo localBeatmap)
+                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash);
 
             if (databasedSet == null)
             {

@@ -6,14 +6,14 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<BeatmapSetInfo>
+    public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
     {
         private readonly bool noVideo;
         private readonly bool minimiseDownloadSize;
 
         private readonly bool useSayobot;
 
-        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool useSayobot, bool noVideo, bool minimiseDownloadSize = false)
+        public DownloadBeatmapSetRequest(IBeatmapSetInfo set, bool useSayobot, bool noVideo, bool minimiseDownloadSize = false)
             : base(set)
         {
             this.noVideo = noVideo;
@@ -25,13 +25,13 @@ namespace osu.Game.Online.API.Requests
         {
             if (useSayobot)
             {
-                var idFull = Model.OnlineBeatmapSetID.ToString();
+                var idFull = Model.OnlineID.ToString();
 
                 var target = $@"{(minimiseDownloadSize ? "mini" : (noVideo ? "novideo" : "full"))}/{idFull}";
                 return target;
             }
 
-            return $@"beatmapsets/{Model.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
+            return $@"beatmapsets/{Model.OnlineID}/download{(noVideo ? "?noVideo=1" : "")}";
         }
 
         private string selectUri()

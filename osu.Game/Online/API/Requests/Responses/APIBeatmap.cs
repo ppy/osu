@@ -43,16 +43,16 @@ namespace osu.Game.Online.API.Requests.Responses
         public double StarRating { get; set; }
 
         [JsonProperty(@"drain")]
-        private float drainRate { get; set; }
+        public float DrainRate { get; set; }
 
         [JsonProperty(@"cs")]
-        private float circleSize { get; set; }
+        public float CircleSize { get; set; }
 
         [JsonProperty(@"ar")]
-        private float approachRate { get; set; }
+        public float ApproachRate { get; set; }
 
         [JsonProperty(@"accuracy")]
-        private float overallDifficulty { get; set; }
+        public float OverallDifficulty { get; set; }
 
         [JsonIgnore]
         public double Length { get; set; }
@@ -81,44 +81,16 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public double BPM { get; set; }
 
-        public virtual BeatmapInfo ToBeatmapInfo(RulesetStore rulesets)
-        {
-            var set = BeatmapSet?.ToBeatmapSet(rulesets);
-
-            return new BeatmapInfo
-            {
-                Metadata = set?.Metadata ?? new BeatmapMetadata(),
-                Ruleset = rulesets.GetRuleset(RulesetID),
-                StarDifficulty = StarRating,
-                OnlineBeatmapID = OnlineID,
-                Version = DifficultyName,
-                // this is actually an incorrect mapping (Length is calculated as drain length in lazer's import process, see BeatmapManager.calculateLength).
-                Length = Length,
-                Status = Status,
-                MD5Hash = Checksum,
-                BeatmapSet = set,
-                MaxCombo = MaxCombo,
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    DrainRate = drainRate,
-                    CircleSize = circleSize,
-                    ApproachRate = approachRate,
-                    OverallDifficulty = overallDifficulty,
-                },
-                OnlineInfo = this,
-            };
-        }
-
         #region Implementation of IBeatmapInfo
 
         public IBeatmapMetadataInfo Metadata => (BeatmapSet as IBeatmapSetInfo)?.Metadata ?? new BeatmapMetadata();
 
         public IBeatmapDifficultyInfo Difficulty => new BeatmapDifficulty
         {
-            DrainRate = drainRate,
-            CircleSize = circleSize,
-            ApproachRate = approachRate,
-            OverallDifficulty = overallDifficulty,
+            DrainRate = DrainRate,
+            CircleSize = CircleSize,
+            ApproachRate = ApproachRate,
+            OverallDifficulty = OverallDifficulty,
         };
 
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;

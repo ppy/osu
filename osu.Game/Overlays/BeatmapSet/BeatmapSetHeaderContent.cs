@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -18,14 +17,17 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapSetHeaderContent : BeatmapDownloadTrackingComposite
+    public class BeatmapSetHeaderContent : CompositeDrawable
     {
+        public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
+
         private const float transition_duration = 200;
         private const float buttons_height = 45;
         private const float buttons_spacing = 5;
@@ -48,13 +50,14 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly FillFlowContainer fadeContent;
         private readonly LoadingSpinner loading;
 
+        private BeatmapDownloadTracker downloadTracker;
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
         [Resolved]
         private BeatmapRulesetSelector rulesetSelector { get; set; }
 
-        private readonly BindableBool useSayobot = new BindableBool();
         private readonly ExternalLinkButton externalLink;
 
         public BeatmapSetHeaderContent()
@@ -217,41 +220,21 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.BeatmapInfo = b.NewValue;
-                externalLink.Link = SelectServer(b.NewValue);
+                externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineID}";
             };
         }
-
-        protected virtual string SelectServer(BeatmapInfo b)
-        {
-            switch (mfConfig.Get<bool>(MSetting.UseSayobot))
-            {
-                case true:
-                    return $@"https:/osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
-
-                case false:
-                    return $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
-            }
-        }
-
-        private MConfigManager mfConfig;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuConfigManager config, MConfigManager mfconfig)
+        private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
         {
-            mfConfig = mfconfig;
-            mfconfig.BindWith(MSetting.UseSayobot, useSayobot);
-            useSayobot.ValueChanged += _ =>
-            {
-                externalLink.Link = SelectServer(Details.BeatmapInfo);
-            };
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
-
-            State.BindValueChanged(_ => updateDownloadButtons());
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
                 Picker.BeatmapSet = rulesetSelector.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
-                cover.OnlineInfo = setInfo.NewValue?.OnlineInfo;
+                cover.OnlineInfo = setInfo.NewValue;
+
+                downloadTracker?.RemoveAndDisposeImmediately();
 
                 if (setInfo.NewValue == null)
                 {
@@ -265,18 +248,22 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
                 else
                 {
+                    downloadTracker = new BeatmapDownloadTracker(setInfo.NewValue);
+                    downloadTracker.State.BindValueChanged(_ => updateDownloadButtons());
+                    AddInternal(downloadTracker);
+
                     fadeContent.FadeIn(500, Easing.OutQuint);
 
                     loading.Hide();
 
-                    title.Text = new RomanisableString(setInfo.NewValue.Metadata.TitleUnicode, setInfo.NewValue.Metadata.Title);
-                    artist.Text = new RomanisableString(setInfo.NewValue.Metadata.ArtistUnicode, setInfo.NewValue.Metadata.Artist);
+                    title.Text = new RomanisableString(setInfo.NewValue.TitleUnicode, setInfo.NewValue.Title);
+                    artist.Text = new RomanisableString(setInfo.NewValue.ArtistUnicode, setInfo.NewValue.Artist);
 
-                    explicitContentPill.Alpha = setInfo.NewValue.OnlineInfo.HasExplicitContent ? 1 : 0;
-                    featuredArtistPill.Alpha = setInfo.NewValue.OnlineInfo.TrackId != null ? 1 : 0;
+                    explicitContentPill.Alpha = setInfo.NewValue.HasExplicitContent ? 1 : 0;
+                    featuredArtistPill.Alpha = setInfo.NewValue.TrackId != null ? 1 : 0;
 
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
-                    onlineStatusPill.Status = setInfo.NewValue.OnlineInfo.Status;
+                    onlineStatusPill.Status = setInfo.NewValue.Status;
 
                     downloadButtonsContainer.FadeIn(transition_duration);
                     favouriteButton.FadeIn(transition_duration);
@@ -290,13 +277,13 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             if (BeatmapSet.Value == null) return;
 
-            if (BeatmapSet.Value.OnlineInfo.Availability.DownloadDisabled && State.Value != DownloadState.LocallyAvailable)
+            if (BeatmapSet.Value.Availability.DownloadDisabled && downloadTracker.State.Value != DownloadState.LocallyAvailable)
             {
                 downloadButtonsContainer.Clear();
                 return;
             }
 
-            switch (State.Value)
+            switch (downloadTracker.State.Value)
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
@@ -316,9 +303,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 default:
                     downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value, false, false, true);
-                    if (BeatmapSet.Value.OnlineInfo.HasVideo)
+                    if (BeatmapSet.Value.HasVideo)
                         downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true, false));
-                    if (BeatmapSet.Value.OnlineInfo.HasStoryboard || BeatmapSet.Value.OnlineInfo.HasVideo)
+
+                    if (BeatmapSet.Value.HasStoryboard || BeatmapSet.Value.HasVideo)
                         downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, false, true)); //Mini
                     break;
             }

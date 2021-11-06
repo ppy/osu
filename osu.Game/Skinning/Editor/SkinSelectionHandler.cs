@@ -70,14 +70,16 @@ namespace osu.Game.Skinning.Editor
             if (anchor.HasFlagFast(Anchor.x1)) scale.X = 0;
             if (anchor.HasFlagFast(Anchor.y1)) scale.Y = 0;
 
-            bool shouldAspectLock =
-                // for now aspect lock scale adjustments that occur at corners..
-                (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
-                // ..or if any of the selection have been rotated.
-                // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
-                || SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation, 0));
-
-            if (shouldAspectLock)
+            // for now aspect lock scale adjustments that occur at corners..
+            if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
+            {
+                // project scale vector along diagonal
+                Vector2 diag = (selectionRect.TopLeft - selectionRect.BottomRight).Normalized();
+                scale = Vector2.Dot(scale, diag) * diag;
+            }
+            // ..or if any of the selection have been rotated.
+            // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
+            else if (SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation, 0)))
             {
                 if (anchor.HasFlagFast(Anchor.x1))
                     // if dragging from the horizontal centre, only a vertical component is available.

@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             {
                 RulesetID = difficulty.rulesetId,
                 StarRating = difficulty.stars
-            }).ToList()
+            }).ToArray()
         };
 
         [Test]

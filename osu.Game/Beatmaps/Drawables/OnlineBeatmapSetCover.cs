@@ -30,8 +30,6 @@ namespace osu.Game.Beatmaps.Drawables
         {
             string resource = null;
 
-            Logger.Log($"封面： {set.Covers.Card}");
-
             switch (mfconfig.Get<bool>(MSetting.UseSayobot))
             {
                 case true:

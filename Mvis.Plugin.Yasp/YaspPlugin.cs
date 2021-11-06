@@ -116,8 +116,7 @@ namespace Mvis.Plugin.Yasp
         }.WithEffect(new BlurEffect
         {
             Colour = Color4.Black.Opacity(0.7f),
-            DrawOriginal = true,
-            CacheDrawnEffect = true
+            DrawOriginal = true
         });
 
         /// <summary>

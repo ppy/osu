@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// A single beatmap difficulty.
     /// </summary>
-    public interface IBeatmapInfo : IHasOnlineID
+    public interface IBeatmapInfo : IHasOnlineID<int>
     {
         /// <summary>
         /// The user-specified name given to this beatmap.
@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The metadata representing this beatmap. May be shared between multiple beatmaps.
         /// </summary>
-        IBeatmapMetadataInfo? Metadata { get; }
+        IBeatmapMetadataInfo Metadata { get; }
 
         /// <summary>
         /// The difficulty settings for this beatmap.

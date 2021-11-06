@@ -25,11 +25,8 @@ namespace osu.Game.Overlays.Music
         private TextFlowContainer text;
         private ITextPart titlePart;
 
-        private ILocalisedBindableString title;
-        private ILocalisedBindableString artist;
-
-        private Color4 selectedColour;
-        private Color4 artistColour;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public PlaylistItem(BeatmapSetInfo item)
             : base(item)
@@ -40,21 +37,14 @@ namespace osu.Game.Overlays.Music
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationManager localisation)
+        private void load()
         {
-            selectedColour = colours.Yellow;
-            artistColour = colours.Gray9;
             HandleColour = colours.Gray5;
-
-            title = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title));
-            artist = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            artist.BindValueChanged(_ => recreateText(), true);
 
             SelectedSet.BindValueChanged(set =>
             {
@@ -68,7 +58,7 @@ namespace osu.Game.Overlays.Music
         private void updateSelectionState(bool instant)
         {
             foreach (Drawable s in titlePart.Drawables)
-                s.FadeColour(SelectedSet.Value?.Equals(Model) == true ? selectedColour : Color4.White, instant ? 0 : FADE_DURATION);
+                s.FadeColour(SelectedSet.Value?.Equals(Model) == true ? colours.Yellow : Color4.White, instant ? 0 : FADE_DURATION);
         }
 
         protected override Drawable CreateContent() => text = new OsuTextFlowContainer
@@ -77,18 +67,23 @@ namespace osu.Game.Overlays.Music
             AutoSizeAxes = Axes.Y,
         };
 
-        private void recreateText()
+        protected override void LoadAsyncComplete()
         {
-            text.Clear();
+            base.LoadAsyncComplete();
 
-            // space after the title to put a space between the title and artist
-            titlePart = text.AddText(title.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
+            var title = new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title);
+            var artist = new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist);
+
+            titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
             updateSelectionState(true);
+            titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
 
-            text.AddText(artist.Value, sprite =>
+            text.AddText(@"  "); // to separate the title from the artist.
+
+            text.AddText(artist, sprite =>
             {
                 sprite.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold);
-                sprite.Colour = artistColour;
+                sprite.Colour = colours.Gray9;
                 sprite.Padding = new MarginPadding { Top = 1 };
             });
         }

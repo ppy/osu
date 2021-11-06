@@ -15,36 +15,42 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class HeaderDownloadButton : BeatmapDownloadTrackingComposite, IHasTooltip
+    public class HeaderDownloadButton : CompositeDrawable, IHasTooltip
     {
         private const int text_size = 17;
 
         private readonly bool noVideo;
-        private readonly bool IsMini;
-        private readonly bool NoSuffix;
+        private readonly bool isMini;
+        private readonly bool noSuffix;
 
         public LocalisableString TooltipText => BeatmapsetsStrings.ShowDetailsDownloadDefault;
 
         private readonly IBindable<User> localUser = new Bindable<User>();
-        private BindableBool UseSayobot = new BindableBool();
+        private BindableBool useSayobot = new BindableBool();
 
         private ShakeContainer shakeContainer;
         private HeaderButton button;
 
-        public HeaderDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false, bool IsMini = false, bool NoSuffix = false)
-            : base(beatmapSet)
+        private BeatmapDownloadTracker downloadTracker;
+
+        private readonly APIBeatmapSet beatmapSet;
+
+        public HeaderDownloadButton(APIBeatmapSet beatmapSet, bool noVideo = false, bool isMini = false, bool noSuffix = false)
         {
+            this.beatmapSet = beatmapSet;
             this.noVideo = noVideo;
-            this.IsMini = IsMini;
-            this.NoSuffix = NoSuffix;
+            this.isMini = isMini;
+            this.noSuffix = noSuffix;
 
             Width = 120;
             RelativeSizeAxes = Axes.Y;
@@ -55,13 +61,17 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         {
             FillFlowContainer textSprites;
 
-            AddInternal(shakeContainer = new ShakeContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = 5,
-                Child = button = new HeaderButton { RelativeSizeAxes = Axes.Both },
-            });
+                shakeContainer = new ShakeContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 5,
+                    Child = button = new HeaderButton { RelativeSizeAxes = Axes.Both },
+                },
+                downloadTracker = new BeatmapDownloadTracker(beatmapSet),
+            };
 
             button.AddRange(new Drawable[]
             {
@@ -89,7 +99,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         },
                     }
                 },
-                new DownloadProgressBar(BeatmapSet.Value)
+                new DownloadProgressBar(beatmapSet)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -98,20 +108,20 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             button.Action = () =>
             {
-                if (State.Value != DownloadState.NotDownloaded)
+                if (downloadTracker.State.Value != DownloadState.NotDownloaded)
                 {
                     shakeContainer.Shake();
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet.Value, mfconfig.Get<bool>(MSetting.UseSayobot), noVideo, IsMini);
+                beatmaps.Download(beatmapSet, mfconfig.Get<bool>(MSetting.UseSayobot), noVideo, isMini);
             };
 
             localUser.BindTo(api.LocalUser);
             localUser.BindValueChanged(userChanged, true);
             button.Enabled.BindValueChanged(enabledChanged, true);
 
-            State.BindValueChanged(state =>
+            downloadTracker.State.BindValueChanged(state =>
             {
                 switch (state.NewValue)
                 {
@@ -120,7 +130,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = Localisation.CommonStrings.Downloading,
+                                Text = CommonStrings.Downloading,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -131,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = Localisation.CommonStrings.Importing,
+                                Text = CommonStrings.Importing,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -151,7 +161,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                             new OsuSpriteText
                             {
-                                Text = NoSuffix ? string.Empty : getVideoSuffixText(),
+                                Text = noSuffix ? string.Empty : getVideoSuffixText(),
                                 Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold)
                             },
                         };
@@ -167,10 +177,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private LocalisableString getVideoSuffixText()
         {
-            if (!BeatmapSet.Value.OnlineInfo.HasVideo && !BeatmapSet.Value.OnlineInfo.HasStoryboard)
+            if (!beatmapSet.HasVideo || !beatmapSet.HasStoryboard)
                 return string.Empty;
 
-            return (IsMini == true ? "Mini" : (noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo));
+            return (isMini ? "Mini" : (noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo));
         }
     }
 }

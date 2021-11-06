@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -142,7 +141,16 @@ namespace osu.Game.Overlays.AccountCreation
 
             characterCheckText = passwordDescription.AddText("密码要求至少长8个字符", cp => cp.Font = cp.Font.With(size: 16));
 
-            passwordTextBox.Current.ValueChanged += password => { characterCheckText.Drawables.ForEach(s => s.Colour = password.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(password.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
+            passwordTextBox.Current.BindValueChanged(_ => updateCharacterCheckTextColour(), true);
+            characterCheckText.DrawablePartsRecreated += _ => updateCharacterCheckTextColour();
+        }
+
+        private void updateCharacterCheckTextColour()
+        {
+            string password = passwordTextBox.Text;
+
+            foreach (var d in characterCheckText.Drawables)
+                d.Colour = password.Length == 0 ? Color4.White : Interpolation.ValueAt(password.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In);
         }
 
         public override void OnEntering(IScreen last)

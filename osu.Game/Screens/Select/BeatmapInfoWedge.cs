@@ -188,8 +188,8 @@ namespace osu.Game.Screens.Select
 
                 RelativeSizeAxes = Axes.Both;
 
-                titleBinding = localisation.GetLocalisedString(new RomanisableString(metadata.TitleUnicode, metadata.Title));
-                artistBinding = localisation.GetLocalisedString(new RomanisableString(metadata.ArtistUnicode, metadata.Artist));
+                titleBinding = localisation.GetLocalisedBindableString(new RomanisableString(metadata.TitleUnicode, metadata.Title));
+                artistBinding = localisation.GetLocalisedBindableString(new RomanisableString(metadata.ArtistUnicode, metadata.Artist));
 
                 const float top_height = 0.7f;
 
