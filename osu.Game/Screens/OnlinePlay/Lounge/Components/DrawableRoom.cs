@@ -353,7 +353,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             })
                             {
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
+                                // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
+                                // TODO: remove when text/link flow can support truncation with ellipsis natively.
+                                Height = 16,
+                                Masking = true
                             }
                         }
                     }
@@ -381,11 +384,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     statusText.Text = "Currently playing ";
                     beatmapText.AddLink(item.NewValue.Beatmap.Value.GetDisplayTitleRomanisable(),
                         LinkAction.OpenBeatmap,
-                        item.NewValue.Beatmap.Value.OnlineBeatmapID.ToString(),
+                        item.NewValue.Beatmap.Value.OnlineID.ToString(),
                         creationParameters: s =>
                         {
                             s.Truncate = true;
-                            s.RelativeSizeAxes = Axes.X;
                         });
                 }
             }

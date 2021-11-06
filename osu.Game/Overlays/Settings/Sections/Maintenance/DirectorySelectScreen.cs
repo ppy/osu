@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     cp.Font = OsuFont.Default.With(size: 24);
                                 })
                                 {
-                                    Text = HeaderText.ToString(),
+                                    Text = HeaderText,
                                     TextAnchor = Anchor.TopCentre,
                                     Margin = new MarginPadding(10),
                                     RelativeSizeAxes = Axes.X,
