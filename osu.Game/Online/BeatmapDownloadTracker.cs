@@ -16,7 +16,7 @@ namespace osu.Game.Online
         [Resolved(CanBeNull = true)]
         protected BeatmapManager? Manager { get; private set; }
 
-        private ArchiveDownloadRequest<BeatmapSetInfo>? attachedRequest;
+        private ArchiveDownloadRequest<IBeatmapSetInfo>? attachedRequest;
 
         public BeatmapDownloadTracker(IBeatmapSetInfo trackedItem)
             : base(trackedItem)
@@ -25,8 +25,8 @@ namespace osu.Game.Online
 
         private IBindable<WeakReference<BeatmapSetInfo>>? managerUpdated;
         private IBindable<WeakReference<BeatmapSetInfo>>? managerRemoved;
-        private IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>>? managerDownloadBegan;
-        private IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>>? managerDownloadFailed;
+        private IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>>? managerDownloadBegan;
+        private IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>>? managerDownloadFailed;
 
         [BackgroundDependencyLoader(true)]
         private void load()
@@ -52,7 +52,7 @@ namespace osu.Game.Online
             managerRemoved.BindValueChanged(itemRemoved);
         }
 
-        private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> weakRequest)
+        private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> weakRequest)
         {
             if (weakRequest.NewValue.TryGetTarget(out var request))
             {
@@ -64,7 +64,7 @@ namespace osu.Game.Online
             }
         }
 
-        private void downloadFailed(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> weakRequest)
+        private void downloadFailed(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> weakRequest)
         {
             if (weakRequest.NewValue.TryGetTarget(out var request))
             {
@@ -76,7 +76,7 @@ namespace osu.Game.Online
             }
         }
 
-        private void attachDownload(ArchiveDownloadRequest<BeatmapSetInfo>? request)
+        private void attachDownload(ArchiveDownloadRequest<IBeatmapSetInfo>? request)
         {
             if (attachedRequest != null)
             {
