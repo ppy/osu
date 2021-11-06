@@ -120,16 +120,6 @@ namespace osu.Game.Screens.Edit.Setup
                 initialPath = currentFile.Value?.DirectoryName;
                 handledExts = handledExtensions;
                 file = currentFile;
-            }
-
-            [BackgroundDependencyLoader(true)]
-            private void load(OsuGame game)
-            {
-                if (game.GetInitialPath() != null)
-                {
-                    initialPath = game.GetInitialPath();
-                }
-
                 Child = new Container
                 {
                     Size = new Vector2(600, 400),

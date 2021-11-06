@@ -86,8 +86,6 @@ namespace osu.Android
             public override bool IsCharging => Battery.PowerSource != BatteryPowerSource.Battery;
         }
 
-        public override string GetInitialPath() => "/sdcard/";
-
         public override bool HasStoragePermission() => gameActivity.CheckSelfPermission(Manifest.Permission.ReadExternalStorage) == (int)Permission.Granted;
 
         public override void RequestStoragePermission() => gameActivity.RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage }, 750);

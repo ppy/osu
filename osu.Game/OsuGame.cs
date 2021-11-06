@@ -178,11 +178,6 @@ namespace osu.Game
         }
 
         /// <summary>
-        /// Returns a predefined platform-specific path to user data.
-        /// </summary>
-        public virtual string GetInitialPath() => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-        /// <summary>
         /// Returns true if user data can be accessed.
         /// </summary>
         public virtual bool HasStoragePermission() => true;
