@@ -223,23 +223,12 @@ namespace osu.Game.Overlays.BeatmapSet
 
         protected virtual string SelectServer(BeatmapInfo b)
         {
-            switch (mfConfig.Get<bool>(MSetting.UseSayobot))
-            {
-                case true:
-                    return $@"https:/osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
-
-                case false:
-                    return $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
-            }
+            return $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
         }
 
-        private MConfigManager mfConfig;
-
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuConfigManager config, MConfigManager mfconfig)
+        private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
         {
-            mfConfig = mfconfig;
-            mfconfig.BindWith(MSetting.UseSayobot, useSayobot);
             useSayobot.ValueChanged += _ =>
             {
                 externalLink.Link = SelectServer(Details.BeatmapInfo);
@@ -315,11 +304,10 @@ namespace osu.Game.Overlays.BeatmapSet
                     break;
 
                 default:
-                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value, false, false, true);
+                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value);
+
                     if (BeatmapSet.Value.OnlineInfo.HasVideo)
-                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true, false));
-                    if (BeatmapSet.Value.OnlineInfo.HasStoryboard || BeatmapSet.Value.OnlineInfo.HasVideo)
-                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, false, true)); //Mini
+                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true));
                     break;
             }
         }

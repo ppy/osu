@@ -4,7 +4,6 @@
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -52,7 +51,6 @@ namespace osu.Game.Screens.Play
         private TriangleButton watchButton;
         private SettingsCheckbox automaticDownload;
         private BeatmapSetInfo onlineBeatmap;
-        private readonly BindableBool useSayobot = new BindableBool();
 
         /// <summary>
         /// The player's immediate online gameplay state.
@@ -71,8 +69,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OsuConfigManager config, MConfigManager mfConfig)
         {
-            mfConfig.BindWith(MSetting.UseSayobot, useSayobot);
-
             InternalChild = new Container
             {
                 Masking = true,
@@ -245,7 +241,7 @@ namespace osu.Game.Screens.Play
             if (beatmaps.IsAvailableLocally(onlineBeatmap))
                 return;
 
-            beatmaps.Download(onlineBeatmap, false, useSayobot.Value);
+            beatmaps.Download(onlineBeatmap);
         }
 
         public override bool OnExiting(IScreen next)

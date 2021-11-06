@@ -34,8 +34,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 new SettingsCheckbox
                 {
                     LabelText = "启用Sayobot功能",
-                    TooltipText = "这将影响所有谱面预览、封面、和下图的功能, 但不会影响已完成或正在进行中的请求",
-                    Current = config.GetBindable<bool>(MSetting.UseSayobot)
+                    TooltipText = "这将影响所有谱面预览、封面、和下图的功能, 但不会影响已完成或正在进行中的请求"
                 },
                 new SettingsCheckbox
                 {

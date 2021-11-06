@@ -8,36 +8,34 @@ namespace osu.Game.Online.API.Requests
 {
     public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<BeatmapSetInfo>
     {
-        private readonly bool noVideo;
+        //private readonly bool noVideo;
+        //private readonly bool useSayobot;
+
         private readonly bool minimiseDownloadSize;
 
-        private readonly bool useSayobot;
-
-        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool useSayobot, bool noVideo, bool minimiseDownloadSize = false)
+        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool minimiseDownloadSize = false)
             : base(set)
         {
-            this.noVideo = noVideo;
             this.minimiseDownloadSize = minimiseDownloadSize;
-            this.useSayobot = useSayobot;
         }
 
         private string getTarget()
         {
-            if (useSayobot)
-            {
-                var idFull = Model.OnlineBeatmapSetID.ToString();
+            //if (useSayobot)
+            //{
+            //    var idFull = Model.OnlineBeatmapSetID.ToString();
+            //
+            //    var target = $@"{(minimiseDownloadSize ? "mini" : (noVideo ? "novideo" : "full"))}/{idFull}";
+            //    return target;
+            //}
 
-                var target = $@"{(minimiseDownloadSize ? "mini" : (noVideo ? "novideo" : "full"))}/{idFull}";
-                return target;
-            }
-
-            return $@"beatmapsets/{Model.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
+            return $@"beatmapsets/{Model.OnlineBeatmapSetID}/download{(minimiseDownloadSize ? "?noVideo=1" : "")}";
         }
 
         private string selectUri()
         {
-            if (useSayobot)
-                return $@"https://txy1.sayobot.cn/beatmaps/download/{Target}";
+            //if (useSayobot)
+            //    return $@"https://txy1.sayobot.cn/beatmaps/download/{Target}";
 
             return $@"{API.WebsiteRootUrl}/api/v2/{Target}";
         }

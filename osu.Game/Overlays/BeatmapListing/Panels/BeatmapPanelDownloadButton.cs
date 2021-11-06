@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
 
                     default:
-                        beatmaps.Download(BeatmapSet.Value, false, mfconfig.Get<bool>(MSetting.UseSayobot), noVideoSetting.Value);
+                        beatmaps.Download(BeatmapSet.Value, noVideoSetting.Value);
                         break;
                 }
             };

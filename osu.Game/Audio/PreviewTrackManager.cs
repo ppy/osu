@@ -14,7 +14,6 @@ using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 
 namespace osu.Game.Audio
 {
@@ -115,19 +114,12 @@ namespace osu.Game.Audio
                 Logger.Log($"A {nameof(PreviewTrack)} was created without a containing {nameof(IPreviewTrackOwner)}. An owner should be added for correct behaviour.");
             }
 
-            private string trackURI()
+            private string trackUri()
             {
-                switch ( mfConfig.Get<bool>(MSetting.UseSayobot) )
-                {
-                    case true:
-                        return $@"https://a.sayobot.cn/preview/{beatmapSetInfo.OnlineID}.mp3";
-
-                    case false:
-                        return $@"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineID}.mp3";
-                }
+                return $@"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineID}.mp3";
             }
 
-            protected override Track GetTrack() => trackManager.Get(trackURI());
+            protected override Track GetTrack() => trackManager.Get(trackUri());
         }
 
         private class PreviewTrackStore : AudioCollectionManager<AdjustableAudioComponent>, ITrackStore

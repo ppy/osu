@@ -28,23 +28,18 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private const int text_size = 17;
 
         private readonly bool noVideo;
-        private readonly bool IsMini;
-        private readonly bool NoSuffix;
 
         public LocalisableString TooltipText => BeatmapsetsStrings.ShowDetailsDownloadDefault;
 
         private readonly IBindable<User> localUser = new Bindable<User>();
-        private BindableBool UseSayobot = new BindableBool();
 
         private ShakeContainer shakeContainer;
         private HeaderButton button;
 
-        public HeaderDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false, bool IsMini = false, bool NoSuffix = false)
+        public HeaderDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
             : base(beatmapSet)
         {
             this.noVideo = noVideo;
-            this.IsMini = IsMini;
-            this.NoSuffix = NoSuffix;
 
             Width = 120;
             RelativeSizeAxes = Axes.Y;
@@ -104,7 +99,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet.Value, mfconfig.Get<bool>(MSetting.UseSayobot), noVideo, IsMini);
+                beatmaps.Download(BeatmapSet.Value, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);
@@ -151,9 +146,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                             new OsuSpriteText
                             {
-                                Text = NoSuffix ? string.Empty : getVideoSuffixText(),
+                                Text = getVideoSuffixText(),
                                 Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold)
-                            },
+                            }
                         };
                         this.FadeIn(200);
                         break;
@@ -170,7 +165,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             if (!BeatmapSet.Value.OnlineInfo.HasVideo && !BeatmapSet.Value.OnlineInfo.HasStoryboard)
                 return string.Empty;
 
-            return (IsMini == true ? "Mini" : (noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo));
+            return noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo;
+            //return (IsMini == true ? "Mini" : (noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo));
         }
     }
 }
