@@ -107,7 +107,7 @@ namespace osu.Game.Online
         private void itemRemoved(ScoreInfo item) => Schedule(() =>
         {
             if (checkEquality(item, TrackedItem))
-                UpdateState(DownloadState.LocallyAvailable);
+                UpdateState(DownloadState.NotDownloaded);
         });
 
         private bool checkEquality(IScoreInfo x, IScoreInfo y) => x.OnlineID == y.OnlineID;
