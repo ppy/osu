@@ -81,9 +81,10 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public virtual IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
+        public virtual IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null, CancellationToken timeoutToken = default)
         {
-            using (var cancellationSource = createCancellationTokenSource(timeout))
+            using (var timeoutSource = createTimeoutTokenSource(timeout))
+            using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutToken, timeoutSource.Token))
             {
                 mods ??= Array.Empty<Mod>();
 
@@ -98,19 +99,19 @@ namespace osu.Game.Beatmaps
                 // Apply conversion mods
                 foreach (var mod in mods.OfType<IApplicableToBeatmapConverter>())
                 {
-                    if (cancellationSource.IsCancellationRequested)
+                    if (linkedTokenSource.IsCancellationRequested)
                         throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
                     mod.ApplyToBeatmapConverter(converter);
                 }
 
                 // Convert
-                IBeatmap converted = converter.Convert(cancellationToken != CancellationToken.None ? cancellationToken : cancellationSource.Token);
+                IBeatmap converted = converter.Convert(linkedTokenSource.Token);
 
                 // Apply conversion mods to the result
                 foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
                 {
-                    if (cancellationSource.IsCancellationRequested)
+                    if (linkedTokenSource.IsCancellationRequested)
                         throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
                     mod.ApplyToBeatmap(converted);
@@ -121,7 +122,7 @@ namespace osu.Game.Beatmaps
                 {
                     foreach (var mod in mods.OfType<IApplicableToDifficulty>())
                     {
-                        if (cancellationSource.IsCancellationRequested)
+                        if (linkedTokenSource.IsCancellationRequested)
                             throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
                         mod.ApplyToDifficulty(converted.Difficulty);
@@ -140,10 +141,10 @@ namespace osu.Game.Beatmaps
                 {
                     foreach (var obj in converted.HitObjects)
                     {
-                        if (cancellationSource.IsCancellationRequested)
+                        if (linkedTokenSource.IsCancellationRequested)
                             throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
-                        obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, cancellationToken != CancellationToken.None ? cancellationToken : cancellationSource.Token);
+                        obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, linkedTokenSource.Token);
                     }
                 }
                 catch (OperationCanceledException)
@@ -155,7 +156,7 @@ namespace osu.Game.Beatmaps
                 {
                     foreach (var obj in converted.HitObjects)
                     {
-                        if (cancellationSource.IsCancellationRequested)
+                        if (linkedTokenSource.IsCancellationRequested)
                             throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
                         mod.ApplyToHitObject(obj);
@@ -166,8 +167,7 @@ namespace osu.Game.Beatmaps
 
                 foreach (var mod in mods.OfType<IApplicableToBeatmap>())
                 {
-                    cancellationSource.Token.ThrowIfCancellationRequested();
-                    cancellationToken.ThrowIfCancellationRequested();
+                    linkedTokenSource.Token.ThrowIfCancellationRequested();
                     mod.ApplyToBeatmap(converted);
                 }
 
@@ -200,7 +200,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private CancellationTokenSource createCancellationTokenSource(TimeSpan? timeout)
+        private CancellationTokenSource createTimeoutTokenSource(TimeSpan? timeout)
         {
             if (Debugger.IsAttached)
                 // ignore timeout when debugger is attached (may be breakpointing / debugging).
