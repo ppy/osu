@@ -25,7 +25,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : IModelManager<ScoreInfo>, IModelFileManager<ScoreInfo, ScoreFileInfo>, IModelDownloader<ScoreInfo>
+    public class ScoreManager : IModelManager<ScoreInfo>, IModelImporter<ScoreInfo>, IModelFileManager<ScoreInfo, ScoreFileInfo>, IModelDownloader<IScoreInfo>
     {
         private readonly Scheduler scheduler;
         private readonly Func<BeatmapDifficultyCache> difficulties;
@@ -356,26 +356,24 @@ namespace osu.Game.Scoring
 
         #endregion
 
-        #region Implementation of IModelDownloader<ScoreInfo>
+        #region Implementation of IModelDownloader<IScoreInfo>
 
-        public Action<ArchiveDownloadRequest<ScoreInfo>> DownloadBegan
+        public Action<ArchiveDownloadRequest<IScoreInfo>> DownloadBegan
         {
             get => scoreModelDownloader.DownloadBegan;
             set => scoreModelDownloader.DownloadBegan = value;
         }
 
-        public Action<ArchiveDownloadRequest<ScoreInfo>> DownloadFailed
+        public Action<ArchiveDownloadRequest<IScoreInfo>> DownloadFailed
         {
             get => scoreModelDownloader.DownloadFailed;
             set => scoreModelDownloader.DownloadFailed = value;
         }
 
-        public bool Download(ScoreInfo model, bool minimiseDownloadSize)
-        {
-            return scoreModelDownloader.Download(model, minimiseDownloadSize);
-        }
+        public bool Download(IScoreInfo model, bool minimiseDownloadSize) =>
+            scoreModelDownloader.Download(model, minimiseDownloadSize);
 
-        public ArchiveDownloadRequest<ScoreInfo> GetExistingDownload(ScoreInfo model)
+        public ArchiveDownloadRequest<IScoreInfo> GetExistingDownload(IScoreInfo model)
         {
             return scoreModelDownloader.GetExistingDownload(model);
         }

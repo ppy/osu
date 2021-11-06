@@ -15,7 +15,7 @@ namespace osu.Game.Online
         [Resolved(CanBeNull = true)]
         protected BeatmapManager? Manager { get; private set; }
 
-        private ArchiveDownloadRequest<BeatmapSetInfo>? attachedRequest;
+        private ArchiveDownloadRequest<IBeatmapSetInfo>? attachedRequest;
 
         public BeatmapDownloadTracker(IBeatmapSetInfo trackedItem)
             : base(trackedItem)
@@ -42,19 +42,19 @@ namespace osu.Game.Online
             Manager.ItemRemoved += itemRemoved;
         }
 
-        private void downloadBegan(ArchiveDownloadRequest<BeatmapSetInfo> request) => Schedule(() =>
+        private void downloadBegan(ArchiveDownloadRequest<IBeatmapSetInfo> request) => Schedule(() =>
         {
             if (checkEquality(request.Model, TrackedItem))
                 attachDownload(request);
         });
 
-        private void downloadFailed(ArchiveDownloadRequest<BeatmapSetInfo> request) => Schedule(() =>
+        private void downloadFailed(ArchiveDownloadRequest<IBeatmapSetInfo> request) => Schedule(() =>
         {
             if (checkEquality(request.Model, TrackedItem))
                 attachDownload(null);
         });
 
-        private void attachDownload(ArchiveDownloadRequest<BeatmapSetInfo>? request)
+        private void attachDownload(ArchiveDownloadRequest<IBeatmapSetInfo>? request)
         {
             if (attachedRequest != null)
             {
