@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
-using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
@@ -131,13 +129,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (slider.LazyEndPosition != null)
                 return;
 
-            slider.LazyTravelTime = slider.NestedHitObjects[slider.NestedHitObjects.Count - 1].StartTime - slider.StartTime;
+            slider.LazyTravelTime = slider.NestedHitObjects[^1].StartTime - slider.StartTime;
 
             double endTimeMin = slider.LazyTravelTime / slider.SpanDuration;
-                if (endTimeMin % 2 >= 1)
-                    endTimeMin = 1 - endTimeMin % 1;
-                else
-                    endTimeMin %= 1;
+            if (endTimeMin % 2 >= 1)
+                endTimeMin = 1 - endTimeMin % 1;
+            else
+                endTimeMin %= 1;
 
             slider.LazyEndPosition = slider.StackedPosition + slider.Path.PositionAt(endTimeMin); // temporary lazy end position until a real result can be derived.
             var currCursorPosition = slider.StackedPosition;
@@ -170,6 +168,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         currMovementLength *= (currMovementLength - assumed_slider_radius) / currMovementLength;
                         slider.LazyTravelDistance += (float)currMovementLength;
                     }
+
                     slider.LazyEndPosition = currCursorPosition;
                 }
                 else if (currMovementObj is SliderRepeat && currMovementLength > normalized_radius)
