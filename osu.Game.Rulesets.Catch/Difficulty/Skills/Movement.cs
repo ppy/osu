@@ -11,10 +11,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
     public class Movement : StrainDecaySkill
     {
-        private const float absolute_player_positioning_error = 16f;
+        private const float absolute_player_positioning_error = 8f;
         private const float normalized_hitobject_radius = 41.0f;
 
-        protected override double SkillMultiplier => 190;
+        protected override double SkillMultiplier => 210;
         protected override double StrainDecayBase => 0.2;
 
         protected override double DecayWeight => 0.94;
@@ -88,12 +88,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (!catchCurrent.LastObject.HyperDash)
             {
                 // The base value is a ratio between distance moved and strain time
-                movementValue = 0.071 * Math.Abs(distanceMoved) / weightedStrainTime;
+                movementValue = 0.07 * Math.Abs(distanceMoved) / weightedStrainTime;
 
                 if (Math.Abs(distanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved) && Math.Sign(lastDistanceMoved) != 0)
                 {
                     // We buff shorter movements upon direction change
-                    movementValue *= 1 + (23 / Math.Pow(Math.Abs(distanceMoved), 0.7));
+                    movementValue *= 1 + (26 / Math.Pow(Math.Abs(exactDistanceMoved), 0.7));
                 }
             }
             else
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                if (previousIsDoubleHdash)
                {
                     // Scaling hyperdash chains according to movement
-                    movementValue *= isSameDirection ? Math.Abs(distanceMoved / 60) : 0.5;
+                    movementValue *= isSameDirection ? Math.Abs(distanceMoved / 60) : 0.4;
                }
             }
 
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (catchCurrent.LastObject.DistanceToHyperDash <= 20)
             {
                 if (!catchCurrent.LastObject.HyperDash)
-                    edgeDashBonus += 10;
+                    edgeDashBonus += 8.3;
                 else
                 {
                     // After a hyperdash we ARE in the correct position. Always!

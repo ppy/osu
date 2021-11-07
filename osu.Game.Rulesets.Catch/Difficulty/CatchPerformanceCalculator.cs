@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                value *= Math.Min(Math.Pow(Score.MaxCombo, 0.4) / Math.Pow(Attributes.MaxCombo, 0.4), 1.0);
+                value *= Math.Min(Math.Pow(Score.MaxCombo, 0.55) / Math.Pow(Attributes.MaxCombo, 0.55), 1.0);
 
             double approachRate = Attributes.ApproachRate;
             double approachRateFactor = 1.0;
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (approachRate > 10.0)
                 approachRateFactor += 0.35 * (approachRate - 10.0); // Additional 35% at AR 11
             else if (approachRate < 8.0)
-                approachRateFactor += 0.04 * (8.0 - approachRate); // 4% for each AR below 8
+                approachRateFactor += 0.02 * (8.0 - approachRate); // 2% for each AR below 8
 
             value *= approachRateFactor;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
 
                 if (approachRate < 9.0)
-                    value *= 1 + 0.04 * (9.0 - approachRate); // Additional 4% for each AR below 9
+                    value *= 1 + 0.03 * (9.0 - approachRate); // Additional 3% for each AR below 9
             }
 
             if (mods.Any(m => m is ModFlashlight))
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 value *= 1.25 * lengthBonus;
 
                 if (approachRate > 8.0f)
-                    value *= 0.20f * (approachRate - 8.0f) + 1; // 20% for each AR above 8
+                    value *= 0.18f * (approachRate - 8.0f) + 1; // 18% for each AR above 8
 
                 if (approachRate <= 8.0f)
                     value *= (0.025f * approachRate) + 0.8f; // -20% for each AR below 8
