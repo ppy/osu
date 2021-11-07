@@ -55,6 +55,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
             someDifficulties.Status = BeatmapSetOnlineStatus.Qualified;
             someDifficulties.HasFavourited = true;
             someDifficulties.FavouriteCount = 1;
+            someDifficulties.NominationStatus = new BeatmapSetNominationStatus
+            {
+                Current = 2,
+                Required = 2
+            };
 
             var manyDifficulties = getManyDifficultiesBeatmapSet(100);
             manyDifficulties.Status = BeatmapSetOnlineStatus.Pending;
