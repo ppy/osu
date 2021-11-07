@@ -9,8 +9,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osuTK;
@@ -20,6 +23,8 @@ namespace osu.Game.Tests.Visual.Beatmaps
 {
     public class TestSceneBeatmapCard : OsuTestScene
     {
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+
         private APIBeatmapSet[] testCases;
 
         #region Test case generation
@@ -163,6 +168,19 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         #endregion
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("register request handling", () => dummyAPI.HandleRequest = request =>
+            {
+                if (!(request is PostBeatmapFavouriteRequest))
+                    return false;
+
+                request.TriggerSuccess();
+                return true;
+            });
+        }
 
         private Drawable createContent(OverlayColourScheme colourScheme, Func<APIBeatmapSet, Drawable> creationFunc)
         {
