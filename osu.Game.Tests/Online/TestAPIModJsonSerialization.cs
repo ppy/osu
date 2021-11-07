@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -67,9 +68,11 @@ namespace osu.Game.Tests.Online
             var deserialised = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
             var converted = (TestModTimeRamp)deserialised?.ToMod(new TestRuleset());
 
-            Assert.That(converted?.AdjustPitch.Value, Is.EqualTo(false));
-            Assert.That(converted?.InitialRate.Value, Is.EqualTo(1.25));
-            Assert.That(converted?.FinalRate.Value, Is.EqualTo(0.25));
+            Assert.That(converted, Is.Not.Null);
+
+            Assert.That(converted.AdjustPitch.Value, Is.EqualTo(false));
+            Assert.That(converted.InitialRate.Value, Is.EqualTo(1.25));
+            Assert.That(converted.FinalRate.Value, Is.EqualTo(0.25));
         }
 
         [Test]
@@ -121,11 +124,11 @@ namespace osu.Game.Tests.Online
                 new TestModDifficultyAdjust()
             };
 
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new System.NotImplementedException();
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
 
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new System.NotImplementedException();
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
 
-            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new System.NotImplementedException();
+            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new NotImplementedException();
 
             public override string Description { get; } = string.Empty;
             public override string ShortName { get; } = string.Empty;

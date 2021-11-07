@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo, IBeatmapOnlineInfo
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo
     {
         public int ID { get; set; }
 
@@ -186,7 +186,7 @@ namespace osu.Game.Beatmaps
         string IBeatmapInfo.DifficultyName => Version;
 
         [JsonIgnore]
-        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
+        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata ?? BeatmapSet?.Metadata ?? new BeatmapMetadata();
 
         [JsonIgnore]
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
@@ -199,25 +199,6 @@ namespace osu.Game.Beatmaps
 
         [JsonIgnore]
         double IBeatmapInfo.StarRating => StarDifficulty;
-
-        #endregion
-
-        #region Implementation of IBeatmapOnlineInfo
-
-        [JsonIgnore]
-        public int CircleCount => OnlineInfo.CircleCount;
-
-        [JsonIgnore]
-        public int SliderCount => OnlineInfo.SliderCount;
-
-        [JsonIgnore]
-        public int PlayCount => OnlineInfo.PlayCount;
-
-        [JsonIgnore]
-        public int PassCount => OnlineInfo.PassCount;
-
-        [JsonIgnore]
-        public APIFailTimes FailTimes => OnlineInfo.FailTimes;
 
         #endregion
     }
