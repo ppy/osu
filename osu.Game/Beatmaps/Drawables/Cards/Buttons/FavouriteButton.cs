@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
@@ -11,17 +13,24 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
-    public class FavouriteButton : BeatmapCardIconButton
+    public class FavouriteButton : BeatmapCardIconButton, IHasCurrentValue<BeatmapSetFavouriteState>
     {
-        private readonly APIBeatmapSet beatmapSet;
+        private readonly BindableWithCurrent<BeatmapSetFavouriteState> current;
+
+        public Bindable<BeatmapSetFavouriteState> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
+
+        private readonly int onlineBeatmapID;
 
         private PostBeatmapFavouriteRequest favouriteRequest;
 
         public FavouriteButton(APIBeatmapSet beatmapSet)
         {
-            this.beatmapSet = beatmapSet;
-
-            updateState();
+            current = new BindableWithCurrent<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(beatmapSet.HasFavourited, beatmapSet.FavouriteCount));
+            onlineBeatmapID = beatmapSet.OnlineID;
         }
 
         [BackgroundDependencyLoader]
@@ -29,17 +38,19 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         {
             Action = () =>
             {
-                var actionType = beatmapSet.HasFavourited ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite;
+                var actionType = current.Value.Favourited ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite;
 
                 favouriteRequest?.Cancel();
-                favouriteRequest = new PostBeatmapFavouriteRequest(beatmapSet.OnlineID, actionType);
+                favouriteRequest = new PostBeatmapFavouriteRequest(onlineBeatmapID, actionType);
 
                 Enabled.Value = false;
                 favouriteRequest.Success += () =>
                 {
-                    beatmapSet.HasFavourited = actionType == BeatmapFavouriteAction.Favourite;
+                    bool favourited = actionType == BeatmapFavouriteAction.Favourite;
+
+                    current.Value = new BeatmapSetFavouriteState(favourited, current.Value.FavouriteCount + (favourited ? 1 : -1));
+
                     Enabled.Value = true;
-                    updateState();
                 };
                 favouriteRequest.Failure += e =>
                 {
@@ -51,9 +62,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            current.BindValueChanged(_ => updateState(), true);
+        }
+
         private void updateState()
         {
-            if (beatmapSet.HasFavourited)
+            if (current.Value.Favourited)
             {
                 Icon.Icon = FontAwesome.Solid.Heart;
                 TooltipText = BeatmapsetsStrings.ShowDetailsUnfavourite;

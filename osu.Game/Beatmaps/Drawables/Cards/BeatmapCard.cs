@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -35,6 +36,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private const float corner_radius = 10;
 
         private readonly APIBeatmapSet beatmapSet;
+        private readonly Bindable<BeatmapSetFavouriteState> favouriteState;
 
         private UpdateableOnlineBeatmapSetCover leftCover;
         private FillFlowContainer leftIconArea;
@@ -55,6 +57,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             : base(HoverSampleSet.Submit)
         {
             this.beatmapSet = beatmapSet;
+            favouriteState = new Bindable<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(beatmapSet.HasFavourited, beatmapSet.FavouriteCount));
         }
 
         [BackgroundDependencyLoader]
@@ -108,7 +111,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         Spacing = new Vector2(0, 14),
                         Children = new BeatmapCardIconButton[]
                         {
-                            new FavouriteButton(beatmapSet),
+                            new FavouriteButton(beatmapSet) { Current = favouriteState },
                             new DownloadButton(beatmapSet)
                         }
                     }
@@ -312,7 +315,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             if (beatmapSet.HypeStatus != null && beatmapSet.NominationStatus != null)
                 yield return new NominationsStatistic(beatmapSet.NominationStatus);
 
-            yield return new FavouritesStatistic(beatmapSet);
+            yield return new FavouritesStatistic(beatmapSet) { Current = favouriteState };
             yield return new PlayCountStatistic(beatmapSet);
 
             var dateStatistic = BeatmapCardDateStatistic.CreateFor(beatmapSet);
