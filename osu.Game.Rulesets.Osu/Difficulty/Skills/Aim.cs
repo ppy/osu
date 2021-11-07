@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double wideAngleBonus = 0;
             double acuteAngleBonus = 0;
             double sliderBonus = 0;
-            double velChangeBonus = 0;
+            double velocityChangeBonus = 0;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
@@ -107,26 +107,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 prevVelocity = (osuLastObj.JumpDistance + osuLastObj.TravelDistance) / osuLastObj.StrainTime;
                 currVelocity = (osuCurrObj.JumpDistance + osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
 
-                // scale with ratio of difference compared to 0.5 * max dist.
+                // Scale with ratio of difference compared to 0.5 * max dist.
                 double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2);
-                // reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
+
+                // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
                 double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
-                double nonOverlapVelocityBuff = Math.Abs(prevVelocity - currVelocity) // reward for % distance slowed down compared to previous, paying attention to not award overlap
-                                                 * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, Math.Min(osuCurrObj.JumpDistance, osuLastObj.JumpDistance) / 100)), 2); // do not award overlap
 
-                velChangeBonus = Math.Max(overlapVelocityBuff, nonOverlapVelocityBuff) * distRatio; // choose larger distance, multiplied by ratio.
+                // Reward for % distance slowed down compared to previous, paying attention to not award overlap
+                double nonOverlapVelocityBuff = Math.Abs(prevVelocity - currVelocity)
+                                                // do not award overlap
+                                                * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, Math.Min(osuCurrObj.JumpDistance, osuLastObj.JumpDistance) / 100)), 2);
 
-                velChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2); // penalize for rhythm changes.
+                // Choose the largest bonus, multiplied by ratio.
+                velocityChangeBonus = Math.Max(overlapVelocityBuff, nonOverlapVelocityBuff) * distRatio;
+
+                // Penalize for rhythm changes.
+                velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
             }
 
             if (osuCurrObj.TravelTime != 0)
             {
-                sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime; // add some slider rewards
+                // Reward sliders based on velocity.
+                sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
             }
 
-            // Add in acute angle bonus or wide angle bonus + velchange bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velChangeBonus * vel_change_multiplier);
-            aimStrain += sliderBonus * slider_multiplier; // Add in additional slider velocity.
+            // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * vel_change_multiplier);
+
+            // Add in additional slider velocity bonus.
+            aimStrain += sliderBonus * slider_multiplier;
 
             return aimStrain;
         }
