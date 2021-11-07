@@ -282,7 +282,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             if (beatmapSet.HypeStatus != null)
                 yield return new HypesStatistic(beatmapSet.HypeStatus);
 
-            if (beatmapSet.NominationStatus != null)
+            // web does not show nominations unless hypes are also present.
+            // see: https://github.com/ppy/osu-web/blob/8ed7d071fd1d3eaa7e43cf0e4ff55ca2fef9c07c/resources/assets/lib/beatmapset-panel.tsx#L443
+            if (beatmapSet.HypeStatus != null && beatmapSet.NominationStatus != null)
                 yield return new NominationsStatistic(beatmapSet.NominationStatus);
 
             yield return new FavouritesStatistic(beatmapSet);
