@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double approachRate = Attributes.ApproachRate;
             double approachRateFactor = 1.0;
             if (approachRate > 9.0)
-                approachRateFactor += 0.1 * (approachRate - 9.0); // 10% for each AR above 9
+                approachRateFactor += 0.08 * (approachRate - 9.0); // 8% for each AR above 9
             if (approachRate > 10.0)
                 approachRateFactor += 0.35 * (approachRate - 10.0); // Additional 35% at AR 11
             else if (approachRate < 8.0)
