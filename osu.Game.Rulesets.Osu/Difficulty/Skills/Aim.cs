@@ -104,10 +104,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 prevVelocity = (osuLastObj.JumpDistance + osuLastObj.TravelDistance) / osuLastObj.StrainTime; // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
                 currVelocity = (osuCurrObj.JumpDistance + osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
 
-                double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2); // scale with ratio of difference compared to max
+                double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, Math.Abs(prevVelocity - currVelocity) / (0.5 * Math.Max(prevVelocity, currVelocity)))), 2); // scale with ratio of difference compared to 0.5 * max dist.
                 double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity)); // reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
                 double nonOverlapVelocityBuff = Math.Abs(prevVelocity - currVelocity) // reward for % distance slowed down compared to previous, paying attention to not award overlap
-                                                 * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, osuCurrObj.JumpDistance / 100)), 2); // do not award overlap
+                                                 * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, Math.Min(osuCurrObj.JumpDistance, osuLastObj.JumpDistance) / 100)), 2); // do not award overlap
 
                 velChangeBonus = Math.Max(overlapVelocityBuff, nonOverlapVelocityBuff) * distRatio; // choose larger distance, multiplied by ratio.
 
