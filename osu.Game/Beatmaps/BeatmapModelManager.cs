@@ -36,12 +36,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Fired when a single difficulty has been hidden.
         /// </summary>
-        public Action<BeatmapInfo> BeatmapHidden;
+        public event Action<BeatmapInfo> BeatmapHidden;
 
         /// <summary>
         /// Fired when a single difficulty has been restored.
         /// </summary>
-        public Action<BeatmapInfo> BeatmapRestored;
+        public event Action<BeatmapInfo> BeatmapRestored;
 
         /// <summary>
         /// An online lookup queue component which handles populating online beatmap metadata.

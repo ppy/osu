@@ -100,19 +100,19 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Fired when a single difficulty has been hidden.
         /// </summary>
-        public Action<BeatmapInfo> BeatmapHidden
+        public event Action<BeatmapInfo> BeatmapHidden
         {
-            get => beatmapModelManager.BeatmapHidden;
-            set => beatmapModelManager.BeatmapHidden = value;
+            add => beatmapModelManager.BeatmapHidden += value;
+            remove => beatmapModelManager.BeatmapHidden -= value;
         }
 
         /// <summary>
         /// Fired when a single difficulty has been restored.
         /// </summary>
-        public Action<BeatmapInfo> BeatmapRestored
+        public event Action<BeatmapInfo> BeatmapRestored
         {
-            get => beatmapModelManager.BeatmapRestored;
-            set => beatmapModelManager.BeatmapRestored = value;
+            add => beatmapModelManager.BeatmapRestored += value;
+            remove => beatmapModelManager.BeatmapRestored -= value;
         }
 
         /// <summary>
