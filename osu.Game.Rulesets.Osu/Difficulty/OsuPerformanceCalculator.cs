@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModRelax))
             {
-                effectiveMissCount += countOk + countMeh;
+                effectiveMissCount = Math.Min(effectiveMissCount + countOk + countMeh, totalHits);
                 multiplier *= 0.6;
             }
 
