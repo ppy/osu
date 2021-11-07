@@ -9,7 +9,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -110,7 +109,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private IBeatmapSetInfo getDownloadableBeatmapSet()
         {
-            var apiBeatmapSet = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).BeatmapSetInfo.OnlineInfo;
+            var apiBeatmapSet = CreateAPIBeatmapSet();
 
             apiBeatmapSet.HasVideo = true;
             apiBeatmapSet.HasStoryboard = true;
@@ -120,7 +119,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private IBeatmapSetInfo getUndownloadableBeatmapSet()
         {
-            var apiBeatmapSet = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).BeatmapSetInfo.OnlineInfo;
+            var apiBeatmapSet = CreateAPIBeatmapSet();
 
             apiBeatmapSet.Artist = "test";
             apiBeatmapSet.Title = "undownloadable";
