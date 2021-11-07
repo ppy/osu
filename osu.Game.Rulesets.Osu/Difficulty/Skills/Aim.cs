@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.0;
         private const double slider_multiplier = 1.5;
-        private const double vel_change_multiplier = 0.75;
+        private const double velocity_change_multiplier = 0.75;
 
         private double currentStrain = 1;
 
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * vel_change_multiplier);
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
 
             // Add in additional slider velocity bonus.
             aimStrain += sliderBonus * slider_multiplier;
