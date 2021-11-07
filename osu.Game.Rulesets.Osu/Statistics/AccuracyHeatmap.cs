@@ -136,10 +136,9 @@ namespace osu.Game.Rulesets.Osu.Statistics
                             }
                         }
                     },
-                    bufferedGrid = new BufferedContainer
+                    bufferedGrid = new BufferedContainer(cachedFrameBuffer: true)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        CacheDrawnFrameBuffer = true,
                         BackgroundColour = Color4Extensions.FromHex("#202624").Opacity(0),
                         Child = pointGrid = new GridContainer
                         {

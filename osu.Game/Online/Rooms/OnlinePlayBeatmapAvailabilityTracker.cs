@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -51,6 +52,8 @@ namespace osu.Game.Online.Rooms
                     return;
 
                 downloadTracker?.RemoveAndDisposeImmediately();
+
+                Debug.Assert(item.NewValue.Beatmap.Value.BeatmapSet != null);
 
                 downloadTracker = new BeatmapDownloadTracker(item.NewValue.Beatmap.Value.BeatmapSet);
 

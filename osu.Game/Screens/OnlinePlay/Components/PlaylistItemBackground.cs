@@ -13,11 +13,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class PlaylistItemBackground : Background
     {
-        public readonly BeatmapInfo? BeatmapInfo;
+        public readonly IBeatmapInfo? Beatmap;
 
         public PlaylistItemBackground(PlaylistItem? playlistItem)
         {
-            BeatmapInfo = playlistItem?.Beatmap.Value;
+            Beatmap = playlistItem?.Beatmap.Value;
         }
 
         [BackgroundDependencyLoader]
@@ -26,8 +26,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
             Texture? texture = null;
 
             // prefer online cover where available.
-            if (BeatmapInfo?.BeatmapSet?.OnlineInfo?.Covers.Cover != null)
-                texture = textures.Get(BeatmapInfo.BeatmapSet.OnlineInfo.Covers.Cover);
+            if (Beatmap?.BeatmapSet is IBeatmapSetOnlineInfo online)
+                texture = textures.Get(online.Covers.Cover);
 
             Sprite.Texture = texture ?? beatmaps.DefaultBeatmap.Background;
         }
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             if (ReferenceEquals(this, other)) return true;
 
             return other.GetType() == GetType()
-                   && ((PlaylistItemBackground)other).BeatmapInfo == BeatmapInfo;
+                   && ((PlaylistItemBackground)other).Beatmap == Beatmap;
         }
     }
 }

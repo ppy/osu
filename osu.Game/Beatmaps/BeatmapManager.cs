@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : IModelDownloader<BeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IWorkingBeatmapCache, IDisposable
+    public class BeatmapManager : IModelDownloader<IBeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         private readonly BeatmapModelManager beatmapModelManager;
         private readonly BeatmapModelDownloader beatmapModelDownloader;
@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected virtual BeatmapModelDownloader CreateBeatmapModelDownloader(IBeatmapModelManager modelManager, IAPIProvider api, GameHost host)
+        protected virtual BeatmapModelDownloader CreateBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> modelManager, IAPIProvider api, GameHost host)
         {
             return new BeatmapModelDownloader(modelManager, api, host);
         }
@@ -114,7 +114,8 @@ namespace osu.Game.Beatmaps
         /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null) => beatmapModelManager.Save(info, beatmapContent, beatmapSkin);
+        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null) =>
+            beatmapModelManager.Save(info, beatmapContent, beatmapSkin);
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
@@ -245,33 +246,16 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelDownloader<BeatmapSetInfo>
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadBegan => beatmapModelDownloader.DownloadBegan;
+        public IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> DownloadBegan => beatmapModelDownloader.DownloadBegan;
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<BeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
+        public IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
 
-        // Temporary method until this class supports IBeatmapSetInfo or otherwise.
         public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false)
-        {
-            return beatmapModelDownloader.Download(new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = model.OnlineID,
-                Metadata = new BeatmapMetadata
-                {
-                    Title = model.Metadata?.Title,
-                    Artist = model.Metadata?.Artist,
-                    TitleUnicode = model.Metadata?.TitleUnicode,
-                    ArtistUnicode = model.Metadata?.ArtistUnicode,
-                    Author = new User { Username = model.Metadata?.Author },
-                }
-            }, minimiseDownloadSize);
-        }
-
-        public bool Download(BeatmapSetInfo model, bool minimiseDownloadSize = false)
         {
             return beatmapModelDownloader.Download(model, minimiseDownloadSize);
         }
 
-        public ArchiveDownloadRequest<BeatmapSetInfo> GetExistingDownload(BeatmapSetInfo model)
+        public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model)
         {
             return beatmapModelDownloader.GetExistingDownload(model);
         }
