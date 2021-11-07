@@ -147,7 +147,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 Vector2 currMovement = Vector2.Subtract(currMovementObj.StackedPosition, currCursorPosition);
                 double currMovementLength = scalingFactor * currMovement.Length;
-                double currRadius = assumed_slider_radius;
+
+                // Amount of movement required so that the cursor position needs to be updated.
+                double requiredMovement = assumed_slider_radius;
 
                 if (i == slider.NestedHitObjects.Count - 1)
                 {
@@ -163,13 +165,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     currMovementLength = scalingFactor * currMovement.Length;
                 }
                 else if (currMovementObj is SliderRepeat)
-                    currRadius = normalized_radius;
+                {
+                    // For a slider repeat, assume a tighter movement threshold to better assess repeat sliders.
+                    requiredMovement = normalized_radius;
+                }
 
-                if (currMovementLength > currRadius)
+                if (currMovementLength > requiredMovement)
                 {
                     // this finds the positional delta from the required radius and the current position, and updates the currCursorPosition accordingly, as well as rewarding distance.
-                    currCursorPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(currMovement, (float)((currMovementLength - currRadius) / currMovementLength)));
-                    currMovementLength *= (currMovementLength - currRadius) / currMovementLength;
+                    currCursorPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(currMovement, (float)((currMovementLength - requiredMovement) / currMovementLength)));
+                    currMovementLength *= (currMovementLength - requiredMovement) / currMovementLength;
                     slider.LazyTravelDistance += (float)currMovementLength;
                 }
 
