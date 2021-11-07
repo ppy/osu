@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
 
                 if (approachRate < 9.0)
-                    value *= 1 + 0.03 * (9.0 - approachRate); // Additional 3% for each AR below 9
+                    value *= 1 + 0.02 * (9.0 - approachRate); // Additional 2% for each AR below 9
             }
 
             if (mods.Any(m => m is ModFlashlight))
