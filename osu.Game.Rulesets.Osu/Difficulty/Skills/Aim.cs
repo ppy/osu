@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.0;
+        private const double slider_multiplier = 1.5;
 
         private double currentStrain = 1;
 
@@ -62,6 +63,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             double angleBonus = 0;
+            double sliderBonus = 0;
+
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
             if (Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime) < 1.25 * Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime)) // If rhythms are the same.
@@ -91,11 +94,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3))); // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
                     acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3))); // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
 
-                    angleBonus = acuteAngleBonus * acute_angle_multiplier + wideAngleBonus * wide_angle_multiplier; // add the angle buffs together.
+                    angleBonus = Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier); // Take the max of the multipliers.
                 }
             }
 
+            if (osuCurrObj.TravelTime != 0)
+            {
+                sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime; // add some slider rewards
+            }
+
             aimStrain += angleBonus; // Add in angle bonus.
+            aimStrain += sliderBonus * slider_multiplier; // Add in additional slider velocity.
 
             return aimStrain;
         }
