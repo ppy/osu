@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private int calculateEffectiveMissCount()
         {
-            // guess the number of misses + slider breaks from combo
+            // Guess the number of misses + slider breaks from combo
             double comboBasedMissCount = 0.0;
 
             if (Attributes.SliderCount > 0)
@@ -267,7 +267,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
             }
 
-            // we're clamping misscount because since its derived from combo it can be higher than total hits and that breaks some calculations
+            // We're clamping misscount because since its derived from combo it can be higher than total hits and that breaks some calculations
             comboBasedMissCount = Math.Min(comboBasedMissCount, totalHits);
 
             return Math.Max(countMiss, (int)Math.Floor(comboBasedMissCount));
