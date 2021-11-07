@@ -37,11 +37,7 @@ namespace osu.Game.Overlays
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
                 Margin = new MarginPadding(20),
-                Action = () =>
-                {
-                    ScrollToStart();
-                    Button.State = Visibility.Hidden;
-                }
+                Action = scrollToTop
             });
         }
 
@@ -56,6 +52,12 @@ namespace osu.Game.Overlays
             }
 
             Button.State = Target > button_scroll_position ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        private void scrollToTop()
+        {
+            ScrollToStart();
+            Button.State = Visibility.Hidden;
         }
 
         public class ScrollToTopButton : OsuHoverContainer
