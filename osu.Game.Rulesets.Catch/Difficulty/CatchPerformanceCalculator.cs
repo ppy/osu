@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     value *= 0.18f * (approachRate - 8.0f) + 1; // 18% for each AR above 8
 
                 if (approachRate <= 8.0f)
-                    value *= (0.025f * approachRate) + 0.8f; // -20% for each AR below 8
+                    value *= (0.025f * approachRate) + 0.8f; // Dreasing by a few percentages below AR 8
             }
 
 
