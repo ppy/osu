@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // such that they're not jumping from the lazy position but rather from very close to (or the end of) the slider.
                 // In such cases, a leniency is applied by also considering the jump distance from the tail of the slider, and taking the minimum jump distance.
                 // Additional distance is removed based on position of jump relative to slider follow circle radius.
-                // JumpDistance is the distance beyond the s. tailJumpDistance is maximum_slider_radius since the full distance of radial leniency is still possible.
+                // JumpDistance is the leniency distance beyond the assumed_slider_radius. tailJumpDistance is maximum_slider_radius since the full distance of radial leniency is still possible.
                 MovementDistance = Math.Max(0, Math.Min(JumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
             else
@@ -148,6 +148,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 Vector2 currMovement = Vector2.Subtract(currMovementObj.StackedPosition, currCursorPosition);
                 double currMovementLength = scalingFactor * currMovement.Length;
 
+                // Amount of movement required so that the cursor position needs to be updated.
+                double requiredMovement = assumed_slider_radius;
+
                 if (i == slider.NestedHitObjects.Count - 1)
                 {
                     // The end of a slider has special aim rules due to the relaxed time constraint on position.
@@ -160,31 +163,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         currMovement = lazyMovement;
 
                     currMovementLength = scalingFactor * currMovement.Length;
-
-                    if (currMovementLength > assumed_slider_radius)
-                    {
-                        // Calculate the vector movement, regardless of final location to get the true lazy end position.
-                        currCursorPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(currMovement, (float)((currMovementLength - assumed_slider_radius) / currMovementLength)));
-                        currMovementLength *= (currMovementLength - assumed_slider_radius) / currMovementLength;
-                        slider.LazyTravelDistance += (float)currMovementLength;
-                    }
-
-                    slider.LazyEndPosition = currCursorPosition;
                 }
-                else if (currMovementObj is SliderRepeat && currMovementLength > normalized_radius)
+                else if (currMovementObj is SliderRepeat)
                 {
                     // For a slider repeat, assume a tighter movement threshold to better assess repeat sliders.
-                    currCursorPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(currMovement, (float)((currMovementLength - normalized_radius) / currMovementLength)));
-                    currMovementLength *= (currMovementLength - normalized_radius) / currMovementLength;
-                    slider.LazyTravelDistance += (float)currMovementLength;
+                    requiredMovement = normalized_radius;
                 }
-                else if (currMovementLength > assumed_slider_radius)
+
+                if (currMovementLength > requiredMovement)
                 {
-                    // For a slider ticks, use the assumed slider radius for a more accurate movement assessment.
-                    currCursorPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(currMovement, (float)((currMovementLength - assumed_slider_radius) / currMovementLength)));
-                    currMovementLength *= (currMovementLength - assumed_slider_radius) / currMovementLength;
+                    // this finds the positional delta from the required radius and the current position, and updates the currCursorPosition accordingly, as well as rewarding distance.
+                    currCursorPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(currMovement, (float)((currMovementLength - requiredMovement) / currMovementLength)));
+                    currMovementLength *= (currMovementLength - requiredMovement) / currMovementLength;
                     slider.LazyTravelDistance += (float)currMovementLength;
                 }
+
+                if (i == slider.NestedHitObjects.Count - 1)
+                    slider.LazyEndPosition = currCursorPosition;
             }
 
             slider.LazyTravelDistance *= (float)Math.Pow(1 + slider.RepeatCount / 2.5, 1.0 / 2.5); // Bonus for repeat sliders until a better per nested object strain system can be achieved.
