@@ -123,12 +123,12 @@ namespace osu.Game.Rulesets.Difficulty
         /// Performs required tasks before every calculation.
         /// </summary>
         /// <param name="mods">The original list of <see cref="Mod"/>s.</param>
-        /// <param name="cancellationToken">The cancellation timeoutToken.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         private void preProcess(IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
 
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, playableMods, timeoutToken: cancellationToken);
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, playableMods, token: cancellationToken);
 
             var track = new TrackVirtual(10000);
             playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
