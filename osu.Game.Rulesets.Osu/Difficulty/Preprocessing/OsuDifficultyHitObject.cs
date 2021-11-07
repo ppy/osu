@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // such that they're not jumping from the lazy position but rather from very close to (or the end of) the slider.
                 // In such cases, a leniency is applied by also considering the jump distance from the tail of the slider, and taking the minimum jump distance.
                 // Additional distance is removed based on position of jump relative to slider follow circle radius.
-                // JumpDistance is the distance beyond the s. tailJumpDistance is maximum_slider_radius since the full distance of radial leniency is still possible.
+                // JumpDistance is the leniency distance beyond the assumed_slider_radius. tailJumpDistance is maximum_slider_radius since the full distance of radial leniency is still possible.
                 MovementDistance = Math.Max(0, Math.Min(JumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
             else
