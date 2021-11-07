@@ -94,18 +94,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                            * Math.Pow(Math.Sin(Math.PI / 2 * (Math.Clamp(osuCurrObj.JumpDistance, 50, 100) - 50) / 50), 2); // Buff distance exceeding 50 (radius) up to 100 (diameter).
                     }
 
-                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3))); // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
-                    acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3))); // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
+                    // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
+                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
+                    // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
+                    acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
                 }
             }
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
             {
-                prevVelocity = (osuLastObj.JumpDistance + osuLastObj.TravelDistance) / osuLastObj.StrainTime; // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
+                // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
+                prevVelocity = (osuLastObj.JumpDistance + osuLastObj.TravelDistance) / osuLastObj.StrainTime;
                 currVelocity = (osuCurrObj.JumpDistance + osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
 
-                double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2); // scale with ratio of difference compared to 0.5 * max dist.
-                double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity)); // reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
+                // scale with ratio of difference compared to 0.5 * max dist.
+                double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2);
+                // reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
+                double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
                 double nonOverlapVelocityBuff = Math.Abs(prevVelocity - currVelocity) // reward for % distance slowed down compared to previous, paying attention to not award overlap
                                                  * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, Math.Min(osuCurrObj.JumpDistance, osuLastObj.JumpDistance) / 100)), 2); // do not award overlap
 
@@ -119,7 +124,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime; // add some slider rewards
             }
 
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velChangeBonus * vel_change_multiplier); // Add in acute angle bonus or wide angle bonus + velchange bonus, whichever is larger.
+            // Add in acute angle bonus or wide angle bonus + velchange bonus, whichever is larger.
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velChangeBonus * vel_change_multiplier);
             aimStrain += sliderBonus * slider_multiplier; // Add in additional slider velocity.
 
             return aimStrain;
