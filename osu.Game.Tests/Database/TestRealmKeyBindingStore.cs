@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -33,7 +34,7 @@ namespace osu.Game.Tests.Database
             storage = new NativeStorage(directory.FullName);
 
             realmContextFactory = new RealmContextFactory(storage, "test");
-            keyBindingStore = new RealmKeyBindingStore(realmContextFactory);
+            keyBindingStore = new RealmKeyBindingStore(realmContextFactory, new ReadableKeyCombinationProvider());
         }
 
         [Test]
