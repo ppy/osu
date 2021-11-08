@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             {
                 base.CopyTo(other);
                 if (!(other is TaikoMultiplierAppliedDifficulty))
-                    SliderMultiplier /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+                    other.SliderMultiplier /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
             }
 
             public override void CopyFrom(IBeatmapDifficultyInfo other)
