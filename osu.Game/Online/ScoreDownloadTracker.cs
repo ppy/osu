@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Scoring;
 
@@ -16,17 +15,12 @@ namespace osu.Game.Online
         [Resolved(CanBeNull = true)]
         protected ScoreManager? Manager { get; private set; }
 
-        private ArchiveDownloadRequest<ScoreInfo>? attachedRequest;
+        private ArchiveDownloadRequest<IScoreInfo>? attachedRequest;
 
         public ScoreDownloadTracker(ScoreInfo trackedItem)
             : base(trackedItem)
         {
         }
-
-        private IBindable<WeakReference<ScoreInfo>>? managerUpdated;
-        private IBindable<WeakReference<ScoreInfo>>? managerRemoved;
-        private IBindable<WeakReference<ArchiveDownloadRequest<ScoreInfo>>>? managerDownloadBegan;
-        private IBindable<WeakReference<ArchiveDownloadRequest<ScoreInfo>>>? managerDownloadFailed;
 
         [BackgroundDependencyLoader(true)]
         private void load()
@@ -46,41 +40,25 @@ namespace osu.Game.Online
             else
                 attachDownload(Manager.GetExistingDownload(scoreInfo));
 
-            managerDownloadBegan = Manager.DownloadBegan.GetBoundCopy();
-            managerDownloadBegan.BindValueChanged(downloadBegan);
-            managerDownloadFailed = Manager.DownloadFailed.GetBoundCopy();
-            managerDownloadFailed.BindValueChanged(downloadFailed);
-            managerUpdated = Manager.ItemUpdated.GetBoundCopy();
-            managerUpdated.BindValueChanged(itemUpdated);
-            managerRemoved = Manager.ItemRemoved.GetBoundCopy();
-            managerRemoved.BindValueChanged(itemRemoved);
+            Manager.DownloadBegan += downloadBegan;
+            Manager.DownloadFailed += downloadFailed;
+            Manager.ItemUpdated += itemUpdated;
+            Manager.ItemRemoved += itemRemoved;
         }
 
-        private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<ScoreInfo>>> weakRequest)
+        private void downloadBegan(ArchiveDownloadRequest<IScoreInfo> request) => Schedule(() =>
         {
-            if (weakRequest.NewValue.TryGetTarget(out var request))
-            {
-                Schedule(() =>
-                {
-                    if (checkEquality(request.Model, TrackedItem))
-                        attachDownload(request);
-                });
-            }
-        }
+            if (checkEquality(request.Model, TrackedItem))
+                attachDownload(request);
+        });
 
-        private void downloadFailed(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<ScoreInfo>>> weakRequest)
+        private void downloadFailed(ArchiveDownloadRequest<IScoreInfo> request) => Schedule(() =>
         {
-            if (weakRequest.NewValue.TryGetTarget(out var request))
-            {
-                Schedule(() =>
-                {
-                    if (checkEquality(request.Model, TrackedItem))
-                        attachDownload(null);
-                });
-            }
-        }
+            if (checkEquality(request.Model, TrackedItem))
+                attachDownload(null);
+        });
 
-        private void attachDownload(ArchiveDownloadRequest<ScoreInfo>? request)
+        private void attachDownload(ArchiveDownloadRequest<IScoreInfo>? request)
         {
             if (attachedRequest != null)
             {
@@ -120,31 +98,19 @@ namespace osu.Game.Online
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void itemUpdated(ValueChangedEvent<WeakReference<ScoreInfo>> weakItem)
+        private void itemUpdated(ScoreInfo item) => Schedule(() =>
         {
-            if (weakItem.NewValue.TryGetTarget(out var item))
-            {
-                Schedule(() =>
-                {
-                    if (checkEquality(item, TrackedItem))
-                        UpdateState(DownloadState.LocallyAvailable);
-                });
-            }
-        }
+            if (checkEquality(item, TrackedItem))
+                UpdateState(DownloadState.LocallyAvailable);
+        });
 
-        private void itemRemoved(ValueChangedEvent<WeakReference<ScoreInfo>> weakItem)
+        private void itemRemoved(ScoreInfo item) => Schedule(() =>
         {
-            if (weakItem.NewValue.TryGetTarget(out var item))
-            {
-                Schedule(() =>
-                {
-                    if (checkEquality(item, TrackedItem))
-                        UpdateState(DownloadState.NotDownloaded);
-                });
-            }
-        }
+            if (checkEquality(item, TrackedItem))
+                UpdateState(DownloadState.NotDownloaded);
+        });
 
-        private bool checkEquality(ScoreInfo x, ScoreInfo y) => x.OnlineScoreID == y.OnlineScoreID;
+        private bool checkEquality(IScoreInfo x, IScoreInfo y) => x.OnlineID == y.OnlineID;
 
         #region Disposal
 
@@ -152,6 +118,14 @@ namespace osu.Game.Online
         {
             base.Dispose(isDisposing);
             attachDownload(null);
+
+            if (Manager != null)
+            {
+                Manager.DownloadBegan -= downloadBegan;
+                Manager.DownloadFailed -= downloadFailed;
+                Manager.ItemUpdated -= itemUpdated;
+                Manager.ItemRemoved -= itemRemoved;
+            }
         }
 
         #endregion

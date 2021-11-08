@@ -7,11 +7,11 @@ using osu.Game.Overlays.Dashboard.Home;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
-using osu.Game.Users;
 using System;
 using osu.Framework.Graphics.Shapes;
 using System.Collections.Generic;
 using osu.Game.Online.API.Requests.Responses;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Title = "Very Long Title (TV size) [TATOE]",
                 Artist = "This artist has a really long name how is this possible",
-                Author = new User
+                Author = new APIUser
                 {
                     Username = "author",
                     Id = 100
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Title = "Very Long Title (TV size) [TATOE]",
                 Artist = "This artist has a really long name how is this possible",
-                Author = new User
+                Author = new APIUser
                 {
                     Username = "author",
                     Id = 100
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Title = "Very Long Title (TV size) [TATOE]",
                 Artist = "This artist has a really long name how is this possible",
-                Author = new User
+                Author = new APIUser
                 {
                     Username = "author",
                     Id = 100
@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Title = "Very Long Title (TV size) [TATOE]",
                 Artist = "This artist has a really long name how is this possible",
-                Author = new User
+                Author = new APIUser
                 {
                     Username = "author",
                     Id = 100

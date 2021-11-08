@@ -27,7 +27,6 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -124,10 +123,10 @@ namespace osu.Game.Screens.OnlinePlay
 
             authorText.Clear();
 
-            if (!string.IsNullOrEmpty(Item.Beatmap.Value?.Metadata.Author))
+            if (!string.IsNullOrEmpty(Item.Beatmap.Value?.Metadata.Author.Username))
             {
                 authorText.AddText("mapped by ");
-                authorText.AddUserLink(new User { Username = Item.Beatmap.Value.Metadata.Author });
+                authorText.AddUserLink(Item.Beatmap.Value.Metadata.Author);
             }
 
             bool hasExplicitContent = (Item.Beatmap.Value.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;

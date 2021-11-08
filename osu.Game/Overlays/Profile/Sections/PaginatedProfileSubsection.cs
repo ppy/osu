@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
-using osu.Game.Users;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,6 +15,7 @@ using osu.Game.Rulesets;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private OsuSpriteText missing;
         private readonly LocalisableString? missingText;
 
-        protected PaginatedProfileSubsection(Bindable<User> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
+        protected PaginatedProfileSubsection(Bindable<APIUser> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
             : base(user, headerText, CounterVisibilityState.AlwaysVisible)
         {
             this.missingText = missingText;
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Profile.Sections
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private void onUserChanged(ValueChangedEvent<User> e)
+        private void onUserChanged(ValueChangedEvent<APIUser> e)
         {
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Profile.Sections
             }, loadCancellation.Token);
         });
 
-        protected virtual int GetCount(User user) => 0;
+        protected virtual int GetCount(APIUser user) => 0;
 
         protected virtual void OnItemsReceived(List<TModel> items)
         {

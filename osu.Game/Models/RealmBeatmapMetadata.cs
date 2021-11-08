@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Users;
 using Realms;
 
 #nullable enable
@@ -26,7 +27,7 @@ namespace osu.Game.Models
         [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; } = string.Empty;
 
-        public string Author { get; set; } = string.Empty; // eventually should be linked to a persisted User.
+        public RealmUser Author { get; set; } = new RealmUser();
 
         public string Source { get; set; } = string.Empty;
 
@@ -41,5 +42,7 @@ namespace osu.Game.Models
 
         public string AudioFile { get; set; } = string.Empty;
         public string BackgroundFile { get; set; } = string.Empty;
+
+        IUser IBeatmapMetadataInfo.Author => Author;
     }
 }
