@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -52,25 +53,49 @@ namespace osu.Game.Screens.Edit
 
         #region Clipboard operations
 
+        public BindableBool CanCut { get; } = new BindableBool();
+
         /// <summary>
         /// Performs a "cut to clipboard" operation appropriate for the given screen.
         /// </summary>
-        public virtual void Cut()
+        protected virtual void PerformCut()
         {
         }
+
+        public void Cut()
+        {
+            if (CanCut.Value)
+                PerformCut();
+        }
+
+        public BindableBool CanCopy { get; } = new BindableBool();
 
         /// <summary>
         /// Performs a "copy to clipboard" operation appropriate for the given screen.
         /// </summary>
-        public virtual void Copy()
+        protected virtual void PerformCopy()
         {
         }
+
+        public virtual void Copy()
+        {
+            if (CanCopy.Value)
+                PerformCopy();
+        }
+
+        public BindableBool CanPaste { get; } = new BindableBool();
 
         /// <summary>
         /// Performs a "paste from clipboard" operation appropriate for the given screen.
         /// </summary>
+        protected virtual void PerformPaste()
+        {
+        }
+
         public virtual void Paste()
         {
+            if (CanPaste.Value)
+                PerformPaste();
         }
 
         #endregion

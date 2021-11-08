@@ -77,6 +77,13 @@ namespace osu.Game.Screens.Edit.Compose
             return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(content);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) => updateClipboardActionAvailability());
+            clipboard.BindValueChanged(_ => updateClipboardActionAvailability(), true);
+        }
+
         #region Input Handling
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
@@ -108,30 +115,24 @@ namespace osu.Game.Screens.Edit.Compose
 
         #region Clipboard operations
 
-        public override void Cut()
+        protected override void PerformCut()
         {
-            base.Cut();
+            base.PerformCut();
 
             Copy();
             EditorBeatmap.RemoveRange(EditorBeatmap.SelectedHitObjects.ToArray());
         }
 
-        public override void Copy()
+        protected override void PerformCopy()
         {
-            base.Copy();
-
-            if (EditorBeatmap.SelectedHitObjects.Count == 0)
-                return;
+            base.PerformCopy();
 
             clipboard.Value = new ClipboardContent(EditorBeatmap).Serialize();
         }
 
-        public override void Paste()
+        protected override void PerformPaste()
         {
-            base.Paste();
-
-            if (string.IsNullOrEmpty(clipboard.Value))
-                return;
+            base.PerformPaste();
 
             var objects = clipboard.Value.Deserialize<ClipboardContent>().HitObjects;
 
@@ -150,6 +151,12 @@ namespace osu.Game.Screens.Edit.Compose
             EditorBeatmap.SelectedHitObjects.AddRange(objects);
 
             EditorBeatmap.EndChange();
+        }
+
+        private void updateClipboardActionAvailability()
+        {
+            CanCut.Value = CanCopy.Value = EditorBeatmap.SelectedHitObjects.Any();
+            CanPaste.Value = !string.IsNullOrEmpty(clipboard.Value);
         }
 
         #endregion

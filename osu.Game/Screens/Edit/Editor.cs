@@ -181,10 +181,6 @@ namespace osu.Game.Screens.Edit
             OsuMenuItem undoMenuItem;
             OsuMenuItem redoMenuItem;
 
-            EditorMenuItem cutMenuItem;
-            EditorMenuItem copyMenuItem;
-            EditorMenuItem pasteMenuItem;
-
             AddInternal(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -300,17 +296,13 @@ namespace osu.Game.Screens.Edit
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
-            editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) =>
-            {
-                bool hasObjects = editorBeatmap.SelectedHitObjects.Count > 0;
-
-                cutMenuItem.Action.Disabled = !hasObjects;
-                copyMenuItem.Action.Disabled = !hasObjects;
-            }, true);
-
-            Clipboard.BindValueChanged(content => pasteMenuItem.Action.Disabled = string.IsNullOrEmpty(content.NewValue));
-
             menuBar.Mode.ValueChanged += onModeChanged;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            setUpClipboardActionAvailability();
         }
 
         /// <summary>
@@ -562,11 +554,37 @@ namespace osu.Game.Screens.Edit
             this.Exit();
         }
 
+        #region Clipboard support
+
+        private EditorMenuItem cutMenuItem;
+        private EditorMenuItem copyMenuItem;
+        private EditorMenuItem pasteMenuItem;
+
+        private readonly BindableWithCurrent<bool> canCut = new BindableWithCurrent<bool>();
+        private readonly BindableWithCurrent<bool> canCopy = new BindableWithCurrent<bool>();
+        private readonly BindableWithCurrent<bool> canPaste = new BindableWithCurrent<bool>();
+
+        private void setUpClipboardActionAvailability()
+        {
+            canCut.Current.BindValueChanged(cut => cutMenuItem.Action.Disabled = !cut.NewValue, true);
+            canCopy.Current.BindValueChanged(copy => copyMenuItem.Action.Disabled = !copy.NewValue, true);
+            canPaste.Current.BindValueChanged(paste => pasteMenuItem.Action.Disabled = !paste.NewValue, true);
+        }
+
+        private void rebindClipboardBindables()
+        {
+            canCut.Current = currentScreen.CanCut;
+            canCopy.Current = currentScreen.CanCopy;
+            canPaste.Current = currentScreen.CanPaste;
+        }
+
         protected void Cut() => currentScreen?.Cut();
 
         protected void Copy() => currentScreen?.Copy();
 
         protected void Paste() => currentScreen?.Paste();
+
+        #endregion
 
         protected void Undo() => changeHandler.RestoreState(-1);
 
@@ -644,6 +662,7 @@ namespace osu.Game.Screens.Edit
             finally
             {
                 updateSampleDisabledState();
+                rebindClipboardBindables();
             }
         }
 
