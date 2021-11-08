@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework;
@@ -24,7 +23,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.IO.Serialization;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
@@ -104,6 +102,9 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private MusicController music { get; set; }
+
+        [Cached(Name = nameof(Clipboard))]
+        public readonly Bindable<string> Clipboard = new Bindable<string>();
 
         public Editor(EditorLoader loader = null)
         {
@@ -307,7 +308,7 @@ namespace osu.Game.Screens.Edit
                 copyMenuItem.Action.Disabled = !hasObjects;
             }, true);
 
-            clipboard.BindValueChanged(content => pasteMenuItem.Action.Disabled = string.IsNullOrEmpty(content.NewValue));
+            Clipboard.BindValueChanged(content => pasteMenuItem.Action.Disabled = string.IsNullOrEmpty(content.NewValue));
 
             menuBar.Mode.ValueChanged += onModeChanged;
         }
@@ -324,7 +325,7 @@ namespace osu.Game.Screens.Edit
         public void RestoreState([NotNull] EditorState state) => Schedule(() =>
         {
             clock.Seek(state.Time);
-            clipboard.Value = state.ClipboardContent;
+            Clipboard.Value = state.ClipboardContent;
         });
 
         protected void Save()
@@ -561,45 +562,11 @@ namespace osu.Game.Screens.Edit
             this.Exit();
         }
 
-        private readonly Bindable<string> clipboard = new Bindable<string>();
+        protected void Cut() => currentScreen?.Cut();
 
-        protected void Cut()
-        {
-            Copy();
-            editorBeatmap.RemoveRange(editorBeatmap.SelectedHitObjects.ToArray());
-        }
+        protected void Copy() => currentScreen?.Copy();
 
-        protected void Copy()
-        {
-            if (editorBeatmap.SelectedHitObjects.Count == 0)
-                return;
-
-            clipboard.Value = new ClipboardContent(editorBeatmap).Serialize();
-        }
-
-        protected void Paste()
-        {
-            if (string.IsNullOrEmpty(clipboard.Value))
-                return;
-
-            var objects = clipboard.Value.Deserialize<ClipboardContent>().HitObjects;
-
-            Debug.Assert(objects.Any());
-
-            double timeOffset = clock.CurrentTime - objects.Min(o => o.StartTime);
-
-            foreach (var h in objects)
-                h.StartTime += timeOffset;
-
-            editorBeatmap.BeginChange();
-
-            editorBeatmap.SelectedHitObjects.Clear();
-
-            editorBeatmap.AddRange(objects);
-            editorBeatmap.SelectedHitObjects.AddRange(objects);
-
-            editorBeatmap.EndChange();
-        }
+        protected void Paste() => currentScreen?.Paste();
 
         protected void Undo() => changeHandler.RestoreState(-1);
 
@@ -757,7 +724,7 @@ namespace osu.Game.Screens.Edit
         protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
         {
             Time = clock.CurrentTimeAccurate,
-            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? clipboard.Value : string.Empty
+            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Value : string.Empty
         });
 
         private void cancelExit()
