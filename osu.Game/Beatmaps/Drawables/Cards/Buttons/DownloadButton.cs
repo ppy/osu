@@ -8,12 +8,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
     public class DownloadButton : BeatmapCardIconButton
     {
-        private readonly APIBeatmapSet beatmapSet;
-
         public DownloadButton(APIBeatmapSet beatmapSet)
         {
-            this.beatmapSet = beatmapSet;
-
             Icon.Icon = FontAwesome.Solid.FileDownload;
         }
 
