@@ -76,6 +76,8 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             if (newScore.HitEvents == null || newScore.HitEvents.Count == 0)
             {
+                spinner.Hide();
+
                 content.Add(new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
