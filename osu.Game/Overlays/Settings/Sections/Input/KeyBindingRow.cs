@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         public bool FilteringActive { get; set; }
 
         [Resolved]
-        private ReadableKeyCombinationProvider readableKeyCombinationProvider { get; set; }
+        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
 
         private OsuSpriteText text;
         private FillFlowContainer cancelAndClearButtons;
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private Bindable<bool> isDefault { get; } = new BindableBool(true);
 
-        public IEnumerable<string> FilterTerms => bindings.Select(b => readableKeyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text.ToString());
+        public IEnumerable<string> FilterTerms => bindings.Select(b => keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text.ToString());
 
         public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
         {
@@ -427,7 +427,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             private OverlayColourProvider colourProvider { get; set; }
 
             [Resolved]
-            private ReadableKeyCombinationProvider readableKeyCombinationProvider { get; set; }
+            private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
 
             private bool isBinding;
 
@@ -486,7 +486,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 base.LoadComplete();
 
-                readableKeyCombinationProvider.KeymapChanged += updateKeyCombinationText;
+                keyCombinationProvider.KeymapChanged += updateKeyCombinationText;
                 updateKeyCombinationText();
             }
 
@@ -524,7 +524,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             private void updateKeyCombinationText()
             {
-                Text.Text = readableKeyCombinationProvider.GetReadableString(KeyBinding.KeyCombination);
+                Text.Text = keyCombinationProvider.GetReadableString(KeyBinding.KeyCombination);
             }
 
             public void UpdateKeyCombination(KeyCombination newCombination)
@@ -540,7 +540,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 base.Dispose(isDisposing);
 
-                readableKeyCombinationProvider.KeymapChanged -= updateKeyCombinationText;
+                keyCombinationProvider.KeymapChanged -= updateKeyCombinationText;
             }
         }
     }
