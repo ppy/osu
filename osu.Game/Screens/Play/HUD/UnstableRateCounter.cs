@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,6 +28,7 @@ namespace osu.Game.Screens.Play.HUD
         protected override double RollingDuration => 750;
 
         private const float alpha_when_invalid = 0.3f;
+        private readonly Bindable<bool> valid = new Bindable<bool>();
 
         private readonly List<double> hitOffsets = new List<double>();
 
@@ -42,6 +44,8 @@ namespace osu.Game.Screens.Play.HUD
         private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache)
         {
             Colour = colours.BlueLighter;
+            valid.BindValueChanged(e =>
+                DrawableCount.FadeTo(e.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
         }
 
         private bool isUrInvalid(JudgementResult judgement)
@@ -55,16 +59,6 @@ namespace osu.Game.Screens.Play.HUD
 
             scoreProcessor.NewJudgement += onJudgementAdded;
             scoreProcessor.JudgementReverted += onJudgementReverted;
-        }
-
-        private bool isValid;
-
-        private void setValid(bool valid)
-        {
-            if (isValid == valid) return;
-
-            DrawableCount.FadeTo(valid ? 1 : alpha_when_invalid, 1000, Easing.OutQuint);
-            isValid = valid;
         }
 
         private void onJudgementAdded(JudgementResult judgement)
@@ -91,12 +85,12 @@ namespace osu.Game.Screens.Play.HUD
                 double mean = hitOffsets.Average();
                 double squares = hitOffsets.Select(offset => Math.Pow(offset - mean, 2)).Sum();
                 Current.Value = Math.Sqrt(squares / hitOffsets.Count) * 10;
-                setValid(true);
+                valid.Value = true;
             }
             else
             {
                 Current.Value = 0;
-                setValid(false);
+                valid.Value = false;
             }
         }
 
