@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -30,9 +30,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly List<double> hitOffsets = new List<double>();
 
-        //May be able to remove the CanBeNull as ScoreProcessor should exist everywhere, for example, in the skin editor it is cached.
-        [CanBeNull]
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private ScoreProcessor scoreProcessor { get; set; }
 
         public UnstableRateCounter()
@@ -46,11 +44,14 @@ namespace osu.Game.Screens.Play.HUD
             Colour = colours.BlueLighter;
         }
 
+        private bool isUrInvalid(JudgementResult judgement)
+        {
+            return judgement.HitObject.HitWindows is HitWindows.EmptyHitWindows || !judgement.IsHit;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            if (scoreProcessor == null) return;
 
             scoreProcessor.NewJudgement += onJudgementAdded;
             scoreProcessor.JudgementReverted += onJudgementReverted;
@@ -68,23 +69,15 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onJudgementAdded(JudgementResult judgement)
         {
-            if (!(judgement.HitObject.HitWindows is HitWindows.EmptyHitWindows) && judgement.IsHit)
-            {
-                hitOffsets.Add(judgement.TimeOffset);
-            }
+            if (isUrInvalid(judgement)) return;
 
+            hitOffsets.Add(judgement.TimeOffset);
             updateUr();
         }
 
-        // If a judgement was reverted successfully, remove the item from the hitOffsets list.
         private void onJudgementReverted(JudgementResult judgement)
         {
-            //Score Processor Conditions to revert
-            if (judgement.FailedAtJudgement || !judgement.Type.IsScorable())
-                return;
-            //UR Conditions to Revert
-            if (judgement.HitObject.HitWindows is HitWindows.EmptyHitWindows || !judgement.IsHit)
-                return;
+            if (judgement.FailedAtJudgement || isUrInvalid(judgement)) return;
 
             hitOffsets.RemoveAt(hitOffsets.Count - 1);
             updateUr();
@@ -109,7 +102,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override LocalisableString FormatCount(double count)
         {
-            return count.ToString("0.00 UR");
+            return count.ToString("0.00");
         }
 
         protected override IHasText CreateText() => new TextComponent
@@ -121,8 +114,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (scoreProcessor == null) return;
-
             scoreProcessor.NewJudgement -= onJudgementAdded;
             scoreProcessor.JudgementReverted -= onJudgementReverted;
         }
@@ -131,17 +122,18 @@ namespace osu.Game.Screens.Play.HUD
         {
             public LocalisableString Text
             {
-                get => intPart.Text;
+                get => fullValue.ToLocalisableString("0.00 UR");
                 set
                 {
-                    //Not too sure about this, is there a better way to go about doing this?
-                    splitValue = value.ToString().Split('.');
-                    intPart.Text = splitValue[0];
-                    decimalPart.Text = splitValue[1];
+                    fullValue = Convert.ToDouble(value.ToString());
+                    intPart.Text = fullValue.ToLocalisableString("0");
+                    decimalPart.Text = (fullValue - Math.Truncate(fullValue))
+                        .ToLocalisableString(".00 UR");
                 }
             }
 
-            private string[] splitValue;
+            private double fullValue;
+
             private readonly OsuSpriteText intPart;
             private readonly OsuSpriteText decimalPart;
 
@@ -159,14 +151,6 @@ namespace osu.Game.Screens.Play.HUD
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Font = OsuFont.Numeric.With(size: 8, fixedWidth: true),
-                            Text = ".",
-                            Padding = new MarginPadding { Bottom = 1.5f },
                         },
                         decimalPart = new OsuSpriteText
                         {
