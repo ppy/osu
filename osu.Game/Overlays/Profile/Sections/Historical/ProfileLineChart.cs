@@ -14,16 +14,16 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osu.Framework.Localisation;
-using static osu.Game.Users.User;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public class ProfileLineChart : CompositeDrawable
     {
-        private UserHistoryCount[] values;
+        private APIUserHistoryCount[] values;
 
         [NotNull]
-        public UserHistoryCount[] Values
+        public APIUserHistoryCount[] Values
         {
             get => values;
             set

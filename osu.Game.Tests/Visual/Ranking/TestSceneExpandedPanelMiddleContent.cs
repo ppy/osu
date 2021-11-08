@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -18,7 +19,6 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestMapWithKnownMapper()
         {
-            var author = new User { Username = "mapper_name" };
+            var author = new APIUser { Username = "mapper_name" };
 
             AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestExcessMods()
         {
-            var author = new User { Username = "mapper_name" };
+            var author = new APIUser { Username = "mapper_name" };
 
             AddStep("show excess mods score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo, true)
             {
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Ranking
         private void showPanel(ScoreInfo score) =>
             Child = new ExpandedPanelMiddleContentContainer(score);
 
-        private BeatmapInfo createTestBeatmap(User author)
+        private BeatmapInfo createTestBeatmap(APIUser author)
         {
             var beatmap = new TestBeatmap(rulesetStore.GetRuleset(0)).BeatmapInfo;
 

@@ -13,10 +13,10 @@ using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Threading;
-using osu.Game.Users;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Game.Graphics.Sprites;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
-        protected readonly IBindable<User> User = new Bindable<User>();
+        protected readonly IBindable<APIUser> User = new Bindable<APIUser>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
