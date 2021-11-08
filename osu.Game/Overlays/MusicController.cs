@@ -12,10 +12,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Utils;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
+using Realms;
 
 namespace osu.Game.Overlays
 {
@@ -24,6 +25,8 @@ namespace osu.Game.Overlays
     /// </summary>
     public class MusicController : CompositeDrawable
     {
+        private IDisposable beatmapSubscription;
+
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
@@ -65,18 +68,37 @@ namespace osu.Game.Overlays
         [NotNull]
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            beatmaps.ItemUpdated += beatmapUpdated;
-            beatmaps.ItemRemoved += beatmapRemoved;
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
 
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(true).OrderBy(_ => RNG.Next()));
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            beatmapSubscription = realmFactory.Context.All<BeatmapSetInfo>().QueryAsyncWithNotifications(beatmapsChanged);
 
             // Todo: These binds really shouldn't be here, but are unlikely to cause any issues for now.
             // They are placed here for now since some tests rely on setting the beatmap _and_ their hierarchies inside their load(), which runs before the MusicController's load().
             beatmap.BindValueChanged(beatmapChanged, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
+        {
+            if (changes == null)
+            {
+                beatmapSets.AddRange(sender);
+                return;
+            }
+
+            // beatmaps.ItemUpdated += set => Schedule(() =>
+            // {
+            //     beatmapSets.Remove(set);
+            //     beatmapSets.Add(set);
+            // });
+            // beatmaps.ItemRemoved += set => Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
+            //
+            // beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal, true).OrderBy(_ => RNG.Next()));
         }
 
         /// <summary>
@@ -111,7 +133,7 @@ namespace osu.Game.Overlays
             beatmapSets.Add(set);
         });
 
-        private void beatmapRemoved(BeatmapSetInfo set) => Schedule(() => beatmapSets.RemoveAll(s => s.Equals(set)));
+        private void beatmapRemoved(BeatmapSetInfo set) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
 
         private ScheduledDelegate seekDelegate;
 
@@ -259,7 +281,7 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Next;
 
-            var playable = BeatmapSets.SkipWhile(i => !i.Equals(current.BeatmapSetInfo)).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
+            var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
 
             if (playable != null)
             {
@@ -429,11 +451,7 @@ namespace osu.Game.Overlays
         {
             base.Dispose(isDisposing);
 
-            if (beatmaps != null)
-            {
-                beatmaps.ItemUpdated -= beatmapUpdated;
-                beatmaps.ItemRemoved -= beatmapRemoved;
-            }
+            beatmapSubscription?.Dispose();
         }
     }
 
