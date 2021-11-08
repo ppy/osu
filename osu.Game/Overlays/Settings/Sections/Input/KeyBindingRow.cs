@@ -522,11 +522,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             }
 
-            private void updateKeyCombinationText()
-            {
-                Text.Text = keyCombinationProvider.GetReadableString(KeyBinding.KeyCombination);
-            }
-
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
                 if (KeyBinding.RulesetID != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
@@ -534,6 +529,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 KeyBinding.KeyCombination = newCombination;
                 updateKeyCombinationText();
+            }
+
+            private void updateKeyCombinationText()
+            {
+                Scheduler.AddOnce(updateText);
+
+                void updateText() => Text.Text = keyCombinationProvider.GetReadableString(KeyBinding.KeyCombination);
             }
 
             protected override void Dispose(bool isDisposing)
