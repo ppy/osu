@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
             set => spriteText.Text = value;
         }
 
-        protected LocalisableString TooltipText { get; set; }
+        public LocalisableString TooltipText { get; protected set; }
 
         private readonly SpriteIcon spriteIcon;
         private readonly OsuSpriteText spriteText;
@@ -72,7 +72,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
 
         #region Tooltip implementation
 
-        LocalisableString IHasTooltip.TooltipText => TooltipText;
         public virtual ITooltip GetCustomTooltip() => null;
         public virtual object TooltipContent => null;
 
