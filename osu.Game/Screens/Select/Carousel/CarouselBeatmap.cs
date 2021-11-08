@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.BeatDivisor.HasFilter || criteria.BeatDivisor.IsInRange(BeatmapInfo.BeatDivisor);
             match &= !criteria.OnlineStatus.HasFilter || criteria.OnlineStatus.IsInRange(BeatmapInfo.Status);
 
-            match &= !criteria.Creator.HasFilter || criteria.Creator.Matches(BeatmapInfo.Metadata.AuthorString);
+            match &= !criteria.Creator.HasFilter || criteria.Creator.Matches(BeatmapInfo.Metadata.Author.Username);
             match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(BeatmapInfo.Metadata.Artist) ||
                      criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
 

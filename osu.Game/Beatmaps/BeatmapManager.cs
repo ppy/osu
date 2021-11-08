@@ -250,15 +250,11 @@ namespace osu.Game.Beatmaps
 
         public IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
 
-        public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false)
-        {
-            return beatmapModelDownloader.Download(model, minimiseDownloadSize);
-        }
+        public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false) =>
+            beatmapModelDownloader.Download(model, minimiseDownloadSize);
 
-        public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model)
-        {
-            return beatmapModelDownloader.GetExistingDownload(model);
-        }
+        public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model) =>
+            beatmapModelDownloader.GetExistingDownload(model);
 
         #endregion
 

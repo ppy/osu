@@ -79,7 +79,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool IsBNG;
 
         [JsonProperty(@"is_bot")]
-        public bool IsBot;
+        public bool IsBot { get; set; }
 
         [JsonProperty(@"is_active")]
         public bool Active;
@@ -200,34 +200,16 @@ namespace osu.Game.Online.API.Requests.Responses
         }
 
         [JsonProperty(@"rank_history")]
-        private RankHistoryData rankHistory
+        private APIRankHistory rankHistory
         {
             set => statistics.RankHistory = value;
-        }
-
-        public class RankHistoryData
-        {
-            [JsonProperty(@"mode")]
-            public string Mode;
-
-            [JsonProperty(@"data")]
-            public int[] Data;
         }
 
         [JsonProperty("badges")]
         public Badge[] Badges;
 
         [JsonProperty("user_achievements")]
-        public UserAchievement[] Achievements;
-
-        public class UserAchievement
-        {
-            [JsonProperty("achieved_at")]
-            public DateTimeOffset AchievedAt;
-
-            [JsonProperty("achievement_id")]
-            public int ID;
-        }
+        public APIUserAchievement[] Achievements;
 
         [JsonProperty("monthly_playcounts")]
         public APIUserHistoryCount[] MonthlyPlaycounts;

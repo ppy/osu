@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
-                BeatmapInfo = createTestBeatmap(null)
+                BeatmapInfo = createTestBeatmap(new APIUser())
             }));
 
             AddAssert("mapped by text not present", () =>
@@ -74,7 +75,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 var ruleset = new OsuRuleset();
 
                 var mods = new Mod[] { ruleset.GetAutoplayMod() };
-                var beatmap = createTestBeatmap(null);
+                var beatmap = createTestBeatmap(new APIUser());
 
                 showPanel(new TestScoreInfo(ruleset.RulesetInfo)
                 {
@@ -90,7 +91,7 @@ namespace osu.Game.Tests.Visual.Ranking
         private void showPanel(ScoreInfo score) =>
             Child = new ExpandedPanelMiddleContentContainer(score);
 
-        private BeatmapInfo createTestBeatmap(APIUser author)
+        private BeatmapInfo createTestBeatmap([NotNull] APIUser author)
         {
             var beatmap = new TestBeatmap(rulesetStore.GetRuleset(0)).BeatmapInfo;
 

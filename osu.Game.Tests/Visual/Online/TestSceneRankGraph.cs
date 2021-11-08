@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     GlobalRank = 89000,
                     PP = 12345,
-                    RankHistory = new APIUser.RankHistoryData
+                    RankHistory = new APIRankHistory
                     {
                         Data = data,
                     }
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     GlobalRank = 89000,
                     PP = 12345,
-                    RankHistory = new APIUser.RankHistoryData
+                    RankHistory = new APIRankHistory
                     {
                         Data = dataWithZeros,
                     }
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     GlobalRank = 12000,
                     PP = 12345,
-                    RankHistory = new APIUser.RankHistoryData
+                    RankHistory = new APIRankHistory
                     {
                         Data = smallData,
                     }
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     GlobalRank = 12000,
                     PP = 12345,
-                    RankHistory = new APIUser.RankHistoryData
+                    RankHistory = new APIRankHistory
                     {
                         Data = edgyData,
                     }
