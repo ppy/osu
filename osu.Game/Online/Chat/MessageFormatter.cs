@@ -320,9 +320,9 @@ namespace osu.Game.Online.Chat
     {
         public readonly LinkAction Action;
 
-        public readonly string Argument;
+        public readonly object Argument;
 
-        public LinkDetails(LinkAction action, string argument)
+        public LinkDetails(LinkAction action, object argument)
         {
             Action = action;
             Argument = argument;
@@ -351,9 +351,9 @@ namespace osu.Game.Online.Chat
         public int Index;
         public int Length;
         public LinkAction Action;
-        public string Argument;
+        public object Argument;
 
-        public Link(string url, int startIndex, int length, LinkAction action, string argument)
+        public Link(string url, int startIndex, int length, LinkAction action, object argument)
         {
             Url = url;
             Index = startIndex;
