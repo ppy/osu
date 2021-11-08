@@ -30,11 +30,6 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 
-        [Obsolete("Use the mod-supporting override")] // can be removed 20210731
-        public virtual Score CreateReplayScore(IBeatmap beatmap) => new Score { Replay = new Replay() };
-
-#pragma warning disable 618
-        public virtual Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => CreateReplayScore(beatmap);
-#pragma warning restore 618
+        public virtual Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score { Replay = new Replay() };
     }
 }
