@@ -191,7 +191,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override Beatmap<TaikoHitObject> CreateBeatmap() => new TaikoBeatmap();
 
-        private class TaikoMultiplierAppliedDifficulty : BeatmapDifficulty
+        internal class TaikoMultiplierAppliedDifficulty : BeatmapDifficulty
         {
             public TaikoMultiplierAppliedDifficulty(IBeatmapDifficultyInfo difficulty)
             {
