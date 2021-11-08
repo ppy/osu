@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -21,6 +22,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
     {
         [Resolved]
         private SkinManager skins { get; set; }
+
+        [Cached(Name = nameof(Screens.Edit.Editor.Clipboard))]
+        private Bindable<string> clipboard = new Bindable<string>();
 
         [SetUpSteps]
         public void SetUpSteps()
