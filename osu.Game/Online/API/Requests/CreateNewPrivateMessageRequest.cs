@@ -3,17 +3,17 @@
 
 using System.Net.Http;
 using osu.Framework.IO.Network;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests
 {
     public class CreateNewPrivateMessageRequest : APIRequest<CreateNewPrivateMessageResponse>
     {
-        private readonly User user;
+        private readonly APIUser user;
         private readonly Message message;
 
-        public CreateNewPrivateMessageRequest(User user, Message message)
+        public CreateNewPrivateMessageRequest(APIUser user, Message message)
         {
             this.user = user;
             this.message = message;

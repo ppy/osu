@@ -10,8 +10,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
-using osu.Game.Users;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                 new APIUserScoreAggregate
                                 {
                                     UserID = 2,
-                                    User = new User { Id = 2, Username = "peppy" },
+                                    User = new APIUser { Id = 2, Username = "peppy" },
                                     TotalScore = 995533,
                                     RoomID = 3,
                                     CompletedBeatmaps = 1,
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                 new APIUserScoreAggregate
                                 {
                                     UserID = 1040328,
-                                    User = new User { Id = 1040328, Username = "smoogipoo" },
+                                    User = new APIUser { Id = 1040328, Username = "smoogipoo" },
                                     TotalScore = 981100,
                                     RoomID = 3,
                                     CompletedBeatmaps = 1,
