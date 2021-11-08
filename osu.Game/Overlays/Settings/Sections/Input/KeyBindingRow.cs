@@ -540,7 +540,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 base.Dispose(isDisposing);
 
-                keyCombinationProvider.KeymapChanged -= updateKeyCombinationText;
+                if (keyCombinationProvider != null)
+                    keyCombinationProvider.KeymapChanged -= updateKeyCombinationText;
             }
         }
     }
