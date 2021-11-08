@@ -17,12 +17,12 @@ namespace osu.Game.Input
     public class RealmKeyBindingStore
     {
         private readonly RealmContextFactory realmFactory;
-        private readonly ReadableKeyCombinationProvider readableKeyCombinationProvider;
+        private readonly ReadableKeyCombinationProvider keyCombinationProvider;
 
-        public RealmKeyBindingStore(RealmContextFactory realmFactory, ReadableKeyCombinationProvider readableKeyCombinationProvider)
+        public RealmKeyBindingStore(RealmContextFactory realmFactory, ReadableKeyCombinationProvider keyCombinationProvider)
         {
             this.realmFactory = realmFactory;
-            this.readableKeyCombinationProvider = readableKeyCombinationProvider;
+            this.keyCombinationProvider = keyCombinationProvider;
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace osu.Game.Input
             {
                 foreach (var action in context.All<RealmKeyBinding>().Where(b => b.RulesetID == null && (GlobalAction)b.ActionInt == globalAction))
                 {
-                    string str = readableKeyCombinationProvider.GetReadableString(action.KeyCombination);
+                    string str = keyCombinationProvider.GetReadableString(action.KeyCombination);
 
                     // even if found, the readable string may be empty for an unbound action.
                     if (str.Length > 0)

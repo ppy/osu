@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Toolbar
         private TextureStore textures { get; set; }
 
         [Resolved]
-        private ReadableKeyCombinationProvider readableKeyCombinationProvider { get; set; }
+        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
 
         public void SetIcon(string texture) =>
             SetIcon(new Sprite
@@ -211,7 +211,7 @@ namespace osu.Game.Overlays.Toolbar
 
             if (realmKeyBinding != null)
             {
-                string keyBindingString = readableKeyCombinationProvider.GetReadableString(realmKeyBinding.KeyCombination);
+                string keyBindingString = keyCombinationProvider.GetReadableString(realmKeyBinding.KeyCombination);
 
                 if (!string.IsNullOrEmpty(keyBindingString))
                     keyBindingTooltip.Text = $" ({keyBindingString})";
