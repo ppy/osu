@@ -18,10 +18,10 @@ using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Create a new <see cref="WorkingBeatmap"/>.
         /// </summary>
-        public WorkingBeatmap CreateNew(RulesetInfo ruleset, User user)
+        public WorkingBeatmap CreateNew(RulesetInfo ruleset, APIUser user)
         {
             var metadata = new BeatmapMetadata
             {
@@ -250,15 +250,11 @@ namespace osu.Game.Beatmaps
 
         public IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
 
-        public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false)
-        {
-            return beatmapModelDownloader.Download(model, minimiseDownloadSize);
-        }
+        public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false) =>
+            beatmapModelDownloader.Download(model, minimiseDownloadSize);
 
-        public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model)
-        {
-            return beatmapModelDownloader.GetExistingDownload(model);
-        }
+        public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model) =>
+            beatmapModelDownloader.GetExistingDownload(model);
 
         #endregion
 

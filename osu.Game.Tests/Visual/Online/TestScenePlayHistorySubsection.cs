@@ -4,7 +4,6 @@
 using osu.Game.Overlays.Profile.Sections.Historical;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Users;
 using NUnit.Framework;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
@@ -12,7 +11,7 @@ using System;
 using System.Linq;
 using osu.Framework.Testing;
 using osu.Framework.Graphics.Shapes;
-using static osu.Game.Users.User;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -21,7 +20,7 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Red);
 
-        private readonly Bindable<User> user = new Bindable<User>();
+        private readonly Bindable<APIUser> user = new Bindable<APIUser>();
         private readonly PlayHistorySubsection section;
 
         public TestScenePlayHistorySubsection()
@@ -101,80 +100,80 @@ namespace osu.Game.Tests.Visual.Online
 
         private int getChartValuesLength() => this.ChildrenOfType<ProfileLineChart>().Single().Values.Length;
 
-        private static readonly User user_with_null_values = new User
+        private static readonly APIUser user_with_null_values = new APIUser
         {
             Id = 1
         };
 
-        private static readonly User user_with_empty_values = new User
+        private static readonly APIUser user_with_empty_values = new APIUser
         {
             Id = 2,
-            MonthlyPlaycounts = Array.Empty<UserHistoryCount>()
+            MonthlyPlaycounts = Array.Empty<APIUserHistoryCount>()
         };
 
-        private static readonly User user_with_one_value = new User
+        private static readonly APIUser user_with_one_value = new APIUser
         {
             Id = 3,
             MonthlyPlaycounts = new[]
             {
-                new UserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 100 }
+                new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 100 }
             }
         };
 
-        private static readonly User user_with_two_values = new User
+        private static readonly APIUser user_with_two_values = new APIUser
         {
             Id = 4,
             MonthlyPlaycounts = new[]
             {
-                new UserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 1 },
-                new UserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 2 }
+                new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 1 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 2 }
             }
         };
 
-        private static readonly User user_with_constant_values = new User
+        private static readonly APIUser user_with_constant_values = new APIUser
         {
             Id = 5,
             MonthlyPlaycounts = new[]
             {
-                new UserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 5 },
-                new UserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 5 },
-                new UserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 5 }
+                new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 5 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 5 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 5 }
             }
         };
 
-        private static readonly User user_with_zero_values = new User
+        private static readonly APIUser user_with_zero_values = new APIUser
         {
             Id = 6,
             MonthlyPlaycounts = new[]
             {
-                new UserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 0 },
-                new UserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 0 },
-                new UserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 0 }
+                new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 0 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 0 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 0 }
             }
         };
 
-        private static readonly User user_with_filled_values = new User
+        private static readonly APIUser user_with_filled_values = new APIUser
         {
             Id = 7,
             MonthlyPlaycounts = new[]
             {
-                new UserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 1000 },
-                new UserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 20 },
-                new UserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 20000 },
-                new UserHistoryCount { Date = new DateTime(2010, 8, 1), Count = 30 },
-                new UserHistoryCount { Date = new DateTime(2010, 9, 1), Count = 50 },
-                new UserHistoryCount { Date = new DateTime(2010, 10, 1), Count = 2000 },
-                new UserHistoryCount { Date = new DateTime(2010, 11, 1), Count = 2100 }
+                new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 1000 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 20 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 20000 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 8, 1), Count = 30 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 9, 1), Count = 50 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 10, 1), Count = 2000 },
+                new APIUserHistoryCount { Date = new DateTime(2010, 11, 1), Count = 2100 }
             }
         };
 
-        private static readonly User user_with_missing_values = new User
+        private static readonly APIUser user_with_missing_values = new APIUser
         {
             Id = 8,
             MonthlyPlaycounts = new[]
             {
-                new UserHistoryCount { Date = new DateTime(2020, 1, 1), Count = 100 },
-                new UserHistoryCount { Date = new DateTime(2020, 7, 1), Count = 200 }
+                new APIUserHistoryCount { Date = new DateTime(2020, 1, 1), Count = 100 },
+                new APIUserHistoryCount { Date = new DateTime(2020, 7, 1), Count = 200 }
             }
         };
     }

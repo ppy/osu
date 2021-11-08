@@ -18,8 +18,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
-using osu.Game.Users;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         public readonly Bindable<APIBeatmap> Beatmap = new Bindable<APIBeatmap>();
         private readonly Bindable<IRulesetInfo> ruleset = new Bindable<IRulesetInfo>();
         private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Global);
-        private readonly IBindable<User> user = new Bindable<User>();
+        private readonly IBindable<APIUser> user = new Bindable<APIUser>();
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             scope.Value = BeatmapLeaderboardScope.Global;
         }
 
-        private void onUserChanged(ValueChangedEvent<User> user)
+        private void onUserChanged(ValueChangedEvent<APIUser> user)
         {
             if (modSelector.SelectedMods.Any())
                 modSelector.DeselectAll();

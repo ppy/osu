@@ -14,9 +14,9 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Menu
 {
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Menu
 
         private readonly OsuScreen nextScreen;
 
-        private readonly Bindable<User> currentUser = new Bindable<User>();
+        private readonly Bindable<APIUser> currentUser = new Bindable<APIUser>();
         private FillFlowContainer fill;
 
         private readonly List<ITextPart> expendableText = new List<ITextPart>();
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Menu
             if (nextScreen != null)
                 LoadComponentAsync(nextScreen);
 
-            ((IBindable<User>)currentUser).BindTo(api.LocalUser);
+            ((IBindable<APIUser>)currentUser).BindTo(api.LocalUser);
         }
 
         public override void OnEntering(IScreen last)

@@ -366,13 +366,12 @@ namespace osu.Game.Overlays
             private readonly WorkingBeatmap beatmap;
 
             public Background(WorkingBeatmap beatmap = null)
+                : base(cachedFrameBuffer: true)
             {
                 this.beatmap = beatmap;
 
                 Depth = float.MaxValue;
                 RelativeSizeAxes = Axes.Both;
-
-                CacheDrawnFrameBuffer = true;
 
                 Children = new Drawable[]
                 {

@@ -53,8 +53,10 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
+using osu.Game.Users;
 
 namespace osu.Game
 {
@@ -323,10 +325,9 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (int.TryParse(link.Argument, out int userId))
-                        ShowUser(userId);
-                    else
-                        ShowUser(link.Argument);
+                    ShowUser(int.TryParse(link.Argument, out int userId)
+                        ? new APIUser { Id = userId }
+                        : new APIUser { Username = link.Argument });
 
                     break;
 
@@ -383,14 +384,8 @@ namespace osu.Game
         /// <summary>
         /// Show a user's profile as an overlay.
         /// </summary>
-        /// <param name="userId">The user to display.</param>
-        public void ShowUser(int userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
-
-        /// <summary>
-        /// Show a user's profile as an overlay.
-        /// </summary>
-        /// <param name="username">The user to display.</param>
-        public void ShowUser(string username) => waitForReady(() => userProfile, _ => userProfile.ShowUser(username));
+        /// <param name="user">The user to display.</param>
+        public void ShowUser(IUser user) => waitForReady(() => userProfile, _ => userProfile.ShowUser(user));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.

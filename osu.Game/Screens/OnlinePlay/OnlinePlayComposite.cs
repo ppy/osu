@@ -6,9 +6,9 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay
         protected Bindable<string> RoomName { get; private set; }
 
         [Resolved(typeof(Room))]
-        protected Bindable<User> Host { get; private set; }
+        protected Bindable<APIUser> Host { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<RoomStatus> Status { get; private set; }
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay
         protected Bindable<RoomCategory> Category { get; private set; }
 
         [Resolved(typeof(Room))]
-        protected BindableList<User> RecentParticipants { get; private set; }
+        protected BindableList<APIUser> RecentParticipants { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<int> ParticipantCount { get; private set; }
