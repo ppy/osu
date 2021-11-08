@@ -153,12 +153,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                         new CancelButton { Action = finalise },
                                         new ClearButton { Action = clear },
                                     },
-                                }
+                                },
+                                new HoverClickSounds()
                             }
                         }
                     }
-                },
-                new HoverClickSounds()
+                }
             };
 
             foreach (var b in bindings)
