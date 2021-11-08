@@ -7,11 +7,11 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Components;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <param name="localUser">The local user to store in responses where required.</param>
         /// <param name="game">The game base for cases where actual online requests need to be sent.</param>
         /// <returns>Whether the request was successfully handled.</returns>
-        public bool HandleRequest(APIRequest request, User localUser, OsuGameBase game)
+        public bool HandleRequest(APIRequest request, APIUser localUser, OsuGameBase game)
         {
             switch (request)
             {

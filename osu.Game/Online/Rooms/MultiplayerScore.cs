@@ -9,10 +9,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Online.Rooms
 {
@@ -22,7 +22,7 @@ namespace osu.Game.Online.Rooms
         public long ID { get; set; }
 
         [JsonProperty("user")]
-        public User User { get; set; }
+        public APIUser User { get; set; }
 
         [JsonProperty("rank")]
         [JsonConverter(typeof(StringEnumConverter))]
