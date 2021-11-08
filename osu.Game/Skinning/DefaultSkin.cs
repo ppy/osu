@@ -68,7 +68,6 @@ namespace osu.Game.Skinning
                                 var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
                                 var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
-                                var unstableRate = container.OfType<UnstableRateCounter>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -85,16 +84,8 @@ namespace osu.Game.Skinning
                                     if (ppCounter != null)
                                     {
                                         ppCounter.Y = score.Position.Y + ppCounter.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).Y - 4;
-                                        ppCounter.X = ppCounter.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 - horizontal_padding;
-                                        ppCounter.Origin = Anchor.TopRight;
+                                        ppCounter.Origin = Anchor.TopCentre;
                                         ppCounter.Anchor = Anchor.TopCentre;
-                                    }
-                                    if (unstableRate != null)
-                                    {
-                                        unstableRate.Y = ppCounter.Position.Y;
-                                        unstableRate.X = -unstableRate.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding;
-                                        unstableRate.Origin = Anchor.TopLeft;
-                                        unstableRate.Anchor = Anchor.TopCentre;
                                     }
 
                                     if (accuracy != null)
@@ -139,8 +130,7 @@ namespace osu.Game.Skinning
                                     new SongProgress(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
-                                    new PerformancePointsCounter(),
-                                    new UnstableRateCounter()
+                                    new PerformancePointsCounter()
                                 }
                             };
 
