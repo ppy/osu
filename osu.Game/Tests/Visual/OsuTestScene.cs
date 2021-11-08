@@ -216,8 +216,6 @@ namespace osu.Game.Tests.Visual
                 Artist = beatmap.BeatmapSet.Metadata.Artist,
                 ArtistUnicode = beatmap.BeatmapSet.Metadata.ArtistUnicode,
                 Author = beatmap.BeatmapSet.Metadata.Author,
-                AuthorID = beatmap.BeatmapSet.Metadata.AuthorID,
-                AuthorString = beatmap.BeatmapSet.Metadata.AuthorString,
                 Source = beatmap.BeatmapSet.Metadata.Source,
                 Tags = beatmap.BeatmapSet.Metadata.Tags,
                 Beatmaps = new[]
@@ -228,7 +226,7 @@ namespace osu.Game.Tests.Visual
                         OnlineBeatmapSetID = beatmap.BeatmapSet.OnlineID,
                         Status = beatmap.Status,
                         Checksum = beatmap.MD5Hash,
-                        AuthorID = beatmap.Metadata.AuthorID,
+                        AuthorID = beatmap.Metadata.Author.OnlineID,
                         RulesetID = beatmap.RulesetID,
                         StarRating = beatmap.StarDifficulty,
                         DifficultyName = beatmap.Version,

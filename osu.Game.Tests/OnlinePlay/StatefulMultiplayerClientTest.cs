@@ -3,8 +3,8 @@
 
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tests.Visual.Multiplayer;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.OnlinePlay
 {
@@ -14,7 +14,7 @@ namespace osu.Game.Tests.OnlinePlay
         [Test]
         public void TestUserAddedOnJoin()
         {
-            var user = new User { Id = 33 };
+            var user = new APIUser { Id = 33 };
 
             AddRepeatStep("add user multiple times", () => Client.AddUser(user), 3);
             AddAssert("room has 2 users", () => Client.Room?.Users.Count == 2);
@@ -23,7 +23,7 @@ namespace osu.Game.Tests.OnlinePlay
         [Test]
         public void TestUserRemovedOnLeave()
         {
-            var user = new User { Id = 44 };
+            var user = new APIUser { Id = 44 };
 
             AddStep("add user", () => Client.AddUser(user));
             AddAssert("room has 2 users", () => Client.Room?.Users.Count == 2);
