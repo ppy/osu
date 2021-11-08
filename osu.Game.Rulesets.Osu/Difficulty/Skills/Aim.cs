@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.75;
 
-        private double currentStrain = 1;
+        private double currentStrain;
 
         private double skillMultiplier => 23.25;
         private double strainDecayBase => 0.15;
