@@ -10,6 +10,7 @@ using osu.Game.Scoring;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -111,6 +112,36 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
             AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+        }
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
+        [Test]
+        public void TestScoreImportThenDelete()
+        {
+            ILive<ScoreInfo> imported = null;
+
+            AddStep("create button without replay", () =>
+            {
+                Child = downloadButton = new TestReplayDownloadButton(getScoreInfo(false))
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
+
+            AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+
+            AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+
+            AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(true)).Result);
+
+            AddUntilStep("state is available", () => downloadButton.State.Value == DownloadState.LocallyAvailable);
+
+            AddStep("delete score", () => scoreManager.Delete(imported.Value));
+
+            AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
         }
 
         [Test]
