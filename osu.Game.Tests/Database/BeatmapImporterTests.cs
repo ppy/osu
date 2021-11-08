@@ -482,7 +482,10 @@ namespace osu.Game.Tests.Database
                 var metadata = new RealmBeatmapMetadata
                 {
                     Artist = "SomeArtist",
-                    Author = "SomeAuthor"
+                    Author =
+                    {
+                        Username = "SomeAuthor"
+                    }
                 };
 
                 var ruleset = realmFactory.Context.All<RealmRuleset>().First();

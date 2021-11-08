@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
                                 new Drawable[]
                                 {
                                     new MetadataLineLabel("Mapper"),
-                                    new MetadataLineInfo(metadata.AuthorString)
+                                    new MetadataLineInfo(metadata.Author.Username)
                                 }
                             }
                         },

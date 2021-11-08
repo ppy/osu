@@ -71,7 +71,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; } = string.Empty;
 
-        public APIUser? Author = new APIUser();
+        public APIUser Author = new APIUser();
 
         /// <summary>
         /// Helper property to deserialize a username to <see cref="APIUser"/>.
@@ -79,12 +79,8 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"user_id")]
         public int AuthorID
         {
-            get => Author?.Id ?? 1;
-            set
-            {
-                Author ??= new APIUser();
-                Author.Id = value;
-            }
+            get => Author.Id;
+            set => Author.Id = value;
         }
 
         /// <summary>
@@ -93,12 +89,8 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"creator")]
         public string AuthorString
         {
-            get => Author?.Username ?? string.Empty;
-            set
-            {
-                Author ??= new APIUser();
-                Author.Username = value;
-            }
+            get => Author.Username;
+            set => Author.Username = value;
         }
 
         [JsonProperty(@"availability")]
