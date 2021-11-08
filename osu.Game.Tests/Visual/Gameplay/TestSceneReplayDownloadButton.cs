@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
-using osu.Game.Users;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
@@ -17,6 +16,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Ranking;
 using osuTK.Input;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -170,7 +170,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 RulesetID = 0,
                 Beatmap = CreateAPIBeatmapSet(new OsuRuleset().RulesetInfo).Beatmaps.First(),
                 HasReplay = replayAvailable,
-                User = new User
+                User = new APIUser
                 {
                     Id = 39828,
                     Username = @"WubWoofWolf",

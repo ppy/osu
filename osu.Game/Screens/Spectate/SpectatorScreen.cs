@@ -10,11 +10,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Spectate
 {
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Spectate
 
         private readonly IBindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
 
-        private readonly Dictionary<int, User> userMap = new Dictionary<int, User>();
+        private readonly Dictionary<int, APIUser> userMap = new Dictionary<int, APIUser>();
         private readonly Dictionary<int, SpectatorGameplayState> gameplayStates = new Dictionary<int, SpectatorGameplayState>();
 
         /// <summary>

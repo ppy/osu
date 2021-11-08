@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests;
-using osu.Game.Users;
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,6 +11,7 @@ using System.Collections.Generic;
 using osu.Game.Online.API;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, LocalisableString headerText)
+        public PaginatedScoreContainer(ScoreType type, Bindable<APIUser> user, LocalisableString headerText)
             : base(user, headerText)
         {
             this.type = type;
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
-        protected override int GetCount(User user)
+        protected override int GetCount(APIUser user)
         {
             switch (type)
             {
