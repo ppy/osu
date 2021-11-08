@@ -428,7 +428,7 @@ namespace osu.Game.Screens.Select
 
             private Drawable getMapper(BeatmapMetadata metadata)
             {
-                if (metadata.Author == null)
+                if (string.IsNullOrEmpty(metadata.Author.Username))
                     return Empty();
 
                 return new LinkFlowContainer(s =>

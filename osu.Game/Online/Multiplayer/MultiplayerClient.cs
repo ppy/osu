@@ -22,8 +22,8 @@ using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
 using osu.Game.Utils;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -402,7 +402,7 @@ namespace osu.Game.Online.Multiplayer
         {
             Debug.Assert(APIRoom != null);
 
-            APIRoom.RecentParticipants.Add(user.User ?? new User
+            APIRoom.RecentParticipants.Add(user.User ?? new APIUser
             {
                 Id = user.UserID,
                 Username = "[Unresolved]"
@@ -614,7 +614,7 @@ namespace osu.Game.Online.Multiplayer
         }
 
         /// <summary>
-        /// Populates the <see cref="User"/> for a given <see cref="MultiplayerRoomUser"/>.
+        /// Populates the <see cref="APIUser"/> for a given <see cref="MultiplayerRoomUser"/>.
         /// </summary>
         /// <param name="multiplayerUser">The <see cref="MultiplayerRoomUser"/> to populate.</param>
         protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID).ConfigureAwait(false);

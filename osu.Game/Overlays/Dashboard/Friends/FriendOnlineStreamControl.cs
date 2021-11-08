@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
     {
         protected override OverlayStreamItem<FriendStream> CreateStreamItem(FriendStream value) => new FriendsOnlineStatusItem(value);
 
-        public void Populate(List<User> users)
+        public void Populate(List<APIUser> users)
         {
             Clear();
 
