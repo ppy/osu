@@ -48,7 +48,6 @@ namespace osu.Game.Overlays.Settings
                         subheader.Colour = colourProvider.Content2;
                         subheader.Font = OsuFont.GetFont(size: 18);
                     });
-
                 })
             };
         }
