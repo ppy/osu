@@ -71,13 +71,13 @@ namespace osu.Game.Tests.Visual.Online
         {
             base.LoadComplete();
 
-            AddStep("Show offline dummy", () => profile.ShowUser(TEST_USER, false));
+            AddStep("Show offline dummy", () => profile.ShowUser(TEST_USER));
 
             AddStep("Show null dummy", () => profile.ShowUser(new APIUser
             {
                 Username = @"Null",
                 Id = 1,
-            }, false));
+            }));
 
             AddStep("Show ppy", () => profile.ShowUser(new APIUser
             {
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Online
                 IsSupporter = true,
                 Country = new Country { FullName = @"Australia", FlagName = @"AU" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
-            }, api.IsLoggedIn));
+            }));
 
             AddStep("Show flyte", () => profile.ShowUser(new APIUser
             {
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 3103765,
                 Country = new Country { FullName = @"Japan", FlagName = @"JP" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
-            }, api.IsLoggedIn));
+            }));
 
             AddStep("Show bancho", () => profile.ShowUser(new APIUser
             {
@@ -103,10 +103,10 @@ namespace osu.Game.Tests.Visual.Online
                 IsBot = true,
                 Country = new Country { FullName = @"Saint Helena", FlagName = @"SH" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg"
-            }, api.IsLoggedIn));
+            }));
 
-            AddStep("Show ppy from username", () => profile.ShowUser(@"peppy"));
-            AddStep("Show flyte from username", () => profile.ShowUser(@"flyte"));
+            AddStep("Show ppy from username", () => profile.ShowUser(new APIUser { Username = @"peppy" }));
+            AddStep("Show flyte from username", () => profile.ShowUser(new APIUser { Username = @"flyte" }));
 
             AddStep("Hide", profile.Hide);
             AddStep("Show without reload", profile.Show);
