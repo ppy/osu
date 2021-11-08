@@ -161,6 +161,8 @@ namespace osu.Game
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
 
+        private RealmRulesetStore realmRulesetStore;
+
         public OsuGameBase()
         {
             UseDevelopmentServer = DebugUtils.IsDebugBuild;
@@ -233,7 +235,7 @@ namespace osu.Game
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             // the following realm components are not actively used yet, but initialised and kept up to date for initial testing.
-            var realmRulesetStore = new RealmRulesetStore(realmFactory, Storage);
+            realmRulesetStore = new RealmRulesetStore(realmFactory, Storage);
 
             dependencies.Cache(realmRulesetStore);
 
@@ -518,6 +520,8 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             contextFactory?.FlushConnections();
+
+            realmRulesetStore?.Dispose();
             realmFactory?.Dispose();
         }
     }
