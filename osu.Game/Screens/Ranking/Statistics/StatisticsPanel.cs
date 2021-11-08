@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Ranking.Statistics
             foreach (var child in content)
                 child.FadeOut(150).Expire();
 
+            spinner.Hide();
+
             var newScore = score.NewValue;
 
             if (newScore == null)
@@ -76,8 +78,6 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             if (newScore.HitEvents == null || newScore.HitEvents.Count == 0)
             {
-                spinner.Hide();
-
                 content.Add(new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
