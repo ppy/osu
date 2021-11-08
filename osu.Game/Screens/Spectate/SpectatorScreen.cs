@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -45,8 +44,6 @@ namespace osu.Game.Screens.Spectate
         private readonly Dictionary<int, APIUser> userMap = new Dictionary<int, APIUser>();
         private readonly Dictionary<int, SpectatorGameplayState> gameplayStates = new Dictionary<int, SpectatorGameplayState>();
 
-        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
-
         /// <summary>
         /// Creates a new <see cref="SpectatorScreen"/>.
         /// </summary>
@@ -73,20 +70,16 @@ namespace osu.Game.Screens.Spectate
                 playingUserStates.BindTo(spectatorClient.PlayingUserStates);
                 playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
 
-                managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
-                managerUpdated.BindValueChanged(beatmapUpdated);
+                beatmaps.ItemUpdated += beatmapUpdated;
 
                 foreach ((int id, var _) in userMap)
                     spectatorClient.WatchUser(id);
             }));
         }
 
-        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> e)
+        private void beatmapUpdated(BeatmapSetInfo beatmapSet)
         {
-            if (!e.NewValue.TryGetTarget(out var beatmapSet))
-                return;
-
-            foreach ((int userId, var _) in userMap)
+            foreach ((int userId, _) in userMap)
             {
                 if (!playingUserStates.TryGetValue(userId, out var userState))
                     continue;
@@ -223,7 +216,8 @@ namespace osu.Game.Screens.Spectate
                     spectatorClient.StopWatchingUser(userId);
             }
 
-            managerUpdated?.UnbindAll();
+            if (beatmaps != null)
+                beatmaps.ItemUpdated -= beatmapUpdated;
         }
     }
 }
