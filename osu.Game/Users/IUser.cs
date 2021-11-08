@@ -7,7 +7,7 @@ namespace osu.Game.Users
 {
     public interface IUser : IHasOnlineID<int>
     {
-        string Username { get; set; }
+        string Username { get; }
 
         bool IsBot { get; }
     }

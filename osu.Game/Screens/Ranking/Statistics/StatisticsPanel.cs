@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Ranking.Statistics
             foreach (var child in content)
                 child.FadeOut(150).Expire();
 
+            spinner.Hide();
+
             var newScore = score.NewValue;
 
             if (newScore == null)

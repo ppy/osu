@@ -15,8 +15,8 @@ namespace osu.Game.Screens.Select.Carousel
     public class SetPanelBackground : BufferedContainer
     {
         public SetPanelBackground(WorkingBeatmap working)
+            : base(cachedFrameBuffer: true)
         {
-            CacheDrawnFrameBuffer = true;
             RedrawOnScale = false;
 
             Children = new Drawable[]

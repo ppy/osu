@@ -98,9 +98,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual void RecreateGraph()
         {
-            var newColumns = new BufferedContainer<Column>
+            var newColumns = new BufferedContainer<Column>(cachedFrameBuffer: true)
             {
-                CacheDrawnFrameBuffer = true,
                 RedrawOnScale = false,
                 RelativeSizeAxes = Axes.Both,
             };

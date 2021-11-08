@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
@@ -167,7 +168,7 @@ namespace osu.Game.Database
 
                     void convertOnlineIDs<T>() where T : RealmObject
                     {
-                        string className = typeof(T).Name.Replace(@"Realm", string.Empty);
+                        string className = getMappedOrOriginalName(typeof(T));
 
                         // version was not bumped when the beatmap/ruleset models were added
                         // therefore we must manually check for their presence to avoid throwing on the `DynamicApi` calls.
@@ -208,17 +209,15 @@ namespace osu.Game.Database
 
                 case 9:
                     // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
-                    string className = nameof(RealmBeatmapMetadata).Replace(@"Realm", string.Empty);
+                    var oldMetadata = migration.OldRealm.DynamicApi.All(getMappedOrOriginalName(typeof(RealmBeatmapMetadata)));
+                    var newMetadata = migration.NewRealm.All<RealmBeatmapMetadata>();
 
-                    var oldItems = migration.OldRealm.DynamicApi.All(className);
-                    var newItems = migration.NewRealm.All<RealmBeatmapMetadata>();
+                    int metadataCount = newMetadata.Count();
 
-                    int itemCount = newItems.Count();
-
-                    for (int i = 0; i < itemCount; i++)
+                    for (int i = 0; i < metadataCount; i++)
                     {
-                        dynamic? oldItem = oldItems.ElementAt(i);
-                        var newItem = newItems.ElementAt(i);
+                        dynamic? oldItem = oldMetadata.ElementAt(i);
+                        var newItem = newMetadata.ElementAt(i);
 
                         string username = oldItem.Author;
                         newItem.Author = new RealmUser
@@ -284,6 +283,9 @@ namespace osu.Game.Database
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
             });
         }
+
+        // https://github.com/realm/realm-dotnet/blob/32f4ebcc88b3e80a3b254412665340cd9f3bd6b5/Realm/Realm/Extensions/ReflectionExtensions.cs#L46
+        private static string getMappedOrOriginalName(MemberInfo member) => member.GetCustomAttribute<MapToAttribute>()?.Mapping ?? member.Name;
 
         private bool isDisposed;
 
