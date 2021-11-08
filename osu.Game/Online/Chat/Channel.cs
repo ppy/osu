@@ -8,7 +8,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.Chat
 {
@@ -19,7 +19,7 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// Contains every joined user except the current logged in user. Currently only returned for PM channels.
         /// </summary>
-        public readonly ObservableCollection<User> Users = new ObservableCollection<User>();
+        public readonly ObservableCollection<APIUser> Users = new ObservableCollection<APIUser>();
 
         [JsonProperty(@"users")]
         private int[] userIds
@@ -27,7 +27,7 @@ namespace osu.Game.Online.Chat
             set
             {
                 foreach (int id in value)
-                    Users.Add(new User { Id = id });
+                    Users.Add(new APIUser { Id = id });
             }
         }
 
@@ -98,7 +98,7 @@ namespace osu.Game.Online.Chat
         /// Create a private messaging channel with the specified user.
         /// </summary>
         /// <param name="user">The user to create the private conversation with.</param>
-        public Channel(User user)
+        public Channel(APIUser user)
         {
             Type = ChannelType.PM;
             Users.Add(user);

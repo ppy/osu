@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplier => 1375;
         private double strainDecayBase => 0.3;
 
-        private double currentStrain = 1;
-        private double currentRhythm = 1;
+        private double currentStrain;
+        private double currentRhythm;
 
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;

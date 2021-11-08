@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Users;
 
 #nullable enable
 
@@ -78,10 +77,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; } = string.Empty;
 
-        public User? Author = new User();
+        public APIUser? Author = new APIUser();
 
         /// <summary>
-        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// Helper property to deserialize a username to <see cref="APIUser"/>.
         /// </summary>
         [JsonProperty(@"user_id")]
         public int AuthorID
@@ -89,13 +88,13 @@ namespace osu.Game.Online.API.Requests.Responses
             get => Author?.Id ?? 1;
             set
             {
-                Author ??= new User();
+                Author ??= new APIUser();
                 Author.Id = value;
             }
         }
 
         /// <summary>
-        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// Helper property to deserialize a username to <see cref="APIUser"/>.
         /// </summary>
         [JsonProperty(@"creator")]
         public string AuthorString
@@ -103,7 +102,7 @@ namespace osu.Game.Online.API.Requests.Responses
             get => Author?.Username ?? string.Empty;
             set
             {
-                Author ??= new User();
+                Author ??= new APIUser();
                 Author.Username = value;
             }
         }
