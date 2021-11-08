@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -22,13 +23,13 @@ namespace osu.Game.Screens.Edit.Compose
     public class ComposeScreen : EditorScreenWithTimeline, IKeyBindingHandler<PlatformAction>
     {
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-
-        [Resolved]
         private GameHost host { get; set; }
 
         [Resolved]
         private EditorClock clock { get; set; }
+
+        [Resolved(Name = nameof(Editor.Clipboard))]
+        private Bindable<string> clipboard { get; set; }
 
         private HitObjectComposer composer;
 
@@ -101,6 +102,54 @@ namespace osu.Game.Screens.Edit.Compose
             return !string.IsNullOrEmpty(selectionAsString)
                 ? $"{displayTime.ToEditorFormattedString()} ({selectionAsString}) - "
                 : $"{displayTime.ToEditorFormattedString()} - ";
+        }
+
+        #endregion
+
+        #region Clipboard operations
+
+        public override void Cut()
+        {
+            base.Cut();
+
+            Copy();
+            EditorBeatmap.RemoveRange(EditorBeatmap.SelectedHitObjects.ToArray());
+        }
+
+        public override void Copy()
+        {
+            base.Copy();
+
+            if (EditorBeatmap.SelectedHitObjects.Count == 0)
+                return;
+
+            clipboard.Value = new ClipboardContent(EditorBeatmap).Serialize();
+        }
+
+        public override void Paste()
+        {
+            base.Paste();
+
+            if (string.IsNullOrEmpty(clipboard.Value))
+                return;
+
+            var objects = clipboard.Value.Deserialize<ClipboardContent>().HitObjects;
+
+            Debug.Assert(objects.Any());
+
+            double timeOffset = clock.CurrentTime - objects.Min(o => o.StartTime);
+
+            foreach (var h in objects)
+                h.StartTime += timeOffset;
+
+            EditorBeatmap.BeginChange();
+
+            EditorBeatmap.SelectedHitObjects.Clear();
+
+            EditorBeatmap.AddRange(objects);
+            EditorBeatmap.SelectedHitObjects.AddRange(objects);
+
+            EditorBeatmap.EndChange();
         }
 
         #endregion

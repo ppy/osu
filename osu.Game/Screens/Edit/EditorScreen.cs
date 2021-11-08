@@ -49,5 +49,30 @@ namespace osu.Game.Screens.Edit
             this.ScaleTo(0.98f, 200, Easing.OutQuint)
                 .FadeOut(200, Easing.OutQuint);
         }
+
+        #region Clipboard operations
+
+        /// <summary>
+        /// Performs a "cut to clipboard" operation appropriate for the given screen.
+        /// </summary>
+        public virtual void Cut()
+        {
+        }
+
+        /// <summary>
+        /// Performs a "copy to clipboard" operation appropriate for the given screen.
+        /// </summary>
+        public virtual void Copy()
+        {
+        }
+
+        /// <summary>
+        /// Performs a "paste from clipboard" operation appropriate for the given screen.
+        /// </summary>
+        public virtual void Paste()
+        {
+        }
+
+        #endregion
     }
 }
