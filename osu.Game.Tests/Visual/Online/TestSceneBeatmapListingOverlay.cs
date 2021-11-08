@@ -14,8 +14,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Scoring;
-using osu.Game.Users;
 using osuTK.Input;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Online
                 };
 
                 // non-supporter user
-                api.LocalUser.Value = new User
+                api.LocalUser.Value = new APIUser
                 {
                     Username = "TestBot",
                     Id = API.LocalUser.Value.Id + 1,

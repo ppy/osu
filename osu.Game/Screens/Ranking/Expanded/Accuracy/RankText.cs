@@ -51,13 +51,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Font = OsuFont.Numeric.With(size: 76),
                     UseFullGlyphHeight = false
                 },
-                superFlash = new BufferedContainer
+                superFlash = new BufferedContainer(cachedFrameBuffer: true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BlurSigma = new Vector2(85),
                     Size = new Vector2(600),
-                    CacheDrawnFrameBuffer = true,
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
                     Children = new[]
@@ -71,14 +70,13 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         },
                     },
                 },
-                flash = new BufferedContainer
+                flash = new BufferedContainer(cachedFrameBuffer: true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BlurSigma = new Vector2(35),
                     BypassAutoSizeAxes = Axes.Both,
                     Size = new Vector2(200),
-                    CacheDrawnFrameBuffer = true,
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
                     Scale = new Vector2(1.8f),

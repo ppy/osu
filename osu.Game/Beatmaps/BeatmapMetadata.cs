@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 
 #nullable enable
@@ -36,40 +37,32 @@ namespace osu.Game.Beatmaps
         public List<BeatmapSetInfo> BeatmapSets { get; set; } = new List<BeatmapSetInfo>();
 
         /// <summary>
-        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// The author of the beatmaps in this set.
+        /// </summary>
+        [JsonIgnore]
+        public APIUser Author = new APIUser();
+
+        /// <summary>
+        /// Helper property to deserialize a username to <see cref="APIUser"/>.
         /// </summary>
         [JsonProperty(@"user_id")]
         [Column("AuthorID")]
         public int AuthorID
         {
-            get => Author?.Id ?? 1;
-            set
-            {
-                Author ??= new User();
-                Author.Id = value;
-            }
+            get => Author.Id; // This should not be used, but is required to make EF work correctly.
+            set => Author.Id = value;
         }
 
         /// <summary>
-        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// Helper property to deserialize a username to <see cref="APIUser"/>.
         /// </summary>
         [JsonProperty(@"creator")]
         [Column("Author")]
         public string AuthorString
         {
-            get => Author?.Username ?? string.Empty;
-            set
-            {
-                Author ??= new User();
-                Author.Username = value;
-            }
+            get => Author.Username; // This should not be used, but is required to make EF work correctly.
+            set => Author.Username = value;
         }
-
-        /// <summary>
-        /// The author of the beatmaps in this set.
-        /// </summary>
-        [JsonIgnore]
-        public User? Author;
 
         public string Source { get; set; } = string.Empty;
 
@@ -90,6 +83,6 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => this.GetDisplayTitle();
 
-        string IBeatmapMetadataInfo.Author => AuthorString;
+        IUser IBeatmapMetadataInfo.Author => Author;
     }
 }

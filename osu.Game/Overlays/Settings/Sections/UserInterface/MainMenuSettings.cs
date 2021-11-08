@@ -8,7 +8,7 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
     {
         protected override LocalisableString Header => UserInterfaceStrings.MainMenuHeader;
 
-        private IBindable<User> user;
+        private IBindable<APIUser> user;
 
         private SettingsEnumDropdown<BackgroundSource> backgroundSourceDropdown;
 

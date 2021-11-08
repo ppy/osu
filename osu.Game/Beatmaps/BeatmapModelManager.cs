@@ -11,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio.Track;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
@@ -37,14 +36,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Fired when a single difficulty has been hidden.
         /// </summary>
-        public IBindable<WeakReference<BeatmapInfo>> BeatmapHidden => beatmapHidden;
-
-        private readonly Bindable<WeakReference<BeatmapInfo>> beatmapHidden = new Bindable<WeakReference<BeatmapInfo>>();
+        public event Action<BeatmapInfo> BeatmapHidden;
 
         /// <summary>
         /// Fired when a single difficulty has been restored.
         /// </summary>
-        public IBindable<WeakReference<BeatmapInfo>> BeatmapRestored => beatmapRestored;
+        public event Action<BeatmapInfo> BeatmapRestored;
 
         /// <summary>
         /// An online lookup queue component which handles populating online beatmap metadata.
@@ -55,8 +52,6 @@ namespace osu.Game.Beatmaps
         /// The game working beatmap cache, used to invalidate entries on changes.
         /// </summary>
         public IWorkingBeatmapCache WorkingBeatmapCache { private get; set; }
-
-        private readonly Bindable<WeakReference<BeatmapInfo>> beatmapRestored = new Bindable<WeakReference<BeatmapInfo>>();
 
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
@@ -75,8 +70,8 @@ namespace osu.Game.Beatmaps
             this.rulesets = rulesets;
 
             beatmaps = (BeatmapStore)ModelStore;
-            beatmaps.BeatmapHidden += b => beatmapHidden.Value = new WeakReference<BeatmapInfo>(b);
-            beatmaps.BeatmapRestored += b => beatmapRestored.Value = new WeakReference<BeatmapInfo>(b);
+            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
+            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
             beatmaps.ItemRemoved += b => WorkingBeatmapCache?.Invalidate(b);
             beatmaps.ItemUpdated += obj => WorkingBeatmapCache?.Invalidate(obj);
         }

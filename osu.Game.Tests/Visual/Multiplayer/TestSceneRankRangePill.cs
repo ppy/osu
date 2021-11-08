@@ -3,8 +3,8 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add user", () =>
             {
-                Client.AddUser(new User
+                Client.AddUser(new APIUser
                 {
                     Id = 2,
                     Statistics = { GlobalRank = 1234 }
@@ -41,19 +41,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add users", () =>
             {
-                Client.AddUser(new User
+                Client.AddUser(new APIUser
                 {
                     Id = 2,
                     Statistics = { GlobalRank = 1234 }
                 });
 
-                Client.AddUser(new User
+                Client.AddUser(new APIUser
                 {
                     Id = 3,
                     Statistics = { GlobalRank = 3333 }
                 });
 
-                Client.AddUser(new User
+                Client.AddUser(new APIUser
                 {
                     Id = 4,
                     Statistics = { GlobalRank = 4321 }
@@ -75,13 +75,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add users", () =>
             {
-                Client.AddUser(new User
+                Client.AddUser(new APIUser
                 {
                     Id = 2,
                     Statistics = { GlobalRank = min }
                 });
 
-                Client.AddUser(new User
+                Client.AddUser(new APIUser
                 {
                     Id = 3,
                     Statistics = { GlobalRank = max }
