@@ -27,45 +27,46 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         private PostBeatmapFavouriteRequest favouriteRequest;
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         public FavouriteButton(APIBeatmapSet beatmapSet)
         {
             current = new BindableWithCurrent<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(beatmapSet.HasFavourited, beatmapSet.FavouriteCount));
             onlineBeatmapID = beatmapSet.OnlineID;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
-        {
-            Action = () =>
-            {
-                var actionType = current.Value.Favourited ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite;
-
-                favouriteRequest?.Cancel();
-                favouriteRequest = new PostBeatmapFavouriteRequest(onlineBeatmapID, actionType);
-
-                Enabled.Value = false;
-                favouriteRequest.Success += () =>
-                {
-                    bool favourited = actionType == BeatmapFavouriteAction.Favourite;
-
-                    current.Value = new BeatmapSetFavouriteState(favourited, current.Value.FavouriteCount + (favourited ? 1 : -1));
-
-                    Enabled.Value = true;
-                };
-                favouriteRequest.Failure += e =>
-                {
-                    Logger.Error(e, $"Failed to {actionType.ToString().ToLower()} beatmap: {e.Message}");
-                    Enabled.Value = true;
-                };
-
-                api.Queue(favouriteRequest);
-            };
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            Action = toggleFavouriteStatus;
             current.BindValueChanged(_ => updateState(), true);
+        }
+
+        private void toggleFavouriteStatus()
+        {
+            var actionType = current.Value.Favourited ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite;
+
+            favouriteRequest?.Cancel();
+            favouriteRequest = new PostBeatmapFavouriteRequest(onlineBeatmapID, actionType);
+
+            Enabled.Value = false;
+            favouriteRequest.Success += () =>
+            {
+                bool favourited = actionType == BeatmapFavouriteAction.Favourite;
+
+                current.Value = new BeatmapSetFavouriteState(favourited, current.Value.FavouriteCount + (favourited ? 1 : -1));
+
+                Enabled.Value = true;
+            };
+            favouriteRequest.Failure += e =>
+            {
+                Logger.Error(e, $"Failed to {actionType.ToString().ToLower()} beatmap: {e.Message}");
+                Enabled.Value = true;
+            };
+
+            api.Queue(favouriteRequest);
         }
 
         private void updateState()
