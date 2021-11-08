@@ -189,7 +189,11 @@ namespace osu.Game.Beatmaps
 
             // Difficulty settings must be copied first due to the clone in `Beatmap<>.BeatmapInfo_Set`.
             // This should hopefully be temporary, assuming said clone is eventually removed.
-            beatmapInfo.BaseDifficulty.CopyFrom(beatmapContent.Difficulty);
+
+            // Warning: The directionality here is important. Changes have to be copied *from* beatmapContent (which comes from editor and is being saved)
+            // *to* the beatmapInfo (which is a database model and needs to receive values without the taiko slider velocity multiplier for correct operation).
+            // CopyTo() will undo such adjustments, while CopyFrom() will not.
+            beatmapContent.Difficulty.CopyTo(beatmapInfo.BaseDifficulty);
 
             // All changes to metadata are made in the provided beatmapInfo, so this should be copied to the `IBeatmap` before encoding.
             beatmapContent.BeatmapInfo = beatmapInfo;
