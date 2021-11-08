@@ -23,8 +23,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.0;
+        private const double slider_multiplier = 1.5;
+        private const double velocity_change_multiplier = 0.75;
 
-        private double currentStrain = 1;
+        private double currentStrain;
 
         private double skillMultiplier => 23.25;
         private double strainDecayBase => 0.15;
@@ -61,7 +63,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
             }
 
-            double angleBonus = 0;
+            double wideAngleBonus = 0;
+            double acuteAngleBonus = 0;
+            double sliderBonus = 0;
+            double velocityChangeBonus = 0;
+
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
             if (Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime) < 1.25 * Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime)) // If rhythms are the same.
@@ -73,10 +79,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     double lastLastAngle = osuLastLastObj.Angle.Value;
 
                     // Rewarding angles, take the smaller velocity as base.
-                    angleBonus = Math.Min(currVelocity, prevVelocity);
+                    double angleBonus = Math.Min(currVelocity, prevVelocity);
 
-                    double wideAngleBonus = calcWideAngleBonus(currAngle);
-                    double acuteAngleBonus = calcAcuteAngleBonus(currAngle);
+                    wideAngleBonus = calcWideAngleBonus(currAngle);
+                    acuteAngleBonus = calcAcuteAngleBonus(currAngle);
 
                     if (osuCurrObj.StrainTime > 100) // Only buff deltaTime exceeding 300 bpm 1/2.
                         acuteAngleBonus = 0;
@@ -88,14 +94,48 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                            * Math.Pow(Math.Sin(Math.PI / 2 * (Math.Clamp(osuCurrObj.JumpDistance, 50, 100) - 50) / 50), 2); // Buff distance exceeding 50 (radius) up to 100 (diameter).
                     }
 
-                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3))); // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
-                    acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3))); // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
-
-                    angleBonus = acuteAngleBonus * acute_angle_multiplier + wideAngleBonus * wide_angle_multiplier; // add the angle buffs together.
+                    // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
+                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
+                    // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
+                    acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
                 }
             }
 
-            aimStrain += angleBonus; // Add in angle bonus.
+            if (Math.Max(prevVelocity, currVelocity) != 0)
+            {
+                // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
+                prevVelocity = (osuLastObj.JumpDistance + osuLastObj.TravelDistance) / osuLastObj.StrainTime;
+                currVelocity = (osuCurrObj.JumpDistance + osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
+
+                // Scale with ratio of difference compared to 0.5 * max dist.
+                double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2);
+
+                // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
+                double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
+
+                // Reward for % distance slowed down compared to previous, paying attention to not award overlap
+                double nonOverlapVelocityBuff = Math.Abs(prevVelocity - currVelocity)
+                                                // do not award overlap
+                                                * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, Math.Min(osuCurrObj.JumpDistance, osuLastObj.JumpDistance) / 100)), 2);
+
+                // Choose the largest bonus, multiplied by ratio.
+                velocityChangeBonus = Math.Max(overlapVelocityBuff, nonOverlapVelocityBuff) * distRatio;
+
+                // Penalize for rhythm changes.
+                velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
+            }
+
+            if (osuCurrObj.TravelTime != 0)
+            {
+                // Reward sliders based on velocity.
+                sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
+            }
+
+            // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
+
+            // Add in additional slider velocity bonus.
+            aimStrain += sliderBonus * slider_multiplier;
 
             return aimStrain;
         }
