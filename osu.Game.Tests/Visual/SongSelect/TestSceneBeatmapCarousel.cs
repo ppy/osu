@@ -873,8 +873,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     }
                 }
             }
-
-            protected override IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => Enumerable.Empty<BeatmapSetInfo>();
         }
     }
 }

@@ -18,12 +18,14 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
 using osuTK;
 using osuTK.Input;
+using Realms;
 
 namespace osu.Game.Screens.Select
 {
@@ -172,17 +174,57 @@ namespace osu.Game.Screens.Select
 
             RightClickScrollingEnabled.ValueChanged += enabled => Scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
-
-            beatmaps.ItemUpdated += beatmapUpdated;
-            beatmaps.ItemRemoved += beatmapRemoved;
-            beatmaps.BeatmapHidden += beatmapHidden;
-            beatmaps.BeatmapRestored += beatmapRestored;
-
-            if (!beatmapSets.Any())
-                loadBeatmapSets(GetLoadableBeatmaps());
         }
 
-        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            realmFactory.Context.All<BeatmapSetInfo>().Where(s => !s.DeletePending).QueryAsyncWithNotifications(beatmapSetsChanged);
+            realmFactory.Context.All<BeatmapInfo>().Where(b => !b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
+        }
+
+        private void beatmapRemoved(BeatmapSetInfo item) => RemoveBeatmapSet(item);
+        private void beatmapUpdated(BeatmapSetInfo item) => UpdateBeatmapSet(item);
+
+        private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
+        {
+            if (changes == null)
+            {
+                // initial load
+                loadBeatmapSets(sender);
+                return;
+            }
+
+            foreach (int i in changes.NewModifiedIndices)
+                UpdateBeatmapSet(sender[i]);
+
+            // moves also appear as deletes / inserts but aren't important to us.
+            if (!changes.Moves.Any())
+            {
+                foreach (int i in changes.InsertedIndices)
+                    UpdateBeatmapSet(sender[i]);
+
+                // TODO: This can not work, as we recently found out https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-1605595.
+                foreach (int i in changes.DeletedIndices)
+                    RemoveBeatmapSet(sender[i]);
+            }
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet changes, Exception error)
+        {
+            // we only care about actual changes in hidden status.
+            if (changes == null)
+                return;
+
+            // TODO: we can probably handle hidden items at a per-panel level (ie. start a realm subscription from there)?
+            // might be cleaner than handling via reconstruction of the whole set's panels.
+            foreach (int i in changes.NewModifiedIndices)
+                UpdateBeatmapSet(sender[i].BeatmapSet);
+        }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
@@ -617,11 +659,6 @@ namespace osu.Game.Screens.Select
             return (firstIndex, lastIndex);
         }
 
-        private void beatmapRemoved(BeatmapSetInfo item) => RemoveBeatmapSet(item);
-        private void beatmapUpdated(BeatmapSetInfo item) => UpdateBeatmapSet(item);
-        private void beatmapRestored(BeatmapInfo b) => UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
-        private void beatmapHidden(BeatmapInfo b) => UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
-
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {
             if (beatmapSet.Beatmaps.All(b => b.Hidden))
@@ -888,8 +925,6 @@ namespace osu.Game.Screens.Select
             {
                 beatmaps.ItemUpdated -= beatmapUpdated;
                 beatmaps.ItemRemoved -= beatmapRemoved;
-                beatmaps.BeatmapHidden -= beatmapHidden;
-                beatmaps.BeatmapRestored -= beatmapRestored;
             }
         }
     }
