@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -21,7 +20,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class UnstableRateCounter : RollingCounter<double>, ISkinnableDrawable
+    public class UnstableRateCounter : RollingCounter<int>, ISkinnableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
@@ -37,7 +36,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public UnstableRateCounter()
         {
-            Current.Value = 0.0;
+            Current.Value = 0;
         }
 
         [BackgroundDependencyLoader]
@@ -48,10 +47,8 @@ namespace osu.Game.Screens.Play.HUD
                 DrawableCount.FadeTo(e.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
         }
 
-        private bool isUrInvalid(JudgementResult judgement)
-        {
-            return judgement.HitObject.HitWindows is HitWindows.EmptyHitWindows || !judgement.IsHit;
-        }
+        private bool changesUnstableRate(JudgementResult judgement)
+            => !(judgement.HitObject.HitWindows is HitWindows.EmptyHitWindows) && judgement.IsHit;
 
         protected override void LoadComplete()
         {
@@ -63,28 +60,28 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onJudgementAdded(JudgementResult judgement)
         {
-            if (isUrInvalid(judgement)) return;
+            if (!changesUnstableRate(judgement)) return;
 
             hitOffsets.Add(judgement.TimeOffset);
-            updateUr();
+            updateDisplay();
         }
 
         private void onJudgementReverted(JudgementResult judgement)
         {
-            if (judgement.FailedAtJudgement || isUrInvalid(judgement)) return;
+            if (judgement.FailedAtJudgement || !changesUnstableRate(judgement)) return;
 
             hitOffsets.RemoveAt(hitOffsets.Count - 1);
-            updateUr();
+            updateDisplay();
         }
 
-        private void updateUr()
+        private void updateDisplay()
         {
             // At Count = 0, we get NaN, While we are allowing count = 1, it will be 0 since average = offset.
             if (hitOffsets.Count > 0)
             {
                 double mean = hitOffsets.Average();
                 double squares = hitOffsets.Select(offset => Math.Pow(offset - mean, 2)).Sum();
-                Current.Value = Math.Sqrt(squares / hitOffsets.Count) * 10;
+                Current.Value = (int)(Math.Sqrt(squares / hitOffsets.Count) * 10);
                 valid.Value = true;
             }
             else
@@ -92,11 +89,6 @@ namespace osu.Game.Screens.Play.HUD
                 Current.Value = 0;
                 valid.Value = false;
             }
-        }
-
-        protected override LocalisableString FormatCount(double count)
-        {
-            return count.ToString("0.00");
         }
 
         protected override IHasText CreateText() => new TextComponent
@@ -108,6 +100,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
+            if (scoreProcessor == null) return;
+
             scoreProcessor.NewJudgement -= onJudgementAdded;
             scoreProcessor.JudgementReverted -= onJudgementReverted;
         }
@@ -116,20 +110,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             public LocalisableString Text
             {
-                get => fullValue.ToLocalisableString("0.00 UR");
-                set
-                {
-                    fullValue = Convert.ToDouble(value.ToString());
-                    intPart.Text = fullValue.ToLocalisableString("0");
-                    decimalPart.Text = (fullValue - Math.Truncate(fullValue))
-                        .ToLocalisableString(".00 UR");
-                }
+                get => text.Text;
+                set => text.Text = value;
             }
 
-            private double fullValue;
-
-            private readonly OsuSpriteText intPart;
-            private readonly OsuSpriteText decimalPart;
+            private readonly OsuSpriteText text;
 
             public TextComponent()
             {
@@ -140,17 +125,18 @@ namespace osu.Game.Screens.Play.HUD
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        intPart = new OsuSpriteText
+                        text = new OsuSpriteText
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
                         },
-                        decimalPart = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.Numeric.With(size: 8, fixedWidth: true),
+                            Text = "UR",
                             Padding = new MarginPadding { Bottom = 1.5f },
                         }
                     }
