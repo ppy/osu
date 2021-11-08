@@ -170,7 +170,7 @@ namespace osu.Game
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ReadableKeyCombinationProvider keyCombinationProvider)
         {
             try
             {
@@ -309,7 +309,7 @@ namespace osu.Game
 
             base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
 
-            KeyBindingStore = new RealmKeyBindingStore(realmFactory);
+            KeyBindingStore = new RealmKeyBindingStore(realmFactory, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
 
             dependencies.Cache(globalBindings);
