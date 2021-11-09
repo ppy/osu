@@ -13,9 +13,16 @@ namespace osu.Game.Tests.Visual.Components
 {
     public class TestScenePreviewTrackManager : OsuTestScene, IPreviewTrackOwner
     {
-        private readonly TestPreviewTrackManager trackManager = new TestPreviewTrackManager();
+        private readonly IAdjustableAudioComponent gameTrackAudio = new AudioAdjustments();
+
+        private readonly TestPreviewTrackManager trackManager;
 
         private AudioManager audio;
+
+        public TestScenePreviewTrackManager()
+        {
+            trackManager = new TestPreviewTrackManager(gameTrackAudio);
+        }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -151,19 +158,19 @@ namespace osu.Game.Tests.Visual.Components
                     audio.VolumeTrack.Value = 1;
             });
 
-            AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
+            AddAssert("game not muted", () => gameTrackAudio.AggregateVolume.Value != 0);
 
             AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
             AddUntilStep("wait loaded", () => track.IsLoaded);
             AddStep("start track", () => track.Start());
-            AddAssert("game is muted", () => audio.Tracks.AggregateVolume.Value == 0);
+            AddAssert("game is muted", () => gameTrackAudio.AggregateVolume.Value == 0);
 
             if (stopAnyPlaying)
                 AddStep("stop any playing", () => trackManager.StopAnyPlaying(owner));
             else
                 AddStep("stop track", () => track.Stop());
 
-            AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
+            AddAssert("game not muted", () => gameTrackAudio.AggregateVolume.Value != 0);
         }
 
         [Test]
@@ -223,6 +230,11 @@ namespace osu.Game.Tests.Visual.Components
             public bool AllowUpdate = true;
 
             public new PreviewTrack CurrentTrack => base.CurrentTrack;
+
+            public TestPreviewTrackManager(IAdjustableAudioComponent mainTrackAdjustments)
+                : base(mainTrackAdjustments)
+            {
+            }
 
             protected override TrackManagerPreviewTrack CreatePreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
 
