@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
         public class IssueTemplateBananaShowerStartGap : IssueTemplateBananaShowerGap
         {
             public IssueTemplateBananaShowerStartGap(ICheck check)
-                : base(check, IssueType.Problem, "There is only {0} ms apart between the start of the spinner and the last object, it should not be less than {1} ms.")
+                : base(check, IssueType.Problem, "There is only {0} ms between the start of the spinner and the last object, it should not be less than {1} ms.")
             {
             }
         }
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
         public class IssueTemplateBananaShowerEndGap : IssueTemplateBananaShowerGap
         {
             public IssueTemplateBananaShowerEndGap(ICheck check)
-                : base(check, IssueType.Problem, "There is only {0} ms apart between the end of the spinner and the next object, it should not be less than {1} ms.")
+                : base(check, IssueType.Problem, "There is only {0} ms between the end of the spinner and the next object, it should not be less than {1} ms.")
             {
             }
         }
