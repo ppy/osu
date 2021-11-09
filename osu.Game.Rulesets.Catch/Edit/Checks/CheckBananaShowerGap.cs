@@ -10,7 +10,10 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Edit.Checks
 {
-    public class CheckTooShortSpinnerGap : ICheck
+    /// <summary>
+    /// Check the spinner/banana shower gaps specified in the osu!catch difficulty specific ranking criteria.
+    /// </summary>
+    public class CheckBananaShowerGap : ICheck
     {
         private static readonly int[] spinner_start_delta_threshold = { 250, 250, 125, 125, 62, 62 };
         private static readonly int[] spinner_end_delta_threshold = { 250, 250, 250, 125, 125, 125 };
@@ -19,8 +22,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
-            new IssueTemplateSpinnerStartGap(this),
-            new IssueTemplateSpinnerEndGap(this)
+            new IssueTemplateBananaShowerStartGap(this),
+            new IssueTemplateBananaShowerEndGap(this)
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -35,33 +38,35 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
                 if (!(hitObjects[i] is BananaShower bananaShower))
                     continue;
 
+                // Skip if the previous hitobject is a banana shower, consecutive spinners are allowed
                 if (i != 0 && hitObjects[i - 1] is CatchHitObject previousHitObject && !(previousHitObject is BananaShower))
                 {
                     double spinnerStartDelta = bananaShower.StartTime - previousHitObject.GetEndTime();
 
                     if (spinnerStartDelta < expectedStartDelta)
                     {
-                        yield return new IssueTemplateSpinnerStartGap(this)
+                        yield return new IssueTemplateBananaShowerStartGap(this)
                             .Create(spinnerStartDelta, expectedStartDelta, bananaShower, previousHitObject);
                     }
                 }
 
+                // Skip if the next hitobject is a banana shower, consecutive spinners are allowed
                 if (hitObjects[i + 1] is CatchHitObject nextHitObject && !(nextHitObject is BananaShower))
                 {
                     double spinnerEndDelta = nextHitObject.StartTime - bananaShower.EndTime;
 
                     if (spinnerEndDelta < expectedEndDelta)
                     {
-                        yield return new IssueTemplateSpinnerEndGap(this)
+                        yield return new IssueTemplateBananaShowerEndGap(this)
                             .Create(spinnerEndDelta, expectedEndDelta, bananaShower, nextHitObject);
                     }
                 }
             }
         }
 
-        public abstract class IssueTemplateSpinnerGap : IssueTemplate
+        public abstract class IssueTemplateBananaShowerGap : IssueTemplate
         {
-            protected IssueTemplateSpinnerGap(ICheck check, IssueType issueType, string unformattedMessage)
+            protected IssueTemplateBananaShowerGap(ICheck check, IssueType issueType, string unformattedMessage)
                 : base(check, issueType, unformattedMessage)
             {
             }
@@ -72,18 +77,18 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
             }
         }
 
-        public class IssueTemplateSpinnerStartGap : IssueTemplateSpinnerGap
+        public class IssueTemplateBananaShowerStartGap : IssueTemplateBananaShowerGap
         {
-            public IssueTemplateSpinnerStartGap(ICheck check)
-                : base(check, IssueType.Problem, "There is only {0} ms apart between the start of the spinner and the last object, there should be {1} ms or more.")
+            public IssueTemplateBananaShowerStartGap(ICheck check)
+                : base(check, IssueType.Problem, "There is only {0} ms apart between the start of the spinner and the last object, it should not be less than {1} ms.")
             {
             }
         }
 
-        public class IssueTemplateSpinnerEndGap : IssueTemplateSpinnerGap
+        public class IssueTemplateBananaShowerEndGap : IssueTemplateBananaShowerGap
         {
-            public IssueTemplateSpinnerEndGap(ICheck check)
-                : base(check, IssueType.Problem, "There is only {0} ms apart between the end of the spinner and the next object, there should be {1} ms or more.")
+            public IssueTemplateBananaShowerEndGap(ICheck check)
+                : base(check, IssueType.Problem, "There is only {0} ms apart between the end of the spinner and the next object, it should not be less than {1} ms.")
             {
             }
         }
