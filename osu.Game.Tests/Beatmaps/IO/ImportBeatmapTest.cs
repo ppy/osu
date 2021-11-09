@@ -17,12 +17,12 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Scores.IO;
-using osu.Game.Users;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
@@ -408,8 +408,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
                     // ReSharper disable once AccessToModifiedClosure
-                    manager.ItemUpdated.BindValueChanged(_ => Interlocked.Increment(ref itemAddRemoveFireCount));
-                    manager.ItemRemoved.BindValueChanged(_ => Interlocked.Increment(ref itemAddRemoveFireCount));
+                    manager.ItemUpdated += _ => Interlocked.Increment(ref itemAddRemoveFireCount);
+                    manager.ItemRemoved += _ => Interlocked.Increment(ref itemAddRemoveFireCount);
 
                     var imported = await LoadOszIntoOsu(osu);
 
@@ -846,6 +846,42 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
+        // TODO: needs to be pulled across to realm implementation when this file is nuked.
+        [Test]
+        public void TestSaveRemovesInvalidCharactersFromPath()
+        {
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, APIUser.SYSTEM_USER);
+
+                    var beatmap = working.Beatmap;
+
+                    beatmap.BeatmapInfo.Version = "difficulty";
+                    beatmap.BeatmapInfo.Metadata = new BeatmapMetadata
+                    {
+                        Artist = "Artist/With\\Slashes",
+                        Title = "Title",
+                        AuthorString = "mapper",
+                    };
+
+                    manager.Save(beatmap.BeatmapInfo, working.Beatmap);
+
+                    Assert.AreEqual("Artist_With_Slashes - Title (mapper) [difficulty].osu", beatmap.BeatmapInfo.Path);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         [Test]
         public void TestCreateNewEmptyBeatmap()
         {
@@ -856,7 +892,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = LoadOsuIntoHost(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
-                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, APIUser.SYSTEM_USER);
 
                     manager.Save(working.BeatmapInfo, working.Beatmap);
 
@@ -883,7 +919,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = LoadOsuIntoHost(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
-                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, APIUser.SYSTEM_USER);
 
                     ((Beatmap)working.Beatmap).HitObjects.Add(new HitCircle { StartTime = 5000 });
 

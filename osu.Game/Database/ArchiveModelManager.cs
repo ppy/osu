@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
@@ -30,7 +29,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : IModelImporter<TModel>, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : class, INamedFileInfo, IHasPrimaryKey, new()
     {
@@ -63,17 +62,13 @@ namespace osu.Game.Database
         /// Fired when a new or updated <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public IBindable<WeakReference<TModel>> ItemUpdated => itemUpdated;
-
-        private readonly Bindable<WeakReference<TModel>> itemUpdated = new Bindable<WeakReference<TModel>>();
+        public event Action<TModel> ItemUpdated;
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> is removed from the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public IBindable<WeakReference<TModel>> ItemRemoved => itemRemoved;
-
-        private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
+        public event Action<TModel> ItemRemoved;
 
         public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
 
@@ -93,8 +88,8 @@ namespace osu.Game.Database
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemUpdated += item => handleEvent(() => itemUpdated.Value = new WeakReference<TModel>(item));
-            ModelStore.ItemRemoved += item => handleEvent(() => itemRemoved.Value = new WeakReference<TModel>(item));
+            ModelStore.ItemUpdated += item => handleEvent(() => ItemUpdated?.Invoke(item));
+            ModelStore.ItemRemoved += item => handleEvent(() => ItemRemoved?.Invoke(item));
 
             exportStorage = storage.GetStorageForDirectory(@"exports");
 
@@ -466,7 +461,7 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
-            string filename = $"{getValidFilename(item.ToString())}{HandledExtensions.First()}";
+            string filename = $"{GetValidFilename(item.ToString())}{HandledExtensions.First()}";
 
             using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
                 ExportModelTo(retrievedItem, stream);
@@ -913,9 +908,15 @@ namespace osu.Game.Database
             return Guid.NewGuid().ToString();
         }
 
-        private string getValidFilename(string filename)
+        private readonly char[] invalidFilenameCharacters = Path.GetInvalidFileNameChars()
+                                                                // Backslash is added to avoid issues when exporting to zip.
+                                                                // See SharpCompress filename normalisation https://github.com/adamhathcock/sharpcompress/blob/a1e7c0068db814c9aa78d86a94ccd1c761af74bd/src/SharpCompress/Writers/Zip/ZipWriter.cs#L143.
+                                                                .Append('\\')
+                                                                .ToArray();
+
+        protected string GetValidFilename(string filename)
         {
-            foreach (char c in Path.GetInvalidFileNameChars())
+            foreach (char c in invalidFilenameCharacters)
                 filename = filename.Replace(c, '_');
             return filename;
         }

@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
 using osu.Game.Users;
@@ -30,26 +31,26 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Show test dummy", () => header.User.Value = TestSceneUserProfileOverlay.TEST_USER);
 
-            AddStep("Show null dummy", () => header.User.Value = new User
+            AddStep("Show null dummy", () => header.User.Value = new APIUser
             {
                 Username = "Null"
             });
 
-            AddStep("Show online dummy", () => header.User.Value = new User
+            AddStep("Show online dummy", () => header.User.Value = new APIUser
             {
                 Username = "IAmOnline",
                 LastVisit = DateTimeOffset.Now,
                 IsOnline = true,
             });
 
-            AddStep("Show offline dummy", () => header.User.Value = new User
+            AddStep("Show offline dummy", () => header.User.Value = new APIUser
             {
                 Username = "IAmOffline",
                 LastVisit = DateTimeOffset.Now,
                 IsOnline = false,
             });
 
-            addOnlineStep("Show ppy", new User
+            addOnlineStep("Show ppy", new APIUser
             {
                 Username = @"peppy",
                 Id = 2,
@@ -58,7 +59,7 @@ namespace osu.Game.Tests.Visual.Online
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
             });
 
-            addOnlineStep("Show flyte", new User
+            addOnlineStep("Show flyte", new APIUser
             {
                 Username = @"flyte",
                 Id = 3103765,
@@ -67,7 +68,7 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private void addOnlineStep(string name, User fallback)
+        private void addOnlineStep(string name, APIUser fallback)
         {
             AddStep(name, () =>
             {

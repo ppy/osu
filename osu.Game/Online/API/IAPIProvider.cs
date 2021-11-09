@@ -6,6 +6,7 @@
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
@@ -16,13 +17,13 @@ namespace osu.Game.Online.API
         /// The local user.
         /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
-        IBindable<User> LocalUser { get; }
+        IBindable<APIUser> LocalUser { get; }
 
         /// <summary>
         /// The user's friends.
         /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
-        IBindableList<User> Friends { get; }
+        IBindableList<APIUser> Friends { get; }
 
         /// <summary>
         /// The current user's activity.

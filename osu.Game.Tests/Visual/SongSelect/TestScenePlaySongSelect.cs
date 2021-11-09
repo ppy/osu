@@ -18,6 +18,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -29,7 +30,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -807,7 +807,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 songSelect.PresentScore(new ScoreInfo
                 {
-                    User = new User { Username = "woo" },
+                    User = new APIUser { Username = "woo" },
                     BeatmapInfo = getPresentBeatmap(),
                     Ruleset = getPresentBeatmap().Ruleset
                 });
@@ -839,7 +839,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 songSelect.PresentScore(new ScoreInfo
                 {
-                    User = new User { Username = "woo" },
+                    User = new APIUser { Username = "woo" },
                     BeatmapInfo = getPresentBeatmap(),
                     Ruleset = getPresentBeatmap().Ruleset
                 });

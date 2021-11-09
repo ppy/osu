@@ -14,8 +14,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Users;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private PostBeatmapFavouriteRequest request;
         private LoadingLayer loading;
 
-        private readonly IBindable<User> localUser = new Bindable<User>();
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
         public LocalisableString TooltipText
         {

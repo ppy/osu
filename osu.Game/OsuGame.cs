@@ -53,8 +53,10 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
+using osu.Game.Users;
 
 namespace osu.Game
 {
@@ -287,25 +289,27 @@ namespace osu.Game
         /// <param name="link">The link to load.</param>
         public void HandleLink(LinkDetails link) => Schedule(() =>
         {
+            string argString = link.Argument.ToString();
+
             switch (link.Action)
             {
                 case LinkAction.OpenBeatmap:
                     // TODO: proper query params handling
-                    if (int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
+                    if (int.TryParse(argString.Contains('?') ? argString.Split('?')[0] : argString, out int beatmapId))
                         ShowBeatmap(beatmapId);
                     break;
 
                 case LinkAction.OpenBeatmapSet:
-                    if (int.TryParse(link.Argument, out int setId))
+                    if (int.TryParse(argString, out int setId))
                         ShowBeatmapSet(setId);
                     break;
 
                 case LinkAction.OpenChannel:
-                    ShowChannel(link.Argument);
+                    ShowChannel(argString);
                     break;
 
                 case LinkAction.SearchBeatmapSet:
-                    SearchBeatmapSet(link.Argument);
+                    SearchBeatmapSet(argString);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -319,27 +323,31 @@ namespace osu.Game
                     break;
 
                 case LinkAction.External:
-                    OpenUrlExternally(link.Argument);
+                    OpenUrlExternally(argString);
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (int.TryParse(link.Argument, out int userId))
-                        ShowUser(userId);
-                    else
-                        ShowUser(link.Argument);
+                    if (!(link.Argument is IUser user))
+                    {
+                        user = int.TryParse(argString, out int userId)
+                            ? new APIUser { Id = userId }
+                            : new APIUser { Username = argString };
+                    }
+
+                    ShowUser(user);
 
                     break;
 
                 case LinkAction.OpenWiki:
-                    ShowWiki(link.Argument);
+                    ShowWiki(argString);
                     break;
 
                 case LinkAction.OpenChangelog:
-                    if (string.IsNullOrEmpty(link.Argument))
+                    if (string.IsNullOrEmpty(argString))
                         ShowChangelogListing();
                     else
                     {
-                        string[] changelogArgs = link.Argument.Split("/");
+                        string[] changelogArgs = argString.Split("/");
                         ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
                     }
 
@@ -383,14 +391,8 @@ namespace osu.Game
         /// <summary>
         /// Show a user's profile as an overlay.
         /// </summary>
-        /// <param name="userId">The user to display.</param>
-        public void ShowUser(int userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
-
-        /// <summary>
-        /// Show a user's profile as an overlay.
-        /// </summary>
-        /// <param name="username">The user to display.</param>
-        public void ShowUser(string username) => waitForReady(() => userProfile, _ => userProfile.ShowUser(username));
+        /// <param name="user">The user to display.</param>
+        public void ShowUser(IUser user) => waitForReady(() => userProfile, _ => userProfile.ShowUser(user));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.
