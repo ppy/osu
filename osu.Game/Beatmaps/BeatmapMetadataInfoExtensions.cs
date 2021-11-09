@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public static string GetDisplayTitle(this IBeatmapMetadataInfo metadataInfo)
         {
-            string author = string.IsNullOrEmpty(metadataInfo.Author.Username) ? string.Empty : $"({metadataInfo.Author})";
+            string author = string.IsNullOrEmpty(metadataInfo.Author.Username) ? string.Empty : $"({metadataInfo.Author.Username})";
             return $"{metadataInfo.Artist} - {metadataInfo.Title} {author}".Trim();
         }
 
