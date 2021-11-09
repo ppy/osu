@@ -128,7 +128,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             {
                 this.beatmapSet = beatmapSet;
 
-                Icon.Icon = FontAwesome.Regular.PlayCircle;
+                Icon.Icon = FontAwesome.Solid.AngleDoubleRight;
                 TooltipText = "Go to beatmap";
             }
 
