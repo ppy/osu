@@ -10,8 +10,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
-using osu.Game.Users;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Online
                 Title = "undownloadable beatmap",
                 Artist = "test",
                 Source = "more tests",
-                Author = new User
+                Author = new APIUser
                 {
                     Username = "BanchoBot",
                     Id = 3,
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
                 HasVideo = true,
                 HasStoryboard = true,
                 Covers = new BeatmapSetOnlineCovers(),
-                Beatmaps = new List<APIBeatmap>
+                Beatmaps = new[]
                 {
                     new APIBeatmap
                     {
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Online
                     Title = "undownloadable beatmap",
                     Artist = "test",
                     Source = "more tests",
-                    Author = new User
+                    Author = new APIUser
                     {
                         Username = "BanchoBot",
                         Id = 3,
@@ -129,7 +129,7 @@ namespace osu.Game.Tests.Visual.Online
                     HasVideo = true,
                     HasStoryboard = true,
                     Covers = new BeatmapSetOnlineCovers(),
-                    Beatmaps = beatmaps,
+                    Beatmaps = beatmaps.ToArray(),
                 };
             }
         }

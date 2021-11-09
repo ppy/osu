@@ -15,14 +15,14 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Users;
 using osuTK.Input;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneMessageNotifier : OsuManualInputManagerTestScene
     {
-        private User friend;
+        private APIUser friend;
         private Channel publicChannel;
         private Channel privateMessageChannel;
         private TestContainer testContainer;
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
                 daa.HandleRequest = dummyAPIHandleRequest;
             }
 
-            friend = new User { Id = 0, Username = "Friend" };
+            friend = new APIUser { Id = 0, Username = "Friend" };
             publicChannel = new Channel { Id = 1, Name = "osu" };
             privateMessageChannel = new Channel(friend) { Id = 2, Name = friend.Username, Type = ChannelType.PM };
 
@@ -178,9 +178,9 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("1 notification fired", () => testContainer.NotificationOverlay.UnreadCount.Value == 1);
         }
 
-        private void receiveMessage(User sender, Channel channel, string content) => channel.AddNewMessages(createMessage(sender, channel, content));
+        private void receiveMessage(APIUser sender, Channel channel, string content) => channel.AddNewMessages(createMessage(sender, channel, content));
 
-        private Message createMessage(User sender, Channel channel, string content) => new Message(messageIdCounter++)
+        private Message createMessage(APIUser sender, Channel channel, string content) => new Message(messageIdCounter++)
         {
             Content = content,
             Sender = sender,

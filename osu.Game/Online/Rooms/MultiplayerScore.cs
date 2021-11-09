@@ -7,11 +7,12 @@ using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Online.Rooms
 {
@@ -21,7 +22,7 @@ namespace osu.Game.Online.Rooms
         public long ID { get; set; }
 
         [JsonProperty("user")]
-        public User User { get; set; }
+        public APIUser User { get; set; }
 
         [JsonProperty("rank")]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -61,7 +62,7 @@ namespace osu.Game.Online.Rooms
         [CanBeNull]
         public MultiplayerScoresAround ScoresAround { get; set; }
 
-        public ScoreInfo CreateScoreInfo(PlaylistItem playlistItem)
+        public ScoreInfo CreateScoreInfo(PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
         {
             var rulesetInstance = playlistItem.Ruleset.Value.CreateInstance();
 
@@ -70,7 +71,7 @@ namespace osu.Game.Online.Rooms
                 OnlineScoreID = ID,
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
-                BeatmapInfo = playlistItem.Beatmap.Value,
+                BeatmapInfo = beatmap,
                 BeatmapInfoID = playlistItem.BeatmapID,
                 Ruleset = playlistItem.Ruleset.Value,
                 RulesetID = playlistItem.RulesetID,

@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
@@ -34,7 +35,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 1);
 
-            AddStep("add user", () => Client.AddUser(new User
+            AddStep("add user", () => Client.AddUser(new APIUser
             {
                 Id = 3,
                 Username = "Second",
@@ -63,11 +64,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestRemoveUser()
         {
-            User secondUser = null;
+            APIUser secondUser = null;
 
             AddStep("add a user", () =>
             {
-                Client.AddUser(secondUser = new User
+                Client.AddUser(secondUser = new APIUser
                 {
                     Id = 3,
                     Username = "Second",
@@ -146,7 +147,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestCrownChangesStateWhenHostTransferred()
         {
-            AddStep("add user", () => Client.AddUser(new User
+            AddStep("add user", () => Client.AddUser(new APIUser
             {
                 Id = 3,
                 Username = "Second",
@@ -165,7 +166,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestKickButtonOnlyPresentWhenHost()
         {
-            AddStep("add user", () => Client.AddUser(new User
+            AddStep("add user", () => Client.AddUser(new APIUser
             {
                 Id = 3,
                 Username = "Second",
@@ -186,7 +187,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestKickButtonKicks()
         {
-            AddStep("add user", () => Client.AddUser(new User
+            AddStep("add user", () => Client.AddUser(new APIUser
             {
                 Id = 3,
                 Username = "Second",
@@ -205,7 +206,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 for (int i = 0; i < 20; i++)
                 {
-                    Client.AddUser(new User
+                    Client.AddUser(new APIUser
                     {
                         Id = i,
                         Username = $"User {i}",
@@ -249,7 +250,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add user", () =>
             {
-                Client.AddUser(new User
+                Client.AddUser(new APIUser
                 {
                     Id = 0,
                     Username = "User 0",
@@ -295,7 +296,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("add user with mods", () =>
             {
-                Client.AddUser(new User
+                Client.AddUser(new APIUser
                 {
                     Id = 0,
                     Username = "Baka",

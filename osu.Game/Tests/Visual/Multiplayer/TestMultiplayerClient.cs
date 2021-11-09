@@ -13,11 +13,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -50,7 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public void Disconnect() => isConnected.Value = false;
 
-        public MultiplayerRoomUser AddUser(User user, bool markAsPlaying = false)
+        public MultiplayerRoomUser AddUser(APIUser user, bool markAsPlaying = false)
         {
             var roomUser = new MultiplayerRoomUser(user.Id) { User = user };
 
@@ -72,7 +73,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Scheduler.Update();
         }
 
-        public void RemoveUser(User user)
+        public void RemoveUser(APIUser user)
         {
             Debug.Assert(Room != null);
             ((IMultiplayerClient)this).UserLeft(new MultiplayerRoomUser(user.Id));
@@ -265,18 +266,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return ((IMultiplayerClient)this).LoadRequested();
         }
 
-        protected override Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
+        protected override Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
         {
             Debug.Assert(Room != null);
 
             var apiRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == Room.RoomID);
-            var set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
-                      ?? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId)?.BeatmapSet;
+            IBeatmapSetInfo? set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
+                                   ?? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId)?.BeatmapSet;
 
             if (set == null)
                 throw new InvalidOperationException("Beatmap not found.");
 
-            return Task.FromResult(set);
+            var apiSet = new APIBeatmapSet
+            {
+                OnlineID = set.OnlineID,
+                Beatmaps = set.Beatmaps.Select(b => new APIBeatmap { OnlineID = b.OnlineID }).ToArray(),
+            };
+
+            return Task.FromResult(apiSet);
         }
 
         private async Task changeMatchType(MatchType type)

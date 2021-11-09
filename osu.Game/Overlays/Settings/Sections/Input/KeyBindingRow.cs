@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Database;
@@ -57,13 +58,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public bool FilteringActive { get; set; }
 
+        [Resolved]
+        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
+
         private OsuSpriteText text;
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
         private Bindable<bool> isDefault { get; } = new BindableBool(true);
 
-        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(text.Text.ToString());
+        public IEnumerable<string> FilterTerms => bindings.Select(b => keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text.ToString());
 
         public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
         {
@@ -149,12 +153,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                         new CancelButton { Action = finalise },
                                         new ClearButton { Action = clear },
                                     },
-                                }
+                                },
+                                new HoverClickSounds()
                             }
                         }
                     }
-                },
-                new HoverClickSounds()
+                }
             };
 
             foreach (var b in bindings)
@@ -422,6 +426,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
 
+            [Resolved]
+            private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
+
             private bool isBinding;
 
             public bool IsBinding
@@ -470,10 +477,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         Margin = new MarginPadding(5),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = keyBinding.KeyCombination.ReadableString(),
                     },
                     new HoverSounds()
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                keyCombinationProvider.KeymapChanged += updateKeyCombinationText;
+                updateKeyCombinationText();
             }
 
             [BackgroundDependencyLoader]
@@ -514,7 +528,22 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     return;
 
                 KeyBinding.KeyCombination = newCombination;
-                Text.Text = KeyBinding.KeyCombination.ReadableString();
+                updateKeyCombinationText();
+            }
+
+            private void updateKeyCombinationText()
+            {
+                Scheduler.AddOnce(updateText);
+
+                void updateText() => Text.Text = keyCombinationProvider.GetReadableString(KeyBinding.KeyCombination);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (keyCombinationProvider != null)
+                    keyCombinationProvider.KeymapChanged -= updateKeyCombinationText;
             }
         }
     }

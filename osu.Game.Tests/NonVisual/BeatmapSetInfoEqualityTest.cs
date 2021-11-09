@@ -39,8 +39,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestCheckNullID()
         {
-            var ourInfo = new BeatmapSetInfo { Status = BeatmapSetOnlineStatus.Loved };
-            var otherInfo = new BeatmapSetInfo { Status = BeatmapSetOnlineStatus.Approved };
+            var ourInfo = new BeatmapSetInfo { Hash = "1" };
+            var otherInfo = new BeatmapSetInfo { Hash = "2" };
 
             Assert.AreNotEqual(ourInfo, otherInfo);
         }

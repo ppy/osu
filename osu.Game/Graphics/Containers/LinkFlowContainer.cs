@@ -46,7 +46,7 @@ namespace osu.Game.Graphics.Containers
                 AddText(text[previousLinkEnd..link.Index]);
 
                 string displayText = text.Substring(link.Index, link.Length);
-                string linkArgument = link.Argument;
+                object linkArgument = link.Argument;
                 string tooltip = displayText == link.Url ? null : link.Url;
 
                 AddLink(displayText, link.Action, linkArgument, tooltip);
@@ -62,16 +62,16 @@ namespace osu.Game.Graphics.Containers
         public void AddLink(LocalisableString text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.Custom, string.Empty), tooltipText, action);
 
-        public void AddLink(LocalisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        public void AddLink(LocalisableString text, LinkAction action, object argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(action, argument), tooltipText);
 
-        public void AddLink(IEnumerable<SpriteText> text, LinkAction action, string linkArgument, string tooltipText = null)
+        public void AddLink(IEnumerable<SpriteText> text, LinkAction action, object linkArgument, string tooltipText = null)
         {
             createLink(new TextPartManual(text), new LinkDetails(action, linkArgument), tooltipText);
         }
 
-        public void AddUserLink(User user, Action<SpriteText> creationParameters = null)
-            => createLink(CreateChunkFor(user.Username, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "view profile");
+        public void AddUserLink(IUser user, Action<SpriteText> creationParameters = null)
+            => createLink(CreateChunkFor(user.Username, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user), "view profile");
 
         private void createLink(ITextPart textPart, LinkDetails link, LocalisableString tooltipText, Action action = null)
         {
@@ -83,7 +83,7 @@ namespace osu.Game.Graphics.Containers
                     game.HandleLink(link);
                 // fallback to handle cases where OsuGame is not available, ie. tournament client.
                 else if (link.Action == LinkAction.External)
-                    host.OpenUrlExternally(link.Argument);
+                    host.OpenUrlExternally(link.Argument.ToString());
             };
 
             AddPart(new TextLink(textPart, tooltipText, onClickAction));

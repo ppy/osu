@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -13,6 +14,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
@@ -20,7 +22,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Input;
 
@@ -223,11 +224,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestDownloadButtonVisibleInitiallyWhenBeatmapDoesNotExist()
         {
-            var byOnlineId = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            byOnlineId.BeatmapSet.OnlineBeatmapSetID = 1337; // Some random ID that does not exist locally.
+            var byOnlineId = CreateAPIBeatmap();
+            byOnlineId.OnlineID = 1337; // Some random ID that does not exist locally.
 
-            var byChecksum = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            byChecksum.MD5Hash = "1337"; // Some random checksum that does not exist locally.
+            var byChecksum = CreateAPIBeatmap();
+            byChecksum.Checksum = "1337"; // Some random checksum that does not exist locally.
 
             createPlaylist(byOnlineId, byChecksum);
 
@@ -237,8 +238,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestExplicitBeatmapItem()
         {
-            var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            beatmap.BeatmapSet.OnlineInfo.HasExplicitContent = true;
+            var beatmap = CreateAPIBeatmap();
+
+            Debug.Assert(beatmap.BeatmapSet != null);
+
+            beatmap.BeatmapSet.HasExplicitContent = true;
 
             createPlaylist(beatmap);
         }
@@ -290,7 +294,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                     Metadata = new BeatmapMetadata
                                     {
                                         Artist = "Artist",
-                                        Author = new User { Username = "Creator name here" },
+                                        Author = new APIUser { Username = "Creator name here" },
                                         Title = "Long title used to check background colour",
                                     },
                                     BeatmapSet = new BeatmapSetInfo()
@@ -310,7 +314,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
         }
 
-        private void createPlaylist(params BeatmapInfo[] beatmaps)
+        private void createPlaylist(params IBeatmapInfo[] beatmaps)
         {
             AddStep("create playlist", () =>
             {

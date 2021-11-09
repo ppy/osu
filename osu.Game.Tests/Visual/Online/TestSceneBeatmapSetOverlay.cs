@@ -7,11 +7,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
-using osu.Game.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Online.API.Requests.Responses;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Online
                     Artist = @"naru narusegawa",
                     Source = @"hinata sou",
                     Tags = @"test tag tag more tag",
-                    Author = new User
+                    Author = new APIUser
                     {
                         Username = @"BanchoBot",
                         Id = 3,
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Online
                     Ratings = Enumerable.Range(0, 11).ToArray(),
                     HasStoryboard = true,
                     Covers = new BeatmapSetOnlineCovers(),
-                    Beatmaps = new List<APIBeatmap>
+                    Beatmaps = new[]
                     {
                         new APIBeatmap
                         {
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Online
 
                 var set = getBeatmapSet();
 
-                set.Beatmaps = beatmaps;
+                set.Beatmaps = beatmaps.ToArray();
 
                 overlay.ShowBeatmapSet(set);
             });
@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             }
 
-            set.Beatmaps = beatmaps;
+            set.Beatmaps = beatmaps.ToArray();
 
             return set;
         }

@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetFriendsRequest : APIRequest<List<User>>
+    public class GetFriendsRequest : APIRequest<List<APIUser>>
     {
         protected override string Target => @"friends";
     }

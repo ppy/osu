@@ -62,8 +62,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Resolved(canBeNull: true)]
         protected OnlinePlayScreen ParentScreen { get; private set; }
 
-        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
-
         [Cached]
         private OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker { get; set; }
 
@@ -246,8 +244,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
 
-            managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
-            managerUpdated.BindValueChanged(beatmapUpdated);
+            beatmapManager.ItemUpdated += beatmapUpdated;
 
             UserMods.BindValueChanged(_ => Scheduler.AddOnce(UpdateMods));
         }
@@ -362,14 +359,14 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }
         }
 
-        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet) => Schedule(updateWorkingBeatmap);
+        private void beatmapUpdated(BeatmapSetInfo set) => Schedule(updateWorkingBeatmap);
 
         private void updateWorkingBeatmap()
         {
             var beatmap = SelectedItem.Value?.Beatmap.Value;
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
+            var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
@@ -430,6 +427,14 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// </summary>
         /// <param name="room">The room to change the settings of.</param>
         protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay(Room room);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmapManager != null)
+                beatmapManager.ItemUpdated -= beatmapUpdated;
+        }
 
         public class UserModSelectButton : PurpleTriangleButton
         {

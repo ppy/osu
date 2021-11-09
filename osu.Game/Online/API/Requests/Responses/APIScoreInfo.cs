@@ -12,7 +12,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -25,7 +24,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int MaxCombo { get; set; }
 
         [JsonProperty(@"user")]
-        public User User { get; set; }
+        public APIUser User { get; set; }
 
         [JsonProperty(@"id")]
         public long OnlineID { get; set; }
@@ -98,7 +97,7 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
-                BeatmapInfo = Beatmap?.ToBeatmapInfo(rulesets),
+                BeatmapInfo = beatmap,
                 User = User,
                 Accuracy = Accuracy,
                 OnlineScoreID = OnlineID,
@@ -110,9 +109,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 Ruleset = ruleset,
                 Mods = modInstances,
             };
-
-            if (beatmap != null)
-                scoreInfo.BeatmapInfo = beatmap;
 
             if (Statistics != null)
             {
