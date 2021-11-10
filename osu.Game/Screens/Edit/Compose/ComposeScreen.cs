@@ -7,9 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -20,7 +17,7 @@ using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit.Compose
 {
-    public class ComposeScreen : EditorScreenWithTimeline, IKeyBindingHandler<PlatformAction>
+    public class ComposeScreen : EditorScreenWithTimeline
     {
         [Resolved]
         private GameHost host { get; set; }
@@ -89,35 +86,6 @@ namespace osu.Game.Screens.Edit.Compose
             clipboard.BindValueChanged(_ => updateClipboardActionAvailability(), true);
         }
 
-        #region Input Handling
-
-        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
-        {
-            if (e.Action == PlatformAction.Copy)
-                host.GetClipboard()?.SetText(formatSelectionAsString());
-
-            return false;
-        }
-
-        public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
-        {
-        }
-
-        private string formatSelectionAsString()
-        {
-            if (composer == null)
-                return string.Empty;
-
-            double displayTime = EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).FirstOrDefault()?.StartTime ?? clock.CurrentTime;
-            string selectionAsString = composer.ConvertSelectionToString();
-
-            return !string.IsNullOrEmpty(selectionAsString)
-                ? $"{displayTime.ToEditorFormattedString()} ({selectionAsString}) - "
-                : $"{displayTime.ToEditorFormattedString()} - ";
-        }
-
-        #endregion
-
         #region Clipboard operations
 
         protected override void PerformCut()
@@ -133,6 +101,8 @@ namespace osu.Game.Screens.Edit.Compose
             base.PerformCopy();
 
             clipboard.Value = new ClipboardContent(EditorBeatmap).Serialize();
+
+            host.GetClipboard()?.SetText(formatSelectionAsString());
         }
 
         protected override void PerformPaste()
@@ -162,6 +132,19 @@ namespace osu.Game.Screens.Edit.Compose
         {
             CanCut.Value = CanCopy.Value = EditorBeatmap.SelectedHitObjects.Any();
             CanPaste.Value = !string.IsNullOrEmpty(clipboard.Value);
+        }
+
+        private string formatSelectionAsString()
+        {
+            if (composer == null)
+                return string.Empty;
+
+            double displayTime = EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).FirstOrDefault()?.StartTime ?? clock.CurrentTime;
+            string selectionAsString = composer.ConvertSelectionToString();
+
+            return !string.IsNullOrEmpty(selectionAsString)
+                ? $"{displayTime.ToEditorFormattedString()} ({selectionAsString}) - "
+                : $"{displayTime.ToEditorFormattedString()} - ";
         }
 
         #endregion
