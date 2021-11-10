@@ -383,25 +383,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(Room != null);
             Debug.Assert(APIRoom != null);
 
-            long nextId = 0;
+            long nextId;
 
             switch (Room.Settings.QueueMode)
             {
-                case QueueModes.HostOnly:
+                default:
                     // Pick the single non-expired playlist item.
-                    nextId = APIRoom.Playlist.SingleOrDefault(i => !i.Expired)?.ID ?? 0;
+                    nextId = APIRoom.Playlist.FirstOrDefault(i => !i.Expired)?.ID
+                             ?? APIRoom.Playlist.LastOrDefault()?.ID
+                             ?? 0;
                     break;
 
                 case QueueModes.FairRotate:
                     // Group playlist items by (user_id -> count_expired), and select the first available playlist item from a user that has available beatmaps where count_expired is the lowest.
                     throw new NotImplementedException();
-
-                case QueueModes.FreeForAll:
-                    // Pick the first available non-expired playlist item, or default to the last.
-                    nextId = APIRoom.Playlist.FirstOrDefault(i => !i.Expired)?.ID
-                             ?? APIRoom.Playlist.LastOrDefault()?.ID
-                             ?? 0;
-                    break;
             }
 
             if (nextId != Room.Settings.PlaylistItemId)
