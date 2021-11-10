@@ -29,52 +29,51 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         [Resolved]
         private OsuColour colours { get; set; }
 
+        private OsuClickableContainer clickableContent;
+
         public TeamDisplay(MultiplayerRoomUser user)
         {
             this.user = user;
 
             RelativeSizeAxes = Axes.Y;
-            Width = 15;
+
+            AutoSizeAxes = Axes.X;
 
             Margin = new MarginPadding { Horizontal = 3 };
-
-            Alpha = 0;
-            Scale = new Vector2(0, 1);
         }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            box = new Container
+            InternalChild = clickableContent = new OsuClickableContainer
             {
-                RelativeSizeAxes = Axes.Both,
-                CornerRadius = 5,
-                Masking = true,
+                Width = 15,
+                Alpha = 0,
                 Scale = new Vector2(0, 1),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Child = new Box
+                RelativeSizeAxes = Axes.Y,
+                Action = changeTeam,
+                Child = box = new Container
                 {
-                    Colour = Color4.White,
                     RelativeSizeAxes = Axes.Both,
+                    CornerRadius = 5,
+                    Masking = true,
+                    Scale = new Vector2(0, 1),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Child = new Box
+                    {
+                        Colour = Color4.White,
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
                 }
             };
 
             if (Client.LocalUser?.Equals(user) == true)
             {
-                InternalChild = new OsuClickableContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    TooltipText = "Change team",
-                    Action = changeTeam,
-                    Child = box
-                };
-            }
-            else
-            {
-                InternalChild = box;
+                clickableContent.Action = changeTeam;
+                clickableContent.TooltipText = "Change team";
             }
 
             sampleTeamSwap = audio.Samples.Get(@"Multiplayer/team-swap");
@@ -117,13 +116,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 box.FadeColour(getColourForTeam(DisplayedTeam.Value), duration, Easing.OutQuint);
                 box.ScaleTo(new Vector2(box.Scale.X < 0 ? 1 : -1, 1), duration, Easing.OutQuint);
 
-                this.ScaleTo(Vector2.One, duration, Easing.OutQuint);
-                this.FadeIn(duration);
+                clickableContent.ScaleTo(Vector2.One, duration, Easing.OutQuint);
+                clickableContent.FadeIn(duration);
             }
             else
             {
-                this.ScaleTo(new Vector2(0, 1), duration, Easing.OutQuint);
-                this.FadeOut(duration);
+                clickableContent.ScaleTo(new Vector2(0, 1), duration, Easing.OutQuint);
+                clickableContent.FadeOut(duration);
             }
         }
 
