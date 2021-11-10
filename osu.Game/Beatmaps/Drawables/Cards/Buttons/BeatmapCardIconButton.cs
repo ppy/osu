@@ -1,8 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -12,26 +16,45 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
     public abstract class BeatmapCardIconButton : OsuHoverContainer
     {
+        protected override IEnumerable<Drawable> EffectTargets => background.Yield();
+
+        private readonly Box background;
         protected readonly SpriteIcon Icon;
 
-        private float size;
+        private float iconSize;
 
-        public new float Size
+        public float IconSize
         {
-            get => size;
+            get => iconSize;
             set
             {
-                size = value;
-                Icon.Size = new Vector2(size);
+                iconSize = value;
+                Icon.Size = new Vector2(iconSize);
             }
         }
 
         protected BeatmapCardIconButton()
         {
-            Add(Icon = new SpriteIcon());
+            Child = new CircularContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Children = new Drawable[]
+                {
+                    background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    Icon = new SpriteIcon
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre
+                    }
+                }
+            };
 
-            AutoSizeAxes = Axes.Both;
-            Size = 12;
+            Size = new Vector2(24);
+            IconSize = 12;
         }
 
         [BackgroundDependencyLoader]
@@ -39,8 +62,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         {
             Anchor = Origin = Anchor.Centre;
 
-            IdleColour = colourProvider.Light1;
-            HoverColour = colourProvider.Content1;
+            IdleColour = colourProvider.Background4;
+            HoverColour = colourProvider.Background1;
+            Icon.Colour = colourProvider.Content2;
         }
     }
 }
