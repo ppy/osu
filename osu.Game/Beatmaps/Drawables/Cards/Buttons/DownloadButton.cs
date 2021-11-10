@@ -14,8 +14,6 @@ using osu.Game.Graphics;
 using osu.Game.Online;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Screens.Ranking.Expanded.Accuracy;
-using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
@@ -24,8 +22,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         protected readonly DownloadIcon Download;
         protected readonly PlayIcon Play;
         protected readonly BeatmapDownloadTracker Tracker;
-
-        private readonly SmoothCircularProgress downloadProgress;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -43,13 +39,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             {
                 Tracker = new BeatmapDownloadTracker(beatmapSet),
                 Download = new DownloadIcon(beatmapSet),
-                downloadProgress = new SmoothCircularProgress
-                {
-                    Size = new Vector2(12),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    InnerRadius = 0.4f,
-                },
                 Play = new PlayIcon(beatmapSet)
             };
         }
@@ -65,12 +54,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         private void updateState()
         {
-            Download.FadeTo(Tracker.State.Value == DownloadState.NotDownloaded ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-
-            downloadProgress.FadeTo(Tracker.State.Value == DownloadState.Downloading || Tracker.State.Value == DownloadState.Importing ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            downloadProgress.FadeColour(Tracker.State.Value == DownloadState.Importing ? colours.Yellow : colourProvider.Highlight1, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            if (Tracker.State.Value == DownloadState.Downloading)
-                downloadProgress.FillTo(Tracker.Progress.Value, Tracker.Progress.Value > 0 ? BeatmapCard.TRANSITION_DURATION : 0, Easing.OutQuint);
+            Download.FadeTo(Tracker.State.Value != DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            Download.Enabled.Value = Tracker.State.Value == DownloadState.NotDownloaded;
 
             Play.FadeTo(Tracker.State.Value == DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }

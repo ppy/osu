@@ -27,6 +27,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
         private APIBeatmapSet[] testCases;
 
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
+
         #region Test case generation
 
         [BackgroundDependencyLoader]
@@ -35,6 +38,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             var normal = CreateAPIBeatmapSet(Ruleset.Value);
             normal.HasVideo = true;
             normal.HasStoryboard = true;
+            normal.OnlineID = 241526;
 
             var withStatistics = CreateAPIBeatmapSet(Ruleset.Value);
             withStatistics.Title = withStatistics.TitleUnicode = "play favourite stats";
@@ -179,6 +183,19 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
                 request.TriggerSuccess();
                 return true;
+            });
+
+            ensureSoleilyRemoved();
+        }
+
+        private void ensureSoleilyRemoved()
+        {
+            AddUntilStep("ensure manager loaded", () => beatmaps != null);
+            AddStep("remove soleily", () =>
+            {
+                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineBeatmapSetID == 241526);
+
+                if (beatmap != null) beatmaps.Delete(beatmap);
             });
         }
 

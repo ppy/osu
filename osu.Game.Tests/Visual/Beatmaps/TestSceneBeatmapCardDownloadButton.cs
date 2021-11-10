@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards.Buttons;
 using osu.Game.Configuration;
@@ -15,7 +14,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -42,22 +40,21 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
             assertDownloadVisible(true);
             assertDownloadEnabled(true);
-            assertProgressVisible(false);
             assertPlayVisible(false);
             AddAssert("tooltip text correct", () => downloadButton.Download.TooltipText == BeatmapsetsStrings.PanelDownloadAll);
 
             AddStep("set downloading state", () => downloadButton.State.Value = DownloadState.Downloading);
-            assertDownloadVisible(false);
-            assertProgressVisible(true);
+            assertDownloadVisible(true);
+            assertDownloadEnabled(false);
             assertPlayVisible(false);
 
-            AddStep("set progress to 30%", () => downloadButton.Progress.Value = 0.3f);
-            AddStep("set progress to 100%", () => downloadButton.Progress.Value = 1f);
             AddStep("set importing state", () => downloadButton.State.Value = DownloadState.Importing);
+            assertDownloadVisible(true);
+            assertDownloadEnabled(false);
+            assertPlayVisible(false);
 
             AddStep("set locally available state", () => downloadButton.State.Value = DownloadState.LocallyAvailable);
             assertDownloadVisible(false);
-            assertProgressVisible(false);
             assertPlayVisible(true);
         }
 
@@ -112,8 +109,6 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
         private void assertDownloadVisible(bool visible) => AddUntilStep($"download {(visible ? "visible" : "not visible")}", () => downloadButton.Download.IsPresent == visible);
         private void assertDownloadEnabled(bool enabled) => AddAssert($"download {(enabled ? "enabled" : "disabled")}", () => downloadButton.Download.Enabled.Value == enabled);
-
-        private void assertProgressVisible(bool visible) => AddUntilStep($"progress {(visible ? "visible" : "not visible")}", () => downloadButton.ChildrenOfType<SmoothCircularProgress>().Single().IsPresent == visible);
 
         private void assertPlayVisible(bool visible) => AddUntilStep($"play {(visible ? "visible" : "not visible")}", () => downloadButton.Play.IsPresent == visible);
 

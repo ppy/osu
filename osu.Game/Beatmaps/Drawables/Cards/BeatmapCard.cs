@@ -50,6 +50,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private GridContainer artistContainer;
         private FillFlowContainer<BeatmapCardStatistic> statisticsContainer;
 
+        private FillFlowContainer idleBottomContent;
+        private BeatmapCardDownloadProgressBar downloadProgressBar;
+
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
@@ -218,34 +221,51 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 }
                             }
                         },
-                        new FillFlowContainer
+                        new Container
                         {
                             Name = @"Bottom content",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Horizontal,
-                            Padding = new MarginPadding
-                            {
-                                Horizontal = 10,
-                                Vertical = 4
-                            },
-                            Spacing = new Vector2(4, 0),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Children = new Drawable[]
                             {
-                                new BeatmapSetOnlineStatusPill
+                                idleBottomContent = new FillFlowContainer
                                 {
-                                    AutoSizeAxes = Axes.Both,
-                                    Status = beatmapSet.Status,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Horizontal,
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = 10,
+                                        Vertical = 4
+                                    },
+                                    Spacing = new Vector2(4, 0),
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Children = new Drawable[]
+                                    {
+                                        new BeatmapSetOnlineStatusPill
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Status = beatmapSet.Status,
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft
+                                        },
+                                        new DifficultySpectrumDisplay(beatmapSet)
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            DotSize = new Vector2(6, 12)
+                                        }
+                                    }
                                 },
-                                new DifficultySpectrumDisplay(beatmapSet)
+                                downloadProgressBar = new BeatmapCardDownloadProgressBar(beatmapSet)
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    DotSize = new Vector2(6, 12)
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 0,
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft
                                 }
                             }
                         }
@@ -283,7 +303,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateState();
+
+            downloadProgressBar.IsActive.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
         }
 
@@ -335,6 +356,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             leftCover.FadeColour(IsHovered ? OsuColour.Gray(0.2f) : Color4.White, TRANSITION_DURATION, Easing.OutQuint);
             statisticsContainer.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
             rightButtonArea.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
+
+            idleBottomContent.FadeTo(downloadProgressBar.IsActive.Value ? 0 : 1, TRANSITION_DURATION, Easing.OutQuint);
+            downloadProgressBar.ResizeHeightTo(downloadProgressBar.IsActive.Value ? 8 : 0, TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
