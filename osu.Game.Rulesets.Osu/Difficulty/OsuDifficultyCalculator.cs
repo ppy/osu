@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
             double flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
 
-            double sliderFactor = aimRating / aimRatingNoSliders;
+            double sliderFactor = aimRatingNoSliders / aimRating;
 
             if (mods.Any(h => h is OsuModRelax))
                 speedRating = 0.0;
