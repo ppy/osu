@@ -656,6 +656,8 @@ namespace osu.Game.Online.Multiplayer
                 // If the currently-selected item was the one that got replaced, update the selected item to the new one.
                 if (CurrentMatchPlayingItem.Value == oldItem)
                     CurrentMatchPlayingItem.Value = APIRoom.Playlist[index];
+
+                RoomUpdated?.Invoke();
             }).ConfigureAwait(false);
         }
 
