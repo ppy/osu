@@ -3,9 +3,12 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.UI;
@@ -18,6 +21,19 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override string Description => "Where's the catcher?";
 
         public PeriodTracker BananaShowerPeriods;
+
+        [SettingSource(
+            "Hidden at combo",
+            "The combo count at which the catcher becomes completely hidden",
+            SettingControlType = typeof(SettingsSlider<int, HiddenComboSlider>)
+        )]
+        public override BindableInt HiddenComboCount { get; } = new BindableInt
+        {
+            Default = 10,
+            Value = 10,
+            MinValue = 0,
+            MaxValue = 50,
+        };
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
