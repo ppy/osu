@@ -294,6 +294,7 @@ namespace osu.Game.Screens.Edit
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding { Left = 10 },
                                                 Size = new Vector2(1),
+                                                Action = testGameplay
                                             }
                                         },
                                     }
@@ -521,7 +522,21 @@ namespace osu.Game.Screens.Edit
             ApplyToBackground(b => b.FadeColour(Color4.White, 500));
             resetTrack();
 
-            // To update the game-wide beatmap with any changes, perform a re-fetch on exit.
+            refetchBeatmap();
+
+            return base.OnExiting(next);
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            refetchBeatmap();
+
+            base.OnSuspending(next);
+        }
+
+        private void refetchBeatmap()
+        {
+            // To update the game-wide beatmap with any changes, perform a re-fetch on exit/suspend.
             // This is required as the editor makes its local changes via EditorBeatmap
             // (which are not propagated outwards to a potentially cached WorkingBeatmap).
             var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
@@ -531,8 +546,6 @@ namespace osu.Game.Screens.Edit
                 Logger.Log("Editor providing re-fetched beatmap post edit session");
                 Beatmap.Value = refetchedBeatmap;
             }
-
-            return base.OnExiting(next);
         }
 
         private void confirmExitWithSave()
@@ -761,6 +774,24 @@ namespace osu.Game.Screens.Edit
         {
             samplePlaybackDisabled.Value = false;
             loader?.CancelPendingDifficultySwitch();
+        }
+
+        private void testGameplay()
+        {
+            if (HasUnsavedChanges)
+            {
+                dialogOverlay.Push(new SaveBeforeGameplayTestDialog(() =>
+                {
+                    Save();
+                    pushEditorPlayer();
+                }));
+            }
+            else
+            {
+                pushEditorPlayer();
+            }
+
+            void pushEditorPlayer() => this.Push(new PlayerLoader(() => new EditorPlayer()));
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
