@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual
                 private readonly TestBeatmapManager testBeatmapManager;
 
                 public TestWorkingBeatmapCache(TestBeatmapManager testBeatmapManager, AudioManager audioManager, IResourceStore<byte[]> resourceStore, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost gameHost)
-                    : base(audioManager, resourceStore, storage, defaultBeatmap, gameHost)
+                    : base(testBeatmapManager.BeatmapTrackStore, audioManager, resourceStore, storage, defaultBeatmap, gameHost)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }
