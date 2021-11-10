@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             AddAssert("cursor must start visible", () => cursorAlphaAlmostEquals(1));
             AddUntilStep("wait for combo", () => Player.ScoreProcessor.Combo.Value >= 2);
             AddAssert("cursor must dim after combo", () => !cursorAlphaAlmostEquals(1));
-            AddStep("break combo", () => Player.ScoreProcessor.Combo.Set(0));
+            AddStep("break combo", () => Player.ScoreProcessor.Combo.Value = 0);
             AddUntilStep("wait for cursor to show", () => cursorAlphaAlmostEquals(1));
         }
 
