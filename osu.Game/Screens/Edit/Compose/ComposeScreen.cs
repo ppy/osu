@@ -28,7 +28,6 @@ namespace osu.Game.Screens.Edit.Compose
         [Resolved]
         private EditorClock clock { get; set; }
 
-        [Resolved(Name = nameof(Editor.Clipboard))]
         private Bindable<string> clipboard { get; set; }
 
         private HitObjectComposer composer;
@@ -75,6 +74,12 @@ namespace osu.Game.Screens.Edit.Compose
             Debug.Assert(ruleset != null);
 
             return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(content);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(EditorClipboard clipboard)
+        {
+            this.clipboard = clipboard.Content.GetBoundCopy();
         }
 
         protected override void LoadComplete()

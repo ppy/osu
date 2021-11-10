@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
@@ -27,8 +26,8 @@ namespace osu.Game.Tests.Visual.Editing
                 }
             });
 
-        [Cached(Name = nameof(Editor.Clipboard))]
-        private Bindable<string> clipboard = new Bindable<string>();
+        [Cached]
+        private EditorClipboard clipboard = new EditorClipboard();
 
         [BackgroundDependencyLoader]
         private void load()
