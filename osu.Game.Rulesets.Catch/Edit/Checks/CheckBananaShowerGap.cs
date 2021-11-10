@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks.Components;
@@ -15,8 +16,15 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
     /// </summary>
     public class CheckBananaShowerGap : ICheck
     {
-        private static readonly int[] spinner_start_delta_threshold = { 250, 250, 125, 125, 62, 62 };
-        private static readonly int[] spinner_end_delta_threshold = { 250, 250, 250, 125, 125, 125 };
+        private static readonly Dictionary<DifficultyRating, (int startGap, int endGap)> spinner_delta_threshold = new Dictionary<DifficultyRating, (int, int)>
+        {
+            [DifficultyRating.Easy] = (250, 250),
+            [DifficultyRating.Normal] = (250, 250),
+            [DifficultyRating.Hard] = (125, 250),
+            [DifficultyRating.Insane] = (125, 125),
+            [DifficultyRating.Expert] = (62, 125),
+            [DifficultyRating.ExpertPlus] = (62, 125)
+        };
 
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "Too short spinner gap");
 
@@ -29,9 +37,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var hitObjects = context.Beatmap.HitObjects;
-            int interpretedDifficulty = (int)context.InterpretedDifficulty;
-            int expectedStartDelta = spinner_start_delta_threshold[interpretedDifficulty];
-            int expectedEndDelta = spinner_end_delta_threshold[interpretedDifficulty];
+            (int expectedStartDelta, int expectedEndDelta) = spinner_delta_threshold[context.InterpretedDifficulty];
 
             for (int i = 0; i < hitObjects.Count - 1; ++i)
             {
