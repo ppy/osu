@@ -65,7 +65,7 @@ namespace osu.Game
         /// <summary>
         /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
         /// </summary>
-        internal const double GLOBAL_TRACK_VOLUME_ADJUST = 0.8;
+        private const double global_track_volume_adjust = 0.8;
 
         public bool UseDevelopmentServer { get; }
 
@@ -159,7 +159,7 @@ namespace osu.Game
 
         private Bindable<bool> fpsDisplayVisible;
 
-        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
+        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(global_track_volume_adjust);
 
         private RealmRulesetStore realmRulesetStore;
 
@@ -315,7 +315,7 @@ namespace osu.Game
             dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
-            dependencies.Cache(previewTrackManager = new PreviewTrackManager());
+            dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
             Add(previewTrackManager);
 
             AddInternal(MusicController = new MusicController());
