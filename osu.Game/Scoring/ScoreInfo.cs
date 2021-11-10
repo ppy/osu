@@ -225,7 +225,7 @@ namespace osu.Game.Scoring
             return clone;
         }
 
-        public override string ToString() => $"{User} playing {BeatmapInfo}";
+        public override string ToString() => this.GetDisplayTitle();
 
         public bool Equals(ScoreInfo other)
         {
