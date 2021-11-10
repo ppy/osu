@@ -387,7 +387,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 case QueueModes.HostOnly:
                     AddOrEditPlaylistButton.Text = "Edit beatmap";
-                    AddOrEditPlaylistButton.Alpha = client.Room.Host?.User?.Equals(client.LocalUser?.User) == true ? 1 : 0;
+                    AddOrEditPlaylistButton.Alpha = client.IsHost ? 1 : 0;
                     break;
 
                 case QueueModes.FreeForAll:
