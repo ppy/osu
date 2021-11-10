@@ -9,6 +9,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Tests.Visual.Spectator;
@@ -18,7 +19,7 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneCurrentlyPlayingDisplay : OsuTestScene
     {
-        private readonly User streamingUser = new User { Id = 2, Username = "Test user" };
+        private readonly APIUser streamingUser = new APIUser { Id = 2, Username = "Test user" };
 
         private TestSpectatorClient spectatorClient;
         private CurrentlyPlayingDisplay currentlyPlaying;
@@ -83,13 +84,13 @@ namespace osu.Game.Tests.Visual.Online
                 "pishifat"
             };
 
-            protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
+            protected override Task<APIUser> ComputeValueAsync(int lookup, CancellationToken token = default)
             {
                 // tests against failed lookups
                 if (lookup == 13)
-                    return Task.FromResult<User>(null);
+                    return Task.FromResult<APIUser>(null);
 
-                return Task.FromResult(new User
+                return Task.FromResult(new APIUser
                 {
                     Id = lookup,
                     Username = usernames[lookup % usernames.Length],

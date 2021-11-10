@@ -9,9 +9,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Tests.Visual;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Chat
 {
@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Chat
             }
         }
 
-        private Channel createChannel(int id, ChannelType type) => new Channel(new User())
+        private Channel createChannel(int id, ChannelType type) => new Channel(new APIUser())
         {
             Id = id,
             Name = $"Channel {id}",

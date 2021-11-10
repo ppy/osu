@@ -45,10 +45,10 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("import soleily", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()));
 
             AddUntilStep("wait for beatmap import", () => beatmaps.GetAllUsableBeatmapSets().Any(b => b.OnlineBeatmapSetID == 241526));
-            AddAssert("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
+            AddUntilStep("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
 
             createButtonWithBeatmap(createSoleily());
-            AddAssert("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
+            AddUntilStep("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
             ensureSoleilyRemoved();
             AddAssert("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
         }

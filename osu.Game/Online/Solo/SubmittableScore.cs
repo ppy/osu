@@ -10,7 +10,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Users;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Online.Solo
 {
@@ -48,7 +48,7 @@ namespace osu.Game.Online.Solo
         public APIMod[] Mods { get; set; }
 
         [JsonProperty("user")]
-        public User User { get; set; }
+        public APIUser User { get; set; }
 
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics { get; set; }
