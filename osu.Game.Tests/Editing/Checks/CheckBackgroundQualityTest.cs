@@ -111,6 +111,24 @@ namespace osu.Game.Tests.Editing.Checks
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooUncompressed);
         }
 
+        [Test]
+        public void TestStreamClosed()
+        {
+            var background = new Texture(1920, 1080);
+            var stream = new Mock<MemoryStream>(new byte[1024 * 1024]);
+
+            var mock = new Mock<IWorkingBeatmap>();
+            mock.SetupGet(w => w.Beatmap).Returns(beatmap);
+            mock.SetupGet(w => w.Background).Returns(background);
+            mock.Setup(w => w.GetStream(It.IsAny<string>())).Returns(stream.Object);
+
+            var context = new BeatmapVerifierContext(beatmap, mock.Object);
+
+            Assert.That(check.Run(context), Is.Empty);
+
+            stream.Verify(x => x.Close(), Times.Once());
+        }
+
         private BeatmapVerifierContext getContext(Texture background, [CanBeNull] byte[] fileBytes = null)
         {
             return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(background, fileBytes).Object);
