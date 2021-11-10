@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
             AddAssert("catcher must start visible", () => catcherAlphaAlmostEquals(1));
             AddUntilStep("wait for combo", () => Player.ScoreProcessor.Combo.Value >= 2);
             AddAssert("catcher must dim after combo", () => !catcherAlphaAlmostEquals(1));
-            AddStep("break combo", () => Player.ScoreProcessor.Combo.Set(0));
+            AddStep("break combo", () => Player.ScoreProcessor.Combo.Value = 0);
             AddUntilStep("wait for catcher to show", () => catcherAlphaAlmostEquals(1));
         }
 
