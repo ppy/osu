@@ -63,7 +63,7 @@ namespace osu.Game.Online.Multiplayer
                     connection.On<int, MatchUserState>(nameof(IMultiplayerClient.MatchUserStateChanged), ((IMultiplayerClient)this).MatchUserStateChanged);
                     connection.On<MatchServerEvent>(nameof(IMultiplayerClient.MatchEvent), ((IMultiplayerClient)this).MatchEvent);
                     connection.On<APIPlaylistItem>(nameof(IMultiplayerClient.PlaylistItemAdded), ((IMultiplayerClient)this).PlaylistItemAdded);
-                    connection.On<APIPlaylistItem>(nameof(IMultiplayerClient.PlaylistItemRemoved), ((IMultiplayerClient)this).PlaylistItemRemoved);
+                    connection.On<long>(nameof(IMultiplayerClient.PlaylistItemRemoved), ((IMultiplayerClient)this).PlaylistItemRemoved);
                     connection.On<APIPlaylistItem>(nameof(IMultiplayerClient.PlaylistItemChanged), ((IMultiplayerClient)this).PlaylistItemChanged);
                 };
 
@@ -159,12 +159,12 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.AddPlaylistItem), item);
         }
 
-        public override Task RemovePlaylistItem(APIPlaylistItem item)
+        public override Task RemovePlaylistItem(long playlistItemId)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.RemovePlaylistItem), item);
+            return connection.InvokeAsync(nameof(IMultiplayerServer.RemovePlaylistItem), playlistItemId);
         }
 
         protected override Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
