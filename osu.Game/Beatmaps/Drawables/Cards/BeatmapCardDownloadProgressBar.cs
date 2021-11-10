@@ -21,8 +21,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public override bool IsPresent => true;
 
         private readonly BeatmapDownloadTracker tracker;
-        private readonly Box background;
-        private readonly Box foreground;
+        private readonly CircularContainer background;
+        private readonly CircularContainer foreground;
+
+        private readonly Box backgroundFill;
+        private readonly Box foregroundFill;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -35,13 +38,23 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             InternalChildren = new Drawable[]
             {
                 tracker = new BeatmapDownloadTracker(beatmapSet),
-                background = new Box
+                background = new CircularContainer
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Child = backgroundFill = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
                 },
-                foreground = new Box
+                foreground = new CircularContainer
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Child = foregroundFill = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
                 }
             };
         }
@@ -49,7 +62,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [BackgroundDependencyLoader]
         private void load()
         {
-            background.Colour = colourProvider.Background6;
+            backgroundFill.Colour = colourProvider.Background6;
         }
 
         protected override void LoadComplete()
@@ -66,12 +79,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             {
                 case DownloadState.Downloading:
                     FinishTransforms(true);
-                    foreground.Colour = colourProvider.Highlight1;
+                    foregroundFill.Colour = colourProvider.Highlight1;
                     isActive.Value = true;
                     break;
 
                 case DownloadState.Importing:
-                    foreground.FadeColour(colours.Yellow, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+                    foregroundFill.FadeColour(colours.Yellow, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
                     isActive.Value = true;
                     break;
 
