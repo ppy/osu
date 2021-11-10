@@ -307,7 +307,7 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task AddPlaylistItem(APIPlaylistItem item);
 
-        public abstract Task RemovePlaylistItem(APIPlaylistItem item);
+        public abstract Task RemovePlaylistItem(long playlistItemId);
 
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
         {
@@ -613,7 +613,7 @@ namespace osu.Game.Online.Multiplayer
             }).ConfigureAwait(false);
         }
 
-        public Task PlaylistItemRemoved(APIPlaylistItem item)
+        public Task PlaylistItemRemoved(long playlistItemId)
         {
             if (Room == null)
                 return Task.CompletedTask;
@@ -625,7 +625,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
-                APIRoom.Playlist.RemoveAll(i => i.ID == item.ID);
+                APIRoom.Playlist.RemoveAll(i => i.ID == playlistItemId);
                 RoomUpdated?.Invoke();
             });
         }
