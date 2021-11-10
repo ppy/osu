@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MessagePack;
@@ -10,6 +11,8 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online.Rooms
 {
+    [Serializable]
+    [MessagePackObject]
     public class APIPlaylistItem
     {
         [Key(0)]
