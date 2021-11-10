@@ -103,8 +103,8 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private MusicController music { get; set; }
 
-        [Cached(Name = nameof(Clipboard))]
-        public readonly Bindable<string> Clipboard = new Bindable<string>();
+        [Cached]
+        public readonly EditorClipboard Clipboard = new EditorClipboard();
 
         public Editor(EditorLoader loader = null)
         {
@@ -317,7 +317,7 @@ namespace osu.Game.Screens.Edit
         public void RestoreState([NotNull] EditorState state) => Schedule(() =>
         {
             clock.Seek(state.Time);
-            Clipboard.Value = state.ClipboardContent;
+            Clipboard.Content.Value = state.ClipboardContent;
         });
 
         protected void Save()
@@ -743,7 +743,7 @@ namespace osu.Game.Screens.Edit
         protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
         {
             Time = clock.CurrentTimeAccurate,
-            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Value : string.Empty
+            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
         });
 
         private void cancelExit()
