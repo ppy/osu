@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             MaxValue = 50,
         };
 
-        public virtual void Update(Playfield playfield)
+        public void Update(Playfield playfield)
         {
             var catchPlayfield = (CatchPlayfield)playfield;
             bool shouldAlwaysShowCatcher = IsBreakTime.Value;
