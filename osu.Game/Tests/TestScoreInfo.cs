@@ -3,12 +3,12 @@
 
 using System;
 using System.Linq;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Users;
 
 namespace osu.Game.Tests
 {
@@ -16,7 +16,7 @@ namespace osu.Game.Tests
     {
         public TestScoreInfo(RulesetInfo ruleset, bool excessMods = false)
         {
-            User = new User
+            User = new APIUser
             {
                 Id = 2,
                 Username = "peppy",

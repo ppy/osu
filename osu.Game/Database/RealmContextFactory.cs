@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
@@ -35,8 +36,9 @@ namespace osu.Game.Database
         /// 6  First tracked version (~20211018)
         /// 7  Changed OnlineID fields to non-nullable to add indexing support (20211018)
         /// 8  Rebind scroll adjust keys to not have control modifier (20211029)
+        /// 9  Converted BeatmapMetadata.Author from string to RealmUser (20211104)
         /// </summary>
-        private const int schema_version = 8;
+        private const int schema_version = 9;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
@@ -151,50 +153,86 @@ namespace osu.Game.Database
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
         {
-            if (lastSchemaVersion < 8)
+            for (ulong i = lastSchemaVersion; i <= schema_version; i++)
+                applyMigrationsForVersion(migration, i);
+        }
+
+        private void applyMigrationsForVersion(Migration migration, ulong version)
+        {
+            switch (version)
             {
-                // Ctrl -/+ now adjusts UI scale so let's clear any bindings which overlap these combinations.
-                // New defaults will be populated by the key store afterwards.
-                var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
+                case 7:
+                    convertOnlineIDs<RealmBeatmap>();
+                    convertOnlineIDs<RealmBeatmapSet>();
+                    convertOnlineIDs<RealmRuleset>();
 
-                var increaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.IncreaseScrollSpeed);
-                if (increaseSpeedBinding != null && increaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Plus }))
-                    migration.NewRealm.Remove(increaseSpeedBinding);
+                    void convertOnlineIDs<T>() where T : RealmObject
+                    {
+                        string className = getMappedOrOriginalName(typeof(T));
 
-                var decreaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.DecreaseScrollSpeed);
-                if (decreaseSpeedBinding != null && decreaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Minus }))
-                    migration.NewRealm.Remove(decreaseSpeedBinding);
-            }
+                        // version was not bumped when the beatmap/ruleset models were added
+                        // therefore we must manually check for their presence to avoid throwing on the `DynamicApi` calls.
+                        if (!migration.OldRealm.Schema.TryFindObjectSchema(className, out _))
+                            return;
 
-            if (lastSchemaVersion < 7)
-            {
-                convertOnlineIDs<RealmBeatmap>();
-                convertOnlineIDs<RealmBeatmapSet>();
-                convertOnlineIDs<RealmRuleset>();
+                        var oldItems = migration.OldRealm.DynamicApi.All(className);
+                        var newItems = migration.NewRealm.DynamicApi.All(className);
 
-                void convertOnlineIDs<T>() where T : RealmObject
-                {
-                    string className = typeof(T).Name.Replace(@"Realm", string.Empty);
+                        int itemCount = newItems.Count();
 
-                    // version was not bumped when the beatmap/ruleset models were added
-                    // therefore we must manually check for their presence to avoid throwing on the `DynamicApi` calls.
-                    if (!migration.OldRealm.Schema.TryFindObjectSchema(className, out _))
+                        for (int i = 0; i < itemCount; i++)
+                        {
+                            dynamic? oldItem = oldItems.ElementAt(i);
+                            dynamic? newItem = newItems.ElementAt(i);
+
+                            long? nullableOnlineID = oldItem?.OnlineID;
+                            newItem.OnlineID = (int)(nullableOnlineID ?? -1);
+                        }
+                    }
+
+                    break;
+
+                case 8:
+                    // Ctrl -/+ now adjusts UI scale so let's clear any bindings which overlap these combinations.
+                    // New defaults will be populated by the key store afterwards.
+                    var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
+
+                    var increaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.IncreaseScrollSpeed);
+                    if (increaseSpeedBinding != null && increaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Plus }))
+                        migration.NewRealm.Remove(increaseSpeedBinding);
+
+                    var decreaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.DecreaseScrollSpeed);
+                    if (decreaseSpeedBinding != null && decreaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Minus }))
+                        migration.NewRealm.Remove(decreaseSpeedBinding);
+
+                    break;
+
+                case 9:
+                    // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
+                    string metadataClassName = getMappedOrOriginalName(typeof(RealmBeatmapMetadata));
+
+                    // May be coming from a version before `RealmBeatmapMetadata` existed.
+                    if (!migration.OldRealm.Schema.TryFindObjectSchema(metadataClassName, out _))
                         return;
 
-                    var oldItems = migration.OldRealm.DynamicApi.All(className);
-                    var newItems = migration.NewRealm.DynamicApi.All(className);
+                    var oldMetadata = migration.OldRealm.DynamicApi.All(metadataClassName);
+                    var newMetadata = migration.NewRealm.All<RealmBeatmapMetadata>();
 
-                    int itemCount = newItems.Count();
+                    int metadataCount = newMetadata.Count();
 
-                    for (int i = 0; i < itemCount; i++)
+                    for (int i = 0; i < metadataCount; i++)
                     {
-                        dynamic? oldItem = oldItems.ElementAt(i);
-                        dynamic? newItem = newItems.ElementAt(i);
+                        dynamic? oldItem = oldMetadata.ElementAt(i);
+                        var newItem = newMetadata.ElementAt(i);
 
-                        long? nullableOnlineID = oldItem?.OnlineID;
-                        newItem.OnlineID = (int)(nullableOnlineID ?? -1);
+                        string username = oldItem.Author;
+                        newItem.Author = new RealmUser
+                        {
+                            Username = username
+                        };
                     }
-                }
+
+                    break;
             }
         }
 
@@ -251,6 +289,9 @@ namespace osu.Game.Database
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
             });
         }
+
+        // https://github.com/realm/realm-dotnet/blob/32f4ebcc88b3e80a3b254412665340cd9f3bd6b5/Realm/Realm/Extensions/ReflectionExtensions.cs#L46
+        private static string getMappedOrOriginalName(MemberInfo member) => member.GetCustomAttribute<MapToAttribute>()?.Mapping ?? member.Name;
 
         private bool isDisposed;
 
