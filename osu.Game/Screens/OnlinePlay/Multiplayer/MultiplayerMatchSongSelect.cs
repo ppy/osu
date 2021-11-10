@@ -59,6 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.AddPlaylistItem(new APIPlaylistItem
                 {
                     BeatmapID = item.BeatmapID,
+                    BeatmapChecksum = item.Beatmap.Value.MD5Hash,
                     RulesetID = item.RulesetID,
                     RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray(),
                     AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray()
