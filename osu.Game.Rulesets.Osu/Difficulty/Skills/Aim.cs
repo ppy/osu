@@ -14,9 +14,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-        public Aim(Mod[] mods)
+        public Aim(Mod[] mods, bool withSliders)
             : base(mods)
         {
+            this.withSliders = withSliders;
         }
 
         protected override int HistoryLength => 2;
@@ -30,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplier => 23.25;
         private double strainDecayBase => 0.15;
+
+        private bool withSliders = true;
 
         private double strainValueOf(DifficultyHitObject current)
         {
@@ -135,7 +138,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
 
             // Add in additional slider velocity bonus.
-            aimStrain += sliderBonus * slider_multiplier;
+            if (withSliders)
+                aimStrain += sliderBonus * slider_multiplier;
 
             return aimStrain;
         }

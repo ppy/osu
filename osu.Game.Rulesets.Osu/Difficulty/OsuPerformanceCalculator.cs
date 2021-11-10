@@ -125,6 +125,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
             }
 
+            // Estimate the number of sliderends dropped
+            double estimateSliderEndsDropped = Math.Min(Attributes.SliderCount, Math.Min(countOk + countMeh + countMiss, Attributes.MaxCombo - scoreMaxCombo));
+            aimValue *= 1 - (((1 - Attributes.SliderFactor) * estimateSliderEndsDropped) / Attributes.SliderCount); 
+
             aimValue *= accuracy;
             // It is important to also consider accuracy difficulty when doing that.
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
