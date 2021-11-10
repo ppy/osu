@@ -88,7 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             });
         }
 
-        private int? displayedTeam;
+        public int? DisplayedTeam { get; private set; }
 
         protected override void OnRoomUpdated()
         {
@@ -102,19 +102,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             int? newTeam = (userRoomState as TeamVersusUserState)?.TeamID;
 
-            if (newTeam == displayedTeam)
+            if (newTeam == DisplayedTeam)
                 return;
 
             // only play the sample if an already valid team changes to another valid team.
             // this avoids playing a sound for each user if the match type is changed to/from a team mode.
-            if (newTeam != null && displayedTeam != null)
+            if (newTeam != null && DisplayedTeam != null)
                 sampleTeamSwap?.Play();
 
-            displayedTeam = newTeam;
+            DisplayedTeam = newTeam;
 
-            if (displayedTeam != null)
+            if (DisplayedTeam != null)
             {
-                box.FadeColour(getColourForTeam(displayedTeam.Value), duration, Easing.OutQuint);
+                box.FadeColour(getColourForTeam(DisplayedTeam.Value), duration, Easing.OutQuint);
                 box.ScaleTo(new Vector2(box.Scale.X < 0 ? 1 : -1, 1), duration, Easing.OutQuint);
 
                 this.ScaleTo(Vector2.One, duration, Easing.OutQuint);
