@@ -17,6 +17,8 @@ namespace osu.Game.Tests.Models
     {
         private static readonly object[][] test_cases =
         {
+            new object[] { makeNoMetadataMockBeatmapSet(), "unknown artist - unknown title" },
+            new object[] { makeNoAuthorMockBeatmapSet(), "artist - title" },
             new object[] { makeMockBeatmapSet(), "artist - title (author)" },
             new object[] { makeMockBeatmap(), "artist - title (author) [difficulty]" },
             new object[] { makeMockMetadata(), "artist - title (author)" },
@@ -28,6 +30,26 @@ namespace osu.Game.Tests.Models
 
         [TestCaseSource(nameof(test_cases))]
         public void TestDisplayString(object model, string expected) => Assert.That(model.GetDisplayString(), Is.EqualTo(expected));
+
+        private static IBeatmapSetInfo makeNoAuthorMockBeatmapSet()
+        {
+            var mock = new Mock<IBeatmapSetInfo>();
+
+            mock.Setup(m => m.Metadata.Artist).Returns("artist");
+            mock.Setup(m => m.Metadata.Title).Returns("title");
+            mock.Setup(m => m.Metadata.Author.Username).Returns(string.Empty);
+
+            return mock.Object;
+        }
+
+        private static IBeatmapSetInfo makeNoMetadataMockBeatmapSet()
+        {
+            var mock = new Mock<IBeatmapSetInfo>();
+
+            mock.Setup(m => m.Metadata).Returns(new BeatmapMetadata());
+
+            return mock.Object;
+        }
 
         private static IBeatmapSetInfo makeMockBeatmapSet()
         {
