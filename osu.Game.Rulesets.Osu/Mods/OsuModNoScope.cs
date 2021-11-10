@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             spinnerPeriods = new PeriodTracker(beatmap.HitObjects.OfType<Spinner>().Select(b => new Period(b.StartTime - TRANSITION_DURATION, b.EndTime)));
         }
 
-        public virtual void Update(Playfield playfield)
+        public void Update(Playfield playfield)
         {
             bool shouldAlwaysShowCursor = IsBreakTime.Value || spinnerPeriods.IsInAny(playfield.Clock.CurrentTime);
             float targetAlpha = shouldAlwaysShowCursor ? 1 : ComboBasedAlpha;
