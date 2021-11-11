@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.withSliders = withSliders;
         }
 
+        private readonly bool withSliders;
+
         protected override int HistoryLength => 2;
 
         private const double wide_angle_multiplier = 1.5;
@@ -31,8 +33,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplier => 23.25;
         private double strainDecayBase => 0.15;
-
-        private bool withSliders = true;
 
         private double strainValueOf(DifficultyHitObject current)
         {
