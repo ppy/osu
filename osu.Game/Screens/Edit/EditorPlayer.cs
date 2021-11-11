@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Screens;
+using osu.Game.Overlays;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit
@@ -12,6 +14,9 @@ namespace osu.Game.Screens.Edit
             : base(new PlayerConfiguration { ShowResults = false })
         {
         }
+
+        [Resolved]
+        private MusicController musicController { get; set; }
 
         protected override void LoadComplete()
         {
@@ -29,5 +34,11 @@ namespace osu.Game.Screens.Edit
         }
 
         protected override bool CheckModsAllowFailure() => false; // never fail.
+
+        public override bool OnExiting(IScreen next)
+        {
+            musicController.Stop();
+            return base.OnExiting(next);
+        }
     }
 }
