@@ -127,9 +127,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("room type is head to head", () => client.Room?.Settings.MatchType == MatchType.HeadToHead);
 
+            AddUntilStep("team displays are not displaying teams", () => multiplayerScreenStack.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam == null));
+
             AddStep("change to team vs", () => client.ChangeSettings(matchType: MatchType.TeamVersus));
 
             AddAssert("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
+
+            AddUntilStep("team displays are displaying teams", () => multiplayerScreenStack.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam != null));
         }
 
         private void createRoom(Func<Room> room)
