@@ -105,6 +105,8 @@ namespace osu.Game.Screens.Select
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
+        private double audioFeedbackLastPlaybackTime;
+
         [Resolved]
         private MusicController music { get; set; }
 
@@ -480,12 +482,14 @@ namespace osu.Game.Screens.Select
 
             if (beatmap != beatmapInfoPrevious)
             {
-                if (beatmap != null && beatmapInfoPrevious != null)
+                if (beatmap != null && beatmapInfoPrevious != null && Time.Current - audioFeedbackLastPlaybackTime >= 50)
                 {
                     if (beatmap.BeatmapSetInfoID == beatmapInfoPrevious.BeatmapSetInfoID)
                         sampleChangeDifficulty.Play();
                     else
                         sampleChangeBeatmap.Play();
+
+                    audioFeedbackLastPlaybackTime = Time.Current;
                 }
 
                 beatmapInfoPrevious = beatmap;
