@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Title = $"{ruleset.ShortName}Title"
                     },
                     Ruleset = ruleset,
-                    StarDifficulty = 6,
+                    StarRating = 6,
                     Version = $"{ruleset.ShortName}Version",
                     BaseDifficulty = new BeatmapDifficulty()
                 },
