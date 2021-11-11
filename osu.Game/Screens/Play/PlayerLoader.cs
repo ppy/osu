@@ -356,7 +356,7 @@ namespace osu.Game.Screens.Play
             content.FadeInFromZero(400);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
             lowPassFilter.CutoffTo(1000, 650, Easing.OutQuint);
-            highPassFilter.CutoffTo(300);
+            highPassFilter.CutoffTo(150);
 
             ApplyToBackground(b => b?.FadeColour(Color4.White, 800, Easing.OutQuint));
         }
