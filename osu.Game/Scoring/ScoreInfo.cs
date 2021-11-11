@@ -14,6 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
 using osu.Game.Utils;
 
 namespace osu.Game.Scoring
@@ -261,6 +262,7 @@ namespace osu.Game.Scoring
 
         IBeatmapInfo IScoreInfo.Beatmap => BeatmapInfo;
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
+        IUser IScoreInfo.User => User;
         bool IScoreInfo.HasReplay => Files.Any();
 
         #endregion
