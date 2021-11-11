@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.Play.HUD
 
             valid.Value = unstableRate != null;
             if (unstableRate != null)
-                Current.Value = (int)unstableRate.Value;
+                Current.Value = (int)Math.Round(unstableRate.Value);
         }
 
         protected override IHasText CreateText() => new TextComponent
