@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (Attributes.SliderCount > 0)
             {
-                double estimateSliderEndsDropped = Math.Min(Math.Min(countOk + countMeh + countMiss, Attributes.MaxCombo - scoreMaxCombo), estimateDifficultSliders);
+                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, Attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
                 double sliderNerfFactor = (1 - Attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + Attributes.SliderFactor;
                 aimValue *= sliderNerfFactor;
             }
