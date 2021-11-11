@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     BaseDifficulty = new BeatmapDifficulty(),
                     Ruleset = ruleset,
                     StarRating = difficultyIndex + 1,
-                    Version = $"SR{difficultyIndex + 1}"
+                    DifficultyName = $"SR{difficultyIndex + 1}"
                 }).ToList()
             };
 
