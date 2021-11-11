@@ -4,12 +4,10 @@
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-    <DefaultMtouchExtraArgs>--nolinkaway</DefaultMtouchExtraArgs>
-    <DefaultMtouchGccFlags>-lstdc++ -lbz2 -framework AudioToolbox -framework AVFoundation -framework CoreMedia -framework VideoToolbox -framework SystemConfiguration -framework CFNetwork -framework Accelerate</DefaultMtouchGccFlags>
     <OutputPath>bin\$(Platform)\$(Configuration)</OutputPath>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
     <OptimizePNGs>false</OptimizePNGs>
-    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -gcc_flags "$(DefaultMtouchGccFlags)"</MtouchExtraArgs>
+    <MtouchExtraArgs>--nolinkaway</MtouchExtraArgs>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
     <CodesignKey>iPhone Developer</CodesignKey>
@@ -49,18 +47,6 @@
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <IOSDebuggerPort>28126</IOSDebuggerPort>
   </PropertyGroup>
-  <ItemGroup>
-    <NativeReference Include="$(OutputPath)\libbass.a;$(OutputPath)\libbass_fx.a">
-      <Kind>Static</Kind>
-      <SmartLink>False</SmartLink>
-      <ForceLoad>True</ForceLoad>
-    </NativeReference>
-    <NativeReference Include="$(OutputPath)\libavcodec.a;$(OutputPath)\libavdevice.a;$(OutputPath)\libavfilter.a;$(OutputPath)\libavformat.a;$(OutputPath)\libavutil.a;$(OutputPath)\libswresample.a;$(OutputPath)\libswscale.a">
-      <Kind>Static</Kind>
-      <SmartLink>False</SmartLink>
-      <ForceLoad>True</ForceLoad>
-    </NativeReference>
-  </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
