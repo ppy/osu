@@ -158,7 +158,10 @@ namespace osu.Game.Screens.Play.HUD
             base.Dispose(isDisposing);
 
             if (scoreProcessor != null)
+            {
                 scoreProcessor.NewJudgement -= onJudgementChanged;
+                scoreProcessor.JudgementReverted -= onJudgementChanged;
+            }
 
             loadCancellationSource?.Cancel();
         }
