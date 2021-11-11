@@ -73,9 +73,9 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
             RunGameplay();
 
             AddStep("change queue mode", () => Client.ChangeSettings(queueMode: QueueModes.HostOnly));
-            AddAssert("playlist has 1 item", () => Client.APIRoom?.Playlist.Count == 1);
-            AddAssert("playlist item is the same as last selected", () => Client.APIRoom?.Playlist[0].Beatmap.Value.OnlineID == OtherBeatmap.OnlineID);
-            AddAssert("playlist item is not expired", () => Client.APIRoom?.Playlist[0].Expired == false);
+            AddAssert("playlist has 2 items", () => Client.APIRoom?.Playlist.Count == 2);
+            AddAssert("playlist item is the other beatmap", () => Client.CurrentMatchPlayingItem.Value?.BeatmapID == OtherBeatmap.OnlineID);
+            AddAssert("playlist item is not expired", () => Client.APIRoom?.Playlist[1].Expired == false);
         }
 
         private void addItem(Func<BeatmapInfo> beatmap)

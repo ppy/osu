@@ -209,29 +209,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(Room != null);
             Debug.Assert(APIRoom != null);
 
-            switch (Room.Settings.QueueMode, settings.QueueMode)
-            {
-                case (QueueModes.HostOnly, QueueModes.HostOnly):
-                    break;
+            // Server is authoritative for the time being.
+            settings.PlaylistItemId = Room.Settings.PlaylistItemId;
 
-                // Host-only is incompatible with other queueing modes, so expire all non-expired items.
-                case (QueueModes.HostOnly, _):
-                case (_, QueueModes.HostOnly):
-                    foreach (var playlistItem in APIRoom.Playlist.Where(i => !i.Expired).ToArray())
-                    {
-                        playlistItem.Expired = true;
-                        await ((IMultiplayerClient)this).PlaylistItemChanged(new APIPlaylistItem(playlistItem)).ConfigureAwait(false);
-                    }
-
-                    break;
-            }
-
-            await ((IMultiplayerClient)this).SettingsChanged(settings).ConfigureAwait(false);
-
-            foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
-                ChangeUserState(user.UserID, MultiplayerUserState.Idle);
-
-            await changeMatchType(settings.MatchType).ConfigureAwait(false);
+            await changeSettings(settings).ConfigureAwait(false);
         }
 
         public override Task ChangeState(MultiplayerUserState newState)
@@ -344,6 +325,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.FromResult(apiSet);
         }
 
+        private async Task changeSettings(MultiplayerRoomSettings settings)
+        {
+            Debug.Assert(Room != null);
+            Debug.Assert(APIRoom != null);
+
+            if (settings.QueueMode == QueueModes.HostOnly)
+            {
+                foreach (var playlistItem in APIRoom.Playlist.Where(i => !i.Expired && i.ID != Room.Settings.PlaylistItemId).ToArray())
+                {
+                    APIRoom.Playlist.Remove(playlistItem);
+                    await ((IMultiplayerClient)this).PlaylistItemRemoved(playlistItem.ID).ConfigureAwait(false);
+                }
+            }
+
+            await ((IMultiplayerClient)this).SettingsChanged(settings).ConfigureAwait(false);
+
+            foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
+                ChangeUserState(user.UserID, MultiplayerUserState.Idle);
+
+            await changeMatchType(settings.MatchType).ConfigureAwait(false);
+        }
+
         private async Task changeMatchType(MatchType type)
         {
             Debug.Assert(Room != null);
@@ -417,7 +420,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (nextId != Room.Settings.PlaylistItemId)
             {
                 Room.Settings.PlaylistItemId = nextId;
-                await ChangeSettings(Room.Settings).ConfigureAwait(false);
+                await changeSettings(Room.Settings).ConfigureAwait(false);
             }
         }
     }
