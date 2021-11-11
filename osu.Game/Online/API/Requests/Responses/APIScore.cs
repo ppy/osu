@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -150,6 +151,11 @@ namespace osu.Game.Online.API.Requests.Responses
         public IRulesetInfo Ruleset => new RulesetInfo { OnlineID = RulesetID };
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => throw new NotImplementedException();
 
+        #region Implementation of IScoreInfo
+
         IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
+        IUser IScoreInfo.User => User;
+
+        #endregion
     }
 }
