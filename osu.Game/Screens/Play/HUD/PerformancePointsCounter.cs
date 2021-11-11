@@ -92,6 +92,9 @@ namespace osu.Game.Screens.Play.HUD
                 scoreProcessor.NewJudgement += onJudgementChanged;
                 scoreProcessor.JudgementReverted += onJudgementChanged;
             }
+
+            if (gameplayState?.LastJudgementResult.Value != null)
+                onJudgementChanged(gameplayState.LastJudgementResult.Value);
         }
 
         private bool isValid;
