@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
                 editorBeatmap.BeatmapInfo.Metadata.Artist = "artist";
                 editorBeatmap.BeatmapInfo.Metadata.Title = "title";
             });
-            AddStep("Set difficulty name", () => editorBeatmap.BeatmapInfo.Version = "difficulty");
+            AddStep("Set difficulty name", () => editorBeatmap.BeatmapInfo.DifficultyName = "difficulty");
 
             checkMutations();
 
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
                 return Precision.AlmostEquals(taikoDifficulty.SliderMultiplier, 2);
             });
             AddAssert("Beatmap has correct metadata", () => editorBeatmap.BeatmapInfo.Metadata.Artist == "artist" && editorBeatmap.BeatmapInfo.Metadata.Title == "title");
-            AddAssert("Beatmap has correct difficulty name", () => editorBeatmap.BeatmapInfo.Version == "difficulty");
+            AddAssert("Beatmap has correct difficulty name", () => editorBeatmap.BeatmapInfo.DifficultyName == "difficulty");
         }
     }
 }

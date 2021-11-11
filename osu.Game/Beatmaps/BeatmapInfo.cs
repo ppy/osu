@@ -134,12 +134,12 @@ namespace osu.Game.Beatmaps
         public double TimelineZoom { get; set; }
 
         // Metadata
-        public string Version { get; set; }
-
-        private string versionString => string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+        [Column("Version")]
+        public string DifficultyName { get; set; }
 
         [JsonProperty("difficulty_rating")]
-        public double StarDifficulty { get; set; }
+        [Column("StarDifficulty")]
+        public double StarRating { get; set; }
 
         /// <summary>
         /// Currently only populated for beatmap deletion. Use <see cref="ScoreManager"/> to query scores.
@@ -147,7 +147,7 @@ namespace osu.Game.Beatmaps
         public List<ScoreInfo> Scores { get; set; }
 
         [JsonIgnore]
-        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
+        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarRating);
 
         public override string ToString() => this.GetDisplayTitle();
 
@@ -183,9 +183,6 @@ namespace osu.Game.Beatmaps
         #region Implementation of IBeatmapInfo
 
         [JsonIgnore]
-        string IBeatmapInfo.DifficultyName => Version;
-
-        [JsonIgnore]
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata ?? BeatmapSet?.Metadata ?? new BeatmapMetadata();
 
         [JsonIgnore]
@@ -196,9 +193,6 @@ namespace osu.Game.Beatmaps
 
         [JsonIgnore]
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
-
-        [JsonIgnore]
-        double IBeatmapInfo.StarRating => StarDifficulty;
 
         #endregion
     }
