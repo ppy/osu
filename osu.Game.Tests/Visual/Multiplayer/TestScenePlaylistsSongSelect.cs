@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Ruleset = new OsuRuleset().RulesetInfo,
                     OnlineBeatmapID = beatmapId,
-                    Version = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
+                    DifficultyName = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                     Length = length,
                     BPM = bpm,
                     BaseDifficulty = new BeatmapDifficulty

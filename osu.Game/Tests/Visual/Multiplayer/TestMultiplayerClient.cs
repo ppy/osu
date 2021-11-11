@@ -72,6 +72,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // We want the user to be immediately available for testing, so force a scheduler update to run the update-bound continuation.
             Scheduler.Update();
+
+            switch (Room?.MatchState)
+            {
+                case TeamVersusRoomState teamVersus:
+                    Debug.Assert(Room != null);
+
+                    // simulate the server's automatic assignment of users to teams on join.
+                    // the "best" team is the one with the least users on it.
+                    int bestTeam = teamVersus.Teams
+                                             .Select(team => (teamID: team.ID, userCount: Room.Users.Count(u => (u.MatchState as TeamVersusUserState)?.TeamID == team.ID)))
+                                             .OrderBy(pair => pair.userCount)
+                                             .First().teamID;
+                    ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, new TeamVersusUserState { TeamID = bestTeam }).Wait();
+                    break;
+            }
         }
 
         public void RemoveUser(APIUser user)
