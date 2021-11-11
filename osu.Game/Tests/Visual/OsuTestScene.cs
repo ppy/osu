@@ -229,7 +229,7 @@ namespace osu.Game.Tests.Visual
                         AuthorID = beatmap.Metadata.Author.OnlineID,
                         RulesetID = beatmap.RulesetID,
                         StarRating = beatmap.StarRating,
-                        DifficultyName = beatmap.Version,
+                        DifficultyName = beatmap.DifficultyName,
                     }
                 }
             };

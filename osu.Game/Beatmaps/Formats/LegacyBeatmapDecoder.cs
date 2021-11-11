@@ -251,7 +251,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Version":
-                    beatmap.BeatmapInfo.Version = pair.Value;
+                    beatmap.BeatmapInfo.DifficultyName = pair.Value;
                     break;
 
                 case @"Source":

@@ -34,7 +34,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 Source = "unit tests",
                 Tags = "look for tags too",
             },
-            Version = "version as well",
+            DifficultyName = "version as well",
             Length = 2500,
             BPM = 160,
             BeatDivisor = 12,

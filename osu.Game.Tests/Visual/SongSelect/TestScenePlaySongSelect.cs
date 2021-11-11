@@ -919,7 +919,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     Ruleset = getRuleset(),
                     OnlineBeatmapID = beatmapId,
-                    Version = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
+                    DifficultyName = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                     Length = length,
                     BPM = bpm,
                     BaseDifficulty = new BeatmapDifficulty

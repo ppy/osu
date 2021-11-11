@@ -215,7 +215,7 @@ namespace osu.Game.Beatmaps
                     var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
 
                     // metadata may have changed; update the path with the standard format.
-                    beatmapInfo.Path = GetValidFilename($"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu");
+                    beatmapInfo.Path = GetValidFilename($"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.DifficultyName}].osu");
 
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 

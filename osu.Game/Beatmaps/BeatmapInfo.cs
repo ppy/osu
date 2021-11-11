@@ -134,9 +134,8 @@ namespace osu.Game.Beatmaps
         public double TimelineZoom { get; set; }
 
         // Metadata
-        public string Version { get; set; }
-
-        private string versionString => string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+        [Column("Version")]
+        public string DifficultyName { get; set; }
 
         [JsonProperty("difficulty_rating")]
         [Column("StarDifficulty")]
@@ -182,9 +181,6 @@ namespace osu.Game.Beatmaps
         #endregion
 
         #region Implementation of IBeatmapInfo
-
-        [JsonIgnore]
-        string IBeatmapInfo.DifficultyName => Version;
 
         [JsonIgnore]
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata ?? BeatmapSet?.Metadata ?? new BeatmapMetadata();

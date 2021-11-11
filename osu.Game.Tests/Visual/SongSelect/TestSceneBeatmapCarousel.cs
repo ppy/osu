@@ -684,7 +684,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     set.Beatmaps.Add(new BeatmapInfo
                     {
-                        Version = $"Stars: {i}",
+                        DifficultyName = $"Stars: {i}",
                         Ruleset = new OsuRuleset().RulesetInfo,
                         StarRating = i,
                     });
@@ -868,7 +868,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 yield return new BeatmapInfo
                 {
                     OnlineBeatmapID = id++ * 10,
-                    Version = version,
+                    DifficultyName = version,
                     StarRating = diff,
                     Ruleset = new OsuRuleset().RulesetInfo,
                     BaseDifficulty = new BeatmapDifficulty
@@ -902,7 +902,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     OnlineBeatmapID = b * 10,
                     Path = $"extra{b}.osu",
-                    Version = $"Extra {b}",
+                    DifficultyName = $"Extra {b}",
                     Ruleset = rulesets.GetRuleset((b - 1) % 4),
                     StarRating = 2,
                     BaseDifficulty = new BeatmapDifficulty
