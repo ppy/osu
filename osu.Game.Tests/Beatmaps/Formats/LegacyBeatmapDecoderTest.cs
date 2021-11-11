@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Soleily", metadata.Artist);
                 Assert.AreEqual("Soleily", metadata.ArtistUnicode);
                 Assert.AreEqual("Gamu", metadata.Author.Username);
-                Assert.AreEqual("Insane", beatmapInfo.Version);
+                Assert.AreEqual("Insane", beatmapInfo.DifficultyName);
                 Assert.AreEqual(string.Empty, metadata.Source);
                 Assert.AreEqual("MBC7 Unisphere 地球ヤバイEP Chikyu Yabai", metadata.Tags);
                 Assert.AreEqual(557821, beatmapInfo.OnlineBeatmapID);

@@ -790,12 +790,12 @@ namespace osu.Game.Tests.Beatmaps.IO
                     // Update via the beatmap, not the beatmap info, to ensure correct linking
                     BeatmapSetInfo setToUpdate = manager.GetAllUsableBeatmapSets()[0];
                     Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
-                    beatmapToUpdate.BeatmapInfo.Version = "updated";
+                    beatmapToUpdate.BeatmapInfo.DifficultyName = "updated";
 
                     manager.Update(setToUpdate);
 
                     BeatmapInfo updatedInfo = manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID);
-                    Assert.That(updatedInfo.Version, Is.EqualTo("updated"));
+                    Assert.That(updatedInfo.DifficultyName, Is.EqualTo("updated"));
                 }
                 finally
                 {
@@ -863,7 +863,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     var beatmap = working.Beatmap;
 
-                    beatmap.BeatmapInfo.Version = "difficulty";
+                    beatmap.BeatmapInfo.DifficultyName = "difficulty";
                     beatmap.BeatmapInfo.Metadata = new BeatmapMetadata
                     {
                         Artist = "Artist/With\\Slashes",

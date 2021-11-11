@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Beatmaps
                     Title = "title",
                     Author = new APIUser { Username = "creator" }
                 },
-                Version = "difficulty"
+                DifficultyName = "difficulty"
             };
 
             Assert.That(beatmap.ToString(), Is.EqualTo("artist - title (creator) [difficulty]"));
