@@ -36,6 +36,7 @@ using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -105,6 +106,9 @@ namespace osu.Game.Screens.Edit
 
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         public Editor(EditorLoader loader = null)
         {
@@ -262,7 +266,8 @@ namespace osu.Game.Screens.Edit
                                     {
                                         new Dimension(GridSizeMode.Absolute, 220),
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.Absolute, 220)
+                                        new Dimension(GridSizeMode.Absolute, 220),
+                                        new Dimension(GridSizeMode.Absolute, 160),
                                     },
                                     Content = new[]
                                     {
@@ -283,6 +288,12 @@ namespace osu.Game.Screens.Edit
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding { Left = 10 },
                                                 Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
+                                            },
+                                            new TestGameplayButton
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Left = 10 },
+                                                Size = new Vector2(1),
                                             }
                                         },
                                     }
