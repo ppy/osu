@@ -106,7 +106,9 @@ namespace osu.Game.Tests.Visual.Editing
             EditorPlayer editorPlayer = null;
             AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
             AddAssert("beatmap has 1 object", () => editorPlayer.Beatmap.Value.Beatmap.HitObjects.Count == 1);
+
             AddUntilStep("wait for return to editor", () => Stack.CurrentScreen is Editor);
+            AddAssert("track stopped", () => !Beatmap.Value.Track.IsRunning);
         }
 
         public override void TearDownSteps()
