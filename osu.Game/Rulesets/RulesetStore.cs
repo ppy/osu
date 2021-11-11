@@ -128,18 +128,16 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var resolvedType = Type.GetType(r.InstantiationInfo);
+                        var resolvedType = Type.GetType(r.InstantiationInfo)
+                                           ?? throw new RulesetLoadException(@"Type could not be resolved");
 
-                        if (resolvedType != null)
-                        {
-                            var instanceInfo = ((Ruleset)Activator.CreateInstance(resolvedType)).RulesetInfo;
+                        var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
+                                           ?? throw new RulesetLoadException(@"Instantiation failure");
 
-                            r.Name = instanceInfo.Name;
-                            r.ShortName = instanceInfo.ShortName;
-                            r.InstantiationInfo = instanceInfo.InstantiationInfo;
-
-                            r.Available = true;
-                        }
+                        r.Name = instanceInfo.Name;
+                        r.ShortName = instanceInfo.ShortName;
+                        r.InstantiationInfo = instanceInfo.InstantiationInfo;
+                        r.Available = true;
                     }
                     catch
                     {
