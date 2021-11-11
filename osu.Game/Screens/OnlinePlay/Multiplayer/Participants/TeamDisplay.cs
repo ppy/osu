@@ -51,7 +51,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 Alpha = 0,
                 Scale = new Vector2(0, 1),
                 RelativeSizeAxes = Axes.Y,
-                Action = changeTeam,
                 Child = box = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
