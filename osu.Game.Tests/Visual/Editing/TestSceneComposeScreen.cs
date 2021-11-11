@@ -26,6 +26,9 @@ namespace osu.Game.Tests.Visual.Editing
                 }
             });
 
+        [Cached]
+        private EditorClipboard clipboard = new EditorClipboard();
+
         [BackgroundDependencyLoader]
         private void load()
         {
