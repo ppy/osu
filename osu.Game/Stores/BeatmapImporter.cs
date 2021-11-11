@@ -253,7 +253,7 @@ namespace osu.Game.Stores
                     var beatmap = new RealmBeatmap(ruleset, difficulty, metadata)
                     {
                         Hash = hash,
-                        DifficultyName = decodedInfo.Version,
+                        DifficultyName = decodedInfo.DifficultyName,
                         OnlineID = decodedInfo.OnlineBeatmapID ?? -1,
                         AudioLeadIn = decodedInfo.AudioLeadIn,
                         StackLeniency = decodedInfo.StackLeniency,

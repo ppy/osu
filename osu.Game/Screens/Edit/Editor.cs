@@ -723,7 +723,7 @@ namespace osu.Game.Screens.Edit
                 if (difficultyItems.Count > 0)
                     difficultyItems.Add(new EditorMenuItemSpacer());
 
-                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarDifficulty))
+                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarRating))
                     difficultyItems.Add(createDifficultyMenuItem(beatmap));
             }
 
