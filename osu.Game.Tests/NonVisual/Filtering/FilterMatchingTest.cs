@@ -17,7 +17,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         private BeatmapInfo getExampleBeatmap() => new BeatmapInfo
         {
             Ruleset = new RulesetInfo { ID = 5 },
-            StarDifficulty = 4.0d,
+            StarRating = 4.0d,
             BaseDifficulty = new BeatmapDifficulty
             {
                 ApproachRate = 5.0f,

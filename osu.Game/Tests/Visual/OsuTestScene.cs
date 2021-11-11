@@ -228,7 +228,7 @@ namespace osu.Game.Tests.Visual
                         Checksum = beatmap.MD5Hash,
                         AuthorID = beatmap.Metadata.Author.OnlineID,
                         RulesetID = beatmap.RulesetID,
-                        StarRating = beatmap.StarDifficulty,
+                        StarRating = beatmap.StarRating,
                         DifficultyName = beatmap.Version,
                     }
                 }

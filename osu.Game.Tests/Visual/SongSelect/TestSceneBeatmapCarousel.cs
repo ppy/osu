@@ -435,8 +435,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             for (int i = 0; i < 3; i++)
             {
                 var set = createTestBeatmapSet(i);
-                set.Beatmaps[0].StarDifficulty = 3 - i;
-                set.Beatmaps[2].StarDifficulty = 6 + i;
+                set.Beatmaps[0].StarRating = 3 - i;
+                set.Beatmaps[2].StarRating = 6 + i;
                 sets.Add(set);
             }
 
@@ -686,7 +686,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Version = $"Stars: {i}",
                         Ruleset = new OsuRuleset().RulesetInfo,
-                        StarDifficulty = i,
+                        StarRating = i,
                     });
                 }
 
@@ -869,7 +869,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     OnlineBeatmapID = id++ * 10,
                     Version = version,
-                    StarDifficulty = diff,
+                    StarRating = diff,
                     Ruleset = new OsuRuleset().RulesetInfo,
                     BaseDifficulty = new BeatmapDifficulty
                     {
@@ -904,7 +904,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Path = $"extra{b}.osu",
                     Version = $"Extra {b}",
                     Ruleset = rulesets.GetRuleset((b - 1) % 4),
-                    StarDifficulty = 2,
+                    StarRating = 2,
                     BaseDifficulty = new BeatmapDifficulty
                     {
                         OverallDifficulty = 3.5f,
