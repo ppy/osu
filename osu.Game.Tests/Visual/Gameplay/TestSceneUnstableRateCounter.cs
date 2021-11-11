@@ -61,6 +61,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("Bring UR to 100", () => applyJudgement(-10, false), 10);
         }
 
+        [Test]
+        public void TestCounterReceivesJudgementsBeforeCreation()
+        {
+            AddRepeatStep("Set UR to 250", () => applyJudgement(25, true), 4);
+
+            AddStep("Create Display", recreateDisplay);
+
+            AddUntilStep("UR = 250", () => counter.Current.Value == 250.0);
+        }
+
         private void recreateDisplay()
         {
             Clear();
