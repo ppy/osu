@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestConversionPreservesNewCombo()
+        public void TestConversionPreservesSliderProperties()
         {
             Slider slider = null;
 
@@ -117,7 +117,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             bool matches(HitCircle circle, double time, Vector2 position, bool startsNewCombo) =>
                 Precision.AlmostEquals(circle.StartTime, time, 1)
                 && Precision.AlmostEquals(circle.Position, position, 0.01f)
-                && circle.NewCombo == startsNewCombo;
+                && circle.NewCombo == startsNewCombo
+                && circle.Samples.SequenceEqual(slider.HeadCircle.Samples)
+                && circle.SampleControlPoint.IsRedundant(slider.SampleControlPoint);
         }
 
         private bool sliderRestored(Slider slider)

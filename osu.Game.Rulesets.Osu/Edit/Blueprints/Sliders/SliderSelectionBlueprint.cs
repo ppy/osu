@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -268,11 +269,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             while (!Precision.DefinitelyBigger(time, HitObject.GetEndTime(), 1))
             {
                 Vector2 position = HitObject.Position + HitObject.Path.PositionAt((time - HitObject.StartTime) / HitObject.Duration);
+
+                var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
+                samplePoint.Time = time;
+
                 editorBeatmap.Add(new HitCircle
                 {
                     StartTime = time,
                     Position = position,
-                    NewCombo = i == 0 && HitObject.NewCombo
+                    NewCombo = i == 0 && HitObject.NewCombo,
+                    SampleControlPoint = samplePoint,
+                    Samples = HitObject.HeadCircle.Samples.Select(s => s.With()).ToList()
                 });
 
                 i += 1;
