@@ -52,22 +52,29 @@ jobs:
 
   build-only-android:
     name: Build only (Android)
-    runs-on: windows-latest
+    runs-on: macos-latest
     timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      # Pin Xamarin.Android version to 11.2 for now to avoid build failures caused by a Xamarin-side regression.
+      # See: https://github.com/xamarin/xamarin-android/issues/6284
+      # This can be removed/reverted when the fix makes it to upstream and is deployed on github runners.
+      - name: Set default Xamarin SDK version
+        run: |
+            $VM_ASSETS/select-xamarin-sdk-v2.sh --mono=6.12 --android=11.2
 
       - name: Install .NET 5.0.x
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "5.0.x"
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1
-
+      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
+      # cannot accept .sln(f) files as arguments.
+      # Build just the main game for now.
       - name: Build
-        run: msbuild osu.Android.slnf /restore /p:Configuration=Debug
+        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
 
   build-only-ios:
     # While this workflow technically *can* run, it fails as iOS builds are blocked by multiple issues.
