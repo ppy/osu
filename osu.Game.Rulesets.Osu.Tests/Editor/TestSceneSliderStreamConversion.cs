@@ -30,7 +30,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             convertToStream();
 
-            AddAssert("stream created", () => streamCreatedFor(slider, 1 / 4d));
+            AddAssert("stream created", () => streamCreatedFor(slider,
+                (time: 0, pathPosition: 0),
+                (time: 0.25, pathPosition: 0.25),
+                (time: 0.5, pathPosition: 0.5),
+                (time: 0.75, pathPosition: 0.75),
+                (time: 1, pathPosition: 1)));
 
             AddStep("undo", () => Editor.Undo());
             AddAssert("slider restored", () => sliderRestored(slider));
@@ -44,7 +49,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("change beat divisor", () => beatDivisor.Value = 8);
 
             convertToStream();
-            AddAssert("stream created", () => streamCreatedFor(slider, 1 / 8d));
+            AddAssert("stream created", () => streamCreatedFor(slider,
+                (time: 0, pathPosition: 0),
+                (time: 0.125, pathPosition: 0.125),
+                (time: 0.25, pathPosition: 0.25),
+                (time: 0.375, pathPosition: 0.375),
+                (time: 0.5, pathPosition: 0.5),
+                (time: 0.625, pathPosition: 0.625),
+                (time: 0.75, pathPosition: 0.75),
+                (time: 0.875, pathPosition: 0.875),
+                (time: 1, pathPosition: 1)));
         }
 
         [Test]
@@ -62,7 +76,32 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             convertToStream();
 
-            AddAssert("stream created", () => streamCreatedFor(slider, 2 / 3d));
+            AddAssert("stream created", () => streamCreatedFor(slider,
+                (time: 0, pathPosition: 0),
+                (time: 2 / 3d, pathPosition: 2 / 3d)));
+        }
+
+        [Test]
+        public void TestConversionWithRepeats()
+        {
+            Slider slider = null;
+
+            AddStep("select first slider with repeats", () =>
+            {
+                slider = (Slider)EditorBeatmap.HitObjects.First(h => h is Slider s && s.RepeatCount > 0);
+                EditorClock.Seek(slider.StartTime);
+                EditorBeatmap.SelectedHitObjects.Add(slider);
+            });
+            AddStep("change beat divisor", () => beatDivisor.Value = 2);
+
+            convertToStream();
+
+            AddAssert("stream created", () => streamCreatedFor(slider,
+                (time: 0, pathPosition: 0),
+                (time: 0.25, pathPosition: 0.5),
+                (time: 0.5, pathPosition: 1),
+                (time: 0.75, pathPosition: 0.5),
+                (time: 1, pathPosition: 0)));
         }
 
         [Test]
@@ -79,7 +118,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             convertToStream();
 
-            AddAssert("stream created", () => streamCreatedFor(slider, 1 / 4d));
+            AddAssert("stream created", () => streamCreatedFor(slider,
+                (time: 0, pathPosition: 0),
+                (time: 0.25, pathPosition: 0.25),
+                (time: 0.5, pathPosition: 0.5),
+                (time: 0.75, pathPosition: 0.75),
+                (time: 1, pathPosition: 1)));
 
             AddStep("undo", () => Editor.Undo());
             AddAssert("slider restored", () => sliderRestored(slider));
@@ -97,18 +141,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
         }
 
-        private bool streamCreatedFor(Slider slider, double spacing)
+        private bool streamCreatedFor(Slider slider, params (double time, double pathPosition)[] expectedCircles)
         {
             if (EditorBeatmap.HitObjects.Contains(slider))
                 return false;
 
-            for (int i = 0; i * spacing <= 1; ++i)
+            foreach ((double expectedTime, double expectedPathPosition) in expectedCircles)
             {
-                double progress = i * spacing;
-                double time = slider.StartTime + progress * slider.Duration;
-                Vector2 position = slider.Position + slider.Path.PositionAt(progress);
+                double time = slider.StartTime + slider.Duration * expectedTime;
+                Vector2 position = slider.Position + slider.Path.PositionAt(expectedPathPosition);
 
-                if (!EditorBeatmap.HitObjects.OfType<HitCircle>().Any(h => matches(h, time, position, slider.NewCombo && progress == 0)))
+                if (!EditorBeatmap.HitObjects.OfType<HitCircle>().Any(h => matches(h, time, position, slider.NewCombo && expectedTime == 0)))
                     return false;
             }
 

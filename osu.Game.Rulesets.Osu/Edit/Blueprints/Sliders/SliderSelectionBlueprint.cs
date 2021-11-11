@@ -16,6 +16,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -268,7 +269,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             while (!Precision.DefinitelyBigger(time, HitObject.GetEndTime(), 1))
             {
-                Vector2 position = HitObject.Position + HitObject.Path.PositionAt((time - HitObject.StartTime) / HitObject.Duration);
+                // positionWithRepeats is a fractional number in the range of [0, HitObject.SpanCount()]
+                // and indicates how many fractional spans of a slider have passed up to time.
+                double positionWithRepeats = (time - HitObject.StartTime) / HitObject.Duration * HitObject.SpanCount();
+                double pathPosition = positionWithRepeats - (int)positionWithRepeats;
+                // every second span is in the reverse direction - need to reverse the path position.
+                if (Precision.AlmostBigger(positionWithRepeats % 2, 1))
+                    pathPosition = 1 - pathPosition;
+
+                Vector2 position = HitObject.Position + HitObject.Path.PositionAt(pathPosition);
 
                 var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
                 samplePoint.Time = time;
