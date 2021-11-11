@@ -106,8 +106,7 @@ namespace osu.Game.Tests.Visual.Editing
             EditorPlayer editorPlayer = null;
             AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
             AddAssert("beatmap has 1 object", () => editorPlayer.Beatmap.Value.Beatmap.HitObjects.Count == 1);
-            AddStep("exit player", () => editorPlayer.Exit());
-            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("wait for return to editor", () => Stack.CurrentScreen is Editor);
         }
 
         public override void TearDownSteps()
