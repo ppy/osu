@@ -129,13 +129,18 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo).AsNonNull())).RulesetInfo;
+                        var resolvedType = Type.GetType(r.InstantiationInfo);
 
-                        r.Name = instanceInfo.Name;
-                        r.ShortName = instanceInfo.ShortName;
-                        r.InstantiationInfo = instanceInfo.InstantiationInfo;
+                        if (resolvedType != null)
+                        {
+                            var instanceInfo = ((Ruleset)Activator.CreateInstance(resolvedType)).RulesetInfo;
 
-                        r.Available = true;
+                            r.Name = instanceInfo.Name;
+                            r.ShortName = instanceInfo.ShortName;
+                            r.InstantiationInfo = instanceInfo.InstantiationInfo;
+
+                            r.Available = true;
+                        }
                     }
                     catch
                     {
