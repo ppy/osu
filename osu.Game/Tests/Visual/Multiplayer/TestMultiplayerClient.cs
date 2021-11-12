@@ -387,8 +387,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             if (newMode == QueueModes.HostOnly)
             {
+                // Remove all but the current and expired items. The current item may be re-used for host-only mode if it's non-expired.
                 foreach (var playlistItem in playlistItems.Where(i => !i.Expired && i.ID != currentItem.ID).ToArray())
                     await ((IMultiplayerClient)this).PlaylistItemRemoved(playlistItem.ID).ConfigureAwait(false);
+
+                // Always ensure that at least one non-expired item exists by duplicating the current item if required.
+                if (currentItem.Expired)
+                    await duplicateCurrentItem().ConfigureAwait(false);
             }
 
             // When changing modes, items could have been added (above) or the queueing order could have changed.
