@@ -151,25 +151,29 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => this.GetDisplayTitle();
 
-        public bool Equals(IBeatmapInfo other)
+        public bool Equals(BeatmapInfo other)
         {
-            if (other is BeatmapInfo b)
-                return Equals(b);
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
-            if (OnlineID > 0 && other?.OnlineID > 0)
-                return other.OnlineID == OnlineID;
+            if (ID != 0 && other.ID != 0)
+                return ID == other.ID;
 
             return false;
         }
 
-        public bool Equals(BeatmapInfo other)
+        public bool Equals(IBeatmapInfo other)
         {
-            if (ID == 0 || other?.ID == 0)
-                // one of the two BeatmapInfos we are comparing isn't sourced from a database.
-                // fall back to reference equality.
-                return ReferenceEquals(this, other);
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
-            return ID == other?.ID;
+            if (other is BeatmapInfo b && Equals(b))
+                return true;
+
+            if (OnlineID > 0 && other.OnlineID > 0)
+                return other.OnlineID == OnlineID;
+
+            return false;
         }
 
         public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&

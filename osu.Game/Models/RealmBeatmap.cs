@@ -20,7 +20,7 @@ namespace osu.Game.Models
     [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("Beatmap")]
-    public class RealmBeatmap : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo
+    public class RealmBeatmap : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<RealmBeatmap>
     {
         [PrimaryKey]
         public Guid ID { get; set; } = Guid.NewGuid();
@@ -98,14 +98,28 @@ namespace osu.Game.Models
 
         #endregion
 
+        public bool Equals(RealmBeatmap? other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
+
+            return ID == other.ID;
+        }
+
         #region Implementation of IEquatable<IBeatmapInfo>
 
         public bool Equals(IBeatmapInfo? other)
         {
-            if (other is RealmBeatmap b)
-                return b.ID == ID;
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
-            if (OnlineID > 0 && other?.OnlineID > 0)
+            if (other is RealmBeatmap b && Equals(b))
+                return true;
+
+            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
+                return Hash == other.Hash;
+
+            if (OnlineID > 0 && other.OnlineID > 0)
                 return other.OnlineID == OnlineID;
 
             return false;
