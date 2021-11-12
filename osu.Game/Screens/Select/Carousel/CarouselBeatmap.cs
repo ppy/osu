@@ -66,8 +66,8 @@ namespace osu.Game.Screens.Select.Carousel
                 // this should be done after text matching so we can prioritise matching numbers in metadata.
                 if (!match && criteria.SearchNumber.HasValue)
                 {
-                    match = (BeatmapInfo.OnlineBeatmapID == criteria.SearchNumber.Value) ||
-                            (BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID == criteria.SearchNumber.Value);
+                    match = (BeatmapInfo.OnlineID == criteria.SearchNumber.Value) ||
+                            (BeatmapInfo.BeatmapSet?.OnlineID == criteria.SearchNumber.Value);
                 }
             }
 

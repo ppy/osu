@@ -29,7 +29,7 @@ namespace osu.Game.Online
                 return;
 
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
-            var beatmapSetInfo = new BeatmapSetInfo { OnlineBeatmapSetID = TrackedItem.OnlineID };
+            var beatmapSetInfo = new BeatmapSetInfo { OnlineID = TrackedItem.OnlineID };
 
             if (Manager.IsAvailableLocally(beatmapSetInfo))
                 UpdateState(DownloadState.LocallyAvailable);
