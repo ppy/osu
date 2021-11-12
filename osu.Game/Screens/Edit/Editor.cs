@@ -332,7 +332,7 @@ namespace osu.Game.Screens.Edit
         /// The next beatmap to be shown, in the case of difficulty switch.
         /// <see langword="null"/> indicates that the beatmap will not be changing.
         /// </param>
-        private EditorState getState([CanBeNull] BeatmapInfo nextBeatmap = null) => new EditorState
+        public EditorState GetState([CanBeNull] BeatmapInfo nextBeatmap = null) => new EditorState
         {
             Time = clock.CurrentTimeAccurate,
             ClipboardContent = nextBeatmap == null || editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
@@ -793,7 +793,7 @@ namespace osu.Game.Screens.Edit
             return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, getState(nextBeatmap));
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, GetState(nextBeatmap));
 
         private void cancelExit()
         {
@@ -816,7 +816,7 @@ namespace osu.Game.Screens.Edit
                 pushEditorPlayer();
             }
 
-            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(getState()));
+            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(this));
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
