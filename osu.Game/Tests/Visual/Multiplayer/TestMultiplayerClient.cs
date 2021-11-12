@@ -191,10 +191,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected override void OnRoomJoined()
         {
+            Debug.Assert(APIRoom != null);
             Debug.Assert(Room != null);
 
             // emulate the server sending this after the join room. scheduler required to make sure the join room event is fired first (in Join).
             changeMatchType(Room.Settings.MatchType).Wait();
+
+            // emulate the server sending all playlist items after room join.
+            var serverSideRom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == APIRoom.RoomID.Value);
+
+            foreach (var playlistItem in serverSideRom.Playlist)
+                ((IMultiplayerClient)this).PlaylistItemAdded(new APIPlaylistItem(playlistItem)).Wait();
         }
 
         protected override Task LeaveRoomInternal() => Task.CompletedTask;
