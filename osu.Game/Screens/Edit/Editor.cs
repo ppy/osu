@@ -798,7 +798,7 @@ namespace osu.Game.Screens.Edit
                 pushEditorPlayer();
             }
 
-            void pushEditorPlayer() => this.Push(new PlayerLoader(() => new EditorPlayer()));
+            void pushEditorPlayer() => this.Push(new EditorPlayerLoader());
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

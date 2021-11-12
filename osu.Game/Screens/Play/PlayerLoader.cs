@@ -36,7 +36,9 @@ namespace osu.Game.Screens.Play
     {
         protected const float BACKGROUND_BLUR = 15;
 
-        private const double content_out_duration = 300;
+        protected const double CONTENT_OUT_DURATION = 300;
+
+        protected virtual double PlayerPushDelay => 1800;
 
         public override bool HideOverlaysOnEnter => hideOverlays;
 
@@ -213,7 +215,7 @@ namespace osu.Game.Screens.Play
 
             // after an initial delay, start the debounced load check.
             // this will continue to execute even after resuming back on restart.
-            Scheduler.Add(new ScheduledDelegate(pushWhenLoaded, Clock.CurrentTime + 1800, 0));
+            Scheduler.Add(new ScheduledDelegate(pushWhenLoaded, Clock.CurrentTime + PlayerPushDelay, 0));
 
             showMuteWarningIfNeeded();
             showBatteryWarningIfNeeded();
@@ -248,13 +250,13 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(IScreen next)
         {
             cancelLoad();
-            contentOut();
+            ContentOut();
 
             // If the load sequence was interrupted, the epilepsy warning may already be displayed (or in the process of being displayed).
             epilepsyWarning?.Hide();
 
             // Ensure the screen doesn't expire until all the outwards fade operations have completed.
-            this.Delay(content_out_duration).FadeOut();
+            this.Delay(CONTENT_OUT_DURATION).FadeOut();
 
             ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
 
@@ -361,15 +363,15 @@ namespace osu.Game.Screens.Play
             ApplyToBackground(b => b?.FadeColour(Color4.White, 800, Easing.OutQuint));
         }
 
-        private void contentOut()
+        protected virtual void ContentOut()
         {
             // Ensure the logo is no longer tracking before we scale the content
             content.StopTracking();
 
-            content.ScaleTo(0.7f, content_out_duration * 2, Easing.OutQuint);
-            content.FadeOut(content_out_duration, Easing.OutQuint);
-            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, content_out_duration);
-            highPassFilter.CutoffTo(0, content_out_duration);
+            content.ScaleTo(0.7f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
+            content.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint);
+            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, CONTENT_OUT_DURATION);
+            highPassFilter.CutoffTo(0, CONTENT_OUT_DURATION);
         }
 
         private void pushWhenLoaded()
@@ -394,9 +396,9 @@ namespace osu.Game.Screens.Play
                 // ensure that once we have reached this "point of no return", readyForPush will be false for all future checks (until a new player instance is prepared).
                 var consumedPlayer = consumePlayer();
 
-                contentOut();
+                ContentOut();
 
-                TransformSequence<PlayerLoader> pushSequence = this.Delay(content_out_duration);
+                TransformSequence<PlayerLoader> pushSequence = this.Delay(CONTENT_OUT_DURATION);
 
                 // only show if the warning was created (i.e. the beatmap needs it)
                 // and this is not a restart of the map (the warning expires after first load).
@@ -418,7 +420,7 @@ namespace osu.Game.Screens.Play
                 else
                 {
                     // This goes hand-in-hand with the restoration of low pass filter in contentOut().
-                    this.TransformBindableTo(volumeAdjustment, 0, content_out_duration, Easing.OutCubic);
+                    this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
                 }
 
                 pushSequence.Schedule(() =>
