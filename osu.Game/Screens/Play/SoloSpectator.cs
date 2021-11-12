@@ -241,7 +241,7 @@ namespace osu.Game.Screens.Play
             if (!automaticDownload.Current.Value)
                 return;
 
-            if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineBeatmapSetID = beatmapSet.OnlineID }))
+            if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmapSet.OnlineID }))
                 return;
 
             beatmaps.Download(beatmapSet);
