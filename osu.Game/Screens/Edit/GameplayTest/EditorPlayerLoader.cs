@@ -14,8 +14,8 @@ namespace osu.Game.Screens.Edit.GameplayTest
         [Resolved]
         private OsuLogo osuLogo { get; set; }
 
-        public EditorPlayerLoader(EditorState editorState)
-            : base(() => new EditorPlayer(editorState))
+        public EditorPlayerLoader(Editor editor)
+            : base(() => new EditorPlayer(editor))
         {
         }
 

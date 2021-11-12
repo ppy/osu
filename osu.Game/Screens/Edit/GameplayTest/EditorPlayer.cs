@@ -11,15 +11,17 @@ namespace osu.Game.Screens.Edit.GameplayTest
 {
     public class EditorPlayer : Player
     {
+        private readonly Editor editor;
         private readonly EditorState editorState;
 
         [Resolved]
         private MusicController musicController { get; set; }
 
-        public EditorPlayer(EditorState editorState)
+        public EditorPlayer(Editor editor)
             : base(new PlayerConfiguration { ShowResults = false })
         {
-            this.editorState = editorState;
+            this.editor = editor;
+            editorState = editor.GetState();
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
@@ -45,6 +47,9 @@ namespace osu.Game.Screens.Edit.GameplayTest
         public override bool OnExiting(IScreen next)
         {
             musicController.Stop();
+
+            editorState.Time = GameplayClockContainer.CurrentTime;
+            editor.RestoreState(editorState);
             return base.OnExiting(next);
         }
     }
