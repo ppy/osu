@@ -9,7 +9,7 @@ namespace osu.Game.Utils
 {
     public static class ZipUtils
     {
-        public static bool IsZipArchive(Stream stream)
+        public static bool IsZipArchive(MemoryStream stream)
         {
             try
             {
