@@ -267,7 +267,7 @@ namespace osu.Game.Screens.Edit
                                         new Dimension(GridSizeMode.Absolute, 220),
                                         new Dimension(),
                                         new Dimension(GridSizeMode.Absolute, 220),
-                                        new Dimension(GridSizeMode.Absolute, 160),
+                                        new Dimension(GridSizeMode.Absolute, 120),
                                     },
                                     Content = new[]
                                     {
