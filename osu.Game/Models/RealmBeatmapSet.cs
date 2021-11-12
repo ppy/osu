@@ -53,7 +53,16 @@ namespace osu.Game.Models
         /// <param name="filename">The name of the file to get the storage path of.</param>
         public string? GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.File.StoragePath;
 
-        public override string ToString() => Metadata?.ToString() ?? base.ToString();
+        public bool Equals(IBeatmapSetInfo? other)
+        {
+            if (other is RealmBeatmap b)
+                return b.ID == ID;
+
+            if (OnlineID > 0 && other?.OnlineID > 0)
+                return other.OnlineID == OnlineID;
+
+            return false;
+        }
 
         public bool Equals(RealmBeatmapSet? other)
         {
@@ -71,6 +80,8 @@ namespace osu.Game.Models
 
             return ReferenceEquals(this, other);
         }
+
+        public override string ToString() => Metadata?.ToString() ?? base.ToString();
 
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
 
