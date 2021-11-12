@@ -19,14 +19,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class DifficultyPointPiece : HitObjectPointPiece, IHasPopover
     {
-        private readonly HitObject hitObject;
+        public readonly HitObject HitObject;
 
         private readonly BindableNumber<double> speedMultiplier;
 
         public DifficultyPointPiece(HitObject hitObject)
             : base(hitObject.DifficultyControlPoint)
         {
-            this.hitObject = hitObject;
+            HitObject = hitObject;
 
             speedMultiplier = hitObject.DifficultyControlPoint.SliderVelocityBindable.GetBoundCopy();
         }
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return true;
         }
 
-        public Popover GetPopover() => new DifficultyEditPopover(hitObject);
+        public Popover GetPopover() => new DifficultyEditPopover(HitObject);
 
         public class DifficultyEditPopover : OsuPopover
         {
