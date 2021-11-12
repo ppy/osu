@@ -151,6 +151,17 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => this.GetDisplayTitle();
 
+        public bool Equals(IBeatmapInfo other)
+        {
+            if (other is BeatmapInfo b)
+                return Equals(b);
+
+            if (OnlineID > 0 && other?.OnlineID > 0)
+                return other.OnlineID == OnlineID;
+
+            return false;
+        }
+
         public bool Equals(BeatmapInfo other)
         {
             if (ID == 0 || other?.ID == 0)

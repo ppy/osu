@@ -103,5 +103,17 @@ namespace osu.Game.Online.API.Requests.Responses
         public string Hash => throw new NotImplementedException();
 
         #endregion
+
+        #region Implementation of IEquatable<IBeatmapInfo>
+
+        public bool Equals(IBeatmapInfo? other)
+        {
+            if (OnlineID > 0 && other?.OnlineID > 0)
+                return other.OnlineID == OnlineID;
+
+            return false;
+        }
+
+        #endregion
     }
 }
