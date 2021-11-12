@@ -208,7 +208,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         {
             var beatmap = getExampleBeatmap();
             beatmap.OnlineID = 20201010;
-            beatmap.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = 1535 };
+            beatmap.BeatmapSet = new BeatmapSetInfo { OnlineID = 1535 };
 
             var criteria = new FilterCriteria { SearchText = query };
             var carouselItem = new CarouselBeatmap(beatmap);

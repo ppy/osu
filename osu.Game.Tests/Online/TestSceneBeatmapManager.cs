@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Online
 
         private static readonly BeatmapSetInfo test_db_model = new BeatmapSetInfo
         {
-            OnlineBeatmapSetID = 1,
+            OnlineID = 1,
             Metadata = new BeatmapMetadata
             {
                 Artist = "test author",

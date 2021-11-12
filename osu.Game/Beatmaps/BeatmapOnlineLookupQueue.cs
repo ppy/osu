@@ -84,7 +84,7 @@ namespace osu.Game.Beatmaps
                 {
                     beatmapInfo.Status = res.Status;
                     beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapSetOnlineStatus.None;
-                    beatmapInfo.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
+                    beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
                     beatmapInfo.OnlineID = res.OnlineID;
 
                     if (beatmapInfo.Metadata != null)
@@ -186,7 +186,7 @@ namespace osu.Game.Beatmaps
 
                                 beatmapInfo.Status = status;
                                 beatmapInfo.BeatmapSet.Status = status;
-                                beatmapInfo.BeatmapSet.OnlineBeatmapSetID = reader.GetInt32(0);
+                                beatmapInfo.BeatmapSet.OnlineID = reader.GetInt32(0);
                                 beatmapInfo.OnlineID = reader.GetInt32(1);
 
                                 if (beatmapInfo.Metadata != null)

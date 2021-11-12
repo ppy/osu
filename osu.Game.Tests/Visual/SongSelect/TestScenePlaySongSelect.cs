@@ -931,7 +931,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = setId,
+                OnlineID = setId,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {

@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 beatmap = Game.BeatmapManager.Import(new BeatmapSetInfo
                 {
                     Hash = Guid.NewGuid().ToString(),
-                    OnlineBeatmapSetID = 1,
+                    OnlineID = 1,
                     Metadata = metadata,
                     Beatmaps = new List<BeatmapInfo>
                     {

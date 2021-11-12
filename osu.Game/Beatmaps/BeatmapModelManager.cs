@@ -102,9 +102,9 @@ namespace osu.Game.Beatmaps
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
             {
-                if (beatmapSet.OnlineBeatmapSetID != null)
+                if (beatmapSet.OnlineID != null)
                 {
-                    beatmapSet.OnlineBeatmapSetID = null;
+                    beatmapSet.OnlineID = null;
                     LogForModel(beatmapSet, "Disassociating beatmap set ID due to loss of all beatmap IDs");
                 }
             }
@@ -116,20 +116,20 @@ namespace osu.Game.Beatmaps
                 throw new InvalidOperationException($"Cannot import {nameof(BeatmapInfo)} with null {nameof(BeatmapInfo.BaseDifficulty)}.");
 
             // check if a set already exists with the same online id, delete if it does.
-            if (beatmapSet.OnlineBeatmapSetID != null)
+            if (beatmapSet.OnlineID != null)
             {
-                var existingSetWithSameOnlineID = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
+                var existingSetWithSameOnlineID = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
 
                 if (existingSetWithSameOnlineID != null)
                 {
                     Delete(existingSetWithSameOnlineID);
 
                     // in order to avoid a unique key constraint, immediately remove the online ID from the previous set.
-                    existingSetWithSameOnlineID.OnlineBeatmapSetID = null;
+                    existingSetWithSameOnlineID.OnlineID = null;
                     foreach (var b in existingSetWithSameOnlineID.Beatmaps)
                         b.OnlineID = null;
 
-                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been deleted.");
+                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineID}). It has been deleted.");
                 }
             }
         }
@@ -254,7 +254,7 @@ namespace osu.Game.Beatmaps
             var importIds = import.Beatmaps.Select(b => b.OnlineID).OrderBy(i => i);
 
             // force re-import if we are not in a sane state.
-            return existing.OnlineBeatmapSetID == import.OnlineBeatmapSetID && existingIds.SequenceEqual(importIds);
+            return existing.OnlineID == import.OnlineID && existingIds.SequenceEqual(importIds);
         }
 
         /// <summary>
@@ -349,7 +349,7 @@ namespace osu.Game.Beatmaps
 
         protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items)
             => base.CheckLocalAvailability(model, items)
-               || (model.OnlineBeatmapSetID != null && items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID));
+               || (model.OnlineID != null && items.Any(b => b.OnlineID == model.OnlineID));
 
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
@@ -368,7 +368,7 @@ namespace osu.Game.Beatmaps
 
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID,
+                OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID,
                 Beatmaps = new List<BeatmapInfo>(),
                 Metadata = beatmap.Metadata,
                 DateAdded = DateTimeOffset.UtcNow
