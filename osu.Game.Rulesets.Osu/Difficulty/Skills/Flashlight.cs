@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -14,15 +16,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Flashlight : OsuStrainSkill
     {
-        public Flashlight(Mod[] mods)
+        public Flashlight(Mod[] mods, double preemptTime)
             : base(mods)
         {
+            this.mods = mods;
+            this.preemptTime = preemptTime;
         }
 
-        private double skillMultiplier => 0.15;
+        private double skillMultiplier => 0.12;
         private double strainDecayBase => 0.15;
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
+
+        private Mod[] mods;
+        private bool hidden;
+        private double preemptTime;
+
+        private const double max_opacity_bonus = 0.4;
 
         private double currentStrain;
 
@@ -30,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             if (current.BaseObject is Spinner)
                 return 0;
+
+            hidden = mods.Any(m => m is OsuModHidden);
 
             var osuCurrent = (OsuDifficultyHitObject)current;
             var osuHitObject = (OsuHitObject)(osuCurrent.BaseObject);
@@ -58,11 +70,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     // We also want to nerf stacks so that only the first object of the stack is accounted for.
                     double stackNerf = Math.Min(1.0, (osuPrevious.JumpDistance / scalingFactor) / 25.0);
 
-                    result += Math.Pow(0.8, i) * stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
+                    // Bonus based on how visible the object is.
+                    double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - opacity(cumulativeStrainTime, preemptTime, hidden));
+
+                    result += Math.Pow(0.8, i) * stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
                 }
             }
 
-            return Math.Pow(smallDistNerf * result, 2.0);
+            result = Math.Pow(smallDistNerf * result, 2.0);
+
+            if (hidden) {
+                result *= 1.0 + max_opacity_bonus;
+            }
+
+            return result;
+        }
+
+        private double opacity(double ms, double preemptTime, bool hidden) {
+            if (hidden) {
+                return Math.Clamp(Math.Min((1 - ms / preemptTime) * 2.5, (ms / preemptTime) * (1.0 / 0.3)), 0.0, 1.0);
+            }
+            else
+            {
+                return Math.Clamp((1.0 - ms / preemptTime) * 1.5, 0.0, 1.0);
+            }
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);

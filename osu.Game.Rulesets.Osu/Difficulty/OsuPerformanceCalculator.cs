@@ -125,16 +125,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
             }
 
-            // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
-            double estimateDifficultSliders = Attributes.SliderCount * 0.15;
-
-            if (Attributes.SliderCount > 0)
-            {
-                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, Attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
-                double sliderNerfFactor = (1 - Attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + Attributes.SliderFactor;
-                aimValue *= sliderNerfFactor;
-            }
-
             aimValue *= accuracy;
             // It is important to also consider accuracy difficulty when doing that.
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
@@ -233,10 +223,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 rawFlashlight = Math.Pow(rawFlashlight, 0.8);
 
             double flashlightValue = Math.Pow(rawFlashlight, 2.0) * 25.0;
-
-            // Add an additional bonus for HDFL.
-            if (mods.Any(h => h is OsuModHidden))
-                flashlightValue *= 1.3;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
