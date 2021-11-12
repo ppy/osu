@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void velocityPopoverHasSingleValue(double velocity) => AddUntilStep($"velocity popover has {velocity}", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<SliderWithTextBoxInput<double>>().Single();
+            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
 
             return slider?.Current.Value == velocity;
         });
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void velocityPopoverHasIndeterminateValue() => AddUntilStep("velocity popover has indeterminate value", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<SliderWithTextBoxInput<double>>().Single();
+            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
 
             return slider != null && slider.Current.Value == null;
         });
@@ -158,7 +158,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void setVelocityViaPopover(double velocity) => AddStep($"set {velocity} via popover", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().Single();
-            var slider = popover.ChildrenOfType<SliderWithTextBoxInput<double>>().Single();
+            var slider = popover.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
             slider.Current.Value = velocity;
         });
 
