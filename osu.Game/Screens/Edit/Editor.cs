@@ -91,6 +91,8 @@ namespace osu.Game.Screens.Edit
 
         private DependencyContainer dependencies;
 
+        private TestGameplayButton testGameplayButton;
+
         private bool isNewBeatmap;
 
         protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
@@ -289,7 +291,7 @@ namespace osu.Game.Screens.Edit
                                                 Padding = new MarginPadding { Left = 10 },
                                                 Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
                                             },
-                                            new TestGameplayButton
+                                            testGameplayButton = new TestGameplayButton
                                             {
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding { Left = 10 },
@@ -469,7 +471,7 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case GlobalAction.EditorTestGameplay:
-                    testGameplay();
+                    testGameplayButton.TriggerClick();
                     return true;
 
                 default:
