@@ -290,7 +290,7 @@ namespace osu.Game.Beatmaps
             catch (BeatmapInvalidForRulesetException e)
             {
                 if (rulesetInfo.Equals(beatmapInfo.Ruleset))
-                    Logger.Error(e, $"Failed to convert {beatmapInfo.OnlineBeatmapID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
+                    Logger.Error(e, $"Failed to convert {beatmapInfo.OnlineID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
 
                 return new StarDifficulty();
             }

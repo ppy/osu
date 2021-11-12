@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach (int user in users)
                 {
-                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
+                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID ?? 0);
                     var roomUser = OnlinePlayDependencies.Client.AddUser(new APIUser { Id = user }, true);
 
                     roomUser.MatchState = new TeamVersusUserState
