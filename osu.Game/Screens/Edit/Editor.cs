@@ -326,6 +326,19 @@ namespace osu.Game.Screens.Edit
         public void UpdateClockSource() => clock.ChangeSource(Beatmap.Value.Track);
 
         /// <summary>
+        /// Creates an <see cref="EditorState"/> instance representing the current state of the editor.
+        /// </summary>
+        /// <param name="nextBeatmap">
+        /// The next beatmap to be shown, in the case of difficulty switch.
+        /// <see langword="null"/> indicates that the beatmap will not be changing.
+        /// </param>
+        private EditorState getState([CanBeNull] BeatmapInfo nextBeatmap = null) => new EditorState
+        {
+            Time = clock.CurrentTimeAccurate,
+            ClipboardContent = nextBeatmap == null || editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
+        };
+
+        /// <summary>
         /// Restore the editor to a provided state.
         /// </summary>
         /// <param name="state">The state to restore.</param>
@@ -780,11 +793,7 @@ namespace osu.Game.Screens.Edit
             return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
-        {
-            Time = clock.CurrentTimeAccurate,
-            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
-        });
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, getState(nextBeatmap));
 
         private void cancelExit()
         {
@@ -807,7 +816,7 @@ namespace osu.Game.Screens.Edit
                 pushEditorPlayer();
             }
 
-            void pushEditorPlayer() => this.Push(new EditorPlayerLoader());
+            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(getState()));
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
