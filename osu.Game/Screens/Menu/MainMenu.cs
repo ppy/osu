@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -214,10 +215,16 @@ namespace osu.Game.Screens.Menu
             }
             else if (!api.IsLoggedIn)
             {
-                logo.Action += displayLogin;
+                // copy out old action to avoid accidentally capturing logo.Action in closure, causing a self-reference loop.
+                var previousAction = logo.Action;
+
+                // we want to hook into logo.Action to display the login overlay, but also preserve the return value of the old action.
+                // therefore pass the old action to displayLogin, so that it can return that value.
+                // this ensures that the OsuLogo sample does not play when it is not desired.
+                logo.Action = () => displayLogin(previousAction);
             }
 
-            bool displayLogin()
+            bool displayLogin(Func<bool> originalAction)
             {
                 if (!loginDisplayed.Value)
                 {
@@ -225,7 +232,7 @@ namespace osu.Game.Screens.Menu
                     loginDisplayed.Value = true;
                 }
 
-                return true;
+                return originalAction.Invoke();
             }
         }
 

@@ -45,8 +45,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Title = title,
                     },
-                    Version = version,
-                    StarDifficulty = RNG.NextDouble(0, 10),
+                    DifficultyName = version,
+                    StarRating = RNG.NextDouble(0, 10),
                 }
             }));
         }
@@ -64,8 +64,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Title = "Heavy beatmap",
                     },
-                    Version = "10k objects",
-                    StarDifficulty = 99.99f,
+                    DifficultyName = "10k objects",
+                    StarRating = 99.99f,
                 }
             }));
 

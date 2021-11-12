@@ -366,7 +366,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             var beatmap = SelectedItem.Value?.Beatmap.Value;
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineID);
+            var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }

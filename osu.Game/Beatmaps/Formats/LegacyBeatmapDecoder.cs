@@ -251,7 +251,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Version":
-                    beatmap.BeatmapInfo.Version = pair.Value;
+                    beatmap.BeatmapInfo.DifficultyName = pair.Value;
                     break;
 
                 case @"Source":
@@ -263,11 +263,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"BeatmapID":
-                    beatmap.BeatmapInfo.OnlineBeatmapID = Parsing.ParseInt(pair.Value);
+                    beatmap.BeatmapInfo.OnlineID = Parsing.ParseInt(pair.Value);
                     break;
 
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = Parsing.ParseInt(pair.Value) };
+                    beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineID = Parsing.ParseInt(pair.Value) };
                     break;
             }
         }
