@@ -15,6 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -98,6 +99,7 @@ namespace osu.Game.Screens.Play.HUD
                 InternalChild = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(2),
                     Children = new Drawable[]
                     {
                         text = new OsuSpriteText
@@ -111,8 +113,8 @@ namespace osu.Game.Screens.Play.HUD
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.Numeric.With(size: 8, fixedWidth: true),
-                            Text = "UR",
-                            Padding = new MarginPadding { Bottom = 1.5f },
+                            Text = @"UR",
+                            Padding = new MarginPadding { Bottom = 1.5f }, // align baseline better
                         }
                     }
                 };
