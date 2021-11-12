@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.preemptTime = preemptTime;
         }
 
-        private double skillMultiplier => 0.12;
+        private double skillMultiplier => 0.11;
         private double strainDecayBase => 0.15;
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double preemptTime;
 
         private const double max_opacity_bonus = 0.4;
+        private const double hidden_bonus = 0.3;
 
         private double currentStrain;
 
@@ -81,6 +82,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (hidden) {
                 result *= 1.0 + max_opacity_bonus;
+                // Additional bonus for Hidden due to there being no approach circles.
+                result *= 1.0 + hidden_bonus;
             }
 
             return result;
