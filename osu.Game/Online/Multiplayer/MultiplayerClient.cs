@@ -442,7 +442,12 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.SettingsChanged(MultiplayerRoomSettings newSettings) => updateLocalRoomSettings(newSettings);
+        Task IMultiplayerClient.SettingsChanged(MultiplayerRoomSettings newSettings)
+        {
+            // Do not return this task, as it will cause tests to deadlock.
+            updateLocalRoomSettings(newSettings);
+            return Task.CompletedTask;
+        }
 
         Task IMultiplayerClient.UserStateChanged(int userId, MultiplayerUserState state)
         {
@@ -601,16 +606,17 @@ namespace osu.Game.Online.Multiplayer
 
             var playlistItem = await createPlaylistItem(item).ConfigureAwait(false);
 
-            await scheduleAsync(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
 
                 Debug.Assert(APIRoom != null);
 
+                APIRoom.Playlist.RemoveAll(i => i.ID == playlistItem.ID);
                 APIRoom.Playlist.Add(playlistItem);
                 RoomUpdated?.Invoke();
-            }).ConfigureAwait(false);
+            });
         }
 
         public Task PlaylistItemRemoved(long playlistItemId)
@@ -618,7 +624,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return Task.CompletedTask;
 
-            return scheduleAsync(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
@@ -628,6 +634,8 @@ namespace osu.Game.Online.Multiplayer
                 APIRoom.Playlist.RemoveAll(i => i.ID == playlistItemId);
                 RoomUpdated?.Invoke();
             });
+
+            return Task.CompletedTask;
         }
 
         public async Task PlaylistItemChanged(APIPlaylistItem item)
@@ -637,7 +645,7 @@ namespace osu.Game.Online.Multiplayer
 
             var playlistItem = await createPlaylistItem(item).ConfigureAwait(false);
 
-            await scheduleAsync(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
@@ -658,7 +666,7 @@ namespace osu.Game.Online.Multiplayer
                     CurrentMatchPlayingItem.Value = APIRoom.Playlist[index];
 
                 RoomUpdated?.Invoke();
-            }).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
