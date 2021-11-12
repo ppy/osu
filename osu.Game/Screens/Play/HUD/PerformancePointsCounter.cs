@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Play.HUD
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.Numeric.With(size: 16)
+                            Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
                         },
                         new OsuSpriteText
                         {
