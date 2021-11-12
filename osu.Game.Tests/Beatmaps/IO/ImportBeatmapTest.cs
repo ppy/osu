@@ -18,6 +18,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
@@ -379,6 +380,41 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     checkBeatmapSetCount(osu, 1);
                     checkSingleReferencedFileCount(osu, 18);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestModelCreationFailureDoesntReturn()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+                    var importer = osu.Dependencies.Get<BeatmapManager>();
+
+                    var progressNotification = new ImportProgressNotification();
+
+                    var zipStream = new MemoryStream();
+
+                    using (var zip = ZipArchive.Create())
+                        zip.SaveTo(zipStream, new ZipWriterOptions(CompressionType.Deflate));
+
+                    var imported = await importer.Import(
+                        progressNotification,
+                        new ImportTask(zipStream, string.Empty)
+                    );
+
+                    checkBeatmapSetCount(osu, 0);
+                    checkBeatmapCount(osu, 0);
+
+                    Assert.IsEmpty(imported);
+                    Assert.AreEqual(ProgressNotificationState.Cancelled, progressNotification.State);
                 }
                 finally
                 {
