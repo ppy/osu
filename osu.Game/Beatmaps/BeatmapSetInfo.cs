@@ -16,12 +16,13 @@ namespace osu.Game.Beatmaps
     {
         public int ID { get; set; }
 
-        private int? onlineBeatmapSetID;
+        private int? onlineID;
 
-        public int? OnlineBeatmapSetID
+        [Column("OnlineBeatmapSetID")]
+        public int? OnlineID
         {
-            get => onlineBeatmapSetID;
-            set => onlineBeatmapSetID = value > 0 ? value : null;
+            get => onlineID;
+            set => onlineID = value > 0 ? value : null;
         }
 
         public DateTimeOffset DateAdded { get; set; }
@@ -74,8 +75,8 @@ namespace osu.Game.Beatmaps
             if (ID != 0 && other.ID != 0)
                 return ID == other.ID;
 
-            if (OnlineBeatmapSetID.HasValue && other.OnlineBeatmapSetID.HasValue)
-                return OnlineBeatmapSetID == other.OnlineBeatmapSetID;
+            if (OnlineID.HasValue && other.OnlineID.HasValue)
+                return OnlineID == other.OnlineID;
 
             if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
                 return Hash == other.Hash;
@@ -85,7 +86,7 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IHasOnlineID
 
-        public int OnlineID => OnlineBeatmapSetID ?? -1;
+        int IHasOnlineID<int>.OnlineID => OnlineID ?? -1;
 
         #endregion
 

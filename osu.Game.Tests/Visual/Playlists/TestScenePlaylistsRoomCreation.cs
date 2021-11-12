@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
                 // intentionally increment online IDs to clash with import below.
                 beatmap.BeatmapInfo.OnlineID++;
-                beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID++;
+                beatmap.BeatmapInfo.BeatmapSet.OnlineID++;
 
                 importedSet = manager.Import(beatmap.BeatmapInfo.BeatmapSet).Result.Value;
             });

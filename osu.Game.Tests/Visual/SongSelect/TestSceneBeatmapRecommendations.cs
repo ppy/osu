@@ -180,7 +180,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             var beatmapSet = new BeatmapSetInfo
             {
                 Hash = Guid.NewGuid().ToString(),
-                OnlineBeatmapSetID = importID,
+                OnlineID = importID,
                 Metadata = metadata,
                 Beatmaps = difficultyRulesets.Select((ruleset, difficultyIndex) => new BeatmapInfo
                 {

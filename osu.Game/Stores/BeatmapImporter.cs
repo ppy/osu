@@ -182,7 +182,7 @@ namespace osu.Game.Stores
 
             return new RealmBeatmapSet
             {
-                OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID ?? -1,
+                OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID ?? -1,
                 // Metadata = beatmap.Metadata,
                 DateAdded = DateTimeOffset.UtcNow
             };

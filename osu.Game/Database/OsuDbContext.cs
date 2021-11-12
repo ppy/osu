@@ -129,7 +129,7 @@ namespace osu.Game.Database
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
 
-            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineBeatmapSetID).IsUnique();
+            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineID).IsUnique();
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
 

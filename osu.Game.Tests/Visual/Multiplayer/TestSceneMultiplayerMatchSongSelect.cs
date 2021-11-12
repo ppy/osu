@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             manager.Import(new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = 10,
+                OnlineID = 10,
                 Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
