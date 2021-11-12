@@ -264,7 +264,7 @@ namespace osu.Game.Database
                 model = CreateModel(archive);
 
                 if (model == null)
-                    return Task.FromResult<ILive<TModel>>(new EntityFrameworkLive<TModel>(null));
+                    return Task.FromResult<ILive<TModel>>(null);
             }
             catch (TaskCanceledException)
             {
