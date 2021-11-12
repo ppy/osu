@@ -3,8 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Menu;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Menus
 {
@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Menus
 
             AddStep("toggle support", () =>
             {
-                ((DummyAPIAccess)API).LocalUser.Value = new User
+                ((DummyAPIAccess)API).LocalUser.Value = new APIUser
                 {
                     Username = API.LocalUser.Value.Username,
                     Id = API.LocalUser.Value.Id + 1,

@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
@@ -24,10 +25,10 @@ namespace osu.Game.Tests.Visual.Online
         {
             RankGraph graph;
 
-            var data = new int[89];
-            var dataWithZeros = new int[89];
-            var smallData = new int[89];
-            var edgyData = new int[89];
+            int[] data = new int[89];
+            int[] dataWithZeros = new int[89];
+            int[] smallData = new int[89];
+            int[] edgyData = new int[89];
 
             for (int i = 0; i < 89; i++)
                 data[i] = dataWithZeros[i] = (i + 1) * 1000;
@@ -81,7 +82,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     GlobalRank = 89000,
                     PP = 12345,
-                    RankHistory = new User.RankHistoryData
+                    RankHistory = new APIRankHistory
                     {
                         Data = data,
                     }
@@ -94,7 +95,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     GlobalRank = 89000,
                     PP = 12345,
-                    RankHistory = new User.RankHistoryData
+                    RankHistory = new APIRankHistory
                     {
                         Data = dataWithZeros,
                     }
@@ -107,7 +108,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     GlobalRank = 12000,
                     PP = 12345,
-                    RankHistory = new User.RankHistoryData
+                    RankHistory = new APIRankHistory
                     {
                         Data = smallData,
                     }
@@ -120,7 +121,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     GlobalRank = 12000,
                     PP = 12345,
-                    RankHistory = new User.RankHistoryData
+                    RankHistory = new APIRankHistory
                     {
                         Data = edgyData,
                     }

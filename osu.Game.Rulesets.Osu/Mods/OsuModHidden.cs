@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -17,6 +19,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHidden : ModHidden, IHidesApproachCircles
     {
+        [SettingSource("Only fade approach circles", "The main object body will not fade when enabled.")]
+        public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
+
         public override string Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => 1.06;
 
@@ -44,15 +49,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            applyState(hitObject, true);
+            applyHiddenState(hitObject, true);
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            applyState(hitObject, false);
+            applyHiddenState(hitObject, false);
         }
 
-        private void applyState(DrawableHitObject drawableObject, bool increaseVisibility)
+        private void applyHiddenState(DrawableHitObject drawableObject, bool increaseVisibility)
         {
             if (!(drawableObject is DrawableOsuHitObject drawableOsuObject))
                 return;
@@ -60,6 +65,24 @@ namespace osu.Game.Rulesets.Osu.Mods
             OsuHitObject hitObject = drawableOsuObject.HitObject;
 
             (double fadeStartTime, double fadeDuration) = getFadeOutParameters(drawableOsuObject);
+
+            // process approach circle hiding first (to allow for early return below).
+            if (!increaseVisibility)
+            {
+                if (drawableObject is DrawableHitCircle circle)
+                {
+                    using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
+                        circle.ApproachCircle.Hide();
+                }
+                else if (drawableObject is DrawableSpinner spinner)
+                {
+                    spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
+                    hideSpinnerApproachCircle(spinner);
+                }
+            }
+
+            if (OnlyFadeApproachCircles.Value)
+                return;
 
             switch (drawableObject)
             {
@@ -84,12 +107,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                         // only fade the circle piece (not the approach circle) for the increased visibility object.
                         fadeTarget = circle.CirclePiece;
                     }
-                    else
-                    {
-                        // we don't want to see the approach circle
-                        using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-                            circle.ApproachCircle.Hide();
-                    }
 
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         fadeTarget.FadeOut(fadeDuration);
@@ -110,9 +127,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSpinner spinner:
                     // hide elements we don't care about.
                     // todo: hide background
-
-                    spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
-                    hideSpinnerApproachCircle(spinner);
 
                     using (spinner.BeginAbsoluteSequence(fadeStartTime))
                         spinner.FadeOut(fadeDuration);
@@ -141,11 +155,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             static (double fadeStartTime, double fadeDuration) getParameters(OsuHitObject hitObject)
             {
-                var fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt + hitObject.TimeFadeIn;
-                var fadeOutDuration = hitObject.TimePreempt * fade_out_duration_multiplier;
+                double fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt + hitObject.TimeFadeIn;
+                double fadeOutDuration = hitObject.TimePreempt * fade_out_duration_multiplier;
 
                 // new duration from completed fade in to end (before fading out)
-                var longFadeDuration = hitObject.GetEndTime() - fadeOutStartTime;
+                double longFadeDuration = hitObject.GetEndTime() - fadeOutStartTime;
 
                 switch (hitObject)
                 {
@@ -153,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         return (fadeOutStartTime, longFadeDuration);
 
                     case SliderTick _:
-                        var tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
+                        double tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
                         return (hitObject.StartTime - tickFadeOutDuration, tickFadeOutDuration);
 
                     case Spinner _:

@@ -9,35 +9,35 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Database
 {
-    public class UserLookupCache : MemoryCachingComponent<int, User>
+    public class UserLookupCache : MemoryCachingComponent<int, APIUser>
     {
         [Resolved]
         private IAPIProvider api { get; set; }
 
         /// <summary>
-        /// Perform an API lookup on the specified user, populating a <see cref="User"/> model.
+        /// Perform an API lookup on the specified user, populating a <see cref="APIUser"/> model.
         /// </summary>
         /// <param name="userId">The user to lookup.</param>
         /// <param name="token">An optional cancellation token.</param>
         /// <returns>The populated user, or null if the user does not exist or the request could not be satisfied.</returns>
         [ItemCanBeNull]
-        public Task<User> GetUserAsync(int userId, CancellationToken token = default) => GetAsync(userId, token);
+        public Task<APIUser> GetUserAsync(int userId, CancellationToken token = default) => GetAsync(userId, token);
 
         /// <summary>
-        /// Perform an API lookup on the specified users, populating a <see cref="User"/> model.
+        /// Perform an API lookup on the specified users, populating a <see cref="APIUser"/> model.
         /// </summary>
         /// <param name="userIds">The users to lookup.</param>
         /// <param name="token">An optional cancellation token.</param>
         /// <returns>The populated users. May include null results for failed retrievals.</returns>
-        public Task<User[]> GetUsersAsync(int[] userIds, CancellationToken token = default)
+        public Task<APIUser[]> GetUsersAsync(int[] userIds, CancellationToken token = default)
         {
-            var userLookupTasks = new List<Task<User>>();
+            var userLookupTasks = new List<Task<APIUser>>();
 
-            foreach (var u in userIds)
+            foreach (int u in userIds)
             {
                 userLookupTasks.Add(GetUserAsync(u, token).ContinueWith(task =>
                 {
@@ -51,18 +51,18 @@ namespace osu.Game.Database
             return Task.WhenAll(userLookupTasks);
         }
 
-        protected override async Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
+        protected override async Task<APIUser> ComputeValueAsync(int lookup, CancellationToken token = default)
             => await queryUser(lookup).ConfigureAwait(false);
 
-        private readonly Queue<(int id, TaskCompletionSource<User>)> pendingUserTasks = new Queue<(int, TaskCompletionSource<User>)>();
+        private readonly Queue<(int id, TaskCompletionSource<APIUser>)> pendingUserTasks = new Queue<(int, TaskCompletionSource<APIUser>)>();
         private Task pendingRequestTask;
         private readonly object taskAssignmentLock = new object();
 
-        private Task<User> queryUser(int userId)
+        private Task<APIUser> queryUser(int userId)
         {
             lock (taskAssignmentLock)
             {
-                var tcs = new TaskCompletionSource<User>();
+                var tcs = new TaskCompletionSource<APIUser>();
 
                 // Add to the queue.
                 pendingUserTasks.Enqueue((userId, tcs));
@@ -78,14 +78,14 @@ namespace osu.Game.Database
         private void performLookup()
         {
             // contains at most 50 unique user IDs from userTasks, which is used to perform the lookup.
-            var userTasks = new Dictionary<int, List<TaskCompletionSource<User>>>();
+            var userTasks = new Dictionary<int, List<TaskCompletionSource<APIUser>>>();
 
             // Grab at most 50 unique user IDs from the queue.
             lock (taskAssignmentLock)
             {
                 while (pendingUserTasks.Count > 0 && userTasks.Count < 50)
                 {
-                    (int id, TaskCompletionSource<User> task) next = pendingUserTasks.Dequeue();
+                    (int id, TaskCompletionSource<APIUser> task) next = pendingUserTasks.Dequeue();
 
                     // Perform a secondary check for existence, in case the user was queried in a previous batch.
                     if (CheckExists(next.id, out var existing))
@@ -95,7 +95,7 @@ namespace osu.Game.Database
                         if (userTasks.TryGetValue(next.id, out var tasks))
                             tasks.Add(next.task);
                         else
-                            userTasks[next.id] = new List<TaskCompletionSource<User>> { next.task };
+                            userTasks[next.id] = new List<TaskCompletionSource<APIUser>> { next.task };
                     }
                 }
             }
@@ -115,7 +115,7 @@ namespace osu.Game.Database
                     createNewTask();
             }
 
-            List<User> foundUsers = request.Response?.Users;
+            List<APIUser> foundUsers = request.Response?.Users;
 
             if (foundUsers != null)
             {

@@ -59,12 +59,12 @@ namespace osu.Game.Beatmaps
         {
             foreach (var r in orderedRulesets)
             {
-                if (!recommendedDifficultyMapping.TryGetValue(r, out var recommendation))
+                if (!recommendedDifficultyMapping.TryGetValue(r, out double recommendation))
                     continue;
 
                 BeatmapInfo beatmapInfo = beatmaps.Where(b => b.Ruleset.Equals(r)).OrderBy(b =>
                 {
-                    var difference = b.StarDifficulty - recommendation;
+                    double difference = b.StarRating - recommendation;
                     return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
                 }).FirstOrDefault();
 

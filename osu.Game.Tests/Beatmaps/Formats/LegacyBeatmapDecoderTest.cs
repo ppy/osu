@@ -112,12 +112,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Renatus", metadata.TitleUnicode);
                 Assert.AreEqual("Soleily", metadata.Artist);
                 Assert.AreEqual("Soleily", metadata.ArtistUnicode);
-                Assert.AreEqual("Gamu", metadata.AuthorString);
-                Assert.AreEqual("Insane", beatmapInfo.Version);
+                Assert.AreEqual("Gamu", metadata.Author.Username);
+                Assert.AreEqual("Insane", beatmapInfo.DifficultyName);
                 Assert.AreEqual(string.Empty, metadata.Source);
                 Assert.AreEqual("MBC7 Unisphere 地球ヤバイEP Chikyu Yabai", metadata.Tags);
-                Assert.AreEqual(557821, beatmapInfo.OnlineBeatmapID);
-                Assert.AreEqual(241526, beatmapInfo.BeatmapSet.OnlineBeatmapSetID);
+                Assert.AreEqual(557821, beatmapInfo.OnlineID);
+                Assert.AreEqual(241526, beatmapInfo.BeatmapSet.OnlineID);
             }
         }
 
@@ -547,7 +547,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
                 Assert.IsNotNull(beatmap);
                 Assert.AreEqual("Beatmap with corrupted header", beatmap.Metadata.Title);
-                Assert.AreEqual("Evil Hacker", beatmap.Metadata.AuthorString);
+                Assert.AreEqual("Evil Hacker", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -565,7 +565,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
                 Assert.IsNotNull(beatmap);
                 Assert.AreEqual("Beatmap with no header", beatmap.Metadata.Title);
-                Assert.AreEqual("Incredibly Evil Hacker", beatmap.Metadata.AuthorString);
+                Assert.AreEqual("Incredibly Evil Hacker", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -583,7 +583,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
                 Assert.IsNotNull(beatmap);
                 Assert.AreEqual("Empty lines at start", beatmap.Metadata.Title);
-                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.AuthorString);
+                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -601,7 +601,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
                 Assert.IsNotNull(beatmap);
                 Assert.AreEqual("The dog ate the file header", beatmap.Metadata.Title);
-                Assert.AreEqual("Why does this keep happening", beatmap.Metadata.AuthorString);
+                Assert.AreEqual("Why does this keep happening", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -619,7 +619,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
                 Assert.IsNotNull(beatmap);
                 Assert.AreEqual("No empty line delimiting header from contents", beatmap.Metadata.Title);
-                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.AuthorString);
+                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -673,6 +673,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(first.ControlPoints[1].Position, Is.EqualTo(new Vector2(161, -244)));
                 Assert.That(first.ControlPoints[1].Type, Is.EqualTo(null));
 
+                // ReSharper disable once HeuristicUnreachableCode
+                // weird one, see https://youtrack.jetbrains.com/issue/RIDER-70159.
                 Assert.That(first.ControlPoints[2].Position, Is.EqualTo(new Vector2(376, -3)));
                 Assert.That(first.ControlPoints[2].Type, Is.EqualTo(PathType.Bezier));
                 Assert.That(first.ControlPoints[3].Position, Is.EqualTo(new Vector2(68, 15)));

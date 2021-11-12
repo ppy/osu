@@ -14,9 +14,9 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Menu
 {
@@ -34,10 +34,10 @@ namespace osu.Game.Screens.Menu
 
         private readonly OsuScreen nextScreen;
 
-        private readonly Bindable<User> currentUser = new Bindable<User>();
+        private readonly Bindable<APIUser> currentUser = new Bindable<APIUser>();
         private FillFlowContainer fill;
 
-        private readonly List<Drawable> expendableText = new List<Drawable>();
+        private readonly List<ITextPart> expendableText = new List<ITextPart>();
 
         public Disclaimer(OsuScreen nextScreen = null)
         {
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Menu
 
             textFlow.AddText("this is osu!", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular));
 
-            expendableText.AddRange(textFlow.AddText("lazer", t =>
+            expendableText.Add(textFlow.AddText("lazer", t =>
             {
                 t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular);
                 t.Colour = colours.PinkLight;
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Menu
                 t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold);
                 t.Colour = colours.Pink;
             });
-            expendableText.AddRange(textFlow.AddText(" coming to osu!", formatRegular));
+            expendableText.Add(textFlow.AddText(" coming to osu!", formatRegular));
             textFlow.AddText(".", formatRegular);
 
             textFlow.NewParagraph();
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Menu
                     t.Font = t.Font.With(size: 20);
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
-                }).First();
+                }).Drawables.First();
 
                 if (IsLoaded)
                     animateHeart();
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Menu
             if (nextScreen != null)
                 LoadComponentAsync(nextScreen);
 
-            ((IBindable<User>)currentUser).BindTo(api.LocalUser);
+            ((IBindable<APIUser>)currentUser).BindTo(api.LocalUser);
         }
 
         public override void OnEntering(IScreen last)
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Menu
                 using (BeginDelayedSequence(520 + 160))
                 {
                     fill.MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
-                    Schedule(() => expendableText.ForEach(t =>
+                    Schedule(() => expendableText.SelectMany(t => t.Drawables).ForEach(t =>
                     {
                         t.FadeOut(100);
                         t.ScaleTo(new Vector2(0, 1), 100, Easing.OutQuart);

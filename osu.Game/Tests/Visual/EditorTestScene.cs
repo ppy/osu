@@ -10,7 +10,6 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
@@ -138,7 +137,7 @@ namespace osu.Game.Tests.Visual
                 private readonly TestBeatmapManager testBeatmapManager;
 
                 public TestWorkingBeatmapCache(TestBeatmapManager testBeatmapManager, AudioManager audioManager, IResourceStore<byte[]> resourceStore, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost gameHost)
-                    : base(audioManager, resourceStore, storage, defaultBeatmap, gameHost)
+                    : base(testBeatmapManager.BeatmapTrackStore, audioManager, resourceStore, storage, defaultBeatmap, gameHost)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }
@@ -154,7 +153,7 @@ namespace osu.Game.Tests.Visual
                 {
                 }
 
-                protected override string ComputeHash(BeatmapSetInfo item, ArchiveReader reader = null)
+                protected override string ComputeHash(BeatmapSetInfo item)
                     => string.Empty;
             }
 

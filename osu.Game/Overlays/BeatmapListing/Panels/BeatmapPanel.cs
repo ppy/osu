@@ -23,6 +23,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osuTK.Graphics;
 
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 {
     public abstract class BeatmapPanel : OsuClickableContainer, IHasContextMenu
     {
-        public readonly BeatmapSetInfo SetInfo;
+        public readonly APIBeatmapSet SetInfo;
 
         private const double hover_transition_time = 400;
         private const int maximum_difficulty_icons = 10;
@@ -49,10 +50,10 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         protected Action ViewBeatmap;
 
-        protected BeatmapPanel(BeatmapSetInfo setInfo)
+        protected BeatmapPanel(APIBeatmapSet setInfo)
             : base(HoverSampleSet.Submit)
         {
-            Debug.Assert(setInfo.OnlineBeatmapSetID != null);
+            Debug.Assert(setInfo.OnlineID > 0);
 
             SetInfo = setInfo;
         }
@@ -95,8 +96,8 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
             Action = ViewBeatmap = () =>
             {
-                Debug.Assert(SetInfo.OnlineBeatmapSetID != null);
-                beatmapSetOverlay?.FetchAndShowBeatmapSet(SetInfo.OnlineBeatmapSetID.Value);
+                Debug.Assert(SetInfo.OnlineID > 0);
+                beatmapSetOverlay?.FetchAndShowBeatmapSet(SetInfo.OnlineID);
             };
         }
 
@@ -146,14 +147,14 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         {
             var icons = new List<DifficultyIcon>();
 
-            if (SetInfo.Beatmaps.Count > maximum_difficulty_icons)
+            if (SetInfo.Beatmaps.Length > maximum_difficulty_icons)
             {
                 foreach (var ruleset in SetInfo.Beatmaps.Select(b => b.Ruleset).Distinct())
-                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is ListBeatmapPanel ? Color4.White : colours.Gray5));
+                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.Where(b => b.RulesetID == ruleset.OnlineID).ToList(), ruleset, this is ListBeatmapPanel ? Color4.White : colours.Gray5));
             }
             else
             {
-                foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.Ruleset.ID).ThenBy(beatmap => beatmap.StarDifficulty))
+                foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.RulesetID).ThenBy(beatmap => beatmap.StarRating))
                     icons.Add(new DifficultyIcon(b));
             }
 
@@ -163,7 +164,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         protected Drawable CreateBackground() => new UpdateableOnlineBeatmapSetCover
         {
             RelativeSizeAxes = Axes.Both,
-            BeatmapSet = SetInfo,
+            OnlineInfo = SetInfo,
         };
 
         public class Statistic : FillFlowContainer

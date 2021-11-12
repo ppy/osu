@@ -17,12 +17,13 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
 using osu.Game.Utils;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -148,6 +149,10 @@ namespace osu.Game.Online.Multiplayer
                 {
                     Room = joinedRoom;
                     APIRoom = room;
+
+                    Debug.Assert(LocalUser != null);
+                    addUserToAPIRoom(LocalUser);
+
                     foreach (var user in joinedRoom.Users)
                         updateUserPlayingState(user.UserID, user.State);
 
@@ -224,7 +229,7 @@ namespace osu.Game.Online.Multiplayer
                 {
                     Value = new BeatmapInfo
                     {
-                        OnlineBeatmapID = Room.Settings.BeatmapID,
+                        OnlineID = Room.Settings.BeatmapID,
                         MD5Hash = Room.Settings.BeatmapChecksum
                     }
                 },
@@ -372,6 +377,8 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Add(user);
 
+                addUserToAPIRoom(user);
+
                 UserJoined?.Invoke(user);
                 RoomUpdated?.Invoke();
             });
@@ -391,6 +398,18 @@ namespace osu.Game.Online.Multiplayer
             return handleUserLeft(user, UserKicked);
         }
 
+        private void addUserToAPIRoom(MultiplayerRoomUser user)
+        {
+            Debug.Assert(APIRoom != null);
+
+            APIRoom.RecentParticipants.Add(user.User ?? new APIUser
+            {
+                Id = user.UserID,
+                Username = "[Unresolved]"
+            });
+            APIRoom.ParticipantCount.Value++;
+        }
+
         private Task handleUserLeft(MultiplayerRoomUser user, Action<MultiplayerRoomUser>? callback)
         {
             if (Room == null)
@@ -403,6 +422,10 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Remove(user);
                 PlayingUserIds.Remove(user.UserID);
+
+                Debug.Assert(APIRoom != null);
+                APIRoom.RecentParticipants.RemoveAll(u => u.Id == user.UserID);
+                APIRoom.ParticipantCount.Value--;
 
                 callback?.Invoke(user);
                 RoomUpdated?.Invoke();
@@ -591,7 +614,7 @@ namespace osu.Game.Online.Multiplayer
         }
 
         /// <summary>
-        /// Populates the <see cref="User"/> for a given <see cref="MultiplayerRoomUser"/>.
+        /// Populates the <see cref="APIUser"/> for a given <see cref="MultiplayerRoomUser"/>.
         /// </summary>
         /// <param name="multiplayerUser">The <see cref="MultiplayerRoomUser"/> to populate.</param>
         protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID).ConfigureAwait(false);
@@ -622,24 +645,32 @@ namespace osu.Game.Online.Multiplayer
 
             RoomUpdated?.Invoke();
 
-            GetOnlineBeatmapSet(settings.BeatmapID, cancellationToken).ContinueWith(set => Schedule(() =>
+            GetOnlineBeatmapSet(settings.BeatmapID, cancellationToken).ContinueWith(task => Schedule(() =>
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                updatePlaylist(settings, set.Result);
+                APIBeatmapSet beatmapSet = task.Result;
+
+                // The incoming response is deserialised without circular reference handling currently.
+                // Because we require using metadata from this instance, populate the nested beatmaps' sets manually here.
+                foreach (var b in beatmapSet.Beatmaps)
+                    b.BeatmapSet = beatmapSet;
+
+                updatePlaylist(settings, beatmapSet);
             }), TaskContinuationOptions.OnlyOnRanToCompletion);
         }, cancellationToken);
 
-        private void updatePlaylist(MultiplayerRoomSettings settings, BeatmapSetInfo beatmapSet)
+        private void updatePlaylist(MultiplayerRoomSettings settings, APIBeatmapSet beatmapSet)
         {
             if (Room == null || !Room.Settings.Equals(settings))
                 return;
 
             Debug.Assert(APIRoom != null);
 
-            var beatmap = beatmapSet.Beatmaps.Single(b => b.OnlineBeatmapID == settings.BeatmapID);
-            beatmap.MD5Hash = settings.BeatmapChecksum;
+            var beatmap = beatmapSet.Beatmaps.Single(b => b.OnlineID == settings.BeatmapID);
+
+            beatmap.Checksum = settings.BeatmapChecksum;
 
             var ruleset = Rulesets.GetRuleset(settings.RulesetID).CreateInstance();
             var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
@@ -672,12 +703,12 @@ namespace osu.Game.Online.Multiplayer
         }
 
         /// <summary>
-        /// Retrieves a <see cref="BeatmapSetInfo"/> from an online source.
+        /// Retrieves a <see cref="APIBeatmapSet"/> from an online source.
         /// </summary>
         /// <param name="beatmapId">The beatmap set ID.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
-        /// <returns>The <see cref="BeatmapSetInfo"/> retrieval task.</returns>
-        protected abstract Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
+        /// <returns>The <see cref="APIBeatmapSet"/> retrieval task.</returns>
+        protected abstract Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.

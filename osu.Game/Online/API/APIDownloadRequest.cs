@@ -23,7 +23,7 @@ namespace osu.Game.Online.API
 
         protected override WebRequest CreateWebRequest()
         {
-            var file = Path.GetTempFileName();
+            string file = Path.GetTempFileName();
 
             File.Move(file, filename = Path.ChangeExtension(file, FileExtension));
 

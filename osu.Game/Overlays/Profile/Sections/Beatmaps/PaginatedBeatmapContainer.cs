@@ -10,8 +10,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
-using osu.Game.Users;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {
@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private const float panel_padding = 10f;
         private readonly BeatmapSetType type;
 
-        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, LocalisableString headerText)
+        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<APIUser> user, LocalisableString headerText)
             : base(user, headerText)
         {
             this.type = type;
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             ItemsContainer.Spacing = new Vector2(panel_padding);
         }
 
-        protected override int GetCount(User user)
+        protected override int GetCount(APIUser user)
         {
             switch (type)
             {
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
         protected override Drawable CreateDrawableItem(APIBeatmapSet model) => model.OnlineID > 0
-            ? new GridBeatmapPanel(model.ToBeatmapSet(Rulesets))
+            ? new GridBeatmapPanel(model)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,

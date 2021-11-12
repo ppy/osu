@@ -9,6 +9,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
@@ -40,9 +41,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             base.SetUpSteps();
 
-            User getUser(int? rulesetID)
+            APIUser getUser(int? rulesetID)
             {
-                return new User
+                return new APIUser
                 {
                     Username = @"Dummy",
                     Id = 1001,
@@ -179,16 +180,16 @@ namespace osu.Game.Tests.Visual.SongSelect
             var beatmapSet = new BeatmapSetInfo
             {
                 Hash = Guid.NewGuid().ToString(),
-                OnlineBeatmapSetID = importID,
+                OnlineID = importID,
                 Metadata = metadata,
                 Beatmaps = difficultyRulesets.Select((ruleset, difficultyIndex) => new BeatmapInfo
                 {
-                    OnlineBeatmapID = importID * 1024 + difficultyIndex,
+                    OnlineID = importID * 1024 + difficultyIndex,
                     Metadata = metadata,
                     BaseDifficulty = new BeatmapDifficulty(),
                     Ruleset = ruleset,
-                    StarDifficulty = difficultyIndex + 1,
-                    Version = $"SR{difficultyIndex + 1}"
+                    StarRating = difficultyIndex + 1,
+                    DifficultyName = $"SR{difficultyIndex + 1}"
                 }).ToList()
             };
 
@@ -204,8 +205,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
             AddUntilStep("recommended beatmap displayed", () =>
             {
-                int? expectedID = getImport().Beatmaps[expectedDiff - 1].OnlineBeatmapID;
-                return Game.Beatmap.Value.BeatmapInfo.OnlineBeatmapID == expectedID;
+                int? expectedID = getImport().Beatmaps[expectedDiff - 1].OnlineID;
+                return Game.Beatmap.Value.BeatmapInfo.OnlineID == expectedID;
             });
         }
     }

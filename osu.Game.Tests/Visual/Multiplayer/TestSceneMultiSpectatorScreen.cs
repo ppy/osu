@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Rulesets.UI;
@@ -19,7 +20,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tests.Beatmaps.IO;
-using osu.Game.Users;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             importedSet = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).Result;
             importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
-            importedBeatmapId = importedBeatmap.OnlineBeatmapID ?? -1;
+            importedBeatmapId = importedBeatmap.OnlineID ?? -1;
         }
 
         [SetUp]
@@ -59,8 +59,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("start players silently", () =>
             {
-                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID }, true);
-                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID }, true);
+                OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_1_ID }, true);
+                OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_2_ID }, true);
 
                 playingUsers.Add(new MultiplayerRoomUser(PLAYER_1_ID));
                 playingUsers.Add(new MultiplayerRoomUser(PLAYER_2_ID));
@@ -120,13 +120,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("start players", () =>
             {
-                var player1 = OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID }, true);
+                var player1 = OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_1_ID }, true);
                 player1.MatchState = new TeamVersusUserState
                 {
                     TeamID = 0,
                 };
 
-                var player2 = OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID }, true);
+                var player2 = OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_2_ID }, true);
                 player2.MatchState = new TeamVersusUserState
                 {
                     TeamID = 1,
@@ -289,7 +289,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestSpectatingDuringGameplay()
         {
-            var players = new[] { PLAYER_1_ID, PLAYER_2_ID };
+            int[] players = { PLAYER_1_ID, PLAYER_2_ID };
 
             start(players);
             sendFrames(players, 300);
@@ -326,7 +326,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             for (int count = 3; count >= 0; count--)
             {
-                var id = PLAYER_1_ID + count;
+                int id = PLAYER_1_ID + count;
 
                 end(id);
                 AddUntilStep($"{id} area grayed", () => getInstance(id).Colour != Color4.White);
@@ -367,7 +367,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     var user = new MultiplayerRoomUser(id)
                     {
-                        User = new User { Id = id },
+                        User = new APIUser { Id = id },
                     };
 
                     OnlinePlayDependencies.Client.AddUser(user.User, true);

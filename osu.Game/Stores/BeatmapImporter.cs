@@ -63,7 +63,7 @@ namespace osu.Game.Stores
 
             validateOnlineIds(beatmapSet, realm);
 
-            bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
+            bool hadOnlineIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
 
             if (onlineLookupQueue != null)
             {
@@ -72,7 +72,7 @@ namespace osu.Game.Stores
             }
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
-            if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
+            if (hadOnlineIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
             {
                 if (beatmapSet.OnlineID > 0)
                 {
@@ -123,7 +123,7 @@ namespace osu.Game.Stores
             // find any existing beatmaps in the database that have matching online ids
             List<RealmBeatmap> existingBeatmaps = new List<RealmBeatmap>();
 
-            foreach (var id in beatmapIds)
+            foreach (int id in beatmapIds)
                 existingBeatmaps.AddRange(realm.All<RealmBeatmap>().Where(b => b.OnlineID == id));
 
             if (existingBeatmaps.Any())
@@ -182,7 +182,7 @@ namespace osu.Game.Stores
 
             return new RealmBeatmapSet
             {
-                OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID ?? -1,
+                OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID ?? -1,
                 // Metadata = beatmap.Metadata,
                 DateAdded = DateTimeOffset.UtcNow
             };
@@ -238,7 +238,11 @@ namespace osu.Game.Stores
                         TitleUnicode = decoded.Metadata.TitleUnicode,
                         Artist = decoded.Metadata.Artist,
                         ArtistUnicode = decoded.Metadata.ArtistUnicode,
-                        Author = decoded.Metadata.AuthorString,
+                        Author =
+                        {
+                            OnlineID = decoded.Metadata.Author.Id,
+                            Username = decoded.Metadata.Author.Username
+                        },
                         Source = decoded.Metadata.Source,
                         Tags = decoded.Metadata.Tags,
                         PreviewTime = decoded.Metadata.PreviewTime,
@@ -249,8 +253,8 @@ namespace osu.Game.Stores
                     var beatmap = new RealmBeatmap(ruleset, difficulty, metadata)
                     {
                         Hash = hash,
-                        DifficultyName = decodedInfo.Version,
-                        OnlineID = decodedInfo.OnlineBeatmapID ?? -1,
+                        DifficultyName = decodedInfo.DifficultyName,
+                        OnlineID = decodedInfo.OnlineID ?? -1,
                         AudioLeadIn = decodedInfo.AudioLeadIn,
                         StackLeniency = decodedInfo.StackLeniency,
                         SpecialStyle = decodedInfo.SpecialStyle,

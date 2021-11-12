@@ -302,7 +302,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             var pattern = new Pattern();
 
-            int noteCount = getRandomNoteCountMirrored(centreProbability, p2, p3, out var addToCentre);
+            int noteCount = getRandomNoteCountMirrored(centreProbability, p2, p3, out bool addToCentre);
 
             int columnLimit = (TotalColumns % 2 == 0 ? TotalColumns : TotalColumns - 1) / 2;
             int nextColumn = GetRandomColumn(upperBound: columnLimit);

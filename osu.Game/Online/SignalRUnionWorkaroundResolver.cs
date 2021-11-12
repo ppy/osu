@@ -20,7 +20,22 @@ namespace osu.Game.Online
         public static readonly MessagePackSerializerOptions OPTIONS =
             MessagePackSerializerOptions.Standard.WithResolver(new SignalRUnionWorkaroundResolver());
 
-        private static readonly Dictionary<Type, IMessagePackFormatter> formatter_map = new Dictionary<Type, IMessagePackFormatter>
+        public static readonly IReadOnlyList<Type> BASE_TYPES = new[]
+        {
+            typeof(MatchServerEvent),
+            typeof(MatchUserRequest),
+            typeof(MatchRoomState),
+            typeof(MatchUserState),
+        };
+
+        public static readonly IReadOnlyList<Type> DERIVED_TYPES = new[]
+        {
+            typeof(ChangeTeamRequest),
+            typeof(TeamVersusRoomState),
+            typeof(TeamVersusUserState),
+        };
+
+        private static readonly IReadOnlyDictionary<Type, IMessagePackFormatter> formatter_map = new Dictionary<Type, IMessagePackFormatter>
         {
             { typeof(TeamVersusUserState), new TypeRedirectingFormatter<TeamVersusUserState, MatchUserState>() },
             { typeof(TeamVersusRoomState), new TypeRedirectingFormatter<TeamVersusRoomState, MatchRoomState>() },

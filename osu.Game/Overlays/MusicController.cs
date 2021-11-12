@@ -65,16 +65,11 @@ namespace osu.Game.Overlays
         [NotNull]
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
-        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
-        private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
-            managerUpdated.BindValueChanged(beatmapUpdated);
-            managerRemoved = beatmaps.ItemRemoved.GetBoundCopy();
-            managerRemoved.BindValueChanged(beatmapRemoved);
+            beatmaps.ItemUpdated += beatmapUpdated;
+            beatmaps.ItemRemoved += beatmapRemoved;
 
             beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal, true).OrderBy(_ => RNG.Next()));
 
@@ -110,28 +105,13 @@ namespace osu.Game.Overlays
         /// </summary>
         public bool TrackLoaded => CurrentTrack.TrackLoaded;
 
-        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
+        private void beatmapUpdated(BeatmapSetInfo set) => Schedule(() =>
         {
-            if (weakSet.NewValue.TryGetTarget(out var set))
-            {
-                Schedule(() =>
-                {
-                    beatmapSets.Remove(set);
-                    beatmapSets.Add(set);
-                });
-            }
-        }
+            beatmapSets.Remove(set);
+            beatmapSets.Add(set);
+        });
 
-        private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
-        {
-            if (weakSet.NewValue.TryGetTarget(out var set))
-            {
-                Schedule(() =>
-                {
-                    beatmapSets.RemoveAll(s => s.ID == set.ID);
-                });
-            }
-        }
+        private void beatmapRemoved(BeatmapSetInfo set) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
 
         private ScheduledDelegate seekDelegate;
 
@@ -238,7 +218,7 @@ namespace osu.Game.Overlays
             if (beatmap.Disabled)
                 return PreviousTrackResult.None;
 
-            var currentTrackPosition = CurrentTrack.CurrentTime;
+            double currentTrackPosition = CurrentTrack.CurrentTime;
 
             if (currentTrackPosition >= restart_cutoff_point)
             {
@@ -329,8 +309,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     // figure out the best direction based on order in playlist.
-                    var last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = newWorking == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != newWorking.BeatmapSetInfo?.ID).Count();
+                    int last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
+                    int next = newWorking == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != newWorking.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }
@@ -435,6 +415,17 @@ namespace osu.Game.Overlays
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(CurrentTrack);
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmaps != null)
+            {
+                beatmaps.ItemUpdated -= beatmapUpdated;
+                beatmaps.ItemRemoved -= beatmapRemoved;
             }
         }
     }

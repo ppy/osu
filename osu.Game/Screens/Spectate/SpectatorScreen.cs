@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,11 +10,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Spectate
 {
@@ -42,10 +41,8 @@ namespace osu.Game.Screens.Spectate
 
         private readonly IBindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
 
-        private readonly Dictionary<int, User> userMap = new Dictionary<int, User>();
+        private readonly Dictionary<int, APIUser> userMap = new Dictionary<int, APIUser>();
         private readonly Dictionary<int, SpectatorGameplayState> gameplayStates = new Dictionary<int, SpectatorGameplayState>();
-
-        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
         /// <summary>
         /// Creates a new <see cref="SpectatorScreen"/>.
@@ -73,25 +70,21 @@ namespace osu.Game.Screens.Spectate
                 playingUserStates.BindTo(spectatorClient.PlayingUserStates);
                 playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
 
-                managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
-                managerUpdated.BindValueChanged(beatmapUpdated);
+                beatmaps.ItemUpdated += beatmapUpdated;
 
-                foreach (var (id, _) in userMap)
+                foreach ((int id, var _) in userMap)
                     spectatorClient.WatchUser(id);
             }));
         }
 
-        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> e)
+        private void beatmapUpdated(BeatmapSetInfo beatmapSet)
         {
-            if (!e.NewValue.TryGetTarget(out var beatmapSet))
-                return;
-
-            foreach (var (userId, _) in userMap)
+            foreach ((int userId, _) in userMap)
             {
                 if (!playingUserStates.TryGetValue(userId, out var userState))
                     continue;
 
-                if (beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID == userState.BeatmapID))
+                if (beatmapSet.Beatmaps.Any(b => b.OnlineID == userState.BeatmapID))
                     updateGameplayState(userId);
             }
         }
@@ -101,20 +94,20 @@ namespace osu.Game.Screens.Spectate
             switch (e.Action)
             {
                 case NotifyDictionaryChangedAction.Add:
-                    foreach (var (userId, state) in e.NewItems.AsNonNull())
+                    foreach ((int userId, var state) in e.NewItems.AsNonNull())
                         onUserStateAdded(userId, state);
                     break;
 
                 case NotifyDictionaryChangedAction.Remove:
-                    foreach (var (userId, _) in e.OldItems.AsNonNull())
+                    foreach ((int userId, var _) in e.OldItems.AsNonNull())
                         onUserStateRemoved(userId);
                     break;
 
                 case NotifyDictionaryChangedAction.Replace:
-                    foreach (var (userId, _) in e.OldItems.AsNonNull())
+                    foreach ((int userId, var _) in e.OldItems.AsNonNull())
                         onUserStateRemoved(userId);
 
-                    foreach (var (userId, state) in e.NewItems.AsNonNull())
+                    foreach ((int userId, var state) in e.NewItems.AsNonNull())
                         onUserStateAdded(userId, state);
                     break;
             }
@@ -157,7 +150,7 @@ namespace osu.Game.Screens.Spectate
             if (resolvedRuleset == null)
                 return;
 
-            var resolvedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == spectatorState.BeatmapID);
+            var resolvedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineID == spectatorState.BeatmapID);
             if (resolvedBeatmap == null)
                 return;
 
@@ -219,11 +212,12 @@ namespace osu.Game.Screens.Spectate
 
             if (spectatorClient != null)
             {
-                foreach (var (userId, _) in userMap)
+                foreach ((int userId, var _) in userMap)
                     spectatorClient.StopWatchingUser(userId);
             }
 
-            managerUpdated?.UnbindAll();
+            if (beatmaps != null)
+                beatmaps.ItemUpdated -= beatmapUpdated;
         }
     }
 }

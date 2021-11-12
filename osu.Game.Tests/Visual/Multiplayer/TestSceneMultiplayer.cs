@@ -17,14 +17,13 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -32,8 +31,8 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Spectate;
 using osu.Game.Tests.Resources;
-using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -44,11 +43,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
 
-        private DependenciesScreen dependenciesScreen;
-        private TestMultiplayer multiplayerScreen;
-        private TestMultiplayerClient client;
+        private TestMultiplayerScreenStack multiplayerScreenStack;
 
-        private TestRequestHandlingMultiplayerRoomManager roomManager => multiplayerScreen.RoomManager;
+        private TestMultiplayerClient client => multiplayerScreenStack.Client;
+        private TestMultiplayerRoomManager roomManager => multiplayerScreenStack.RoomManager;
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -70,22 +68,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             });
 
-            AddStep("create multiplayer screen", () => multiplayerScreen = new TestMultiplayer());
-
-            AddStep("load dependencies", () =>
-            {
-                client = new TestMultiplayerClient(roomManager);
-
-                // The screen gets suspended so it stops receiving updates.
-                Child = client;
-
-                LoadScreen(dependenciesScreen = new DependenciesScreen(client));
-            });
-
-            AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
-
-            AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
-            AddUntilStep("wait for multiplayer to load", () => multiplayerScreen.IsLoaded);
+            AddStep("load multiplayer", () => LoadScreen(multiplayerScreenStack = new TestMultiplayerScreenStack()));
+            AddUntilStep("wait for multiplayer to load", () => multiplayerScreenStack.IsLoaded);
             AddUntilStep("wait for lounge to load", () => this.ChildrenOfType<MultiplayerLoungeSubScreen>().FirstOrDefault()?.IsLoaded == true);
         }
 
@@ -145,12 +129,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void addRandomPlayer()
         {
             int randomUser = RNG.Next(200000, 500000);
-            client.AddUser(new User { Id = randomUser, Username = $"user {randomUser}" });
+            client.AddUser(new APIUser { Id = randomUser, Username = $"user {randomUser}" });
         }
 
         private void removeLastUser()
         {
-            User lastUser = client.Room?.Users.Last().User;
+            APIUser lastUser = client.Room?.Users.Last().User;
 
             if (lastUser == null || lastUser == client.LocalUser?.User)
                 return;
@@ -160,7 +144,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void kickLastUser()
         {
-            User lastUser = client.Room?.Users.Last().User;
+            APIUser lastUser = client.Room?.Users.Last().User;
 
             if (lastUser == null || lastUser == client.LocalUser?.User)
                 return;
@@ -247,6 +231,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }
                 }
             });
+
+            AddAssert("Check participant count correct", () => client.APIRoom?.ParticipantCount.Value == 1);
+            AddAssert("Check participant list contains user", () => client.APIRoom?.RecentParticipants.Count(u => u.Id == API.LocalUser.Value.Id) == 1);
         }
 
         [Test]
@@ -306,6 +293,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddUntilStep("wait for join", () => client.Room != null);
+
+            AddAssert("Check participant count correct", () => client.APIRoom?.ParticipantCount.Value == 1);
+            AddAssert("Check participant list contains user", () => client.APIRoom?.RecentParticipants.Count(u => u.Id == API.LocalUser.Value.Id) == 1);
         }
 
         [Test]
@@ -424,7 +414,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("join other user (ready, host)", () =>
             {
-                client.AddUser(new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Other" });
+                client.AddUser(new APIUser { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Other" });
                 client.TransferHost(MultiplayerTestScene.PLAYER_1_ID);
                 client.ChangeUserState(MultiplayerTestScene.PLAYER_1_ID, MultiplayerUserState.Ready);
             });
@@ -441,7 +431,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("start match externally", () => client.StartMatch());
 
-            AddAssert("play not started", () => multiplayerScreen.IsCurrentScreen());
+            AddAssert("play not started", () => multiplayerScreenStack.IsCurrentScreen());
         }
 
         [Test]
@@ -464,7 +454,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("join other user (ready, host)", () =>
             {
-                client.AddUser(new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Other" });
+                client.AddUser(new APIUser { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Other" });
                 client.TransferHost(MultiplayerTestScene.PLAYER_1_ID);
                 client.ChangeUserState(MultiplayerTestScene.PLAYER_1_ID, MultiplayerUserState.Ready);
             });
@@ -485,7 +475,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             });
 
-            AddUntilStep("play started", () => !multiplayerScreen.IsCurrentScreen());
+            AddUntilStep("play started", () => multiplayerScreenStack.CurrentScreen is SpectatorScreen);
         }
 
         [Test]
@@ -527,16 +517,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("open mod overlay", () => this.ChildrenOfType<RoomSubScreen.UserModSelectButton>().Single().TriggerClick());
 
-            AddStep("invoke on back button", () => multiplayerScreen.OnBackButton());
+            AddStep("invoke on back button", () => multiplayerScreenStack.OnBackButton());
 
             AddAssert("mod overlay is hidden", () => this.ChildrenOfType<UserModSelectOverlay>().Single().State.Value == Visibility.Hidden);
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
 
-            testLeave("back button", () => multiplayerScreen.OnBackButton());
+            testLeave("back button", () => multiplayerScreenStack.OnBackButton());
 
             // mimics home button and OS window close
-            testLeave("forced exit", () => multiplayerScreen.Exit());
+            testLeave("forced exit", () => multiplayerScreenStack.Exit());
 
             void testLeave(string actionName, Action action)
             {
@@ -577,24 +567,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("click start button", () => InputManager.Click(MouseButton.Left));
 
-            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+            AddUntilStep("wait for player", () => multiplayerScreenStack.CurrentScreen is Player);
 
             // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
             for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
             {
-                var time = i;
+                double time = i;
                 AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.GameplayClock.CurrentTime > time);
             }
 
-            AddUntilStep("wait for results", () => Stack.CurrentScreen is ResultsScreen);
+            AddUntilStep("wait for results", () => multiplayerScreenStack.CurrentScreen is ResultsScreen);
         }
 
         private MultiplayerReadyButton readyButton => this.ChildrenOfType<MultiplayerReadyButton>().Single();
 
         private void createRoom(Func<Room> room)
         {
-            AddUntilStep("wait for lounge", () => multiplayerScreen.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
-            AddStep("open room", () => multiplayerScreen.ChildrenOfType<LoungeSubScreen>().Single().Open(room()));
+            AddUntilStep("wait for lounge", () => multiplayerScreenStack.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
+            AddStep("open room", () => multiplayerScreenStack.ChildrenOfType<LoungeSubScreen>().Single().Open(room()));
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddWaitStep("wait for transition", 2);
@@ -606,27 +596,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for join", () => client.Room != null);
-        }
-
-        /// <summary>
-        /// Used for the sole purpose of adding <see cref="TestMultiplayerClient"/> as a resolvable dependency.
-        /// </summary>
-        private class DependenciesScreen : OsuScreen
-        {
-            [Cached(typeof(MultiplayerClient))]
-            public readonly TestMultiplayerClient Client;
-
-            public DependenciesScreen(TestMultiplayerClient client)
-            {
-                Client = client;
-            }
-        }
-
-        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
-        {
-            public new TestRequestHandlingMultiplayerRoomManager RoomManager { get; private set; }
-
-            protected override RoomManager CreateRoomManager() => RoomManager = new TestRequestHandlingMultiplayerRoomManager();
         }
     }
 }

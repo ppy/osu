@@ -4,13 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.Chat;
-using osu.Game.Users;
 using osuTK;
 using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Chat;
 using osuTK.Input;
 
@@ -18,26 +18,26 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneStandAloneChatDisplay : OsuManualInputManagerTestScene
     {
-        private readonly User admin = new User
+        private readonly APIUser admin = new APIUser
         {
             Username = "HappyStick",
             Id = 2,
             Colour = "f2ca34"
         };
 
-        private readonly User redUser = new User
+        private readonly APIUser redUser = new APIUser
         {
             Username = "BanchoBot",
             Id = 3,
         };
 
-        private readonly User blueUser = new User
+        private readonly APIUser blueUser = new APIUser
         {
             Username = "Zallius",
             Id = 4,
         };
 
-        private readonly User longUsernameUser = new User
+        private readonly APIUser longUsernameUser = new APIUser
         {
             Username = "Very Long Long Username",
             Id = 5,
@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var indices = chatDisplay.FillFlow.OfType<DrawableChannel.DaySeparator>().Select(ds => chatDisplay.FillFlow.IndexOf(ds));
 
-                foreach (var i in indices)
+                foreach (int i in indices)
                 {
                     if (i < chatDisplay.FillFlow.Count && chatDisplay.FillFlow[i + 1] is DrawableChannel.DaySeparator)
                         return false;

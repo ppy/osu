@@ -76,6 +76,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
             new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridDisplayMode),
+            new KeyBinding(new[] { InputKey.F5 }, GlobalAction.EditorTestGameplay),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -84,8 +85,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.ExtraMouseButton2, GlobalAction.SkipCutscene),
             new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry),
             new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
+            new KeyBinding(new[] { InputKey.F3 }, GlobalAction.DecreaseScrollSpeed),
+            new KeyBinding(new[] { InputKey.F4 }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
@@ -288,6 +289,9 @@ namespace osu.Game.Input.Bindings
         ToggleChatFocus,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridDisplayMode))]
-        EditorCycleGridDisplayMode
+        EditorCycleGridDisplayMode,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestGameplay))]
+        EditorTestGameplay
     }
 }

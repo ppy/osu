@@ -235,8 +235,17 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override IEnumerable<HitObject> Objects => new[] { new HitCircle { HitWindows = HitWindows } };
 
-            public override event Action<JudgementResult> NewResult;
-            public override event Action<JudgementResult> RevertResult;
+            public override event Action<JudgementResult> NewResult
+            {
+                add => throw new InvalidOperationException();
+                remove => throw new InvalidOperationException();
+            }
+
+            public override event Action<JudgementResult> RevertResult
+            {
+                add => throw new InvalidOperationException();
+                remove => throw new InvalidOperationException();
+            }
 
             public override Playfield Playfield { get; }
             public override Container Overlays { get; }
@@ -251,9 +260,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public TestDrawableRuleset()
                 : base(new OsuRuleset())
             {
-                // won't compile without this.
-                NewResult?.Invoke(null);
-                RevertResult?.Invoke(null);
             }
 
             public override void SetReplayScore(Score replayScore) => throw new NotImplementedException();

@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Select.Carousel
                     return compareUsingAggregateMax(otherSet, b => b.Length);
 
                 case SortMode.Difficulty:
-                    return compareUsingAggregateMax(otherSet, b => b.StarDifficulty);
+                    return compareUsingAggregateMax(otherSet, b => b.StarRating);
             }
         }
 
@@ -95,8 +95,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private int compareUsingAggregateMax(CarouselBeatmapSet other, Func<BeatmapInfo, double> func)
         {
-            var ourBeatmaps = ValidBeatmaps.Any();
-            var otherBeatmaps = other.ValidBeatmaps.Any();
+            bool ourBeatmaps = ValidBeatmaps.Any();
+            bool otherBeatmaps = other.ValidBeatmaps.Any();
 
             if (!ourBeatmaps && !otherBeatmaps) return 0;
             if (!ourBeatmaps) return -1;

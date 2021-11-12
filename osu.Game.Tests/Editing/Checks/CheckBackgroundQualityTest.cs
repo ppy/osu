@@ -53,8 +53,8 @@ namespace osu.Game.Tests.Editing.Checks
         public void TestMissing()
         {
             // While this is a problem, it is out of scope for this check and is caught by a different one.
-            beatmap.Metadata.BackgroundFile = null;
-            var context = getContext(null, System.Array.Empty<byte>());
+            beatmap.Metadata.BackgroundFile = string.Empty;
+            var context = getContext(null, new MemoryStream(System.Array.Empty<byte>()));
 
             Assert.That(check.Run(context), Is.Empty);
         }
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestTooUncompressed()
         {
-            var context = getContext(new Texture(1920, 1080), new byte[1024 * 1024 * 3]);
+            var context = getContext(new Texture(1920, 1080), new MemoryStream(new byte[1024 * 1024 * 3]));
 
             var issues = check.Run(context).ToList();
 
@@ -111,19 +111,32 @@ namespace osu.Game.Tests.Editing.Checks
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooUncompressed);
         }
 
-        private BeatmapVerifierContext getContext(Texture background, [CanBeNull] byte[] fileBytes = null)
+        [Test]
+        public void TestStreamClosed()
         {
-            return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(background, fileBytes).Object);
+            var background = new Texture(1920, 1080);
+            var stream = new Mock<MemoryStream>(new byte[1024 * 1024]);
+
+            var context = getContext(background, stream.Object);
+
+            Assert.That(check.Run(context), Is.Empty);
+
+            stream.Verify(x => x.Close(), Times.Once());
+        }
+
+        private BeatmapVerifierContext getContext(Texture background, [CanBeNull] Stream stream = null)
+        {
+            return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(background, stream).Object);
         }
 
         /// <summary>
-        /// Returns the mock of the working beatmap with the given background and filesize.
+        /// Returns the mock of the working beatmap with the given background and its file stream.
         /// </summary>
         /// <param name="background">The texture of the background.</param>
-        /// <param name="fileBytes">The bytes that represent the background file.</param>
-        private Mock<IWorkingBeatmap> getMockWorkingBeatmap(Texture background, [CanBeNull] byte[] fileBytes = null)
+        /// <param name="stream">The stream representing the background file.</param>
+        private Mock<IWorkingBeatmap> getMockWorkingBeatmap(Texture background, [CanBeNull] Stream stream = null)
         {
-            var stream = new MemoryStream(fileBytes ?? new byte[1024 * 1024]);
+            stream ??= new MemoryStream(new byte[1024 * 1024]);
 
             var mock = new Mock<IWorkingBeatmap>();
             mock.SetupGet(w => w.Beatmap).Returns(beatmap);

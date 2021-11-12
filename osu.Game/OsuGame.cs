@@ -53,8 +53,10 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
+using osu.Game.Users;
 
 namespace osu.Game
 {
@@ -158,6 +160,8 @@ namespace osu.Game
 
         private Bindable<int> configRuleset;
 
+        private Bindable<float> uiScale;
+
         private Bindable<int> configSkin;
 
         private readonly string[] args;
@@ -219,6 +223,7 @@ namespace osu.Game
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
+            uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
 
             var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
 
@@ -284,25 +289,27 @@ namespace osu.Game
         /// <param name="link">The link to load.</param>
         public void HandleLink(LinkDetails link) => Schedule(() =>
         {
+            string argString = link.Argument.ToString();
+
             switch (link.Action)
             {
                 case LinkAction.OpenBeatmap:
                     // TODO: proper query params handling
-                    if (int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
+                    if (int.TryParse(argString.Contains('?') ? argString.Split('?')[0] : argString, out int beatmapId))
                         ShowBeatmap(beatmapId);
                     break;
 
                 case LinkAction.OpenBeatmapSet:
-                    if (int.TryParse(link.Argument, out int setId))
+                    if (int.TryParse(argString, out int setId))
                         ShowBeatmapSet(setId);
                     break;
 
                 case LinkAction.OpenChannel:
-                    ShowChannel(link.Argument);
+                    ShowChannel(argString);
                     break;
 
                 case LinkAction.SearchBeatmapSet:
-                    SearchBeatmapSet(link.Argument);
+                    SearchBeatmapSet(argString);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -316,27 +323,31 @@ namespace osu.Game
                     break;
 
                 case LinkAction.External:
-                    OpenUrlExternally(link.Argument);
+                    OpenUrlExternally(argString);
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (int.TryParse(link.Argument, out int userId))
-                        ShowUser(userId);
-                    else
-                        ShowUser(link.Argument);
+                    if (!(link.Argument is IUser user))
+                    {
+                        user = int.TryParse(argString, out int userId)
+                            ? new APIUser { Id = userId }
+                            : new APIUser { Username = argString };
+                    }
+
+                    ShowUser(user);
 
                     break;
 
                 case LinkAction.OpenWiki:
-                    ShowWiki(link.Argument);
+                    ShowWiki(argString);
                     break;
 
                 case LinkAction.OpenChangelog:
-                    if (string.IsNullOrEmpty(link.Argument))
+                    if (string.IsNullOrEmpty(argString))
                         ShowChangelogListing();
                     else
                     {
-                        var changelogArgs = link.Argument.Split("/");
+                        string[] changelogArgs = argString.Split("/");
                         ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
                     }
 
@@ -380,14 +391,8 @@ namespace osu.Game
         /// <summary>
         /// Show a user's profile as an overlay.
         /// </summary>
-        /// <param name="userId">The user to display.</param>
-        public void ShowUser(int userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
-
-        /// <summary>
-        /// Show a user's profile as an overlay.
-        /// </summary>
-        /// <param name="username">The user to display.</param>
-        public void ShowUser(string username) => waitForReady(() => userProfile, _ => userProfile.ShowUser(username));
+        /// <param name="user">The user to display.</param>
+        public void ShowUser(IUser user) => waitForReady(() => userProfile, _ => userProfile.ShowUser(user));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.
@@ -433,11 +438,15 @@ namespace osu.Game
         /// <item>first beatmap from any ruleset.</item>
         /// </list>
         /// </remarks>
-        public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
+        public void PresentBeatmap(IBeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            var databasedSet = beatmap.OnlineBeatmapSetID != null
-                ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
-                : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
+            BeatmapSetInfo databasedSet = null;
+
+            if (beatmap.OnlineID > 0)
+                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
+
+            if (beatmap is BeatmapSetInfo localBeatmap)
+                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash);
 
             if (databasedSet == null)
             {
@@ -622,7 +631,7 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
-                var cultureCode = language.ToCultureCode();
+                string cultureCode = language.ToCultureCode();
 
                 try
                 {
@@ -870,7 +879,7 @@ namespace osu.Game
         {
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith('-')).ToArray();
+                string[] paths = args.Where(a => !a.StartsWith('-')).ToArray();
                 if (paths.Length > 0)
                     Task.Run(() => Import(paths));
             }
@@ -913,7 +922,7 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
-                    var logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
+                    string logFile = $@"{entry.Target.ToString().ToLowerInvariant()}.log";
 
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
@@ -1020,6 +1029,28 @@ namespace osu.Game
             return false;
         }
 
+        public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+        {
+            const float adjustment_increment = 0.05f;
+
+            switch (e.Action)
+            {
+                case PlatformAction.ZoomIn:
+                    uiScale.Value += adjustment_increment;
+                    return true;
+
+                case PlatformAction.ZoomOut:
+                    uiScale.Value -= adjustment_increment;
+                    return true;
+
+                case PlatformAction.ZoomDefault:
+                    uiScale.SetDefault();
+                    return true;
+            }
+
+            return base.OnPressed(e);
+        }
+
         #region Inactive audio dimming
 
         private readonly BindableDouble inactiveVolumeFade = new BindableDouble();
@@ -1059,7 +1090,7 @@ namespace osu.Game
             ScreenOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
             overlayOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
 
-            var horizontalOffset = 0f;
+            float horizontalOffset = 0f;
 
             // Content.ToLocalSpace() is used instead of this.ToLocalSpace() to correctly calculate the offset with scaling modes active.
             // Content is a child of a scaling container with ScalingMode.Everything set, while the game itself is never scaled.

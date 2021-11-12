@@ -8,27 +8,27 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Users;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class FavouriteButton : HeaderButton, IHasTooltip
     {
-        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+        public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
         private readonly BindableBool favourited = new BindableBool();
 
         private PostBeatmapFavouriteRequest request;
         private LoadingLayer loading;
 
-        private readonly IBindable<User> localUser = new Bindable<User>();
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
         public LocalisableString TooltipText
         {
@@ -61,13 +61,13 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             Action = () =>
             {
                 // guaranteed by disabled state above.
-                Debug.Assert(BeatmapSet.Value.OnlineBeatmapSetID != null);
+                Debug.Assert(BeatmapSet.Value.OnlineID > 0);
 
                 loading.Show();
 
                 request?.Cancel();
 
-                request = new PostBeatmapFavouriteRequest(BeatmapSet.Value.OnlineBeatmapSetID.Value, favourited.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
+                request = new PostBeatmapFavouriteRequest(BeatmapSet.Value.OnlineID, favourited.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
 
                 request.Success += () =>
                 {
@@ -98,11 +98,11 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             BeatmapSet.BindValueChanged(setInfo =>
             {
                 updateEnabled();
-                favourited.Value = setInfo.NewValue?.OnlineInfo?.HasFavourited ?? false;
+                favourited.Value = setInfo.NewValue?.HasFavourited ?? false;
             }, true);
         }
 
-        private void updateEnabled() => Enabled.Value = !(localUser.Value is GuestUser) && BeatmapSet.Value?.OnlineBeatmapSetID > 0;
+        private void updateEnabled() => Enabled.Value = !(localUser.Value is GuestUser) && BeatmapSet.Value?.OnlineID > 0;
 
         protected override void UpdateAfterChildren()
         {

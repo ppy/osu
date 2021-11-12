@@ -175,51 +175,61 @@ namespace osu.Game.Tests.Visual
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
-        protected APIBeatmapSet CreateAPIBeatmapSet(RulesetInfo ruleset)
+        /// <summary>
+        /// Returns a sample API Beatmap with BeatmapSet populated.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to create the sample model using. osu! ruleset will be used if not specified.</param>
+        protected APIBeatmap CreateAPIBeatmap(RulesetInfo ruleset = null)
         {
-            var beatmap = CreateBeatmap(ruleset).BeatmapInfo;
+            var beatmapSet = CreateAPIBeatmapSet(ruleset ?? Ruleset.Value);
+
+            // Avoid circular reference.
+            var beatmap = beatmapSet.Beatmaps.First();
+            beatmapSet.Beatmaps = Array.Empty<APIBeatmap>();
+
+            // Populate the set as that's generally what we expect from the API.
+            beatmap.BeatmapSet = beatmapSet;
+
+            return beatmap;
+        }
+
+        /// <summary>
+        /// Returns a sample API BeatmapSet with beatmaps populated.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to create the sample model using. osu! ruleset will be used if not specified.</param>
+        protected APIBeatmapSet CreateAPIBeatmapSet(RulesetInfo ruleset = null)
+        {
+            var beatmap = CreateBeatmap(ruleset ?? Ruleset.Value).BeatmapInfo;
 
             return new APIBeatmapSet
             {
-                Covers = beatmap.BeatmapSet.Covers,
-                OnlineID = beatmap.BeatmapSet.OnlineID,
-                Status = beatmap.BeatmapSet.Status,
-                Preview = beatmap.BeatmapSet.Preview,
-                HasFavourited = beatmap.BeatmapSet.HasFavourited,
-                PlayCount = beatmap.BeatmapSet.PlayCount,
-                FavouriteCount = beatmap.BeatmapSet.FavouriteCount,
-                BPM = beatmap.BeatmapSet.BPM,
-                HasExplicitContent = beatmap.BeatmapSet.HasExplicitContent,
-                HasVideo = beatmap.BeatmapSet.HasVideo,
-                HasStoryboard = beatmap.BeatmapSet.HasStoryboard,
-                Submitted = beatmap.BeatmapSet.Submitted,
-                Ranked = beatmap.BeatmapSet.Ranked,
-                LastUpdated = beatmap.BeatmapSet.LastUpdated,
-                TrackId = beatmap.BeatmapSet.TrackId,
+                OnlineID = ((IBeatmapSetInfo)beatmap.BeatmapSet).OnlineID,
+                Status = BeatmapSetOnlineStatus.Ranked,
+                Covers = new BeatmapSetOnlineCovers
+                {
+                    Cover = "https://assets.ppy.sh/beatmaps/163112/covers/cover.jpg",
+                    Card = "https://assets.ppy.sh/beatmaps/163112/covers/card.jpg",
+                    List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg"
+                },
                 Title = beatmap.BeatmapSet.Metadata.Title,
                 TitleUnicode = beatmap.BeatmapSet.Metadata.TitleUnicode,
                 Artist = beatmap.BeatmapSet.Metadata.Artist,
                 ArtistUnicode = beatmap.BeatmapSet.Metadata.ArtistUnicode,
                 Author = beatmap.BeatmapSet.Metadata.Author,
-                AuthorID = beatmap.BeatmapSet.Metadata.AuthorID,
-                AuthorString = beatmap.BeatmapSet.Metadata.AuthorString,
-                Availability = beatmap.BeatmapSet.Availability,
-                Genre = beatmap.BeatmapSet.Genre,
-                Language = beatmap.BeatmapSet.Language,
                 Source = beatmap.BeatmapSet.Metadata.Source,
                 Tags = beatmap.BeatmapSet.Metadata.Tags,
                 Beatmaps = new[]
                 {
                     new APIBeatmap
                     {
-                        OnlineID = beatmap.OnlineID,
-                        OnlineBeatmapSetID = beatmap.BeatmapSet.OnlineID,
+                        OnlineID = ((IBeatmapInfo)beatmap).OnlineID,
+                        OnlineBeatmapSetID = ((IBeatmapSetInfo)beatmap.BeatmapSet).OnlineID,
                         Status = beatmap.Status,
                         Checksum = beatmap.MD5Hash,
-                        AuthorID = beatmap.Metadata.AuthorID,
+                        AuthorID = beatmap.Metadata.Author.OnlineID,
                         RulesetID = beatmap.RulesetID,
-                        StarRating = beatmap.StarDifficulty,
-                        DifficultyName = beatmap.Version,
+                        StarRating = beatmap.StarRating,
+                        DifficultyName = beatmap.DifficultyName,
                     }
                 }
             };

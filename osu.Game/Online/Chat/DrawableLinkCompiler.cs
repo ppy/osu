@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -29,6 +31,11 @@ namespace osu.Game.Online.Chat
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, Parts);
+
+        public DrawableLinkCompiler(ITextPart part)
+            : this(part.Drawables.OfType<SpriteText>())
+        {
+        }
 
         public DrawableLinkCompiler(IEnumerable<Drawable> parts)
             : base(HoverSampleSet.Submit)

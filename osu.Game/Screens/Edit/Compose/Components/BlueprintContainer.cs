@@ -58,13 +58,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        foreach (var o in args.NewItems)
+                        foreach (object o in args.NewItems)
                             SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Select();
 
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        foreach (var o in args.OldItems)
+                        foreach (object o in args.OldItems)
                             SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Deselect();
 
                         break;
@@ -108,11 +108,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             bool selectionPerformed = performMouseDownActions(e);
-
-            // even if a selection didn't occur, a drag event may still move the selection.
             bool movementPossible = prepareSelectionMovement();
 
-            return selectionPerformed || (e.Button == MouseButton.Left && movementPossible);
+            // check if selection has occurred
+            if (selectionPerformed)
+            {
+                // only unmodified right click should show context menu
+                bool shouldShowContextMenu = e.Button == MouseButton.Right && !e.ShiftPressed && !e.AltPressed && !e.SuperPressed;
+
+                // stop propagation if not showing context menu
+                return !shouldShowContextMenu;
+            }
+
+            // even if a selection didn't occur, a drag event may still move the selection.
+            return e.Button == MouseButton.Left && movementPossible;
         }
 
         protected SelectionBlueprint<T> ClickedBlueprint { get; private set; }
@@ -468,7 +477,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (snapProvider != null)
             {
                 // check for positional snap for every object in selection (for things like object-object snapping)
-                for (var i = 0; i < movementBlueprintOriginalPositions.Length; i++)
+                for (int i = 0; i < movementBlueprintOriginalPositions.Length; i++)
                 {
                     Vector2 originalPosition = movementBlueprintOriginalPositions[i];
                     var testPosition = originalPosition + distanceTravelled;

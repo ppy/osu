@@ -13,11 +13,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -39,9 +40,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        private readonly TestRequestHandlingMultiplayerRoomManager roomManager;
+        private readonly TestMultiplayerRoomManager roomManager;
 
-        public TestMultiplayerClient(TestRequestHandlingMultiplayerRoomManager roomManager)
+        public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
         {
             this.roomManager = roomManager;
         }
@@ -50,7 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public void Disconnect() => isConnected.Value = false;
 
-        public MultiplayerRoomUser AddUser(User user, bool markAsPlaying = false)
+        public MultiplayerRoomUser AddUser(APIUser user, bool markAsPlaying = false)
         {
             var roomUser = new MultiplayerRoomUser(user.Id) { User = user };
 
@@ -62,7 +63,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return roomUser;
         }
 
-        public void AddNullUser() => addUser(new MultiplayerRoomUser(TestUserLookupCache.NULL_USER_ID));
+        public void TestAddUnresolvedUser() => addUser(new MultiplayerRoomUser(TestUserLookupCache.UNRESOLVED_USER_ID));
 
         private void addUser(MultiplayerRoomUser user)
         {
@@ -70,9 +71,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // We want the user to be immediately available for testing, so force a scheduler update to run the update-bound continuation.
             Scheduler.Update();
+
+            switch (Room?.MatchState)
+            {
+                case TeamVersusRoomState teamVersus:
+                    Debug.Assert(Room != null);
+
+                    // simulate the server's automatic assignment of users to teams on join.
+                    // the "best" team is the one with the least users on it.
+                    int bestTeam = teamVersus.Teams
+                                             .Select(team => (teamID: team.ID, userCount: Room.Users.Count(u => (u.MatchState as TeamVersusUserState)?.TeamID == team.ID)))
+                                             .OrderBy(pair => pair.userCount)
+                                             .First().teamID;
+                    ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, new TeamVersusUserState { TeamID = bestTeam }).Wait();
+                    break;
+            }
         }
 
-        public void RemoveUser(User user)
+        public void RemoveUser(APIUser user)
         {
             Debug.Assert(Room != null);
             ((IMultiplayerClient)this).UserLeft(new MultiplayerRoomUser(user.Id));
@@ -265,18 +281,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return ((IMultiplayerClient)this).LoadRequested();
         }
 
-        protected override Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
+        protected override Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
         {
             Debug.Assert(Room != null);
 
             var apiRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == Room.RoomID);
-            var set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
-                      ?? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId)?.BeatmapSet;
+            IBeatmapSetInfo? set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
+                                   ?? beatmaps.QueryBeatmap(b => b.OnlineID == beatmapId)?.BeatmapSet;
 
             if (set == null)
                 throw new InvalidOperationException("Beatmap not found.");
 
-            return Task.FromResult(set);
+            var apiSet = new APIBeatmapSet
+            {
+                OnlineID = set.OnlineID,
+                Beatmaps = set.Beatmaps.Select(b => new APIBeatmap { OnlineID = b.OnlineID }).ToArray(),
+            };
+
+            return Task.FromResult(apiSet);
         }
 
         private async Task changeMatchType(MatchType type)

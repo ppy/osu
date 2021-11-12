@@ -12,11 +12,11 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Users;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected virtual TrackedUserData CreateUserData(MultiplayerRoomUser user, ScoreProcessor scoreProcessor) => new TrackedUserData(user, scoreProcessor);
 
-        protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(User user, bool isTracked)
+        protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser user, bool isTracked)
         {
             var leaderboardScore = base.CreateLeaderboardScoreDrawable(user, isTracked);
 
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Play.HUD
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (var userId in e.OldItems.OfType<int>())
+                    foreach (int userId in e.OldItems.OfType<int>())
                     {
                         spectatorClient.StopWatchingUser(userId);
 
