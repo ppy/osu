@@ -66,32 +66,29 @@ namespace osu.Game.Beatmaps
 
         public bool Protected { get; set; }
 
-        public bool Equals(IBeatmapSetInfo other)
-        {
-            if (other is BeatmapSetInfo b)
-                return Equals(b);
-
-            if (OnlineID > 0 && other?.OnlineID > 0)
-                return other.OnlineID == OnlineID;
-
-            return false;
-        }
-
         public bool Equals(BeatmapSetInfo other)
         {
-            if (other == null)
-                return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
             if (ID != 0 && other.ID != 0)
                 return ID == other.ID;
 
-            if (OnlineBeatmapSetID.HasValue && other.OnlineBeatmapSetID.HasValue)
-                return OnlineBeatmapSetID == other.OnlineBeatmapSetID;
+            return false;
+        }
 
-            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
-                return Hash == other.Hash;
+        public bool Equals(IBeatmapSetInfo other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
-            return ReferenceEquals(this, other);
+            if (other is BeatmapSetInfo b && Equals(b))
+                return true;
+
+            if (OnlineID > 0 && other.OnlineID > 0)
+                return other.OnlineID == OnlineID;
+
+            return false;
         }
 
         #region Implementation of IHasOnlineID
