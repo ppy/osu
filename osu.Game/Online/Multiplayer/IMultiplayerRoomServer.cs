@@ -78,6 +78,11 @@ namespace osu.Game.Online.Multiplayer
         Task StartMatch();
 
         /// <summary>
+        /// Requests for all playlist items of the room to be sent to the client.
+        /// </summary>
+        Task RequestAllPlaylistItems();
+
+        /// <summary>
         /// Adds an item to the playlist.
         /// </summary>
         /// <param name="item">The item to add.</param>
