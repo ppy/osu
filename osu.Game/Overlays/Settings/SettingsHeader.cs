@@ -33,9 +33,9 @@ namespace osu.Game.Overlays.Settings
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding
+                    Padding = new MarginPadding
                     {
-                        Left = SettingsPanel.CONTENT_MARGINS,
+                        Horizontal = SettingsPanel.CONTENT_MARGINS,
                         Top = Toolbar.Toolbar.TOOLTIP_HEIGHT,
                         Bottom = 30
                     }
