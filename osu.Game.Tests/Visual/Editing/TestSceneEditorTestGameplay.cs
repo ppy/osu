@@ -12,6 +12,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
+using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Input;
 
