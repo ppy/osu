@@ -14,10 +14,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-        public Aim(Mod[] mods)
+        public Aim(Mod[] mods, bool withSliders)
             : base(mods)
         {
+            this.withSliders = withSliders;
         }
+
+        private readonly bool withSliders;
 
         protected override int HistoryLength => 2;
 
@@ -44,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
-            if (osuLastObj.BaseObject is Slider)
+            if (osuLastObj.BaseObject is Slider && withSliders)
             {
                 double movementVelocity = osuCurrObj.MovementDistance / osuCurrObj.MovementTime; // calculate the movement velocity from slider end to current object
                 double travelVelocity = osuCurrObj.TravelDistance / osuCurrObj.TravelTime; // calculate the slider velocity from slider head to slider end.
@@ -55,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // As above, do the same for the previous hitobject.
             double prevVelocity = osuLastObj.JumpDistance / osuLastObj.StrainTime;
 
-            if (osuLastLastObj.BaseObject is Slider)
+            if (osuLastLastObj.BaseObject is Slider && withSliders)
             {
                 double movementVelocity = osuLastObj.MovementDistance / osuLastObj.MovementTime;
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime;
@@ -135,7 +138,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
 
             // Add in additional slider velocity bonus.
-            aimStrain += sliderBonus * slider_multiplier;
+            if (withSliders)
+                aimStrain += sliderBonus * slider_multiplier;
 
             return aimStrain;
         }
