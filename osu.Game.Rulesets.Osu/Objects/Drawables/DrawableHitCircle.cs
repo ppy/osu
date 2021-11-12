@@ -30,6 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableHitCircle : DrawableOsuHitObject, IHasMainCirclePiece, IHasApproachCircle
     {
         [Resolved]
+        
         private OsuColour colours { get; set; }
 
         [Resolved(canBeNull: true)]
@@ -284,7 +285,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
             }
         }
-             private void updateSnapColour()
+            private void updateSnapColour()
         {
             if (beatmap == null || HitObject == null) return;
 
