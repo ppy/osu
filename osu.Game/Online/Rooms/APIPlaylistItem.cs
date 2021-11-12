@@ -19,21 +19,24 @@ namespace osu.Game.Online.Rooms
         public long ID { get; set; }
 
         [Key(1)]
-        public int BeatmapID { get; set; }
+        public int UserID { get; set; }
 
         [Key(2)]
-        public string BeatmapChecksum { get; set; } = string.Empty;
+        public int BeatmapID { get; set; }
 
         [Key(3)]
-        public int RulesetID { get; set; }
+        public string BeatmapChecksum { get; set; } = string.Empty;
 
         [Key(4)]
-        public IEnumerable<APIMod> RequiredMods { get; set; } = Enumerable.Empty<APIMod>();
+        public int RulesetID { get; set; }
 
         [Key(5)]
-        public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
+        public IEnumerable<APIMod> RequiredMods { get; set; } = Enumerable.Empty<APIMod>();
 
         [Key(6)]
+        public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
+
+        [Key(7)]
         public bool Expired { get; set; }
 
         public APIPlaylistItem()
