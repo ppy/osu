@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -161,9 +162,10 @@ namespace osu.Game.Online
                 builder.AddNewtonsoftJsonProtocol(options =>
                 {
                     options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    // TODO: This should only be required to be `TypeNameHandling.Auto`.
-                    // See usage in osu-server-spectator for further documentation as to why this is required.
-                    options.PayloadSerializerSettings.TypeNameHandling = TypeNameHandling.All;
+                    options.PayloadSerializerSettings.Converters = new List<JsonConverter>
+                    {
+                        new SignalRDerivedTypeWorkaroundJsonConverter(),
+                    };
                 });
             }
 

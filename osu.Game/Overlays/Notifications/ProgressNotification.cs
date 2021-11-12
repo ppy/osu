@@ -23,9 +23,16 @@ namespace osu.Game.Overlays.Notifications
     {
         private const float loading_spinner_size = 22;
 
+        private LocalisableString text;
+
         public LocalisableString Text
         {
-            set => Schedule(() => textDrawable.Text = value);
+            get => text;
+            set
+            {
+                text = value;
+                Schedule(() => textDrawable.Text = text);
+            }
         }
 
         public string CompletionText { get; set; } = "Task has completed!";
