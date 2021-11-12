@@ -16,6 +16,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Timing;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -72,6 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Width = 200,
                         Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(0, 15),
                         Children = new Drawable[]
                         {
                             sliderVelocitySlider = new IndeterminateSliderWithTextBoxInput<double>("Velocity", new DifficultyControlPoint().SliderVelocityBindable)
