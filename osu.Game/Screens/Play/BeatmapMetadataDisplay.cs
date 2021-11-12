@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Play
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = beatmap?.BeatmapInfo?.Version,
+                                    Text = beatmap?.BeatmapInfo?.DifficultyName,
                                     Font = OsuFont.GetFont(size: 26, italics: true),
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
