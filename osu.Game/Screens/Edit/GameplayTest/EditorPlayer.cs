@@ -44,6 +44,16 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         protected override bool CheckModsAllowFailure() => false; // never fail.
 
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            // finish alpha transforms on entering to avoid gameplay starting in a half-hidden state.
+            // the finish calls are purposefully not propagated to children to avoid messing up their state.
+            FinishTransforms();
+            GameplayClockContainer.FinishTransforms(false, nameof(Alpha));
+        }
+
         public override bool OnExiting(IScreen next)
         {
             musicController.Stop();
