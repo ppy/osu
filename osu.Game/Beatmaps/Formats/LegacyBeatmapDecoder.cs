@@ -263,7 +263,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"BeatmapID":
-                    beatmap.BeatmapInfo.OnlineBeatmapID = Parsing.ParseInt(pair.Value);
+                    beatmap.BeatmapInfo.OnlineID = Parsing.ParseInt(pair.Value);
                     break;
 
                 case @"BeatmapSetID":

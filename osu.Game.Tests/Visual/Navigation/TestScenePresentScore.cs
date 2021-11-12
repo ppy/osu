@@ -45,14 +45,14 @@ namespace osu.Game.Tests.Visual.Navigation
                     {
                         new BeatmapInfo
                         {
-                            OnlineBeatmapID = 1 * 1024,
+                            OnlineID = 1 * 1024,
                             Metadata = metadata,
                             BaseDifficulty = difficulty,
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                         new BeatmapInfo
                         {
-                            OnlineBeatmapID = 1 * 2048,
+                            OnlineID = 1 * 2048,
                             Metadata = metadata,
                             BaseDifficulty = difficulty,
                             Ruleset = new OsuRuleset().RulesetInfo

@@ -542,7 +542,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var imported = await LoadOszIntoOsu(osu);
 
                     foreach (var b in imported.Beatmaps)
-                        b.OnlineBeatmapID = null;
+                        b.OnlineID = null;
 
                     osu.Dependencies.Get<BeatmapManager>().Update(imported);
 
@@ -587,13 +587,13 @@ namespace osu.Game.Tests.Beatmaps.IO
                         {
                             new BeatmapInfo
                             {
-                                OnlineBeatmapID = 2,
+                                OnlineID = 2,
                                 Metadata = metadata,
                                 BaseDifficulty = difficulty
                             },
                             new BeatmapInfo
                             {
-                                OnlineBeatmapID = 2,
+                                OnlineID = 2,
                                 Metadata = metadata,
                                 Status = BeatmapSetOnlineStatus.Loved,
                                 BaseDifficulty = difficulty
@@ -606,8 +606,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var imported = await manager.Import(toImport);
 
                     Assert.NotNull(imported);
-                    Assert.AreEqual(null, imported.Value.Beatmaps[0].OnlineBeatmapID);
-                    Assert.AreEqual(null, imported.Value.Beatmaps[1].OnlineBeatmapID);
+                    Assert.AreEqual(null, imported.Value.Beatmaps[0].OnlineID);
+                    Assert.AreEqual(null, imported.Value.Beatmaps[1].OnlineID);
                 }
                 finally
                 {
@@ -1078,7 +1078,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var set = queryBeatmapSets().First();
             foreach (BeatmapInfo b in set.Beatmaps)
-                Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID));
+                Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineID == b.OnlineID));
             Assert.IsTrue(set.Beatmaps.Count > 0);
             var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Any() == true);

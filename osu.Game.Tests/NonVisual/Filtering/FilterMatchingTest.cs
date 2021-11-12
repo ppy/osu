@@ -207,7 +207,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestCriteriaMatchingBeatmapIDs(string query, bool filtered)
         {
             var beatmap = getExampleBeatmap();
-            beatmap.OnlineBeatmapID = 20201010;
+            beatmap.OnlineID = 20201010;
             beatmap.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = 1535 };
 
             var criteria = new FilterCriteria { SearchText = query };

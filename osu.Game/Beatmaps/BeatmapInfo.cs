@@ -23,13 +23,14 @@ namespace osu.Game.Beatmaps
 
         public int BeatmapVersion;
 
-        private int? onlineBeatmapID;
+        private int? onlineID;
 
         [JsonProperty("id")]
-        public int? OnlineBeatmapID
+        [Column("OnlineBeatmapID")]
+        public int? OnlineID
         {
-            get => onlineBeatmapID;
-            set => onlineBeatmapID = value > 0 ? value : null;
+            get => onlineID;
+            set => onlineID = value > 0 ? value : null;
         }
 
         [JsonIgnore]
@@ -176,7 +177,7 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IHasOnlineID
 
-        public int OnlineID => OnlineBeatmapID ?? -1;
+        int IHasOnlineID<int>.OnlineID => onlineID ?? -1;
 
         #endregion
 

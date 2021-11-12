@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo.BeatmapSet.OnlineBeatmapSetID = Interlocked.Increment(ref onlineSetID);
             BeatmapInfo.Length = 75000;
             BeatmapInfo.OnlineInfo = new APIBeatmap();
-            BeatmapInfo.OnlineBeatmapID = Interlocked.Increment(ref onlineBeatmapID);
+            BeatmapInfo.OnlineID = Interlocked.Increment(ref onlineBeatmapID);
         }
 
         protected virtual Beatmap CreateBeatmap() => createTestBeatmap();

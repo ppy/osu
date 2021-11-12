@@ -94,13 +94,13 @@ namespace osu.Game.Beatmaps
 
             validateOnlineIds(beatmapSet);
 
-            bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0);
+            bool hadOnlineIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
 
             if (OnlineLookupQueue != null)
                 await OnlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken).ConfigureAwait(false);
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
-            if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
+            if (hadOnlineIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
             {
                 if (beatmapSet.OnlineBeatmapSetID != null)
                 {
@@ -127,7 +127,7 @@ namespace osu.Game.Beatmaps
                     // in order to avoid a unique key constraint, immediately remove the online ID from the previous set.
                     existingSetWithSameOnlineID.OnlineBeatmapSetID = null;
                     foreach (var b in existingSetWithSameOnlineID.Beatmaps)
-                        b.OnlineBeatmapID = null;
+                        b.OnlineID = null;
 
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been deleted.");
                 }
@@ -136,7 +136,7 @@ namespace osu.Game.Beatmaps
 
         private void validateOnlineIds(BeatmapSetInfo beatmapSet)
         {
-            var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
+            var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineID.HasValue).Select(b => b.OnlineID).ToList();
 
             // ensure all IDs are unique
             if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
@@ -147,7 +147,7 @@ namespace osu.Game.Beatmaps
             }
 
             // find any existing beatmaps in the database that have matching online ids
-            var existingBeatmaps = QueryBeatmaps(b => beatmapIds.Contains(b.OnlineBeatmapID)).ToList();
+            var existingBeatmaps = QueryBeatmaps(b => beatmapIds.Contains(b.OnlineID)).ToList();
 
             if (existingBeatmaps.Count > 0)
             {
@@ -162,7 +162,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
+            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineID = null);
         }
 
         /// <summary>
@@ -242,7 +242,7 @@ namespace osu.Game.Beatmaps
             if (!base.CanSkipImport(existing, import))
                 return false;
 
-            return existing.Beatmaps.Any(b => b.OnlineBeatmapID != null);
+            return existing.Beatmaps.Any(b => b.OnlineID != null);
         }
 
         protected override bool CanReuseExisting(BeatmapSetInfo existing, BeatmapSetInfo import)
@@ -250,8 +250,8 @@ namespace osu.Game.Beatmaps
             if (!base.CanReuseExisting(existing, import))
                 return false;
 
-            var existingIds = existing.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
-            var importIds = import.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
+            var existingIds = existing.Beatmaps.Select(b => b.OnlineID).OrderBy(i => i);
+            var importIds = import.Beatmaps.Select(b => b.OnlineID).OrderBy(i => i);
 
             // force re-import if we are not in a sane state.
             return existing.OnlineBeatmapSetID == import.OnlineBeatmapSetID && existingIds.SequenceEqual(importIds);
