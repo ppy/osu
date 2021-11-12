@@ -85,6 +85,46 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectHasVelocity(1, 5);
         }
 
+        [Test]
+        public void TestMultipleSelectionWithSameSliderVelocity()
+        {
+            AddStep("unify slider velocity", () =>
+            {
+                foreach (var h in EditorBeatmap.HitObjects)
+                    h.DifficultyControlPoint.SliderVelocity = 1.5;
+            });
+
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            clickDifficultyPiece(0);
+            velocityPopoverHasSingleValue(1.5);
+
+            dismissPopover();
+
+            clickDifficultyPiece(1);
+            velocityPopoverHasSingleValue(1.5);
+
+            setVelocityViaPopover(5);
+            hitObjectHasVelocity(0, 5);
+            hitObjectHasVelocity(1, 5);
+        }
+
+        [Test]
+        public void TestMultipleSelectionWithDifferentSliderVelocity()
+        {
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            clickDifficultyPiece(0);
+            velocityPopoverHasIndeterminateValue();
+
+            dismissPopover();
+
+            clickDifficultyPiece(1);
+            velocityPopoverHasIndeterminateValue();
+
+            setVelocityViaPopover(3);
+            hitObjectHasVelocity(0, 3);
+            hitObjectHasVelocity(1, 3);
+        }
+
         private void clickDifficultyPiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} difficulty piece", () =>
         {
             var difficultyPiece = this.ChildrenOfType<DifficultyPointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
@@ -99,6 +139,14 @@ namespace osu.Game.Tests.Visual.Editing
             var slider = popover?.ChildrenOfType<SliderWithTextBoxInput<double>>().Single();
 
             return slider?.Current.Value == velocity;
+        });
+
+        private void velocityPopoverHasIndeterminateValue() => AddUntilStep("velocity popover has indeterminate value", () =>
+        {
+            var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
+            var slider = popover?.ChildrenOfType<SliderWithTextBoxInput<double>>().Single();
+
+            return slider != null && slider.Current.Value == null;
         });
 
         private void dismissPopover()
