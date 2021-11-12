@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
@@ -17,6 +18,9 @@ namespace osu.Game.Tests.Visual.Editing
         [Cached(typeof(EditorBeatmap))]
         [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap;
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         protected override bool ScrollUsingMouseWheel => false;
 

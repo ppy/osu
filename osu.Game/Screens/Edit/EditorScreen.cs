@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit
 {
@@ -16,9 +16,6 @@ namespace osu.Game.Screens.Edit
     {
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
-
-        [Cached]
-        protected readonly OverlayColourProvider ColourProvider;
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -32,8 +29,6 @@ namespace osu.Game.Screens.Edit
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
-
-            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
             InternalChild = content = new PopoverContainer { RelativeSizeAxes = Axes.Both };
         }
@@ -49,5 +44,54 @@ namespace osu.Game.Screens.Edit
             this.ScaleTo(0.98f, 200, Easing.OutQuint)
                 .FadeOut(200, Easing.OutQuint);
         }
+
+        #region Clipboard operations
+
+        public BindableBool CanCut { get; } = new BindableBool();
+
+        /// <summary>
+        /// Performs a "cut to clipboard" operation appropriate for the given screen.
+        /// </summary>
+        protected virtual void PerformCut()
+        {
+        }
+
+        public void Cut()
+        {
+            if (CanCut.Value)
+                PerformCut();
+        }
+
+        public BindableBool CanCopy { get; } = new BindableBool();
+
+        /// <summary>
+        /// Performs a "copy to clipboard" operation appropriate for the given screen.
+        /// </summary>
+        protected virtual void PerformCopy()
+        {
+        }
+
+        public virtual void Copy()
+        {
+            if (CanCopy.Value)
+                PerformCopy();
+        }
+
+        public BindableBool CanPaste { get; } = new BindableBool();
+
+        /// <summary>
+        /// Performs a "paste from clipboard" operation appropriate for the given screen.
+        /// </summary>
+        protected virtual void PerformPaste()
+        {
+        }
+
+        public virtual void Paste()
+        {
+            if (CanPaste.Value)
+                PerformPaste();
+        }
+
+        #endregion
     }
 }

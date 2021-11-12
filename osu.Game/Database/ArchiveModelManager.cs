@@ -15,6 +15,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
@@ -192,7 +193,7 @@ namespace osu.Game.Database
             else
             {
                 notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First().Value}!"
+                    ? $"Imported {imported.First().Value.GetDisplayString()}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PostImport != null)
@@ -263,7 +264,7 @@ namespace osu.Game.Database
                 model = CreateModel(archive);
 
                 if (model == null)
-                    return Task.FromResult<ILive<TModel>>(new EntityFrameworkLive<TModel>(null));
+                    return Task.FromResult<ILive<TModel>>(null);
             }
             catch (TaskCanceledException)
             {

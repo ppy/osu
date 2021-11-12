@@ -443,7 +443,7 @@ namespace osu.Game
             BeatmapSetInfo databasedSet = null;
 
             if (beatmap.OnlineID > 0)
-                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineID);
+                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
 
             if (beatmap is BeatmapSetInfo localBeatmap)
                 databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash);
