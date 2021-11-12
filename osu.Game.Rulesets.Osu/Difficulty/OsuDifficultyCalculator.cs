@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const double difficulty_multiplier = 0.0675;
         private double hitWindowGreat;
+        private double preempt;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -34,11 +35,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return new OsuDifficultyAttributes { Mods = mods, Skills = skills };
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
-            double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
-            double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
-            double flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
-
-            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
+            double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
+            double flashlightRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
 
             if (mods.Any(h => h is OsuModRelax))
                 speedRating = 0.0;
@@ -77,7 +75,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimStrain = aimRating,
                 SpeedStrain = speedRating,
                 FlashlightRating = flashlightRating,
-                SliderFactor = sliderFactor,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 DrainRate = drainRate,
@@ -110,12 +107,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
+            preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+
             return new Skill[]
             {
-                new Aim(mods, true),
-                new Aim(mods, false),
+                new Aim(mods),
                 new Speed(mods, hitWindowGreat),
-                new Flashlight(mods)
+                new Flashlight(mods, preempt)
             };
         }
 
@@ -126,6 +124,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new OsuModEasy(),
             new OsuModHardRock(),
             new OsuModFlashlight(),
+            new OsuModHidden(),
         };
     }
 }
