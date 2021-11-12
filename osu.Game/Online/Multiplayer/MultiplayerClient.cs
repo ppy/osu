@@ -158,6 +158,8 @@ namespace osu.Game.Online.Multiplayer
                     OnRoomJoined();
                 }, cancellationSource.Token).ConfigureAwait(false);
 
+                await RequestAllPlaylistItems().ConfigureAwait(false);
+
                 // Update room settings.
                 await updateLocalRoomSettings(joinedRoom.Settings, cancellationSource.Token).ConfigureAwait(false);
             }, cancellationSource.Token).ConfigureAwait(false);
@@ -304,6 +306,8 @@ namespace osu.Game.Online.Multiplayer
         public abstract Task SendMatchRequest(MatchUserRequest request);
 
         public abstract Task StartMatch();
+
+        public abstract Task RequestAllPlaylistItems();
 
         public abstract Task AddPlaylistItem(APIPlaylistItem item);
 

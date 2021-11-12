@@ -199,10 +199,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // emulate the server sending this after the join room. scheduler required to make sure the join room event is fired first (in Join).
             changeMatchType(Room.Settings.MatchType).Wait();
-
-            // emulate the server sending all playlist items after room join.
-            var serverSideRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == APIRoom.RoomID.Value);
-            Task.WhenAll(serverSideRoom.Playlist.Select(i => ((IMultiplayerClient)this).PlaylistItemAdded(new APIPlaylistItem(i)))).Wait();
         }
 
         protected override Task LeaveRoomInternal() => Task.CompletedTask;
@@ -296,6 +292,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
             return ((IMultiplayerClient)this).LoadRequested();
+        }
+
+        public override async Task RequestAllPlaylistItems()
+        {
+            foreach (var item in playlistItems)
+                await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
         }
 
         public override async Task AddPlaylistItem(APIPlaylistItem item)
