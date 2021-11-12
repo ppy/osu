@@ -141,5 +141,17 @@ namespace osu.Game.Online.API.Requests.Responses
         double IBeatmapSetInfo.MaxBPM => BPM;
 
         #endregion
+
+        #region Implementation of IEquatable<IBeatmapSetInfo>
+
+        public bool Equals(IBeatmapSetInfo? other)
+        {
+            if (OnlineID > 0 && other?.OnlineID > 0)
+                return other.OnlineID == OnlineID;
+
+            return false;
+        }
+
+        #endregion
     }
 }
