@@ -222,7 +222,7 @@ namespace osu.Game.Tests.Visual
                 {
                     new APIBeatmap
                     {
-                        OnlineID = beatmap.OnlineID,
+                        OnlineID = ((IBeatmapInfo)beatmap).OnlineID,
                         OnlineBeatmapSetID = beatmap.BeatmapSet.OnlineID,
                         Status = beatmap.Status,
                         Checksum = beatmap.MD5Hash,

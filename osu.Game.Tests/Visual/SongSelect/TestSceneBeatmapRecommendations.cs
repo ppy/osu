@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Metadata = metadata,
                 Beatmaps = difficultyRulesets.Select((ruleset, difficultyIndex) => new BeatmapInfo
                 {
-                    OnlineBeatmapID = importID * 1024 + difficultyIndex,
+                    OnlineID = importID * 1024 + difficultyIndex,
                     Metadata = metadata,
                     BaseDifficulty = new BeatmapDifficulty(),
                     Ruleset = ruleset,
@@ -205,8 +205,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
             AddUntilStep("recommended beatmap displayed", () =>
             {
-                int? expectedID = getImport().Beatmaps[expectedDiff - 1].OnlineBeatmapID;
-                return Game.Beatmap.Value.BeatmapInfo.OnlineBeatmapID == expectedID;
+                int? expectedID = getImport().Beatmaps[expectedDiff - 1].OnlineID;
+                return Game.Beatmap.Value.BeatmapInfo.OnlineID == expectedID;
             });
         }
     }
