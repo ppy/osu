@@ -270,9 +270,9 @@ namespace osu.Game.Screens.Play
 
             const double duration = 300;
 
-            if (!resuming) logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
+            if (!resuming) logo.MoveTo(new Vector2(0.5f), duration, Easing.OutQuint);
 
-            logo.ScaleTo(new Vector2(0.15f), duration, Easing.In);
+            logo.ScaleTo(new Vector2(0.15f), duration, Easing.OutQuint);
             logo.FadeIn(350);
 
             Scheduler.AddDelayed(() =>
