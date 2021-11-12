@@ -468,6 +468,10 @@ namespace osu.Game.Screens.Edit
                     menuBar.Mode.Value = EditorScreenMode.Verify;
                     return true;
 
+                case GlobalAction.EditorTestGameplay:
+                    testGameplay();
+                    return true;
+
                 default:
                     return false;
             }
