@@ -54,7 +54,7 @@ namespace osu.Game.Extensions
             }
 
             // fallback in case none of the above happens to match.
-            result ??= model.ToString();
+            result ??= model?.ToString() ?? @"null";
             return result;
         }
     }
