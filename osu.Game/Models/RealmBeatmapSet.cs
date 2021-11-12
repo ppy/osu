@@ -55,7 +55,7 @@ namespace osu.Game.Models
 
         public bool Equals(IBeatmapSetInfo? other)
         {
-            if (other is RealmBeatmap b)
+            if (other is RealmBeatmapSet b)
                 return b.ID == ID;
 
             if (OnlineID > 0 && other?.OnlineID > 0)
