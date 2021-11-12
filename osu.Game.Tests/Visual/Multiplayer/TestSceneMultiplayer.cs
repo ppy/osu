@@ -19,11 +19,13 @@ using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.Queueing;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -577,6 +579,54 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             AddUntilStep("wait for results", () => multiplayerScreenStack.CurrentScreen is ResultsScreen);
+        }
+
+        [Test]
+        public void TestRoomSettingsReQueriedWhenJoiningRoom()
+        {
+            AddStep("create room", () =>
+            {
+                roomManager.AddServerSideRoom(new Room
+                {
+                    Name = { Value = "Test Room" },
+                    QueueMode = { Value = QueueModes.FreeForAll },
+                    Playlist =
+                    {
+                        new PlaylistItem
+                        {
+                            Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        }
+                    }
+                });
+            });
+
+            AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+            AddStep("select room", () => InputManager.Key(Key.Down));
+
+            AddStep("disable polling", () => this.ChildrenOfType<ListingPollingComponent>().Single().TimeBetweenPolls.Value = 0);
+            AddStep("change server-side settings", () =>
+            {
+                roomManager.ServerSideRooms[0].Name.Value = "New name";
+                roomManager.ServerSideRooms[0].Playlist.Add(new PlaylistItem
+                {
+                    ID = 2,
+                    Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                });
+            });
+
+            AddStep("join room", () => InputManager.Key(Key.Enter));
+            AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
+            AddUntilStep("wait for join", () => client.Room != null);
+
+            AddAssert("local room has correct settings", () =>
+            {
+                var localRoom = this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().Room;
+                return localRoom.Name.Value == roomManager.ServerSideRooms[0].Name.Value
+                       && localRoom.Playlist.SequenceEqual(roomManager.ServerSideRooms[0].Playlist);
+            });
         }
 
         private MultiplayerReadyButton readyButton => this.ChildrenOfType<MultiplayerReadyButton>().Single();
