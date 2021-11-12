@@ -16,6 +16,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Stores;
 using osu.Game.Tests.Resources;
 using Realms;
@@ -94,7 +95,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapImporter(realmFactory, storage);
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
-                var tempPath = TestResources.GetTestBeatmapForImport();
+                string? tempPath = TestResources.GetTestBeatmapForImport();
 
                 ILive<RealmBeatmapSet>? importedSet;
 
@@ -144,7 +145,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapImporter(realmFactory, storage);
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
-                var temp = TestResources.GetTestBeatmapForImport();
+                string? temp = TestResources.GetTestBeatmapForImport();
 
                 string extractedFolder = $"{temp}_extracted";
                 Directory.CreateDirectory(extractedFolder);
@@ -193,7 +194,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapImporter(realmFactory, storage);
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
-                var temp = TestResources.GetTestBeatmapForImport();
+                string? temp = TestResources.GetTestBeatmapForImport();
 
                 string extractedFolder = $"{temp}_extracted";
                 Directory.CreateDirectory(extractedFolder);
@@ -245,7 +246,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapImporter(realmFactory, storage);
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
-                var temp = TestResources.GetTestBeatmapForImport();
+                string? temp = TestResources.GetTestBeatmapForImport();
 
                 string extractedFolder = $"{temp}_extracted";
                 Directory.CreateDirectory(extractedFolder);
@@ -293,7 +294,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapImporter(realmFactory, storage);
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
-                var temp = TestResources.GetTestBeatmapForImport();
+                string? temp = TestResources.GetTestBeatmapForImport();
 
                 string extractedFolder = $"{temp}_extracted";
                 Directory.CreateDirectory(extractedFolder);
@@ -368,6 +369,34 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestModelCreationFailureDoesntReturn()
+        {
+            RunTestWithRealmAsync(async (realmFactory, storage) =>
+            {
+                using var importer = new BeatmapImporter(realmFactory, storage);
+                using var store = new RealmRulesetStore(realmFactory, storage);
+
+                var progressNotification = new ImportProgressNotification();
+
+                var zipStream = new MemoryStream();
+
+                using (var zip = ZipArchive.Create())
+                    zip.SaveTo(zipStream, new ZipWriterOptions(CompressionType.Deflate));
+
+                var imported = await importer.Import(
+                    progressNotification,
+                    new ImportTask(zipStream, string.Empty)
+                );
+
+                checkBeatmapSetCount(realmFactory.Context, 0);
+                checkBeatmapCount(realmFactory.Context, 0);
+
+                Assert.IsEmpty(imported);
+                Assert.AreEqual(ProgressNotificationState.Cancelled, progressNotification.State);
+            });
+        }
+
+        [Test]
         public void TestRollbackOnFailure()
         {
             RunTestWithRealmAsync(async (realmFactory, storage) =>
@@ -391,7 +420,7 @@ namespace osu.Game.Tests.Database
                 checkBeatmapCount(realmFactory.Context, 12);
                 checkSingleReferencedFileCount(realmFactory.Context, 18);
 
-                var brokenTempFilename = TestResources.GetTestBeatmapForImport();
+                string? brokenTempFilename = TestResources.GetTestBeatmapForImport();
 
                 MemoryStream brokenOsu = new MemoryStream();
                 MemoryStream brokenOsz = new MemoryStream(await File.ReadAllBytesAsync(brokenTempFilename));
@@ -482,7 +511,10 @@ namespace osu.Game.Tests.Database
                 var metadata = new RealmBeatmapMetadata
                 {
                     Artist = "SomeArtist",
-                    Author = "SomeAuthor"
+                    Author =
+                    {
+                        Username = "SomeAuthor"
+                    }
                 };
 
                 var ruleset = realmFactory.Context.All<RealmRuleset>().First();
@@ -522,7 +554,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapImporter(realmFactory, storage);
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
-                var temp = TestResources.GetTestBeatmapForImport();
+                string? temp = TestResources.GetTestBeatmapForImport();
                 using (File.OpenRead(temp))
                     await importer.Import(temp);
                 ensureLoaded(realmFactory.Context);
@@ -539,7 +571,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapImporter(realmFactory, storage);
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
-                var temp = TestResources.GetTestBeatmapForImport();
+                string? temp = TestResources.GetTestBeatmapForImport();
 
                 string extractedFolder = $"{temp}_extracted";
                 Directory.CreateDirectory(extractedFolder);
@@ -575,7 +607,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapImporter(realmFactory, storage);
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
-                var temp = TestResources.GetTestBeatmapForImport();
+                string? temp = TestResources.GetTestBeatmapForImport();
 
                 string extractedFolder = $"{temp}_extracted";
                 string subfolder = Path.Combine(extractedFolder, "subfolder");
@@ -617,7 +649,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapImporter(realmFactory, storage);
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
-                var temp = TestResources.GetTestBeatmapForImport();
+                string? temp = TestResources.GetTestBeatmapForImport();
 
                 string extractedFolder = $"{temp}_extracted";
                 string dataFolder = Path.Combine(extractedFolder, "actual_data");
@@ -668,7 +700,7 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapImporter(realmFactory, storage);
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
-                var temp = TestResources.GetTestBeatmapForImport();
+                string? temp = TestResources.GetTestBeatmapForImport();
                 await importer.Import(temp);
 
                 // Update via the beatmap, not the beatmap info, to ensure correct linking
@@ -685,7 +717,7 @@ namespace osu.Game.Tests.Database
 
         public static async Task<RealmBeatmapSet?> LoadQuickOszIntoOsu(BeatmapImporter importer, Realm realm)
         {
-            var temp = TestResources.GetQuickTestBeatmapForImport();
+            string? temp = TestResources.GetQuickTestBeatmapForImport();
 
             var importedSet = await importer.Import(new ImportTask(temp));
 
@@ -700,7 +732,7 @@ namespace osu.Game.Tests.Database
 
         public static async Task<RealmBeatmapSet> LoadOszIntoStore(BeatmapImporter importer, Realm realm, string? path = null, bool virtualTrack = false)
         {
-            var temp = path ?? TestResources.GetTestBeatmapForImport(virtualTrack);
+            string? temp = path ?? TestResources.GetTestBeatmapForImport(virtualTrack);
 
             var importedSet = await importer.Import(new ImportTask(temp));
 

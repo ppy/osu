@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API
 {
@@ -69,7 +69,7 @@ namespace osu.Game.Online.API
         /// <summary>
         /// The currently logged in user. Note that this will only be populated during <see cref="Perform"/>.
         /// </summary>
-        protected User User { get; private set; }
+        protected APIUser User { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
@@ -107,7 +107,8 @@ namespace osu.Game.Online.API
             WebRequest = CreateWebRequest();
             WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
-            WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
+            if (!string.IsNullOrEmpty(API.AccessToken))
+                WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
 
             if (isFailing) return;
 

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -23,6 +24,11 @@ namespace osu.Game.Overlays.BeatmapListing
         public BeatmapSearchMultipleSelectionFilterRow(LocalisableString header)
             : base(header)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Current.BindTo(filter.Current);
         }
 
@@ -31,6 +37,7 @@ namespace osu.Game.Overlays.BeatmapListing
         /// <summary>
         /// Creates a filter control that can be used to simultaneously select multiple values of type <typeparamref name="T"/>.
         /// </summary>
+        [NotNull]
         protected virtual MultipleSelectionFilter CreateMultipleSelectionFilter() => new MultipleSelectionFilter();
 
         protected class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>

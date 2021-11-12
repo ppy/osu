@@ -102,75 +102,74 @@ namespace osu.Game.Stores
 
         private void addMissingRulesets()
         {
-            realmFactory.Context.Write(realm =>
+            using (var context = realmFactory.CreateContext())
             {
-                var rulesets = realm.All<RealmRuleset>();
-
-                List<Ruleset> instances = loadedAssemblies.Values
-                                                          .Select(r => Activator.CreateInstance(r) as Ruleset)
-                                                          .Where(r => r != null)
-                                                          .Select(r => r.AsNonNull())
-                                                          .ToList();
-
-                // add all legacy rulesets first to ensure they have exclusive choice of primary key.
-                foreach (var r in instances.Where(r => r is ILegacyRuleset))
+                context.Write(realm =>
                 {
-                    if (realm.All<RealmRuleset>().FirstOrDefault(rr => rr.OnlineID == r.RulesetInfo.ID) == null)
-                        realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.ID));
-                }
+                    var rulesets = realm.All<RealmRuleset>();
 
-                // add any other rulesets which have assemblies present but are not yet in the database.
-                foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
-                {
-                    if (rulesets.FirstOrDefault(ri => ri.InstantiationInfo.Equals(r.RulesetInfo.InstantiationInfo, StringComparison.Ordinal)) == null)
+                    List<Ruleset> instances = loadedAssemblies.Values
+                                                              .Select(r => Activator.CreateInstance(r) as Ruleset)
+                                                              .Where(r => r != null)
+                                                              .Select(r => r.AsNonNull())
+                                                              .ToList();
+
+                    // add all legacy rulesets first to ensure they have exclusive choice of primary key.
+                    foreach (var r in instances.Where(r => r is ILegacyRuleset))
                     {
-                        var existingSameShortName = rulesets.FirstOrDefault(ri => ri.ShortName == r.RulesetInfo.ShortName);
-
-                        if (existingSameShortName != null)
-                        {
-                            // even if a matching InstantiationInfo was not found, there may be an existing ruleset with the same ShortName.
-                            // this generally means the user or ruleset provider has renamed their dll but the underlying ruleset is *likely* the same one.
-                            // in such cases, update the instantiation info of the existing entry to point to the new one.
-                            existingSameShortName.InstantiationInfo = r.RulesetInfo.InstantiationInfo;
-                        }
-                        else
+                        if (realm.All<RealmRuleset>().FirstOrDefault(rr => rr.OnlineID == r.RulesetInfo.ID) == null)
                             realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.ID));
                     }
-                }
 
-                List<RealmRuleset> detachedRulesets = new List<RealmRuleset>();
-
-                // perform a consistency check and detach final rulesets from realm for cross-thread runtime usage.
-                foreach (var r in rulesets)
-                {
-                    try
+                    // add any other rulesets which have assemblies present but are not yet in the database.
+                    foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
                     {
-                        var type = Type.GetType(r.InstantiationInfo);
+                        if (rulesets.FirstOrDefault(ri => ri.InstantiationInfo.Equals(r.RulesetInfo.InstantiationInfo, StringComparison.Ordinal)) == null)
+                        {
+                            var existingSameShortName = rulesets.FirstOrDefault(ri => ri.ShortName == r.RulesetInfo.ShortName);
 
-                        if (type == null)
-                            throw new InvalidOperationException(@"Type resolution failure.");
-
-                        var rInstance = (Activator.CreateInstance(type) as Ruleset)?.RulesetInfo;
-
-                        if (rInstance == null)
-                            throw new InvalidOperationException(@"Instantiation failure.");
-
-                        r.Name = rInstance.Name;
-                        r.ShortName = rInstance.ShortName;
-                        r.InstantiationInfo = rInstance.InstantiationInfo;
-                        r.Available = true;
-
-                        detachedRulesets.Add(r.Clone());
+                            if (existingSameShortName != null)
+                            {
+                                // even if a matching InstantiationInfo was not found, there may be an existing ruleset with the same ShortName.
+                                // this generally means the user or ruleset provider has renamed their dll but the underlying ruleset is *likely* the same one.
+                                // in such cases, update the instantiation info of the existing entry to point to the new one.
+                                existingSameShortName.InstantiationInfo = r.RulesetInfo.InstantiationInfo;
+                            }
+                            else
+                                realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.ID));
+                        }
                     }
-                    catch (Exception ex)
+
+                    List<RealmRuleset> detachedRulesets = new List<RealmRuleset>();
+
+                    // perform a consistency check and detach final rulesets from realm for cross-thread runtime usage.
+                    foreach (var r in rulesets)
                     {
-                        r.Available = false;
-                        Logger.Log($"Could not load ruleset {r}: {ex.Message}");
-                    }
-                }
+                        try
+                        {
+                            var resolvedType = Type.GetType(r.InstantiationInfo)
+                                               ?? throw new RulesetLoadException(@"Type could not be resolved");
 
-                availableRulesets.AddRange(detachedRulesets);
-            });
+                            var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
+                                               ?? throw new RulesetLoadException(@"Instantiation failure");
+
+                            r.Name = instanceInfo.Name;
+                            r.ShortName = instanceInfo.ShortName;
+                            r.InstantiationInfo = instanceInfo.InstantiationInfo;
+                            r.Available = true;
+
+                            detachedRulesets.Add(r.Clone());
+                        }
+                        catch (Exception ex)
+                        {
+                            r.Available = false;
+                            Logger.Log($"Could not load ruleset {r}: {ex.Message}");
+                        }
+                    }
+
+                    availableRulesets.AddRange(detachedRulesets);
+                });
+            }
         }
 
         private void loadFromAppDomain()
@@ -193,7 +192,7 @@ namespace osu.Game.Stores
         {
             var rulesets = rulesetStorage.GetFiles(@".", @$"{ruleset_library_prefix}.*.dll");
 
-            foreach (var ruleset in rulesets.Where(f => !f.Contains(@"Tests")))
+            foreach (string? ruleset in rulesets.Where(f => !f.Contains(@"Tests")))
                 loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
         }
 
@@ -201,7 +200,7 @@ namespace osu.Game.Stores
         {
             try
             {
-                var files = Directory.GetFiles(RuntimeInfo.StartupDirectory, @$"{ruleset_library_prefix}.*.dll");
+                string[] files = Directory.GetFiles(RuntimeInfo.StartupDirectory, @$"{ruleset_library_prefix}.*.dll");
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
@@ -214,7 +213,7 @@ namespace osu.Game.Stores
 
         private void loadRulesetFromFile(string file)
         {
-            var filename = Path.GetFileNameWithoutExtension(file);
+            string? filename = Path.GetFileNameWithoutExtension(file);
 
             if (loadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
                 return;

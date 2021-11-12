@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
@@ -30,9 +30,9 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : IModelImporter<TModel>, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
-        where TFileModel : class, INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, IHasPrimaryKey, new()
     {
         private const int import_queue_request_concurrency = 1;
 
@@ -63,17 +63,13 @@ namespace osu.Game.Database
         /// Fired when a new or updated <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public IBindable<WeakReference<TModel>> ItemUpdated => itemUpdated;
-
-        private readonly Bindable<WeakReference<TModel>> itemUpdated = new Bindable<WeakReference<TModel>>();
+        public event Action<TModel> ItemUpdated;
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> is removed from the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public IBindable<WeakReference<TModel>> ItemRemoved => itemRemoved;
-
-        private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
+        public event Action<TModel> ItemRemoved;
 
         public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
 
@@ -93,8 +89,8 @@ namespace osu.Game.Database
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemUpdated += item => handleEvent(() => itemUpdated.Value = new WeakReference<TModel>(item));
-            ModelStore.ItemRemoved += item => handleEvent(() => itemRemoved.Value = new WeakReference<TModel>(item));
+            ModelStore.ItemUpdated += item => handleEvent(() => ItemUpdated?.Invoke(item));
+            ModelStore.ItemRemoved += item => handleEvent(() => ItemRemoved?.Invoke(item));
 
             exportStorage = storage.GetStorageForDirectory(@"exports");
 
@@ -197,7 +193,7 @@ namespace osu.Game.Database
             else
             {
                 notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First().Value}!"
+                    ? $"Imported {imported.First().Value.GetDisplayString()}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PostImport != null)
@@ -268,7 +264,7 @@ namespace osu.Game.Database
                 model = CreateModel(archive);
 
                 if (model == null)
-                    return Task.FromResult<ILive<TModel>>(new EntityFrameworkLive<TModel>(null));
+                    return Task.FromResult<ILive<TModel>>(null);
             }
             catch (TaskCanceledException)
             {
@@ -315,25 +311,29 @@ namespace osu.Game.Database
         /// <remarks>
         ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
         /// </remarks>
-        protected virtual string ComputeHash(TModel item, ArchiveReader reader = null)
+        protected virtual string ComputeHash(TModel item)
         {
-            if (reader != null)
-                // fast hashing for cases where the item's files may not be populated.
-                return computeHashFast(reader);
+            var hashableFiles = item.Files
+                                    .Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+                                    .OrderBy(f => f.Filename)
+                                    .ToArray();
 
-            // for now, concatenate all hashable files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
-
-            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
+            if (hashableFiles.Length > 0)
             {
-                using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
-                    s.CopyTo(hashable);
+                // for now, concatenate all hashable files in the set to create a unique hash.
+                MemoryStream hashable = new MemoryStream();
+
+                foreach (TFileModel file in hashableFiles)
+                {
+                    using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
+                        s.CopyTo(hashable);
+                }
+
+                if (hashable.Length > 0)
+                    return hashable.ComputeSHA2Hash();
             }
 
-            if (hashable.Length > 0)
-                return hashable.ComputeSHA2Hash();
-
-            return item.Hash;
+            return generateFallbackHash();
         }
 
         /// <summary>
@@ -393,7 +393,7 @@ namespace osu.Game.Database
                 LogForModel(item, @"Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
-                item.Hash = ComputeHash(item, archive);
+                item.Hash = ComputeHash(item);
 
                 await Populate(item, archive, cancellationToken).ConfigureAwait(false);
 
@@ -462,7 +462,7 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
-            string filename = $"{getValidFilename(item.ToString())}{HandledExtensions.First()}";
+            string filename = $"{GetValidFilename(item.ToString())}{HandledExtensions.First()}";
 
             using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
                 ExportModelTo(retrievedItem, stream);
@@ -516,9 +516,12 @@ namespace osu.Game.Database
                 {
                     Files.Dereference(file.FileInfo);
 
-                    // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
-                    // Definitely can be removed once we rework the database backend.
-                    usage.Context.Set<TFileModel>().Remove(file);
+                    if (file.ID > 0)
+                    {
+                        // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
+                        // Definitely can be removed once we rework the database backend.
+                        usage.Context.Set<TFileModel>().Remove(file);
+                    }
                 }
 
                 model.Files.Remove(file);
@@ -540,9 +543,10 @@ namespace osu.Game.Database
                     Filename = filename,
                     FileInfo = Files.Add(contents)
                 });
-
-                Update(model);
             }
+
+            if (model.ID > 0)
+                Update(model);
         }
 
         /// <summary>
@@ -675,7 +679,7 @@ namespace osu.Game.Database
         {
             MemoryStream hashable = new MemoryStream();
 
-            foreach (var file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
             {
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
@@ -684,7 +688,7 @@ namespace osu.Game.Database
             if (hashable.Length > 0)
                 return hashable.ComputeSHA2Hash();
 
-            return reader.Name.ComputeSHA2Hash();
+            return generateFallbackHash();
         }
 
         /// <summary>
@@ -897,9 +901,23 @@ namespace osu.Game.Database
 
         #endregion
 
-        private string getValidFilename(string filename)
+        private static string generateFallbackHash()
         {
-            foreach (char c in Path.GetInvalidFileNameChars())
+            // if a hash could no be generated from file content, presume a unique / new import.
+            // therefore, let's use a guaranteed unique hash.
+            // this doesn't follow the SHA2 hashing schema intentionally, so such entries on the data store can be identified.
+            return Guid.NewGuid().ToString();
+        }
+
+        private readonly char[] invalidFilenameCharacters = Path.GetInvalidFileNameChars()
+                                                                // Backslash is added to avoid issues when exporting to zip.
+                                                                // See SharpCompress filename normalisation https://github.com/adamhathcock/sharpcompress/blob/a1e7c0068db814c9aa78d86a94ccd1c761af74bd/src/SharpCompress/Writers/Zip/ZipWriter.cs#L143.
+                                                                .Append('\\')
+                                                                .ToArray();
+
+        protected string GetValidFilename(string filename)
+        {
+            foreach (char c in invalidFilenameCharacters)
                 filename = filename.Replace(c, '_');
             return filename;
         }

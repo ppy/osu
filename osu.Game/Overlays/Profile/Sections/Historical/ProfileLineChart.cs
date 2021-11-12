@@ -14,16 +14,16 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osu.Framework.Localisation;
-using static osu.Game.Users.User;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public class ProfileLineChart : CompositeDrawable
     {
-        private UserHistoryCount[] values;
+        private APIUserHistoryCount[] values;
 
         [NotNull]
-        public UserHistoryCount[] Values
+        public APIUserHistoryCount[] Values
         {
             get => values;
             set
@@ -116,10 +116,10 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             rowTicksContainer.Clear();
             rowLinesContainer.Clear();
 
-            var min = values.Select(v => v.Count).Min();
-            var max = values.Select(v => v.Count).Max();
+            long min = values.Select(v => v.Count).Min();
+            long max = values.Select(v => v.Count).Max();
 
-            var tickInterval = getTickInterval(max - min, 6);
+            long tickInterval = getTickInterval(max - min, 6);
 
             for (long currentTick = 0; currentTick <= max; currentTick += tickInterval)
             {
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             columnTicksContainer.Clear();
             columnLinesContainer.Clear();
 
-            var totalMonths = values.Length;
+            int totalMonths = values.Length;
 
             int monthsPerTick = 1;
 
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
             for (int i = 0; i < totalMonths; i += monthsPerTick)
             {
-                var x = (float)i / (totalMonths - 1);
+                float x = (float)i / (totalMonths - 1);
                 addColumnTick(x, values[i].Date);
             }
         }
@@ -215,15 +215,15 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             // this interval is what would be achieved if the interval was divided perfectly evenly into maxTicksCount ticks.
             // can contain ugly fractional parts.
-            var exactTickInterval = (float)range / (maxTicksCount - 1);
+            float exactTickInterval = (float)range / (maxTicksCount - 1);
 
             // the ideal ticks start with a 1, 2 or 5, and are multipliers of powers of 10.
             // first off, use log10 to calculate the number of digits in the "exact" interval.
-            var numberOfDigits = Math.Floor(Math.Log10(exactTickInterval));
-            var tickBase = Math.Pow(10, numberOfDigits);
+            double numberOfDigits = Math.Floor(Math.Log10(exactTickInterval));
+            double tickBase = Math.Pow(10, numberOfDigits);
 
             // then see how the exact tick relates to the power of 10.
-            var exactTickMultiplier = exactTickInterval / tickBase;
+            double exactTickMultiplier = exactTickInterval / tickBase;
 
             double tickMultiplier;
 

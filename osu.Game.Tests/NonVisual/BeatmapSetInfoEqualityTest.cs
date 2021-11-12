@@ -12,8 +12,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestOnlineWithOnline()
         {
-            var ourInfo = new BeatmapSetInfo { OnlineBeatmapSetID = 123 };
-            var otherInfo = new BeatmapSetInfo { OnlineBeatmapSetID = 123 };
+            var ourInfo = new BeatmapSetInfo { OnlineID = 123 };
+            var otherInfo = new BeatmapSetInfo { OnlineID = 123 };
 
             Assert.AreEqual(ourInfo, otherInfo);
         }
@@ -30,8 +30,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestDatabasedWithOnline()
         {
-            var ourInfo = new BeatmapSetInfo { ID = 123, OnlineBeatmapSetID = 12 };
-            var otherInfo = new BeatmapSetInfo { OnlineBeatmapSetID = 12 };
+            var ourInfo = new BeatmapSetInfo { ID = 123, OnlineID = 12 };
+            var otherInfo = new BeatmapSetInfo { OnlineID = 12 };
 
             Assert.AreEqual(ourInfo, otherInfo);
         }
@@ -39,8 +39,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestCheckNullID()
         {
-            var ourInfo = new BeatmapSetInfo { Status = BeatmapSetOnlineStatus.Loved };
-            var otherInfo = new BeatmapSetInfo { Status = BeatmapSetOnlineStatus.Approved };
+            var ourInfo = new BeatmapSetInfo { Hash = "1" };
+            var otherInfo = new BeatmapSetInfo { Hash = "2" };
 
             Assert.AreNotEqual(ourInfo, otherInfo);
         }

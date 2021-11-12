@@ -41,13 +41,13 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private BeatmapInfo beatmapInfo;
+        private IBeatmapInfo beatmapInfo;
 
         private APIFailTimes failTimes;
 
         private int[] ratings;
 
-        public BeatmapInfo BeatmapInfo
+        public IBeatmapInfo BeatmapInfo
         {
             get => beatmapInfo;
             set
@@ -56,8 +56,11 @@ namespace osu.Game.Screens.Select
 
                 beatmapInfo = value;
 
-                failTimes = beatmapInfo?.OnlineInfo?.FailTimes;
-                ratings = beatmapInfo?.BeatmapSet?.Ratings;
+                var onlineInfo = beatmapInfo as IBeatmapOnlineInfo;
+                var onlineSetInfo = beatmapInfo.BeatmapSet as IBeatmapSetOnlineInfo;
+
+                failTimes = onlineInfo?.FailTimes;
+                ratings = onlineSetInfo?.Ratings;
 
                 Scheduler.AddOnce(updateStatistics);
             }
@@ -178,19 +181,19 @@ namespace osu.Game.Screens.Select
         private void updateStatistics()
         {
             advanced.BeatmapInfo = BeatmapInfo;
-            description.Text = BeatmapInfo?.Version;
-            source.Text = BeatmapInfo?.Metadata?.Source;
-            tags.Text = BeatmapInfo?.Metadata?.Tags;
+            description.Text = BeatmapInfo?.DifficultyName;
+            source.Text = BeatmapInfo?.Metadata.Source;
+            tags.Text = BeatmapInfo?.Metadata.Tags;
 
-            // metrics may have been previously fetched
+            // failTimes may have been previously fetched
             if (ratings != null && failTimes != null)
             {
                 updateMetrics();
                 return;
             }
 
-            // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
-            if (BeatmapInfo?.OnlineBeatmapID == null || api.State.Value == APIState.Offline)
+            // for now, let's early abort if an OnlineID is not present (should have been populated at import time).
+            if (BeatmapInfo == null || BeatmapInfo.OnlineID <= 0 || api.State.Value == APIState.Offline)
             {
                 updateMetrics();
                 return;
@@ -233,7 +236,7 @@ namespace osu.Game.Screens.Select
 
         private void updateMetrics()
         {
-            var hasMetrics = (failTimes?.Retries?.Any() ?? false) || (failTimes?.Fails?.Any() ?? false);
+            bool hasMetrics = (failTimes?.Retries?.Any() ?? false) || (failTimes?.Fails?.Any() ?? false);
 
             if (ratings?.Any() ?? false)
             {

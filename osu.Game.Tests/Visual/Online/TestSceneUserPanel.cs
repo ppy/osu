@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
@@ -42,27 +43,27 @@ namespace osu.Game.Tests.Visual.Online
                 Spacing = new Vector2(10f),
                 Children = new Drawable[]
                 {
-                    new UserBrickPanel(new User
+                    new UserBrickPanel(new APIUser
                     {
                         Username = @"flyte",
                         Id = 3103765,
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
                     }),
-                    new UserBrickPanel(new User
+                    new UserBrickPanel(new APIUser
                     {
                         Username = @"peppy",
                         Id = 2,
                         Colour = "99EB47",
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     }),
-                    flyte = new UserGridPanel(new User
+                    flyte = new UserGridPanel(new APIUser
                     {
                         Username = @"flyte",
                         Id = 3103765,
                         Country = new Country { FlagName = @"JP" },
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
                     }) { Width = 300 },
-                    peppy = new UserGridPanel(new User
+                    peppy = new UserGridPanel(new APIUser
                     {
                         Username = @"peppy",
                         Id = 2,
@@ -71,7 +72,7 @@ namespace osu.Game.Tests.Visual.Online
                         IsSupporter = true,
                         SupportLevel = 3,
                     }) { Width = 300 },
-                    evast = new TestUserListPanel(new User
+                    evast = new TestUserListPanel(new APIUser
                     {
                         Username = @"Evast",
                         Id = 8195163,
@@ -134,7 +135,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestUserListPanel : UserListPanel
         {
-            public TestUserListPanel(User user)
+            public TestUserListPanel(APIUser user)
                 : base(user)
             {
             }

@@ -6,10 +6,10 @@ using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Tests.Visual.Multiplayer;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.NonVisual.Multiplayer
 {
@@ -21,7 +21,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
         {
             int id = 2000;
 
-            AddRepeatStep("add some users", () => Client.AddUser(new User { Id = id++ }), 5);
+            AddRepeatStep("add some users", () => Client.AddUser(new APIUser { Id = id++ }), 5);
             checkPlayingUserCount(0);
 
             AddAssert("playlist item is available", () => Client.CurrentMatchPlayingItem.Value != null);
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
                     room.State = MultiplayerRoomState.Playing;
                     room.Users.Add(new MultiplayerRoomUser(PLAYER_1_ID)
                     {
-                        User = new User { Id = PLAYER_1_ID },
+                        User = new APIUser { Id = PLAYER_1_ID },
                         State = MultiplayerUserState.Playing
                     });
                 };
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             {
                 for (int i = 0; i < userCount; ++i)
                 {
-                    var userId = Client.Room?.Users[i].UserID ?? throw new AssertionException("Room cannot be null!");
+                    int userId = Client.Room?.Users[i].UserID ?? throw new AssertionException("Room cannot be null!");
                     Client.ChangeUserState(userId, state);
                 }
             });

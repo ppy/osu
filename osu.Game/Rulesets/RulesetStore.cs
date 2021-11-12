@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -129,12 +128,15 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo).AsNonNull())).RulesetInfo;
+                        var resolvedType = Type.GetType(r.InstantiationInfo)
+                                           ?? throw new RulesetLoadException(@"Type could not be resolved");
+
+                        var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
+                                           ?? throw new RulesetLoadException(@"Instantiation failure");
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
                         r.InstantiationInfo = instanceInfo.InstantiationInfo;
-
                         r.Available = true;
                     }
                     catch
@@ -168,7 +170,7 @@ namespace osu.Game.Rulesets
 
             var rulesets = rulesetStorage.GetFiles(".", $"{ruleset_library_prefix}.*.dll");
 
-            foreach (var ruleset in rulesets.Where(f => !f.Contains("Tests")))
+            foreach (string ruleset in rulesets.Where(f => !f.Contains("Tests")))
                 loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
         }
 
@@ -176,7 +178,7 @@ namespace osu.Game.Rulesets
         {
             try
             {
-                var files = Directory.GetFiles(RuntimeInfo.StartupDirectory, $"{ruleset_library_prefix}.*.dll");
+                string[] files = Directory.GetFiles(RuntimeInfo.StartupDirectory, $"{ruleset_library_prefix}.*.dll");
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
@@ -189,7 +191,7 @@ namespace osu.Game.Rulesets
 
         private void loadRulesetFromFile(string file)
         {
-            var filename = Path.GetFileNameWithoutExtension(file);
+            string filename = Path.GetFileNameWithoutExtension(file);
 
             if (loadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
                 return;

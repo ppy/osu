@@ -8,12 +8,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO.Legacy;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
@@ -39,13 +39,13 @@ namespace osu.Game.Scoring.Legacy
 
                 score.ScoreInfo = scoreInfo;
 
-                var version = sr.ReadInt32();
+                int version = sr.ReadInt32();
 
                 workingBeatmap = GetBeatmap(sr.ReadString());
                 if (workingBeatmap is DummyWorkingBeatmap)
                     throw new BeatmapNotFoundException();
 
-                scoreInfo.User = new User { Username = sr.ReadString() };
+                scoreInfo.User = new APIUser { Username = sr.ReadString() };
 
                 // MD5Hash
                 sr.ReadString();
@@ -77,7 +77,7 @@ namespace osu.Game.Scoring.Legacy
 
                 scoreInfo.Date = sr.ReadDateTime();
 
-                var compressedReplay = sr.ReadByteArray();
+                byte[] compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
                     scoreInfo.OnlineScoreID = sr.ReadInt64();
@@ -228,11 +228,11 @@ namespace osu.Game.Scoring.Legacy
             float lastTime = 0;
             ReplayFrame currentFrame = null;
 
-            var frames = reader.ReadToEnd().Split(',');
+            string[] frames = reader.ReadToEnd().Split(',');
 
-            for (var i = 0; i < frames.Length; i++)
+            for (int i = 0; i < frames.Length; i++)
             {
-                var split = frames[i].Split('|');
+                string[] split = frames[i].Split('|');
 
                 if (split.Length < 4)
                     continue;
@@ -243,9 +243,9 @@ namespace osu.Game.Scoring.Legacy
                     continue;
                 }
 
-                var diff = Parsing.ParseFloat(split[0]);
-                var mouseX = Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE);
-                var mouseY = Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE);
+                float diff = Parsing.ParseFloat(split[0]);
+                float mouseX = Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE);
+                float mouseY = Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE);
 
                 lastTime += diff;
 

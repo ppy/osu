@@ -214,8 +214,8 @@ namespace osu.Game.Screens.Select.Carousel
                 if (Item.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
-                if (beatmapSet.OnlineBeatmapSetID != null && viewDetails != null)
-                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineBeatmapSetID.Value)));
+                if (beatmapSet.OnlineID != null && viewDetails != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID.Value)));
 
                 if (collectionManager != null)
                 {
@@ -241,7 +241,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             TernaryState state;
 
-            var countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
+            int countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
 
             if (countExisting == beatmapSet.Beatmaps.Count)
                 state = TernaryState.True;

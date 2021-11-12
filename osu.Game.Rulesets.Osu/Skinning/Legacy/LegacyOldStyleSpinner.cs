@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             // careful: need to call this exactly once for all calculations in a frame
             // as the function has a random factor in it
-            var metreHeight = getMetreHeight(DrawableSpinner.Progress);
+            float metreHeight = getMetreHeight(DrawableSpinner.Progress);
 
             // hack to make the metre blink up from below than down from above.
             // move down the container to be able to apply masking for the metre,

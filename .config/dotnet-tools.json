@@ -14,8 +14,8 @@
         "jb"
       ]
     },
-    "smoogipoo.nvika": {
-      "version": "1.0.1",
+    "nvika": {
+      "version": "2.2.0",
       "commands": [
         "nvika"
       ]

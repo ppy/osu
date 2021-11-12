@@ -80,7 +80,7 @@ namespace osu.Game.Online.Spectator
                     watchingUsers.Clear();
 
                     // resubscribe to watched users.
-                    foreach (var userId in users)
+                    foreach (int userId in users)
                         WatchUser(userId);
 
                     // re-send state in case it wasn't received
@@ -144,7 +144,7 @@ namespace osu.Game.Online.Spectator
             IsPlaying = true;
 
             // transfer state at point of beginning play
-            currentState.BeatmapID = score.ScoreInfo.BeatmapInfo.OnlineBeatmapID;
+            currentState.BeatmapID = score.ScoreInfo.BeatmapInfo.OnlineID;
             currentState.RulesetID = score.ScoreInfo.RulesetID;
             currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
 

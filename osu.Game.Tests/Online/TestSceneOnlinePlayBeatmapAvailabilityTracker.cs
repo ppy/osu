@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Online
             testBeatmapInfo = getTestBeatmapInfo(testBeatmapFile);
             testBeatmapSet = testBeatmapInfo.BeatmapSet;
 
-            var existing = beatmaps.QueryBeatmapSet(s => s.OnlineBeatmapSetID == testBeatmapSet.OnlineBeatmapSetID);
+            var existing = beatmaps.QueryBeatmapSet(s => s.OnlineID == testBeatmapSet.OnlineID);
             if (existing != null)
                 beatmaps.Delete(existing);
 
@@ -101,10 +101,10 @@ namespace osu.Game.Tests.Online
             AddStep("import beatmap", () => beatmaps.Import(testBeatmapFile).Wait());
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
 
-            AddStep("delete beatmap", () => beatmaps.Delete(beatmaps.QueryBeatmapSet(b => b.OnlineBeatmapSetID == testBeatmapSet.OnlineBeatmapSetID)));
+            AddStep("delete beatmap", () => beatmaps.Delete(beatmaps.QueryBeatmapSet(b => b.OnlineID == testBeatmapSet.OnlineID)));
             addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("undelete beatmap", () => beatmaps.Undelete(beatmaps.QueryBeatmapSet(b => b.OnlineBeatmapSetID == testBeatmapSet.OnlineBeatmapSetID)));
+            AddStep("undelete beatmap", () => beatmaps.Undelete(beatmaps.QueryBeatmapSet(b => b.OnlineID == testBeatmapSet.OnlineID)));
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
         }
 
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Online
 
         private void addAvailabilityCheckStep(string description, Func<BeatmapAvailability> expected)
         {
-            AddAssert(description, () => availabilityTracker.Availability.Value.Equals(expected.Invoke()));
+            AddUntilStep(description, () => availabilityTracker.Availability.Value.Equals(expected.Invoke()));
         }
 
         private static BeatmapInfo getTestBeatmapInfo(string archiveFile)
@@ -168,19 +168,19 @@ namespace osu.Game.Tests.Online
                 return new TestBeatmapModelManager(this, storage, contextFactory, rulesets, api, host);
             }
 
-            protected override BeatmapModelDownloader CreateBeatmapModelDownloader(IBeatmapModelManager manager, IAPIProvider api, GameHost host)
+            protected override BeatmapModelDownloader CreateBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> manager, IAPIProvider api, GameHost host)
             {
                 return new TestBeatmapModelDownloader(manager, api, host);
             }
 
             internal class TestBeatmapModelDownloader : BeatmapModelDownloader
             {
-                public TestBeatmapModelDownloader(IBeatmapModelManager modelManager, IAPIProvider apiProvider, GameHost gameHost)
-                    : base(modelManager, apiProvider, gameHost)
+                public TestBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> importer, IAPIProvider apiProvider, GameHost gameHost)
+                    : base(importer, apiProvider, gameHost)
                 {
                 }
 
-                protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
+                protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize)
                     => new TestDownloadRequest(set);
             }
 
@@ -202,12 +202,12 @@ namespace osu.Game.Tests.Online
             }
         }
 
-        private class TestDownloadRequest : ArchiveDownloadRequest<BeatmapSetInfo>
+        private class TestDownloadRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
         {
             public new void SetProgress(float progress) => base.SetProgress(progress);
             public new void TriggerSuccess(string filename) => base.TriggerSuccess(filename);
 
-            public TestDownloadRequest(BeatmapSetInfo model)
+            public TestDownloadRequest(IBeatmapSetInfo model)
                 : base(model)
             {
             }

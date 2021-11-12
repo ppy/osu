@@ -77,9 +77,13 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                var backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
-                if (backgroundPath == null)
+                string backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile;
+
+                if (string.IsNullOrEmpty(backgroundPath))
                     return false;
+
+                // Importantly, do this after the NullOrEmpty because EF may have stored the non-nullable value as null to the database, bypassing compile-time constraints.
+                backgroundPath = backgroundPath.ToLowerInvariant();
 
                 return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
             }
@@ -91,9 +95,9 @@ namespace osu.Game.Storyboards
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
         {
             Drawable drawable = null;
-            var storyboardPath = BeatmapInfo.BeatmapSet?.Files.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            string storyboardPath = BeatmapInfo.BeatmapSet?.Files.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
-            if (storyboardPath != null)
+            if (!string.IsNullOrEmpty(storyboardPath))
                 drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };
             // if the texture isn't available locally in the beatmap, some storyboards choose to source from the underlying skin lookup hierarchy.
             else if (UseSkinSprites)

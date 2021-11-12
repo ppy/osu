@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Extensions.Color4Extensions;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osu.Game.Overlays.Profile.Header.Components;
 
@@ -14,7 +15,7 @@ namespace osu.Game.Users
 {
     public class UserListPanel : ExtendedUserPanel
     {
-        public UserListPanel(User user)
+        public UserListPanel(APIUser user)
             : base(user)
         {
             RelativeSizeAxes = Axes.X;

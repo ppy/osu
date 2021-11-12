@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             var deviceItems = new List<string> { string.Empty };
             deviceItems.AddRange(audio.AudioDeviceNames);
 
-            var preferredDeviceName = audio.AudioDevice.Value;
+            string preferredDeviceName = audio.AudioDevice.Value;
             if (deviceItems.All(kv => kv != preferredDeviceName))
                 deviceItems.Add(preferredDeviceName);
 
