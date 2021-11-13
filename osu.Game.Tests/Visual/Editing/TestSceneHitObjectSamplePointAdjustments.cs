@@ -120,6 +120,46 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectHasSampleVolume(1, 30);
         }
 
+        [Test]
+        public void TestMultipleSelectionWithSameSampleBank()
+        {
+            AddStep("unify sample bank", () =>
+            {
+                foreach (var h in EditorBeatmap.HitObjects)
+                    h.SampleControlPoint.SampleBank = "soft";
+            });
+
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            clickSamplePiece(0);
+            samplePopoverHasSingleBank("soft");
+
+            dismissPopover();
+
+            clickSamplePiece(1);
+            samplePopoverHasSingleBank("soft");
+
+            setBankViaPopover("drum");
+            hitObjectHasSampleBank(0, "drum");
+            hitObjectHasSampleBank(1, "drum");
+        }
+
+        [Test]
+        public void TestMultipleSelectionWithDifferentSampleBank()
+        {
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            clickSamplePiece(0);
+            samplePopoverHasIndeterminateBank();
+
+            dismissPopover();
+
+            clickSamplePiece(1);
+            samplePopoverHasIndeterminateBank();
+
+            setBankViaPopover("normal");
+            hitObjectHasSampleBank(0, "normal");
+            hitObjectHasSampleBank(1, "normal");
+        }
+
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} difficulty piece", () =>
         {
             var difficultyPiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
@@ -150,6 +190,14 @@ namespace osu.Game.Tests.Visual.Editing
             var textBox = popover?.ChildrenOfType<LabelledTextBox>().First();
 
             return textBox?.Current.Value == bank;
+        });
+
+        private void samplePopoverHasIndeterminateBank() => AddUntilStep($"sample popover has indeterminate bank", () =>
+        {
+            var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
+            var textBox = popover?.ChildrenOfType<LabelledTextBox>().First();
+
+            return textBox != null && textBox.Current.Value == null;
         });
 
         private void dismissPopover()
