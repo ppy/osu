@@ -10,9 +10,12 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
+using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Tests.Beatmaps.IO;
+using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -58,6 +61,42 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
             AddStep("exit player", () => editorPlayer.Exit());
             AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("background has correct params", () =>
+            {
+                var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single();
+                return background.Colour == Color4.DarkGray && background.BlurAmount.Value == 0;
+            });
+        }
+
+        [Test]
+        public void TestGameplayTestWhenTrackRunning()
+        {
+            AddStep("start track", () => EditorClock.Start());
+            AddAssert("sample playback enabled", () => !Editor.SamplePlaybackDisabled.Value);
+
+            AddStep("click test gameplay button", () =>
+            {
+                var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            EditorPlayer editorPlayer = null;
+            AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
+            AddAssert("editor track stopped", () => !EditorClock.IsRunning);
+            AddAssert("sample playback disabled", () => Editor.SamplePlaybackDisabled.Value);
+
+            AddStep("exit player", () => editorPlayer.Exit());
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("background has correct params", () =>
+            {
+                var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single();
+                return background.Colour == Color4.DarkGray && background.BlurAmount.Value == 0;
+            });
+
+            AddStep("start track", () => EditorClock.Start());
+            AddAssert("sample playback re-enabled", () => !Editor.SamplePlaybackDisabled.Value);
         }
 
         [Test]
