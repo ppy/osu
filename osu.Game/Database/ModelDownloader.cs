@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 
@@ -50,7 +51,7 @@ namespace osu.Game.Database
 
             DownloadNotification notification = new DownloadNotification
             {
-                Text = $"Downloading {request.Model}",
+                Text = $"Downloading {request.Model.GetDisplayString()}",
             };
 
             request.DownloadProgressed += progress =>

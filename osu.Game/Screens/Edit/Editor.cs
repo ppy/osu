@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework;
@@ -24,7 +23,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.IO.Serialization;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
@@ -38,6 +36,7 @@ using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -92,6 +91,8 @@ namespace osu.Game.Screens.Edit
 
         private DependencyContainer dependencies;
 
+        private TestGameplayButton testGameplayButton;
+
         private bool isNewBeatmap;
 
         protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
@@ -104,6 +105,12 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private MusicController music { get; set; }
+
+        [Cached]
+        public readonly EditorClipboard Clipboard = new EditorClipboard();
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         public Editor(EditorLoader loader = null)
         {
@@ -179,10 +186,6 @@ namespace osu.Game.Screens.Edit
 
             OsuMenuItem undoMenuItem;
             OsuMenuItem redoMenuItem;
-
-            EditorMenuItem cutMenuItem;
-            EditorMenuItem copyMenuItem;
-            EditorMenuItem pasteMenuItem;
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -265,7 +268,8 @@ namespace osu.Game.Screens.Edit
                                     {
                                         new Dimension(GridSizeMode.Absolute, 220),
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.Absolute, 220)
+                                        new Dimension(GridSizeMode.Absolute, 220),
+                                        new Dimension(GridSizeMode.Absolute, 120),
                                     },
                                     Content = new[]
                                     {
@@ -286,6 +290,13 @@ namespace osu.Game.Screens.Edit
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding { Left = 10 },
                                                 Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
+                                            },
+                                            testGameplayButton = new TestGameplayButton
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Left = 10 },
+                                                Size = new Vector2(1),
+                                                Action = testGameplay
                                             }
                                         },
                                     }
@@ -299,17 +310,13 @@ namespace osu.Game.Screens.Edit
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
-            editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) =>
-            {
-                bool hasObjects = editorBeatmap.SelectedHitObjects.Count > 0;
-
-                cutMenuItem.Action.Disabled = !hasObjects;
-                copyMenuItem.Action.Disabled = !hasObjects;
-            }, true);
-
-            clipboard.BindValueChanged(content => pasteMenuItem.Action.Disabled = string.IsNullOrEmpty(content.NewValue));
-
             menuBar.Mode.ValueChanged += onModeChanged;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            setUpClipboardActionAvailability();
         }
 
         /// <summary>
@@ -324,7 +331,7 @@ namespace osu.Game.Screens.Edit
         public void RestoreState([NotNull] EditorState state) => Schedule(() =>
         {
             clock.Seek(state.Time);
-            clipboard.Value = state.ClipboardContent;
+            Clipboard.Content.Value = state.ClipboardContent;
         });
 
         protected void Save()
@@ -463,6 +470,10 @@ namespace osu.Game.Screens.Edit
                     menuBar.Mode.Value = EditorScreenMode.Verify;
                     return true;
 
+                case GlobalAction.EditorTestGameplay:
+                    testGameplayButton.TriggerClick();
+                    return true;
+
                 default:
                     return false;
             }
@@ -517,7 +528,21 @@ namespace osu.Game.Screens.Edit
             ApplyToBackground(b => b.FadeColour(Color4.White, 500));
             resetTrack();
 
-            // To update the game-wide beatmap with any changes, perform a re-fetch on exit.
+            refetchBeatmap();
+
+            return base.OnExiting(next);
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            refetchBeatmap();
+
+            base.OnSuspending(next);
+        }
+
+        private void refetchBeatmap()
+        {
+            // To update the game-wide beatmap with any changes, perform a re-fetch on exit/suspend.
             // This is required as the editor makes its local changes via EditorBeatmap
             // (which are not propagated outwards to a potentially cached WorkingBeatmap).
             var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
@@ -527,8 +552,6 @@ namespace osu.Game.Screens.Edit
                 Logger.Log("Editor providing re-fetched beatmap post edit session");
                 Beatmap.Value = refetchedBeatmap;
             }
-
-            return base.OnExiting(next);
         }
 
         private void confirmExitWithSave()
@@ -561,45 +584,37 @@ namespace osu.Game.Screens.Edit
             this.Exit();
         }
 
-        private readonly Bindable<string> clipboard = new Bindable<string>();
+        #region Clipboard support
 
-        protected void Cut()
+        private EditorMenuItem cutMenuItem;
+        private EditorMenuItem copyMenuItem;
+        private EditorMenuItem pasteMenuItem;
+
+        private readonly BindableWithCurrent<bool> canCut = new BindableWithCurrent<bool>();
+        private readonly BindableWithCurrent<bool> canCopy = new BindableWithCurrent<bool>();
+        private readonly BindableWithCurrent<bool> canPaste = new BindableWithCurrent<bool>();
+
+        private void setUpClipboardActionAvailability()
         {
-            Copy();
-            editorBeatmap.RemoveRange(editorBeatmap.SelectedHitObjects.ToArray());
+            canCut.Current.BindValueChanged(cut => cutMenuItem.Action.Disabled = !cut.NewValue, true);
+            canCopy.Current.BindValueChanged(copy => copyMenuItem.Action.Disabled = !copy.NewValue, true);
+            canPaste.Current.BindValueChanged(paste => pasteMenuItem.Action.Disabled = !paste.NewValue, true);
         }
 
-        protected void Copy()
+        private void rebindClipboardBindables()
         {
-            if (editorBeatmap.SelectedHitObjects.Count == 0)
-                return;
-
-            clipboard.Value = new ClipboardContent(editorBeatmap).Serialize();
+            canCut.Current = currentScreen.CanCut;
+            canCopy.Current = currentScreen.CanCopy;
+            canPaste.Current = currentScreen.CanPaste;
         }
 
-        protected void Paste()
-        {
-            if (string.IsNullOrEmpty(clipboard.Value))
-                return;
+        protected void Cut() => currentScreen?.Cut();
 
-            var objects = clipboard.Value.Deserialize<ClipboardContent>().HitObjects;
+        protected void Copy() => currentScreen?.Copy();
 
-            Debug.Assert(objects.Any());
+        protected void Paste() => currentScreen?.Paste();
 
-            double timeOffset = clock.CurrentTime - objects.Min(o => o.StartTime);
-
-            foreach (var h in objects)
-                h.StartTime += timeOffset;
-
-            editorBeatmap.BeginChange();
-
-            editorBeatmap.SelectedHitObjects.Clear();
-
-            editorBeatmap.AddRange(objects);
-            editorBeatmap.SelectedHitObjects.AddRange(objects);
-
-            editorBeatmap.EndChange();
-        }
+        #endregion
 
         protected void Undo() => changeHandler.RestoreState(-1);
 
@@ -677,6 +692,7 @@ namespace osu.Game.Screens.Edit
             finally
             {
                 updateSampleDisabledState();
+                rebindClipboardBindables();
             }
         }
 
@@ -737,7 +753,7 @@ namespace osu.Game.Screens.Edit
                 if (difficultyItems.Count > 0)
                     difficultyItems.Add(new EditorMenuItemSpacer());
 
-                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarDifficulty))
+                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarRating))
                     difficultyItems.Add(createDifficultyMenuItem(beatmap));
             }
 
@@ -757,13 +773,31 @@ namespace osu.Game.Screens.Edit
         protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
         {
             Time = clock.CurrentTimeAccurate,
-            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? clipboard.Value : string.Empty
+            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
         });
 
         private void cancelExit()
         {
             samplePlaybackDisabled.Value = false;
             loader?.CancelPendingDifficultySwitch();
+        }
+
+        private void testGameplay()
+        {
+            if (HasUnsavedChanges)
+            {
+                dialogOverlay.Push(new SaveBeforeGameplayTestDialog(() =>
+                {
+                    Save();
+                    pushEditorPlayer();
+                }));
+            }
+            else
+            {
+                pushEditorPlayer();
+            }
+
+            void pushEditorPlayer() => this.Push(new PlayerLoader(() => new EditorPlayer()));
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

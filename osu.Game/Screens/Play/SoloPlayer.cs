@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
 
         protected override APIRequest<APIScoreToken> CreateTokenRequest()
         {
-            if (!(Beatmap.Value.BeatmapInfo.OnlineBeatmapID is int beatmapId))
+            if (!(Beatmap.Value.BeatmapInfo.OnlineID is int beatmapId))
                 return null;
 
             if (!(Ruleset.Value.ID is int rulesetId) || Ruleset.Value.ID > ILegacyRuleset.MAX_LEGACY_RULESET_ID)
@@ -40,9 +40,9 @@ namespace osu.Game.Screens.Play
         {
             var beatmap = score.ScoreInfo.BeatmapInfo;
 
-            Debug.Assert(beatmap.OnlineBeatmapID != null);
+            Debug.Assert(beatmap.OnlineID != null);
 
-            int beatmapId = beatmap.OnlineBeatmapID.Value;
+            int beatmapId = beatmap.OnlineID.Value;
 
             return new SubmitSoloScoreRequest(beatmapId, token, score.ScoreInfo);
         }

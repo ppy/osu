@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Id = 39828,
                     Username = @"WubWoofWolf",
                 }
-            }.CreateScoreInfo(rulesets);
+            }.CreateScoreInfo(rulesets, CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo);
         }
 
         private class TestReplayDownloadButton : ReplayDownloadButton

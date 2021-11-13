@@ -147,19 +147,15 @@ namespace osu.Game.Stores
                     {
                         try
                         {
-                            var type = Type.GetType(r.InstantiationInfo);
+                            var resolvedType = Type.GetType(r.InstantiationInfo)
+                                               ?? throw new RulesetLoadException(@"Type could not be resolved");
 
-                            if (type == null)
-                                throw new InvalidOperationException(@"Type resolution failure.");
+                            var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
+                                               ?? throw new RulesetLoadException(@"Instantiation failure");
 
-                            var rInstance = (Activator.CreateInstance(type) as Ruleset)?.RulesetInfo;
-
-                            if (rInstance == null)
-                                throw new InvalidOperationException(@"Instantiation failure.");
-
-                            r.Name = rInstance.Name;
-                            r.ShortName = rInstance.ShortName;
-                            r.InstantiationInfo = rInstance.InstantiationInfo;
+                            r.Name = instanceInfo.Name;
+                            r.ShortName = instanceInfo.ShortName;
+                            r.InstantiationInfo = instanceInfo.InstantiationInfo;
                             r.Available = true;
 
                             detachedRulesets.Add(r.Clone());

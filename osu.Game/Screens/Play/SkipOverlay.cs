@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Play
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
 
-                sampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
+                sampleConfirm = audio.Samples.Get(@"UI/submit-select");
 
                 Children = new Drawable[]
                 {
