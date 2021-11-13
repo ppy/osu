@@ -507,13 +507,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                     i.IsFiltered || i.Item.BeatmapInfo.Ruleset.ID == targetRuleset || i.Item.BeatmapInfo.Ruleset.ID == 0);
             });
 
-            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmapInfo?.OnlineBeatmapID == target.OnlineBeatmapID);
-            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmapInfo?.OnlineID == target.OnlineID);
+            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineID == target.OnlineID);
 
             AddStep("reset filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = string.Empty);
 
-            AddAssert("game still correct", () => Beatmap.Value?.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
-            AddAssert("carousel still correct", () => songSelect.Carousel.SelectedBeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddAssert("game still correct", () => Beatmap.Value?.BeatmapInfo.OnlineID == target.OnlineID);
+            AddAssert("carousel still correct", () => songSelect.Carousel.SelectedBeatmapInfo.OnlineID == target.OnlineID);
         }
 
         [Test]
@@ -544,8 +544,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo != null);
 
-            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmapInfo?.OnlineBeatmapID == target.OnlineBeatmapID);
-            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmapInfo?.OnlineID == target.OnlineID);
+            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineID == target.OnlineID);
 
             AddStep("set filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nononoo");
 
@@ -918,8 +918,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 beatmaps.Add(new BeatmapInfo
                 {
                     Ruleset = getRuleset(),
-                    OnlineBeatmapID = beatmapId,
-                    Version = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
+                    OnlineID = beatmapId,
+                    DifficultyName = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                     Length = length,
                     BPM = bpm,
                     BaseDifficulty = new BeatmapDifficulty
@@ -931,7 +931,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = setId,
+                OnlineID = setId,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {

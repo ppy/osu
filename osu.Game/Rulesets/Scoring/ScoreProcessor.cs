@@ -54,6 +54,12 @@ namespace osu.Game.Rulesets.Scoring
         public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
 
         /// <summary>
+        /// The <see cref="HitEvent"/>s collected during gameplay thus far.
+        /// Intended for use with various statistics displays.
+        /// </summary>
+        public IReadOnlyList<HitEvent> HitEvents => hitEvents;
+
+        /// <summary>
         /// The default portion of <see cref="max_score"/> awarded for hitting <see cref="HitObject"/>s accurately. Defaults to 30%.
         /// </summary>
         protected virtual double DefaultAccuracyPortion => 0.3;
