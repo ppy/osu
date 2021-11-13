@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class SamplePointPiece : HitObjectPointPiece, IHasPopover
     {
-        private readonly HitObject hitObject;
+        public readonly HitObject HitObject;
 
         private readonly Bindable<string> bank;
         private readonly BindableNumber<int> volume;
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public SamplePointPiece(HitObject hitObject)
             : base(hitObject.SampleControlPoint)
         {
-            this.hitObject = hitObject;
+            HitObject = hitObject;
             volume = hitObject.SampleControlPoint.SampleVolumeBindable.GetBoundCopy();
             bank = hitObject.SampleControlPoint.SampleBankBindable.GetBoundCopy();
         }
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Label.Text = $"{bank.Value} {volume.Value}";
         }
 
-        public Popover GetPopover() => new SampleEditPopover(hitObject);
+        public Popover GetPopover() => new SampleEditPopover(HitObject);
 
         public class SampleEditPopover : OsuPopover
         {
