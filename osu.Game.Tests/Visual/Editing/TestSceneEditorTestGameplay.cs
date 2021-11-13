@@ -69,6 +69,37 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestGameplayTestWhenTrackRunning()
+        {
+            AddStep("start track", () => EditorClock.Start());
+            AddAssert("sample playback enabled", () => !Editor.SamplePlaybackDisabled.Value);
+
+            AddStep("click test gameplay button", () =>
+            {
+                var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            EditorPlayer editorPlayer = null;
+            AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
+            AddAssert("editor track stopped", () => !EditorClock.IsRunning);
+            AddAssert("sample playback disabled", () => Editor.SamplePlaybackDisabled.Value);
+
+            AddStep("exit player", () => editorPlayer.Exit());
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("background has correct params", () =>
+            {
+                var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single();
+                return background.Colour == Color4.DarkGray && background.BlurAmount.Value == 0;
+            });
+
+            AddStep("start track", () => EditorClock.Start());
+            AddAssert("sample playback re-enabled", () => !Editor.SamplePlaybackDisabled.Value);
+        }
+
+        [Test]
         public void TestCancelGameplayTestWithUnsavedChanges()
         {
             AddStep("delete all but first object", () => EditorBeatmap.RemoveRange(EditorBeatmap.HitObjects.Skip(1).ToList()));
