@@ -35,6 +35,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private const float width = 408;
         private const float height = 100;
         private const float corner_radius = 10;
+        private const float icon_area_width = 30;
 
         private readonly APIBeatmapSet beatmapSet;
         private readonly Bindable<BeatmapSetFavouriteState> favouriteState;
@@ -45,7 +46,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private UpdateableOnlineBeatmapSetCover leftCover;
         private FillFlowContainer leftIconArea;
 
-        private Container rightButtonArea;
+        private Container rightAreaBackground;
+        private Container rightAreaButtons;
 
         private Container mainContent;
         private BeatmapCardContentBackground mainContentBackground;
@@ -56,6 +58,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private FillFlowContainer idleBottomContent;
         private BeatmapCardDownloadProgressBar downloadProgressBar;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
@@ -79,10 +84,20 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             InternalChildren = new Drawable[]
             {
                 downloadTracker,
-                new Box
+                rightAreaBackground = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3
+                    RelativeSizeAxes = Axes.Y,
+                    Width = icon_area_width + 2 * corner_radius,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    // workaround for masking artifacts at the top & bottom of card,
+                    // which become especially visible on downloaded beatmaps (when the icon area has a lime background).
+                    Padding = new MarginPadding { Vertical = 1 },
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.White
+                    },
                 },
                 new Container
                 {
@@ -104,7 +119,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         }
                     }
                 },
-                rightButtonArea = new Container
+                rightAreaButtons = new Container
                 {
                     Name = @"Right (button) area",
                     Width = 30,
@@ -364,15 +379,16 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             float targetWidth = width - height;
             if (IsHovered)
-                targetWidth -= 20;
+                targetWidth = targetWidth - icon_area_width + corner_radius;
 
             mainContent.ResizeWidthTo(targetWidth, TRANSITION_DURATION, Easing.OutQuint);
             mainContentBackground.Dimmed.Value = IsHovered;
 
             leftCover.FadeColour(IsHovered ? OsuColour.Gray(0.2f) : Color4.White, TRANSITION_DURATION, Easing.OutQuint);
             statisticsContainer.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
-            rightButtonArea.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
 
+            rightAreaBackground.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, TRANSITION_DURATION, Easing.OutQuint);
+            rightAreaButtons.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
             bool showProgress = downloadTracker.State.Value == DownloadState.Downloading || downloadTracker.State.Value == DownloadState.Importing;
 
             idleBottomContent.FadeTo(showProgress ? 0 : 1, TRANSITION_DURATION, Easing.OutQuint);
