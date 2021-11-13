@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Editing.Checks
         public void TestMissing()
         {
             // While this is a problem, it is out of scope for this check and is caught by a different one.
-            beatmap.Metadata.AudioFile = null;
+            beatmap.Metadata.AudioFile = string.Empty;
 
             var mock = new Mock<IWorkingBeatmap>();
             mock.SetupGet(w => w.Beatmap).Returns(beatmap);

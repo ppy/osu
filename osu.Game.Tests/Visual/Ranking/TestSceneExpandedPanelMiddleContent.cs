@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -18,7 +20,6 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -31,7 +32,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestMapWithKnownMapper()
         {
-            var author = new User { Username = "mapper_name" };
+            var author = new APIUser { Username = "mapper_name" };
 
             AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
@@ -42,7 +43,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestExcessMods()
         {
-            var author = new User { Username = "mapper_name" };
+            var author = new APIUser { Username = "mapper_name" };
 
             AddStep("show excess mods score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo, true)
             {
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
-                BeatmapInfo = createTestBeatmap(null)
+                BeatmapInfo = createTestBeatmap(new APIUser())
             }));
 
             AddAssert("mapped by text not present", () =>
@@ -74,7 +75,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 var ruleset = new OsuRuleset();
 
                 var mods = new Mod[] { ruleset.GetAutoplayMod() };
-                var beatmap = createTestBeatmap(null);
+                var beatmap = createTestBeatmap(new APIUser());
 
                 showPanel(new TestScoreInfo(ruleset.RulesetInfo)
                 {
@@ -90,7 +91,7 @@ namespace osu.Game.Tests.Visual.Ranking
         private void showPanel(ScoreInfo score) =>
             Child = new ExpandedPanelMiddleContentContainer(score);
 
-        private BeatmapInfo createTestBeatmap(User author)
+        private BeatmapInfo createTestBeatmap([NotNull] APIUser author)
         {
             var beatmap = new TestBeatmap(rulesetStore.GetRuleset(0)).BeatmapInfo;
 

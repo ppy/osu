@@ -214,8 +214,8 @@ namespace osu.Game.Screens.Select.Carousel
                 if (Item.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("展开", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
-                if (beatmapSet.OnlineBeatmapSetID != null && viewDetails != null)
-                    items.Add(new OsuMenuItem("细节", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineBeatmapSetID.Value)));
+                if (beatmapSet.OnlineID != null && viewDetails != null)
+                    items.Add(new OsuMenuItem("细节", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID.Value)));
 
                 if (collectionManager != null)
                 {

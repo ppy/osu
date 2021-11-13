@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Logging;
 using osu.Game.Configuration;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -29,8 +28,6 @@ namespace osu.Game.Beatmaps.Drawables
         private void load(LargeTextureStore textures, MConfigManager mfconfig)
         {
             string resource = null;
-
-            Logger.Log($"封面： {set.Covers.Card}");
 
             switch (mfconfig.Get<bool>(MSetting.UseSayobot))
             {

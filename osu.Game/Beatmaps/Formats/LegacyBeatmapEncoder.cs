@@ -82,7 +82,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[General]");
 
-            if (beatmap.Metadata.AudioFile != null) writer.WriteLine(FormattableString.Invariant($"AudioFilename: {Path.GetFileName(beatmap.Metadata.AudioFile)}"));
+            if (!string.IsNullOrEmpty(beatmap.Metadata.AudioFile)) writer.WriteLine(FormattableString.Invariant($"AudioFilename: {Path.GetFileName(beatmap.Metadata.AudioFile)}"));
             writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.BeatmapInfo.AudioLeadIn}"));
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.BeatmapInfo.Countdown}"));
@@ -126,15 +126,15 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine("[Metadata]");
 
             writer.WriteLine(FormattableString.Invariant($"Title: {beatmap.Metadata.Title}"));
-            if (beatmap.Metadata.TitleUnicode != null) writer.WriteLine(FormattableString.Invariant($"TitleUnicode: {beatmap.Metadata.TitleUnicode}"));
+            if (!string.IsNullOrEmpty(beatmap.Metadata.TitleUnicode)) writer.WriteLine(FormattableString.Invariant($"TitleUnicode: {beatmap.Metadata.TitleUnicode}"));
             writer.WriteLine(FormattableString.Invariant($"Artist: {beatmap.Metadata.Artist}"));
-            if (beatmap.Metadata.ArtistUnicode != null) writer.WriteLine(FormattableString.Invariant($"ArtistUnicode: {beatmap.Metadata.ArtistUnicode}"));
-            writer.WriteLine(FormattableString.Invariant($"Creator: {beatmap.Metadata.AuthorString}"));
-            writer.WriteLine(FormattableString.Invariant($"Version: {beatmap.BeatmapInfo.Version}"));
-            if (beatmap.Metadata.Source != null) writer.WriteLine(FormattableString.Invariant($"Source: {beatmap.Metadata.Source}"));
-            if (beatmap.Metadata.Tags != null) writer.WriteLine(FormattableString.Invariant($"Tags: {beatmap.Metadata.Tags}"));
-            if (beatmap.BeatmapInfo.OnlineBeatmapID != null) writer.WriteLine(FormattableString.Invariant($"BeatmapID: {beatmap.BeatmapInfo.OnlineBeatmapID}"));
-            if (beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID != null) writer.WriteLine(FormattableString.Invariant($"BeatmapSetID: {beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID}"));
+            if (!string.IsNullOrEmpty(beatmap.Metadata.ArtistUnicode)) writer.WriteLine(FormattableString.Invariant($"ArtistUnicode: {beatmap.Metadata.ArtistUnicode}"));
+            writer.WriteLine(FormattableString.Invariant($"Creator: {beatmap.Metadata.Author.Username}"));
+            writer.WriteLine(FormattableString.Invariant($"Version: {beatmap.BeatmapInfo.DifficultyName}"));
+            if (!string.IsNullOrEmpty(beatmap.Metadata.Source)) writer.WriteLine(FormattableString.Invariant($"Source: {beatmap.Metadata.Source}"));
+            if (!string.IsNullOrEmpty(beatmap.Metadata.Tags)) writer.WriteLine(FormattableString.Invariant($"Tags: {beatmap.Metadata.Tags}"));
+            if (beatmap.BeatmapInfo.OnlineID != null) writer.WriteLine(FormattableString.Invariant($"BeatmapID: {beatmap.BeatmapInfo.OnlineID}"));
+            if (beatmap.BeatmapInfo.BeatmapSet?.OnlineID != null) writer.WriteLine(FormattableString.Invariant($"BeatmapSetID: {beatmap.BeatmapInfo.BeatmapSet.OnlineID}"));
         }
 
         private void handleDifficulty(TextWriter writer)

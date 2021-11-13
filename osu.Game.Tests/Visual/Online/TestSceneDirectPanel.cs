@@ -10,112 +10,33 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
-using osu.Game.Users;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [Cached(typeof(IPreviewTrackOwner))]
     public class TestSceneDirectPanel : OsuTestScene, IPreviewTrackOwner
     {
-        private BeatmapSetInfo getUndownloadableBeatmapSet() => new BeatmapSetInfo
-        {
-            OnlineBeatmapSetID = 123,
-            Metadata = new BeatmapMetadata
-            {
-                Title = "undownloadable beatmap",
-                Artist = "test",
-                Source = "more tests",
-                Author = new User
-                {
-                    Username = "BanchoBot",
-                    Id = 3,
-                },
-            },
-            OnlineInfo = new APIBeatmapSet
-            {
-                Availability = new BeatmapSetOnlineAvailability
-                {
-                    DownloadDisabled = true,
-                },
-                Preview = @"https://b.ppy.sh/preview/12345.mp3",
-                PlayCount = 123,
-                FavouriteCount = 456,
-                BPM = 111,
-                HasVideo = true,
-                HasStoryboard = true,
-                Covers = new BeatmapSetOnlineCovers(),
-            },
-            Beatmaps = new List<BeatmapInfo>
-            {
-                new BeatmapInfo
-                {
-                    Ruleset = Ruleset.Value,
-                    Version = "Test",
-                    StarDifficulty = 6.42,
-                }
-            }
-        };
-
-        private BeatmapSetInfo getManyDifficultiesBeatmapSet(RulesetStore rulesets)
-        {
-            var beatmaps = new List<BeatmapInfo>();
-
-            for (int i = 0; i < 100; i++)
-            {
-                beatmaps.Add(new BeatmapInfo
-                {
-                    Ruleset = rulesets.GetRuleset(i % 4),
-                    StarDifficulty = 2 + i % 4 * 2,
-                    BaseDifficulty = new BeatmapDifficulty
-                    {
-                        OverallDifficulty = 3.5f,
-                    }
-                });
-            }
-
-            return new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = 1,
-                Metadata = new BeatmapMetadata
-                {
-                    Title = "many difficulties beatmap",
-                    Artist = "test",
-                    Author = new User
-                    {
-                        Username = "BanchoBot",
-                        Id = 3,
-                    }
-                },
-                OnlineInfo = new APIBeatmapSet
-                {
-                    HasVideo = true,
-                    HasStoryboard = true,
-                    Covers = new BeatmapSetOnlineCovers(),
-                },
-                Beatmaps = beatmaps,
-            };
-        }
-
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
             var normal = getBeatmapSet();
-            normal.OnlineInfo.HasVideo = true;
-            normal.OnlineInfo.HasStoryboard = true;
+            normal.HasVideo = true;
+            normal.HasStoryboard = true;
 
             var undownloadable = getUndownloadableBeatmapSet();
-            var manyDifficulties = getManyDifficultiesBeatmapSet(rulesets);
+            var manyDifficulties = getManyDifficultiesBeatmapSet();
 
             var explicitMap = getBeatmapSet();
-            explicitMap.OnlineInfo.HasExplicitContent = true;
+            explicitMap.HasExplicitContent = true;
 
             var featuredMap = getBeatmapSet();
-            featuredMap.OnlineInfo.TrackId = 1;
+            featuredMap.TrackId = 1;
 
             var explicitFeaturedMap = getBeatmapSet();
-            explicitFeaturedMap.OnlineInfo.HasExplicitContent = true;
-            explicitFeaturedMap.OnlineInfo.TrackId = 2;
+            explicitFeaturedMap.HasExplicitContent = true;
+            explicitFeaturedMap.TrackId = 2;
 
             Child = new BasicScrollContainer
             {
@@ -145,7 +66,72 @@ namespace osu.Game.Tests.Visual.Online
                 },
             };
 
-            BeatmapSetInfo getBeatmapSet() => CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+            APIBeatmapSet getBeatmapSet() => CreateAPIBeatmapSet(Ruleset.Value);
+
+            APIBeatmapSet getUndownloadableBeatmapSet() => new APIBeatmapSet
+            {
+                OnlineID = 123,
+                Title = "undownloadable beatmap",
+                Artist = "test",
+                Source = "more tests",
+                Author = new APIUser
+                {
+                    Username = "BanchoBot",
+                    Id = 3,
+                },
+                Availability = new BeatmapSetOnlineAvailability
+                {
+                    DownloadDisabled = true,
+                },
+                Preview = @"https://b.ppy.sh/preview/12345.mp3",
+                PlayCount = 123,
+                FavouriteCount = 456,
+                BPM = 111,
+                HasVideo = true,
+                HasStoryboard = true,
+                Covers = new BeatmapSetOnlineCovers(),
+                Beatmaps = new[]
+                {
+                    new APIBeatmap
+                    {
+                        RulesetID = Ruleset.Value.ID ?? 0,
+                        DifficultyName = "Test",
+                        StarRating = 6.42,
+                    }
+                }
+            };
+
+            APIBeatmapSet getManyDifficultiesBeatmapSet()
+            {
+                var beatmaps = new List<APIBeatmap>();
+
+                for (int i = 0; i < 100; i++)
+                {
+                    beatmaps.Add(new APIBeatmap
+                    {
+                        RulesetID = i % 4,
+                        StarRating = 2 + i % 4 * 2,
+                        OverallDifficulty = 3.5f,
+                    });
+                }
+
+                return new APIBeatmapSet
+                {
+                    OnlineID = 1,
+                    Title = "undownloadable beatmap",
+                    Artist = "test",
+                    Source = "more tests",
+                    Author = new APIUser
+                    {
+                        Username = "BanchoBot",
+                        Id = 3,
+                    },
+                    HasVideo = true,
+                    HasStoryboard = true,
+                    Covers = new BeatmapSetOnlineCovers(),
+                    Beatmaps = beatmaps.ToArray(),
+                };
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
+using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -67,9 +68,11 @@ namespace osu.Game.Tests.Online
             var deserialised = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
             var converted = (TestModTimeRamp)deserialised?.ToMod(new TestRuleset());
 
-            Assert.That(converted?.AdjustPitch.Value, Is.EqualTo(false));
-            Assert.That(converted?.InitialRate.Value, Is.EqualTo(1.25));
-            Assert.That(converted?.FinalRate.Value, Is.EqualTo(0.25));
+            Assert.That(converted, Is.Not.Null);
+
+            Assert.That(converted.AdjustPitch.Value, Is.EqualTo(false));
+            Assert.That(converted.InitialRate.Value, Is.EqualTo(1.25));
+            Assert.That(converted.FinalRate.Value, Is.EqualTo(0.25));
         }
 
         [Test]
@@ -89,33 +92,27 @@ namespace osu.Game.Tests.Online
         }
 
         [Test]
-        public void TestDeserialiseScoreInfoWithEmptyMods()
+        public void TestDeserialiseSubmittableScoreWithEmptyMods()
         {
-            var score = new ScoreInfo { Ruleset = new OsuRuleset().RulesetInfo };
+            var score = new SubmittableScore(new ScoreInfo { Ruleset = new OsuRuleset().RulesetInfo });
 
-            var deserialised = JsonConvert.DeserializeObject<ScoreInfo>(JsonConvert.SerializeObject(score));
-
-            if (deserialised != null)
-                deserialised.Ruleset = new OsuRuleset().RulesetInfo;
+            var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
 
             Assert.That(deserialised?.Mods.Length, Is.Zero);
         }
 
         [Test]
-        public void TestDeserialiseScoreInfoWithCustomModSetting()
+        public void TestDeserialiseSubmittableScoreWithCustomModSetting()
         {
-            var score = new ScoreInfo
+            var score = new SubmittableScore(new ScoreInfo
             {
                 Ruleset = new OsuRuleset().RulesetInfo,
                 Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } }
-            };
+            });
 
-            var deserialised = JsonConvert.DeserializeObject<ScoreInfo>(JsonConvert.SerializeObject(score));
+            var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
 
-            if (deserialised != null)
-                deserialised.Ruleset = new OsuRuleset().RulesetInfo;
-
-            Assert.That(((OsuModDoubleTime)deserialised?.Mods[0])?.SpeedChange.Value, Is.EqualTo(2));
+            Assert.That((deserialised?.Mods[0])?.Settings["speed_change"], Is.EqualTo(2));
         }
 
         private class TestRuleset : Ruleset

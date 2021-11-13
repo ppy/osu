@@ -9,59 +9,66 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class HeaderDownloadButton : BeatmapDownloadTrackingComposite, IHasTooltip
+    public class HeaderDownloadButton : CompositeDrawable, IHasTooltip
     {
-        private const int text_size = 17;
+        private const int text_size = 16;
 
         private readonly bool noVideo;
-        private readonly bool IsMini;
-        private readonly bool NoSuffix;
+        private readonly bool accel;
 
         public LocalisableString TooltipText => BeatmapsetsStrings.ShowDetailsDownloadDefault;
 
-        private readonly IBindable<User> localUser = new Bindable<User>();
-        private BindableBool UseSayobot = new BindableBool();
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
         private ShakeContainer shakeContainer;
         private HeaderButton button;
 
-        public HeaderDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false, bool IsMini = false, bool NoSuffix = false)
-            : base(beatmapSet)
+        private BeatmapDownloadTracker downloadTracker;
+
+        private readonly APIBeatmapSet beatmapSet;
+
+        public HeaderDownloadButton(APIBeatmapSet beatmapSet, bool noVideo = false, bool accel = false)
         {
+            this.beatmapSet = beatmapSet;
             this.noVideo = noVideo;
-            this.IsMini = IsMini;
-            this.NoSuffix = NoSuffix;
+
+            this.accel = accel;
 
             Width = 120;
             RelativeSizeAxes = Axes.Y;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, BeatmapManager beatmaps, MConfigManager mfconfig)
+        private void load(IAPIProvider api, BeatmapManager beatmaps)
         {
             FillFlowContainer textSprites;
 
-            AddInternal(shakeContainer = new ShakeContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = 5,
-                Child = button = new HeaderButton { RelativeSizeAxes = Axes.Both },
-            });
+                shakeContainer = new ShakeContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 5,
+                    Child = button = new HeaderButton { RelativeSizeAxes = Axes.Both },
+                },
+                downloadTracker = new BeatmapDownloadTracker(beatmapSet),
+            };
 
             button.AddRange(new Drawable[]
             {
@@ -89,7 +96,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         },
                     }
                 },
-                new DownloadProgressBar(BeatmapSet.Value)
+                new DownloadProgressBar(beatmapSet)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -98,20 +105,23 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             button.Action = () =>
             {
-                if (State.Value != DownloadState.NotDownloaded)
+                if (downloadTracker.State.Value != DownloadState.NotDownloaded)
                 {
                     shakeContainer.Shake();
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet.Value, mfconfig.Get<bool>(MSetting.UseSayobot), noVideo, IsMini);
+                if (accel)
+                    beatmaps.AccelDownload(beatmapSet, noVideo);
+                else
+                    beatmaps.Download(beatmapSet, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);
             localUser.BindValueChanged(userChanged, true);
             button.Enabled.BindValueChanged(enabledChanged, true);
 
-            State.BindValueChanged(state =>
+            downloadTracker.State.BindValueChanged(state =>
             {
                 switch (state.NewValue)
                 {
@@ -120,7 +130,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = Localisation.CommonStrings.Downloading,
+                                Text = CommonStrings.Downloading,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -131,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = Localisation.CommonStrings.Importing,
+                                Text = CommonStrings.Importing,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
@@ -151,26 +161,36 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                             new OsuSpriteText
                             {
-                                Text = NoSuffix ? string.Empty : getVideoSuffixText(),
+                                Text = getVideoSuffixText(),
                                 Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold)
                             },
                         };
+
+                        if (accel)
+                        {
+                            textSprites.Add(new OsuSpriteText
+                            {
+                                Text = "加速下载",
+                                Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold)
+                            });
+                        }
+
                         this.FadeIn(200);
                         break;
                 }
             }, true);
         }
 
-        private void userChanged(ValueChangedEvent<User> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
+        private void userChanged(ValueChangedEvent<APIUser> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
 
         private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
 
         private LocalisableString getVideoSuffixText()
         {
-            if (!BeatmapSet.Value.OnlineInfo.HasVideo && !BeatmapSet.Value.OnlineInfo.HasStoryboard)
+            if (!beatmapSet.HasVideo)
                 return string.Empty;
 
-            return (IsMini == true ? "Mini" : (noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo));
+            return noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo;
         }
     }
 }

@@ -76,7 +76,7 @@ namespace osu.Game.Tournament.Components
                     {
                         new TournamentSpriteText
                         {
-                            Text = Beatmap.GetDisplayTitleRomanisable(false),
+                            Text = Beatmap.GetDisplayTitleRomanisable(false, false),
                             Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                         },
                         new FillFlowContainer
@@ -93,7 +93,7 @@ namespace osu.Game.Tournament.Components
                                 },
                                 new TournamentSpriteText
                                 {
-                                    Text = Beatmap.Metadata.Author,
+                                    Text = Beatmap.Metadata.Author.Username,
                                     Padding = new MarginPadding { Right = 20 },
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },

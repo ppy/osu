@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
@@ -19,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         protected virtual bool PlaySoundsOnUserChange => true;
 
-        public string LabelText
+        public LocalisableString LabelText
         {
             set
             {

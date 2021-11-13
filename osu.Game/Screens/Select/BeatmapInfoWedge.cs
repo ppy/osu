@@ -188,8 +188,8 @@ namespace osu.Game.Screens.Select
 
                 RelativeSizeAxes = Axes.Both;
 
-                titleBinding = localisation.GetLocalisedString(new RomanisableString(metadata.TitleUnicode, metadata.Title));
-                artistBinding = localisation.GetLocalisedString(new RomanisableString(metadata.ArtistUnicode, metadata.Artist));
+                titleBinding = localisation.GetLocalisedBindableString(new RomanisableString(metadata.TitleUnicode, metadata.Title));
+                artistBinding = localisation.GetLocalisedBindableString(new RomanisableString(metadata.ArtistUnicode, metadata.Artist));
 
                 const float top_height = 0.7f;
 
@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Select
                         {
                             VersionLabel = new OsuSpriteText
                             {
-                                Text = beatmapInfo.Version,
+                                Text = beatmapInfo.DifficultyName,
                                 Font = OsuFont.GetFont(size: 24, italics: true),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true
@@ -324,7 +324,7 @@ namespace osu.Game.Screens.Select
                 });
 
                 // no difficulty means it can't have a status to show
-                if (beatmapInfo.Version == null)
+                if (beatmapInfo.DifficultyName == null)
                     StatusPill.Hide();
 
                 addInfoLabels();
@@ -428,7 +428,7 @@ namespace osu.Game.Screens.Select
 
             private Drawable getMapper(BeatmapMetadata metadata)
             {
-                if (metadata.Author == null)
+                if (string.IsNullOrEmpty(metadata.Author.Username))
                     return Empty();
 
                 return new LinkFlowContainer(s =>

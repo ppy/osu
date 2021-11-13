@@ -6,45 +6,19 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<BeatmapSetInfo>
+    public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
     {
-        private readonly bool noVideo;
         private readonly bool minimiseDownloadSize;
 
-        private readonly bool useSayobot;
-
-        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool useSayobot, bool noVideo, bool minimiseDownloadSize = false)
+        public DownloadBeatmapSetRequest(IBeatmapSetInfo set, bool minimiseDownloadSize = false)
             : base(set)
         {
-            this.noVideo = noVideo;
             this.minimiseDownloadSize = minimiseDownloadSize;
-            this.useSayobot = useSayobot;
         }
 
-        private string getTarget()
-        {
-            if (useSayobot)
-            {
-                var idFull = Model.OnlineBeatmapSetID.ToString();
+        protected override string Target => $@"beatmapsets/{Model.OnlineID}/download{(minimiseDownloadSize ? "?noVideo=1" : "")}";
 
-                var target = $@"{(minimiseDownloadSize ? "mini" : (noVideo ? "novideo" : "full"))}/{idFull}";
-                return target;
-            }
-
-            return $@"beatmapsets/{Model.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
-        }
-
-        private string selectUri()
-        {
-            if (useSayobot)
-                return $@"https://txy1.sayobot.cn/beatmaps/download/{Target}";
-
-            return $@"{API.WebsiteRootUrl}/api/v2/{Target}";
-        }
-
-        protected override string Target => getTarget();
-
-        protected override string Uri => selectUri();
+        protected override string Uri => $@"{API.WebsiteRootUrl}/api/v2/{Target}";
 
         protected override WebRequest CreateWebRequest()
         {

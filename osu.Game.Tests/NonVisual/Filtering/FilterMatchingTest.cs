@@ -17,7 +17,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         private BeatmapInfo getExampleBeatmap() => new BeatmapInfo
         {
             Ruleset = new RulesetInfo { ID = 5 },
-            StarDifficulty = 4.0d,
+            StarRating = 4.0d,
             BaseDifficulty = new BeatmapDifficulty
             {
                 ApproachRate = 5.0f,
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 Source = "unit tests",
                 Tags = "look for tags too",
             },
-            Version = "version as well",
+            DifficultyName = "version as well",
             Length = 2500,
             BPM = 160,
             BeatDivisor = 12,
@@ -189,7 +189,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestCriteriaMatchingArtistWithNullUnicodeName(string artistName, bool filtered)
         {
             var exampleBeatmapInfo = getExampleBeatmap();
-            exampleBeatmapInfo.Metadata.ArtistUnicode = null;
+            exampleBeatmapInfo.Metadata.ArtistUnicode = string.Empty;
 
             var criteria = new FilterCriteria
             {
@@ -207,8 +207,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestCriteriaMatchingBeatmapIDs(string query, bool filtered)
         {
             var beatmap = getExampleBeatmap();
-            beatmap.OnlineBeatmapID = 20201010;
-            beatmap.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = 1535 };
+            beatmap.OnlineID = 20201010;
+            beatmap.BeatmapSet = new BeatmapSetInfo { OnlineID = 1535 };
 
             var criteria = new FilterCriteria { SearchText = query };
             var carouselItem = new CarouselBeatmap(beatmap);

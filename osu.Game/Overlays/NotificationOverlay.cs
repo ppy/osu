@@ -158,7 +158,7 @@ namespace osu.Game.Overlays
                 dBusManager.Notifications.PostAsync(new SystemNotification
                 {
                     Title = "mfosu",
-                    Description = sn.Text,
+                    Description = sn.Text.ToString(),
                     IconName = sn.IsImportant ? "dialog-warning" : "dialog-information"
                 });
             }

@@ -134,6 +134,8 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModBeatCore(),
                         new CatchModFloatingFruits(),
                         new CatchModMuted(),
+                        new ModNoDrain(),
+                        new CatchModNoScope(),
                     };
 
                 default:
@@ -189,5 +191,7 @@ namespace osu.Game.Rulesets.Catch
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
 
         public override HitObjectComposer CreateHitObjectComposer() => new CatchHitObjectComposer(this);
+
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new CatchBeatmapVerifier();
     }
 }

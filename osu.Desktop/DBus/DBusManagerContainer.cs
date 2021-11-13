@@ -19,6 +19,7 @@ using osu.Game;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -230,7 +231,7 @@ namespace osu.Desktop.DBus
             Logger.Log($"收到一条来自DBus的消息: {message}");
         }
 
-        private void onUserChanged(ValueChangedEvent<User> v)
+        private void onUserChanged(ValueChangedEvent<APIUser> v)
         {
             bindableActivity.UnbindBindings();
             bindableActivity.BindTo(v.NewValue.Activity);

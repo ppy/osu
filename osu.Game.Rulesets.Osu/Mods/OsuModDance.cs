@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
         {
-            ScoreInfo = new ScoreInfo { User = new User { Username = "lazer!dance" } },
+            ScoreInfo = new ScoreInfo { User = new APIUser { Username = "lazer!dance", IsBot = true } },
             Replay = new OsuDanceAutoGenerator(beatmap, mods).Generate()
         };
     }

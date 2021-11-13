@@ -8,13 +8,19 @@ using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapModelDownloader : ModelDownloader<BeatmapSetInfo>
+    public class BeatmapModelDownloader : ModelDownloader<BeatmapSetInfo, IBeatmapSetInfo>
     {
-        protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize, bool useSayobot, bool noVideo) =>
-            new DownloadBeatmapSetRequest(set, useSayobot, noVideo, minimiseDownloadSize);
+        protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize) =>
+            new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
 
-        public BeatmapModelDownloader(IBeatmapModelManager beatmapModelManager, IAPIProvider api, GameHost host = null)
-            : base(beatmapModelManager, api, host)
+        protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateAccelDownloadRequest(IBeatmapSetInfo model, bool isMini)
+            => new SayoDownloadBeatmapSetRequest(model, isMini);
+
+        public override ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model)
+            => CurrentDownloads.Find(r => r.Model.OnlineID == model.OnlineID);
+
+        public BeatmapModelDownloader(IModelImporter<BeatmapSetInfo> beatmapImporter, IAPIProvider api, GameHost host = null)
+            : base(beatmapImporter, api, host)
         {
         }
     }

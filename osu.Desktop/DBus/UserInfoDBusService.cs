@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using M.DBus;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 using Tmds.DBus;
 
 namespace osu.Desktop.DBus
@@ -109,7 +109,7 @@ namespace osu.Desktop.DBus
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mfosu/CurrentUser");
 
-        public User User
+        public APIUser User
         {
             set
             {

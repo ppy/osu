@@ -19,10 +19,10 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Menu
 {
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Menu
 
         private readonly OsuScreen nextScreen;
 
-        private readonly Bindable<User> currentUser = new Bindable<User>();
+        private readonly Bindable<APIUser> currentUser = new Bindable<APIUser>();
         private FillFlowContainer fill;
 
         private readonly List<ITextPart> expendableText = new List<ITextPart>();
@@ -221,7 +221,7 @@ namespace osu.Game.Screens.Menu
             if (nextScreen != null)
                 LoadComponentAsync(nextScreen);
 
-            ((IBindable<User>)currentUser).BindTo(api.LocalUser);
+            ((IBindable<APIUser>)currentUser).BindTo(api.LocalUser);
         }
 
         public override void OnEntering(IScreen last)
@@ -327,6 +327,10 @@ namespace osu.Game.Screens.Menu
                 "您可以在游戏中按Ctrl+F11来切换高级fps显示功能！",
                 "使用Ctrl+F2来查看详细性能记录！",
                 "看看\"游玩列表\"系统, 他允许用户创建自己的自定义排行榜和永久排行榜!",
+                "使用linux游玩以获得更好的体验（） ——翎",
+                "原来，你也玩osu",
+                "选择ppy，选择成功！",
+                "I use Arch btw.",
                 "owo"
             };
 

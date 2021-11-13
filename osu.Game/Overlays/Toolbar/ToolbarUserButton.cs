@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
@@ -64,8 +64,8 @@ namespace osu.Game.Overlays.Toolbar
             switch (state.NewValue)
             {
                 default:
-                    Text = "游客";
-                    avatar.User = new User();
+                    Text = @"游客";
+                    avatar.User = new APIUser();
                     break;
 
                 case APIState.Online:

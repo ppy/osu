@@ -11,8 +11,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private int currentDisplay;
         private const int background_count = 7;
-        private IBindable<User> user;
+        private IBindable<APIUser> user;
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> mode;
         private Bindable<IntroSequence> introSequence;

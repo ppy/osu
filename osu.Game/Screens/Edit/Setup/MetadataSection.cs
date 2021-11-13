@@ -46,8 +46,8 @@ namespace osu.Game.Screens.Edit.Setup
 
                 Empty(),
 
-                creatorTextBox = createTextBox<LabelledTextBox>("谱师", metadata.AuthorString),
-                difficultyTextBox = createTextBox<LabelledTextBox>("难度名", Beatmap.BeatmapInfo.Version),
+                creatorTextBox = createTextBox<LabelledTextBox>("谱师", metadata.Author.Username),
+                difficultyTextBox = createTextBox<LabelledTextBox>("难度名", Beatmap.BeatmapInfo.DifficultyName),
                 sourceTextBox = createTextBox<LabelledTextBox>("来源", metadata.Source),
                 tagsTextBox = createTextBox<LabelledTextBox>("标签", metadata.Tags)
             };
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Metadata.Title = RomanisedTitleTextBox.Current.Value;
 
             Beatmap.Metadata.AuthorString = creatorTextBox.Current.Value;
-            Beatmap.BeatmapInfo.Version = difficultyTextBox.Current.Value;
+            Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
             Beatmap.Metadata.Source = sourceTextBox.Current.Value;
             Beatmap.Metadata.Tags = tagsTextBox.Current.Value;
         }

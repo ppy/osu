@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
@@ -18,10 +19,11 @@ namespace osu.Game.Overlays.Profile
     {
         private UserCoverBackground coverContainer;
 
-        public Bindable<User> User = new Bindable<User>();
+        public Bindable<APIUser> User = new Bindable<APIUser>();
 
         //private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
+        private TopHeaderContainer topheaderContainer;
 
         public ProfileHeader()
         {
@@ -32,7 +34,7 @@ namespace osu.Game.Overlays.Profile
             TabControl.AddItem(LayoutStrings.HeaderUsersShow);
             TabControl.AddItem(LayoutStrings.HeaderUsersModding);
 
-            detailHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
+            //topheaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
 
         protected override Drawable CreateBackground() =>
@@ -62,7 +64,7 @@ namespace osu.Game.Overlays.Profile
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                new TopHeaderContainer
+                topheaderContainer = new TopHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
@@ -87,7 +89,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
 
-        private void updateDisplay(User user) => coverContainer.User = user;
+        private void updateDisplay(APIUser user) => coverContainer.User = user;
 
         private class ProfileHeaderTitle : OverlayTitle
         {

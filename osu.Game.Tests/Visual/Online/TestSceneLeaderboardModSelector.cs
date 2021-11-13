@@ -26,7 +26,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             LeaderboardModSelector modSelector;
             FillFlowContainer<SpriteText> selectedMods;
-            var ruleset = new Bindable<RulesetInfo>();
+
+            var ruleset = new Bindable<IRulesetInfo>();
 
             Add(selectedMods = new FillFlowContainer<SpriteText>
             {

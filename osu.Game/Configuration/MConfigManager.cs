@@ -27,7 +27,7 @@ namespace osu.Game.Configuration
             base.InitialiseDefaults();
 
             //Other Settings
-            SetDefault(MSetting.UseSayobot, true);
+            SetDefault(MSetting.UseSayobot, false);
             SetDefault(MSetting.DoNotShowDisclaimer, false);
 
             //UI Settings

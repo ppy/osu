@@ -7,12 +7,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -48,7 +46,7 @@ namespace osu.Game.Graphics.Containers
                 AddText(text[previousLinkEnd..link.Index]);
 
                 string displayText = text.Substring(link.Index, link.Length);
-                string linkArgument = link.Argument;
+                object linkArgument = link.Argument;
                 string tooltip = displayText == link.Url ? null : link.Url;
 
                 AddLink(displayText, link.Action, linkArgument, tooltip);
@@ -58,31 +56,22 @@ namespace osu.Game.Graphics.Containers
             AddText(text.Substring(previousLinkEnd));
         }
 
-        public void AddLink(string text, string url, Action<SpriteText> creationParameters = null) =>
+        public void AddLink(LocalisableString text, string url, Action<SpriteText> creationParameters = null) =>
             createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.External, url), url);
 
-        public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        public void AddLink(LocalisableString text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.Custom, string.Empty), tooltipText, action);
 
-        public void AddLink(string text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        public void AddLink(LocalisableString text, LinkAction action, object argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(action, argument), tooltipText);
 
-        public void AddLink(LocalisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
-        {
-            var spriteText = new OsuSpriteText { Text = text };
-
-            AddText(spriteText, creationParameters);
-            RemoveInternal(spriteText); // TODO: temporary, will go away when TextParts support localisation properly.
-            createLink(new TextPartManual(spriteText.Yield()), new LinkDetails(action, argument), tooltipText);
-        }
-
-        public void AddLink(IEnumerable<SpriteText> text, LinkAction action, string linkArgument, string tooltipText = null)
+        public void AddLink(IEnumerable<SpriteText> text, LinkAction action, object linkArgument, string tooltipText = null)
         {
             createLink(new TextPartManual(text), new LinkDetails(action, linkArgument), tooltipText);
         }
 
-        public void AddUserLink(User user, Action<SpriteText> creationParameters = null)
-            => createLink(CreateChunkFor(user.Username, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "查看资料");
+        public void AddUserLink(IUser user, Action<SpriteText> creationParameters = null)
+            => createLink(CreateChunkFor(user.Username, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user), "查看资料");
 
         private void createLink(ITextPart textPart, LinkDetails link, LocalisableString tooltipText, Action action = null)
         {
@@ -94,7 +83,7 @@ namespace osu.Game.Graphics.Containers
                     game.HandleLink(link);
                 // fallback to handle cases where OsuGame is not available, ie. tournament client.
                 else if (link.Action == LinkAction.External)
-                    host.OpenUrlExternally(link.Argument);
+                    host.OpenUrlExternally(link.Argument.ToString());
             };
 
             AddPart(new TextLink(textPart, tooltipText, onClickAction));

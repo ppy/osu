@@ -9,8 +9,8 @@ using System.Linq;
 using MessagePack;
 using Newtonsoft.Json;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
-using osu.Game.Users;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -40,7 +40,7 @@ namespace osu.Game.Online.Multiplayer
         public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
 
         [IgnoreMember]
-        public User? User { get; set; }
+        public APIUser? User { get; set; }
 
         [JsonConstructor]
         public MultiplayerRoomUser(int userId)

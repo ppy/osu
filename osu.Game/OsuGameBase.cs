@@ -40,6 +40,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Stores;
 using osu.Game.Utils;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 using M.Resources;
@@ -66,7 +67,7 @@ namespace osu.Game
         /// <summary>
         /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
         /// </summary>
-        internal const double GLOBAL_TRACK_VOLUME_ADJUST = 0.8;
+        private const double global_track_volume_adjust = 0.8;
 
         public bool UseDevelopmentServer { get; }
 
@@ -161,7 +162,9 @@ namespace osu.Game
 
         private Bindable<bool> fpsDisplayVisible;
 
-        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
+        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(global_track_volume_adjust);
+
+        private RealmRulesetStore realmRulesetStore;
 
         public OsuGameBase()
         {
@@ -170,7 +173,7 @@ namespace osu.Game
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ReadableKeyCombinationProvider keyCombinationProvider)
         {
             try
             {
@@ -219,17 +222,11 @@ namespace osu.Game
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
             // needs to be done here rather than inside SkinManager to ensure thread safety of CurrentSkinInfo.
-            SkinManager.ItemRemoved.BindValueChanged(weakRemovedInfo =>
+            SkinManager.ItemRemoved += item => Schedule(() =>
             {
-                if (weakRemovedInfo.NewValue.TryGetTarget(out var removedInfo))
-                {
-                    Schedule(() =>
-                    {
-                        // check the removed skin is not the current user choice. if it is, switch back to default.
-                        if (removedInfo.ID == SkinManager.CurrentSkinInfo.Value.ID)
-                            SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
-                    });
-                }
+                // check the removed skin is not the current user choice. if it is, switch back to default.
+                if (item.ID == SkinManager.CurrentSkinInfo.Value.ID)
+                    SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
             });
 
             EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
@@ -250,6 +247,11 @@ namespace osu.Game
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
+            // the following realm components are not actively used yet, but initialised and kept up to date for initial testing.
+            realmRulesetStore = new RealmRulesetStore(realmFactory, Storage);
+
+            dependencies.Cache(realmRulesetStore);
+
             // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
             // allow lookups to be done on the child (ScoreManager in this case) to perform the cascading delete.
@@ -259,17 +261,8 @@ namespace osu.Game
                 return ScoreManager.QueryScores(s => beatmapIds.Contains(s.BeatmapInfo.ID)).ToList();
             }
 
-            BeatmapManager.ItemRemoved.BindValueChanged(i =>
-            {
-                if (i.NewValue.TryGetTarget(out var item))
-                    ScoreManager.Delete(getBeatmapScores(item), true);
-            });
-
-            BeatmapManager.ItemUpdated.BindValueChanged(i =>
-            {
-                if (i.NewValue.TryGetTarget(out var item))
-                    ScoreManager.Undelete(getBeatmapScores(item), true);
-            });
+            BeatmapManager.ItemRemoved += item => ScoreManager.Delete(getBeatmapScores(item), true);
+            BeatmapManager.ItemUpdated += item => ScoreManager.Undelete(getBeatmapScores(item), true);
 
             dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
             AddInternal(difficultyCache);
@@ -333,13 +326,13 @@ namespace osu.Game
 
             base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
 
-            KeyBindingStore = new RealmKeyBindingStore(realmFactory);
+            KeyBindingStore = new RealmKeyBindingStore(realmFactory, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
 
             dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
-            dependencies.Cache(previewTrackManager = new PreviewTrackManager());
+            dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
             Add(previewTrackManager);
 
             AddInternal(MusicController = new MusicController());
@@ -546,6 +539,8 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             contextFactory?.FlushConnections();
+
+            realmRulesetStore?.Dispose();
             realmFactory?.Dispose();
         }
     }

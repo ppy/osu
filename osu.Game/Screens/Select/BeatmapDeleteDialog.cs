@@ -28,8 +28,8 @@ namespace osu.Game.Screens.Select
             {
                 new PopupDialogOkButton
                 {
-                    Text = @"是的,我确定",
-                    Action = () => manager.Delete(beatmap),
+                    Text = @"是的。完全，删掉他。",
+                    Action = () => manager?.Delete(beatmap),
                 },
                 new PopupDialogCancelButton
                 {

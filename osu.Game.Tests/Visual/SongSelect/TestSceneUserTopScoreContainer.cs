@@ -5,6 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Online.API.Requests.Responses;
+using osuTK.Graphics;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
@@ -60,7 +62,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 6602580,
                         Username = @"waaiiru",
@@ -78,7 +80,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 4608074,
                         Username = @"Skycries",
@@ -96,7 +98,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 1541390,
                         Username = @"Toukai",

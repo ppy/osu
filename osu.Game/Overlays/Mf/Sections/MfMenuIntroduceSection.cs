@@ -1,8 +1,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Mf.TextBox;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Overlays.Mf.Sections
@@ -110,25 +110,25 @@ namespace osu.Game.Overlays.Mf.Sections
         {
             var t = new MfLinkFlowContainer();
 
-            t.AddUserLink(new User
+            t.AddUserLink(new APIUser
             {
                 Username = "A M D (比赛端、游戏内翻译修正)",
                 Id = 5321112
             });
             t.NewParagraph();
-            t.AddUserLink(new User
+            t.AddUserLink(new APIUser
             {
                 Username = "MATRIX-feather (主要翻译, 项目发起和维护等)",
                 Id = 13870362
             });
             t.NewParagraph();
-            t.AddUserLink(new User
+            t.AddUserLink(new APIUser
             {
                 Username = "pedajilao (游戏内翻译修正)",
                 Id = 13851970
             });
             t.NewParagraph();
-            t.AddUserLink(new User
+            t.AddUserLink(new APIUser
             {
                 Username = "PercyDan (游戏内bug修复，功能增强)",
                 Id = 17268434
@@ -203,7 +203,7 @@ namespace osu.Game.Overlays.Mf.Sections
         {
             var t = new MfLinkFlowContainer();
 
-            t.AddUserLink(new User
+            t.AddUserLink(new APIUser
             {
                 Username = "A M D",
                 Id = 5321112

@@ -11,12 +11,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.IO.Archives;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Scores.IO
 {
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Scores.IO
                         Accuracy = 0.8,
                         MaxCombo = 500,
                         Combo = 250,
-                        User = new User { Username = "Test user" },
+                        User = new APIUser { Username = "Test user" },
                         Date = DateTimeOffset.Now,
                         OnlineScoreID = 12345,
                     };

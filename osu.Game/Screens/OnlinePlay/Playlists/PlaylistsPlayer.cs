@@ -32,8 +32,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void load(IBindable<RulesetInfo> ruleset)
         {
             // Sanity checks to ensure that PlaylistsPlayer matches the settings for the current PlaylistItem
-            if (Beatmap.Value.BeatmapInfo.OnlineBeatmapID != PlaylistItem.Beatmap.Value.OnlineBeatmapID)
-                throw new InvalidOperationException("当前谱面与游玩列表不匹配"); //Current Beatmap does not match PlaylistItem's Beatmap
+            if (Beatmap.Value.BeatmapInfo.OnlineID != PlaylistItem.Beatmap.Value.OnlineID)
+                throw new InvalidOperationException("当前谱面与游玩列表不匹配");
 
             if (ruleset.Value.ID != PlaylistItem.Ruleset.Value.ID)
                 throw new InvalidOperationException("当前游戏模式与游玩列表不匹配"); //Current Ruleset does not match PlaylistItem's Ruleset
