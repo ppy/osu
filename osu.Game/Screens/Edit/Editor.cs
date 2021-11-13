@@ -31,6 +31,7 @@ using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
+using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
@@ -486,7 +487,18 @@ namespace osu.Game.Screens.Edit
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+            dimBackground();
+            resetTrack(true);
+        }
 
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+            dimBackground();
+        }
+
+        private void dimBackground()
+        {
             ApplyToBackground(b =>
             {
                 // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
@@ -495,8 +507,6 @@ namespace osu.Game.Screens.Edit
                 b.IgnoreUserSettings.Value = true;
                 b.BlurAmount.Value = 0;
             });
-
-            resetTrack(true);
         }
 
         public override bool OnExiting(IScreen next)
@@ -535,9 +545,9 @@ namespace osu.Game.Screens.Edit
 
         public override void OnSuspending(IScreen next)
         {
-            refetchBeatmap();
-
             base.OnSuspending(next);
+            clock.Stop();
+            refetchBeatmap();
         }
 
         private void refetchBeatmap()
@@ -797,7 +807,7 @@ namespace osu.Game.Screens.Edit
                 pushEditorPlayer();
             }
 
-            void pushEditorPlayer() => this.Push(new PlayerLoader(() => new EditorPlayer()));
+            void pushEditorPlayer() => this.Push(new EditorPlayerLoader());
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
