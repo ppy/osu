@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             AddUntilStep("ensure manager loaded", () => beatmaps != null);
             AddStep("remove soleily", () =>
             {
-                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineBeatmapSetID == 241526);
+                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineID == 241526);
 
                 if (beatmap != null) beatmaps.Delete(beatmap);
             });
