@@ -26,9 +26,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class HeaderDownloadButton : CompositeDrawable, IHasTooltip
     {
-        private const int text_size = 12;
+        private const int text_size = 16;
 
         private readonly bool noVideo;
+        private readonly bool accel;
 
         public LocalisableString TooltipText => BeatmapsetsStrings.ShowDetailsDownloadDefault;
 
@@ -41,10 +42,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly APIBeatmapSet beatmapSet;
 
-        public HeaderDownloadButton(APIBeatmapSet beatmapSet, bool noVideo = false)
+        public HeaderDownloadButton(APIBeatmapSet beatmapSet, bool noVideo = false, bool accel = false)
         {
             this.beatmapSet = beatmapSet;
             this.noVideo = noVideo;
+
+            this.accel = accel;
 
             Width = 120;
             RelativeSizeAxes = Axes.Y;
@@ -108,7 +111,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                beatmaps.Download(beatmapSet, noVideo);
+                if (accel)
+                    beatmaps.AccelDownload(beatmapSet, noVideo);
+                else
+                    beatmaps.Download(beatmapSet, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);
@@ -159,6 +165,16 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                                 Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold)
                             },
                         };
+
+                        if (accel)
+                        {
+                            textSprites.Add(new OsuSpriteText
+                            {
+                                Text = "加速下载",
+                                Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold)
+                            });
+                        }
+
                         this.FadeIn(200);
                         break;
                 }

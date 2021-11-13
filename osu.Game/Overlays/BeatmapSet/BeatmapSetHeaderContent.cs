@@ -301,10 +301,21 @@ namespace osu.Game.Overlays.BeatmapSet
                     break;
 
                 default:
-                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value);
+                    downloadButtonsContainer.Children = new Drawable[]
+                    {
+                        new HeaderDownloadButton(BeatmapSet.Value),
+                        new HeaderDownloadButton(BeatmapSet.Value, accel: true)
+                    };
 
                     if (BeatmapSet.Value.HasVideo)
-                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true));
+                    {
+                        downloadButtonsContainer.AddRange(new Drawable[]
+                        {
+                            new HeaderDownloadButton(BeatmapSet.Value, true),
+                            new HeaderDownloadButton(BeatmapSet.Value, true, true)
+                        });
+                    }
+
                     break;
             }
         }
