@@ -487,7 +487,18 @@ namespace osu.Game.Screens.Edit
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+            dimBackground();
+            resetTrack(true);
+        }
 
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+            dimBackground();
+        }
+
+        private void dimBackground()
+        {
             ApplyToBackground(b =>
             {
                 // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
@@ -496,8 +507,6 @@ namespace osu.Game.Screens.Edit
                 b.IgnoreUserSettings.Value = true;
                 b.BlurAmount.Value = 0;
             });
-
-            resetTrack(true);
         }
 
         public override bool OnExiting(IScreen next)
