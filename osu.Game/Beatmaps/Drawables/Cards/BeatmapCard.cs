@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
@@ -37,6 +38,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private readonly APIBeatmapSet beatmapSet;
         private readonly Bindable<BeatmapSetFavouriteState> favouriteState;
+
+        [Cached]
+        private readonly BeatmapDownloadTracker downloadTracker;
 
         private UpdateableOnlineBeatmapSetCover leftCover;
         private FillFlowContainer leftIconArea;
@@ -61,6 +65,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             this.beatmapSet = beatmapSet;
             favouriteState = new Bindable<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(beatmapSet.HasFavourited, beatmapSet.FavouriteCount));
+            downloadTracker = new BeatmapDownloadTracker(beatmapSet);
         }
 
         [BackgroundDependencyLoader]
@@ -73,6 +78,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             InternalChildren = new Drawable[]
             {
+                downloadTracker,
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -270,7 +276,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                         }
                                     }
                                 },
-                                downloadProgressBar = new BeatmapCardDownloadProgressBar(beatmapSet)
+                                downloadProgressBar = new BeatmapCardDownloadProgressBar
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Height = 6,
@@ -314,7 +320,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             base.LoadComplete();
 
-            downloadProgressBar.IsActive.BindValueChanged(_ => updateState(), true);
+            downloadTracker.State.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
         }
 
@@ -367,8 +373,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             statisticsContainer.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
             rightButtonArea.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
 
-            idleBottomContent.FadeTo(downloadProgressBar.IsActive.Value ? 0 : 1, TRANSITION_DURATION, Easing.OutQuint);
-            downloadProgressBar.FadeTo(downloadProgressBar.IsActive.Value ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
+            bool showProgress = downloadTracker.State.Value == DownloadState.Downloading || downloadTracker.State.Value == DownloadState.Importing;
+
+            idleBottomContent.FadeTo(showProgress ? 0 : 1, TRANSITION_DURATION, Easing.OutQuint);
+            downloadProgressBar.FadeTo(showProgress ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
