@@ -80,6 +80,46 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectHasSampleBank(1, "drum");
         }
 
+        [Test]
+        public void TestMultipleSelectionWithSameSampleVolume()
+        {
+            AddStep("unify sample volume", () =>
+            {
+                foreach (var h in EditorBeatmap.HitObjects)
+                    h.SampleControlPoint.SampleVolume = 50;
+            });
+
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            clickSamplePiece(0);
+            samplePopoverHasSingleVolume(50);
+
+            dismissPopover();
+
+            clickSamplePiece(1);
+            samplePopoverHasSingleVolume(50);
+
+            setVolumeViaPopover(75);
+            hitObjectHasSampleVolume(0, 75);
+            hitObjectHasSampleVolume(1, 75);
+        }
+
+        [Test]
+        public void TestMultipleSelectionWithDifferentSampleVolume()
+        {
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            clickSamplePiece(0);
+            samplePopoverHasIndeterminateVolume();
+
+            dismissPopover();
+
+            clickSamplePiece(1);
+            samplePopoverHasIndeterminateVolume();
+
+            setVolumeViaPopover(30);
+            hitObjectHasSampleVolume(0, 30);
+            hitObjectHasSampleVolume(1, 30);
+        }
+
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} difficulty piece", () =>
         {
             var difficultyPiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
@@ -94,6 +134,14 @@ namespace osu.Game.Tests.Visual.Editing
             var slider = popover?.ChildrenOfType<SliderWithTextBoxInput<int>>().Single();
 
             return slider?.Current.Value == volume;
+        });
+
+        private void samplePopoverHasIndeterminateVolume() => AddUntilStep($"sample popover has indeterminate volume", () =>
+        {
+            var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
+            var slider = popover?.ChildrenOfType<SliderWithTextBoxInput<int>>().Single();
+
+            return slider != null && slider.Current.Value == null;
         });
 
         private void samplePopoverHasSingleBank(string bank) => AddUntilStep($"sample popover has bank {bank}", () =>
