@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Timing;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -82,6 +83,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Width = 200,
                         Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(0, 10),
                         Children = new Drawable[]
                         {
                             bank = new LabelledTextBox
