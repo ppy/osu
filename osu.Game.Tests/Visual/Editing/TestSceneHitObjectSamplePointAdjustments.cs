@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -43,7 +44,7 @@ namespace osu.Game.Tests.Visual.Editing
                     }
                 });
 
-                EditorBeatmap.Add(new HitCircle()
+                EditorBeatmap.Add(new HitCircle
                 {
                     StartTime = 500,
                     Position = (OsuPlayfield.BASE_SIZE + new Vector2(100, 0)) / 2,
@@ -138,9 +139,15 @@ namespace osu.Game.Tests.Visual.Editing
             clickSamplePiece(1);
             samplePopoverHasSingleBank("soft");
 
+            setBankViaPopover(string.Empty);
+            hitObjectHasSampleBank(0, "soft");
+            hitObjectHasSampleBank(1, "soft");
+            samplePopoverHasSingleBank("soft");
+
             setBankViaPopover("drum");
             hitObjectHasSampleBank(0, "drum");
             hitObjectHasSampleBank(1, "drum");
+            samplePopoverHasSingleBank("drum");
         }
 
         [Test]
@@ -155,9 +162,15 @@ namespace osu.Game.Tests.Visual.Editing
             clickSamplePiece(1);
             samplePopoverHasIndeterminateBank();
 
+            setBankViaPopover(string.Empty);
+            hitObjectHasSampleBank(0, "normal");
+            hitObjectHasSampleBank(1, "soft");
+            samplePopoverHasIndeterminateBank();
+
             setBankViaPopover("normal");
             hitObjectHasSampleBank(0, "normal");
             hitObjectHasSampleBank(1, "normal");
+            samplePopoverHasSingleBank("normal");
         }
 
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} difficulty piece", () =>
@@ -187,17 +200,17 @@ namespace osu.Game.Tests.Visual.Editing
         private void samplePopoverHasSingleBank(string bank) => AddUntilStep($"sample popover has bank {bank}", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var textBox = popover?.ChildrenOfType<LabelledTextBox>().First();
+            var textBox = popover?.ChildrenOfType<OsuTextBox>().First();
 
-            return textBox?.Current.Value == bank;
+            return textBox?.Current.Value == bank && string.IsNullOrEmpty(textBox?.PlaceholderText.ToString());
         });
 
-        private void samplePopoverHasIndeterminateBank() => AddUntilStep($"sample popover has indeterminate bank", () =>
+        private void samplePopoverHasIndeterminateBank() => AddUntilStep("sample popover has indeterminate bank", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var textBox = popover?.ChildrenOfType<LabelledTextBox>().First();
+            var textBox = popover?.ChildrenOfType<OsuTextBox>().First();
 
-            return textBox != null && string.IsNullOrEmpty(textBox.Current.Value);
+            return textBox != null && string.IsNullOrEmpty(textBox.Current.Value) && !string.IsNullOrEmpty(textBox.PlaceholderText.ToString());
         });
 
         private void dismissPopover()
