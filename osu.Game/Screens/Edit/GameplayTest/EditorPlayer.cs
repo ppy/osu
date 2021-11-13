@@ -6,7 +6,7 @@ using osu.Framework.Screens;
 using osu.Game.Overlays;
 using osu.Game.Screens.Play;
 
-namespace osu.Game.Screens.Edit
+namespace osu.Game.Screens.Edit.GameplayTest
 {
     public class EditorPlayer : Player
     {
