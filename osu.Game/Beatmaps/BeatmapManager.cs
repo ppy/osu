@@ -244,15 +244,22 @@ namespace osu.Game.Beatmaps
 
         #endregion
 
+        #region Implementation of ISayoModelDownloader<BeatmapSetInfo>
+
+        #endregion
+
         #region Implementation of IModelDownloader<BeatmapSetInfo>
+
+        public bool AccelDownload(IBeatmapSetInfo model, bool noVideo)
+            => beatmapModelDownloader.AccelDownload(model, noVideo);
 
         public IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> DownloadBegan => beatmapModelDownloader.DownloadBegan;
 
         public IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
 
-        public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false, bool useSayobot = false, bool noVideo = false)
+        public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false)
         {
-            return beatmapModelDownloader.Download(model, minimiseDownloadSize, useSayobot, noVideo);
+            return beatmapModelDownloader.Download(model, minimiseDownloadSize);
         }
 
         public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model)

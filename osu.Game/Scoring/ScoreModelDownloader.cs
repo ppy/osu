@@ -15,7 +15,13 @@ namespace osu.Game.Scoring
         {
         }
 
-        protected override ArchiveDownloadRequest<IScoreInfo> CreateDownloadRequest(IScoreInfo score, bool useSayobot, bool noVideo, bool minimiseDownload) => new DownloadReplayRequest(score);
+        protected override ArchiveDownloadRequest<IScoreInfo> CreateDownloadRequest(IScoreInfo score, bool minimiseDownload)
+            => new DownloadReplayRequest(score);
+
+        protected override ArchiveDownloadRequest<IScoreInfo> CreateAccelDownloadRequest(IScoreInfo model, bool isMini)
+        {
+            throw new System.NotImplementedException();
+        }
 
         public override ArchiveDownloadRequest<IScoreInfo> GetExistingDownload(IScoreInfo model)
             => CurrentDownloads.Find(r => r.Model.OnlineID == model.OnlineID);

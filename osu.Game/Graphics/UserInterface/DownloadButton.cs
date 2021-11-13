@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.Centre,
                 X = 8,
                 Size = Vector2.Zero,
-                Icon = FontAwesome.Solid.Check,
+                Icon = FontAwesome.Solid.Check
             });
 
             State.BindValueChanged(updateState, true);

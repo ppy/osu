@@ -58,10 +58,9 @@ namespace osu.Game.Overlays.BeatmapSet
         [Resolved]
         private BeatmapRulesetSelector rulesetSelector { get; set; }
 
-        private readonly ExternalLinkButton externalLink;
-
         public BeatmapSetHeaderContent()
         {
+            ExternalLinkButton externalLink;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             InternalChild = new Container
@@ -302,12 +301,10 @@ namespace osu.Game.Overlays.BeatmapSet
                     break;
 
                 default:
-                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value, false, false, true);
-                    if (BeatmapSet.Value.HasVideo)
-                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true, false));
+                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value);
 
-                    if (BeatmapSet.Value.HasStoryboard || BeatmapSet.Value.HasVideo)
-                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, false, true)); //Mini
+                    if (BeatmapSet.Value.HasVideo)
+                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true));
                     break;
             }
         }

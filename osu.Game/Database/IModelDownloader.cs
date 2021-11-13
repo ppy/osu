@@ -11,7 +11,7 @@ namespace osu.Game.Database
     /// Represents a <see cref="IModelManager{TModel}"/> that can download new models from an external source.
     /// </summary>
     /// <typeparam name="T">The item's interface type.</typeparam>
-    public interface IModelDownloader<T> : IPostNotifications
+    public partial interface IModelDownloader<T> : IPostNotifications
         where T : class
     {
         /// <summary>
@@ -31,10 +31,8 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="item">The <typeparamref name="T"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Upstream arg</param>
-        /// <param name="useSayobot">Decides whether to use sayobot to download</param>
-        /// <param name="noVideo">Whether this download should be optimised for slow connections. Generally means Videos are not included in the download bundle.</param>
         /// <returns>Whether the download was started.</returns>
-        bool Download(T item, bool minimiseDownloadSize, bool useSayobot, bool noVideo);
+        bool Download(T item, bool minimiseDownloadSize);
 
         /// <summary>
         /// Gets an existing <typeparamref name="T"/> download request if it exists.

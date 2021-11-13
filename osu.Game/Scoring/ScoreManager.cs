@@ -354,8 +354,15 @@ namespace osu.Game.Scoring
 
         public IBindable<WeakReference<ArchiveDownloadRequest<IScoreInfo>>> DownloadFailed => scoreModelDownloader.DownloadFailed;
 
-        public bool Download(IScoreInfo model, bool minimiseDownloadSize, bool useSayobot, bool noVideo) =>
-            scoreModelDownloader.Download(model, minimiseDownloadSize, useSayobot, noVideo);
+        public bool Download(IScoreInfo model, bool minimiseDownloadSize)
+        {
+            return scoreModelDownloader.Download(model, minimiseDownloadSize);
+        }
+
+        public bool AccelDownload(IScoreInfo model, bool minimiseDownloadSize)
+        {
+            throw new NotImplementedException();
+        }
 
         public ArchiveDownloadRequest<IScoreInfo> GetExistingDownload(IScoreInfo model)
         {

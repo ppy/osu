@@ -43,17 +43,29 @@ namespace osu.Game.Database
         /// Creates the download request for this <typeparamref name="T"/>.
         /// </summary>
         /// <param name="model">The <typeparamref name="T"/> to be downloaded.</param>
-        /// <param name="useSayobot">Decides whether to use sayobot to download.</param>
-        /// <param name="noVideo">Whether this download should be optimised for slow connections. Generally means Videos are not included in the download bundle.</param>
-        /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
+        /// <param name="isMini">Whether this downlaod should be optimised for very slow connections. Generally means any extra files are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
-        protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model, bool minimiseDownloadSize, bool useSayobot, bool noVideo);
+        protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model, bool isMini);
 
-        public bool Download(T model, bool minimiseDownloadSize = false, bool useSayobot = false, bool noVideo = false)
+        protected abstract ArchiveDownloadRequest<T> CreateAccelDownloadRequest(T model, bool isMini);
+
+        private bool accel;
+
+        /// <summary>
+        /// Begin a download for the requested <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="model">The <typeparamref name="T"/> to be downloaded.</param>
+        /// <param name="minimiseDownloadSize">Upstream arg</param>
+        /// <returns>Whether the download was started.</returns>
+        public bool Download(T model, bool minimiseDownloadSize)
         {
             if (!canDownload(model)) return false;
 
-            var request = CreateDownloadRequest(model, minimiseDownloadSize, useSayobot, noVideo);
+            var request = accel
+                ? CreateAccelDownloadRequest(model, minimiseDownloadSize)
+                : CreateDownloadRequest(model, minimiseDownloadSize);
+
+            accel = false;
 
             DownloadNotification notification = new DownloadNotification
             {
@@ -110,6 +122,12 @@ namespace osu.Game.Database
                 if (!(error is OperationCanceledException))
                     Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} 下载失败!");
             }
+        }
+
+        public bool AccelDownload(T model, bool minimiseDownloadSize)
+        {
+            accel = true;
+            return Download(model, minimiseDownloadSize);
         }
 
         public abstract ArchiveDownloadRequest<T> GetExistingDownload(T model);

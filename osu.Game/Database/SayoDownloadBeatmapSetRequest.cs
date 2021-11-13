@@ -3,22 +3,27 @@
 
 using osu.Framework.IO.Network;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Database
 {
-    public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
+    public class SayoDownloadBeatmapSetRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
     {
         private readonly bool minimiseDownloadSize;
 
-        public DownloadBeatmapSetRequest(IBeatmapSetInfo set, bool minimiseDownloadSize = false)
+        public SayoDownloadBeatmapSetRequest(IBeatmapSetInfo set, bool minimiseDownloadSize)
             : base(set)
         {
             this.minimiseDownloadSize = minimiseDownloadSize;
         }
 
-        protected override string Target => $@"beatmapsets/{Model.OnlineID}/download{(minimiseDownloadSize ? "?noVideo=1" : "")}";
+        private string getTarget() => $@"{(minimiseDownloadSize ? "novideo" : "full")}/{Model.OnlineID}";
 
-        protected override string Uri => $@"{API.WebsiteRootUrl}/api/v2/{Target}";
+        private string selectUri() => $@"https://txy1.sayobot.cn/beatmaps/download/{Target}";
+
+        protected override string Target => getTarget();
+
+        protected override string Uri => selectUri();
 
         protected override WebRequest CreateWebRequest()
         {
