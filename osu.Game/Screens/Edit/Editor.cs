@@ -545,9 +545,9 @@ namespace osu.Game.Screens.Edit
 
         public override void OnSuspending(IScreen next)
         {
-            refetchBeatmap();
-
             base.OnSuspending(next);
+            clock.Stop();
+            refetchBeatmap();
         }
 
         private void refetchBeatmap()
