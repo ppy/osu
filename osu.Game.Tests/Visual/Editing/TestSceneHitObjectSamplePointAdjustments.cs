@@ -171,15 +171,15 @@ namespace osu.Game.Tests.Visual.Editing
         private void samplePopoverHasSingleVolume(int volume) => AddUntilStep($"sample popover has volume {volume}", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<SliderWithTextBoxInput<int>>().Single();
+            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
 
             return slider?.Current.Value == volume;
         });
 
-        private void samplePopoverHasIndeterminateVolume() => AddUntilStep($"sample popover has indeterminate volume", () =>
+        private void samplePopoverHasIndeterminateVolume() => AddUntilStep("sample popover has indeterminate volume", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<SliderWithTextBoxInput<int>>().Single();
+            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
 
             return slider != null && slider.Current.Value == null;
         });
@@ -197,7 +197,7 @@ namespace osu.Game.Tests.Visual.Editing
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
             var textBox = popover?.ChildrenOfType<LabelledTextBox>().First();
 
-            return textBox != null && textBox.Current.Value == null;
+            return textBox != null && string.IsNullOrEmpty(textBox.Current.Value);
         });
 
         private void dismissPopover()
@@ -209,7 +209,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void setVolumeViaPopover(int volume) => AddStep($"set volume {volume} via popover", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
-            var slider = popover.ChildrenOfType<SliderWithTextBoxInput<int>>().Single();
+            var slider = popover.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
             slider.Current.Value = volume;
         });
 
