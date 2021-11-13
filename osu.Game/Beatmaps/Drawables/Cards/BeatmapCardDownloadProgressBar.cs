@@ -8,24 +8,21 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
     public class BeatmapCardDownloadProgressBar : CompositeDrawable
     {
-        private readonly BindableBool isActive = new BindableBool();
-        public IBindable<bool> IsActive => isActive;
-
         public override bool IsPresent => true;
 
-        private readonly BeatmapDownloadTracker tracker;
-        private readonly CircularContainer background;
         private readonly CircularContainer foreground;
 
         private readonly Box backgroundFill;
         private readonly Box foregroundFill;
+
+        private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
+        private readonly BindableDouble progress = new BindableDouble();
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -33,12 +30,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        public BeatmapCardDownloadProgressBar(APIBeatmapSet beatmapSet)
+        public BeatmapCardDownloadProgressBar()
         {
             InternalChildren = new Drawable[]
             {
-                tracker = new BeatmapDownloadTracker(beatmapSet),
-                background = new CircularContainer
+                new CircularContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
@@ -60,44 +56,40 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(BeatmapDownloadTracker downloadTracker)
         {
             backgroundFill.Colour = colourProvider.Background6;
+
+            ((IBindable<DownloadState>)state).BindTo(downloadTracker.State);
+            ((IBindable<double>)progress).BindTo(downloadTracker.Progress);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            tracker.State.BindValueChanged(_ => stateChanged(), true);
-            tracker.Progress.BindValueChanged(_ => progressChanged(), true);
+            state.BindValueChanged(_ => stateChanged(), true);
+            progress.BindValueChanged(_ => progressChanged(), true);
         }
 
         private void stateChanged()
         {
-            switch (tracker.State.Value)
+            switch (state.Value)
             {
                 case DownloadState.Downloading:
                     FinishTransforms(true);
                     foregroundFill.Colour = colourProvider.Highlight1;
-                    isActive.Value = true;
                     break;
 
                 case DownloadState.Importing:
                     foregroundFill.FadeColour(colours.Yellow, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-                    isActive.Value = true;
-                    break;
-
-                default:
-                    isActive.Value = false;
                     break;
             }
         }
 
         private void progressChanged()
         {
-            double progress = tracker.Progress.Value;
-            foreground.ResizeWidthTo((float)progress, progress > 0 ? BeatmapCard.TRANSITION_DURATION : 0, Easing.OutQuint);
+            foreground.ResizeWidthTo((float)progress.Value, progress.Value > 0 ? BeatmapCard.TRANSITION_DURATION : 0, Easing.OutQuint);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
     {
         protected readonly DownloadIcon Download;
         protected readonly PlayIcon Play;
-        protected readonly BeatmapDownloadTracker Tracker;
+        protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -37,27 +37,32 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
             InternalChildren = new Drawable[]
             {
-                Tracker = new BeatmapDownloadTracker(beatmapSet),
                 Download = new DownloadIcon(beatmapSet),
                 Play = new PlayIcon(beatmapSet)
             };
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(BeatmapDownloadTracker? tracker)
+        {
+            if (tracker != null)
+                ((IBindable<DownloadState>)State).BindTo(tracker.State);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Tracker.Progress.BindValueChanged(_ => updateState());
-            Tracker.State.BindValueChanged(_ => updateState(), true);
+            State.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
         }
 
         private void updateState()
         {
-            Download.FadeTo(Tracker.State.Value != DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            Download.Enabled.Value = Tracker.State.Value == DownloadState.NotDownloaded;
+            Download.FadeTo(State.Value != DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            Download.Enabled.Value = State.Value == DownloadState.NotDownloaded;
 
-            Play.FadeTo(Tracker.State.Value == DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            Play.FadeTo(State.Value == DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected class DownloadIcon : BeatmapCardIconButton

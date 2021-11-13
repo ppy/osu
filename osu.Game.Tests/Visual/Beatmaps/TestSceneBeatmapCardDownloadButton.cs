@@ -178,8 +178,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
         private class TestDownloadButton : DownloadButton
         {
-            public readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
-            public readonly BindableNumber<double> Progress = new BindableNumber<double>();
+            public new Bindable<DownloadState> State => base.State;
 
             public new BeatmapCardIconButton Download => base.Download;
             public new BeatmapCardIconButton Play => base.Play;
@@ -187,8 +186,6 @@ namespace osu.Game.Tests.Visual.Beatmaps
             public TestDownloadButton(APIBeatmapSet beatmapSet)
                 : base(beatmapSet)
             {
-                Tracker.State.BindTo(State);
-                Tracker.Progress.BindTo(Progress);
             }
         }
     }
