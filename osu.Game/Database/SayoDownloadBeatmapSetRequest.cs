@@ -5,25 +5,23 @@ using osu.Framework.IO.Network;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 
-namespace osu.Game.Database.Sayo
+namespace osu.Game.Database
 {
     public class SayoDownloadBeatmapSetRequest : ArchiveDownloadRequest<BeatmapSetInfo>
     {
-        private readonly bool noVideo;
-        private readonly bool mini;
+        private readonly bool minimiseDownloadSize;
 
-        public SayoDownloadBeatmapSetRequest(BeatmapSetInfo set, bool noVideo, bool mini)
+        public SayoDownloadBeatmapSetRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
             : base(set)
         {
-            this.noVideo = noVideo;
-            this.mini = mini;
+            this.minimiseDownloadSize = minimiseDownloadSize;
         }
 
         private string getTarget()
         {
             string idFull = Model.OnlineBeatmapSetID.ToString();
 
-            string target = $@"{(mini ? "mini" : (noVideo ? "novideo" : "full"))}/{idFull}";
+            string target = $@"{(minimiseDownloadSize ? "novideo" : "full")}/{idFull}";
             return target;
         }
 

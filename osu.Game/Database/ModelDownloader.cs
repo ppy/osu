@@ -46,6 +46,8 @@ namespace osu.Game.Database
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool isMini);
 
+        protected abstract ArchiveDownloadRequest<TModel> CreateAccelDownloadRequest(TModel model, bool isMini);
+
         /// <summary>
         /// Begin a download for the requested <typeparamref name="TModel"/>.
         /// </summary>
@@ -57,6 +59,69 @@ namespace osu.Game.Database
             if (!canDownload(model)) return false;
 
             var request = CreateDownloadRequest(model, minimiseDownloadSize);
+
+            DownloadNotification notification = new DownloadNotification
+            {
+                Text = $"正在下载 {request.Model}"
+            };
+
+            request.DownloadProgressed += progress =>
+            {
+                notification.State = ProgressNotificationState.Active;
+                notification.Progress = progress;
+            };
+
+            request.Success += filename =>
+            {
+                Task.Factory.StartNew(async () =>
+                {
+                    // This gets scheduled back to the update thread, but we want the import to run in the background.
+                    var imported = await modelManager.Import(notification, new ImportTask(filename)).ConfigureAwait(false);
+
+                    // for now a failed import will be marked as a failed download for simplicity.
+                    if (!imported.Any())
+                        downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+
+                    currentDownloads.Remove(request);
+                }, TaskCreationOptions.LongRunning);
+            };
+
+            request.Failure += triggerFailure;
+
+            notification.CancelRequested += () =>
+            {
+                request.Cancel();
+                return true;
+            };
+
+            currentDownloads.Add(request);
+            PostNotification?.Invoke(notification);
+
+            api.PerformAsync(request);
+
+            downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+            return true;
+
+            void triggerFailure(Exception error)
+            {
+                currentDownloads.Remove(request);
+
+                downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+
+                downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+
+                notification.State = ProgressNotificationState.Cancelled;
+
+                if (!(error is OperationCanceledException))
+                    Logger.Error(error, $"{modelManager.HumanisedModelName.Titleize()}下载失败!");
+            }
+        }
+
+        public bool AccelDownload(TModel model, bool minimiseDownloadSize)
+        {
+            if (!canDownload(model)) return false;
+
+            var request = CreateAccelDownloadRequest(model, minimiseDownloadSize);
 
             DownloadNotification notification = new DownloadNotification
             {

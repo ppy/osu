@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 }
 
                 if (mConfig.Get<bool>(MSetting.UseSayobot))
-                    beatmaps.SayoDownload(BeatmapSet.Value, noVideo, false);
+                    beatmaps.AccelDownload(BeatmapSet.Value, noVideo);
                 else
                     beatmaps.Download(BeatmapSet.Value, noVideo);
             };

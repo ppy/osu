@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
-using osu.Game.Database.Sayo;
 using osu.Game.Online.API;
 
 namespace osu.Game.Online
@@ -41,9 +40,6 @@ namespace osu.Game.Online
         private IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> managerDownloadBegan;
         private IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> managerDownloadFailed;
 
-        private IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> sayoManagerDownloadBegan;
-        private IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> sayoManagerDownloadFailed;
-
         [BackgroundDependencyLoader(true)]
         private void load()
         {
@@ -56,18 +52,6 @@ namespace osu.Game.Online
                 else
                     attachDownload(Manager?.GetExistingDownload(modelInfo.NewValue));
             }, true);
-
-            if (Manager == null)
-                return;
-
-            if (Manager is ISayoModelDownloader<TModel> sayoManager)
-            {
-                sayoManagerDownloadBegan = sayoManager.SayoDownloadBegan.GetBoundCopy();
-                sayoManagerDownloadBegan.BindValueChanged(downloadBegan);
-
-                sayoManagerDownloadFailed = sayoManager.SayoDownloadFailed.GetBoundCopy();
-                sayoManagerDownloadFailed.BindValueChanged(downloadFailed);
-            }
 
             managerDownloadBegan = Manager.DownloadBegan.GetBoundCopy();
             managerDownloadBegan.BindValueChanged(downloadBegan);

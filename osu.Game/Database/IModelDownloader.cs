@@ -11,7 +11,7 @@ namespace osu.Game.Database
     /// Represents a <see cref="IModelManager{TModel}"/> that can download new models from an external source.
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
-    public interface IModelDownloader<TModel> : IPostNotifications
+    public partial interface IModelDownloader<TModel> : IPostNotifications
         where TModel : class
     {
         /// <summary>

@@ -359,6 +359,11 @@ namespace osu.Game.Scoring
             return scoreModelDownloader.Download(model, minimiseDownloadSize);
         }
 
+        public bool AccelDownload(ScoreInfo model, bool minimiseDownloadSize)
+        {
+            throw new NotImplementedException();
+        }
+
         public ArchiveDownloadRequest<ScoreInfo> GetExistingDownload(ScoreInfo model)
         {
             return scoreModelDownloader.GetExistingDownload(model);

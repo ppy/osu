@@ -17,5 +17,10 @@ namespace osu.Game.Scoring
 
         protected override ArchiveDownloadRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, bool minimiseDownload)
             => new DownloadReplayRequest(score);
+
+        protected override ArchiveDownloadRequest<ScoreInfo> CreateAccelDownloadRequest(ScoreInfo model, bool isMini)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
