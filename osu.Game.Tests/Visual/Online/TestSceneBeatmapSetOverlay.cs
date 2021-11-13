@@ -10,11 +10,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
-using osu.Game.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Online.API.Requests.Responses;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Online
                     Artist = @"naru narusegawa",
                     Source = @"hinata sou",
                     Tags = @"test tag tag more tag",
-                    Author = new User
+                    Author = new APIUser
                     {
                         Username = @"BanchoBot",
                         Id = 3,

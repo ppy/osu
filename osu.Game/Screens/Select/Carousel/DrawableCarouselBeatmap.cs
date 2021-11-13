@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Select.Carousel
                                     {
                                         new OsuSpriteText
                                         {
-                                            Text = beatmapInfo.Version,
+                                            Text = beatmapInfo.DifficultyName,
                                             Font = OsuFont.GetFont(size: 20),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = $"{(beatmapInfo.Metadata ?? beatmapInfo.BeatmapSet.Metadata).Author?.Username ?? string.Empty}",
+                                            Text = $"{(beatmapInfo.Metadata ?? beatmapInfo.BeatmapSet.Metadata).Author.Username}",
                                             Font = OsuFont.GetFont(italics: true),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
@@ -238,8 +238,8 @@ namespace osu.Game.Screens.Select.Carousel
                 if (editRequested != null)
                     items.Add(new OsuMenuItem("编辑", MenuItemType.Standard, () => editRequested(beatmapInfo)));
 
-                if (beatmapInfo.OnlineBeatmapID.HasValue && beatmapOverlay != null)
-                    items.Add(new OsuMenuItem("细节", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineBeatmapID.Value)));
+                if (beatmapInfo.OnlineID.HasValue && beatmapOverlay != null)
+                    items.Add(new OsuMenuItem("细节", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID.Value)));
 
                 if (collectionManager != null)
                 {

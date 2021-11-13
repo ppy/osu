@@ -16,13 +16,13 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
-using osu.Game.IPC;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Scores.IO;
-using osu.Game.Users;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
@@ -388,6 +388,41 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        public async Task TestModelCreationFailureDoesntReturn()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+                    var importer = osu.Dependencies.Get<BeatmapManager>();
+
+                    var progressNotification = new ImportProgressNotification();
+
+                    var zipStream = new MemoryStream();
+
+                    using (var zip = ZipArchive.Create())
+                        zip.SaveTo(zipStream, new ZipWriterOptions(CompressionType.Deflate));
+
+                    var imported = await importer.Import(
+                        progressNotification,
+                        new ImportTask(zipStream, string.Empty)
+                    );
+
+                    checkBeatmapSetCount(osu, 0);
+                    checkBeatmapCount(osu, 0);
+
+                    Assert.IsEmpty(imported);
+                    Assert.AreEqual(ProgressNotificationState.Cancelled, progressNotification.State);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
         public async Task TestRollbackOnFailure()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
@@ -408,8 +443,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
                     // ReSharper disable once AccessToModifiedClosure
-                    manager.ItemUpdated.BindValueChanged(_ => Interlocked.Increment(ref itemAddRemoveFireCount));
-                    manager.ItemRemoved.BindValueChanged(_ => Interlocked.Increment(ref itemAddRemoveFireCount));
+                    manager.ItemUpdated += _ => Interlocked.Increment(ref itemAddRemoveFireCount);
+                    manager.ItemRemoved += _ => Interlocked.Increment(ref itemAddRemoveFireCount);
 
                     var imported = await LoadOszIntoOsu(osu);
 
@@ -506,7 +541,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var imported = await LoadOszIntoOsu(osu);
 
                     foreach (var b in imported.Beatmaps)
-                        b.OnlineBeatmapID = null;
+                        b.OnlineID = null;
 
                     osu.Dependencies.Get<BeatmapManager>().Update(imported);
 
@@ -545,19 +580,19 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     var toImport = new BeatmapSetInfo
                     {
-                        OnlineBeatmapSetID = 1,
+                        OnlineID = 1,
                         Metadata = metadata,
                         Beatmaps = new List<BeatmapInfo>
                         {
                             new BeatmapInfo
                             {
-                                OnlineBeatmapID = 2,
+                                OnlineID = 2,
                                 Metadata = metadata,
                                 BaseDifficulty = difficulty
                             },
                             new BeatmapInfo
                             {
-                                OnlineBeatmapID = 2,
+                                OnlineID = 2,
                                 Metadata = metadata,
                                 Status = BeatmapSetOnlineStatus.Loved,
                                 BaseDifficulty = difficulty
@@ -570,8 +605,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var imported = await manager.Import(toImport);
 
                     Assert.NotNull(imported);
-                    Assert.AreEqual(null, imported.Value.Beatmaps[0].OnlineBeatmapID);
-                    Assert.AreEqual(null, imported.Value.Beatmaps[1].OnlineBeatmapID);
+                    Assert.AreEqual(null, imported.Value.Beatmaps[0].OnlineID);
+                    Assert.AreEqual(null, imported.Value.Beatmaps[1].OnlineID);
                 }
                 finally
                 {
@@ -790,12 +825,12 @@ namespace osu.Game.Tests.Beatmaps.IO
                     // Update via the beatmap, not the beatmap info, to ensure correct linking
                     BeatmapSetInfo setToUpdate = manager.GetAllUsableBeatmapSets()[0];
                     Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
-                    beatmapToUpdate.BeatmapInfo.Version = "updated";
+                    beatmapToUpdate.BeatmapInfo.DifficultyName = "updated";
 
                     manager.Update(setToUpdate);
 
                     BeatmapInfo updatedInfo = manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID);
-                    Assert.That(updatedInfo.Version, Is.EqualTo("updated"));
+                    Assert.That(updatedInfo.DifficultyName, Is.EqualTo("updated"));
                 }
                 finally
                 {
@@ -859,11 +894,11 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
-                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, APIUser.SYSTEM_USER);
 
                     var beatmap = working.Beatmap;
 
-                    beatmap.BeatmapInfo.Version = "difficulty";
+                    beatmap.BeatmapInfo.DifficultyName = "difficulty";
                     beatmap.BeatmapInfo.Metadata = new BeatmapMetadata
                     {
                         Artist = "Artist/With\\Slashes",
@@ -892,7 +927,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = LoadOsuIntoHost(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
-                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, APIUser.SYSTEM_USER);
 
                     manager.Save(working.BeatmapInfo, working.Beatmap);
 
@@ -919,7 +954,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = LoadOsuIntoHost(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
-                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, APIUser.SYSTEM_USER);
 
                     ((Beatmap)working.Beatmap).HitObjects.Add(new HitCircle { StartTime = 5000 });
 
@@ -1020,13 +1055,13 @@ namespace osu.Game.Tests.Beatmaps.IO
         {
             IEnumerable<BeatmapSetInfo> resultSets = null;
             var store = osu.Dependencies.Get<BeatmapManager>();
-            waitForOrAssert(() => (resultSets = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526)).Any(),
+            waitForOrAssert(() => (resultSets = store.QueryBeatmapSets(s => s.OnlineID == 241526)).Any(),
                 @"BeatmapSet did not import to the database in allocated time.", timeout);
 
             // ensure we were stored to beatmap database backing...
             Assert.IsTrue(resultSets.Count() == 1, $@"Incorrect result count found ({resultSets.Count()} but should be 1).");
-            IEnumerable<BeatmapInfo> queryBeatmaps() => store.QueryBeatmaps(s => s.BeatmapSet.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0);
-            IEnumerable<BeatmapSetInfo> queryBeatmapSets() => store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526);
+            IEnumerable<BeatmapInfo> queryBeatmaps() => store.QueryBeatmaps(s => s.BeatmapSet.OnlineID == 241526 && s.BaseDifficultyID > 0);
+            IEnumerable<BeatmapSetInfo> queryBeatmapSets() => store.QueryBeatmapSets(s => s.OnlineID == 241526);
 
             // if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
             waitForOrAssert(() => queryBeatmaps().Count() == 12,
@@ -1042,7 +1077,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var set = queryBeatmapSets().First();
             foreach (BeatmapInfo b in set.Beatmaps)
-                Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID));
+                Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineID == b.OnlineID));
             Assert.IsTrue(set.Beatmaps.Count > 0);
             var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Any() == true);

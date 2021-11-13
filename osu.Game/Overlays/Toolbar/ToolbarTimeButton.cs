@@ -5,7 +5,6 @@ using System;
 using System.Globalization;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -15,8 +14,6 @@ namespace osu.Game.Overlays.Toolbar
     public class ToolbarTimeButton : ToolbarButton
     {
         private readonly TimeSpan launchTick = new TimeSpan(DateTime.Now.Ticks);
-        private IBindable<WeakReference<BeatmapSetInfo>> beatmapUpdated;
-        private IBindable<WeakReference<BeatmapSetInfo>> beatmapRemoved;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -29,8 +26,8 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmapUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
-            beatmapRemoved = beatmapManager.ItemRemoved.GetBoundCopy();
+            beatmapManager.ItemUpdated += _ => updateBeatmapTooltip();
+            beatmapManager.ItemRemoved += _ => updateBeatmapTooltip();
         }
 
         protected override void LoadComplete()
@@ -38,8 +35,7 @@ namespace osu.Game.Overlays.Toolbar
             base.LoadComplete();
 
             updateTime();
-            beatmapUpdated.BindValueChanged(_ => updateBeatmapTooltip(), true);
-            beatmapRemoved.BindValueChanged(_ => updateBeatmapTooltip());
+            updateBeatmapTooltip();
         }
 
         private void updateTime()

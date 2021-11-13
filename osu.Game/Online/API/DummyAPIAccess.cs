@@ -6,19 +6,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
     public class DummyAPIAccess : Component, IAPIProvider
     {
-        public Bindable<User> LocalUser { get; } = new Bindable<User>(new User
+        public Bindable<APIUser> LocalUser { get; } = new Bindable<APIUser>(new APIUser
         {
             Username = @"Dummy",
             Id = 1001,
         });
 
-        public BindableList<User> Friends { get; } = new BindableList<User>();
+        public BindableList<APIUser> Friends { get; } = new BindableList<APIUser>();
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
@@ -90,7 +91,7 @@ namespace osu.Game.Online.API
             }
 
             LastLoginError = null;
-            LocalUser.Value = new User
+            LocalUser.Value = new APIUser
             {
                 Username = username,
                 Id = 1001,
@@ -115,8 +116,8 @@ namespace osu.Game.Online.API
 
         public void SetState(APIState newState) => state.Value = newState;
 
-        IBindable<User> IAPIProvider.LocalUser => LocalUser;
-        IBindableList<User> IAPIProvider.Friends => Friends;
+        IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
+        IBindableList<APIUser> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
 
         public void FailNextLogin() => shouldFailNextLogin = true;

@@ -92,6 +92,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
             new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridDisplayMode),
+            new KeyBinding(new[] { InputKey.F5 }, GlobalAction.EditorTestGameplay),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -334,6 +335,9 @@ namespace osu.Game.Input.Bindings
         ToggleChatFocus,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridDisplayMode))]
-        EditorCycleGridDisplayMode
+        EditorCycleGridDisplayMode,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestGameplay))]
+        EditorTestGameplay
     }
 }

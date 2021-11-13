@@ -10,6 +10,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -97,16 +98,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddAssert("user on team 0", () => (client.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddStep("add another user", () => client.AddUser(new APIUser { Username = "otheruser", Id = 44 }));
 
-            AddStep("press button", () =>
+            AddStep("press own button", () =>
             {
                 InputManager.MoveMouseTo(multiplayerScreenStack.ChildrenOfType<TeamDisplay>().First());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("user on team 1", () => (client.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 1);
 
-            AddStep("press button", () => InputManager.Click(MouseButton.Left));
+            AddStep("press own button again", () => InputManager.Click(MouseButton.Left));
             AddAssert("user on team 0", () => (client.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+
+            AddStep("press other user's button", () =>
+            {
+                InputManager.MoveMouseTo(multiplayerScreenStack.ChildrenOfType<TeamDisplay>().ElementAt(1));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("user still on team 0", () => (client.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
         }
 
         [Test]
@@ -127,9 +136,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("room type is head to head", () => client.Room?.Settings.MatchType == MatchType.HeadToHead);
 
+            AddUntilStep("team displays are not displaying teams", () => multiplayerScreenStack.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam == null));
+
             AddStep("change to team vs", () => client.ChangeSettings(matchType: MatchType.TeamVersus));
 
             AddAssert("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
+
+            AddUntilStep("team displays are displaying teams", () => multiplayerScreenStack.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam != null));
         }
 
         private void createRoom(Func<Room> room)

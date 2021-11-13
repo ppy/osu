@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -70,6 +71,7 @@ namespace osu.Game.Screens.Play
         private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
 
         private AudioFilter lowPassFilter;
+        private AudioFilter highPassFilter;
 
         protected bool BackgroundBrightnessReduction
         {
@@ -172,7 +174,8 @@ namespace osu.Game.Screens.Play
                     },
                     idleTracker = new IdleTracker(750),
                 }),
-                lowPassFilter = new AudioFilter(audio.TrackMixer)
+                lowPassFilter = new AudioFilter(audio.TrackMixer),
+                highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass)
             };
 
             optui.BindValueChanged(_ => updateExtraDelay());
@@ -259,6 +262,7 @@ namespace osu.Game.Screens.Play
             Beatmap.Value.Track.Stop();
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
+            highPassFilter.CutoffTo(0);
         }
 
         public override bool OnExiting(IScreen next)
@@ -286,9 +290,9 @@ namespace osu.Game.Screens.Play
 
             const double duration = 300;
 
-            if (!resuming) logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
+            if (!resuming) logo.MoveTo(new Vector2(0.5f), duration, Easing.OutQuint);
 
-            logo.ScaleTo(new Vector2(0.15f), duration, Easing.In);
+            logo.ScaleTo(new Vector2(0.15f), duration, Easing.OutQuint);
             logo.FadeIn(350);
 
             Scheduler.AddDelayed(() =>
@@ -372,6 +376,7 @@ namespace osu.Game.Screens.Play
             content.FadeInFromZero(400);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
             lowPassFilter.CutoffTo(1000, 650, Easing.OutQuint);
+            highPassFilter.CutoffTo(300).Then().CutoffTo(0, 1250); // 1250 is to line up with the appearance of MetadataInfo (750 delay + 500 fade-in)
 
             ApplyToBackground(b => b?.FadeColour(Color4.White, 800, Easing.OutQuint));
         }
@@ -384,6 +389,7 @@ namespace osu.Game.Screens.Play
             content.ScaleTo(0.7f, content_out_duration * 2, Easing.OutQuint);
             content.FadeOut(content_out_duration, Easing.OutQuint);
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, content_out_duration);
+            highPassFilter.CutoffTo(0, content_out_duration);
         }
 
         private void pushWhenLoaded()

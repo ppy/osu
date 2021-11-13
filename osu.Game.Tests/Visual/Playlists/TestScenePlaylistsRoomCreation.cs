@@ -121,8 +121,8 @@ namespace osu.Game.Tests.Visual.Playlists
                 beatmap.BeatmapInfo.BaseDifficulty.CircleSize = 1;
 
                 // intentionally increment online IDs to clash with import below.
-                beatmap.BeatmapInfo.OnlineBeatmapID++;
-                beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID++;
+                beatmap.BeatmapInfo.OnlineID++;
+                beatmap.BeatmapInfo.BeatmapSet.OnlineID++;
 
                 importedSet = manager.Import(beatmap.BeatmapInfo.BeatmapSet).Result.Value;
             });

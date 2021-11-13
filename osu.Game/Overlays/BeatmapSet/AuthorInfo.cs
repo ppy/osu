@@ -13,9 +13,9 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Users;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 };
             }
 
-            public Field(string first, User second, FontUsage secondFont)
+            public Field(string first, APIUser second, FontUsage secondFont)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;

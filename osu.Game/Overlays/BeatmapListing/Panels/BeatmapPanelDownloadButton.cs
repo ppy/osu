@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                     case DownloadState.LocallyAvailable:
                         Predicate<BeatmapInfo> findPredicate = null;
                         if (SelectedBeatmap.Value != null)
-                            findPredicate = b => b.OnlineBeatmapID == SelectedBeatmap.Value.OnlineID;
+                            findPredicate = b => b.OnlineID == SelectedBeatmap.Value.OnlineID;
 
                         game?.PresentBeatmap(beatmapSet, findPredicate);
                         break;

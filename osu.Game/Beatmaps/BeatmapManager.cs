@@ -10,7 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
+using osu.Framework.Audio.Mixing;
+using osu.Framework.Audio.Track;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -18,10 +19,10 @@ using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
@@ -31,18 +32,23 @@ namespace osu.Game.Beatmaps
     [ExcludeFromDynamicCompile]
     public class BeatmapManager : IModelDownloader<IBeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
+        public ITrackStore BeatmapTrackStore { get; }
+
         private readonly BeatmapModelManager beatmapModelManager;
         private readonly BeatmapModelDownloader beatmapModelDownloader;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue onlineBeatmapLookupQueue;
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null,
-                              WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false, AudioMixer mainTrackMixer = null)
         {
+            var userResources = new FileStore(contextFactory, storage).Store;
+
+            BeatmapTrackStore = audioManager.GetTrackStore(userResources);
+
             beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, api, host);
             beatmapModelDownloader = CreateBeatmapModelDownloader(beatmapModelManager, api, host);
-            workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, resources, new FileStore(contextFactory, storage).Store, defaultBeatmap, host);
+            workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
 
             workingBeatmapCache.BeatmapManager = beatmapModelManager;
             beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
@@ -59,8 +65,10 @@ namespace osu.Game.Beatmaps
             return new BeatmapModelDownloader(modelManager, api, host);
         }
 
-        protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host) =>
-            new WorkingBeatmapCache(audioManager, resources, storage, defaultBeatmap, host);
+        protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host)
+        {
+            return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
+        }
 
         protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host) =>
             new BeatmapModelManager(storage, contextFactory, rulesets, host);
@@ -68,7 +76,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Create a new <see cref="WorkingBeatmap"/>.
         /// </summary>
-        public WorkingBeatmap CreateNew(RulesetInfo ruleset, User user)
+        public WorkingBeatmap CreateNew(RulesetInfo ruleset, APIUser user)
         {
             var metadata = new BeatmapMetadata
             {
@@ -101,12 +109,20 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Fired when a single difficulty has been hidden.
         /// </summary>
-        public IBindable<WeakReference<BeatmapInfo>> BeatmapHidden => beatmapModelManager.BeatmapHidden;
+        public event Action<BeatmapInfo> BeatmapHidden
+        {
+            add => beatmapModelManager.BeatmapHidden += value;
+            remove => beatmapModelManager.BeatmapHidden -= value;
+        }
 
         /// <summary>
         /// Fired when a single difficulty has been restored.
         /// </summary>
-        public IBindable<WeakReference<BeatmapInfo>> BeatmapRestored => beatmapModelManager.BeatmapRestored;
+        public event Action<BeatmapInfo> BeatmapRestored
+        {
+            add => beatmapModelManager.BeatmapRestored += value;
+            remove => beatmapModelManager.BeatmapRestored -= value;
+        }
 
         /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
@@ -198,9 +214,17 @@ namespace osu.Game.Beatmaps
             return beatmapModelManager.IsAvailableLocally(model);
         }
 
-        public IBindable<WeakReference<BeatmapSetInfo>> ItemUpdated => beatmapModelManager.ItemUpdated;
+        public event Action<BeatmapSetInfo> ItemUpdated
+        {
+            add => beatmapModelManager.ItemUpdated += value;
+            remove => beatmapModelManager.ItemUpdated -= value;
+        }
 
-        public IBindable<WeakReference<BeatmapSetInfo>> ItemRemoved => beatmapModelManager.ItemRemoved;
+        public event Action<BeatmapSetInfo> ItemRemoved
+        {
+            add => beatmapModelManager.ItemRemoved += value;
+            remove => beatmapModelManager.ItemRemoved -= value;
+        }
 
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {
@@ -250,22 +274,26 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelDownloader<BeatmapSetInfo>
 
+        public event Action<ArchiveDownloadRequest<IBeatmapSetInfo>> DownloadBegan
+        {
+            add => beatmapModelDownloader.DownloadBegan += value;
+            remove => beatmapModelDownloader.DownloadBegan -= value;
+        }
+
+        public event Action<ArchiveDownloadRequest<IBeatmapSetInfo>> DownloadFailed
+        {
+            add => beatmapModelDownloader.DownloadFailed += value;
+            remove => beatmapModelDownloader.DownloadFailed -= value;
+        }
+
+        public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false) =>
+            beatmapModelDownloader.Download(model, minimiseDownloadSize);
+
         public bool AccelDownload(IBeatmapSetInfo model, bool noVideo)
             => beatmapModelDownloader.AccelDownload(model, noVideo);
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> DownloadBegan => beatmapModelDownloader.DownloadBegan;
-
-        public IBindable<WeakReference<ArchiveDownloadRequest<IBeatmapSetInfo>>> DownloadFailed => beatmapModelDownloader.DownloadFailed;
-
-        public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false)
-        {
-            return beatmapModelDownloader.Download(model, minimiseDownloadSize);
-        }
-
-        public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model)
-        {
-            return beatmapModelDownloader.GetExistingDownload(model);
-        }
+        public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model) =>
+            beatmapModelDownloader.GetExistingDownload(model);
 
         #endregion
 

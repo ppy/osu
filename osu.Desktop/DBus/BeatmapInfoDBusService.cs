@@ -110,13 +110,13 @@ namespace osu.Desktop.DBus
         {
             set
             {
-                setProperty(nameof(properties.FullName), (value.Metadata.ArtistUnicode ?? value.Metadata.Artist)
+                setProperty(nameof(properties.FullName), (value.Metadata.ArtistUnicode)
                                                          + " - "
-                                                         + (value.Metadata.TitleUnicode ?? value.Metadata.Title));
+                                                         + (value.Metadata.TitleUnicode));
 
-                setProperty(nameof(properties.Version), value.BeatmapInfo.Version ?? "???");
-                setProperty(nameof(properties.Stars), value.BeatmapInfo.StarDifficulty);
-                setProperty(nameof(properties.OnlineID), value.BeatmapInfo.OnlineBeatmapID ?? -1);
+                setProperty(nameof(properties.Version), value.BeatmapInfo.DifficultyName ?? "???");
+                setProperty(nameof(properties.Stars), value.BeatmapInfo.StarRating);
+                setProperty(nameof(properties.OnlineID), value.BeatmapInfo.OnlineID ?? -1);
                 setProperty(nameof(properties.BPM), value.BeatmapInfo.BPM);
                 setProperty(nameof(properties.CoverPath), resolveBeatmapCoverUrl(value));
             }
@@ -174,7 +174,7 @@ namespace osu.Desktop.DBus
         private string resolveBeatmapCoverUrl(WorkingBeatmap beatmap)
         {
             string body;
-            var backgroundFilename = beatmap?.BeatmapInfo.Metadata?.BackgroundFile;
+            string backgroundFilename = beatmap?.BeatmapInfo.Metadata?.BackgroundFile;
 
             if (!string.IsNullOrEmpty(backgroundFilename))
             {

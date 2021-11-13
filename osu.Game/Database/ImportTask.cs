@@ -47,10 +47,30 @@ namespace osu.Game.Database
         /// </summary>
         public ArchiveReader GetReader()
         {
-            if (Stream != null)
-                return new ZipArchiveReader(Stream, Path);
+            return Stream != null
+                ? getReaderFrom(Stream)
+                : getReaderFrom(Path);
+        }
 
-            return getReaderFrom(Path);
+        /// <summary>
+        /// Creates an <see cref="ArchiveReader"/> from a stream.
+        /// </summary>
+        /// <param name="stream">A seekable stream containing the archive content.</param>
+        /// <returns>A reader giving access to the archive's content.</returns>
+        private ArchiveReader getReaderFrom(Stream stream)
+        {
+            if (!(stream is MemoryStream memoryStream))
+            {
+                // This isn't used in any current path. May need to reconsider for performance reasons (ie. if we don't expect the incoming stream to be copied out).
+                byte[] buffer = new byte[stream.Length];
+                stream.Read(buffer, 0, (int)stream.Length);
+                memoryStream = new MemoryStream(buffer);
+            }
+
+            if (ZipUtils.IsZipArchive(memoryStream))
+                return new ZipArchiveReader(memoryStream, Path);
+
+            return new LegacyByteArrayReader(memoryStream.ToArray(), Path);
         }
 
         /// <summary>

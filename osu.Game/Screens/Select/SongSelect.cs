@@ -110,6 +110,8 @@ namespace osu.Game.Screens.Select
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
+        private double audioFeedbackLastPlaybackTime;
+
         [Resolved]
         private MusicController music { get; set; }
 
@@ -451,6 +453,7 @@ namespace osu.Game.Screens.Select
         }
 
         // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
+        private BeatmapInfo beatmapInfoPrevious;
         private BeatmapInfo beatmapInfoNoDebounce;
         private RulesetInfo rulesetNoDebounce;
 
@@ -493,6 +496,21 @@ namespace osu.Game.Screens.Select
             else
                 selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
 
+            if (beatmap != beatmapInfoPrevious)
+            {
+                if (beatmap != null && beatmapInfoPrevious != null && Time.Current - audioFeedbackLastPlaybackTime >= 50)
+                {
+                    if (beatmap.BeatmapSetInfoID == beatmapInfoPrevious.BeatmapSetInfoID)
+                        sampleChangeDifficulty.Play();
+                    else
+                        sampleChangeBeatmap.Play();
+
+                    audioFeedbackLastPlaybackTime = Time.Current;
+                }
+
+                beatmapInfoPrevious = beatmap;
+            }
+
             void run()
             {
                 // clear pending task immediately to track any potential nested debounce operation.
@@ -524,18 +542,7 @@ namespace osu.Game.Screens.Select
                 if (!EqualityComparer<BeatmapInfo>.Default.Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
-
-                    int? lastSetID = Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
-
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
-
-                    if (beatmap != null)
-                    {
-                        if (beatmap.BeatmapSetInfoID == lastSetID)
-                            sampleChangeDifficulty.Play();
-                        else
-                            sampleChangeBeatmap.Play();
-                    }
                 }
 
                 if (this.IsCurrentScreen())

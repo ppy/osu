@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Humanizer;
-using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 
@@ -20,13 +20,9 @@ namespace osu.Game.Database
     {
         public Action<Notification> PostNotification { protected get; set; }
 
-        public IBindable<WeakReference<ArchiveDownloadRequest<T>>> DownloadBegan => downloadBegan;
+        public event Action<ArchiveDownloadRequest<T>> DownloadBegan;
 
-        private readonly Bindable<WeakReference<ArchiveDownloadRequest<T>>> downloadBegan = new Bindable<WeakReference<ArchiveDownloadRequest<T>>>();
-
-        public IBindable<WeakReference<ArchiveDownloadRequest<T>>> DownloadFailed => downloadFailed;
-
-        private readonly Bindable<WeakReference<ArchiveDownloadRequest<T>>> downloadFailed = new Bindable<WeakReference<ArchiveDownloadRequest<T>>>();
+        public event Action<ArchiveDownloadRequest<T>> DownloadFailed;
 
         private readonly IModelImporter<TModel> importer;
         private readonly IAPIProvider api;
@@ -69,7 +65,7 @@ namespace osu.Game.Database
 
             DownloadNotification notification = new DownloadNotification
             {
-                Text = $"正在下载 {request.Model}"
+                Text = $"正在下载 {request.Model.GetDisplayString()}",
             };
 
             request.DownloadProgressed += progress =>
@@ -87,7 +83,7 @@ namespace osu.Game.Database
 
                     // for now a failed import will be marked as a failed download for simplicity.
                     if (!imported.Any())
-                        downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
+                        DownloadFailed?.Invoke(request);
 
                     CurrentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
@@ -106,16 +102,14 @@ namespace osu.Game.Database
 
             api.PerformAsync(request);
 
-            downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
+            DownloadBegan?.Invoke(request);
             return true;
 
             void triggerFailure(Exception error)
             {
                 CurrentDownloads.Remove(request);
 
-                downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
-
-                downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<T>>(request);
+                DownloadFailed?.Invoke(request);
 
                 notification.State = ProgressNotificationState.Cancelled;
 
