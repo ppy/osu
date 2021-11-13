@@ -237,6 +237,10 @@ namespace osu.Game.Tests.Visual.Editing
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
             var textBox = popover.ChildrenOfType<LabelledTextBox>().First();
             textBox.Current.Value = bank;
+            // force a commit via keyboard.
+            // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
+            InputManager.ChangeFocus(textBox);
+            InputManager.Key(Key.Enter);
         });
 
         private void hitObjectHasSampleBank(int objectIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} has bank {bank}", () =>

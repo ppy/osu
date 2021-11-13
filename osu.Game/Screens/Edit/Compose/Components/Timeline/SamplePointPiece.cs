@@ -99,19 +99,29 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 var relevantControlPoints = relevantObjects.Select(h => h.SampleControlPoint).ToArray();
 
                 // even if there are multiple objects selected, we can still display sample volume or bank if they all have the same value.
-                string? commonBank = relevantControlPoints.Select(point => point.SampleBank).Distinct().Count() == 1 ? relevantControlPoints.First().SampleBank : null;
-
+                string? commonBank = getCommonBank(relevantControlPoints);
                 if (!string.IsNullOrEmpty(commonBank))
                     bank.Current.Value = commonBank;
 
-                int? commonVolume = relevantControlPoints.Select(point => point.SampleVolume).Distinct().Count() == 1 ? (int?)relevantControlPoints.First().SampleVolume : null;
-
+                int? commonVolume = getCommonVolume(relevantControlPoints);
                 if (commonVolume != null)
                     volume.Current.Value = commonVolume.Value;
 
-                bank.Current.BindValueChanged(val => updateBankFor(relevantObjects, val.NewValue));
+                updateBankPlaceholderText(relevantObjects);
+                bank.Current.BindValueChanged(val =>
+                {
+                    updateBankFor(relevantObjects, val.NewValue);
+                    updateBankPlaceholderText(relevantObjects);
+                });
+                // on commit, ensure that the value is correct by sourcing it from the objects' control points again.
+                // this ensures that committing empty text causes a revert to the previous value.
+                bank.OnCommit += (_, __) => bank.Current.Value = getCommonBank(relevantControlPoints);
+
                 volume.Current.BindValueChanged(val => updateVolumeFor(relevantObjects, val.NewValue));
             }
+
+            private static string? getCommonBank(SampleControlPoint[] relevantControlPoints) => relevantControlPoints.Select(point => point.SampleBank).Distinct().Count() == 1 ? relevantControlPoints.First().SampleBank : null;
+            private static int? getCommonVolume(SampleControlPoint[] relevantControlPoints) => relevantControlPoints.Select(point => point.SampleVolume).Distinct().Count() == 1 ? (int?)relevantControlPoints.First().SampleVolume : null;
 
             private void updateBankFor(IEnumerable<HitObject> objects, string? newBank)
             {
@@ -127,6 +137,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
 
                 beatmap.EndChange();
+            }
+
+            private void updateBankPlaceholderText(IEnumerable<HitObject> objects)
+            {
+                string? commonBank = getCommonBank(objects.Select(h => h.SampleControlPoint).ToArray());
+                bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : null;
             }
 
             private void updateVolumeFor(IEnumerable<HitObject> objects, int? newVolume)
