@@ -84,8 +84,8 @@ namespace osu.Game.Beatmaps
                 {
                     beatmapInfo.Status = res.Status;
                     beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapSetOnlineStatus.None;
-                    beatmapInfo.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-                    beatmapInfo.OnlineBeatmapID = res.OnlineID;
+                    beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
+                    beatmapInfo.OnlineID = res.OnlineID;
 
                     if (beatmapInfo.Metadata != null)
                         beatmapInfo.Metadata.AuthorID = res.AuthorID;
@@ -103,7 +103,7 @@ namespace osu.Game.Beatmaps
 
             void fail(Exception e)
             {
-                beatmapInfo.OnlineBeatmapID = null;
+                beatmapInfo.OnlineID = null;
                 logForModel(set, $"Online retrieval failed for {beatmapInfo} ({e.Message})");
             }
         }
@@ -161,7 +161,7 @@ namespace osu.Game.Beatmaps
 
             if (string.IsNullOrEmpty(beatmapInfo.MD5Hash)
                 && string.IsNullOrEmpty(beatmapInfo.Path)
-                && beatmapInfo.OnlineBeatmapID == null)
+                && beatmapInfo.OnlineID == null)
                 return false;
 
             try
@@ -172,10 +172,10 @@ namespace osu.Game.Beatmaps
 
                     using (var cmd = db.CreateCommand())
                     {
-                        cmd.CommandText = "SELECT beatmapset_id, beatmap_id, approved, user_id FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path";
+                        cmd.CommandText = "SELECT beatmapset_id, beatmap_id, approved, user_id FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineID OR filename = @Path";
 
                         cmd.Parameters.Add(new SqliteParameter("@MD5Hash", beatmapInfo.MD5Hash));
-                        cmd.Parameters.Add(new SqliteParameter("@OnlineBeatmapID", beatmapInfo.OnlineBeatmapID ?? (object)DBNull.Value));
+                        cmd.Parameters.Add(new SqliteParameter("@OnlineID", beatmapInfo.OnlineID ?? (object)DBNull.Value));
                         cmd.Parameters.Add(new SqliteParameter("@Path", beatmapInfo.Path));
 
                         using (var reader = cmd.ExecuteReader())
@@ -186,8 +186,8 @@ namespace osu.Game.Beatmaps
 
                                 beatmapInfo.Status = status;
                                 beatmapInfo.BeatmapSet.Status = status;
-                                beatmapInfo.BeatmapSet.OnlineBeatmapSetID = reader.GetInt32(0);
-                                beatmapInfo.OnlineBeatmapID = reader.GetInt32(1);
+                                beatmapInfo.BeatmapSet.OnlineID = reader.GetInt32(0);
+                                beatmapInfo.OnlineID = reader.GetInt32(1);
 
                                 if (beatmapInfo.Metadata != null)
                                     beatmapInfo.Metadata.AuthorID = reader.GetInt32(3);

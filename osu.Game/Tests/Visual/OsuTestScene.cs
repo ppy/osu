@@ -203,7 +203,7 @@ namespace osu.Game.Tests.Visual
 
             return new APIBeatmapSet
             {
-                OnlineID = beatmap.BeatmapSet.OnlineID,
+                OnlineID = ((IBeatmapSetInfo)beatmap.BeatmapSet).OnlineID,
                 Status = BeatmapSetOnlineStatus.Ranked,
                 Covers = new BeatmapSetOnlineCovers
                 {
@@ -216,22 +216,20 @@ namespace osu.Game.Tests.Visual
                 Artist = beatmap.BeatmapSet.Metadata.Artist,
                 ArtistUnicode = beatmap.BeatmapSet.Metadata.ArtistUnicode,
                 Author = beatmap.BeatmapSet.Metadata.Author,
-                AuthorID = beatmap.BeatmapSet.Metadata.AuthorID,
-                AuthorString = beatmap.BeatmapSet.Metadata.AuthorString,
                 Source = beatmap.BeatmapSet.Metadata.Source,
                 Tags = beatmap.BeatmapSet.Metadata.Tags,
                 Beatmaps = new[]
                 {
                     new APIBeatmap
                     {
-                        OnlineID = beatmap.OnlineID,
-                        OnlineBeatmapSetID = beatmap.BeatmapSet.OnlineID,
+                        OnlineID = ((IBeatmapInfo)beatmap).OnlineID,
+                        OnlineBeatmapSetID = ((IBeatmapSetInfo)beatmap.BeatmapSet).OnlineID,
                         Status = beatmap.Status,
                         Checksum = beatmap.MD5Hash,
-                        AuthorID = beatmap.Metadata.AuthorID,
+                        AuthorID = beatmap.Metadata.Author.OnlineID,
                         RulesetID = beatmap.RulesetID,
-                        StarRating = beatmap.StarDifficulty,
-                        DifficultyName = beatmap.Version,
+                        StarRating = beatmap.StarRating,
+                        DifficultyName = beatmap.DifficultyName,
                     }
                 }
             };

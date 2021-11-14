@@ -170,6 +170,11 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorCycleGridDisplayMode => new TranslatableString(getKey(@"editor_cycle_grid_display_mode"), @"Cycle grid display mode");
 
         /// <summary>
+        /// "Test gameplay"
+        /// </summary>
+        public static LocalisableString EditorTestGameplay => new TranslatableString(getKey(@"editor_test_gameplay"), @"Test gameplay");
+
+        /// <summary>
         /// "Hold for HUD"
         /// </summary>
         public static LocalisableString HoldForHUD => new TranslatableString(getKey(@"hold_for_hud"), @"Hold for HUD");

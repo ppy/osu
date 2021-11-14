@@ -9,6 +9,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Replays;
@@ -18,13 +19,12 @@ using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Tests.Visual.Spectator;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSpectator : ScreenTestScene
     {
-        private readonly User streamingUser = new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Test user" };
+        private readonly APIUser streamingUser = new APIUser { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Test user" };
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("import beatmap", () =>
             {
                 importedBeatmap = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).Result;
-                importedBeatmapId = importedBeatmap.Beatmaps.First(b => b.RulesetID == 0).OnlineBeatmapID ?? -1;
+                importedBeatmapId = importedBeatmap.Beatmaps.First(b => b.RulesetID == 0).OnlineID ?? -1;
             });
         }
 

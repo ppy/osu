@@ -27,6 +27,7 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Spectate;
 using osu.Game.Users;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Screens.Play
 {
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.Play
     public class SoloSpectator : SpectatorScreen, IPreviewTrackOwner
     {
         [NotNull]
-        private readonly User targetUser;
+        private readonly APIUser targetUser;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.Play
 
         private APIBeatmapSet beatmapSet;
 
-        public SoloSpectator([NotNull] User targetUser)
+        public SoloSpectator([NotNull] APIUser targetUser)
             : base(targetUser.Id)
         {
             this.targetUser = targetUser;
@@ -240,7 +241,7 @@ namespace osu.Game.Screens.Play
             if (!automaticDownload.Current.Value)
                 return;
 
-            if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineBeatmapSetID = beatmapSet.OnlineID }))
+            if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmapSet.OnlineID }))
                 return;
 
             beatmaps.Download(beatmapSet);

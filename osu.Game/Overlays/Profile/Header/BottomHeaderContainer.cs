@@ -14,7 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osuTK.Graphics;
 
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public class BottomHeaderContainer : CompositeDrawable
     {
-        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
         private LinkFlowContainer topLinkContainer;
         private LinkFlowContainer bottomLinkContainer;
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Profile.Header
             User.BindValueChanged(user => updateDisplay(user.NewValue));
         }
 
-        private void updateDisplay(User user)
+        private void updateDisplay(APIUser user)
         {
             topLinkContainer.Clear();
             bottomLinkContainer.Clear();

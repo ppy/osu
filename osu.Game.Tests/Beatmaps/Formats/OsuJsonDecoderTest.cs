@@ -31,11 +31,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var beatmap = decodeAsJson(normal);
             var meta = beatmap.BeatmapInfo.Metadata;
-            Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID);
+            Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet.OnlineID);
             Assert.AreEqual("Soleily", meta.Artist);
             Assert.AreEqual("Soleily", meta.ArtistUnicode);
             Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", meta.AudioFile);
-            Assert.AreEqual("Gamu", meta.AuthorString);
+            Assert.AreEqual("Gamu", meta.Author.Username);
             Assert.AreEqual("machinetop_background.jpg", meta.BackgroundFile);
             Assert.AreEqual(164471, meta.PreviewTime);
             Assert.AreEqual(string.Empty, meta.Source);

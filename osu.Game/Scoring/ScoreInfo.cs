@@ -10,10 +10,10 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Users;
 using osu.Game.Utils;
 
 namespace osu.Game.Scoring
@@ -105,7 +105,7 @@ namespace osu.Game.Scoring
         }
 
         [NotMapped]
-        public User User { get; set; }
+        public APIUser User { get; set; }
 
         [Column("User")]
         public string UserString
@@ -113,7 +113,7 @@ namespace osu.Game.Scoring
             get => User?.Username;
             set
             {
-                User ??= new User();
+                User ??= new APIUser();
                 User.Username = value;
             }
         }
@@ -124,7 +124,7 @@ namespace osu.Game.Scoring
             get => User?.Id ?? 1;
             set
             {
-                User ??= new User();
+                User ??= new APIUser();
                 User.Id = value ?? 1;
             }
         }
@@ -225,7 +225,7 @@ namespace osu.Game.Scoring
             return clone;
         }
 
-        public override string ToString() => $"{User} playing {BeatmapInfo}";
+        public override string ToString() => this.GetDisplayTitle();
 
         public bool Equals(ScoreInfo other)
         {

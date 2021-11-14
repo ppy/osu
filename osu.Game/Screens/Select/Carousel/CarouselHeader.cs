@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Select.Carousel
                     RelativeSizeAxes = Axes.Both,
                 };
 
-                sampleHover = audio.Samples.Get("SongSelect/song-ping");
+                sampleHover = audio.Samples.Get("UI/default-hover");
             }
 
             public bool InsetForBorder

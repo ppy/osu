@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 using osuTK;
 
@@ -18,9 +19,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
 {
     public class FriendDisplay : CompositeDrawable
     {
-        private List<User> users = new List<User>();
+        private List<APIUser> users = new List<APIUser>();
 
-        public List<User> Users
+        public List<APIUser> Users
         {
             get => users;
             set
@@ -41,7 +42,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
         private Container itemsPlaceholder;
         private LoadingLayer loading;
 
-        private readonly IBindableList<User> apiFriends = new BindableList<User>();
+        private readonly IBindableList<APIUser> apiFriends = new BindableList<APIUser>();
 
         public FriendDisplay()
         {
@@ -169,7 +170,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             LoadComponentAsync(createTable(sortedUsers), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
-        private List<User> getUsersInCurrentGroup()
+        private List<APIUser> getUsersInCurrentGroup()
         {
             switch (onlineStreamControl.Current.Value?.Status)
             {
@@ -201,7 +202,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             currentContent.FadeIn(200, Easing.OutQuint);
         }
 
-        private FillFlowContainer createTable(List<User> users)
+        private FillFlowContainer createTable(List<APIUser> users)
         {
             var style = userListToolbar.DisplayStyle.Value;
 
@@ -214,7 +215,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             };
         }
 
-        private UserPanel createUserPanel(User user, OverlayPanelDisplayStyle style)
+        private UserPanel createUserPanel(APIUser user, OverlayPanelDisplayStyle style)
         {
             switch (style)
             {
@@ -235,7 +236,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             }
         }
 
-        private List<User> sortUsers(List<User> unsorted)
+        private List<APIUser> sortUsers(List<APIUser> unsorted)
         {
             switch (userListToolbar.SortCriteria.Value)
             {

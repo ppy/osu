@@ -17,9 +17,9 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         public LocalisableString TooltipText => BeatmapsetsStrings.ShowDetailsDownloadDefault;
 
-        private readonly IBindable<User> localUser = new Bindable<User>();
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
         private ShakeContainer shakeContainer;
         private HeaderButton button;
@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             }, true);
         }
 
-        private void userChanged(ValueChangedEvent<User> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
+        private void userChanged(ValueChangedEvent<APIUser> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
 
         private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
 

@@ -16,6 +16,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Stores;
 using osu.Game.Tests.Resources;
 using Realms;
@@ -368,6 +369,34 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestModelCreationFailureDoesntReturn()
+        {
+            RunTestWithRealmAsync(async (realmFactory, storage) =>
+            {
+                using var importer = new BeatmapImporter(realmFactory, storage);
+                using var store = new RealmRulesetStore(realmFactory, storage);
+
+                var progressNotification = new ImportProgressNotification();
+
+                var zipStream = new MemoryStream();
+
+                using (var zip = ZipArchive.Create())
+                    zip.SaveTo(zipStream, new ZipWriterOptions(CompressionType.Deflate));
+
+                var imported = await importer.Import(
+                    progressNotification,
+                    new ImportTask(zipStream, string.Empty)
+                );
+
+                checkBeatmapSetCount(realmFactory.Context, 0);
+                checkBeatmapCount(realmFactory.Context, 0);
+
+                Assert.IsEmpty(imported);
+                Assert.AreEqual(ProgressNotificationState.Cancelled, progressNotification.State);
+            });
+        }
+
+        [Test]
         public void TestRollbackOnFailure()
         {
             RunTestWithRealmAsync(async (realmFactory, storage) =>
@@ -482,7 +511,10 @@ namespace osu.Game.Tests.Database
                 var metadata = new RealmBeatmapMetadata
                 {
                     Artist = "SomeArtist",
-                    Author = "SomeAuthor"
+                    Author =
+                    {
+                        Username = "SomeAuthor"
+                    }
                 };
 
                 var ruleset = realmFactory.Context.All<RealmRuleset>().First();

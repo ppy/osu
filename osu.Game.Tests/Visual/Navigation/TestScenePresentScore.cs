@@ -39,20 +39,20 @@ namespace osu.Game.Tests.Visual.Navigation
                 beatmap = Game.BeatmapManager.Import(new BeatmapSetInfo
                 {
                     Hash = Guid.NewGuid().ToString(),
-                    OnlineBeatmapSetID = 1,
+                    OnlineID = 1,
                     Metadata = metadata,
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
                         {
-                            OnlineBeatmapID = 1 * 1024,
+                            OnlineID = 1 * 1024,
                             Metadata = metadata,
                             BaseDifficulty = difficulty,
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                         new BeatmapInfo
                         {
-                            OnlineBeatmapID = 1 * 2048,
+                            OnlineID = 1 * 2048,
                             Metadata = metadata,
                             BaseDifficulty = difficulty,
                             Ruleset = new OsuRuleset().RulesetInfo
