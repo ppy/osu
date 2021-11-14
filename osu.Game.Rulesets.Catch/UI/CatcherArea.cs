@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osuTK;
 
@@ -73,8 +72,8 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             Catcher.OnNewResult(hitObject, result);
 
-            if (!result.Type.IsScorable())
-                return;
+            // Ignore JuiceStreams and BananaShowers
+            if (!(hitObject is DrawablePalpableCatchHitObject)) return;
 
             if (hitObject.HitObject.LastInCombo)
             {
