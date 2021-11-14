@@ -48,18 +48,18 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (currentFrame == replayFrames.Count - 1) return;
 
-           // double time = gameplayClock.CurrentTime;
             double time = playfield.Clock.CurrentTime;
 
             bool breakNow = false;
             bool pause = false;
             foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
-                // we are not yet close enough to the object time
+                // We are not yet close enough to the object time
                 if (time < h.HitObject.StartTime - relax_leniency) 
                     break;
                     
-                // already hit or beyond the hittable end time.
+                // Already hit or beyond the hittable end time. 
+                //Here a relax_leniency is used instead of end time because end time causes lags for some reason
                 if (h.IsHit || time > h.HitObject.StartTime + relax_leniency)
                     continue;
 
@@ -84,6 +84,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
             }
 
+            //If it's time to move the cursor, check if it needs to be paused 
+            //(to account for player error when tapping)
+            //If not, catch up to the current position required
             if (Math.Abs(replayFrames[currentFrame + cachedFrames].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
             {
                 if(pause) {
