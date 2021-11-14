@@ -12,6 +12,11 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
 
+//using osuTK.Input;
+using osu.Framework.Logging;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
+
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModAutopilot : Mod, IApplicableFailOverride, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
@@ -36,21 +41,60 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private int currentFrame;
 
+        int cachedFrames = 1;
+        private const float relax_leniency = 3f;
+
         public void Update(Playfield playfield)
         {
             if (currentFrame == replayFrames.Count - 1) return;
 
-            double time = gameplayClock.CurrentTime;
+           // double time = gameplayClock.CurrentTime;
+            double time = playfield.Clock.CurrentTime;
 
-            // Very naive implementation of autopilot based on proximity to replay frames.
-            // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
-            if (Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
+            bool breakNow = false;
+            bool pause = false;
+            foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
-                currentFrame++;
-                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
+                // we are not yet close enough to the object time
+                if (time < h.HitObject.StartTime - relax_leniency) 
+                    break;
+                    
+                // already hit or beyond the hittable end time.
+                if (h.IsHit || time > h.HitObject.StartTime + relax_leniency)
+                    continue;
+
+                switch (h)
+                {
+                    case DrawableHitCircle circle:
+                        pause = true;
+                        breakNow = true;
+                        break;
+
+                    case DrawableSlider slider:
+                        breakNow = true;
+                        break;
+
+                    case DrawableSpinner _:
+                        breakNow = true;
+                        break;
+                }
+
+                if(breakNow) {
+                    break;
+                }
             }
 
-            // TODO: Implement the functionality to automatically spin spinners
+            if (Math.Abs(replayFrames[currentFrame + cachedFrames].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
+            {
+                if(pause) {
+                    cachedFrames++;
+                } else {
+                    currentFrame += cachedFrames;
+                    cachedFrames = 1;
+                }
+            }
+
+            new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
