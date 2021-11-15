@@ -28,8 +28,10 @@ namespace osu.Game.Beatmaps
     {
         public readonly BeatmapInfo BeatmapInfo;
 
+        // ReSharper disable once FieldHidesInterfacePropertyWithDefaultImplementation
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
+        // ReSharper disable once FieldHidesInterfacePropertyWithDefaultImplementation
         public readonly BeatmapMetadata Metadata;
 
         protected AudioManager AudioManager { get; }
@@ -88,6 +90,9 @@ namespace osu.Game.Beatmaps
                 mods ??= Array.Empty<Mod>();
 
                 var rulesetInstance = ruleset.CreateInstance();
+
+                if (rulesetInstance == null)
+                    throw new RulesetLoadException("Creating ruleset instance failed when attempting to create playable beatmap.");
 
                 IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
 
@@ -176,17 +181,8 @@ namespace osu.Game.Beatmaps
 
         private CancellationTokenSource loadCancellation = new CancellationTokenSource();
 
-        /// <summary>
-        /// Beings loading the contents of this <see cref="WorkingBeatmap"/> asynchronously.
-        /// </summary>
-        public void BeginAsyncLoad()
-        {
-            loadBeatmapAsync();
-        }
+        public void BeginAsyncLoad() => loadBeatmapAsync();
 
-        /// <summary>
-        /// Cancels the asynchronous loading of the contents of this <see cref="WorkingBeatmap"/>.
-        /// </summary>
         public void CancelAsyncLoad()
         {
             lock (beatmapFetchLock)
@@ -234,6 +230,8 @@ namespace osu.Game.Beatmaps
 
         public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
 
+        IBeatmapInfo IWorkingBeatmap.BeatmapInfo => BeatmapInfo;
+
         public IBeatmap Beatmap
         {
             get
@@ -273,9 +271,6 @@ namespace osu.Game.Beatmaps
         [NotNull]
         public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
-        /// <summary>
-        /// Reads the correct track restart point from beatmap metadata and sets looping to enabled.
-        /// </summary>
         public void PrepareTrackForPreviewLooping()
         {
             Track.Looping = true;
