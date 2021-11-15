@@ -27,11 +27,7 @@ namespace osu.Game.Beatmaps
     public abstract class WorkingBeatmap : IWorkingBeatmap
     {
         public readonly BeatmapInfo BeatmapInfo;
-
-        // ReSharper disable once FieldHidesInterfacePropertyWithDefaultImplementation
         public readonly BeatmapSetInfo BeatmapSetInfo;
-
-        // ReSharper disable once FieldHidesInterfacePropertyWithDefaultImplementation
         public readonly BeatmapMetadata Metadata;
 
         protected AudioManager AudioManager { get; }
