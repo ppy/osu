@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.EmptyScrolling
 {
     public class EmptyScrollingDifficultyCalculator : DifficultyCalculator
     {
-        public EmptyScrollingDifficultyCalculator(Ruleset ruleset, IWorkingBeatmap beatmap)
+        public EmptyScrollingDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }

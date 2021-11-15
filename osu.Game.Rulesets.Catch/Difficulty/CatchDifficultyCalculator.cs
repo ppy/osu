@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         private float halfCatcherWidth;
 
-        public CatchDifficultyCalculator(Ruleset ruleset, IWorkingBeatmap beatmap)
+        public CatchDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }
