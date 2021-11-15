@@ -4,7 +4,6 @@
 using System;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
-using osu.Game.Extensions;
 using osu.Game.Rulesets;
 
 #nullable enable
@@ -102,12 +101,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonIgnore]
         public string Hash => throw new NotImplementedException();
-
-        #endregion
-
-        #region Implementation of IEquatable<IBeatmapInfo>
-
-        public bool Equals(IBeatmapInfo? other) => this.MatchesOnlineID(other);
 
         #endregion
     }

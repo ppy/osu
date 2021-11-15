@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Extensions;
 
 #nullable enable
 
@@ -140,12 +139,6 @@ namespace osu.Game.Online.API.Requests.Responses
         double IBeatmapSetInfo.MaxStarDifficulty => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxLength => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxBPM => BPM;
-
-        #endregion
-
-        #region Implementation of IEquatable<IBeatmapSetInfo>
-
-        public bool Equals(IBeatmapInfo? other) => this.MatchesOnlineID(other);
 
         #endregion
     }
