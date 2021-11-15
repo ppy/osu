@@ -106,27 +106,6 @@ namespace osu.Game.Models
             return ID == other.ID;
         }
 
-        #region Implementation of IEquatable<IBeatmapInfo>
-
-        public bool Equals(IBeatmapInfo? other)
-        {
-            if (ReferenceEquals(this, other)) return true;
-            if (other == null) return false;
-
-            if (other is RealmBeatmap b && Equals(b))
-                return true;
-
-            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
-                return Hash == other.Hash;
-
-            if (OnlineID > 0 && other.OnlineID > 0)
-                return other.OnlineID == OnlineID;
-
-            return false;
-        }
-
-        #endregion
-
         public bool AudioEquals(RealmBeatmap? other) => other != null
                                                         && BeatmapSet != null
                                                         && other.BeatmapSet != null

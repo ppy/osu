@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using Realms;
 
 #nullable enable
@@ -61,21 +62,7 @@ namespace osu.Game.Models
             return ID == other.ID;
         }
 
-        public bool Equals(IBeatmapSetInfo? other)
-        {
-            if (ReferenceEquals(this, other)) return true;
-            if (other == null) return false;
-
-            if (other is RealmBeatmapSet b && Equals(b))
-                return true;
-
-            if (OnlineID > 0 && other.OnlineID > 0)
-                return OnlineID == other.OnlineID;
-
-            return false;
-        }
-
-        public override string ToString() => Metadata?.ToString() ?? base.ToString();
+        public override string ToString() => Metadata?.GetDisplayString() ?? base.ToString();
 
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
 
