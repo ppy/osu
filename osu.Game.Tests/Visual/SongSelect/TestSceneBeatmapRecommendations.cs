@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -203,11 +204,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("recommended beatmap displayed", () =>
-            {
-                int? expectedID = getImport().Beatmaps[expectedDiff - 1].OnlineID;
-                return Game.Beatmap.Value.BeatmapInfo.OnlineID == expectedID;
-            });
+            AddUntilStep("recommended beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.MatchesOnlineID(getImport().Beatmaps[expectedDiff - 1]));
         }
     }
 }
