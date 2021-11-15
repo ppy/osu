@@ -559,7 +559,7 @@ namespace osu.Game
 
         #region Beatmap progression
 
-        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
+        private void beatmapChanged(ValueChangedEvent<IWorkingBeatmap> beatmap)
         {
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();

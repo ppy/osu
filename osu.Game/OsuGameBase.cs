@@ -112,7 +112,8 @@ namespace osu.Game
 
         protected Storage Storage { get; set; }
 
-        protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
+        protected Bindable<IWorkingBeatmap> Beatmap { get; private set; } // cached via load() method
+        private Bindable<WorkingBeatmap> typedBeatmap { get; set; } // cached via load() method
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -281,10 +282,22 @@ namespace osu.Game
             // we may want to revisit this if users notice or complain about the difference (consider this a bit of a trial).
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
 
-            Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+            Beatmap = new NonNullableBindable<IWorkingBeatmap>(defaultBeatmap);
 
-            dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
+            dependencies.CacheAs<IBindable<IWorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
+
+            // this is kept around for EF use cases which eventually need to be removed or replaced.
+            typedBeatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+            dependencies.CacheAs<IBindable<WorkingBeatmap>>(typedBeatmap);
+            dependencies.CacheAs(typedBeatmap);
+            typedBeatmap.BindValueChanged(b => Beatmap.Value = b.NewValue);
+            Beatmap.BindValueChanged(b =>
+            {
+                // handle the case of leasing. should always be a feedback event anyway.
+                if (!typedBeatmap.Disabled)
+                    typedBeatmap.Value = b.NewValue as WorkingBeatmap;
+            });
 
             fileStore.Cleanup();
 
