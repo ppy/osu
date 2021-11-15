@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
@@ -29,7 +30,7 @@ namespace osu.Game.Overlays.Music
             var items = (SearchContainer<RearrangeableListItem<BeatmapSetInfo>>)ListContainer;
 
             foreach (var item in items.OfType<PlaylistItem>())
-                item.InSelectedCollection = criteria.Collection?.Beatmaps.Any(b => b.BeatmapSet.Equals(item.Model)) ?? true;
+                item.InSelectedCollection = criteria.Collection?.Beatmaps.Any(b => b.MatchesOnlineID(item.Model)) ?? true;
 
             items.SearchTerm = criteria.SearchText;
         }
