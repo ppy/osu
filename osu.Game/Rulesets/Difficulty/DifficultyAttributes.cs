@@ -17,10 +17,10 @@ namespace osu.Game.Rulesets.Difficulty
         [JsonIgnore]
         public Skill[] Skills { get; set; }
 
-        [JsonProperty("star_rating")]
+        [JsonProperty("star_rating", Order = -3)]
         public double StarRating { get; set; }
 
-        [JsonProperty("max_combo")]
+        [JsonProperty("max_combo", Order = -2)]
         public int MaxCombo { get; set; }
 
         public DifficultyAttributes()
