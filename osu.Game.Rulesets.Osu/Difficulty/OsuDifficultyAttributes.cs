@@ -30,16 +30,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("overall_difficulty")]
         public double OverallDifficulty { get; set; }
 
-        [JsonIgnore]
         public double DrainRate { get; set; }
 
-        [JsonIgnore]
         public int HitCircleCount { get; set; }
 
-        [JsonIgnore]
         public int SliderCount { get; set; }
 
-        [JsonIgnore]
         public int SpinnerCount { get; set; }
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
