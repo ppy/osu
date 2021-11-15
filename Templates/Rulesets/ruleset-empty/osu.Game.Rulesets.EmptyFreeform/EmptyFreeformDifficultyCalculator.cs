@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.EmptyFreeform
 {
     public class EmptyFreeformDifficultyCalculator : DifficultyCalculator
     {
-        public EmptyFreeformDifficultyCalculator(Ruleset ruleset, IWorkingBeatmap beatmap)
+        public EmptyFreeformDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }
