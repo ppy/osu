@@ -102,8 +102,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             BeatmapSetInfo catchSet = null, mixedSet = null;
 
-            AddStep("create catch beatmapset", () => catchSet = importBeatmapSet(0, new[] { new CatchRuleset().RulesetInfo }));
-            AddStep("create mixed beatmapset", () => mixedSet = importBeatmapSet(1,
+            AddStep("create catch beatmapset", () => catchSet = importBeatmapSet(1, new[] { new CatchRuleset().RulesetInfo }));
+            AddStep("create mixed beatmapset", () => mixedSet = importBeatmapSet(2,
                 new[] { new TaikoRuleset().RulesetInfo, new CatchRuleset().RulesetInfo, new ManiaRuleset().RulesetInfo }));
 
             AddAssert("all sets imported", () => ensureAllBeatmapSetsImported(new[] { catchSet, mixedSet }));
@@ -120,8 +120,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             BeatmapSetInfo osuSet = null, mixedSet = null;
 
-            AddStep("create osu! beatmapset", () => osuSet = importBeatmapSet(0, new[] { new OsuRuleset().RulesetInfo }));
-            AddStep("create mixed beatmapset", () => mixedSet = importBeatmapSet(1,
+            AddStep("create osu! beatmapset", () => osuSet = importBeatmapSet(1, new[] { new OsuRuleset().RulesetInfo }));
+            AddStep("create mixed beatmapset", () => mixedSet = importBeatmapSet(2,
                 new[] { new TaikoRuleset().RulesetInfo, new CatchRuleset().RulesetInfo, new ManiaRuleset().RulesetInfo }));
 
             AddAssert("all sets imported", () => ensureAllBeatmapSetsImported(new[] { osuSet, mixedSet }));
@@ -138,8 +138,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             BeatmapSetInfo osuSet = null, mixedSet = null;
 
-            AddStep("create osu! beatmapset", () => osuSet = importBeatmapSet(0, new[] { new OsuRuleset().RulesetInfo }));
-            AddStep("create mixed beatmapset", () => mixedSet = importBeatmapSet(1,
+            AddStep("create osu! beatmapset", () => osuSet = importBeatmapSet(1, new[] { new OsuRuleset().RulesetInfo }));
+            AddStep("create mixed beatmapset", () => mixedSet = importBeatmapSet(2,
                 new[] { new TaikoRuleset().RulesetInfo, new CatchRuleset().RulesetInfo, new TaikoRuleset().RulesetInfo }));
 
             AddAssert("all sets imported", () => ensureAllBeatmapSetsImported(new[] { osuSet, mixedSet }));
@@ -156,8 +156,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             BeatmapSetInfo osuSet = null, maniaSet = null;
 
-            AddStep("create osu! beatmapset", () => osuSet = importBeatmapSet(0, new[] { new OsuRuleset().RulesetInfo }));
-            AddStep("create mania beatmapset", () => maniaSet = importBeatmapSet(1, Enumerable.Repeat(new ManiaRuleset().RulesetInfo, 10)));
+            AddStep("create osu! beatmapset", () => osuSet = importBeatmapSet(1, new[] { new OsuRuleset().RulesetInfo }));
+            AddStep("create mania beatmapset", () => maniaSet = importBeatmapSet(2, Enumerable.Repeat(new ManiaRuleset().RulesetInfo, 10)));
 
             AddAssert("all sets imported", () => ensureAllBeatmapSetsImported(new[] { osuSet, maniaSet }));
 
