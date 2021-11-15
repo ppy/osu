@@ -24,9 +24,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         [JsonProperty("great_hit_window")]
         public double GreatHitWindow { get; set; }
 
-        public override IEnumerable<(int attributeId, object value)> ToDatabase()
+        public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
-            foreach (var v in base.ToDatabase())
+            foreach (var v in base.ToDatabaseAttributes())
                 yield return v;
 
             yield return (9, MaxCombo);
@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             yield return (13, GreatHitWindow);
         }
 
-        public override void FromDatabase(IReadOnlyDictionary<int, double> values, int hitCircleCount, int spinnerCount)
+        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
-            base.FromDatabase(values, hitCircleCount, spinnerCount);
+            base.FromDatabaseAttributes(values);
 
             MaxCombo = (int)values[9];
             StarRating = values[11];

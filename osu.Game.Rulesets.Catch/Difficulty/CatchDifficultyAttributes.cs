@@ -12,9 +12,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         [JsonProperty("approach_rate")]
         public double ApproachRate { get; set; }
 
-        public override IEnumerable<(int attributeId, object value)> ToDatabase()
+        public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
-            foreach (var v in base.ToDatabase())
+            foreach (var v in base.ToDatabaseAttributes())
                 yield return v;
 
             // Todo: Catch should not output star rating in the 'aim' attribute.
@@ -23,9 +23,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             yield return (9, MaxCombo);
         }
 
-        public override void FromDatabase(IReadOnlyDictionary<int, double> values, int hitCircleCount, int spinnerCount)
+        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
-            base.FromDatabase(values, hitCircleCount, spinnerCount);
+            base.FromDatabaseAttributes(values);
 
             StarRating = values[1];
             ApproachRate = values[7];
