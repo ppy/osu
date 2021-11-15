@@ -10,6 +10,7 @@ using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -62,7 +63,7 @@ namespace osu.Game.Online.Rooms
         [CanBeNull]
         public MultiplayerScoresAround ScoresAround { get; set; }
 
-        public ScoreInfo CreateScoreInfo(PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
+        public ScoreInfo CreateScoreInfo(RulesetStore rulesets, PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
         {
             var rulesetInstance = playlistItem.Ruleset.Value.CreateInstance();
 
@@ -73,7 +74,7 @@ namespace osu.Game.Online.Rooms
                 MaxCombo = MaxCombo,
                 BeatmapInfo = beatmap,
                 BeatmapInfoID = playlistItem.BeatmapID,
-                Ruleset = playlistItem.Ruleset.Value,
+                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID),
                 RulesetID = playlistItem.RulesetID,
                 Statistics = Statistics,
                 User = User,

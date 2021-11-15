@@ -46,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay
         private ModDisplay modDisplay;
 
         private readonly Bindable<IBeatmapInfo> beatmap = new Bindable<IBeatmapInfo>();
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly Bindable<IRulesetInfo> ruleset = new Bindable<IRulesetInfo>();
         private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
 
         public readonly PlaylistItem Item;
