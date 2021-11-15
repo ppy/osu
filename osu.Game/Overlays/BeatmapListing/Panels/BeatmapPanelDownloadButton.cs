@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
@@ -80,7 +81,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                     case DownloadState.LocallyAvailable:
                         Predicate<BeatmapInfo> findPredicate = null;
                         if (SelectedBeatmap.Value != null)
-                            findPredicate = b => b.OnlineID == SelectedBeatmap.Value.OnlineID;
+                            findPredicate = b => b.MatchesOnlineID(SelectedBeatmap.Value);
 
                         game?.PresentBeatmap(beatmapSet, findPredicate);
                         break;

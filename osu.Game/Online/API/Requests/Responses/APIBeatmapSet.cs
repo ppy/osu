@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 
 #nullable enable
 
@@ -144,13 +145,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         #region Implementation of IEquatable<IBeatmapSetInfo>
 
-        public bool Equals(IBeatmapSetInfo? other)
-        {
-            if (OnlineID > 0 && other?.OnlineID > 0)
-                return other.OnlineID == OnlineID;
-
-            return false;
-        }
+        public bool Equals(IBeatmapInfo? other) => this.MatchesOnlineID(other);
 
         #endregion
     }

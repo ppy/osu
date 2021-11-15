@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -166,7 +167,7 @@ namespace osu.Game.Overlays.BeatmapSet
             if (BeatmapSet != null)
             {
                 Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps
-                                                            .Where(b => b.Ruleset.OnlineID == ruleset.Value?.OnlineID)
+                                                            .Where(b => b.Ruleset.MatchesOnlineID(ruleset.Value))
                                                             .OrderBy(b => b.StarRating)
                                                             .Select(b => new DifficultySelectorButton(b)
                                                             {

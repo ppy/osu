@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
@@ -64,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
-                int beatmapsCount = setInfo.NewValue?.Beatmaps.Count(b => b.Ruleset.OnlineID == Value.OnlineID) ?? 0;
+                int beatmapsCount = setInfo.NewValue?.Beatmaps.Count(b => b.Ruleset.MatchesOnlineID(Value)) ?? 0;
 
                 count.Text = beatmapsCount.ToString();
                 countContainer.FadeTo(beatmapsCount > 0 ? 1 : 0);
