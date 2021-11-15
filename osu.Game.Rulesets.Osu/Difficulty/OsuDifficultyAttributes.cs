@@ -42,9 +42,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonIgnore]
         public int SpinnerCount { get; set; }
 
-        public override IEnumerable<(int attributeId, object value)> ToDatabase()
+        public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
-            foreach (var v in base.ToDatabase())
+            foreach (var v in base.ToDatabaseAttributes())
                 yield return v;
 
             yield return (1, AimStrain);
@@ -60,9 +60,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (19, SliderFactor);
         }
 
-        public override void FromDatabase(IReadOnlyDictionary<int, double> values, int hitCircleCount, int spinnerCount)
+        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
-            base.FromDatabase(values, hitCircleCount, spinnerCount);
+            base.FromDatabaseAttributes(values);
 
             AimStrain = values[1];
             SpeedStrain = values[3];
@@ -72,8 +72,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             StarRating = values[11];
             FlashlightRating = values.GetValueOrDefault(17);
             SliderFactor = values[19];
-            HitCircleCount = hitCircleCount;
-            SpinnerCount = spinnerCount;
         }
 
         [UsedImplicitly]

@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         [JsonProperty("score_multiplier")]
         public double ScoreMultiplier { get; set; }
 
-        public override IEnumerable<(int attributeId, object value)> ToDatabase()
+        public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
-            foreach (var v in base.ToDatabase())
+            foreach (var v in base.ToDatabaseAttributes())
                 yield return v;
 
             // Todo: Mania doesn't output MaxCombo attribute for some reason.
@@ -26,9 +26,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             yield return (15, ScoreMultiplier);
         }
 
-        public override void FromDatabase(IReadOnlyDictionary<int, double> values, int hitCircleCount, int spinnerCount)
+        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
-            base.FromDatabase(values, hitCircleCount, spinnerCount);
+            base.FromDatabaseAttributes(values);
 
             StarRating = values[11];
             GreatHitWindow = values[13];

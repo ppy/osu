@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets.Difficulty
             StarRating = starRating;
         }
 
-        public virtual IEnumerable<(int attributeId, object value)> ToDatabase() => Enumerable.Empty<(int, object)>();
+        public virtual IEnumerable<(int attributeId, object value)> ToDatabaseAttributes() => Enumerable.Empty<(int, object)>();
 
-        public virtual void FromDatabase(IReadOnlyDictionary<int, double> values, int hitCircleCount, int spinnerCount)
+        public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
         }
     }
