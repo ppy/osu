@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, IBindable<WorkingBeatmap> beatmap)
+        private void load(AudioManager audio, IBindable<IWorkingBeatmap> beatmap)
         {
             track = beatmap.Value.Track;
             failSample = audio.Samples.Get(@"Gameplay/failsound");

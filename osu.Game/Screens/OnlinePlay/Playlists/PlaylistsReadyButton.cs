@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private Bindable<PlaylistAggregateScore> userScore { get; set; }
 
         [Resolved]
-        private IBindable<WorkingBeatmap> gameBeatmap { get; set; }
+        private IBindable<IWorkingBeatmap> gameBeatmap { get; set; }
 
         public PlaylistsReadyButton()
         {

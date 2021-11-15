@@ -197,7 +197,7 @@ namespace osu.Game.Collections
             private OsuColour colours { get; set; }
 
             [Resolved]
-            private IBindable<WorkingBeatmap> beatmap { get; set; }
+            private IBindable<IWorkingBeatmap> beatmap { get; set; }
 
             [CanBeNull]
             private readonly BindableList<IBeatmapInfo> collectionBeatmaps;

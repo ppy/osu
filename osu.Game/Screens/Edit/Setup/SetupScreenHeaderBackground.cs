@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Setup
         private OsuColour colours { get; set; }
 
         [Resolved]
-        private IBindable<WorkingBeatmap> working { get; set; }
+        private IBindable<IWorkingBeatmap> working { get; set; }
 
         private readonly Container content;
 

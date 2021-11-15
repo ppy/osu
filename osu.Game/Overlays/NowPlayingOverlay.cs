@@ -59,7 +59,7 @@ namespace osu.Game.Overlays
         private MusicController musicController { get; set; }
 
         [Resolved]
-        private Bindable<WorkingBeatmap> beatmap { get; set; }
+        private Bindable<IWorkingBeatmap> beatmap { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -272,12 +272,12 @@ namespace osu.Game.Overlays
 
         private Action pendingBeatmapSwitch;
 
-        private void trackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction = TrackChangeDirection.None)
+        private void trackChanged(IWorkingBeatmap beatmap, TrackChangeDirection direction = TrackChangeDirection.None)
         {
             // avoid using scheduler as our scheduler may not be run for a long time, holding references to beatmaps.
             pendingBeatmapSwitch = delegate
             {
-                // todo: this can likely be replaced with WorkingBeatmap.GetBeatmapAsync()
+                // todo: this can likely be replaced with IWorkingBeatmap.GetBeatmapAsync()
                 Task.Run(() =>
                 {
                     if (beatmap?.Beatmap == null) // this is not needed if a placeholder exists
@@ -287,7 +287,7 @@ namespace osu.Game.Overlays
                     }
                     else
                     {
-                        BeatmapMetadata metadata = beatmap.Metadata;
+                        IBeatmapMetadataInfo metadata = beatmap.Metadata;
                         title.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
                         artist.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
                     }
@@ -363,9 +363,9 @@ namespace osu.Game.Overlays
         private class Background : BufferedContainer
         {
             private readonly Sprite sprite;
-            private readonly WorkingBeatmap beatmap;
+            private readonly IWorkingBeatmap beatmap;
 
-            public Background(WorkingBeatmap beatmap = null)
+            public Background(IWorkingBeatmap beatmap = null)
                 : base(cachedFrameBuffer: true)
             {
                 this.beatmap = beatmap;

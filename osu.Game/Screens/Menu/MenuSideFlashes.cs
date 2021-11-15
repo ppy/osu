@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Menu
 {
     public class MenuSideFlashes : BeatSyncedContainer
     {
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<IWorkingBeatmap> beatmap = new Bindable<IWorkingBeatmap>();
 
         private Box leftBox;
         private Box rightBox;
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, IAPIProvider api, SkinManager skinManager)
+        private void load(IBindable<IWorkingBeatmap> beatmap, IAPIProvider api, SkinManager skinManager)
         {
             this.beatmap.BindTo(beatmap);
 

@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private EditorBeatmap beatmap { get; set; }
 
         [Resolved]
-        private Bindable<WorkingBeatmap> working { get; set; }
+        private Bindable<IWorkingBeatmap> working { get; set; }
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }

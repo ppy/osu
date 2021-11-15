@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
 
-        public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        public readonly IBindable<IWorkingBeatmap> Beatmap = new Bindable<IWorkingBeatmap>();
 
         [Resolved]
         private EditorClock editorClock { get; set; }
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<float> waveformOpacity;
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
+        private void load(IBindable<IWorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
         {
             CentreMarker centreMarker;
 

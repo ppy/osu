@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Menu
         private const int fade_duration = 800;
 
         [Resolved]
-        private Bindable<WorkingBeatmap> beatmap { get; set; }
+        private Bindable<IWorkingBeatmap> beatmap { get; set; }
 
         private readonly OsuSpriteText title, artist;
 

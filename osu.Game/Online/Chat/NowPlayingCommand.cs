@@ -19,7 +19,7 @@ namespace osu.Game.Online.Chat
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private Bindable<WorkingBeatmap> currentBeatmap { get; set; }
+        private Bindable<IWorkingBeatmap> currentBeatmap { get; set; }
 
         private readonly Channel target;
 

@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         private IScrollingInfo scrollingInfo { get; set; }
 
         [Resolved]
-        private Bindable<WorkingBeatmap> working { get; set; }
+        private Bindable<IWorkingBeatmap> working { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }

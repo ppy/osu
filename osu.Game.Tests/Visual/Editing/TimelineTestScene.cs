@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Editing
             private readonly Drawable marker;
 
             [Resolved]
-            private IBindable<WorkingBeatmap> beatmap { get; set; }
+            private IBindable<IWorkingBeatmap> beatmap { get; set; }
 
             [Resolved]
             private EditorClock editorClock { get; set; }

@@ -79,7 +79,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         [Resolved]
-        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
+        protected IBindable<IWorkingBeatmap> Beatmap { get; private set; }
 
         [Resolved(canBeNull: true)]
         protected GameplayClock GameplayClock { get; private set; }

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Music
     public class MusicKeyBindingHandler : Component, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
+        private IBindable<IWorkingBeatmap> beatmap { get; set; }
 
         [Resolved]
         private MusicController musicController { get; set; }

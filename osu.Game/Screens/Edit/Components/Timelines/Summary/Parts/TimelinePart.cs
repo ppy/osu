@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     public class TimelinePart<T> : Container<T> where T : Drawable
     {
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<IWorkingBeatmap> beatmap = new Bindable<IWorkingBeatmap>();
 
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, EditorClock clock)
+        private void load(IBindable<IWorkingBeatmap> beatmap, EditorClock clock)
         {
             this.beatmap.BindTo(beatmap);
             LoadBeatmap(EditorBeatmap);

@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.Components
         private const float corner_radius = 5;
         private const float contents_padding = 15;
 
-        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly IBindable<IWorkingBeatmap> Beatmap = new Bindable<IWorkingBeatmap>();
 
         protected readonly IBindable<Track> Track = new Bindable<Track>();
 
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, EditorClock clock)
+        private void load(IBindable<IWorkingBeatmap> beatmap, OsuColour colours, EditorClock clock)
         {
             Beatmap.BindTo(beatmap);
             Track.BindTo(clock.Track);

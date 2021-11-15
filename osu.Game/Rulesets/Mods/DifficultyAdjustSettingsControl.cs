@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
     public class DifficultyAdjustSettingsControl : SettingsItem<float?>
     {
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
+        private IBindable<IWorkingBeatmap> beatmap { get; set; }
 
         /// <summary>
         /// Used to track the display value on the setting slider.
@@ -74,10 +74,7 @@ namespace osu.Game.Rulesets.Mods
                 return;
             }
 
-            var difficulty = beatmap.Value.BeatmapInfo.BaseDifficulty;
-
-            if (difficulty == null)
-                return;
+            var difficulty = beatmap.Value.BeatmapInfo.Difficulty;
 
             // generally should always be implemented, else the slider will have a zero default.
             if (difficultyBindable.ReadCurrentFromDifficulty == null)

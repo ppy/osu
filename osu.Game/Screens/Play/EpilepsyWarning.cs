@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IBindable<WorkingBeatmap> beatmap)
+        private void load(OsuColour colours, IBindable<IWorkingBeatmap> beatmap)
         {
             Children = new Drawable[]
             {

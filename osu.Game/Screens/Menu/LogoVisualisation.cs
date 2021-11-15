@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public class LogoVisualisation : Drawable
     {
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<IWorkingBeatmap> beatmap = new Bindable<IWorkingBeatmap>();
 
         /// <summary>
         /// The number of bars to jump each update iteration.
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap)
+        private void load(ShaderManager shaders, IBindable<IWorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);

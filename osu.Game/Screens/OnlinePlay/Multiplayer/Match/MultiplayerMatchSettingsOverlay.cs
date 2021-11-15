@@ -77,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private MultiplayerClient client { get; set; }
 
             [Resolved]
-            private Bindable<WorkingBeatmap> beatmap { get; set; }
+            private Bindable<IWorkingBeatmap> beatmap { get; set; }
 
             [Resolved]
             private Bindable<RulesetInfo> ruleset { get; set; }
