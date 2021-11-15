@@ -9,12 +9,11 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class DifficultyAttributes
     {
-        [JsonIgnore]
         public Mod[] Mods { get; set; }
 
-        [JsonIgnore]
         public Skill[] Skills { get; set; }
 
         [JsonProperty("star_rating", Order = -3)]
