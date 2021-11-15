@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -37,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Remove:
-                        if (args.OldItems.Contains(SelectedItem))
+                        if (allowSelection && args.OldItems.Contains(SelectedItem))
                             SelectedItem.Value = null;
                         break;
                 }
@@ -62,7 +64,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void requestDeletion(PlaylistItem item)
         {
-            if (SelectedItem.Value == item)
+            if (allowSelection && SelectedItem.Value == item)
             {
                 if (Items.Count == 1)
                     SelectedItem.Value = null;
