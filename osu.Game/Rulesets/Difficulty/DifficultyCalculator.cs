@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Difficulty
         private double clockRate;
 
         private readonly Ruleset ruleset;
-        private readonly WorkingBeatmap beatmap;
+        private readonly IWorkingBeatmap beatmap;
 
-        protected DifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+        protected DifficultyCalculator(Ruleset ruleset, IWorkingBeatmap beatmap)
         {
             this.ruleset = ruleset;
             this.beatmap = beatmap;
