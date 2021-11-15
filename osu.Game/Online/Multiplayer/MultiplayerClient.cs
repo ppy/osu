@@ -309,7 +309,7 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task RequestAllPlaylistItems();
 
-        public abstract Task AddPlaylistItem(APIPlaylistItem item);
+        public abstract Task AddPlaylistItem(MultiplayerPlaylistItem item);
 
         public abstract Task RemovePlaylistItem(long playlistItemId);
 
@@ -603,7 +603,7 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        public async Task PlaylistItemAdded(APIPlaylistItem item)
+        public async Task PlaylistItemAdded(MultiplayerPlaylistItem item)
         {
             if (Room == null)
                 return;
@@ -642,7 +642,7 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        public async Task PlaylistItemChanged(APIPlaylistItem item)
+        public async Task PlaylistItemChanged(MultiplayerPlaylistItem item)
         {
             if (Room == null)
                 return;
@@ -703,7 +703,7 @@ namespace osu.Game.Online.Multiplayer
             CurrentMatchPlayingItem.Value = APIRoom.Playlist.SingleOrDefault(p => p.ID == settings.PlaylistItemId);
         }, cancellationToken);
 
-        private async Task<PlaylistItem> createPlaylistItem(APIPlaylistItem item)
+        private async Task<PlaylistItem> createPlaylistItem(MultiplayerPlaylistItem item)
         {
             var set = await GetOnlineBeatmapSet(item.BeatmapID).ConfigureAwait(false);
 

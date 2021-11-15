@@ -41,9 +41,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        private readonly List<APIPlaylistItem> playlistItems = new List<APIPlaylistItem>();
+        private readonly List<MultiplayerPlaylistItem> playlistItems = new List<MultiplayerPlaylistItem>();
         private readonly TestMultiplayerRoomManager roomManager;
-        private APIPlaylistItem? currentItem;
+        private MultiplayerPlaylistItem? currentItem;
 
         public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
         {
@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (password != apiRoom.Password.Value)
                 throw new InvalidOperationException("Invalid password.");
 
-            playlistItems.AddRange(apiRoom.Playlist.Select(i => new APIPlaylistItem(i)));
+            playlistItems.AddRange(apiRoom.Playlist.Select(i => new MultiplayerPlaylistItem(i)));
 
             var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
@@ -300,7 +300,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
         }
 
-        public override async Task AddPlaylistItem(APIPlaylistItem item)
+        public override async Task AddPlaylistItem(MultiplayerPlaylistItem item)
         {
             Debug.Assert(Room != null);
             Debug.Assert(APIRoom != null);
@@ -425,7 +425,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
-            var newItem = new APIPlaylistItem
+            var newItem = new MultiplayerPlaylistItem
             {
                 ID = playlistItems.Last().ID + 1,
                 BeatmapID = currentItem.BeatmapID,
