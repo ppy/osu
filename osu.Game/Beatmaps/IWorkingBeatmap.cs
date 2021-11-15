@@ -19,9 +19,9 @@ namespace osu.Game.Beatmaps
     {
         IBeatmapInfo BeatmapInfo { get; }
 
-        IBeatmapSetInfo BeatmapSetInfo => BeatmapInfo.BeatmapSet;
+        IBeatmapSetInfo BeatmapSetInfo { get; }
 
-        IBeatmapMetadataInfo Metadata => BeatmapInfo.Metadata;
+        IBeatmapMetadataInfo Metadata { get; }
 
         /// <summary>
         /// Whether the Beatmap has finished loading.
