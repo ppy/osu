@@ -44,6 +44,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override string ShortTitle => "room";
 
+        public OsuButton AddOrEditPlaylistButton { get; private set; }
+
         [Resolved]
         private MultiplayerClient client { get; set; }
 
@@ -55,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [CanBeNull]
         private IDisposable readyClickOperation;
 
-        public OsuButton AddOrEditPlaylistButton { get; private set; }
+        private DrawableRoomPlaylist playlist;
 
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
@@ -72,6 +74,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
+
+            playlist.Items.BindTo(Room.Playlist);
+            playlist.SelectedItem.BindTo(SelectedItem);
 
             client.LoadRequested += onLoadRequested;
             client.RoomUpdated += onRoomUpdated;
@@ -149,11 +154,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 null,
                                 new Drawable[]
                                 {
-                                    new DrawableRoomPlaylist(false, false)
+                                    playlist = new DrawableRoomPlaylist(false, false)
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Items = { BindTarget = Room.Playlist },
-                                        SelectedItem = { BindTarget = SelectedItem }
                                     },
                                 },
                                 new[]
