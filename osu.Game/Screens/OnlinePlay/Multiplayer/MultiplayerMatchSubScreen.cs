@@ -154,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 null,
                                 new Drawable[]
                                 {
-                                    playlist = new DrawableRoomPlaylist(false, false)
+                                    playlist = new DrawableRoomPlaylist(false, false, true)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                     },
