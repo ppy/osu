@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -74,5 +75,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             HitCircleCount = hitCircleCount;
             SpinnerCount = spinnerCount;
         }
+
+        [UsedImplicitly]
+        public bool ShouldSerializeFlashlightRating() => Mods.OfType<ModFlashlight>().Any();
     }
 }
