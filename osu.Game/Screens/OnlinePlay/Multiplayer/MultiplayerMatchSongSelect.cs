@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 loadingLayer.Show();
 
-                client.AddPlaylistItem(new APIPlaylistItem
+                client.AddPlaylistItem(new MultiplayerPlaylistItem
                 {
                     BeatmapID = item.BeatmapID,
                     BeatmapChecksum = item.Beatmap.Value.MD5Hash,

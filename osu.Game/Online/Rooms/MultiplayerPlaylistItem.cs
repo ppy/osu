@@ -13,7 +13,7 @@ namespace osu.Game.Online.Rooms
 {
     [Serializable]
     [MessagePackObject]
-    public class APIPlaylistItem
+    public class MultiplayerPlaylistItem
     {
         [Key(0)]
         public long ID { get; set; }
@@ -39,11 +39,11 @@ namespace osu.Game.Online.Rooms
         [Key(7)]
         public bool Expired { get; set; }
 
-        public APIPlaylistItem()
+        public MultiplayerPlaylistItem()
         {
         }
 
-        public APIPlaylistItem(PlaylistItem item)
+        public MultiplayerPlaylistItem(PlaylistItem item)
         {
             ID = item.ID;
             BeatmapID = item.BeatmapID;

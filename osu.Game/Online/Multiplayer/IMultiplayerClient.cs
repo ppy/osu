@@ -111,7 +111,7 @@ namespace osu.Game.Online.Multiplayer
         /// Signals that an item has been added to the playlist.
         /// </summary>
         /// <param name="item">The added item.</param>
-        Task PlaylistItemAdded(APIPlaylistItem item);
+        Task PlaylistItemAdded(MultiplayerPlaylistItem item);
 
         /// <summary>
         /// Signals that an item has been removed from the playlist.
@@ -123,6 +123,6 @@ namespace osu.Game.Online.Multiplayer
         /// Signals that an item has been changed in the playlist.
         /// </summary>
         /// <param name="item">The changed item.</param>
-        Task PlaylistItemChanged(APIPlaylistItem item);
+        Task PlaylistItemChanged(MultiplayerPlaylistItem item);
     }
 }

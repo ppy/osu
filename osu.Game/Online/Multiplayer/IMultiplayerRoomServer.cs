@@ -86,7 +86,7 @@ namespace osu.Game.Online.Multiplayer
         /// Adds an item to the playlist.
         /// </summary>
         /// <param name="item">The item to add.</param>
-        Task AddPlaylistItem(APIPlaylistItem item);
+        Task AddPlaylistItem(MultiplayerPlaylistItem item);
 
         /// <summary>
         /// Removes an item from the playlist.
