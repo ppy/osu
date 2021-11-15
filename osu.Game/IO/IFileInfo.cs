@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
+
 #nullable enable
 
 namespace osu.Game.IO
@@ -14,5 +16,7 @@ namespace osu.Game.IO
         /// SHA-256 hash of the file content.
         /// </summary>
         string Hash { get; }
+
+        string StoragePath => Path.Combine(Hash.Remove(1), Hash.Remove(2), Hash);
     }
 }
