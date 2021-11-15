@@ -19,10 +19,12 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly bool allowEdit;
         private readonly bool allowSelection;
 
-        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection)
+        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection, bool reverse = false)
         {
             this.allowEdit = allowEdit;
             this.allowSelection = allowSelection;
+
+            ((ReversibleFillFlowContainer)ListContainer).Reverse = reverse;
         }
 
         protected override void LoadComplete()
@@ -47,10 +49,8 @@ namespace osu.Game.Screens.OnlinePlay
             d.ScrollbarVisible = false;
         });
 
-        protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<PlaylistItem>>
+        protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new ReversibleFillFlowContainer
         {
-            LayoutDuration = 200,
-            LayoutEasing = Easing.OutQuint,
             Spacing = new Vector2(0, 2)
         };
 
@@ -71,6 +71,23 @@ namespace osu.Game.Screens.OnlinePlay
             }
 
             Items.Remove(item);
+        }
+
+        private class ReversibleFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
+        {
+            private bool reverse;
+
+            public bool Reverse
+            {
+                get => reverse;
+                set
+                {
+                    reverse = value;
+                    Invalidate();
+                }
+            }
+
+            public override IEnumerable<Drawable> FlowingChildren => Reverse ? base.FlowingChildren.OrderBy(d => -GetLayoutPosition(d)) : base.FlowingChildren;
         }
     }
 }
