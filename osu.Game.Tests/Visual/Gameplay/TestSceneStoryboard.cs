@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             track.Start();
         }
 
-        private void loadStoryboard(WorkingBeatmap working)
+        private void loadStoryboard(IWorkingBeatmap working)
         {
             if (storyboard != null)
                 storyboardContainer.Remove(storyboard);

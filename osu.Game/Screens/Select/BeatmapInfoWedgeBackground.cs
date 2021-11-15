@@ -15,9 +15,9 @@ namespace osu.Game.Screens.Select
 {
     internal class BeatmapInfoWedgeBackground : CompositeDrawable
     {
-        private readonly WorkingBeatmap beatmap;
+        private readonly IWorkingBeatmap beatmap;
 
-        public BeatmapInfoWedgeBackground(WorkingBeatmap beatmap)
+        public BeatmapInfoWedgeBackground(IWorkingBeatmap beatmap)
         {
             this.beatmap = beatmap;
         }

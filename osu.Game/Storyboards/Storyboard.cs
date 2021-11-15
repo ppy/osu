@@ -89,7 +89,7 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null) =>
+        public DrawableStoryboard CreateDrawable(IWorkingBeatmap working = null) =>
             new DrawableStoryboard(this);
 
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)

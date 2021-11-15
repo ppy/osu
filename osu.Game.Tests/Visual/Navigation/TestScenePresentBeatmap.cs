@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
@@ -139,7 +140,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapSetInfo.ID == getImport().ID);
+            AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapSetInfo.MatchesOnlineID(getImport()));
             AddAssert("correct ruleset selected", () => Game.Ruleset.Value.ID == getImport().Beatmaps.First().Ruleset.ID);
         }
 
