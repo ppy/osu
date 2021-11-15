@@ -102,6 +102,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private readonly Room room;
 
             private Drawable playlistContainer;
+            private DrawableRoomPlaylist drawablePlaylist;
 
             public MatchSettings(Room room)
             {
@@ -256,12 +257,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                     Spacing = new Vector2(5),
                                                     Children = new Drawable[]
                                                     {
-                                                        new DrawableRoomPlaylist(false, false)
+                                                        drawablePlaylist = new DrawableRoomPlaylist(false, false)
                                                         {
                                                             RelativeSizeAxes = Axes.X,
-                                                            Height = DrawableRoomPlaylistItem.HEIGHT,
-                                                            Items = { BindTarget = Playlist },
-                                                            SelectedItem = { BindTarget = SelectedItem }
+                                                            Height = DrawableRoomPlaylistItem.HEIGHT
                                                         },
                                                         new PurpleTriangleButton
                                                         {
@@ -346,6 +345,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     else
                         loadingLayer.Hide();
                 });
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                drawablePlaylist.Items.BindTo(Playlist);
+                drawablePlaylist.SelectedItem.BindTo(SelectedItem);
             }
 
             protected override void Update()
