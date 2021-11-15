@@ -184,7 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             const double fade_time = 50;
 
-            // Todo: FIX THIS
+            // Todo: Should use the room's selected item to determine ruleset.
             var ruleset = rulesets.GetRuleset(0).CreateInstance();
 
             int? currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank;
