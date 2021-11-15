@@ -10,9 +10,13 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
+using osu.Game.Screens.Edit.GameplayTest;
+using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
+using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -58,6 +62,42 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
             AddStep("exit player", () => editorPlayer.Exit());
             AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("background has correct params", () =>
+            {
+                var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single();
+                return background.Colour == Color4.DarkGray && background.BlurAmount.Value == 0;
+            });
+        }
+
+        [Test]
+        public void TestGameplayTestWhenTrackRunning()
+        {
+            AddStep("start track", () => EditorClock.Start());
+            AddAssert("sample playback enabled", () => !Editor.SamplePlaybackDisabled.Value);
+
+            AddStep("click test gameplay button", () =>
+            {
+                var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            EditorPlayer editorPlayer = null;
+            AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
+            AddAssert("editor track stopped", () => !EditorClock.IsRunning);
+            AddAssert("sample playback disabled", () => Editor.SamplePlaybackDisabled.Value);
+
+            AddStep("exit player", () => editorPlayer.Exit());
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("background has correct params", () =>
+            {
+                var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single();
+                return background.Colour == Color4.DarkGray && background.BlurAmount.Value == 0;
+            });
+
+            AddStep("start track", () => EditorClock.Start());
+            AddAssert("sample playback re-enabled", () => !Editor.SamplePlaybackDisabled.Value);
         }
 
         [Test]
@@ -109,6 +149,35 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("wait for return to editor", () => Stack.CurrentScreen is Editor);
             AddAssert("track stopped", () => !Beatmap.Value.Track.IsRunning);
+        }
+
+        [Test]
+        public void TestSharedClockState()
+        {
+            AddStep("seek to 00:01:00", () => EditorClock.Seek(60_000));
+            AddStep("click test gameplay button", () =>
+            {
+                var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            EditorPlayer editorPlayer = null;
+            AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
+
+            GameplayClockContainer gameplayClockContainer = null;
+            AddStep("fetch gameplay clock", () => gameplayClockContainer = editorPlayer.ChildrenOfType<GameplayClockContainer>().First());
+            AddUntilStep("gameplay clock running", () => gameplayClockContainer.IsRunning);
+            AddAssert("gameplay time past 00:01:00", () => gameplayClockContainer.CurrentTime >= 60_000);
+
+            double timeAtPlayerExit = 0;
+            AddWaitStep("wait some", 5);
+            AddStep("store time before exit", () => timeAtPlayerExit = gameplayClockContainer.CurrentTime);
+
+            AddStep("exit player", () => editorPlayer.Exit());
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddAssert("time is past player exit", () => EditorClock.CurrentTime >= timeAtPlayerExit);
         }
 
         public override void TearDownSteps()
