@@ -50,22 +50,20 @@ namespace osu.Game.Rulesets.Difficulty
             if (!Beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
 
-            int index = 0;
-            foreach (var hitObject in getDifficultyHitObjects())
+            var listOfHitObjects = getDifficultyHitObjects().ToList();
+
+            for (int index = 0; index < listOfHitObjects.Count; index++)
             {
+                var hitObject = listOfHitObjects[index];
                 foreach (var preSkill in preSkills)
                     preSkill.ProcessInternal(preSkills, index, hitObject);
-
-                index++;
             }
 
-            index = 0;
-            foreach (var hitObject in getDifficultyHitObjects())
+            for (int index = 0; index < listOfHitObjects.Count; index++)
             {
+                var hitObject = listOfHitObjects[index];
                 foreach (var skill in skills)
                     skill.ProcessInternal(preSkills, index, hitObject);
-
-                index++;
             }
 
             return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
@@ -89,25 +87,25 @@ namespace osu.Game.Rulesets.Difficulty
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
 
-            int index = 0;
-            foreach (var hitObject in getDifficultyHitObjects())
+            var listOfHitObjects = getDifficultyHitObjects().ToList();
+
+            for(int index = 0; index < listOfHitObjects.Count; index++)
             {
+                var hitObject = listOfHitObjects[index];
+                foreach (var preSkill in preSkills)
+                    preSkill.ProcessInternal(preSkills, index, hitObject);
+            }
+
+            for (int index = 0; index < listOfHitObjects.Count; index++)
+            {
+                var hitObject = listOfHitObjects[index];
+
+                progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
+
                 foreach (var preSkill in preSkills)
                     preSkill.ProcessInternal(preSkills, index, hitObject);
 
-                index++;
-            }
-
-            index = 0;
-            foreach (var hitObject in getDifficultyHitObjects())
-            {
-                progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
-
-                foreach (var skill in skills)
-                    skill.ProcessInternal(preSkills, index, hitObject);
-
                 attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
-                index++;
             }
 
             return attribs;
