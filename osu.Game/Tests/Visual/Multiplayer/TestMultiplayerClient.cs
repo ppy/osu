@@ -294,12 +294,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return ((IMultiplayerClient)this).LoadRequested();
         }
 
-        public override async Task RequestAllPlaylistItems()
-        {
-            foreach (var item in playlistItems)
-                await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
-        }
-
         public override async Task AddPlaylistItem(MultiplayerPlaylistItem item)
         {
             Debug.Assert(Room != null);

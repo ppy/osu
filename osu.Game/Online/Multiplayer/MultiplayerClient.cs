@@ -139,6 +139,9 @@ namespace osu.Game.Online.Multiplayer
                 var joinedRoom = await JoinRoom(room.RoomID.Value.Value, password ?? room.Password.Value).ConfigureAwait(false);
                 Debug.Assert(joinedRoom != null);
 
+                // Populate playlist items.
+                var playlistItems = await Task.WhenAll(joinedRoom.Playlist.Select(createPlaylistItem)).ConfigureAwait(false);
+
                 // Populate users.
                 Debug.Assert(joinedRoom.Users != null);
                 await Task.WhenAll(joinedRoom.Users.Select(PopulateUser)).ConfigureAwait(false);
@@ -149,6 +152,9 @@ namespace osu.Game.Online.Multiplayer
                     Room = joinedRoom;
                     APIRoom = room;
 
+                    APIRoom.Playlist.Clear();
+                    APIRoom.Playlist.AddRange(playlistItems);
+
                     Debug.Assert(LocalUser != null);
                     addUserToAPIRoom(LocalUser);
 
@@ -157,8 +163,6 @@ namespace osu.Game.Online.Multiplayer
 
                     OnRoomJoined();
                 }, cancellationSource.Token).ConfigureAwait(false);
-
-                await RequestAllPlaylistItems().ConfigureAwait(false);
 
                 // Update room settings.
                 await updateLocalRoomSettings(joinedRoom.Settings, cancellationSource.Token).ConfigureAwait(false);
@@ -306,8 +310,6 @@ namespace osu.Game.Online.Multiplayer
         public abstract Task SendMatchRequest(MatchUserRequest request);
 
         public abstract Task StartMatch();
-
-        public abstract Task RequestAllPlaylistItems();
 
         public abstract Task AddPlaylistItem(MultiplayerPlaylistItem item);
 
