@@ -22,7 +22,8 @@ namespace osu.Game.Tests.NonVisual.Ranking
 
             var unstableRate = new UnstableRate(events);
 
-            Assert.IsTrue(Precision.AlmostEquals(unstableRate.Value, 10 * Math.Sqrt(10)));
+            Assert.IsNotNull(unstableRate.Value);
+            Assert.IsTrue(Precision.AlmostEquals(unstableRate.Value.Value, 10 * Math.Sqrt(10)));
         }
 
         [Test]

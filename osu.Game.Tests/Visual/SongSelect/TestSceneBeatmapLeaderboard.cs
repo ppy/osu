@@ -388,7 +388,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             leaderboard.BeatmapInfo = new BeatmapInfo
             {
-                OnlineBeatmapID = 1113057,
+                OnlineID = 1113057,
                 Status = status,
             };
         }

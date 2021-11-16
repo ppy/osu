@@ -209,7 +209,13 @@ namespace osu.Game.Database
 
                 case 9:
                     // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
-                    var oldMetadata = migration.OldRealm.DynamicApi.All(getMappedOrOriginalName(typeof(RealmBeatmapMetadata)));
+                    string metadataClassName = getMappedOrOriginalName(typeof(RealmBeatmapMetadata));
+
+                    // May be coming from a version before `RealmBeatmapMetadata` existed.
+                    if (!migration.OldRealm.Schema.TryFindObjectSchema(metadataClassName, out _))
+                        return;
+
+                    var oldMetadata = migration.OldRealm.DynamicApi.All(metadataClassName);
                     var newMetadata = migration.NewRealm.All<RealmBeatmapMetadata>();
 
                     int metadataCount = newMetadata.Count();

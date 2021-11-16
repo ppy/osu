@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double AimStrain { get; set; }
         public double SpeedStrain { get; set; }
         public double FlashlightRating { get; set; }
+        public double SliderFactor { get; set; }
         public double ApproachRate { get; set; }
         public double OverallDifficulty { get; set; }
         public double DrainRate { get; set; }

@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Select.Carousel
                                     {
                                         new OsuSpriteText
                                         {
-                                            Text = beatmapInfo.Version,
+                                            Text = beatmapInfo.DifficultyName,
                                             Font = OsuFont.GetFont(size: 20),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
@@ -238,8 +238,8 @@ namespace osu.Game.Screens.Select.Carousel
                 if (editRequested != null)
                     items.Add(new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested(beatmapInfo)));
 
-                if (beatmapInfo.OnlineBeatmapID.HasValue && beatmapOverlay != null)
-                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineBeatmapID.Value)));
+                if (beatmapInfo.OnlineID.HasValue && beatmapOverlay != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID.Value)));
 
                 if (collectionManager != null)
                 {

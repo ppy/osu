@@ -23,13 +23,14 @@ namespace osu.Game.Beatmaps
 
         public int BeatmapVersion;
 
-        private int? onlineBeatmapID;
+        private int? onlineID;
 
         [JsonProperty("id")]
-        public int? OnlineBeatmapID
+        [Column("OnlineBeatmapID")]
+        public int? OnlineID
         {
-            get => onlineBeatmapID;
-            set => onlineBeatmapID = value > 0 ? value : null;
+            get => onlineID;
+            set => onlineID = value > 0 ? value : null;
         }
 
         [JsonIgnore]
@@ -134,12 +135,12 @@ namespace osu.Game.Beatmaps
         public double TimelineZoom { get; set; }
 
         // Metadata
-        public string Version { get; set; }
-
-        private string versionString => string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+        [Column("Version")]
+        public string DifficultyName { get; set; }
 
         [JsonProperty("difficulty_rating")]
-        public double StarDifficulty { get; set; }
+        [Column("StarDifficulty")]
+        public double StarRating { get; set; }
 
         /// <summary>
         /// Currently only populated for beatmap deletion. Use <see cref="ScoreManager"/> to query scores.
@@ -147,7 +148,7 @@ namespace osu.Game.Beatmaps
         public List<ScoreInfo> Scores { get; set; }
 
         [JsonIgnore]
-        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
+        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarRating);
 
         public override string ToString() => this.GetDisplayTitle();
 
@@ -176,14 +177,11 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IHasOnlineID
 
-        public int OnlineID => OnlineBeatmapID ?? -1;
+        int IHasOnlineID<int>.OnlineID => OnlineID ?? -1;
 
         #endregion
 
         #region Implementation of IBeatmapInfo
-
-        [JsonIgnore]
-        string IBeatmapInfo.DifficultyName => Version;
 
         [JsonIgnore]
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata ?? BeatmapSet?.Metadata ?? new BeatmapMetadata();
@@ -196,9 +194,6 @@ namespace osu.Game.Beatmaps
 
         [JsonIgnore]
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
-
-        [JsonIgnore]
-        double IBeatmapInfo.StarRating => StarDifficulty;
 
         #endregion
     }

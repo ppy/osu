@@ -102,5 +102,19 @@ namespace osu.Game.Beatmaps
         /// Total vote counts of user ratings on a scale of 0..10 where 0 is unused (probably will be fixed at API?).
         /// </summary>
         int[]? Ratings { get; }
+
+        /// <summary>
+        /// Contains the current hype status of the beatmap set.
+        /// Non-null only for <see cref="BeatmapSetOnlineStatus.WIP"/>, <see cref="BeatmapSetOnlineStatus.Pending"/>, and <see cref="BeatmapSetOnlineStatus.Qualified"/> sets.
+        /// </summary>
+        /// <remarks>
+        /// See: https://github.com/ppy/osu-web/blob/93930cd02cfbd49724929912597c727c9fbadcd1/app/Models/Beatmapset.php#L155
+        /// </remarks>
+        BeatmapSetHypeStatus? HypeStatus { get; }
+
+        /// <summary>
+        /// Contains the current nomination status of the beatmap set.
+        /// </summary>
+        BeatmapSetNominationStatus? NominationStatus { get; }
     }
 }

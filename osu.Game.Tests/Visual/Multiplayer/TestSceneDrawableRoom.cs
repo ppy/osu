@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                         {
                                             BeatmapInfo =
                                             {
-                                                StarDifficulty = 2.5
+                                                StarRating = 2.5
                                             }
                                         }.BeatmapInfo,
                                     }
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                         {
                                             BeatmapInfo =
                                             {
-                                                StarDifficulty = 2.5,
+                                                StarRating = 2.5,
                                                 Metadata =
                                                 {
                                                     Artist = "very very very very very very very very very long artist",
@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                         {
                                             BeatmapInfo =
                                             {
-                                                StarDifficulty = 2.5
+                                                StarRating = 2.5
                                             }
                                         }.BeatmapInfo,
                                     }
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                         {
                                             BeatmapInfo =
                                             {
-                                                StarDifficulty = 4.5
+                                                StarRating = 4.5
                                             }
                                         }.BeatmapInfo,
                                     }

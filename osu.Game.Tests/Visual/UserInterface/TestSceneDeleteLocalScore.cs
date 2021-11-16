@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                     Username = "TestAuthor"
                                 },
                             },
-                            Version = "Insane"
+                            DifficultyName = "Insane"
                         },
                     }
                 },

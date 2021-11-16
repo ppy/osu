@@ -8,20 +8,21 @@ namespace osu.Game.Online.API.Requests
 {
     public class PostBeatmapFavouriteRequest : APIRequest
     {
+        public readonly BeatmapFavouriteAction Action;
+
         private readonly int id;
-        private readonly BeatmapFavouriteAction action;
 
         public PostBeatmapFavouriteRequest(int id, BeatmapFavouriteAction action)
         {
             this.id = id;
-            this.action = action;
+            Action = action;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
             req.Method = HttpMethod.Post;
-            req.AddParameter(@"action", action.ToString().ToLowerInvariant());
+            req.AddParameter(@"action", Action.ToString().ToLowerInvariant());
             return req;
         }
 

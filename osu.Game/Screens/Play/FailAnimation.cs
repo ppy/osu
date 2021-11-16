@@ -107,7 +107,8 @@ namespace osu.Game.Screens.Play
 
             this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
             {
-                RemoveFilters();
+                // Don't reset frequency as the pause screen may appear post transform, causing a second frequency sweep.
+                RemoveFilters(false);
                 OnComplete?.Invoke();
             });
 
@@ -137,15 +138,16 @@ namespace osu.Game.Screens.Play
             Content.FadeColour(Color4.Gray, duration);
         }
 
-        public void RemoveFilters()
+        public void RemoveFilters(bool resetTrackFrequency = true)
         {
+            if (resetTrackFrequency)
+                track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+
             if (filters.Parent == null)
                 return;
 
             RemoveInternal(filters);
             filters.Dispose();
-
-            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
         }
 
         protected override void Update()

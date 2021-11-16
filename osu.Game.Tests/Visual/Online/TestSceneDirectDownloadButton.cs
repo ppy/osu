@@ -44,11 +44,11 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
             AddStep("import soleily", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()));
 
-            AddUntilStep("wait for beatmap import", () => beatmaps.GetAllUsableBeatmapSets().Any(b => b.OnlineBeatmapSetID == 241526));
-            AddAssert("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
+            AddUntilStep("wait for beatmap import", () => beatmaps.GetAllUsableBeatmapSets().Any(b => b.OnlineID == 241526));
+            AddUntilStep("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
 
             createButtonWithBeatmap(createSoleily());
-            AddAssert("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
+            AddUntilStep("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
             ensureSoleilyRemoved();
             AddAssert("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
         }
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("remove soleily", () =>
             {
-                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineBeatmapSetID == 241526);
+                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineID == 241526);
 
                 if (beatmap != null) beatmaps.Delete(beatmap);
             });

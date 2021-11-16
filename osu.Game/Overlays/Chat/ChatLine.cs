@@ -209,7 +209,7 @@ namespace osu.Game.Overlays.Chat
             username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
 
             // remove non-existent channels from the link list
-            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
+            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument.ToString()) != true);
 
             ContentFlow.Clear();
             ContentFlow.AddLinks(message.DisplayContent, message.Links);
