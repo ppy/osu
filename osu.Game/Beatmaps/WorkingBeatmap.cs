@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -186,15 +185,6 @@ namespace osu.Game.Beatmaps
                 if (beatmapLoadTask?.IsCompleted != true)
                     beatmapLoadTask = null;
             }
-        }
-
-        private CancellationTokenSource createTimeoutTokenSource(TimeSpan? timeout)
-        {
-            if (Debugger.IsAttached)
-                // ignore timeout when debugger is attached (may be breakpointing / debugging).
-                return new CancellationTokenSource();
-
-            return new CancellationTokenSource(timeout ?? TimeSpan.FromSeconds(10));
         }
 
         private readonly object beatmapFetchLock = new object();
