@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 
 #nullable enable
 
@@ -142,6 +143,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         #endregion
 
-        public bool Equals(IBeatmapSetInfo? other) => other is APIBeatmapSet b && Equals(b);
+        public bool Equals(IBeatmapSetInfo? other) => other is APIBeatmapSet b && this.MatchesOnlineID(b);
     }
 }
