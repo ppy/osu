@@ -62,12 +62,30 @@ namespace osu.Game.Extensions
         }
 
         /// <summary>
-        /// Check whether the online ID of two instances match.
+        /// Check whether the online ID of two <see cref="IBeatmapSetInfo"/>s match.
         /// </summary>
         /// <param name="instance">The instance to compare.</param>
         /// <param name="other">The other instance to compare against.</param>
         /// <returns>Whether online IDs match. If either instance is missing an online ID, this will return false.</returns>
-        public static bool MatchesOnlineID(this IHasOnlineID<long>? instance, IHasOnlineID<long>? other)
+        public static bool MatchesOnlineID(this IBeatmapSetInfo? instance, IBeatmapSetInfo? other) => matchesOnlineID(instance, other);
+
+        /// <summary>
+        /// Check whether the online ID of two <see cref="IBeatmapInfo"/>s match.
+        /// </summary>
+        /// <param name="instance">The instance to compare.</param>
+        /// <param name="other">The other instance to compare against.</param>
+        /// <returns>Whether online IDs match. If either instance is missing an online ID, this will return false.</returns>
+        public static bool MatchesOnlineID(this IBeatmapInfo? instance, IBeatmapInfo? other) => matchesOnlineID(instance, other);
+
+        /// <summary>
+        /// Check whether the online ID of two <see cref="IRulesetInfo"/>s match.
+        /// </summary>
+        /// <param name="instance">The instance to compare.</param>
+        /// <param name="other">The other instance to compare against.</param>
+        /// <returns>Whether online IDs match. If either instance is missing an online ID, this will return false.</returns>
+        public static bool MatchesOnlineID(this IRulesetInfo? instance, IRulesetInfo? other) => matchesOnlineID(instance, other);
+
+        private static bool matchesOnlineID(this IHasOnlineID<long>? instance, IHasOnlineID<long>? other)
         {
             if (instance == null || other == null)
                 return false;
@@ -78,13 +96,7 @@ namespace osu.Game.Extensions
             return instance.OnlineID.Equals(other.OnlineID);
         }
 
-        /// <summary>
-        /// Check whether the online ID of two instances match.
-        /// </summary>
-        /// <param name="instance">The instance to compare.</param>
-        /// <param name="other">The other instance to compare against.</param>
-        /// <returns>Whether online IDs match. If either instance is missing an online ID, this will return false.</returns>
-        public static bool MatchesOnlineID(this IHasOnlineID<int>? instance, IHasOnlineID<int>? other)
+        private static bool matchesOnlineID(this IHasOnlineID<int>? instance, IHasOnlineID<int>? other)
         {
             if (instance == null || other == null)
                 return false;
