@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// A single beatmap difficulty.
     /// </summary>
-    public interface IBeatmapInfo : IHasOnlineID<int>
+    public interface IBeatmapInfo : IHasOnlineID<int>, IEquatable<IBeatmapInfo>
     {
         /// <summary>
         /// The user-specified name given to this beatmap.
