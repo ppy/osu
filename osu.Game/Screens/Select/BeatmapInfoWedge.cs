@@ -86,9 +86,9 @@ namespace osu.Game.Screens.Select
             this.FadeOut(transition_duration * 2, Easing.In);
         }
 
-        private WorkingBeatmap beatmap;
+        private IWorkingBeatmap beatmap;
 
-        public WorkingBeatmap Beatmap
+        public IWorkingBeatmap Beatmap
         {
             get => beatmap;
             set
@@ -163,15 +163,15 @@ namespace osu.Game.Screens.Select
             private FillFlowContainer infoLabelContainer;
             private Container bpmLabelContainer;
 
-            private readonly WorkingBeatmap beatmap;
-            private readonly RulesetInfo ruleset;
+            private readonly IWorkingBeatmap beatmap;
+            private readonly IRulesetInfo ruleset;
 
             [Resolved]
             private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
             private ModSettingChangeTracker settingChangeTracker;
 
-            public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset)
+            public WedgeInfoText(IWorkingBeatmap beatmap, RulesetInfo userRuleset)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Select
             private void load(OsuColour colours, LocalisationManager localisation, BeatmapDifficultyCache difficultyCache)
             {
                 var beatmapInfo = beatmap.BeatmapInfo;
-                var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+                var metadata = beatmapInfo.Metadata;
 
                 RelativeSizeAxes = Axes.Both;
 
@@ -263,7 +263,8 @@ namespace osu.Game.Screens.Select
                                 Shear = -wedged_container_shear,
                                 TextSize = 11,
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
-                                Status = beatmapInfo.Status,
+                                // TODO: remove case once IBeatmapInfo somehow provides this information (needs RealmBeatmap implementation).
+                                Status = ((BeatmapInfo)beatmapInfo).Status,
                             }
                         }
                     },
@@ -324,7 +325,7 @@ namespace osu.Game.Screens.Select
                 });
 
                 // no difficulty means it can't have a status to show
-                if (beatmapInfo.DifficultyName == null)
+                if (string.IsNullOrEmpty(beatmapInfo.DifficultyName))
                     StatusPill.Hide();
 
                 addInfoLabels();
@@ -426,7 +427,7 @@ namespace osu.Game.Screens.Select
                 });
             }
 
-            private Drawable getMapper(BeatmapMetadata metadata)
+            private Drawable getMapper(IBeatmapMetadataInfo metadata)
             {
                 if (string.IsNullOrEmpty(metadata.Author.Username))
                     return Empty();
