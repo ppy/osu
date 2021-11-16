@@ -281,7 +281,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (allowSelection)
+            if (allowSelection && valid.Value)
                 SelectedItem.Value = Model;
             return true;
         }
