@@ -41,9 +41,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        private readonly List<MultiplayerPlaylistItem> playlistItems = new List<MultiplayerPlaylistItem>();
+        private MultiplayerPlaylistItem? currentItem => Room?.Playlist[currentIndex];
+
         private readonly TestMultiplayerRoomManager roomManager;
-        private MultiplayerPlaylistItem? currentItem;
+        private int currentIndex;
 
         public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
         {
@@ -162,15 +163,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (password != apiRoom.Password.Value)
                 throw new InvalidOperationException("Invalid password.");
 
-            playlistItems.AddRange(apiRoom.Playlist.Select(i => new MultiplayerPlaylistItem(i)));
-
             var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
                 User = api.LocalUser.Value
             };
-
-            await updateCurrentItem(apiRoom: apiRoom).ConfigureAwait(false);
-            Debug.Assert(currentItem != null);
 
             var room = new MultiplayerRoom(roomId)
             {
@@ -178,13 +174,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Name = apiRoom.Name.Value,
                     MatchType = apiRoom.Type.Value,
-                    PlaylistItemId = currentItem.ID,
                     Password = password,
                     QueueMode = apiRoom.QueueMode.Value
                 },
+                Playlist = apiRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
                 Users = { localUser },
                 Host = localUser
             };
+
+            await updateCurrentItem(room, false).ConfigureAwait(false);
 
             RoomSetupAction?.Invoke(room);
             RoomSetupAction = null;
@@ -308,28 +306,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 case QueueModes.HostOnly:
                     // In host-only mode, the current item is re-used.
                     item.ID = currentItem.ID;
-                    playlistItems[playlistItems.FindIndex(i => i == currentItem)] = item;
+
+                    Room.Playlist[currentIndex] = item;
                     await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
 
                     // Note: Unlike the server, this is the easiest way to update the current item at this point.
-                    await updateCurrentItem(false).ConfigureAwait(false);
+                    await updateCurrentItem(Room, false).ConfigureAwait(false);
                     break;
 
                 default:
-                    item.ID = playlistItems.Last().ID + 1;
-                    playlistItems.Add(item);
+                    item.ID = Room.Playlist.Last().ID + 1;
+
+                    Room.Playlist.Add(item);
                     await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
-                    await updateCurrentItem().ConfigureAwait(false);
+
+                    await updateCurrentItem(Room).ConfigureAwait(false);
                     break;
             }
         }
 
         protected override Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
         {
-            Debug.Assert(Room != null);
-
-            var apiRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == Room.RoomID);
-            IBeatmapSetInfo? set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
+            IBeatmapSetInfo? set = roomManager.ServerSideRooms.SelectMany(r => r.Playlist)
+                                              .FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
                                    ?? beatmaps.QueryBeatmap(b => b.OnlineID == beatmapId)?.BeatmapSet;
 
             if (set == null)
@@ -368,14 +367,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private async Task changeQueueMode(QueueModes newMode)
         {
+            Debug.Assert(Room != null);
             Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
             if (newMode == QueueModes.HostOnly)
             {
                 // Remove all but the current and expired items. The current item may be re-used for host-only mode if it's non-expired.
-                foreach (var playlistItem in playlistItems.Where(i => !i.Expired && i.ID != currentItem.ID).ToArray())
-                    await ((IMultiplayerClient)this).PlaylistItemRemoved(playlistItem.ID).ConfigureAwait(false);
+                for (int i = 0; i < Room.Playlist.Count; i++)
+                {
+                    var item = Room.Playlist[i];
+
+                    if (item.Expired || item.ID == Room.Settings.PlaylistItemId)
+                        continue;
+
+                    Room.Playlist.RemoveAt(i--);
+
+                    await ((IMultiplayerClient)this).PlaylistItemRemoved(item.ID).ConfigureAwait(false);
+                }
 
                 // Always ensure that at least one non-expired item exists by duplicating the current item if required.
                 if (currentItem.Expired)
@@ -383,7 +392,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             // When changing modes, items could have been added (above) or the queueing order could have changed.
-            await updateCurrentItem().ConfigureAwait(false);
+            await updateCurrentItem(Room).ConfigureAwait(false);
         }
 
         private async Task finishCurrentItem()
@@ -400,7 +409,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (Room.Settings.QueueMode == QueueModes.HostOnly)
                 await duplicateCurrentItem().ConfigureAwait(false);
 
-            await updateCurrentItem().ConfigureAwait(false);
+            await updateCurrentItem(Room).ConfigureAwait(false);
         }
 
         private async Task duplicateCurrentItem()
@@ -411,7 +420,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             var newItem = new MultiplayerPlaylistItem
             {
-                ID = playlistItems.Last().ID + 1,
+                ID = Room.Playlist.Last().ID + 1,
                 BeatmapID = currentItem.BeatmapID,
                 BeatmapChecksum = currentItem.BeatmapChecksum,
                 RulesetID = currentItem.RulesetID,
@@ -419,23 +428,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AllowedMods = currentItem.AllowedMods
             };
 
-            playlistItems.Add(newItem);
+            Room.Playlist.Add(newItem);
             await ((IMultiplayerClient)this).PlaylistItemAdded(newItem).ConfigureAwait(false);
         }
 
-        private async Task updateCurrentItem(bool notify = true, Room? apiRoom = null)
+        private async Task updateCurrentItem(MultiplayerRoom room, bool notify = true)
         {
-            if (apiRoom == null)
-            {
-                Debug.Assert(APIRoom != null);
-                apiRoom = APIRoom;
-            }
+            MultiplayerPlaylistItem newItem;
 
-            switch (apiRoom.QueueMode.Value)
+            switch (room.Settings.QueueMode)
             {
                 default:
                     // Pick the single non-expired playlist item.
-                    currentItem = playlistItems.FirstOrDefault(i => !i.Expired) ?? playlistItems.Last();
+                    newItem = room.Playlist.FirstOrDefault(i => !i.Expired) ?? room.Playlist.Last();
                     break;
 
                 case QueueModes.FairRotate:
@@ -443,14 +448,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     throw new NotImplementedException();
             }
 
-            if (Room != null)
-            {
-                long lastItem = Room.Settings.PlaylistItemId;
-                Room.Settings.PlaylistItemId = currentItem.ID;
+            currentIndex = room.Playlist.IndexOf(newItem);
 
-                if (notify && currentItem.ID != lastItem)
-                    await ((IMultiplayerClient)this).SettingsChanged(Room.Settings).ConfigureAwait(false);
-            }
+            long lastItem = room.Settings.PlaylistItemId;
+            room.Settings.PlaylistItemId = newItem.ID;
+
+            if (notify && newItem.ID != lastItem)
+                await ((IMultiplayerClient)this).SettingsChanged(room.Settings).ConfigureAwait(false);
         }
     }
 }
