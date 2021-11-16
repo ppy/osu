@@ -168,14 +168,6 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.AddPlaylistItem), item);
         }
 
-        public override Task RemovePlaylistItem(long playlistItemId)
-        {
-            if (!IsConnected.Value)
-                return Task.CompletedTask;
-
-            return connection.InvokeAsync(nameof(IMultiplayerServer.RemovePlaylistItem), playlistItemId);
-        }
-
         protected override Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<APIBeatmapSet>();
