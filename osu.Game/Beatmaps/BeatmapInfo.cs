@@ -163,6 +163,8 @@ namespace osu.Game.Beatmaps
             return false;
         }
 
+        public bool Equals(IBeatmapInfo other) => other is BeatmapInfo b && Equals(b);
+
         public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
                                                       BeatmapSet.Hash == other.BeatmapSet.Hash &&
                                                       (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
