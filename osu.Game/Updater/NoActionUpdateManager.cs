@@ -1,10 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
@@ -15,9 +13,9 @@ namespace osu.Game.Updater
 {
     /// <summary>
     /// An update manager that shows notifications if a newer release is detected.
-    /// Installation is left up to the user.
+    /// This is a case where updates are handled externally by a package manager or other means, so no action is performed on clicking the notification.
     /// </summary>
-    public class SimpleUpdateManager : UpdateManager
+    public class NoActionUpdateManager : UpdateManager
     {
         private string version;
 
@@ -50,13 +48,8 @@ namespace osu.Game.Updater
                     Notifications.Post(new SimpleNotification
                     {
                         Text = $"A newer release of osu! has been found ({version} → {latestTagName}).\n\n"
-                               + "Click here to download the new version, which can be installed over the top of your existing installation",
+                               + "Check with your package manager / provider to bring osu! up-to-date!",
                         Icon = FontAwesome.Solid.Upload,
-                        Activated = () =>
-                        {
-                            host.OpenUrlExternally(getBestUrl(latest));
-                            return true;
-                        }
                     });
 
                     return true;
@@ -69,38 +62,6 @@ namespace osu.Game.Updater
             }
 
             return false;
-        }
-
-        private string getBestUrl(GitHubRelease release)
-        {
-            GitHubAsset bestAsset = null;
-
-            switch (RuntimeInfo.OS)
-            {
-                case RuntimeInfo.Platform.Windows:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe", StringComparison.Ordinal));
-                    break;
-
-                case RuntimeInfo.Platform.macOS:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip", StringComparison.Ordinal));
-                    break;
-
-                case RuntimeInfo.Platform.Linux:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".AppImage", StringComparison.Ordinal));
-                    break;
-
-                case RuntimeInfo.Platform.iOS:
-                    // iOS releases are available via testflight. this link seems to work well enough for now.
-                    // see https://stackoverflow.com/a/32960501
-                    return "itms-beta://beta.itunes.apple.com/v1/app/1447765923";
-
-                case RuntimeInfo.Platform.Android:
-                    // on our testing device this causes the download to magically disappear.
-                    //bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".apk"));
-                    break;
-            }
-
-            return bestAsset?.BrowserDownloadUrl ?? release.HtmlUrl;
         }
     }
 }
