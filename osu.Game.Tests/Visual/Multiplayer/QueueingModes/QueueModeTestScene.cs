@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
 {
     public abstract class QueueModeTestScene : ScreenTestScene
     {
-        protected abstract QueueModes Mode { get; }
+        protected abstract QueueMode Mode { get; }
 
         protected BeatmapInfo InitialBeatmap { get; private set; }
         protected BeatmapInfo OtherBeatmap { get; private set; }

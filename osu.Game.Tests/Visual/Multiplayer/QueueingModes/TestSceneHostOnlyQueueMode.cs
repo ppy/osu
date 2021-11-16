@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
 {
     public class TestSceneHostOnlyQueueMode : QueueModeTestScene
     {
-        protected override QueueModes Mode => QueueModes.HostOnly;
+        protected override QueueMode Mode => QueueMode.HostOnly;
 
         [Test]
         public void TestFirstItemSelectedByDefault()

@@ -298,12 +298,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
-            if (Room.Settings.QueueMode == QueueModes.HostOnly && Room.Host?.UserID != LocalUser?.UserID)
+            if (Room.Settings.QueueMode == QueueMode.HostOnly && Room.Host?.UserID != LocalUser?.UserID)
                 throw new InvalidOperationException("Local user is not the room host.");
 
             switch (Room.Settings.QueueMode)
             {
-                case QueueModes.HostOnly:
+                case QueueMode.HostOnly:
                     // In host-only mode, the current item is re-used.
                     item.ID = currentItem.ID;
 
@@ -365,13 +365,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
         }
 
-        private async Task changeQueueMode(QueueModes newMode)
+        private async Task changeQueueMode(QueueMode newMode)
         {
             Debug.Assert(Room != null);
             Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
-            if (newMode == QueueModes.HostOnly)
+            if (newMode == QueueMode.HostOnly)
             {
                 // Remove all but the current and expired items. The current item may be re-used for host-only mode if it's non-expired.
                 for (int i = 0; i < Room.Playlist.Count; i++)
@@ -406,7 +406,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await ((IMultiplayerClient)this).PlaylistItemChanged(currentItem).ConfigureAwait(false);
 
             // In host-only mode, a duplicate playlist item will be used for the next round.
-            if (Room.Settings.QueueMode == QueueModes.HostOnly)
+            if (Room.Settings.QueueMode == QueueMode.HostOnly)
                 await duplicateCurrentItem().ConfigureAwait(false);
 
             await updateCurrentItem(Room).ConfigureAwait(false);
@@ -443,7 +443,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     newItem = room.Playlist.FirstOrDefault(i => !i.Expired) ?? room.Playlist.Last();
                     break;
 
-                case QueueModes.FairRotate:
+                case QueueMode.FairRotate:
                     // Group playlist items by (user_id -> count_expired), and select the first available playlist item from a user that has available beatmaps where count_expired is the lowest.
                     throw new NotImplementedException();
             }

@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
 {
     public class TestSceneFreeForAllQueueMode : QueueModeTestScene
     {
-        protected override QueueModes Mode => QueueModes.FreeForAll;
+        protected override QueueMode Mode => QueueMode.FreeForAll;
 
         [Test]
         public void TestFirstItemSelectedByDefault()
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
             // Move to the "other" beatmap.
             RunGameplay();
 
-            AddStep("change queue mode", () => Client.ChangeSettings(queueMode: QueueModes.HostOnly));
+            AddStep("change queue mode", () => Client.ChangeSettings(queueMode: QueueMode.HostOnly));
             AddAssert("playlist has 2 items", () => Client.APIRoom?.Playlist.Count == 2);
             AddAssert("playlist item is the other beatmap", () => Client.CurrentMatchPlayingItem.Value?.BeatmapID == OtherBeatmap.OnlineID);
             AddAssert("playlist item is not expired", () => Client.APIRoom?.Playlist[1].Expired == false);

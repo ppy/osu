@@ -388,13 +388,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             switch (client.Room.Settings.QueueMode)
             {
-                case QueueModes.HostOnly:
+                case QueueMode.HostOnly:
                     AddOrEditPlaylistButton.Text = "Edit beatmap";
                     AddOrEditPlaylistButton.Alpha = client.IsHost ? 1 : 0;
                     break;
 
-                case QueueModes.FreeForAll:
-                case QueueModes.FairRotate:
+                case QueueMode.FreeForAll:
+                case QueueMode.FairRotate:
                     AddOrEditPlaylistButton.Text = "Add beatmap";
                     AddOrEditPlaylistButton.Alpha = 1;
                     break;
