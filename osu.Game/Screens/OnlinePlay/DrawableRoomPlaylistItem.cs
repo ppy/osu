@@ -45,6 +45,7 @@ namespace osu.Game.Screens.OnlinePlay
         private ModDisplay modDisplay;
 
         private readonly Bindable<IBeatmapInfo> beatmap = new Bindable<IBeatmapInfo>();
+        private readonly IBindable<bool> valid = new Bindable<bool>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
 
@@ -65,14 +66,18 @@ namespace osu.Game.Screens.OnlinePlay
             this.allowSelection = allowSelection;
 
             beatmap.BindTo(item.Beatmap);
+            valid.BindTo(item.Valid);
             ruleset.BindTo(item.Ruleset);
             requiredMods.BindTo(item.RequiredMods);
 
             ShowDragHandle.Value = allowEdit;
         }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             if (!allowEdit)
                 HandleColour = HandleColour.Opacity(0);
@@ -88,6 +93,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             beatmap.BindValueChanged(_ => Scheduler.AddOnce(refresh));
             ruleset.BindValueChanged(_ => Scheduler.AddOnce(refresh));
+            valid.BindValueChanged(_ => Scheduler.AddOnce(refresh));
             requiredMods.CollectionChanged += (_, __) => Scheduler.AddOnce(refresh);
 
             refresh();
@@ -97,6 +103,12 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void refresh()
         {
+            if (!valid.Value)
+            {
+                maskingContainer.BorderThickness = 5;
+                maskingContainer.BorderColour = colours.Red;
+            }
+
             difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(32) };
 
             panelBackground.Beatmap.Value = Item.Beatmap.Value;
