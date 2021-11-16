@@ -27,7 +27,7 @@ namespace osu.Game.Online.Multiplayer
         public MatchType MatchType { get; set; } = MatchType.HeadToHead;
 
         [Key(4)]
-        public QueueModes QueueMode { get; set; } = QueueModes.HostOnly;
+        public QueueMode QueueMode { get; set; } = QueueMode.HostOnly;
 
         public bool Equals(MultiplayerRoomSettings other)
             => Password.Equals(other.Password, StringComparison.Ordinal)

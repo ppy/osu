@@ -76,11 +76,11 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         [JsonIgnore]
-        public readonly Bindable<QueueModes> QueueMode = new Bindable<QueueModes>();
+        public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
 
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         [JsonProperty("queue_mode")]
-        private QueueModes queueMode
+        private QueueMode queueMode
         {
             get => QueueMode.Value;
             set => QueueMode.Value = value;

@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay
         protected Bindable<TimeSpan?> Duration { get; private set; }
 
         [Resolved(typeof(Room), nameof(Room.QueueMode))]
-        protected Bindable<QueueModes> QueueMode { get; private set; }
+        protected Bindable<QueueMode> QueueMode { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private IBindable<PlaylistItem> subScreenSelectedItem { get; set; }

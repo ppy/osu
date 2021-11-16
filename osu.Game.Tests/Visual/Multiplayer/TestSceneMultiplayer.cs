@@ -589,7 +589,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 roomManager.AddServerSideRoom(new Room
                 {
                     Name = { Value = "Test Room" },
-                    QueueMode = { Value = QueueModes.FreeForAll },
+                    QueueMode = { Value = QueueMode.FreeForAll },
                     Playlist =
                     {
                         new PlaylistItem
