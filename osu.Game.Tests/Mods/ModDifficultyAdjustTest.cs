@@ -156,7 +156,7 @@ namespace osu.Game.Tests.Mods
                 throw new System.NotImplementedException();
             }
 
-            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap)
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap)
             {
                 throw new System.NotImplementedException();
             }
