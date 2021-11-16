@@ -64,6 +64,8 @@ namespace osu.Game.Models
 
         public override string ToString() => Metadata?.GetDisplayString() ?? base.ToString();
 
+        public bool Equals(IBeatmapSetInfo? other) => other is RealmBeatmapSet b && Equals(b);
+
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
 
         IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;

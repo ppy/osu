@@ -103,5 +103,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public string Hash => throw new NotImplementedException();
 
         #endregion
+
+        public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && Equals(b);
     }
 }

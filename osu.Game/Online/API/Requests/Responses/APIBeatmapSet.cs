@@ -141,5 +141,7 @@ namespace osu.Game.Online.API.Requests.Responses
         double IBeatmapSetInfo.MaxBPM => BPM;
 
         #endregion
+
+        public bool Equals(IBeatmapSetInfo? other) => other is APIBeatmapSet b && Equals(b);
     }
 }
