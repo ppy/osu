@@ -330,16 +330,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
         }
 
-        public override Task RemovePlaylistItem(long playlistItemId)
-        {
-            Debug.Assert(Room != null);
-
-            if (Room.Host?.UserID != LocalUser?.UserID)
-                throw new InvalidOperationException("Local user is not the room host.");
-
-            return ((IMultiplayerClient)this).PlaylistItemRemoved(playlistItemId);
-        }
-
         protected override Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
         {
             Debug.Assert(Room != null);
