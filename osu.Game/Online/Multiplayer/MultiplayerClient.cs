@@ -617,7 +617,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
-                APIRoom.Playlist.RemoveAll(i => i.ID == playlistItem.ID);
+                APIRoom.Playlist.RemoveAll(existingItem => existingItem.ID == playlistItem.ID);
                 APIRoom.Playlist.Add(playlistItem);
                 RoomUpdated?.Invoke();
             });
@@ -635,7 +635,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
-                APIRoom.Playlist.RemoveAll(i => i.ID == playlistItemId);
+                APIRoom.Playlist.RemoveAll(item => item.ID == playlistItemId);
                 RoomUpdated?.Invoke();
             });
 
@@ -656,18 +656,18 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
-                int index = APIRoom.Playlist.Select((i, index) => (i, index)).Single(kvp => kvp.i.ID == item.ID).index;
-                var oldItem = APIRoom.Playlist[index];
-                if (oldItem.Equals(playlistItem))
+                PlaylistItem existingItem = APIRoom.Playlist.Single(existingItem => existingItem.ID == item.ID);
+                int existingIndex = APIRoom.Playlist.IndexOf(existingItem);
+                if (existingItem.Equals(playlistItem))
                     return;
 
                 // Replace the item.
-                APIRoom.Playlist.RemoveAt(index);
-                APIRoom.Playlist.Insert(index, playlistItem);
+                APIRoom.Playlist.RemoveAt(existingIndex);
+                APIRoom.Playlist.Insert(existingIndex, playlistItem);
 
                 // If the currently-selected item was the one that got replaced, update the selected item to the new one.
-                if (CurrentMatchPlayingItem.Value == oldItem)
-                    CurrentMatchPlayingItem.Value = APIRoom.Playlist[index];
+                if (CurrentMatchPlayingItem.Value == existingItem)
+                    CurrentMatchPlayingItem.Value = playlistItem;
 
                 RoomUpdated?.Invoke();
             });
