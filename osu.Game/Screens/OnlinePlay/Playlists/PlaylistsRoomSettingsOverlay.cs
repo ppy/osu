@@ -339,9 +339,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 Duration.Value = DurationField.Current.Value;
 
-                manager?.CreateRoom(room, onSuccess, onError);
-
                 loadingLayer.Show();
+                manager?.CreateRoom(room, onSuccess, onError);
             }
 
             private void hideError() => ErrorText.FadeOut(50);
