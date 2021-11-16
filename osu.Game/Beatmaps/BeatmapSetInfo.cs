@@ -78,6 +78,8 @@ namespace osu.Game.Beatmaps
             return false;
         }
 
+        public bool Equals(IBeatmapSetInfo other) => other is BeatmapSetInfo b && Equals(b);
+
         #region Implementation of IHasOnlineID
 
         int IHasOnlineID<int>.OnlineID => OnlineID ?? -1;
