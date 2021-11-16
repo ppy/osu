@@ -29,12 +29,17 @@ namespace osu.Game.Online.Multiplayer
         [Key(4)]
         public QueueMode QueueMode { get; set; } = QueueMode.HostOnly;
 
-        public bool Equals(MultiplayerRoomSettings other)
-            => Password.Equals(other.Password, StringComparison.Ordinal)
-               && Name.Equals(other.Name, StringComparison.Ordinal)
-               && PlaylistItemId == other.PlaylistItemId
-               && MatchType == other.MatchType
-               && QueueMode == other.QueueMode;
+        public bool Equals(MultiplayerRoomSettings? other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
+
+            return Password.Equals(other.Password, StringComparison.Ordinal)
+                   && Name.Equals(other.Name, StringComparison.Ordinal)
+                   && PlaylistItemId == other.PlaylistItemId
+                   && MatchType == other.MatchType
+                   && QueueMode == other.QueueMode;
+        }
 
         public override string ToString() => $"Name:{Name}"
                                              + $" Password:{(string.IsNullOrEmpty(Password) ? "no" : "yes")}"
