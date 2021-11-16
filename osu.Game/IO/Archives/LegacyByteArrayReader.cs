@@ -7,7 +7,7 @@ using System.IO;
 namespace osu.Game.IO.Archives
 {
     /// <summary>
-    /// Allows reading a single file from the provided stream.
+    /// Allows reading a single file from the provided byte array.
     /// </summary>
     public class LegacyByteArrayReader : ArchiveReader
     {

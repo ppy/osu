@@ -22,6 +22,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Resolved]
         private SkinManager skins { get; set; }
 
+        [Cached]
+        private EditorClipboard clipboard = new EditorClipboard();
+
         [SetUpSteps]
         public void SetUpSteps()
         {

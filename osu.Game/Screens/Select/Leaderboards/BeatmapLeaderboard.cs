@@ -44,10 +44,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private bool filterMods;
 
-        private IBindable<WeakReference<ScoreInfo>> itemRemoved;
-
-        private IBindable<WeakReference<ScoreInfo>> itemAdded;
-
         /// <summary>
         /// Whether to apply the game's currently selected mods as a filter when retrieving scores.
         /// </summary>
@@ -90,11 +86,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                     UpdateScores();
             };
 
-            itemRemoved = scoreManager.ItemRemoved.GetBoundCopy();
-            itemRemoved.BindValueChanged(onScoreRemoved);
-
-            itemAdded = scoreManager.ItemUpdated.GetBoundCopy();
-            itemAdded.BindValueChanged(onScoreAdded);
+            scoreManager.ItemRemoved += scoreStoreChanged;
+            scoreManager.ItemUpdated += scoreStoreChanged;
         }
 
         protected override void Reset()
@@ -103,22 +96,13 @@ namespace osu.Game.Screens.Select.Leaderboards
             TopScore = null;
         }
 
-        private void onScoreRemoved(ValueChangedEvent<WeakReference<ScoreInfo>> score) =>
-            scoreStoreChanged(score);
-
-        private void onScoreAdded(ValueChangedEvent<WeakReference<ScoreInfo>> score) =>
-            scoreStoreChanged(score);
-
-        private void scoreStoreChanged(ValueChangedEvent<WeakReference<ScoreInfo>> score)
+        private void scoreStoreChanged(ScoreInfo score)
         {
             if (Scope != BeatmapLeaderboardScope.Local)
                 return;
 
-            if (score.NewValue.TryGetTarget(out var scoreInfo))
-            {
-                if (BeatmapInfo?.ID != scoreInfo.BeatmapInfoID)
-                    return;
-            }
+            if (BeatmapInfo?.ID != score.BeatmapInfoID)
+                return;
 
             RefreshScores();
         }
@@ -168,7 +152,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (BeatmapInfo.OnlineBeatmapID == null || BeatmapInfo?.Status <= BeatmapSetOnlineStatus.Pending)
+            if (BeatmapInfo.OnlineID == null || BeatmapInfo?.Status <= BeatmapSetOnlineStatus.Pending)
             {
                 PlaceholderState = PlaceholderState.Unavailable;
                 return null;
@@ -215,5 +199,16 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             Action = () => ScoreSelected?.Invoke(model)
         };
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (scoreManager != null)
+            {
+                scoreManager.ItemRemoved -= scoreStoreChanged;
+                scoreManager.ItemUpdated -= scoreStoreChanged;
+            }
+        }
     }
 }

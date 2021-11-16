@@ -92,6 +92,9 @@ namespace osu.Game.Screens.Play.HUD
                 scoreProcessor.NewJudgement += onJudgementChanged;
                 scoreProcessor.JudgementReverted += onJudgementChanged;
             }
+
+            if (gameplayState?.LastJudgementResult.Value != null)
+                onJudgementChanged(gameplayState.LastJudgementResult.Value);
         }
 
         private bool isValid;
@@ -155,7 +158,10 @@ namespace osu.Game.Screens.Play.HUD
             base.Dispose(isDisposing);
 
             if (scoreProcessor != null)
+            {
                 scoreProcessor.NewJudgement -= onJudgementChanged;
+                scoreProcessor.JudgementReverted -= onJudgementChanged;
+            }
 
             loadCancellationSource?.Cancel();
         }
@@ -184,7 +190,7 @@ namespace osu.Game.Screens.Play.HUD
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.Numeric.With(size: 16)
+                            Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
                         },
                         new OsuSpriteText
                         {

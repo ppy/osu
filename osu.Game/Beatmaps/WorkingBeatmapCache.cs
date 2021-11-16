@@ -41,7 +41,7 @@ namespace osu.Game.Beatmaps
         [CanBeNull]
         private readonly GameHost host;
 
-        public WorkingBeatmapCache([NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null, GameHost host = null)
+        public WorkingBeatmapCache(ITrackStore trackStore, AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null, GameHost host = null)
         {
             DefaultBeatmap = defaultBeatmap;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Beatmaps
             this.host = host;
             this.files = files;
             largeTextureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(files));
-            trackStore = audioManager.GetTrackStore(files);
+            this.trackStore = trackStore;
         }
 
         public void Invalidate(BeatmapSetInfo info)

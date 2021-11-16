@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Select.Carousel
                     return compareUsingAggregateMax(otherSet, b => b.Length);
 
                 case SortMode.Difficulty:
-                    return compareUsingAggregateMax(otherSet, b => b.StarDifficulty);
+                    return compareUsingAggregateMax(otherSet, b => b.StarRating);
             }
         }
 

@@ -229,7 +229,7 @@ namespace osu.Game.Online.Multiplayer
                 {
                     Value = new BeatmapInfo
                     {
-                        OnlineBeatmapID = Room.Settings.BeatmapID,
+                        OnlineID = Room.Settings.BeatmapID,
                         MD5Hash = Room.Settings.BeatmapChecksum
                     }
                 },
