@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Difficulty
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
 
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, playableMods, token: cancellationToken);
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, playableMods, cancellationToken: cancellationToken);
 
             var track = new TrackVirtual(10000);
             playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));

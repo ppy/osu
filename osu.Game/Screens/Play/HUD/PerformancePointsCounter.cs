@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Play.HUD
                 this.gameplayBeatmap = gameplayBeatmap;
             }
 
-            public override IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, CancellationToken timeoutToken = default)
+            public override IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, CancellationToken cancellationToken = default)
                 => gameplayBeatmap;
 
             protected override IBeatmap GetBeatmap() => gameplayBeatmap;
