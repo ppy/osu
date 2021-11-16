@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -87,22 +86,14 @@ namespace osu.Game.Screens.OnlinePlay
 
             SelectedItem.BindValueChanged(selected => maskingContainer.BorderThickness = selected.NewValue == Model ? 5 : 0, true);
 
-            beatmap.BindValueChanged(_ => scheduleRefresh());
-            ruleset.BindValueChanged(_ => scheduleRefresh());
-
-            requiredMods.CollectionChanged += (_, __) => scheduleRefresh();
+            beatmap.BindValueChanged(_ => Scheduler.AddOnce(refresh));
+            ruleset.BindValueChanged(_ => Scheduler.AddOnce(refresh));
+            requiredMods.CollectionChanged += (_, __) => Scheduler.AddOnce(refresh);
 
             refresh();
         }
 
-        private ScheduledDelegate scheduledRefresh;
         private PanelBackground panelBackground;
-
-        private void scheduleRefresh()
-        {
-            scheduledRefresh?.Cancel();
-            scheduledRefresh = Schedule(refresh);
-        }
 
         private void refresh()
         {
