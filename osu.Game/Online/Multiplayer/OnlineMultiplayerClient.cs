@@ -3,7 +3,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -150,14 +149,6 @@ namespace osu.Game.Online.Multiplayer
                 return Task.CompletedTask;
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.StartMatch));
-        }
-
-        public override Task RequestAllPlaylistItems()
-        {
-            if (!IsConnected.Value)
-                return Task.FromResult(Array.Empty<MultiplayerPlaylistItem>());
-
-            return connection.InvokeAsync<MultiplayerPlaylistItem[]>(nameof(IMultiplayerServer.RequestAllPlaylistItems));
         }
 
         public override Task AddPlaylistItem(MultiplayerPlaylistItem item)
