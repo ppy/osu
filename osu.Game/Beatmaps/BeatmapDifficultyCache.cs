@@ -140,21 +140,21 @@ namespace osu.Game.Beatmaps
             return GetAsync(new DifficultyCacheLookup(localBeatmapInfo, localRulesetInfo, mods), cancellationToken);
         }
 
-        protected override Task<StarDifficulty> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken token = default)
+        protected override Task<StarDifficulty> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken cancellationToken = default)
         {
             return Task.Factory.StartNew(() =>
             {
                 if (CheckExists(lookup, out var existing))
                     return existing;
 
-                return computeDifficulty(lookup, token);
-            }, token, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+                return computeDifficulty(lookup, cancellationToken);
+            }, cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
-        public Task<List<TimedDifficultyAttributes>> GetTimedDifficultyAttributesAsync(WorkingBeatmap beatmap, Ruleset ruleset, Mod[] mods, CancellationToken token = default)
+        public Task<List<TimedDifficultyAttributes>> GetTimedDifficultyAttributesAsync(WorkingBeatmap beatmap, Ruleset ruleset, Mod[] mods, CancellationToken cancellationToken = default)
         {
-            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods, token),
-                token,
+            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods, cancellationToken),
+                cancellationToken,
                 TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
                 updateScheduler);
         }
