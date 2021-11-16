@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Ranking
             AddStep("show excess mods score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), new TestScoreInfo(new OsuRuleset().RulesetInfo, true)));
         }
 
-        private void showPanel(WorkingBeatmap workingBeatmap, ScoreInfo score)
+        private void showPanel(IWorkingBeatmap workingBeatmap, ScoreInfo score)
         {
             Child = new ContractedPanelMiddleContentContainer(workingBeatmap, score);
         }
@@ -43,11 +43,11 @@ namespace osu.Game.Tests.Visual.Ranking
         private class ContractedPanelMiddleContentContainer : Container
         {
             [Cached]
-            private Bindable<WorkingBeatmap> workingBeatmap { get; set; }
+            private Bindable<IWorkingBeatmap> workingBeatmap { get; set; }
 
-            public ContractedPanelMiddleContentContainer(WorkingBeatmap beatmap, ScoreInfo score)
+            public ContractedPanelMiddleContentContainer(IWorkingBeatmap beatmap, ScoreInfo score)
             {
-                workingBeatmap = new Bindable<WorkingBeatmap>(beatmap);
+                workingBeatmap = new Bindable<IWorkingBeatmap>(beatmap);
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;

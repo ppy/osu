@@ -51,10 +51,10 @@ namespace osu.Game.Overlays
         public bool UserPauseRequested { get; private set; }
 
         /// <summary>
-        /// Fired when the global <see cref="WorkingBeatmap"/> has changed.
+        /// Fired when the global <see cref="IWorkingBeatmap"/> has changed.
         /// Includes direction information for display purposes.
         /// </summary>
-        public event Action<WorkingBeatmap, TrackChangeDirection> TrackChanged;
+        public event Action<IWorkingBeatmap, TrackChangeDirection> TrackChanged;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
-        /// Forcefully reload the current <see cref="WorkingBeatmap"/>'s track from disk.
+        /// Forcefully reload the current <see cref="IWorkingBeatmap"/>'s track from disk.
         /// </summary>
         public void ReloadCurrentTrack() => changeTrack();
 
@@ -370,7 +370,7 @@ namespace osu.Game.Overlays
             });
         }
 
-        private void onTrackCompleted(WorkingBeatmap workingBeatmap)
+        private void onTrackCompleted(IWorkingBeatmap workingBeatmap)
         {
             // the source of track completion is the audio thread, so the beatmap may have changed before firing.
             if (current != workingBeatmap)
