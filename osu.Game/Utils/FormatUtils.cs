@@ -31,5 +31,23 @@ namespace osu.Game.Utils
         /// </summary>
         /// <param name="rank">The rank/position to be formatted.</param>
         public static string FormatRank(this int rank) => rank.ToMetric(decimals: rank < 100_000 ? 1 : 0);
+
+        /// <summary>
+        /// Finds the number of digits after the decimal.
+        /// </summary>
+        /// <param name="d">The value to find the number of decimal digits for.</param>
+        /// <returns>The number decimal digits.</returns>
+        public static int FindPrecision(decimal d)
+        {
+            int precision = 0;
+
+            while (d != Math.Round(d))
+            {
+                d *= 10;
+                precision++;
+            }
+
+            return precision;
+        }
     }
 }
