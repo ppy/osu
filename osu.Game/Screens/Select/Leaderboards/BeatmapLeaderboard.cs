@@ -116,6 +116,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             loadCancellationSource?.Cancel();
             loadCancellationSource = new CancellationTokenSource();
 
+            var cancellationToken = loadCancellationSource.Token;
+
             if (BeatmapInfo == null)
             {
                 PlaceholderState = PlaceholderState.NoneSelected;
@@ -140,7 +142,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
                 }
 
-                scoreManager.OrderByTotalScoreAsync(scores.ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
                             .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
 
                 return null;
@@ -176,10 +178,10 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             req.Success += r =>
             {
-                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, BeatmapInfo)).ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, BeatmapInfo)).ToArray(), cancellationToken)
                             .ContinueWith(ordered => Schedule(() =>
                             {
-                                if (loadCancellationSource.IsCancellationRequested)
+                                if (cancellationToken.IsCancellationRequested)
                                     return;
 
                                 scoresCallback?.Invoke(ordered.Result);
