@@ -5,7 +5,7 @@ using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 
-namespace osu.Game.Screens.Edit
+namespace osu.Game.Screens.Edit.GameplayTest
 {
     public class SaveBeforeGameplayTestDialog : PopupDialog
     {

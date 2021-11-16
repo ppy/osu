@@ -106,6 +106,8 @@ namespace osu.Game.Models
             return ID == other.ID;
         }
 
+        public bool Equals(IBeatmapInfo? other) => other is RealmBeatmap b && Equals(b);
+
         public bool AudioEquals(RealmBeatmap? other) => other != null
                                                         && BeatmapSet != null
                                                         && other.BeatmapSet != null
