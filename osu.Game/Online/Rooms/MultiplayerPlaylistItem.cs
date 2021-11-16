@@ -19,7 +19,7 @@ namespace osu.Game.Online.Rooms
         public long ID { get; set; }
 
         [Key(1)]
-        public int UserID { get; set; }
+        public int OwnerID { get; set; }
 
         [Key(2)]
         public int BeatmapID { get; set; }
