@@ -72,9 +72,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             new Strain(mods, ((ManiaBeatmap)Beatmap).TotalColumns)
         };
 
-        protected override PreStrainSkill[] CreatePreSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected override Skill[] CreatePreSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            return new PreStrainSkill[]
+            return new Skill[]
             {
 
             };

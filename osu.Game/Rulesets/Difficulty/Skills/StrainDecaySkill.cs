@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         protected override double CalculateInitialStrain(double time) => CurrentStrain * strainDecay(time - Previous[0].StartTime);
 
-        protected override double StrainValueAt(PreStrainSkill[] preSkills, int index, DifficultyHitObject current)
+        protected override double StrainValueAt(Skill[] preSkills, int index, DifficultyHitObject current)
         {
             CurrentStrain *= strainDecay(current.DeltaTime);
             CurrentStrain += StrainValueOf(preSkills, index, current) * SkillMultiplier;
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
         /// </summary>
-        protected abstract double StrainValueOf(PreStrainSkill[] preSkills, int index, DifficultyHitObject current);
+        protected abstract double StrainValueOf(Skill[] preSkills, int index, DifficultyHitObject current);
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
     }

@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
         }
 
-        private double strainValueOf(PreStrainSkill[] preSkills, int index, DifficultyHitObject current)
+        private double strainValueOf(Skill[] preSkills, int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double CalculateInitialStrain(double time) => (currentStrain * currentRhythm) * strainDecay(time - Previous[0].StartTime);
 
-        protected override double StrainValueAt(PreStrainSkill[] preSkills, int index, DifficultyHitObject current)
+        protected override double StrainValueAt(Skill[] preSkills, int index, DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
             currentStrain += strainValueOf(preSkills, index, current) * skillMultiplier;

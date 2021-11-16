@@ -256,7 +256,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="clockRate">Clockrate to calculate difficulty with.</param>
         /// <returns>The <see cref="Skill"/>s.</returns>
         protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
-        protected abstract PreStrainSkill[] CreatePreSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
+        protected abstract Skill[] CreatePreSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
 
         /// <summary>
         /// Used to calculate timed difficulty attributes, where only a subset of hitobjects should be visible at any point in time.
