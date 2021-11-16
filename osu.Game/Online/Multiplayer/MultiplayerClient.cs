@@ -617,7 +617,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
-                APIRoom.Playlist.RemoveAll(existingItem => existingItem.ID == playlistItem.ID);
+                APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItem.ID);
                 APIRoom.Playlist.Add(playlistItem);
                 RoomUpdated?.Invoke();
             });
@@ -635,7 +635,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
-                APIRoom.Playlist.RemoveAll(item => item.ID == playlistItemId);
+                APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItemId);
                 RoomUpdated?.Invoke();
             });
 
@@ -656,7 +656,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
-                PlaylistItem existingItem = APIRoom.Playlist.Single(existingItem => existingItem.ID == item.ID);
+                PlaylistItem existingItem = APIRoom.Playlist.Single(existing => existing.ID == item.ID);
                 int existingIndex = APIRoom.Playlist.IndexOf(existingItem);
                 if (existingItem.Equals(playlistItem))
                     return;
