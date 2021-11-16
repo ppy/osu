@@ -102,8 +102,8 @@ namespace osu.Game.Rulesets.Difficulty
 
                 progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
 
-                foreach (var preSkill in preSkills)
-                    preSkill.ProcessInternal(preSkills, index, hitObject);
+                foreach (var skill in skills)
+                    skill.ProcessInternal(preSkills, index, hitObject);
 
                 attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
