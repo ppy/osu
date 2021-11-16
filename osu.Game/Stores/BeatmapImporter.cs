@@ -22,8 +22,10 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using Realms;
 
 #nullable enable
@@ -315,21 +317,35 @@ namespace osu.Game.Stores
         /// <summary>
         /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.
         /// </summary>
-        private class DummyConversionBeatmap : WorkingBeatmap
+        private class DummyConversionBeatmap : IWorkingBeatmap
         {
-            private readonly IBeatmap beatmap;
+            public IBeatmap Beatmap { get; }
 
             public DummyConversionBeatmap(IBeatmap beatmap)
-                : base(beatmap.BeatmapInfo, null)
             {
-                this.beatmap = beatmap;
+                Beatmap = beatmap;
             }
 
-            protected override IBeatmap GetBeatmap() => beatmap;
-            protected override Texture? GetBackground() => null;
-            protected override Track? GetBeatmapTrack() => null;
-            protected internal override ISkin? GetSkin() => null;
-            public override Stream? GetStream(string storagePath) => null;
+            public IBeatmapInfo BeatmapInfo => throw new NotImplementedException();
+            public IBeatmapSetInfo BeatmapSetInfo => throw new NotImplementedException();
+            public IBeatmapMetadataInfo Metadata => throw new NotImplementedException();
+            public bool BeatmapLoaded => throw new NotImplementedException();
+            public bool BackgroundLoaded => throw new NotImplementedException();
+            public bool WaveformLoaded => throw new NotImplementedException();
+            public bool StoryboardLoaded => throw new NotImplementedException();
+            public bool SkinLoaded => throw new NotImplementedException();
+            public bool TrackLoaded => throw new NotImplementedException();
+            public Texture Background => throw new NotImplementedException();
+            public Waveform Waveform => throw new NotImplementedException();
+            public Storyboard Storyboard => throw new NotImplementedException();
+            public ISkin Skin => throw new NotImplementedException();
+            public Track Track => throw new NotImplementedException();
+            public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, TimeSpan? timeout = null) => throw new NotImplementedException();
+            public Track LoadTrack() => throw new NotImplementedException();
+            public Stream GetStream(string storagePath) => throw new NotImplementedException();
+            public void BeginAsyncLoad() => throw new NotImplementedException();
+            public void CancelAsyncLoad() => throw new NotImplementedException();
+            public void PrepareTrackForPreviewLooping() => throw new NotImplementedException();
         }
     }
 }
