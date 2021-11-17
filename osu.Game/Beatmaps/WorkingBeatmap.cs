@@ -85,10 +85,10 @@ namespace osu.Game.Beatmaps
 
             var rulesetInstance = ruleset.CreateInstance();
 
-            IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
-
             if (rulesetInstance == null)
                 throw new RulesetLoadException("Creating ruleset instance failed when attempting to create playable beatmap.");
+
+            IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
 
             // Check if the beatmap can be converted
             if (Beatmap.HitObjects.Count > 0 && !converter.CanConvert())
