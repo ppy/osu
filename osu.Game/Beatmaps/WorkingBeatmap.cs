@@ -27,9 +27,7 @@ namespace osu.Game.Beatmaps
     public abstract class WorkingBeatmap : IWorkingBeatmap
     {
         public readonly BeatmapInfo BeatmapInfo;
-
         public readonly BeatmapSetInfo BeatmapSetInfo;
-
         public readonly BeatmapMetadata Metadata;
 
         protected AudioManager AudioManager { get; }
@@ -81,13 +79,16 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public virtual IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
+        public virtual IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
         {
             using (var cancellationSource = createCancellationTokenSource(timeout))
             {
                 mods ??= Array.Empty<Mod>();
 
                 var rulesetInstance = ruleset.CreateInstance();
+
+                if (rulesetInstance == null)
+                    throw new RulesetLoadException("Creating ruleset instance failed when attempting to create playable beatmap.");
 
                 IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
 
@@ -176,17 +177,8 @@ namespace osu.Game.Beatmaps
 
         private CancellationTokenSource loadCancellation = new CancellationTokenSource();
 
-        /// <summary>
-        /// Beings loading the contents of this <see cref="WorkingBeatmap"/> asynchronously.
-        /// </summary>
-        public void BeginAsyncLoad()
-        {
-            loadBeatmapAsync();
-        }
+        public void BeginAsyncLoad() => loadBeatmapAsync();
 
-        /// <summary>
-        /// Cancels the asynchronous loading of the contents of this <see cref="WorkingBeatmap"/>.
-        /// </summary>
         public void CancelAsyncLoad()
         {
             lock (beatmapFetchLock)
@@ -234,6 +226,10 @@ namespace osu.Game.Beatmaps
 
         public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
 
+        IBeatmapInfo IWorkingBeatmap.BeatmapInfo => BeatmapInfo;
+        IBeatmapMetadataInfo IWorkingBeatmap.Metadata => Metadata;
+        IBeatmapSetInfo IWorkingBeatmap.BeatmapSetInfo => BeatmapSetInfo;
+
         public IBeatmap Beatmap
         {
             get
@@ -273,9 +269,6 @@ namespace osu.Game.Beatmaps
         [NotNull]
         public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
-        /// <summary>
-        /// Reads the correct track restart point from beatmap metadata and sets looping to enabled.
-        /// </summary>
         public void PrepareTrackForPreviewLooping()
         {
             Track.Looping = true;

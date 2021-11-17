@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void TestClockRateAdjusted(double expected, string name)
             => Test(expected, name, new CatchModDoubleTime());
 
-        protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(new CatchRuleset(), beatmap);
+        protected override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new CatchDifficultyCalculator(new CatchRuleset().RulesetInfo, beatmap);
 
         protected override Ruleset CreateRuleset() => new CatchRuleset();
     }
