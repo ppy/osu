@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double preemptTime;
 
         private const double max_opacity_bonus = 0.4;
-        private const double hidden_bonus = 0.3;
+        private const double hidden_bonus = 0.4;
 
         private double currentStrain;
 
