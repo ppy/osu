@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
 
         private const double min_velocity = 0.5;
-        private const double slider_multiplier = 2.5;
+        private const double slider_multiplier = 1.3;
 
         private double currentStrain;
 
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 // Reward sliders based on velocity.
                 double normalisedTravelDistance = osuCurrent.TravelDistance / scalingFactor;
-                sliderBonus = Math.Max(0.0, (normalisedTravelDistance) / osuCurrent.TravelTime - min_velocity);
+                sliderBonus = Math.Pow(Math.Max(0.0, (normalisedTravelDistance) / osuCurrent.TravelTime - min_velocity), 0.5);
                 // Longer sliders require more memorisation.
                 sliderBonus *= normalisedTravelDistance;
             }
