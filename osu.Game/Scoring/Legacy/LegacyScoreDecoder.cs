@@ -124,7 +124,7 @@ namespace osu.Game.Scoring.Legacy
             return score;
         }
 
-        protected void CalculateAccuracy(ScoreInfo score)
+        public static void CalculateAccuracy(ScoreInfo score)
         {
             int countMiss = score.GetCountMiss() ?? 0;
             int count50 = score.GetCount50() ?? 0;
