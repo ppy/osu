@@ -87,7 +87,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return result;
         }
 
-        private double opacity(double ms, double preemptTime, bool hidden) {
+        private double opacity(double ms, double preemptTime, bool hidden)
+        {
             if (hidden)
                 return Math.Clamp(Math.Min((1 - ms / preemptTime) * 2.5, (ms / preemptTime) * (1.0 / 0.3)), 0.0, 1.0);
             else
