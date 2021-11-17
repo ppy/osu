@@ -193,7 +193,7 @@ namespace osu.Game.Utils
         /// <param name="ruleset">The ruleset to verify mods against.</param>
         /// <param name="proposedMods">The proposed mods.</param>
         /// <param name="valid">Mods instantiated from <paramref name="proposedMods"/> which were valid for the given <paramref name="ruleset"/>.</param>
-        /// <returns>Whether all <see cref="proposedMods"/> were valid for the given <paramref name="ruleset"/>.</returns>
+        /// <returns>Whether all <paramref name="proposedMods"/> were valid for the given <paramref name="ruleset"/>.</returns>
         public static bool InstantiateValidModsForRuleset(Ruleset ruleset, IEnumerable<APIMod> proposedMods, out List<Mod> valid)
         {
             valid = new List<Mod>();
