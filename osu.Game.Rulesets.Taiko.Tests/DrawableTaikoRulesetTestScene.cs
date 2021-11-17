@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             var controlPointInfo = new ControlPointInfo();
             controlPointInfo.Add(0, new TimingControlPoint());
 
-            WorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
+            IWorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
             {
                 HitObjects = new List<HitObject> { new Hit { Type = HitType.Centre } },
                 BeatmapInfo = new BeatmapInfo
