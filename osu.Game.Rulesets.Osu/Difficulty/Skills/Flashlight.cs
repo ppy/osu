@@ -80,11 +80,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             result = Math.Pow(smallDistNerf * result, 2.0);
 
-            if (hidden) {
-                result *= 1.0 + max_opacity_bonus;
-                // Additional bonus for Hidden due to there being no approach circles.
+            // Additional bonus for Hidden due to there being no approach circles.
+            if (hidden)
                 result *= 1.0 + hidden_bonus;
-            }
 
             return result;
         }
