@@ -90,7 +90,24 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(selected => maskingContainer.BorderThickness = selected.NewValue == Model ? 5 : 0, true);
+            SelectedItem.BindValueChanged(selected =>
+            {
+                bool isCurrent = selected.NewValue == Model;
+
+                if (!valid.Value)
+                {
+                    // Don't allow selection when not valid.
+                    if (isCurrent)
+                    {
+                        SelectedItem.Value = selected.OldValue;
+                    }
+
+                    // Don't update border when not valid (the border is displaying this fact).
+                    return;
+                }
+
+                maskingContainer.BorderThickness = isCurrent ? 5 : 0;
+            }, true);
 
             beatmap.BindValueChanged(_ => Scheduler.AddOnce(refresh));
             ruleset.BindValueChanged(_ => Scheduler.AddOnce(refresh));
