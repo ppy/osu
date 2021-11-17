@@ -95,7 +95,7 @@ namespace osu.Game.Beatmaps
         /// <param name="cancellationToken">Cancellation token that cancels the beatmap loading process. If not provided, a default timeout of 10,000ms will be applied to the load process.</param>
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
-        IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, CancellationToken? cancellationToken = null);
+        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null, CancellationToken? cancellationToken = null);
 
         /// <summary>
         /// Load a new audio track instance for this beatmap. This should be called once before accessing <see cref="Track"/>.

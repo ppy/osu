@@ -34,7 +34,7 @@ namespace osu.Game.Online.Rooms
         public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
 
         [JsonIgnore]
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public readonly Bindable<IRulesetInfo> Ruleset = new Bindable<IRulesetInfo>();
 
         [JsonIgnore]
         public readonly BindableList<Mod> AllowedMods = new BindableList<Mod>();
@@ -66,7 +66,7 @@ namespace osu.Game.Online.Rooms
         public PlaylistItem()
         {
             Beatmap.BindValueChanged(beatmap => BeatmapID = beatmap.NewValue?.OnlineID ?? -1);
-            Ruleset.BindValueChanged(ruleset => RulesetID = ruleset.NewValue?.ID ?? 0);
+            Ruleset.BindValueChanged(ruleset => RulesetID = ruleset.NewValue?.OnlineID ?? 0);
         }
 
         public void MapObjects(RulesetStore rulesets)
