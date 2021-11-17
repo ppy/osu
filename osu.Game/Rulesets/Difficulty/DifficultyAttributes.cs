@@ -9,23 +9,47 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty
 {
+    /// <summary>
+    /// Describes the difficulty of a beatmap, as output by a <see cref="DifficultyCalculator"/>.
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class DifficultyAttributes
     {
+        /// <summary>
+        /// The mods which were applied to the beatmap.
+        /// </summary>
         public Mod[] Mods { get; set; }
 
+        /// <summary>
+        /// The skills resulting from the difficulty calculation.
+        /// </summary>
         public Skill[] Skills { get; set; }
 
+        /// <summary>
+        /// The combined star rating of all skill.
+        /// </summary>
         [JsonProperty("star_rating", Order = -3)]
         public double StarRating { get; set; }
 
+        /// <summary>
+        /// The maximum achievable combo.
+        /// </summary>
         [JsonProperty("max_combo", Order = -2)]
         public int MaxCombo { get; set; }
 
+        /// <summary>
+        /// Creates new <see cref="DifficultyAttributes"/>.
+        /// </summary>
         public DifficultyAttributes()
         {
         }
 
+        /// <summary>
+        /// Creates new <see cref="DifficultyAttributes"/>.
+        /// </summary>
+        /// <param name="mods">The mods which were applied to the beatmap.</param>
+        /// <param name="skills">The skills resulting from the difficulty calculation.</param>
+        /// <param name="starRating">The combined star rating of all skills.</param>
         public DifficultyAttributes(Mod[] mods, Skill[] skills, double starRating)
         {
             Mods = mods;
@@ -33,8 +57,18 @@ namespace osu.Game.Rulesets.Difficulty
             StarRating = starRating;
         }
 
+        /// <summary>
+        /// Converts this <see cref="DifficultyAttributes"/> to osu-web compatible database attribute mappings.
+        /// </summary>
+        /// <remarks>
+        /// See: osu_difficulty_attribs table.
+        /// </remarks>
         public virtual IEnumerable<(int attributeId, object value)> ToDatabaseAttributes() => Enumerable.Empty<(int, object)>();
 
+        /// <summary>
+        /// Reads osu-web database attribute mappings into this <see cref="DifficultyAttributes"/> object.
+        /// </summary>
+        /// <param name="values">The attribute mappings.</param>
         public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
         }
