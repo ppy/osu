@@ -24,6 +24,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
 
+        private const double min_velocity = 0.5;
+        private const double slider_multiplier = 2.5;
+
         private double currentStrain;
 
         private double strainValueOf(DifficultyHitObject current)
@@ -62,7 +65,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
-            return Math.Pow(smallDistNerf * result, 2.0);
+            result = Math.Pow(smallDistNerf * result, 2.0);
+
+            double sliderBonus = 0.0;
+            if (osuCurrent.TravelTime != 0)
+            {
+                // Reward sliders based on velocity.
+                double normalisedTravelDistance = osuCurrent.TravelDistance / scalingFactor;
+                sliderBonus = Math.Max(0.0, (normalisedTravelDistance) / osuCurrent.TravelTime - min_velocity);
+                // Longer sliders require more memorisation.
+                sliderBonus *= normalisedTravelDistance;
+            }
+
+            result += sliderBonus * slider_multiplier;
+
+            return result;
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
