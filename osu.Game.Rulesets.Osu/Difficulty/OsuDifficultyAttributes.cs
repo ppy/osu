@@ -70,6 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             SliderFactor = values[19];
         }
 
+        // Used implicitly by Newtonsoft.Json to not serialize flashlight property in some cases.
         [UsedImplicitly]
         public bool ShouldSerializeFlashlightRating() => Mods.OfType<ModFlashlight>().Any();
     }
