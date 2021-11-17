@@ -28,9 +28,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
 
-        private Mod[] mods;
+        private readonly Mod[] mods;
         private bool hidden;
-        private double preemptTime;
+        private readonly double preemptTime;
 
         private const double max_opacity_bonus = 0.7;
         private const double hidden_bonus = 0.5;
