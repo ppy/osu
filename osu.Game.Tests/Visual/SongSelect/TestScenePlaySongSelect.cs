@@ -508,13 +508,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                     i.IsFiltered || i.Item.BeatmapInfo.Ruleset.ID == targetRuleset || i.Item.BeatmapInfo.Ruleset.ID == 0);
             });
 
-            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmapInfo?.OnlineID == target.OnlineID);
-            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineID == target.OnlineID);
+            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmapInfo?.MatchesOnlineID(target) == true);
+            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(target));
 
             AddStep("reset filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = string.Empty);
 
-            AddAssert("game still correct", () => Beatmap.Value?.BeatmapInfo.OnlineID == target.OnlineID);
-            AddAssert("carousel still correct", () => songSelect.Carousel.SelectedBeatmapInfo.OnlineID == target.OnlineID);
+            AddAssert("game still correct", () => Beatmap.Value?.BeatmapInfo.MatchesOnlineID(target) == true);
+            AddAssert("carousel still correct", () => songSelect.Carousel.SelectedBeatmapInfo.MatchesOnlineID(target));
         }
 
         [Test]
@@ -545,8 +545,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo != null);
 
-            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmapInfo?.OnlineID == target.OnlineID);
-            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineID == target.OnlineID);
+            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmapInfo?.MatchesOnlineID(target) == true);
+            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(target));
 
             AddStep("set filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nononoo");
 
@@ -739,7 +739,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
 
-            AddAssert("Selected beatmap still same set", () => songSelect.Carousel.SelectedBeatmapInfo.BeatmapSet.ID == previousSetID);
+            AddAssert("Selected beatmap still same set", () => songSelect.Carousel.SelectedBeatmapInfo.BeatmapSet.OnlineID == previousSetID);
             AddAssert("Selected beatmap is mania", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID == 3);
         }
 
