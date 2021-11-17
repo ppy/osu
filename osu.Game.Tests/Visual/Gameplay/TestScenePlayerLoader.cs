@@ -95,8 +95,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void prepareBeatmap()
         {
-            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-            Beatmap.Value.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
+            var workingBeatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
+            Beatmap.Value = workingBeatmap;
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(Beatmap.Value.Track);
