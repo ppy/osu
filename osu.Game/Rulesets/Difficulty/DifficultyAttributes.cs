@@ -15,6 +15,17 @@ namespace osu.Game.Rulesets.Difficulty
     [JsonObject(MemberSerialization.OptIn)]
     public class DifficultyAttributes
     {
+        protected const int ATTRIB_ID_AIM = 1;
+        protected const int ATTRIB_ID_SPEED = 3;
+        protected const int ATTRIB_ID_OVERALL_DIFFICULTY = 5;
+        protected const int ATTRIB_ID_APPROACH_RATE = 7;
+        protected const int ATTRIB_ID_MAX_COMBO = 9;
+        protected const int ATTRIB_ID_STRAIN = 11;
+        protected const int ATTRIB_ID_GREAT_HIT_WINDOW = 13;
+        protected const int ATTRIB_ID_SCORE_MULTIPLIER = 15;
+        protected const int ATTRIB_ID_FLASHLIGHT = 17;
+        protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
+
         /// <summary>
         /// The mods which were applied to the beatmap.
         /// </summary>
@@ -72,16 +83,5 @@ namespace osu.Game.Rulesets.Difficulty
         public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
         }
-
-        protected const int ATTRIB_ID_AIM = 1;
-        protected const int ATTRIB_ID_SPEED = 3;
-        protected const int ATTRIB_ID_OVERALL_DIFFICULTY = 5;
-        protected const int ATTRIB_ID_APPROACH_RATE = 7;
-        protected const int ATTRIB_ID_MAX_COMBO = 9;
-        protected const int ATTRIB_ID_STRAIN = 11;
-        protected const int ATTRIB_ID_GREAT_HIT_WINDOW = 13;
-        protected const int ATTRIB_ID_SCORE_MULTIPLIER = 15;
-        protected const int ATTRIB_ID_FLASHLIGHT = 17;
-        protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
     }
 }
