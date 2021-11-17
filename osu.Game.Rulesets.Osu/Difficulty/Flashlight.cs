@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.preemptTime = preemptTime;
         }
 
-        private double skillMultiplier => 0.09;
+        private double skillMultiplier => 0.07;
         private double strainDecayBase => 0.15;
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
@@ -32,8 +32,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private bool hidden;
         private double preemptTime;
 
-        private const double max_opacity_bonus = 0.7;
-        private const double hidden_bonus = 0.5;
+        private const double max_opacity_bonus = 1.0;
+        private const double hidden_bonus = 0.8;
 
         private double currentStrain;
 
