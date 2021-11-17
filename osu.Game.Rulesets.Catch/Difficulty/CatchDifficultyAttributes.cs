@@ -17,19 +17,19 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             foreach (var v in base.ToDatabaseAttributes())
                 yield return v;
 
-            // Todo: Catch should not output star rating in the 'aim' attribute.
-            yield return (1, StarRating);
-            yield return (7, ApproachRate);
-            yield return (9, MaxCombo);
+            // Todo: osu!catch should not output star rating in the 'aim' attribute.
+            yield return (ATTRIB_ID_AIM, StarRating);
+            yield return (ATTRIB_ID_APPROACH_RATE, ApproachRate);
+            yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
             base.FromDatabaseAttributes(values);
 
-            StarRating = values[1];
-            ApproachRate = values[7];
-            MaxCombo = (int)values[9];
+            StarRating = values[ATTRIB_ID_AIM];
+            ApproachRate = values[ATTRIB_ID_APPROACH_RATE];
+            MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
         }
     }
 }

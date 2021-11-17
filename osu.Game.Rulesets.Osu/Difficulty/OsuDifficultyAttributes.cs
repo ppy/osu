@@ -43,31 +43,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             foreach (var v in base.ToDatabaseAttributes())
                 yield return v;
 
-            yield return (1, AimStrain);
-            yield return (3, SpeedStrain);
-            yield return (5, OverallDifficulty);
-            yield return (7, ApproachRate);
-            yield return (9, MaxCombo);
-            yield return (11, StarRating);
+            yield return (ATTRIB_ID_AIM, AimStrain);
+            yield return (ATTRIB_ID_SPEED, SpeedStrain);
+            yield return (ATTRIB_ID_OVERALL_DIFFICULTY, OverallDifficulty);
+            yield return (ATTRIB_ID_APPROACH_RATE, ApproachRate);
+            yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
+            yield return (ATTRIB_ID_STRAIN, StarRating);
 
             if (ShouldSerializeFlashlightRating())
-                yield return (17, FlashlightRating);
+                yield return (ATTRIB_ID_FLASHLIGHT, FlashlightRating);
 
-            yield return (19, SliderFactor);
+            yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
             base.FromDatabaseAttributes(values);
 
-            AimStrain = values[1];
-            SpeedStrain = values[3];
-            OverallDifficulty = values[5];
-            ApproachRate = values[7];
-            MaxCombo = (int)values[9];
-            StarRating = values[11];
-            FlashlightRating = values.GetValueOrDefault(17);
-            SliderFactor = values[19];
+            AimStrain = values[ATTRIB_ID_AIM];
+            SpeedStrain = values[ATTRIB_ID_SPEED];
+            OverallDifficulty = values[ATTRIB_ID_OVERALL_DIFFICULTY];
+            ApproachRate = values[ATTRIB_ID_APPROACH_RATE];
+            MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
+            StarRating = values[ATTRIB_ID_STRAIN];
+            FlashlightRating = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
+            SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
         }
 
         // Used implicitly by Newtonsoft.Json to not serialize flashlight property in some cases.
