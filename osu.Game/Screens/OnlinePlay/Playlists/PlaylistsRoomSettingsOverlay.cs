@@ -355,7 +355,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
                 {
-                    ErrorText.Text = "One or more beatmap was not available online. Please remove or replaced the highlighted items.";
+                    ErrorText.Text = "One or more beatmaps were not available online. Please remove or replaced the highlighted items.";
 
                     int[] invalidBeatmapIDs = text
                                               .Substring(not_found_prefix.Length + 1)
