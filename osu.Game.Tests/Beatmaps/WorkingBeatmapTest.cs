@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Moq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -60,6 +61,17 @@ namespace osu.Game.Tests.Beatmaps
             Assert.Throws<OperationCanceledException>(() => working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo));
 
             working.ResetEvent.Set();
+        }
+
+        [Test]
+        public void TestGetPlayableRulesetLoadFailure()
+        {
+            var working = new TestWorkingBeatmap(new Beatmap());
+
+            // by default mocks return nulls if not set up, which is actually desired here to simulate a ruleset load failure scenario.
+            var ruleset = new Mock<IRulesetInfo>();
+
+            Assert.Throws<RulesetLoadException>(() => working.GetPlayableBeatmap(ruleset.Object));
         }
 
         public class TestNeverLoadsWorkingBeatmap : TestWorkingBeatmap
