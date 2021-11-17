@@ -68,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             result = Math.Pow(smallDistNerf * result, 2.0);
 
             double sliderBonus = 0.0;
+
             if (osuCurrent.TravelTime != 0)
             {
                 // Reward sliders based on velocity.
