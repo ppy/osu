@@ -5,22 +5,22 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class SupporterIcon : CompositeDrawable, IHasTooltip
+    public class SupporterIcon : OsuClickableContainer
     {
         private readonly Box background;
         private readonly FillFlowContainer iconContainer;
         private readonly CircularContainer content;
 
-        public LocalisableString TooltipText => UsersStrings.ShowIsSupporter;
+        public override LocalisableString TooltipText => UsersStrings.ShowIsSupporter;
 
         public int SupportLevel
         {
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             AutoSizeAxes = Axes.X;
 
-            InternalChild = content = new CircularContainer
+            Child = content = new CircularContainer
             {
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
@@ -78,10 +78,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, OsuGame game)
         {
             background.Colour = colours.Pink;
+
+            Action = () => game?.OpenUrlExternally(@"/home/support");
         }
     }
 }
