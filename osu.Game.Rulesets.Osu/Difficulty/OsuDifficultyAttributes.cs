@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (9, MaxCombo);
             yield return (11, StarRating);
 
-            if (Mods.Any(m => m is ModFlashlight))
+            if (ShouldSerializeFlashlightRating())
                 yield return (17, FlashlightRating);
 
             yield return (19, SliderFactor);
@@ -72,6 +72,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         // Used implicitly by Newtonsoft.Json to not serialize flashlight property in some cases.
         [UsedImplicitly]
-        public bool ShouldSerializeFlashlightRating() => Mods.OfType<ModFlashlight>().Any();
+        public bool ShouldSerializeFlashlightRating() => Mods.Any(m => m is ModFlashlight);
     }
 }
