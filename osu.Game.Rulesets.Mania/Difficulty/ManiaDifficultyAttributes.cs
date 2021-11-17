@@ -20,19 +20,19 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             foreach (var v in base.ToDatabaseAttributes())
                 yield return v;
 
-            // Todo: Mania doesn't output MaxCombo attribute for some reason.
-            yield return (11, StarRating);
-            yield return (13, GreatHitWindow);
-            yield return (15, ScoreMultiplier);
+            // Todo: osu!mania doesn't output MaxCombo attribute for some reason.
+            yield return (ATTRIB_ID_STRAIN, StarRating);
+            yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
+            yield return (ATTRIB_ID_SCORE_MULTIPLIER, ScoreMultiplier);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
             base.FromDatabaseAttributes(values);
 
-            StarRating = values[11];
-            GreatHitWindow = values[13];
-            ScoreMultiplier = values[15];
+            StarRating = values[ATTRIB_ID_STRAIN];
+            GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
+            ScoreMultiplier = values[ATTRIB_ID_SCORE_MULTIPLIER];
         }
     }
 }

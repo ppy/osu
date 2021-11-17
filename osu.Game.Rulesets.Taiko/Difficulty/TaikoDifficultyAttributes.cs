@@ -29,18 +29,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             foreach (var v in base.ToDatabaseAttributes())
                 yield return v;
 
-            yield return (9, MaxCombo);
-            yield return (11, StarRating);
-            yield return (13, GreatHitWindow);
+            yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
+            yield return (ATTRIB_ID_STRAIN, StarRating);
+            yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values)
         {
             base.FromDatabaseAttributes(values);
 
-            MaxCombo = (int)values[9];
-            StarRating = values[11];
-            GreatHitWindow = values[13];
+            MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
+            StarRating = values[ATTRIB_ID_STRAIN];
+            GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
         }
     }
 }
