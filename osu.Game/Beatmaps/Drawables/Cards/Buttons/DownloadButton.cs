@@ -17,8 +17,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
     public class DownloadButton : BeatmapCardIconButton
     {
         private readonly APIBeatmapSet beatmapSet;
+        private readonly Bindable<DownloadState> downloadState = new Bindable<DownloadState>();
+
         private Bindable<bool> preferNoVideo = null!;
-        private Bindable<DownloadState> downloadState = new Bindable<DownloadState>();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
