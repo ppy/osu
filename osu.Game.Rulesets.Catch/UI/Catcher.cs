@@ -210,7 +210,16 @@ namespace osu.Game.Rulesets.Catch.UI
             catchResult.CatcherAnimationState = CurrentState;
             catchResult.CatcherHyperDash = HyperDashing;
 
+            // Ignore JuiceStreams and BananaShowers
             if (!(drawableObject is DrawablePalpableCatchHitObject palpableObject)) return;
+
+            if (palpableObject.HitObject.LastInCombo)
+            {
+                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
+                    Explode();
+                else
+                    Drop();
+            }
 
             var hitObject = palpableObject.HitObject;
 

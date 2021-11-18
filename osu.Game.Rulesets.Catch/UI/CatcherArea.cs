@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
@@ -71,18 +70,6 @@ namespace osu.Game.Rulesets.Catch.UI
         public void OnNewResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
             Catcher.OnNewResult(hitObject, result);
-
-            // Ignore JuiceStreams and BananaShowers
-            if (!(hitObject is DrawablePalpableCatchHitObject)) return;
-
-            if (hitObject.HitObject.LastInCombo)
-            {
-                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
-                    Catcher.Explode();
-                else
-                    Catcher.Drop();
-            }
-
             comboDisplay.OnNewResult(hitObject, result);
         }
 
