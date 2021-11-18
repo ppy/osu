@@ -26,10 +26,10 @@ namespace osu.Game.Rulesets.Difficulty
         private Mod[] playableMods;
         private double clockRate;
 
-        private readonly Ruleset ruleset;
-        private readonly WorkingBeatmap beatmap;
+        private readonly IRulesetInfo ruleset;
+        private readonly IWorkingBeatmap beatmap;
 
-        protected DifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+        protected DifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
         {
             this.ruleset = ruleset;
             this.beatmap = beatmap;
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Difficulty
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
 
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, playableMods);
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset, playableMods);
 
             var track = new TrackVirtual(10000);
             playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
