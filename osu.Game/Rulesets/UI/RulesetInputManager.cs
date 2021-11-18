@@ -168,6 +168,8 @@ namespace osu.Game.Rulesets.UI
 
         public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
         {
+            protected override bool HandleRepeats => false;
+
             public RulesetKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
             {
