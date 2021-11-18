@@ -231,6 +231,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool OnPressed(KeyBindingPressEvent<TestAction> e)
             {
+                if (e.Repeat)
+                    return false;
+
                 box.Colour = Color4.White;
                 return true;
             }
