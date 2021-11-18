@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Music
             var items = (SearchContainer<RearrangeableListItem<BeatmapSetInfo>>)ListContainer;
 
             foreach (var item in items.OfType<PlaylistItem>())
-                item.InSelectedCollection = criteria.Collection?.Beatmaps.Any(b => b.BeatmapSet.Equals(item.Model)) ?? true;
+                item.InSelectedCollection = criteria.Collection?.Beatmaps.Any(b => item.Model.Equals(b.BeatmapSet)) ?? true;
 
             items.SearchTerm = criteria.SearchText;
         }

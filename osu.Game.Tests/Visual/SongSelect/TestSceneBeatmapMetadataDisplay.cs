@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
-        private void showMetadataForBeatmap(Func<WorkingBeatmap> getBeatmap)
+        private void showMetadataForBeatmap(Func<IWorkingBeatmap> getBeatmap)
         {
             AddStep("setup display", () =>
             {

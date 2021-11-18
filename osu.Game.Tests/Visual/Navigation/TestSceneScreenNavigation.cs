@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Navigation
             Player player = null;
             ResultsScreen results = null;
 
-            WorkingBeatmap beatmap() => Game.Beatmap.Value;
+            IWorkingBeatmap beatmap() => Game.Beatmap.Value;
 
             PushAndConfirm(() => new TestPlaySongSelect());
 
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             Player player = null;
 
-            WorkingBeatmap beatmap() => Game.Beatmap.Value;
+            IWorkingBeatmap beatmap() => Game.Beatmap.Value;
 
             PushAndConfirm(() => new TestPlaySongSelect());
 

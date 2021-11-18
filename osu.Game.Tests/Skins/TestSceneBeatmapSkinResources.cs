@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Skins
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        private WorkingBeatmap beatmap;
+        private IWorkingBeatmap beatmap;
 
         [BackgroundDependencyLoader]
         private void load()

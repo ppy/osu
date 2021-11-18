@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private const double colour_skill_multiplier = 0.01;
         private const double stamina_skill_multiplier = 0.02;
 
-        public TaikoDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+        public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }

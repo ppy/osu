@@ -69,20 +69,16 @@ namespace osu.Game.Beatmaps
 
         public bool Equals(BeatmapSetInfo other)
         {
-            if (other == null)
-                return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
             if (ID != 0 && other.ID != 0)
                 return ID == other.ID;
 
-            if (OnlineID.HasValue && other.OnlineID.HasValue)
-                return OnlineID == other.OnlineID;
-
-            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
-                return Hash == other.Hash;
-
-            return ReferenceEquals(this, other);
+            return false;
         }
+
+        public bool Equals(IBeatmapSetInfo other) => other is BeatmapSetInfo b && Equals(b);
 
         #region Implementation of IHasOnlineID
 

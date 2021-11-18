@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using Realms;
 
 #nullable enable
@@ -53,24 +54,17 @@ namespace osu.Game.Models
         /// <param name="filename">The name of the file to get the storage path of.</param>
         public string? GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.File.StoragePath;
 
-        public override string ToString() => Metadata?.ToString() ?? base.ToString();
-
         public bool Equals(RealmBeatmapSet? other)
         {
-            if (other == null)
-                return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
-            if (IsManaged && other.IsManaged)
-                return ID == other.ID;
-
-            if (OnlineID > 0 && other.OnlineID > 0)
-                return OnlineID == other.OnlineID;
-
-            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
-                return Hash == other.Hash;
-
-            return ReferenceEquals(this, other);
+            return ID == other.ID;
         }
+
+        public override string ToString() => Metadata?.GetDisplayString() ?? base.ToString();
+
+        public bool Equals(IBeatmapSetInfo? other) => other is RealmBeatmapSet b && Equals(b);
 
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
 

@@ -68,6 +68,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestMarkInvalid()
+        {
+            createPlaylist(true, true);
+
+            AddStep("mark item 0 as invalid", () => playlist.Items[0].MarkInvalid());
+
+            moveToItem(0);
+
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
+        }
+
+        [Test]
         public void TestSelectable()
         {
             createPlaylist(false, true);

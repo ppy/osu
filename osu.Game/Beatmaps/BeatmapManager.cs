@@ -179,7 +179,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
-        public WorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
+        public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
 
         /// <summary>
         /// Fired when a notification should be presented to the user.
