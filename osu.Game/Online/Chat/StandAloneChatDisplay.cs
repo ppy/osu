@@ -41,8 +41,10 @@ namespace osu.Game.Online.Chat
         /// <param name="postingTextbox">Whether a textbox for posting new messages should be displayed.</param>
         public StandAloneChatDisplay(bool postingTextbox = false)
         {
+            const float corner_radius = 10;
+
             this.postingTextbox = postingTextbox;
-            CornerRadius = 10;
+            CornerRadius = corner_radius;
             Masking = true;
 
             InternalChildren = new Drawable[]
@@ -62,6 +64,7 @@ namespace osu.Game.Online.Chat
                     RelativeSizeAxes = Axes.X,
                     Height = textbox_height,
                     PlaceholderText = "type your message",
+                    CornerRadius = corner_radius,
                     ReleaseFocusOnCommit = false,
                     HoldFocus = true,
                     Anchor = Anchor.BottomLeft,

@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Pippidon
 {
     public class PippidonDifficultyCalculator : DifficultyCalculator
     {
-        public PippidonDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+        public PippidonDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }

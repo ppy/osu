@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -204,7 +205,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 {
                                                                     new Drawable[]
                                                                     {
-                                                                        playlist = new DrawableRoomPlaylist(true, true) { RelativeSizeAxes = Axes.Both }
+                                                                        playlist = new DrawableRoomPlaylist(true, false) { RelativeSizeAxes = Axes.Both }
                                                                     },
                                                                     new Drawable[]
                                                                     {
@@ -339,9 +340,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 Duration.Value = DurationField.Current.Value;
 
-                manager?.CreateRoom(room, onSuccess, onError);
-
                 loadingLayer.Show();
+                manager?.CreateRoom(room, onSuccess, onError);
             }
 
             private void hideError() => ErrorText.FadeOut(50);
@@ -350,9 +350,31 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             private void onError(string text)
             {
-                ErrorText.Text = text;
-                ErrorText.FadeIn(50);
+                // see https://github.com/ppy/osu-web/blob/2c97aaeb64fb4ed97c747d8383a35b30f57428c7/app/Models/Multiplayer/PlaylistItem.php#L48.
+                const string not_found_prefix = "beatmaps not found:";
 
+                if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
+                {
+                    ErrorText.Text = "One or more beatmaps were not available online. Please remove or replace the highlighted items.";
+
+                    int[] invalidBeatmapIDs = text
+                                              .Substring(not_found_prefix.Length + 1)
+                                              .Split(", ")
+                                              .Select(int.Parse)
+                                              .ToArray();
+
+                    foreach (var item in Playlist)
+                    {
+                        if (invalidBeatmapIDs.Contains(item.BeatmapID))
+                            item.MarkInvalid();
+                    }
+                }
+                else
+                {
+                    ErrorText.Text = text;
+                }
+
+                ErrorText.FadeIn(50);
                 loadingLayer.Hide();
             }
         }
