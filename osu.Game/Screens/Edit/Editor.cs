@@ -393,6 +393,9 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case PlatformAction.Save:
+                    if (e.Repeat)
+                        return false;
+
                     Save();
                     return true;
             }
@@ -457,6 +460,9 @@ namespace osu.Game.Screens.Edit
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.Back:
