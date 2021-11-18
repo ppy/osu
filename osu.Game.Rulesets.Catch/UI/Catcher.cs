@@ -213,14 +213,6 @@ namespace osu.Game.Rulesets.Catch.UI
             // Ignore JuiceStreams and BananaShowers
             if (!(drawableObject is DrawablePalpableCatchHitObject palpableObject)) return;
 
-            if (palpableObject.HitObject.LastInCombo)
-            {
-                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
-                    Explode();
-                else
-                    Drop();
-            }
-
             var hitObject = palpableObject.HitObject;
 
             if (result.IsHit)
@@ -253,6 +245,14 @@ namespace osu.Game.Rulesets.Catch.UI
                 CurrentState = hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle;
             else if (!(hitObject is Banana))
                 CurrentState = CatcherAnimationState.Fail;
+
+            if (palpableObject.HitObject.LastInCombo)
+            {
+                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
+                    Explode();
+                else
+                    Drop();
+            }
         }
 
         public void OnRevertResult(DrawableCatchHitObject drawableObject, JudgementResult result)
