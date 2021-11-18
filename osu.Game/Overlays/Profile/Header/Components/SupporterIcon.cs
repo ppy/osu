@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -78,12 +79,27 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
         }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, OsuGame game)
+        private void load(OsuGame game)
         {
             background.Colour = colours.Pink;
 
             Action = () => game?.OpenUrlExternally(@"/home/support");
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            background.FadeColour(colours.PinkLight, 500, Easing.OutQuint);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            background.FadeColour(colours.Pink, 500, Easing.OutQuint);
+            base.OnHoverLost(e);
         }
     }
 }
