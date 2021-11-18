@@ -83,6 +83,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool OnPressed(KeyBindingPressEvent<TestAction> e)
             {
+                if (e.Repeat)
+                    return false;
+
                 ReceivedAction = e.Action == TestAction.Down;
                 return true;
             }
