@@ -112,8 +112,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return new Skill[]
             {
-                new Aim(mods, true),
-                new Aim(mods, false),
+                new Aim(mods, true, hitWindowGreat),
+                new Aim(mods, false, hitWindowGreat),
                 new Speed(mods, hitWindowGreat),
                 new Flashlight(mods)
             };

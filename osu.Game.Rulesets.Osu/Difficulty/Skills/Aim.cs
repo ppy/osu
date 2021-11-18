@@ -14,13 +14,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-        public Aim(Mod[] mods, bool withSliders)
+        public Aim(Mod[] mods, bool withSliders, double hitWindowGreat)
             : base(mods)
         {
             this.withSliders = withSliders;
+
+            windowGreat = hitWindowGreat;
         }
 
         private readonly bool withSliders;
+        private readonly double windowGreat;
 
         protected override int HistoryLength => 2;
 
@@ -49,7 +52,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliders)
             {
-                double movementVelocity = osuCurrObj.MovementDistance / osuCurrObj.MovementTime; // calculate the movement velocity from slider end to current object
+                double sliderStartNerf = osuCurrObj.BaseObject is Slider ? windowGreat : 0; // nerf time from last sliderend to current sliderstart
+
+                double movementVelocity = osuCurrObj.MovementDistance / (osuCurrObj.MovementTime + sliderStartNerf); // calculate the movement velocity from slider end to current object
                 double travelVelocity = osuCurrObj.TravelDistance / osuCurrObj.TravelTime; // calculate the slider velocity from slider head to slider end.
 
                 currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
@@ -60,7 +65,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (osuLastLastObj.BaseObject is Slider && withSliders)
             {
-                double movementVelocity = osuLastObj.MovementDistance / osuLastObj.MovementTime;
+                double sliderStartNerf = osuLastObj.BaseObject is Slider ? windowGreat : 0;
+
+                double movementVelocity = osuLastObj.MovementDistance / (osuLastObj.MovementTime + sliderStartNerf);
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime;
 
                 prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
