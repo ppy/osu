@@ -25,6 +25,7 @@ using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
 using DownloadButton = osu.Game.Beatmaps.Drawables.Cards.Buttons.DownloadButton;
+using PlayButton = osu.Game.Beatmaps.Drawables.Cards.Buttons.PlayButton;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
@@ -47,7 +48,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private FillFlowContainer leftIconArea;
 
         private Container rightAreaBackground;
-        private Container rightAreaButtons;
+        private Container<BeatmapCardIconButton> rightAreaButtons;
 
         private Container mainContent;
         private BeatmapCardContentBackground mainContentBackground;
@@ -119,24 +120,35 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         }
                     }
                 },
-                rightAreaButtons = new Container
+                new Container
                 {
                     Name = @"Right (button) area",
                     Width = 30,
                     RelativeSizeAxes = Axes.Y,
                     Origin = Anchor.TopRight,
                     Anchor = Anchor.TopRight,
-                    Child = new FillFlowContainer
+                    Padding = new MarginPadding { Vertical = 17.5f },
+                    Child = rightAreaButtons = new Container<BeatmapCardIconButton>
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 14),
-                        Children = new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new BeatmapCardIconButton[]
                         {
-                            new FavouriteButton(beatmapSet) { Current = favouriteState },
+                            new FavouriteButton(beatmapSet)
+                            {
+                                Current = favouriteState,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre
+                            },
                             new DownloadButton(beatmapSet)
+                            {
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre
+                            },
+                            new PlayButton(beatmapSet)
+                            {
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre
+                            }
                         }
                     }
                 },
@@ -389,6 +401,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             rightAreaBackground.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, TRANSITION_DURATION, Easing.OutQuint);
             rightAreaButtons.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
+
+            foreach (var button in rightAreaButtons)
+            {
+                button.IdleColour = downloadTracker.State.Value != DownloadState.LocallyAvailable ? colourProvider.Light1 : colourProvider.Background3;
+                button.HoverColour = downloadTracker.State.Value != DownloadState.LocallyAvailable ? colourProvider.Content1 : colourProvider.Foreground1;
+            }
+
             bool showProgress = downloadTracker.State.Value == DownloadState.Downloading || downloadTracker.State.Value == DownloadState.Importing;
 
             idleBottomContent.FadeTo(showProgress ? 0 : 1, TRANSITION_DURATION, Easing.OutQuint);

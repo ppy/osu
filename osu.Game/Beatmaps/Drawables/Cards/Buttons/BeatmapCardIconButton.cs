@@ -1,25 +1,44 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
-    public abstract class BeatmapCardIconButton : OsuHoverContainer
+    public abstract class BeatmapCardIconButton : OsuClickableContainer
     {
-        protected override IEnumerable<Drawable> EffectTargets => background.Yield();
+        private Colour4 idleColour;
 
-        private readonly Box background;
-        protected readonly SpriteIcon Icon;
+        public Colour4 IdleColour
+        {
+            get => idleColour;
+            set
+            {
+                idleColour = value;
+                if (IsLoaded)
+                    updateState();
+            }
+        }
+
+        private Colour4 hoverColour;
+
+        public Colour4 HoverColour
+        {
+            get => hoverColour;
+            set
+            {
+                hoverColour = value;
+                if (IsLoaded)
+                    updateState();
+            }
+        }
 
         private float iconSize;
 
@@ -33,18 +52,18 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             }
         }
 
+        protected readonly SpriteIcon Icon;
+
         protected BeatmapCardIconButton()
         {
+            Anchor = Origin = Anchor.Centre;
+
             Child = new CircularContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 Children = new Drawable[]
                 {
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    },
                     Icon = new SpriteIcon
                     {
                         Origin = Anchor.Centre,
@@ -60,11 +79,33 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            Anchor = Origin = Anchor.Centre;
+            IdleColour = colourProvider.Light1;
+            HoverColour = colourProvider.Content1;
+        }
 
-            IdleColour = colourProvider.Background4;
-            HoverColour = colourProvider.Background1;
-            Icon.Colour = colourProvider.Content2;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Enabled.BindValueChanged(_ => updateState(), true);
+            FinishTransforms(true);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateState();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            updateState();
+        }
+
+        private void updateState()
+        {
+            Content.FadeColour(IsHovered && Enabled.Value ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
