@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -80,7 +81,10 @@ namespace osu.Game.Beatmaps
 
         public virtual IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null, CancellationToken? cancellationToken = null)
         {
-            var token = cancellationToken ?? new CancellationTokenSource(10000).Token;
+            var token = cancellationToken ??
+                        // don't apply the default timeout when debugger is attached (may be breakpointing / debugging).
+                        (Debugger.IsAttached ? new CancellationToken() : new CancellationTokenSource(10000).Token);
+
             mods ??= Array.Empty<Mod>();
 
             var rulesetInstance = ruleset.CreateInstance();
