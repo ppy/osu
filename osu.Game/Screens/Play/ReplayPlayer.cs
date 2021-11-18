@@ -7,9 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Extensions;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -48,8 +46,6 @@ namespace osu.Game.Screens.Play
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
 
-        private ScheduledDelegate keyboardSeekDelegate;
-
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             const double keyboard_seek_amount = 5000;
@@ -57,13 +53,11 @@ namespace osu.Game.Screens.Play
             switch (e.Action)
             {
                 case GlobalAction.SeekReplayBackward:
-                    keyboardSeekDelegate?.Cancel();
-                    keyboardSeekDelegate = this.BeginKeyRepeat(Scheduler, () => keyboardSeek(-1));
+                    keyboardSeek(-1);
                     return true;
 
                 case GlobalAction.SeekReplayForward:
-                    keyboardSeekDelegate?.Cancel();
-                    keyboardSeekDelegate = this.BeginKeyRepeat(Scheduler, () => keyboardSeek(1));
+                    keyboardSeek(1);
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
@@ -86,13 +80,6 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            switch (e.Action)
-            {
-                case GlobalAction.SeekReplayBackward:
-                case GlobalAction.SeekReplayForward:
-                    keyboardSeekDelegate?.Cancel();
-                    break;
-            }
         }
     }
 }
