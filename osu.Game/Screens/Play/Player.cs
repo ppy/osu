@@ -354,7 +354,7 @@ namespace osu.Game.Screens.Play
         private Drawable createUnderlayComponents() =>
             DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both };
 
-        private Drawable createGameplayComponents(WorkingBeatmap working, IBeatmap playableBeatmap) => new ScalingContainer(ScalingMode.Gameplay)
+        private Drawable createGameplayComponents(IWorkingBeatmap working, IBeatmap playableBeatmap) => new ScalingContainer(ScalingMode.Gameplay)
         {
             Children = new Drawable[]
             {
@@ -372,7 +372,7 @@ namespace osu.Game.Screens.Play
             }
         };
 
-        private Drawable createOverlayComponents(WorkingBeatmap working)
+        private Drawable createOverlayComponents(IWorkingBeatmap working)
         {
             var container = new Container
             {

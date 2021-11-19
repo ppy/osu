@@ -7,6 +7,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Game.Extensions;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
@@ -240,6 +241,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public int OnlineID => Id;
 
-        public bool Equals(APIUser other) => OnlineID == other?.OnlineID;
+        public bool Equals(APIUser other) => this.MatchesOnlineID(other);
     }
 }

@@ -174,7 +174,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
             PushAndConfirm(() => new TestPlaySongSelect());
-            AddUntilStep("beatmap updated", () => Game.Beatmap.Value.BeatmapSetInfo.OnlineBeatmapSetID == 241526);
+            AddUntilStep("beatmap updated", () => Game.Beatmap.Value.BeatmapSetInfo.OnlineID == 241526);
         }
 
         public class DialogBlockingScreen : OsuScreen

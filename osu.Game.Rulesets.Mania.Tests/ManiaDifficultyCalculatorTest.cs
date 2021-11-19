@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         public void TestClockRateAdjusted(double expected, string name)
             => Test(expected, name, new ManiaModDoubleTime());
 
-        protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(new ManiaRuleset(), beatmap);
+        protected override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new ManiaDifficultyCalculator(new ManiaRuleset().RulesetInfo, beatmap);
 
         protected override Ruleset CreateRuleset() => new ManiaRuleset();
     }
