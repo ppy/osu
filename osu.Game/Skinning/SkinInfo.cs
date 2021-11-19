@@ -18,6 +18,8 @@ namespace osu.Game.Skinning
 
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public string Name { get; set; } = string.Empty;
 
         public string Creator { get; set; } = string.Empty;
