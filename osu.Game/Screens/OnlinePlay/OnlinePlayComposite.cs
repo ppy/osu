@@ -60,13 +60,13 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room))]
         protected Bindable<RoomAvailability> Availability { get; private set; }
 
-        [Resolved(typeof(Room), nameof(Room.Password))]
+        [Resolved(typeof(Room))]
         public Bindable<string> Password { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<TimeSpan?> Duration { get; private set; }
 
-        [Resolved(typeof(Room), nameof(Room.QueueMode))]
+        [Resolved(typeof(Room))]
         protected Bindable<QueueMode> QueueMode { get; private set; }
 
         [Resolved(CanBeNull = true)]
