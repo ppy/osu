@@ -1007,6 +1007,9 @@ namespace osu.Game
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (introScreen == null) return false;
 
             switch (e.Action)
