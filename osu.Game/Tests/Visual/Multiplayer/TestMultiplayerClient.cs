@@ -442,7 +442,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     newItem = room.Playlist.FirstOrDefault(i => !i.Expired) ?? room.Playlist.Last();
                     break;
 
-                case QueueMode.FairRotate:
+                case QueueMode.AllPlayersRR:
                     // Group playlist items by (user_id -> count_expired), and select the first available playlist item from a user that has available beatmaps where count_expired is the lowest.
                     throw new NotImplementedException();
             }

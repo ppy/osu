@@ -12,10 +12,10 @@ namespace osu.Game.Online.Multiplayer
         [Description("Host only")]
         HostOnly,
 
-        [Description("Free-for-all")]
-        FreeForAll,
+        [Description("All players")]
+        AllPlayers,
 
-        [Description("Fair rotate")]
-        FairRotate
+        [Description("All players (round robin)")]
+        AllPlayersRR
     }
 }

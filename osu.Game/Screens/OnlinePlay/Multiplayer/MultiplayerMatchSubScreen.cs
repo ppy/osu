@@ -392,8 +392,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     AddOrEditPlaylistButton.Alpha = client.IsHost ? 1 : 0;
                     break;
 
-                case QueueMode.FreeForAll:
-                case QueueMode.FairRotate:
+                case QueueMode.AllPlayers:
+                case QueueMode.AllPlayersRR:
                     AddOrEditPlaylistButton.Text = "Add beatmap";
                     AddOrEditPlaylistButton.Alpha = 1;
                     break;
