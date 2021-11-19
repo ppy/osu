@@ -5,18 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
+using osu.Game.Models;
 using Realms;
 
 #nullable enable
 
-namespace osu.Game.Models
+namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [MapTo("BeatmapSet")]
-    public class RealmBeatmapSet : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<RealmBeatmapSet>, IBeatmapSetInfo
+    public class BeatmapSetInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
     {
         [PrimaryKey]
         public Guid ID { get; set; } = Guid.NewGuid();
@@ -26,9 +26,9 @@ namespace osu.Game.Models
 
         public DateTimeOffset DateAdded { get; set; }
 
-        public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new RealmBeatmapMetadata();
+        public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
 
-        public IList<RealmBeatmap> Beatmaps { get; } = null!;
+        public IList<BeatmapInfo> Beatmaps { get; } = null!;
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Models
         /// <param name="filename">The name of the file to get the storage path of.</param>
         public string? GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
 
-        public bool Equals(RealmBeatmapSet? other)
+        public bool Equals(BeatmapSetInfo? other)
         {
             if (ReferenceEquals(this, other)) return true;
             if (other == null) return false;
@@ -73,7 +73,7 @@ namespace osu.Game.Models
 
         public override string ToString() => Metadata.GetDisplayString();
 
-        public bool Equals(IBeatmapSetInfo? other) => other is RealmBeatmapSet b && Equals(b);
+        public bool Equals(IBeatmapSetInfo? other) => other is BeatmapSetInfo b && Equals(b);
 
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
