@@ -10,6 +10,8 @@ namespace osu.Game.IO
     {
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public string Hash { get; set; }
 
         public string StoragePath => Path.Combine(Hash.Remove(1), Hash.Remove(2), Hash);
