@@ -10,7 +10,7 @@ using osu.Framework.Testing;
 namespace osu.Game.Rulesets
 {
     [ExcludeFromDynamicCompile]
-    public sealed class RulesetInfo : IEquatable<RulesetInfo>, IRulesetInfo
+    public sealed class EFRulesetInfo : IEquatable<EFRulesetInfo>, IRulesetInfo
     {
         public int? ID { get; set; }
 
@@ -45,9 +45,9 @@ namespace osu.Game.Rulesets
             return ruleset;
         }
 
-        public bool Equals(RulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
+        public bool Equals(EFRulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
 
-        public override bool Equals(object obj) => obj is RulesetInfo rulesetInfo && Equals(rulesetInfo);
+        public override bool Equals(object obj) => obj is EFRulesetInfo rulesetInfo && Equals(rulesetInfo);
 
         public bool Equals(IRulesetInfo other) => other is RulesetInfo b && Equals(b);
 

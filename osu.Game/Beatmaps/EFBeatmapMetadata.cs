@@ -16,7 +16,7 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey, IBeatmapMetadataInfo
+    public class EFBeatmapMetadata : IEquatable<EFBeatmapMetadata>, IHasPrimaryKey, IBeatmapMetadataInfo
     {
         public int ID { get; set; }
 
@@ -33,10 +33,10 @@ namespace osu.Game.Beatmaps
         public string ArtistUnicode { get; set; } = string.Empty;
 
         [JsonIgnore]
-        public List<BeatmapInfo> Beatmaps { get; set; } = new List<BeatmapInfo>();
+        public List<EFBeatmapInfo> Beatmaps { get; set; } = new List<EFBeatmapInfo>();
 
         [JsonIgnore]
-        public List<BeatmapSetInfo> BeatmapSets { get; set; } = new List<BeatmapSetInfo>();
+        public List<EFBeatmapSetInfo> BeatmapSets { get; set; } = new List<EFBeatmapSetInfo>();
 
         /// <summary>
         /// The author of the beatmaps in this set.
@@ -81,7 +81,7 @@ namespace osu.Game.Beatmaps
 
         public string BackgroundFile { get; set; } = string.Empty;
 
-        public bool Equals(BeatmapMetadata other) => ((IBeatmapMetadataInfo)this).Equals(other);
+        public bool Equals(EFBeatmapMetadata other) => ((IBeatmapMetadataInfo)this).Equals(other);
 
         public override string ToString() => this.GetDisplayTitle();
 
