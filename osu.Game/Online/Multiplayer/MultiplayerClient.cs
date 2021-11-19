@@ -15,7 +15,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Online.API;
-using osu.Game.Online.Multiplayer.Queueing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;

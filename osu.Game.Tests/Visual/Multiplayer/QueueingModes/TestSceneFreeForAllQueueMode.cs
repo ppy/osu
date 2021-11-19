@@ -6,7 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Online.Multiplayer.Queueing;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osuTK.Input;
 
