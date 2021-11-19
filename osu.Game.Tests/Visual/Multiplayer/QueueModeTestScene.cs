@@ -21,7 +21,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
+namespace osu.Game.Tests.Visual.Multiplayer
 {
     public abstract class QueueModeTestScene : ScreenTestScene
     {

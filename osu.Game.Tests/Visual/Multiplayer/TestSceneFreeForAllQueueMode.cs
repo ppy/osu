@@ -10,7 +10,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.Multiplayer.QueueingModes
+namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneFreeForAllQueueMode : QueueModeTestScene
     {
