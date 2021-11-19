@@ -12,9 +12,9 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneFreeForAllQueueMode : QueueModeTestScene
+    public class TestSceneAllPlayersQueueMode : QueueModeTestScene
     {
-        protected override QueueMode Mode => QueueMode.FreeForAll;
+        protected override QueueMode Mode => QueueMode.AllPlayers;
 
         [Test]
         public void TestFirstItemSelectedByDefault()
