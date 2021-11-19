@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
@@ -92,10 +92,10 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="ruleset">The <see cref="RulesetInfo"/> to create a playable <see cref="IBeatmap"/> for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply to the <see cref="IBeatmap"/>.</param>
-        /// <param name="timeout">The maximum length in milliseconds to wait for load to complete. Defaults to 10,000ms.</param>
+        /// <param name="cancellationToken">Cancellation token that cancels the beatmap loading process. If not provided, a default timeout of 10,000ms will be applied to the load process.</param>
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
-        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null);
+        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null, CancellationToken? cancellationToken = null);
 
         /// <summary>
         /// Load a new audio track instance for this beatmap. This should be called once before accessing <see cref="Track"/>.
