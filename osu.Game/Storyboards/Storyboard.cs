@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
@@ -95,7 +96,7 @@ namespace osu.Game.Storyboards
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
         {
             Drawable drawable = null;
-            string storyboardPath = BeatmapInfo.BeatmapSet?.Files.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            string storyboardPath = BeatmapInfo.BeatmapSet?.Files.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.GetStoragePath();
 
             if (!string.IsNullOrEmpty(storyboardPath))
                 drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };

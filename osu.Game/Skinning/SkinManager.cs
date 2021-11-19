@@ -215,7 +215,7 @@ namespace osu.Game.Skinning
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                 {
-                    using (var existingStream = Files.Storage.GetStream(existingFile.FileInfo.StoragePath))
+                    using (var existingStream = Files.Storage.GetStream(existingFile.FileInfo.GetStoragePath()))
                     using (var sr = new StreamReader(existingStream))
                     {
                         string line;
