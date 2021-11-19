@@ -35,7 +35,9 @@ namespace osu.Game.Online
             typeof(TeamVersusUserState),
         };
 
-        private static readonly IReadOnlyDictionary<Type, IMessagePackFormatter> formatter_map = new Dictionary<Type, IMessagePackFormatter>
+        private static IReadOnlyDictionary<Type, IMessagePackFormatter> formatterMapBacking;
+
+        private static IReadOnlyDictionary<Type, IMessagePackFormatter> formatterMap => formatterMapBacking ??= new Dictionary<Type, IMessagePackFormatter>
         {
             { typeof(TeamVersusUserState), new TypeRedirectingFormatter<TeamVersusUserState, MatchUserState>() },
             { typeof(TeamVersusRoomState), new TypeRedirectingFormatter<TeamVersusRoomState, MatchRoomState>() },
@@ -51,7 +53,7 @@ namespace osu.Game.Online
 
         public IMessagePackFormatter<T> GetFormatter<T>()
         {
-            if (formatter_map.TryGetValue(typeof(T), out var formatter))
+            if (formatterMap.TryGetValue(typeof(T), out var formatter))
                 return (IMessagePackFormatter<T>)formatter;
 
             return StandardResolver.Instance.GetFormatter<T>();
