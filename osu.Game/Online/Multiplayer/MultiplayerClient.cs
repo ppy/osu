@@ -616,8 +616,9 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
-                APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItem.ID);
+                Room.Playlist.Add(item);
                 APIRoom.Playlist.Add(playlistItem);
+
                 RoomUpdated?.Invoke();
             });
         }
@@ -634,7 +635,9 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
+                Room.Playlist.Remove(Room.Playlist.Single(existing => existing.ID == playlistItemId));
                 APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItemId);
+
                 RoomUpdated?.Invoke();
             });
 
@@ -655,17 +658,14 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
 
-                PlaylistItem existingItem = APIRoom.Playlist.Single(existing => existing.ID == item.ID);
-                int existingIndex = APIRoom.Playlist.IndexOf(existingItem);
-                if (existingItem.Equals(playlistItem))
-                    return;
+                Room.Playlist[Room.Playlist.IndexOf(Room.Playlist.First(existing => existing.ID == item.ID))] = item;
 
-                // Replace the item.
+                int existingIndex = APIRoom.Playlist.IndexOf(APIRoom.Playlist.Single(existing => existing.ID == item.ID));
                 APIRoom.Playlist.RemoveAt(existingIndex);
                 APIRoom.Playlist.Insert(existingIndex, playlistItem);
 
                 // If the currently-selected item was the one that got replaced, update the selected item to the new one.
-                if (CurrentMatchPlayingItem.Value == existingItem)
+                if (CurrentMatchPlayingItem.Value?.ID == playlistItem.ID)
                     CurrentMatchPlayingItem.Value = playlistItem;
 
                 RoomUpdated?.Invoke();
