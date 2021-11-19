@@ -54,14 +54,19 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         protected readonly SpriteIcon Icon;
 
+        private readonly Container content;
+
         protected BeatmapCardIconButton()
         {
-            Anchor = Origin = Anchor.Centre;
+            Origin = Anchor.Centre;
+            Anchor = Anchor.Centre;
 
-            Child = new CircularContainer
+            Child = content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
                 Children = new Drawable[]
                 {
                     Icon = new SpriteIcon
@@ -105,7 +110,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         private void updateState()
         {
-            Content.FadeColour(IsHovered && Enabled.Value ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            bool isHovered = IsHovered && Enabled.Value;
+
+            content.ScaleTo(isHovered ? 1.2f : 1, 500, Easing.OutQuint);
+            content.FadeColour(isHovered ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
