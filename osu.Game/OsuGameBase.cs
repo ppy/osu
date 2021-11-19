@@ -295,8 +295,10 @@ namespace osu.Game
             Beatmap.BindValueChanged(b =>
             {
                 // handle the case of leasing. should always be a feedback event anyway.
-                if (!typedBeatmap.Disabled)
-                    typedBeatmap.Value = b.NewValue as WorkingBeatmap;
+                if (typedBeatmap.Value == b.NewValue)
+                    return;
+
+                typedBeatmap.Value = b.NewValue as WorkingBeatmap;
             });
 
             fileStore.Cleanup();
