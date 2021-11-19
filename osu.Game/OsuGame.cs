@@ -443,7 +443,7 @@ namespace osu.Game
             BeatmapSetInfo databasedSet = null;
 
             if (beatmap.OnlineID > 0)
-                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineID);
+                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
 
             if (beatmap is BeatmapSetInfo localBeatmap)
                 databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash);
@@ -1007,6 +1007,9 @@ namespace osu.Game
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (introScreen == null) return false;
 
             switch (e.Action)

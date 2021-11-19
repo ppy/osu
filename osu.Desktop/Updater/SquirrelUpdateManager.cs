@@ -183,6 +183,19 @@ namespace osu.Desktop.Updater
                     }
                 });
             }
+
+            public override void Close()
+            {
+                // cancelling updates is not currently supported by the underlying updater.
+                // only allow dismissing for now.
+
+                switch (State)
+                {
+                    case ProgressNotificationState.Cancelled:
+                        base.Close();
+                        break;
+                }
+            }
         }
 
         private class SquirrelLogger : Splat.ILogger, IDisposable

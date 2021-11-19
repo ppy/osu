@@ -81,11 +81,11 @@ namespace osu.Game.Tests.Visual.Editing
 
         public class EditorBeatmapContainer : Container
         {
-            private readonly WorkingBeatmap working;
+            private readonly IWorkingBeatmap working;
 
             public EditorBeatmap EditorBeatmap { get; private set; }
 
-            public EditorBeatmapContainer(WorkingBeatmap working)
+            public EditorBeatmapContainer(IWorkingBeatmap working)
             {
                 this.working = working;
 

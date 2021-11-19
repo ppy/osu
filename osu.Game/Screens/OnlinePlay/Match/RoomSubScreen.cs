@@ -18,6 +18,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 
@@ -58,6 +59,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         [Resolved(canBeNull: true)]
         protected OnlinePlayScreen ParentScreen { get; private set; }
@@ -344,7 +348,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             UpdateMods();
 
-            Ruleset.Value = selected.Ruleset.Value;
+            Ruleset.Value = rulesets.GetRuleset(selected.RulesetID);
 
             if (!selected.AllowedMods.Any())
             {
@@ -366,7 +370,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             var beatmap = SelectedItem.Value?.Beatmap.Value;
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineID);
+            var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }

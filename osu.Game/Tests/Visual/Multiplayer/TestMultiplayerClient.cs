@@ -287,7 +287,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             var apiRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == Room.RoomID);
             IBeatmapSetInfo? set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
-                                   ?? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId)?.BeatmapSet;
+                                   ?? beatmaps.QueryBeatmap(b => b.OnlineID == beatmapId)?.BeatmapSet;
 
             if (set == null)
                 throw new InvalidOperationException("Beatmap not found.");

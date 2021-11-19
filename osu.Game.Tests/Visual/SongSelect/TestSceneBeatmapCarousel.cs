@@ -838,7 +838,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             return new BeatmapSetInfo
             {
                 ID = id,
-                OnlineBeatmapSetID = id,
+                OnlineID = id,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
@@ -867,7 +867,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 yield return new BeatmapInfo
                 {
-                    OnlineBeatmapID = id++ * 10,
+                    OnlineID = id++ * 10,
                     DifficultyName = version,
                     StarRating = diff,
                     Ruleset = new OsuRuleset().RulesetInfo,
@@ -884,7 +884,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             var toReturn = new BeatmapSetInfo
             {
                 ID = id,
-                OnlineBeatmapSetID = id,
+                OnlineID = id,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
@@ -900,7 +900,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 toReturn.Beatmaps.Add(new BeatmapInfo
                 {
-                    OnlineBeatmapID = b * 10,
+                    OnlineID = b * 10,
                     Path = $"extra{b}.osu",
                     DifficultyName = $"Extra {b}",
                     Ruleset = rulesets.GetRuleset((b - 1) % 4),

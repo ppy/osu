@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
             AddStep("import soleily", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()));
 
-            AddUntilStep("wait for beatmap import", () => beatmaps.GetAllUsableBeatmapSets().Any(b => b.OnlineBeatmapSetID == 241526));
+            AddUntilStep("wait for beatmap import", () => beatmaps.GetAllUsableBeatmapSets().Any(b => b.OnlineID == 241526));
             AddUntilStep("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
 
             createButtonWithBeatmap(createSoleily());
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("remove soleily", () =>
             {
-                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineBeatmapSetID == 241526);
+                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineID == 241526);
 
                 if (beatmap != null) beatmaps.Delete(beatmap);
             });

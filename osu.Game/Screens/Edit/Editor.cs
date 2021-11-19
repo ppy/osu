@@ -31,11 +31,13 @@ using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
+using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -90,6 +92,8 @@ namespace osu.Game.Screens.Edit
 
         private DependencyContainer dependencies;
 
+        private TestGameplayButton testGameplayButton;
+
         private bool isNewBeatmap;
 
         protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
@@ -105,6 +109,9 @@ namespace osu.Game.Screens.Edit
 
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         public Editor(EditorLoader loader = null)
         {
@@ -262,7 +269,8 @@ namespace osu.Game.Screens.Edit
                                     {
                                         new Dimension(GridSizeMode.Absolute, 220),
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.Absolute, 220)
+                                        new Dimension(GridSizeMode.Absolute, 220),
+                                        new Dimension(GridSizeMode.Absolute, 120),
                                     },
                                     Content = new[]
                                     {
@@ -283,6 +291,13 @@ namespace osu.Game.Screens.Edit
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding { Left = 10 },
                                                 Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
+                                            },
+                                            testGameplayButton = new TestGameplayButton
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Left = 10 },
+                                                Size = new Vector2(1),
+                                                Action = testGameplay
                                             }
                                         },
                                     }
@@ -309,6 +324,19 @@ namespace osu.Game.Screens.Edit
         /// If the beatmap's track has changed, this method must be called to keep the editor in a valid state.
         /// </summary>
         public void UpdateClockSource() => clock.ChangeSource(Beatmap.Value.Track);
+
+        /// <summary>
+        /// Creates an <see cref="EditorState"/> instance representing the current state of the editor.
+        /// </summary>
+        /// <param name="nextBeatmap">
+        /// The next beatmap to be shown, in the case of difficulty switch.
+        /// <see langword="null"/> indicates that the beatmap will not be changing.
+        /// </param>
+        public EditorState GetState([CanBeNull] BeatmapInfo nextBeatmap = null) => new EditorState
+        {
+            Time = clock.CurrentTimeAccurate,
+            ClipboardContent = nextBeatmap == null || editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
+        };
 
         /// <summary>
         /// Restore the editor to a provided state.
@@ -365,6 +393,9 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case PlatformAction.Save:
+                    if (e.Repeat)
+                        return false;
+
                     Save();
                     return true;
             }
@@ -429,6 +460,9 @@ namespace osu.Game.Screens.Edit
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.Back:
@@ -456,6 +490,10 @@ namespace osu.Game.Screens.Edit
                     menuBar.Mode.Value = EditorScreenMode.Verify;
                     return true;
 
+                case GlobalAction.EditorTestGameplay:
+                    testGameplayButton.TriggerClick();
+                    return true;
+
                 default:
                     return false;
             }
@@ -468,7 +506,18 @@ namespace osu.Game.Screens.Edit
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+            dimBackground();
+            resetTrack(true);
+        }
 
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+            dimBackground();
+        }
+
+        private void dimBackground()
+        {
             ApplyToBackground(b =>
             {
                 // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
@@ -477,8 +526,6 @@ namespace osu.Game.Screens.Edit
                 b.IgnoreUserSettings.Value = true;
                 b.BlurAmount.Value = 0;
             });
-
-            resetTrack(true);
         }
 
         public override bool OnExiting(IScreen next)
@@ -510,7 +557,21 @@ namespace osu.Game.Screens.Edit
             ApplyToBackground(b => b.FadeColour(Color4.White, 500));
             resetTrack();
 
-            // To update the game-wide beatmap with any changes, perform a re-fetch on exit.
+            refetchBeatmap();
+
+            return base.OnExiting(next);
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            base.OnSuspending(next);
+            clock.Stop();
+            refetchBeatmap();
+        }
+
+        private void refetchBeatmap()
+        {
+            // To update the game-wide beatmap with any changes, perform a re-fetch on exit/suspend.
             // This is required as the editor makes its local changes via EditorBeatmap
             // (which are not propagated outwards to a potentially cached WorkingBeatmap).
             var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
@@ -520,8 +581,6 @@ namespace osu.Game.Screens.Edit
                 Logger.Log("Editor providing re-fetched beatmap post edit session");
                 Beatmap.Value = refetchedBeatmap;
             }
-
-            return base.OnExiting(next);
         }
 
         private void confirmExitWithSave()
@@ -740,16 +799,30 @@ namespace osu.Game.Screens.Edit
             return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
-        {
-            Time = clock.CurrentTimeAccurate,
-            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
-        });
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, GetState(nextBeatmap));
 
         private void cancelExit()
         {
             samplePlaybackDisabled.Value = false;
             loader?.CancelPendingDifficultySwitch();
+        }
+
+        private void testGameplay()
+        {
+            if (HasUnsavedChanges)
+            {
+                dialogOverlay.Push(new SaveBeforeGameplayTestDialog(() =>
+                {
+                    Save();
+                    pushEditorPlayer();
+                }));
+            }
+            else
+            {
+                pushEditorPlayer();
+            }
+
+            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(this));
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

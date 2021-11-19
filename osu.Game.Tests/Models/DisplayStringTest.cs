@@ -10,19 +10,28 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Users;
 
+#nullable enable
+
 namespace osu.Game.Tests.Models
 {
     [TestFixture]
     public class DisplayStringTest
     {
         [Test]
+        public void TestNull()
+        {
+            IBeatmapSetInfo? beatmap = null;
+            Assert.That(beatmap.GetDisplayString(), Is.EqualTo("null"));
+        }
+
+        [Test]
         public void TestBeatmapSet()
         {
             var mock = new Mock<IBeatmapSetInfo>();
 
-            mock.Setup(m => m.Metadata.Artist).Returns("artist");
-            mock.Setup(m => m.Metadata.Title).Returns("title");
-            mock.Setup(m => m.Metadata.Author.Username).Returns("author");
+            mock.Setup(m => m.Metadata!.Artist).Returns("artist");
+            mock.Setup(m => m.Metadata!.Title).Returns("title");
+            mock.Setup(m => m.Metadata!.Author.Username).Returns("author");
 
             Assert.That(mock.Object.GetDisplayString(), Is.EqualTo("artist - title (author)"));
         }
@@ -32,9 +41,9 @@ namespace osu.Game.Tests.Models
         {
             var mock = new Mock<IBeatmapSetInfo>();
 
-            mock.Setup(m => m.Metadata.Artist).Returns("artist");
-            mock.Setup(m => m.Metadata.Title).Returns("title");
-            mock.Setup(m => m.Metadata.Author.Username).Returns(string.Empty);
+            mock.Setup(m => m.Metadata!.Artist).Returns("artist");
+            mock.Setup(m => m.Metadata!.Title).Returns("title");
+            mock.Setup(m => m.Metadata!.Author.Username).Returns(string.Empty);
 
             Assert.That(mock.Object.GetDisplayString(), Is.EqualTo("artist - title"));
         }
