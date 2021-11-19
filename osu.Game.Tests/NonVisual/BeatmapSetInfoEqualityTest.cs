@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 
 namespace osu.Game.Tests.NonVisual
 {
@@ -15,7 +16,8 @@ namespace osu.Game.Tests.NonVisual
             var ourInfo = new BeatmapSetInfo { OnlineID = 123 };
             var otherInfo = new BeatmapSetInfo { OnlineID = 123 };
 
-            Assert.AreEqual(ourInfo, otherInfo);
+            Assert.AreNotEqual(ourInfo, otherInfo);
+            Assert.IsTrue(ourInfo.MatchesOnlineID(otherInfo));
         }
 
         [Test]
@@ -33,7 +35,8 @@ namespace osu.Game.Tests.NonVisual
             var ourInfo = new BeatmapSetInfo { ID = 123, OnlineID = 12 };
             var otherInfo = new BeatmapSetInfo { OnlineID = 12 };
 
-            Assert.AreEqual(ourInfo, otherInfo);
+            Assert.AreNotEqual(ourInfo, otherInfo);
+            Assert.IsTrue(ourInfo.MatchesOnlineID(otherInfo));
         }
 
         [Test]

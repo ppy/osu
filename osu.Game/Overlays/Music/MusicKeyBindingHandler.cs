@@ -32,6 +32,9 @@ namespace osu.Game.Overlays.Music
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (beatmap.Disabled)
                 return false;
 

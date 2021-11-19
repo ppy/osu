@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -28,11 +29,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private readonly bool isForCurrentRuleset;
         private readonly double originalOverallDifficulty;
 
-        public ManiaDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+        public ManiaDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
-            isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
-            originalOverallDifficulty = beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty;
+            isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.MatchesOnlineID(ruleset);
+            originalOverallDifficulty = beatmap.BeatmapInfo.Difficulty.OverallDifficulty;
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)

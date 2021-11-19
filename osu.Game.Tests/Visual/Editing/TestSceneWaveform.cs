@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public class TestSceneWaveform : OsuTestScene
     {
-        private WorkingBeatmap waveformBeatmap;
+        private IWorkingBeatmap waveformBeatmap;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)

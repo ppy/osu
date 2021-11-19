@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             var controlPointInfo = new ControlPointInfo();
             controlPointInfo.Add(0, new TimingControlPoint());
 
-            WorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
+            IWorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
             {
                 HitObjects = new List<HitObject> { new Fruit() },
                 BeatmapInfo = new BeatmapInfo

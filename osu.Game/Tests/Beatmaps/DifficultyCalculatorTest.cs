@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Beatmaps
             Assert.That(CreateDifficultyCalculator(getBeatmap(name)).Calculate(mods).StarRating, Is.EqualTo(expected).Within(0.00001));
         }
 
-        private WorkingBeatmap getBeatmap(string name)
+        private IWorkingBeatmap getBeatmap(string name)
         {
             using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new LineBufferedReader(resStream))
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Beatmaps
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 
-        protected abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
+        protected abstract DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap);
 
         protected abstract Ruleset CreateRuleset();
     }
