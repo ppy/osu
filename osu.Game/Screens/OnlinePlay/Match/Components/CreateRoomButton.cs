@@ -19,6 +19,9 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (!Enabled.Value)
                 return false;
 
