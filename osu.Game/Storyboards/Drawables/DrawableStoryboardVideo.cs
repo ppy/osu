@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader(true)]
         private void load(IBindable<IWorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            string path = beatmap.Value.BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.Equals(Video.Path, StringComparison.OrdinalIgnoreCase))?.File.StoragePath;
+            string path = beatmap.Value.BeatmapSetInfo?.Files.FirstOrDefault(f => f.Filename.Equals(Video.Path, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
 
             if (path == null)
                 return;
