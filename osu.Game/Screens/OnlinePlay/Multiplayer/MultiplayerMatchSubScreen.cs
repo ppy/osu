@@ -393,7 +393,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     break;
 
                 case QueueMode.AllPlayers:
-                case QueueMode.AllPlayersRR:
+                case QueueMode.AllPlayersRoundRobin:
                     AddOrEditPlaylistButton.Text = "Add beatmap";
                     AddOrEditPlaylistButton.Alpha = 1;
                     break;
