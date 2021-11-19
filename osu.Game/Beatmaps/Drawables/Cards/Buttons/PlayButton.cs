@@ -28,8 +28,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame? game, BeatmapDownloadTracker downloadTracker)
         {
-            if (game != null)
-                Action = () => game.PresentBeatmap(beatmapSet);
+            Action = () => game?.PresentBeatmap(beatmapSet);
 
             ((IBindable<DownloadState>)downloadState).BindTo(downloadTracker.State);
         }
