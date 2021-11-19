@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             get
             {
-                int index = skinItems.FindIndex(s => s.ID > 0);
+                int index = skinItems.FindIndex(s => s.IsManaged);
                 if (index < 0)
                     index = skinItems.Count;
 
@@ -176,7 +176,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 Action = export;
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();
-                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.ID > 0, true);
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.IsManaged, true);
             }
 
             private void export()
