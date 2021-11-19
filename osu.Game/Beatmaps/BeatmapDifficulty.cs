@@ -12,6 +12,11 @@ namespace osu.Game.Beatmaps
     [MapTo("BeatmapDifficulty")]
     public class BeatmapDifficulty : EmbeddedObject, IBeatmapDifficultyInfo
     {
+        /// <summary>
+        /// The default value used for all difficulty settings except <see cref="SliderMultiplier"/> and <see cref="SliderTickRate"/>.
+        /// </summary>
+        public const float DEFAULT_DIFFICULTY = 5;
+
         public float DrainRate { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
         public float CircleSize { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
         public float OverallDifficulty { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
@@ -19,6 +24,15 @@ namespace osu.Game.Beatmaps
 
         public double SliderMultiplier { get; set; } = 1;
         public double SliderTickRate { get; set; } = 1;
+
+        public BeatmapDifficulty()
+        {
+        }
+
+        public BeatmapDifficulty(IBeatmapDifficultyInfo source)
+        {
+            CopyFrom(source);
+        }
 
         /// <summary>
         /// Returns a shallow-clone of this <see cref="BeatmapDifficulty"/>.
@@ -30,7 +44,7 @@ namespace osu.Game.Beatmaps
             return diff;
         }
 
-        public void CopyTo(BeatmapDifficulty difficulty)
+        public virtual void CopyTo(BeatmapDifficulty difficulty)
         {
             difficulty.ApproachRate = ApproachRate;
             difficulty.DrainRate = DrainRate;
@@ -39,6 +53,17 @@ namespace osu.Game.Beatmaps
 
             difficulty.SliderMultiplier = SliderMultiplier;
             difficulty.SliderTickRate = SliderTickRate;
+        }
+
+        public virtual void CopyFrom(IBeatmapDifficultyInfo other)
+        {
+            ApproachRate = other.ApproachRate;
+            DrainRate = other.DrainRate;
+            CircleSize = other.CircleSize;
+            OverallDifficulty = other.OverallDifficulty;
+
+            SliderMultiplier = other.SliderMultiplier;
+            SliderTickRate = other.SliderTickRate;
         }
     }
 }
