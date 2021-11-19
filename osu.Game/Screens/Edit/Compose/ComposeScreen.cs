@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Edit.Compose
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            ruleset = parent.Get<IBindable<IWorkingBeatmap>>().Value.BeatmapInfo.Ruleset?.CreateInstance();
+            ruleset = parent.Get<IBindable<IWorkingBeatmap>>().Value.BeatmapInfo.Ruleset.CreateInstance();
             composer = ruleset?.CreateHitObjectComposer();
 
             // make the composer available to the timeline and other components in this screen.
