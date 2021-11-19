@@ -5,7 +5,6 @@
 
 using System;
 using MessagePack;
-using osu.Game.Online.Multiplayer.Queueing;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer

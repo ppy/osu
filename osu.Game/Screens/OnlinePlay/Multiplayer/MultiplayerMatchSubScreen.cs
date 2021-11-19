@@ -17,7 +17,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.Queueing;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;

@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 
-namespace osu.Game.Online.Multiplayer.Queueing
+namespace osu.Game.Online.Multiplayer
 {
     public enum QueueMode
     {
