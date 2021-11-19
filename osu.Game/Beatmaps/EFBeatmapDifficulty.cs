@@ -6,7 +6,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapDifficulty : IHasPrimaryKey, IBeatmapDifficultyInfo
+    public class EFBeatmapDifficulty : IHasPrimaryKey, IBeatmapDifficultyInfo
     {
         /// <summary>
         /// The default value used for all difficulty settings except <see cref="SliderMultiplier"/> and <see cref="SliderTickRate"/>.
@@ -23,11 +23,11 @@ namespace osu.Game.Beatmaps
 
         private float? approachRate;
 
-        public BeatmapDifficulty()
+        public EFBeatmapDifficulty()
         {
         }
 
-        public BeatmapDifficulty(IBeatmapDifficultyInfo source)
+        public EFBeatmapDifficulty(IBeatmapDifficultyInfo source)
         {
             CopyFrom(source);
         }
@@ -42,11 +42,11 @@ namespace osu.Game.Beatmaps
         public double SliderTickRate { get; set; } = 1;
 
         /// <summary>
-        /// Returns a shallow-clone of this <see cref="BeatmapDifficulty"/>.
+        /// Returns a shallow-clone of this <see cref="EFBeatmapDifficulty"/>.
         /// </summary>
-        public BeatmapDifficulty Clone()
+        public EFBeatmapDifficulty Clone()
         {
-            var diff = (BeatmapDifficulty)Activator.CreateInstance(GetType());
+            var diff = (EFBeatmapDifficulty)Activator.CreateInstance(GetType());
             CopyTo(diff);
             return diff;
         }
@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps
             SliderTickRate = other.SliderTickRate;
         }
 
-        public virtual void CopyTo(BeatmapDifficulty other)
+        public virtual void CopyTo(EFBeatmapDifficulty other)
         {
             other.ApproachRate = ApproachRate;
             other.DrainRate = DrainRate;
