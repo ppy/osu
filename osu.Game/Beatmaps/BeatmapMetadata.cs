@@ -44,5 +44,15 @@ namespace osu.Game.Beatmaps
         public string BackgroundFile { get; set; } = string.Empty;
 
         IUser IBeatmapMetadataInfo.Author => Author;
+
+        #region Compatibility properties
+
+        public string AuthorString
+        {
+            get => Author.Username;
+            set => Author.Username = value;
+        }
+
+        #endregion
     }
 }

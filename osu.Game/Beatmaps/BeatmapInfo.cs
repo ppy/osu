@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Models;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using Realms;
 
@@ -72,7 +73,7 @@ namespace osu.Game.Beatmaps
         }
 
         [UsedImplicitly]
-        private BeatmapInfo()
+        public BeatmapInfo()
         {
         }
 
@@ -100,6 +101,13 @@ namespace osu.Game.Beatmaps
 
         public double TimelineZoom { get; set; }
 
+        public CountdownType Countdown { get; set; } = CountdownType.Normal;
+
+        /// <summary>
+        /// The number of beats to move the countdown backwards (compared to its default location).
+        /// </summary>
+        public int CountdownOffset { get; set; }
+
         #endregion
 
         public bool Equals(BeatmapInfo? other)
@@ -113,20 +121,53 @@ namespace osu.Game.Beatmaps
         public bool Equals(IBeatmapInfo? other) => other is BeatmapInfo b && Equals(b);
 
         public bool AudioEquals(BeatmapInfo? other) => other != null
-                                                        && BeatmapSet != null
-                                                        && other.BeatmapSet != null
-                                                        && BeatmapSet.Hash == other.BeatmapSet.Hash
-                                                        && Metadata.AudioFile == other.Metadata.AudioFile;
+                                                       && BeatmapSet != null
+                                                       && other.BeatmapSet != null
+                                                       && BeatmapSet.Hash == other.BeatmapSet.Hash
+                                                       && Metadata.AudioFile == other.Metadata.AudioFile;
 
         public bool BackgroundEquals(BeatmapInfo? other) => other != null
-                                                             && BeatmapSet != null
-                                                             && other.BeatmapSet != null
-                                                             && BeatmapSet.Hash == other.BeatmapSet.Hash
-                                                             && Metadata.BackgroundFile == other.Metadata.BackgroundFile;
+                                                            && BeatmapSet != null
+                                                            && other.BeatmapSet != null
+                                                            && BeatmapSet.Hash == other.BeatmapSet.Hash
+                                                            && Metadata.BackgroundFile == other.Metadata.BackgroundFile;
 
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
+
+        #region Compatibility properties
+
+        [Ignored]
+        public int RulesetID => Ruleset.OnlineID;
+
+        [Ignored]
+        public Guid BeatmapSetInfoID => BeatmapSet?.ID ?? Guid.Empty;
+
+        [Ignored]
+        public BeatmapDifficulty BaseDifficulty
+        {
+            get => Difficulty;
+            set => Difficulty = value;
+        }
+
+        [Ignored]
+        public string? Path => File?.Filename;
+
+        [Ignored]
+        public APIBeatmap? OnlineInfo { get; set; }
+
+        [Ignored]
+        public int? MaxCombo { get; set; }
+
+        [Ignored]
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
+
+        public int BeatmapVersion;
+
+        public BeatmapInfo Clone() => this.Detach();
+
+        #endregion
     }
 }

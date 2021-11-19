@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets
         }
 
         [UsedImplicitly]
-        private RulesetInfo()
+        public RulesetInfo()
         {
         }
 
@@ -83,5 +83,11 @@ namespace osu.Game.Rulesets
 
             return ruleset;
         }
+
+        #region Compatibility properties
+
+        public int ID => OnlineID;
+
+        #endregion
     }
 }
