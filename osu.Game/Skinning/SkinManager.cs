@@ -307,7 +307,7 @@ namespace osu.Game.Skinning
 
         public void Save(Skin skin)
         {
-            if (skin.SkinInfo.ID <= 0)
+            if (!skin.SkinInfo.IsManaged)
                 throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Call {nameof(EnsureMutableSkin)} first.");
 
             foreach (var drawableInfo in skin.DrawableComponentInfo)
