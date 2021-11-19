@@ -4,18 +4,18 @@
 using System;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
+using osu.Game.Models;
 using osu.Game.Users;
 using Realms;
 
 #nullable enable
 
-namespace osu.Game.Models
+namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("BeatmapMetadata")]
-    public class RealmBeatmapMetadata : RealmObject, IBeatmapMetadataInfo
+    public class BeatmapMetadata : RealmObject, IBeatmapMetadataInfo
     {
         public string Title { get; set; } = string.Empty;
 

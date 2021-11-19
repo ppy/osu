@@ -4,16 +4,15 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Testing;
-using osu.Game.Rulesets;
 using Realms;
 
 #nullable enable
 
-namespace osu.Game.Models
+namespace osu.Game.Rulesets
 {
     [ExcludeFromDynamicCompile]
     [MapTo("Ruleset")]
-    public class RealmRuleset : RealmObject, IEquatable<RealmRuleset>, IRulesetInfo
+    public class RulesetInfo : RealmObject, IEquatable<RulesetInfo>, IRulesetInfo
     {
         [PrimaryKey]
         public string ShortName { get; set; } = string.Empty;
@@ -25,7 +24,7 @@ namespace osu.Game.Models
 
         public string InstantiationInfo { get; set; } = string.Empty;
 
-        public RealmRuleset(string shortName, string name, string instantiationInfo, int onlineID)
+        public RulesetInfo(string shortName, string name, string instantiationInfo, int onlineID)
         {
             ShortName = shortName;
             Name = name;
@@ -34,11 +33,11 @@ namespace osu.Game.Models
         }
 
         [UsedImplicitly]
-        private RealmRuleset()
+        private RulesetInfo()
         {
         }
 
-        public RealmRuleset(int? onlineID, string name, string shortName, bool available)
+        public RulesetInfo(int? onlineID, string name, string shortName, bool available)
         {
             OnlineID = onlineID ?? -1;
             Name = name;
@@ -48,13 +47,13 @@ namespace osu.Game.Models
 
         public bool Available { get; set; }
 
-        public bool Equals(RealmRuleset? other) => other != null && OnlineID == other.OnlineID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
+        public bool Equals(RulesetInfo? other) => other != null && OnlineID == other.OnlineID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
 
-        public bool Equals(IRulesetInfo? other) => other is RealmRuleset b && Equals(b);
+        public bool Equals(IRulesetInfo? other) => other is RulesetInfo b && Equals(b);
 
         public override string ToString() => Name;
 
-        public RealmRuleset Clone() => new RealmRuleset
+        public RulesetInfo Clone() => new RulesetInfo
         {
             OnlineID = OnlineID,
             Name = Name,

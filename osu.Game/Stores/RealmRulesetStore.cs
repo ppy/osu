@@ -11,7 +11,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
-using osu.Game.Models;
 using osu.Game.Rulesets;
 
 #nullable enable
@@ -106,7 +105,7 @@ namespace osu.Game.Stores
             {
                 context.Write(realm =>
                 {
-                    var rulesets = realm.All<RealmRuleset>();
+                    var rulesets = realm.All<RulesetInfo>();
 
                     List<Ruleset> instances = loadedAssemblies.Values
                                                               .Select(r => Activator.CreateInstance(r) as Ruleset)
@@ -117,8 +116,8 @@ namespace osu.Game.Stores
                     // add all legacy rulesets first to ensure they have exclusive choice of primary key.
                     foreach (var r in instances.Where(r => r is ILegacyRuleset))
                     {
-                        if (realm.All<RealmRuleset>().FirstOrDefault(rr => rr.OnlineID == r.RulesetInfo.OnlineID) == null)
-                            realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.OnlineID));
+                        if (realm.All<RulesetInfo>().FirstOrDefault(rr => rr.OnlineID == r.RulesetInfo.OnlineID) == null)
+                            realm.Add(new RulesetInfo(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.OnlineID));
                     }
 
                     // add any other rulesets which have assemblies present but are not yet in the database.
@@ -136,11 +135,11 @@ namespace osu.Game.Stores
                                 existingSameShortName.InstantiationInfo = r.RulesetInfo.InstantiationInfo;
                             }
                             else
-                                realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.OnlineID));
+                                realm.Add(new RulesetInfo(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.OnlineID));
                         }
                     }
 
-                    List<RealmRuleset> detachedRulesets = new List<RealmRuleset>();
+                    List<RulesetInfo> detachedRulesets = new List<RulesetInfo>();
 
                     // perform a consistency check and detach final rulesets from realm for cross-thread runtime usage.
                     foreach (var r in rulesets)

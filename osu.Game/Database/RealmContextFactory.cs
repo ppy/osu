@@ -12,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Game.Configuration;
+using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using osu.Game.Skinning;
@@ -109,7 +110,7 @@ namespace osu.Game.Database
             using (var realm = CreateContext())
             using (var transaction = realm.BeginWrite())
             {
-                var pendingDeleteSets = realm.All<RealmBeatmapSet>().Where(s => s.DeletePending);
+                var pendingDeleteSets = realm.All<BeatmapSetInfo>().Where(s => s.DeletePending);
 
                 foreach (var s in pendingDeleteSets)
                 {
@@ -206,9 +207,9 @@ namespace osu.Game.Database
             switch (targetVersion)
             {
                 case 7:
-                    convertOnlineIDs<RealmBeatmap>();
-                    convertOnlineIDs<RealmBeatmapSet>();
-                    convertOnlineIDs<RealmRuleset>();
+                    convertOnlineIDs<BeatmapInfo>();
+                    convertOnlineIDs<BeatmapSetInfo>();
+                    convertOnlineIDs<RulesetInfo>();
 
                     void convertOnlineIDs<T>() where T : RealmObject
                     {
@@ -253,14 +254,14 @@ namespace osu.Game.Database
 
                 case 9:
                     // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
-                    string metadataClassName = getMappedOrOriginalName(typeof(RealmBeatmapMetadata));
+                    string metadataClassName = getMappedOrOriginalName(typeof(BeatmapMetadata));
 
                     // May be coming from a version before `RealmBeatmapMetadata` existed.
                     if (!migration.OldRealm.Schema.TryFindObjectSchema(metadataClassName, out _))
                         return;
 
                     var oldMetadata = migration.OldRealm.DynamicApi.All(metadataClassName);
-                    var newMetadata = migration.NewRealm.All<RealmBeatmapMetadata>();
+                    var newMetadata = migration.NewRealm.All<BeatmapMetadata>();
 
                     int metadataCount = newMetadata.Count();
 

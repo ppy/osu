@@ -2,16 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using Realms;
 
 #nullable enable
 
-namespace osu.Game.Models
+namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [MapTo("BeatmapDifficulty")]
-    public class RealmBeatmapDifficulty : EmbeddedObject, IBeatmapDifficultyInfo
+    public class BeatmapDifficulty : EmbeddedObject, IBeatmapDifficultyInfo
     {
         public float DrainRate { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
         public float CircleSize { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
@@ -22,16 +21,16 @@ namespace osu.Game.Models
         public double SliderTickRate { get; set; } = 1;
 
         /// <summary>
-        /// Returns a shallow-clone of this <see cref="RealmBeatmapDifficulty"/>.
+        /// Returns a shallow-clone of this <see cref="BeatmapDifficulty"/>.
         /// </summary>
-        public RealmBeatmapDifficulty Clone()
+        public BeatmapDifficulty Clone()
         {
-            var diff = new RealmBeatmapDifficulty();
+            var diff = new BeatmapDifficulty();
             CopyTo(diff);
             return diff;
         }
 
-        public void CopyTo(RealmBeatmapDifficulty difficulty)
+        public void CopyTo(BeatmapDifficulty difficulty)
         {
             difficulty.ApproachRate = ApproachRate;
             difficulty.DrainRate = DrainRate;
