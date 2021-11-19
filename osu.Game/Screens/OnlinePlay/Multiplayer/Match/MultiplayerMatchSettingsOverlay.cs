@@ -201,7 +201,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         },
                                                                     },
                                                                 },
-                                                                new Section("Picking mode")
+                                                                new Section("Queue mode")
                                                                 {
                                                                     Child = new Container
                                                                     {
