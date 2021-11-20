@@ -97,7 +97,7 @@ namespace osu.Desktop
                 presence.State = truncate(activity.Value.Status);
                 presence.Details = truncate(getDetails(activity.Value));
 
-                if (getOnlineID(activity.Value) != string.Empty)
+                if (getOnlineID(activity.Value) != null)
                 {
                     presence.Buttons = new Button[]
                     {
@@ -167,18 +167,14 @@ namespace osu.Desktop
             return string.Empty;
         }
 
-        private string getOnlineID(UserActivity activity)
+        private int? getOnlineID(UserActivity activity)
         {
-            switch (activity)
+            if (activity is UserActivity.InGame game && game.BeatmapInfo.OnlineID > 0)
             {
-                case UserActivity.InGame game:
-                    if (!(game.BeatmapInfo.OnlineID < 1))
-                        return game.BeatmapInfo.OnlineID.ToString();
-
-                    return string.Empty;
+                return game.BeatmapInfo.OnlineID;
             }
 
-            return string.Empty;
+            return null;
         }
 
         protected override void Dispose(bool isDisposing)
