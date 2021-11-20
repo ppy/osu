@@ -164,9 +164,9 @@ namespace osu.Game.Tests.Beatmaps
         {
             public Func<DifficultyCacheLookup, StarDifficulty> ComputeDifficulty { get; set; }
 
-            protected override Task<StarDifficulty> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken token = default)
+            protected override Task<StarDifficulty?> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken token = default)
             {
-                return Task.FromResult(ComputeDifficulty?.Invoke(lookup) ?? new StarDifficulty(BASE_STARS, 0));
+                return Task.FromResult<StarDifficulty?>(ComputeDifficulty?.Invoke(lookup) ?? new StarDifficulty(BASE_STARS, 0));
             }
         }
     }
