@@ -75,6 +75,9 @@ namespace osu.Game.Graphics.UserInterface
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (!HasFocus) return false;
 
             if (e.Action == GlobalAction.Back)

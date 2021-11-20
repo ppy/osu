@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using M.Resources.Localisation.LLin.Plugins;
+using Mvis.Plugin.CollectionSupport.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -36,7 +37,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
 
         public Bindable<CollectionPanel> SelectedPanel = new Bindable<CollectionPanel>();
 
-        private readonly List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
+        private readonly List<IBeatmapSetInfo> beatmapSets = new List<IBeatmapSetInfo>();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -75,7 +76,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         {
             sortBeatmapCollection();
 
-            WorkingBeatmap targetBeatmap = beatmaps.GetWorkingBeatmap(beatmapSets.FirstOrDefault()?.Beatmaps.First());
+            WorkingBeatmap targetBeatmap = beatmaps.GetWorkingBeatmap(beatmapSets.FirstOrDefault()?.Beatmaps.First().AsBeatmapInfo());
 
             AddRangeInternal(new Drawable[]
             {
@@ -292,9 +293,9 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             [Resolved]
             private BeatmapManager beatmaps { get; set; }
 
-            private readonly List<BeatmapSetInfo> beatmapSetList;
+            private readonly List<IBeatmapSetInfo> beatmapSetList;
 
-            public BeatmapThumbnailFlow(List<BeatmapSetInfo> list)
+            public BeatmapThumbnailFlow(List<IBeatmapSetInfo> list)
             {
                 beatmapSetList = list;
                 Direction = FillDirection.Horizontal;
@@ -317,10 +318,10 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 {
                     collections++;
 
-                    var b = beatmaps.GetWorkingBeatmap(c.Beatmaps.First());
-                    string tooltip = $"{b.Metadata.ArtistUnicode ?? b.Metadata.Artist}"
+                    var b = beatmaps.GetWorkingBeatmap(c.Beatmaps.First().AsBeatmapInfo());
+                    string tooltip = $"{b.Metadata.ArtistUnicode}"
                                      + " - "
-                                     + $"{b.Metadata.TitleUnicode ?? b.Metadata.Title}";
+                                     + $"{b.Metadata.TitleUnicode}";
 
                     if (collections <= limit)
                     {

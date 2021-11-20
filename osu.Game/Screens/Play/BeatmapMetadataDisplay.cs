@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class BeatmapMetadataDisplay : Container
     {
-        private readonly WorkingBeatmap beatmap;
+        private readonly IWorkingBeatmap beatmap;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable logoFacade;
         private LoadingSpinner loading;
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable logoFacade)
+        public BeatmapMetadataDisplay(IWorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable logoFacade)
         {
             this.beatmap = beatmap;
             this.logoFacade = logoFacade;
@@ -328,7 +328,7 @@ namespace osu.Game.Screens.Play
             [CanBeNull]
             private readonly Ruleset ruleset;
 
-            public SelectedRulesetIcon(RulesetInfo rulesetInfo)
+            public SelectedRulesetIcon(IRulesetInfo rulesetInfo)
             {
                 ruleset = rulesetInfo?.CreateInstance();
             }

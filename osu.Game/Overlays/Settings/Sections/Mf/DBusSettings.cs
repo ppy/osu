@@ -35,31 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 }
             };
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-            {
-                SettingsCheckbox trayCheckbox;
-                AddRange(new Drawable[]
-                {
-                    trayCheckbox = new SettingsCheckbox
-                    {
-                        LabelText = "启用DBus系统托盘",
-                        Current = config.GetBindable<bool>(MSetting.EnableTray)
-                    },
-                    new SettingsCheckbox
-                    {
-                        LabelText = "允许通过DBus发送系统通知",
-                        Current = config.GetBindable<bool>(MSetting.EnableSystemNotifications)
-                    },
-                    new SettingsTextBox
-                    {
-                        LabelText = "托盘图标名称",
-                        Current = config.GetBindable<string>(MSetting.TrayIconName)
-                    }
-                });
-
-                trayCheckbox.WarningText = "由于未知原因, 启用再禁用托盘功能不会使托盘图标消失。\n具体原因正在调查中。";
-            }
-            else
+            if (RuntimeInfo.OS != RuntimeInfo.Platform.Linux)
             {
                 intergrationCheckbox.WarningText = "非Linux平台可能需要自行安装并启用DBus";
             }
