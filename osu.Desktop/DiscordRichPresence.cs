@@ -92,7 +92,7 @@ namespace osu.Desktop
                 return;
             }
 
-            if (/*status.Value is UserStatusOnline &&*/ activity.Value != null)
+            if (status.Value is UserStatusOnline && activity.Value != null)
             {
                 presence.State = truncate(activity.Value.Status);
                 presence.Details = truncate(getDetails(activity.Value));
