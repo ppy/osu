@@ -47,6 +47,8 @@ namespace osu.Desktop
                 SkipIdenticalPresence = false // handles better on discord IPC loss, see updateStatus call in onReady.
             };
 
+            client.RegisterUriScheme();
+
             client.OnReady += onReady;
 
             // safety measure for now, until we performance test / improve backoff for failed connections.
@@ -90,10 +92,22 @@ namespace osu.Desktop
                 return;
             }
 
-            if (status.Value is UserStatusOnline && activity.Value != null)
+            if (/*status.Value is UserStatusOnline &&*/ activity.Value != null)
             {
                 presence.State = truncate(activity.Value.Status);
                 presence.Details = truncate(getDetails(activity.Value));
+
+                if (getOnlineID(activity.Value) != string.Empty)
+                {
+                    presence.Buttons = new Button[]
+                    {
+                        new Button() { Label = "Beatmap Link", Url = $"https://osu.ppy.sh/b/{getOnlineID(activity.Value)}" }
+                    };
+                }
+                else
+                {
+                    presence.Buttons = null;
+                }
             }
             else
             {
@@ -109,6 +123,7 @@ namespace osu.Desktop
 
             // update ruleset
             presence.Assets.SmallImageKey = ruleset.Value.ID <= 3 ? $"mode_{ruleset.Value.ID}" : "mode_custom";
+
             presence.Assets.SmallImageText = ruleset.Value.Name;
 
             client.SetPresence(presence);
@@ -147,6 +162,20 @@ namespace osu.Desktop
 
                 case UserActivity.InLobby lobby:
                     return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;
+            }
+
+            return string.Empty;
+        }
+
+        private string getOnlineID(UserActivity activity)
+        {
+            switch (activity)
+            {
+                case UserActivity.InGame game:
+                    if (!(game.BeatmapInfo.OnlineID < 1))
+                        return game.BeatmapInfo.OnlineID.ToString();
+
+                    return string.Empty;
             }
 
             return string.Empty;
