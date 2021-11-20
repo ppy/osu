@@ -18,6 +18,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
@@ -197,7 +198,7 @@ namespace osu.Game.Stores
 
             foreach (var file in files.Where(f => f.Filename.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)))
             {
-                using (var memoryStream = new MemoryStream(Files.Store.Get(file.File.StoragePath))) // we need a memory stream so we can seek
+                using (var memoryStream = new MemoryStream(Files.Store.Get(file.File.GetStoragePath()))) // we need a memory stream so we can seek
                 {
                     IBeatmap decoded;
                     using (var lineReader = new LineBufferedReader(memoryStream, true))

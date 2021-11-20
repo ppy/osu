@@ -13,6 +13,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
@@ -77,7 +78,7 @@ namespace osu.Game.Scoring
             if (file == null)
                 return;
 
-            using (var inputStream = Files.Storage.GetStream(file.FileInfo.StoragePath))
+            using (var inputStream = Files.Storage.GetStream(file.FileInfo.GetStoragePath()))
                 inputStream.CopyTo(outputStream);
         }
 
