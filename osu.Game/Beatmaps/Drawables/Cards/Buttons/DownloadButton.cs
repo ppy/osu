@@ -16,8 +16,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
     public class DownloadButton : BeatmapCardIconButton
     {
+        public IBindable<DownloadState> State => state;
+        private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
+
         private readonly APIBeatmapSet beatmapSet;
-        private readonly Bindable<DownloadState> downloadState = new Bindable<DownloadState>();
 
         private Bindable<bool> preferNoVideo = null!;
 
@@ -32,23 +34,22 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, BeatmapDownloadTracker downloadTracker)
+        private void load(OsuConfigManager config)
         {
             preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
-            ((IBindable<DownloadState>)downloadState).BindTo(downloadTracker.State);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             preferNoVideo.BindValueChanged(_ => updateState());
-            downloadState.BindValueChanged(_ => updateState(), true);
+            state.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
         }
 
         private void updateState()
         {
-            this.FadeTo(downloadState.Value != DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            this.FadeTo(state.Value != DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
 
             if (beatmapSet.Availability.DownloadDisabled)
             {

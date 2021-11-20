@@ -14,8 +14,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
     public class GoToBeatmapButton : BeatmapCardIconButton
     {
+        public IBindable<DownloadState> State => state;
+        private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
+
         private readonly APIBeatmapSet beatmapSet;
-        private readonly Bindable<DownloadState> downloadState = new Bindable<DownloadState>();
 
         public GoToBeatmapButton(APIBeatmapSet beatmapSet)
         {
@@ -26,24 +28,22 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame? game, BeatmapDownloadTracker downloadTracker)
+        private void load(OsuGame? game)
         {
             Action = () => game?.PresentBeatmap(beatmapSet);
-
-            ((IBindable<DownloadState>)downloadState).BindTo(downloadTracker.State);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            downloadState.BindValueChanged(_ => updateState(), true);
+            state.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
         }
 
         private void updateState()
         {
-            this.FadeTo(downloadState.Value == DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            this.FadeTo(state.Value == DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
