@@ -34,7 +34,8 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
-        private float extraDelay = 750;
+        protected float ExtraDelay = 750;
+
         private readonly Bindable<bool> optui = new Bindable<bool>();
 
         protected const float BACKGROUND_BLUR = 15;
@@ -197,11 +198,11 @@ namespace osu.Game.Screens.Play
             switch (optui.Value)
             {
                 case true:
-                    extraDelay = 750;
+                    ExtraDelay = 750;
                     break;
 
                 case false:
-                    extraDelay = 0;
+                    ExtraDelay = 0;
                     break;
             }
         }
@@ -388,8 +389,8 @@ namespace osu.Game.Screens.Play
             // Ensure the logo is no longer tracking before we scale the content
             content.StopTracking();
 
-            content.ScaleTo(0.7f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
-            content.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint);
+            content.Delay(ExtraDelay).ScaleTo(0.7f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
+            content.Delay(ExtraDelay).FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint);
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, CONTENT_OUT_DURATION);
             highPassFilter.CutoffTo(0, CONTENT_OUT_DURATION);
         }
@@ -418,7 +419,7 @@ namespace osu.Game.Screens.Play
 
                 ContentOut();
 
-                TransformSequence<PlayerLoader> pushSequence = this.Delay(CONTENT_OUT_DURATION + extraDelay);
+                TransformSequence<PlayerLoader> pushSequence = this.Delay(CONTENT_OUT_DURATION + ExtraDelay);
 
                 // only show if the warning was created (i.e. the beatmap needs it)
                 // and this is not a restart of the map (the warning expires after first load).

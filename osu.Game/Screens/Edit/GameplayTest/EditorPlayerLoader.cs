@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
         protected override void ContentOut()
         {
             base.ContentOut();
-            osuLogo.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint);
+            osuLogo.Delay(ExtraDelay).FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint);
         }
 
         protected override double PlayerPushDelay => 0;
