@@ -152,7 +152,10 @@ namespace osu.Game.Screens.Select.Details
 
             Task.WhenAll(normalStarDifficulty, moddedStarDifficulty).ContinueWith(_ => Schedule(() =>
             {
-                starDifficulty.Value = ((float)normalStarDifficulty.Result.Stars, (float)moddedStarDifficulty.Result.Stars);
+                if (normalStarDifficulty.Result == null || moddedStarDifficulty.Result == null)
+                    return;
+
+                starDifficulty.Value = ((float)normalStarDifficulty.Result.Value.Stars, (float)moddedStarDifficulty.Result.Value.Stars);
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
 
