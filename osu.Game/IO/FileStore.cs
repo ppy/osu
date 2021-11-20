@@ -12,6 +12,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Extensions;
 
 namespace osu.Game.IO
 {
@@ -47,7 +48,7 @@ namespace osu.Game.IO
 
                 var info = existing ?? new FileInfo { Hash = hash };
 
-                string path = info.StoragePath;
+                string path = info.GetStoragePath();
 
                 // we may be re-adding a file to fix missing store entries.
                 bool requiresCopy = !Storage.Exists(path);
@@ -120,7 +121,7 @@ namespace osu.Game.IO
                 {
                     try
                     {
-                        Storage.Delete(f.StoragePath);
+                        Storage.Delete(f.GetStoragePath());
                         context.FileInfo.Remove(f);
                     }
                     catch (Exception e)
