@@ -294,15 +294,22 @@ namespace osu.Game.Beatmaps
 
                 return new StarDifficulty(attributes);
             }
-            catch (BeatmapInvalidForRulesetException e)
+            catch (OperationCanceledException)
+            {
+                // no need to log, cancellations are expected as part of normal operation.
+                return null;
+            }
+            catch (BeatmapInvalidForRulesetException invalidForRuleset)
             {
                 if (rulesetInfo.Equals(beatmapInfo.Ruleset))
-                    Logger.Error(e, $"Failed to convert {beatmapInfo.OnlineID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
+                    Logger.Error(invalidForRuleset, $"Failed to convert {beatmapInfo.OnlineID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
 
                 return null;
             }
-            catch
+            catch (Exception unknownException)
             {
+                Logger.Error(unknownException, "Failed to calculate beatmap difficulty");
+
                 return null;
             }
         }
