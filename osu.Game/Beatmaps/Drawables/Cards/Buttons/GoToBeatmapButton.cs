@@ -12,12 +12,12 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
-    public class PlayButton : BeatmapCardIconButton
+    public class GoToBeatmapButton : BeatmapCardIconButton
     {
         private readonly APIBeatmapSet beatmapSet;
         private readonly Bindable<DownloadState> downloadState = new Bindable<DownloadState>();
 
-        public PlayButton(APIBeatmapSet beatmapSet)
+        public GoToBeatmapButton(APIBeatmapSet beatmapSet)
         {
             this.beatmapSet = beatmapSet;
 

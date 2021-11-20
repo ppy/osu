@@ -25,7 +25,6 @@ using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
 using DownloadButton = osu.Game.Beatmaps.Drawables.Cards.Buttons.DownloadButton;
-using PlayButton = osu.Game.Beatmaps.Drawables.Cards.Buttons.PlayButton;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
@@ -144,7 +143,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre
                             },
-                            new PlayButton(beatmapSet)
+                            new GoToBeatmapButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre
