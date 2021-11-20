@@ -92,9 +92,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
-        private readonly BindableBool bindableBool = new BindableBool();
-
-        private void showMetadataForBeatmap(Func<WorkingBeatmap> getBeatmap)
+        private void showMetadataForBeatmap(Func<IWorkingBeatmap> getBeatmap)
         {
             AddStep("setup display", () =>
             {

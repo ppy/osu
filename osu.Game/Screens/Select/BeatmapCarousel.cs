@@ -18,7 +18,6 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
@@ -479,30 +478,15 @@ namespace osu.Game.Screens.Select
             switch (e.Key)
             {
                 case Key.Left:
-                    if (!e.Repeat)
-                        beginRepeatSelection(() => SelectNext(-1), e.Key);
+                    SelectNext(-1);
                     return true;
 
                 case Key.Right:
-                    if (!e.Repeat)
-                        beginRepeatSelection(() => SelectNext(), e.Key);
+                    SelectNext();
                     return true;
             }
 
             return false;
-        }
-
-        protected override void OnKeyUp(KeyUpEvent e)
-        {
-            switch (e.Key)
-            {
-                case Key.Left:
-                case Key.Right:
-                    endRepeatSelection(e.Key);
-                    break;
-            }
-
-            base.OnKeyUp(e);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -510,11 +494,11 @@ namespace osu.Game.Screens.Select
             switch (e.Action)
             {
                 case GlobalAction.SelectNext:
-                    beginRepeatSelection(() => SelectNext(1, false), e.Action);
+                    SelectNext(1, false);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                    beginRepeatSelection(() => SelectNext(-1, false), e.Action);
+                    SelectNext(-1, false);
                     return true;
             }
 
@@ -523,40 +507,6 @@ namespace osu.Game.Screens.Select
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            switch (e.Action)
-            {
-                case GlobalAction.SelectNext:
-                case GlobalAction.SelectPrevious:
-                    endRepeatSelection(e.Action);
-                    break;
-            }
-        }
-
-        private ScheduledDelegate repeatDelegate;
-        private object lastRepeatSource;
-
-        /// <summary>
-        /// Begin repeating the specified selection action.
-        /// </summary>
-        /// <param name="action">The action to perform.</param>
-        /// <param name="source">The source of the action. Used in conjunction with <see cref="endRepeatSelection"/> to only cancel the correct action (most recently pressed key).</param>
-        private void beginRepeatSelection(Action action, object source)
-        {
-            endRepeatSelection();
-
-            lastRepeatSource = source;
-            repeatDelegate = this.BeginKeyRepeat(Scheduler, action);
-        }
-
-        private void endRepeatSelection(object source = null)
-        {
-            // only the most recent source should be able to cancel the current action.
-            if (source != null && !EqualityComparer<object>.Default.Equals(lastRepeatSource, source))
-                return;
-
-            repeatDelegate?.Cancel();
-            repeatDelegate = null;
-            lastRepeatSource = null;
         }
 
         #endregion

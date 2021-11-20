@@ -99,6 +99,11 @@ namespace osu.Desktop
 
         protected override UpdateManager CreateUpdateManager()
         {
+            string packageManaged = Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER");
+
+            if (!string.IsNullOrEmpty(packageManaged))
+                return new NoActionUpdateManager();
+
             switch (RuntimeInfo.OS)
             {
                 default:

@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
@@ -17,33 +17,69 @@ namespace osu.Game.Beatmaps
 {
     public interface IWorkingBeatmap
     {
+        IBeatmapInfo BeatmapInfo { get; }
+
+        IBeatmapSetInfo BeatmapSetInfo { get; }
+
+        IBeatmapMetadataInfo Metadata { get; }
+
         /// <summary>
-        /// Retrieves the <see cref="IBeatmap"/> which this <see cref="WorkingBeatmap"/> represents.
+        /// Whether the Beatmap has finished loading.
+        ///</summary>
+        public bool BeatmapLoaded { get; }
+
+        /// <summary>
+        /// Whether the Background has finished loading.
+        ///</summary>
+        public bool BackgroundLoaded { get; }
+
+        /// <summary>
+        /// Whether the Waveform has finished loading.
+        ///</summary>
+        public bool WaveformLoaded { get; }
+
+        /// <summary>
+        /// Whether the Storyboard has finished loading.
+        ///</summary>
+        public bool StoryboardLoaded { get; }
+
+        /// <summary>
+        /// Whether the Skin has finished loading.
+        ///</summary>
+        public bool SkinLoaded { get; }
+
+        /// <summary>
+        /// Whether the Track has finished loading.
+        ///</summary>
+        public bool TrackLoaded { get; }
+
+        /// <summary>
+        /// Retrieves the <see cref="IBeatmap"/> which this <see cref="IWorkingBeatmap"/> represents.
         /// </summary>
         IBeatmap Beatmap { get; }
 
         /// <summary>
-        /// Retrieves the background for this <see cref="WorkingBeatmap"/>.
+        /// Retrieves the background for this <see cref="IWorkingBeatmap"/>.
         /// </summary>
         Texture Background { get; }
 
         /// <summary>
-        /// Retrieves the <see cref="Waveform"/> for the <see cref="Track"/> of this <see cref="WorkingBeatmap"/>.
+        /// Retrieves the <see cref="Waveform"/> for the <see cref="Track"/> of this <see cref="IWorkingBeatmap"/>.
         /// </summary>
         Waveform Waveform { get; }
 
         /// <summary>
-        /// Retrieves the <see cref="Storyboard"/> which this <see cref="WorkingBeatmap"/> provides.
+        /// Retrieves the <see cref="Storyboard"/> which this <see cref="IWorkingBeatmap"/> provides.
         /// </summary>
         Storyboard Storyboard { get; }
 
         /// <summary>
-        /// Retrieves the <see cref="Skin"/> which this <see cref="WorkingBeatmap"/> provides.
+        /// Retrieves the <see cref="Skin"/> which this <see cref="IWorkingBeatmap"/> provides.
         /// </summary>
         ISkin Skin { get; }
 
         /// <summary>
-        /// Retrieves the <see cref="Track"/> which this <see cref="WorkingBeatmap"/> has loaded.
+        /// Retrieves the <see cref="Track"/> which this <see cref="IWorkingBeatmap"/> has loaded.
         /// </summary>
         Track Track { get; }
 
@@ -56,10 +92,10 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="ruleset">The <see cref="RulesetInfo"/> to create a playable <see cref="IBeatmap"/> for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply to the <see cref="IBeatmap"/>.</param>
-        /// <param name="timeout">The maximum length in milliseconds to wait for load to complete. Defaults to 10,000ms.</param>
+        /// <param name="cancellationToken">Cancellation token that cancels the beatmap loading process. If not provided, a default timeout of 10,000ms will be applied to the load process.</param>
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
-        IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null);
+        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null, CancellationToken? cancellationToken = null);
 
         /// <summary>
         /// Load a new audio track instance for this beatmap. This should be called once before accessing <see cref="Track"/>.
@@ -67,7 +103,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <remarks>
         /// In a standard game context, the loading of the track is managed solely by MusicController, which will
-        /// automatically load the track of the current global IBindable WorkingBeatmap.
+        /// automatically load the track of the current global IBindable IWorkingBeatmap.
         /// As such, this method should only be called in very special scenarios, such as external tests or apps which are
         /// outside of the game context.
         /// </remarks>
@@ -79,5 +115,20 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="storagePath">The storage path to the file.</param>
         Stream GetStream(string storagePath);
+
+        /// <summary>
+        /// Beings loading the contents of this <see cref="IWorkingBeatmap"/> asynchronously.
+        /// </summary>
+        public void BeginAsyncLoad();
+
+        /// <summary>
+        /// Cancels the asynchronous loading of the contents of this <see cref="IWorkingBeatmap"/>.
+        /// </summary>
+        public void CancelAsyncLoad();
+
+        /// <summary>
+        /// Reads the correct track restart point from beatmap metadata and sets looping to enabled.
+        /// </summary>
+        void PrepareTrackForPreviewLooping();
     }
 }

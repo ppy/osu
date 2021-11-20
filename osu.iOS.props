@@ -4,16 +4,18 @@
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-    <DefaultMtouchExtraArgs>--nolinkaway</DefaultMtouchExtraArgs>
-    <DefaultMtouchGccFlags>-lstdc++ -lbz2 -framework AudioToolbox -framework AVFoundation -framework CoreMedia -framework VideoToolbox -framework SystemConfiguration -framework CFNetwork -framework Accelerate</DefaultMtouchGccFlags>
     <OutputPath>bin\$(Platform)\$(Configuration)</OutputPath>
     <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
     <OptimizePNGs>false</OptimizePNGs>
-    <MtouchExtraArgs>$(DefaultMtouchExtraArgs) -gcc_flags "$(DefaultMtouchGccFlags)"</MtouchExtraArgs>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <MtouchVerbosity></MtouchVerbosity>
     <CodesignKey>iPhone Developer</CodesignKey>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- Generated via osu.Framework.iOS/generate-symbol-strip-flags.sh -->
+    <GeneratedMtouchSymbolStripFlags>--nosymbolstrip=BASS_FX_BPM_BeatCallbackReset --nosymbolstrip=BASS_FX_BPM_BeatCallbackSet --nosymbolstrip=BASS_FX_BPM_BeatDecodeGet --nosymbolstrip=BASS_FX_BPM_BeatFree --nosymbolstrip=BASS_FX_BPM_BeatGetParameters --nosymbolstrip=BASS_FX_BPM_BeatSetParameters --nosymbolstrip=BASS_FX_BPM_CallbackReset --nosymbolstrip=BASS_FX_BPM_CallbackSet --nosymbolstrip=BASS_FX_BPM_DecodeGet --nosymbolstrip=BASS_FX_BPM_Free --nosymbolstrip=BASS_FX_BPM_Translate --nosymbolstrip=BASS_FX_GetVersion --nosymbolstrip=BASS_FX_ReverseCreate --nosymbolstrip=BASS_FX_ReverseGetSource --nosymbolstrip=BASS_FX_TempoCreate --nosymbolstrip=BASS_FX_TempoGetRateRatio --nosymbolstrip=BASS_FX_TempoGetSource --nosymbolstrip=BASS_Mixer_ChannelFlags --nosymbolstrip=BASS_Mixer_ChannelGetData --nosymbolstrip=BASS_Mixer_ChannelGetEnvelopePos --nosymbolstrip=BASS_Mixer_ChannelGetLevel --nosymbolstrip=BASS_Mixer_ChannelGetLevelEx --nosymbolstrip=BASS_Mixer_ChannelGetMatrix --nosymbolstrip=BASS_Mixer_ChannelGetMixer --nosymbolstrip=BASS_Mixer_ChannelGetPosition --nosymbolstrip=BASS_Mixer_ChannelGetPositionEx --nosymbolstrip=BASS_Mixer_ChannelIsActive --nosymbolstrip=BASS_Mixer_ChannelRemove --nosymbolstrip=BASS_Mixer_ChannelRemoveSync --nosymbolstrip=BASS_Mixer_ChannelSetEnvelope --nosymbolstrip=BASS_Mixer_ChannelSetEnvelopePos --nosymbolstrip=BASS_Mixer_ChannelSetMatrix --nosymbolstrip=BASS_Mixer_ChannelSetMatrixEx --nosymbolstrip=BASS_Mixer_ChannelSetPosition --nosymbolstrip=BASS_Mixer_ChannelSetSync --nosymbolstrip=BASS_Mixer_GetVersion --nosymbolstrip=BASS_Mixer_StreamAddChannel --nosymbolstrip=BASS_Mixer_StreamAddChannelEx --nosymbolstrip=BASS_Mixer_StreamCreate --nosymbolstrip=BASS_Mixer_StreamGetChannels --nosymbolstrip=BASS_Split_StreamCreate --nosymbolstrip=BASS_Split_StreamGetAvailable --nosymbolstrip=BASS_Split_StreamGetSource --nosymbolstrip=BASS_Split_StreamGetSplits --nosymbolstrip=BASS_Split_StreamReset --nosymbolstrip=BASS_Split_StreamResetEx</GeneratedMtouchSymbolStripFlags>
+    <MtouchExtraArgs>--nolinkaway $(GeneratedMtouchSymbolStripFlags)</MtouchExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugSymbols>true</DebugSymbols>
@@ -50,18 +52,6 @@
     <IOSDebuggerPort>28126</IOSDebuggerPort>
   </PropertyGroup>
   <ItemGroup>
-    <NativeReference Include="$(OutputPath)\libbass.a;$(OutputPath)\libbass_fx.a">
-      <Kind>Static</Kind>
-      <SmartLink>False</SmartLink>
-      <ForceLoad>True</ForceLoad>
-    </NativeReference>
-    <NativeReference Include="$(OutputPath)\libavcodec.a;$(OutputPath)\libavdevice.a;$(OutputPath)\libavfilter.a;$(OutputPath)\libavformat.a;$(OutputPath)\libavutil.a;$(OutputPath)\libswresample.a;$(OutputPath)\libswscale.a">
-      <Kind>Static</Kind>
-      <SmartLink>False</SmartLink>
-      <ForceLoad>True</ForceLoad>
-    </NativeReference>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -70,7 +60,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2021.1108.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2021.1119.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2021.1112.0" />
   </ItemGroup>
   <!-- See https://github.com/dotnet/runtime/issues/35988 (can be removed after Xamarin uses net5.0 / net6.0) -->
@@ -88,17 +78,17 @@
   </ItemGroup>
   <!-- Xamarin.iOS does not automatically handle transitive dependencies from NuGet packages. -->
   <ItemGroup Label="Transitive Dependencies">
-    <PackageReference Include="DiffPlex" Version="1.6.3" />
-    <PackageReference Include="Humanizer" Version="2.11.10" />
+    <PackageReference Include="DiffPlex" Version="1.7.0" />
+    <PackageReference Include="Humanizer" Version="2.13.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="ppy.osu.Framework" Version="2021.1108.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.1119.0" />
     <PackageReference Include="SharpCompress" Version="0.30.0" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2021.805.0" ExcludeAssets="all" />
-    <PackageReference Include="Realm" Version="10.6.0" />
+    <PackageReference Include="Realm" Version="10.7.1" />
   </ItemGroup>
 </Project>
