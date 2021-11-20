@@ -365,7 +365,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 Debug.Assert(applyingSettingsOperation != null);
 
-                ErrorText.Text = text;
+                // see https://github.com/ppy/osu-web/blob/2c97aaeb64fb4ed97c747d8383a35b30f57428c7/app/Models/Multiplayer/PlaylistItem.php#L48.
+                const string not_found_prefix = "beatmaps not found:";
+
+                if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
+                {
+                    ErrorText.Text = "The selected beatmap is not available online.";
+                    SelectedItem.Value.MarkInvalid();
+                }
+                else
+                {
+                    ErrorText.Text = text;
+                }
+
                 ErrorText.FadeIn(50);
 
                 applyingSettingsOperation.Dispose();
