@@ -14,15 +14,18 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 {
     public class BeatmapCardDownloadProgressBar : CompositeDrawable
     {
+        public IBindable<DownloadState> State => state;
+        private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
+
+        public IBindable<double> Progress => progress;
+        private readonly BindableDouble progress = new BindableDouble();
+
         public override bool IsPresent => true;
 
         private readonly CircularContainer foreground;
 
         private readonly Box backgroundFill;
         private readonly Box foregroundFill;
-
-        private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
-        private readonly BindableDouble progress = new BindableDouble();
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -56,12 +59,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDownloadTracker downloadTracker)
+        private void load()
         {
             backgroundFill.Colour = colourProvider.Background6;
-
-            ((IBindable<DownloadState>)state).BindTo(downloadTracker.State);
-            ((IBindable<double>)progress).BindTo(downloadTracker.Progress);
         }
 
         protected override void LoadComplete()

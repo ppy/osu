@@ -1,14 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards.Buttons;
 using osu.Game.Configuration;
-using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
@@ -54,22 +52,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
         {
             AddStep("create button", () =>
             {
-                var beatmapSet = downloadable ? getDownloadableBeatmapSet(hasVideo) : getUndownloadableBeatmapSet();
-                var downloadTracker = new BeatmapDownloadTracker(beatmapSet);
-
-                Child = new DependencyProvidingContainer
+                Child = downloadButton = new DownloadButton(downloadable ? getDownloadableBeatmapSet(hasVideo) : getUndownloadableBeatmapSet())
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    CachedDependencies = new (Type, object)[]
-                    {
-                        (typeof(BeatmapDownloadTracker), downloadTracker)
-                    },
-                    Child = downloadButton = new DownloadButton(downloadable ? getDownloadableBeatmapSet(hasVideo) : getUndownloadableBeatmapSet())
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Scale = new Vector2(2)
-                    }
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(2)
                 };
             });
         }

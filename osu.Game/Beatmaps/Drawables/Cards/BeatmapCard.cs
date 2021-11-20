@@ -141,12 +141,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             new DownloadButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre
+                                Origin = Anchor.BottomCentre,
+                                State = { BindTarget = downloadTracker.State }
                             },
                             new GoToBeatmapButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre
+                                Origin = Anchor.BottomCentre,
+                                State = { BindTarget = downloadTracker.State }
                             }
                         }
                     }
@@ -307,7 +309,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                     RelativeSizeAxes = Axes.X,
                                     Height = 6,
                                     Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre
+                                    Origin = Anchor.Centre,
+                                    State = { BindTarget = downloadTracker.State },
+                                    Progress = { BindTarget = downloadTracker.Progress }
                                 }
                             }
                         }
