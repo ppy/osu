@@ -34,7 +34,15 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
-        protected float ExtraDelay = 750;
+        private float realExtraDelay = 750;
+
+        protected float ExtraDelay
+        {
+            get => screenExiting ? 0 : realExtraDelay;
+            set => realExtraDelay = value;
+        }
+
+        private bool screenExiting;
 
         private readonly Bindable<bool> optui = new Bindable<bool>();
 
@@ -270,6 +278,8 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
+            screenExiting = true;
+
             cancelLoad();
             ContentOut();
 
