@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using ManagedBass;
 using osu.Framework.Audio.Callbacks;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             foreach (var file in beatmapSet.Files)
             {
-                using (Stream data = context.WorkingBeatmap.GetStream(file.FileInfo.StoragePath))
+                using (Stream data = context.WorkingBeatmap.GetStream(file.FileInfo.GetStoragePath()))
                 {
                     if (data == null)
                         continue;

@@ -115,7 +115,7 @@ namespace osu.Game.Scoring.Legacy
                 }
             }
 
-            CalculateAccuracy(score.ScoreInfo);
+            PopulateAccuracy(score.ScoreInfo);
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
@@ -124,7 +124,14 @@ namespace osu.Game.Scoring.Legacy
             return score;
         }
 
-        protected void CalculateAccuracy(ScoreInfo score)
+        /// <summary>
+        /// Populates the accuracy of a given <see cref="ScoreInfo"/> from its contained statistics.
+        /// </summary>
+        /// <remarks>
+        /// Legacy use only.
+        /// </remarks>
+        /// <param name="score">The <see cref="ScoreInfo"/> to populate.</param>
+        public static void PopulateAccuracy(ScoreInfo score)
         {
             int countMiss = score.GetCountMiss() ?? 0;
             int count50 = score.GetCount50() ?? 0;

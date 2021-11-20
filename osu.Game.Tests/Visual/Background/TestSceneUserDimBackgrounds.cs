@@ -428,7 +428,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public float CurrentDim => dimmable.DimLevel;
 
-            public Vector2 CurrentBlur => Background.BlurSigma;
+            public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
 
             private TestDimmableBackground dimmable;
 

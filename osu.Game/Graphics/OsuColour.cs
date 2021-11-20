@@ -52,15 +52,18 @@ namespace osu.Game.Graphics
 
         public Color4 ForStarDifficulty(double starDifficulty) => ColourUtils.SampleFromLinearGradient(new[]
         {
-            (1.5f, Color4Extensions.FromHex("4fc0ff")),
+            (0.1f, Color4Extensions.FromHex("aaaaaa")),
+            (0.1f, Color4Extensions.FromHex("4290fb")),
+            (1.25f, Color4Extensions.FromHex("4fc0ff")),
             (2.0f, Color4Extensions.FromHex("4fffd5")),
             (2.5f, Color4Extensions.FromHex("7cff4f")),
-            (3.25f, Color4Extensions.FromHex("f6f05c")),
-            (4.5f, Color4Extensions.FromHex("ff8068")),
-            (6.0f, Color4Extensions.FromHex("ff3c71")),
-            (7.0f, Color4Extensions.FromHex("6563de")),
-            (8.0f, Color4Extensions.FromHex("18158e")),
-            (8.0f, Color4.Black),
+            (3.3f, Color4Extensions.FromHex("f6f05c")),
+            (4.2f, Color4Extensions.FromHex("ff8068")),
+            (4.9f, Color4Extensions.FromHex("ff4e6f")),
+            (5.8f, Color4Extensions.FromHex("c645b8")),
+            (6.7f, Color4Extensions.FromHex("6563de")),
+            (7.7f, Color4Extensions.FromHex("18158e")),
+            (9.0f, Color4.Black),
         }, (float)Math.Round(starDifficulty, 2, MidpointRounding.AwayFromZero));
 
         /// <summary>

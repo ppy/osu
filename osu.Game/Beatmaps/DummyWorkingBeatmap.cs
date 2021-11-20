@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps
 
                 public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new DummyBeatmapConverter { Beatmap = beatmap };
 
-                public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => null;
+                public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null;
 
                 public override string Description => "dummy";
 

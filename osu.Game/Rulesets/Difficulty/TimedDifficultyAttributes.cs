@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Difficulty
 {
     /// <summary>
     /// Wraps a <see cref="DifficultyAttributes"/> object and adds a time value for which the attribute is valid.
-    /// Output by <see cref="DifficultyCalculator.CalculateTimed"/>.
+    /// Output by DifficultyCalculator.CalculateTimed methods.
     /// </summary>
     public class TimedDifficultyAttributes : IComparable<TimedDifficultyAttributes>
     {
