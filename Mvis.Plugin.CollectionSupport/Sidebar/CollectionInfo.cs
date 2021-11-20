@@ -24,7 +24,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;
         private readonly Bindable<BeatmapCollection> collection = new Bindable<BeatmapCollection>();
-        private readonly List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
+        private readonly List<IBeatmapSetInfo> beatmapSets = new List<IBeatmapSetInfo>();
 
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }

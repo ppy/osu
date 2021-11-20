@@ -328,7 +328,7 @@ namespace osu.Game.Screens.Play
             [CanBeNull]
             private readonly Ruleset ruleset;
 
-            public SelectedRulesetIcon(RulesetInfo rulesetInfo)
+            public SelectedRulesetIcon(IRulesetInfo rulesetInfo)
             {
                 ruleset = rulesetInfo?.CreateInstance();
             }

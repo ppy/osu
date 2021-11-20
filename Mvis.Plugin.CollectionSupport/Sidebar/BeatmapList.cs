@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Mvis.Plugin.CollectionSupport.Utils;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -23,7 +24,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         [Resolved]
         private Bindable<WorkingBeatmap> working { get; set; }
 
-        private readonly List<BeatmapSetInfo> beatmapSets;
+        private readonly List<IBeatmapSetInfo> beatmapSets;
         private readonly Cached scrollCache = new Cached();
         private BeatmapPiece currentPiece;
         private OsuScrollContainer beatmapScroll;
@@ -33,7 +34,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
 
         public BindableBool IsCurrent = new BindableBool();
 
-        public BeatmapList(List<BeatmapSetInfo> set)
+        public BeatmapList(List<IBeatmapSetInfo> set)
         {
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
@@ -120,7 +121,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
 
         private void addBeatmapSets()
         {
-            fillFlow.AddRange(beatmapSets.Select(s => new BeatmapPiece(beatmaps.GetWorkingBeatmap(s.Beatmaps.First()))));
+            fillFlow.AddRange(beatmapSets.Select(s => new BeatmapPiece(beatmaps.GetWorkingBeatmap(s.Beatmaps.First().AsBeatmapInfo()))));
 
             scrollCache.Invalidate();
         }
@@ -134,7 +135,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 return;
             }
 
-            var index = fillFlow.IndexOf(currentPiece);
+            int index = fillFlow.IndexOf(currentPiece);
 
             //如果是第一个，那么滚动到头
             if (index == 0)
