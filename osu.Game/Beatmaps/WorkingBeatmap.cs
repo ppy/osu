@@ -79,14 +79,24 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public virtual IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null, CancellationToken? cancellationToken = null)
+        public IBeatmap GetPlayableBeatmap([NotNull] IRulesetInfo ruleset, params Mod[] mods)
         {
-            var token = cancellationToken ??
-                        // don't apply the default timeout when debugger is attached (may be breakpointing / debugging).
-                        (Debugger.IsAttached ? new CancellationToken() : new CancellationTokenSource(10000).Token);
+            try
+            {
+                using (var cancellationTokenSource = new CancellationTokenSource(10_000))
+                {
+                    // don't apply the default timeout when debugger is attached (may be breakpointing / debugging).
+                    return GetPlayableBeatmap(ruleset, mods, Debugger.IsAttached ? new CancellationToken() : cancellationTokenSource.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw new BeatmapLoadTimeoutException(BeatmapInfo);
+            }
+        }
 
-            mods ??= Array.Empty<Mod>();
-
+        public virtual IBeatmap GetPlayableBeatmap([NotNull] IRulesetInfo ruleset, [NotNull] IReadOnlyList<Mod> mods, CancellationToken token)
+        {
             var rulesetInstance = ruleset.CreateInstance();
 
             if (rulesetInstance == null)
@@ -101,9 +111,7 @@ namespace osu.Game.Beatmaps
             // Apply conversion mods
             foreach (var mod in mods.OfType<IApplicableToBeatmapConverter>())
             {
-                if (token.IsCancellationRequested)
-                    throw new BeatmapLoadTimeoutException(BeatmapInfo);
-
+                token.ThrowIfCancellationRequested();
                 mod.ApplyToBeatmapConverter(converter);
             }
 
@@ -113,9 +121,7 @@ namespace osu.Game.Beatmaps
             // Apply conversion mods to the result
             foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
             {
-                if (token.IsCancellationRequested)
-                    throw new BeatmapLoadTimeoutException(BeatmapInfo);
-
+                token.ThrowIfCancellationRequested();
                 mod.ApplyToBeatmap(converted);
             }
 
@@ -124,9 +130,7 @@ namespace osu.Game.Beatmaps
             {
                 foreach (var mod in mods.OfType<IApplicableToDifficulty>())
                 {
-                    if (token.IsCancellationRequested)
-                        throw new BeatmapLoadTimeoutException(BeatmapInfo);
-
+                    token.ThrowIfCancellationRequested();
                     mod.ApplyToDifficulty(converted.Difficulty);
                 }
             }
@@ -139,28 +143,17 @@ namespace osu.Game.Beatmaps
             processor?.PreProcess();
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
-            try
+            foreach (var obj in converted.HitObjects)
             {
-                foreach (var obj in converted.HitObjects)
-                {
-                    if (token.IsCancellationRequested)
-                        throw new BeatmapLoadTimeoutException(BeatmapInfo);
-
-                    obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, token);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                throw new BeatmapLoadTimeoutException(BeatmapInfo);
+                token.ThrowIfCancellationRequested();
+                obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, token);
             }
 
             foreach (var mod in mods.OfType<IApplicableToHitObject>())
             {
                 foreach (var obj in converted.HitObjects)
                 {
-                    if (token.IsCancellationRequested)
-                        throw new BeatmapLoadTimeoutException(BeatmapInfo);
-
+                    token.ThrowIfCancellationRequested();
                     mod.ApplyToHitObject(obj);
                 }
             }
