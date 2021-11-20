@@ -325,7 +325,7 @@ namespace osu.Game.Database
 
                 foreach (TFileModel file in hashableFiles)
                 {
-                    using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
+                    using (Stream s = Files.Store.GetStream(file.FileInfo.GetStoragePath()))
                         s.CopyTo(hashable);
                 }
 
@@ -480,7 +480,7 @@ namespace osu.Game.Database
             using (var archive = ZipArchive.Create())
             {
                 foreach (var file in model.Files)
-                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
+                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.GetStoragePath()));
 
                 archive.SaveTo(outputStream);
             }
