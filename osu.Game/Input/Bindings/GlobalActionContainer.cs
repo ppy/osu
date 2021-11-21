@@ -77,6 +77,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
             new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridDisplayMode),
             new KeyBinding(new[] { InputKey.F5 }, GlobalAction.EditorTestGameplay),
+            new KeyBinding(new[] { InputKey.F1 }, GlobalAction.EditorTestQuickExit),
+            new KeyBinding(new[] { InputKey.F2 }, GlobalAction.EditorTestCurrentPositionExit),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -292,6 +294,12 @@ namespace osu.Game.Input.Bindings
         EditorCycleGridDisplayMode,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestGameplay))]
-        EditorTestGameplay
+        EditorTestGameplay,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestQuickExit))]
+        EditorTestQuickExit,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestCurrentPositionExit))]
+        EditorTestCurrentPositionExit
     }
 }

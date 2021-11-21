@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -44,6 +46,25 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         protected override bool CheckModsAllowFailure() => false; // never fail.
 
+        protected override IEnumerable<Container> GetCustomRulesetHotkeys() => new Container[]
+        {
+            new EditorHotkeyCurrentPositionExitContainer
+            {
+                Action = () =>
+                {
+                    editorState.Time = GameplayClockContainer.CurrentTime;
+                    PerformExit(false);
+                }
+            },
+            new EditorHotkeyQuickExitContainer
+            {
+                Action = () =>
+                {
+                    PerformExit(false);
+                }
+            }
+        };
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -58,7 +79,6 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
             musicController.Stop();
 
-            editorState.Time = GameplayClockContainer.CurrentTime;
             editor.RestoreState(editorState);
             return base.OnExiting(next);
         }

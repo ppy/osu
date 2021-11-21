@@ -175,6 +175,16 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorTestGameplay => new TranslatableString(getKey(@"editor_test_gameplay"), @"Test gameplay");
 
         /// <summary>
+        /// "Test quick exit"
+        /// </summary>
+        public static LocalisableString EditorTestQuickExit => new TranslatableString(getKey(@"editor_test_quick_exit"), @"Test quick exit");
+
+        /// <summary>
+        /// "Test current position exit"
+        /// </summary>
+        public static LocalisableString EditorTestCurrentPositionExit => new TranslatableString(getKey(@"editor_test_current_position_exit"), @"Test current position exit");
+
+        /// <summary>
         /// "Hold for HUD"
         /// </summary>
         public static LocalisableString HoldForHUD => new TranslatableString(getKey(@"hold_for_hud"), @"Hold for HUD");

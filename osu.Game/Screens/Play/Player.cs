@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -129,6 +130,11 @@ namespace osu.Game.Screens.Play
         /// By default, this checks whether all selected mods allow failing.
         /// </summary>
         protected virtual bool CheckModsAllowFailure() => GameplayState.Mods.OfType<IApplicableFailOverride>().All(m => m.PerformFail());
+
+        /// <summary>
+        /// Custom hotkeys which will be added to the <see cref="RulesetSkinProvidingContainer"/>.
+        /// </summary>
+        protected virtual IEnumerable<Container> GetCustomRulesetHotkeys() => Array.Empty<Container>();
 
         public readonly PlayerConfiguration Configuration;
 
@@ -274,6 +280,8 @@ namespace osu.Game.Screens.Play
                     },
                 });
             }
+
+            rulesetSkinProvider.AddRange(GetCustomRulesetHotkeys());
 
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
