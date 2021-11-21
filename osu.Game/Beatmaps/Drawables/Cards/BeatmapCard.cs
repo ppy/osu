@@ -40,7 +40,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private readonly APIBeatmapSet beatmapSet;
         private readonly Bindable<BeatmapSetFavouriteState> favouriteState;
 
-        [Cached]
         private readonly BeatmapDownloadTracker downloadTracker;
 
         private UpdateableOnlineBeatmapSetCover leftCover;
