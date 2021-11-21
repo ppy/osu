@@ -10,6 +10,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Models;
 using Realms;
 
@@ -64,7 +65,7 @@ namespace osu.Game.Stores
         {
             data.Seek(0, SeekOrigin.Begin);
 
-            using (var output = Storage.GetStream(file.StoragePath, FileAccess.Write))
+            using (var output = Storage.GetStream(file.GetStoragePath(), FileAccess.Write))
                 data.CopyTo(output);
 
             data.Seek(0, SeekOrigin.Begin);
@@ -72,7 +73,7 @@ namespace osu.Game.Stores
 
         private bool checkFileExistsAndMatchesHash(RealmFile file)
         {
-            string path = file.StoragePath;
+            string path = file.GetStoragePath();
 
             // we may be re-adding a file to fix missing store entries.
             if (!Storage.Exists(path))
@@ -100,7 +101,7 @@ namespace osu.Game.Stores
 
                     try
                     {
-                        Storage.Delete(file.StoragePath);
+                        Storage.Delete(file.GetStoragePath());
                         realm.Remove(file);
                     }
                     catch (Exception e)

@@ -8,6 +8,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Extensions;
 
 namespace osu.Game.Beatmaps
 {
@@ -61,7 +62,7 @@ namespace osu.Game.Beatmaps
         /// The path returned is relative to the user file storage.
         /// </summary>
         /// <param name="filename">The name of the file to get the storage path of.</param>
-        public string GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+        public string GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.GetStoragePath();
 
         public override string ToString() => Metadata?.ToString() ?? base.ToString();
 
