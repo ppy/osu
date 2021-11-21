@@ -162,7 +162,12 @@ namespace osu.Game.Scoring
 
                     // We can compute the max combo locally after the async beatmap difficulty computation.
                     var difficulty = await difficulties().GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
-                    beatmapMaxCombo = difficulty.MaxCombo;
+
+                    // Something failed during difficulty calculation. Fall back to provided score.
+                    if (difficulty == null)
+                        return score.TotalScore;
+
+                    beatmapMaxCombo = difficulty.Value.MaxCombo;
                 }
             }
             else
