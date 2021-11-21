@@ -101,7 +101,7 @@ namespace osu.Desktop
                 {
                     presence.Buttons = new Button[]
                     {
-                        new Button() { Label = "Beatmap Link", Url = $"https://osu.ppy.sh/b/{getOnlineID(activity.Value)}" }
+                        new Button() { Label = "Open Beatmap", Url = $"https://osu.ppy.sh/b/{getOnlineID(activity.Value)}" }
                     };
                 }
                 else
