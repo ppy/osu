@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     double stackNerf = Math.Min(1.0, (osuPrevious.JumpDistance / scalingFactor) / 25.0);
 
                     // Bonus based on how visible the object is.
-                    double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - opacity(cumulativeStrainTime, preemptTime, hidden));
+                    double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.opacity(cumulativeStrainTime, hidden));
 
                     result += Math.Pow(0.8, i) * stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
                 }
@@ -85,14 +85,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 result *= 1.0 + hidden_bonus;
 
             return result;
-        }
-
-        private double opacity(double ms, double preemptTime, bool hidden)
-        {
-            if (hidden)
-                return Math.Clamp(Math.Min((1 - ms / preemptTime) * 2.5, (ms / preemptTime) * (1.0 / 0.3)), 0.0, 1.0);
-            else
-                return Math.Clamp((1.0 - ms / preemptTime) * 1.5, 0.0, 1.0);
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
