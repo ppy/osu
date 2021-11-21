@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Difficulty
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
 
             if (!Beatmap.HitObjects.Any())
-                return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
+                return CreateDifficultyAttributes(Beatmap, playableMods, preSkills, skills, clockRate);
 
             var listOfHitObjects = getDifficultyHitObjects().ToList();
 
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Difficulty
                     skill.ProcessInternal(preSkills, index, hitObject);
             }
 
-            return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
+            return CreateDifficultyAttributes(Beatmap, playableMods, preSkills, skills, clockRate);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                     skill.ProcessInternal(preSkills, index, hitObject);
 
-                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, preSkills, skills, clockRate)));
             }
 
             return attribs;
@@ -233,9 +233,10 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.
         /// This may differ from <see cref="Beatmap"/> in the case of timed calculation.</param>
         /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
+        /// <param name="preSkills">The pre-skills which processed the beatmap.</param>
         /// <param name="skills">The skills which processed the beatmap.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
-        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
+        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] preSkills, Skill[] skills, double clockRate);
 
         /// <summary>
         /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
