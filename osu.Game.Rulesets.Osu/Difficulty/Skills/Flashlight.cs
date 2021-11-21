@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.mods = mods;
         }
 
-        private double skillMultiplier => 0.11;
+        private double skillMultiplier => 0.1;
         private double strainDecayBase => 0.15;
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly Mod[] mods;
         private bool hidden;
 
-        private const double max_opacity_bonus = 0.5;
-        private const double hidden_bonus = 0.1;
+        private const double max_opacity_bonus = 0.4;
+        private const double hidden_bonus = 0.2;
 
         private double currentStrain;
 
