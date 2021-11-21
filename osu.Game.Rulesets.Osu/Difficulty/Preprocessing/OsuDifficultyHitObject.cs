@@ -56,17 +56,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
+        private readonly double clockRate;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastLastObject, HitObject lastObject, double clockRate)
             : base(hitObject, lastObject, clockRate)
         {
             this.lastLastObject = (OsuHitObject)lastLastObject;
             this.lastObject = (OsuHitObject)lastObject;
+            this.clockRate = clockRate;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, min_delta_time);
 
             setDistances(clockRate);
+        }
+
+        public double opacity(double ms, bool hidden)
+        {
+            double preemptTime = BaseObject.TimePreempt / clockRate;
+            if (hidden)
+                return Math.Clamp(Math.Min((1 - ms / preemptTime) * 2.5, (ms / preemptTime) * (1.0 / 0.3)), 0.0, 1.0);
+            else
+                return Math.Clamp((1.0 - ms / preemptTime) * 1.5, 0.0, 1.0);
         }
 
         private void setDistances(double clockRate)
