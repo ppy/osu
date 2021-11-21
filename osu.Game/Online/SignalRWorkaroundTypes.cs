@@ -15,7 +15,7 @@ namespace osu.Game.Online
     /// <seealso cref="SignalRDerivedTypeWorkaroundJsonConverter"/>
     internal static class SignalRWorkaroundTypes
     {
-        internal static readonly IReadOnlyList<(Type derivedType, Type baseType)> BASE_DERIVED = new[]
+        internal static readonly IReadOnlyList<(Type derivedType, Type baseType)> BASE_TYPE_MAPPING = new[]
         {
             (typeof(ChangeTeamRequest), typeof(MatchUserRequest)),
             (typeof(TeamVersusRoomState), typeof(MatchRoomState)),

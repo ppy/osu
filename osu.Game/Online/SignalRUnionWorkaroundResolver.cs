@@ -23,13 +23,13 @@ namespace osu.Game.Online
 
         private static IReadOnlyDictionary<Type, IMessagePackFormatter> createFormatterMap()
         {
-            IEnumerable<(Type derivedType, Type baseType)> baseDerived = SignalRWorkaroundTypes.BASE_DERIVED;
+            IEnumerable<(Type derivedType, Type baseType)> baseMap = SignalRWorkaroundTypes.BASE_TYPE_MAPPING;
 
             // This should not be required. The fallback should work. But something is weird with the way caching is done.
             // For future adventurers, I would not advise looking into this further. It's likely not worth the effort.
-            baseDerived = baseDerived.Concat(baseDerived.Select(t => (t.baseType, t.baseType))).Distinct();
+            baseMap = baseMap.Concat(baseMap.Select(t => (t.baseType, t.baseType)));
 
-            return new Dictionary<Type, IMessagePackFormatter>(baseDerived.Select(t =>
+            return new Dictionary<Type, IMessagePackFormatter>(baseMap.Select(t =>
             {
                 var formatter = (IMessagePackFormatter)Activator.CreateInstance(typeof(TypeRedirectingFormatter<,>).MakeGenericType(t.derivedType, t.baseType));
                 return new KeyValuePair<Type, IMessagePackFormatter>(t.derivedType, formatter);
