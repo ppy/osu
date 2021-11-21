@@ -79,14 +79,14 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public IBeatmap GetPlayableBeatmap([NotNull] IRulesetInfo ruleset, params Mod[] mods)
+        public IBeatmap GetPlayableBeatmap([NotNull] IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null)
         {
             try
             {
                 using (var cancellationTokenSource = new CancellationTokenSource(10_000))
                 {
                     // don't apply the default timeout when debugger is attached (may be breakpointing / debugging).
-                    return GetPlayableBeatmap(ruleset, mods, Debugger.IsAttached ? new CancellationToken() : cancellationTokenSource.Token);
+                    return GetPlayableBeatmap(ruleset, mods ?? Array.Empty<Mod>(), Debugger.IsAttached ? new CancellationToken() : cancellationTokenSource.Token);
                 }
             }
             catch (OperationCanceledException)
