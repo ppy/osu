@@ -16,11 +16,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Flashlight : OsuStrainSkill
     {
-        public Flashlight(Mod[] mods, double preemptTime)
+        public Flashlight(Mod[] mods)
             : base(mods)
         {
             this.mods = mods;
-            this.preemptTime = preemptTime;
         }
 
         private double skillMultiplier => 0.09;
@@ -30,7 +29,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly Mod[] mods;
         private bool hidden;
-        private readonly double preemptTime;
 
         private const double max_opacity_bonus = 0.7;
         private const double hidden_bonus = 0.5;

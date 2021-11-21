@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const double difficulty_multiplier = 0.0675;
         private double hitWindowGreat;
-        private double preempt;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -60,6 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double starRating = basePerformance > 0.00001 ? Math.Cbrt(1.12) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
 
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;
 
             int maxCombo = beatmap.HitObjects.Count;
@@ -110,14 +110,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
-            preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
-
             return new Skill[]
             {
                 new Aim(mods, true),
                 new Aim(mods, false),
                 new Speed(mods, hitWindowGreat),
-                new Flashlight(mods, preempt)
+                new Flashlight(mods)
             };
         }
 
