@@ -15,6 +15,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
@@ -305,7 +306,7 @@ namespace osu.Game.Stores
 
             foreach (RealmNamedFileUsage file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
             {
-                using (Stream s = Files.Store.GetStream(file.File.StoragePath))
+                using (Stream s = Files.Store.GetStream(file.File.GetStoragePath()))
                     s.CopyTo(hashable);
             }
 
