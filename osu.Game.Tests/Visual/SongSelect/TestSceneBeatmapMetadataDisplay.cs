@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             }
 
-            public override async Task<StarDifficulty> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo rulesetInfo = null, IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
+            public override async Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo rulesetInfo = null, IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
             {
                 if (blockCalculation)
                     await calculationBlocker.Task.ConfigureAwait(false);
