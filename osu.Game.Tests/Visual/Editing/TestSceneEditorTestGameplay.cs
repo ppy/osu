@@ -154,7 +154,8 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestSharedClockState()
         {
-            AddStep("seek to 00:01:00", () => EditorClock.Seek(60_000));
+            const double time_at_player_start = 60_000;
+            AddStep("seek to 00:01:00", () => EditorClock.Seek(time_at_player_start));
             AddStep("click test gameplay button", () =>
             {
                 var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
@@ -169,13 +170,62 @@ namespace osu.Game.Tests.Visual.Editing
             GameplayClockContainer gameplayClockContainer = null;
             AddStep("fetch gameplay clock", () => gameplayClockContainer = editorPlayer.ChildrenOfType<GameplayClockContainer>().First());
             AddUntilStep("gameplay clock running", () => gameplayClockContainer.IsRunning);
-            AddAssert("gameplay time past 00:01:00", () => gameplayClockContainer.CurrentTime >= 60_000);
-
-            double timeAtPlayerExit = 0;
             AddWaitStep("wait some", 5);
-            AddStep("store time before exit", () => timeAtPlayerExit = gameplayClockContainer.CurrentTime);
+            AddAssert("gameplay time past 00:01:00", () => gameplayClockContainer.CurrentTime > time_at_player_start);
 
             AddStep("exit player", () => editorPlayer.Exit());
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddAssert("time is player enter", () => EditorClock.CurrentTime == time_at_player_start);
+        }
+
+        [Test]
+        public void TestHotkeyQuickExit()
+        {
+            const double time_at_player_start = 60_000;
+            AddStep("seek to 00:01:00", () => EditorClock.Seek(time_at_player_start));
+            AddStep("click test gameplay button", () =>
+            {
+                var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            EditorPlayer editorPlayer = null;
+            AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
+
+            GameplayClockContainer gameplayClockContainer = null;
+            AddStep("fetch gameplay clock", () => gameplayClockContainer = editorPlayer.ChildrenOfType<GameplayClockContainer>().First());
+            AddWaitStep("wait some", 5);
+
+            AddStep("Click current position exit hotkey", () =>
+                gameplayClockContainer.ChildrenOfType<EditorHotkeyQuickExitContainer>().First()?.Action.Invoke());
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddAssert("time is player enter", () => EditorClock.CurrentTime == time_at_player_start);
+        }
+
+        [Test]
+        public void TestHotkeyCurrentPositionExit()
+        {
+            AddStep("click test gameplay button", () =>
+            {
+                var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            EditorPlayer editorPlayer = null;
+            AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
+
+            GameplayClockContainer gameplayClockContainer = null;
+            AddStep("fetch gameplay clock", () => gameplayClockContainer = editorPlayer.ChildrenOfType<GameplayClockContainer>().First());
+            AddWaitStep("wait some", 5);
+
+            double timeAtPlayerExit = 0;
+            AddStep("store time before exit", () => timeAtPlayerExit = gameplayClockContainer.CurrentTime);
+            AddStep("Click current position exit hotkey", () =>
+                gameplayClockContainer.ChildrenOfType<EditorHotkeyCurrentPositionExitContainer>().First()?.Action.Invoke());
             AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
             AddAssert("time is past player exit", () => EditorClock.CurrentTime >= timeAtPlayerExit);
         }
