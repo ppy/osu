@@ -37,12 +37,12 @@ namespace osu.Game.Scoring
             var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, token).ConfigureAwait(false);
 
             // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
-            if (attributes.Attributes == null)
+            if (attributes?.Attributes == null)
                 return null;
 
             token.ThrowIfCancellationRequested();
 
-            var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(attributes.Attributes, score);
+            var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(attributes.Value.Attributes, score);
 
             return calculator?.Calculate();
         }

@@ -3,11 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 
 namespace osu.Game.Online
 {
@@ -20,34 +19,22 @@ namespace osu.Game.Online
         public static readonly MessagePackSerializerOptions OPTIONS =
             MessagePackSerializerOptions.Standard.WithResolver(new SignalRUnionWorkaroundResolver());
 
-        public static readonly IReadOnlyList<Type> BASE_TYPES = new[]
-        {
-            typeof(MatchServerEvent),
-            typeof(MatchUserRequest),
-            typeof(MatchRoomState),
-            typeof(MatchUserState),
-        };
+        private static readonly IReadOnlyDictionary<Type, IMessagePackFormatter> formatter_map = createFormatterMap();
 
-        public static readonly IReadOnlyList<Type> DERIVED_TYPES = new[]
+        private static IReadOnlyDictionary<Type, IMessagePackFormatter> createFormatterMap()
         {
-            typeof(ChangeTeamRequest),
-            typeof(TeamVersusRoomState),
-            typeof(TeamVersusUserState),
-        };
+            IEnumerable<(Type derivedType, Type baseType)> baseMap = SignalRWorkaroundTypes.BASE_TYPE_MAPPING;
 
-        private static readonly IReadOnlyDictionary<Type, IMessagePackFormatter> formatter_map = new Dictionary<Type, IMessagePackFormatter>
-        {
-            { typeof(TeamVersusUserState), new TypeRedirectingFormatter<TeamVersusUserState, MatchUserState>() },
-            { typeof(TeamVersusRoomState), new TypeRedirectingFormatter<TeamVersusRoomState, MatchRoomState>() },
-            { typeof(ChangeTeamRequest), new TypeRedirectingFormatter<ChangeTeamRequest, MatchUserRequest>() },
-
-            // These should not be required. The fallback should work. But something is weird with the way caching is done.
+            // This should not be required. The fallback should work. But something is weird with the way caching is done.
             // For future adventurers, I would not advise looking into this further. It's likely not worth the effort.
-            { typeof(MatchUserState), new TypeRedirectingFormatter<MatchUserState, MatchUserState>() },
-            { typeof(MatchRoomState), new TypeRedirectingFormatter<MatchRoomState, MatchRoomState>() },
-            { typeof(MatchUserRequest), new TypeRedirectingFormatter<MatchUserRequest, MatchUserRequest>() },
-            { typeof(MatchServerEvent), new TypeRedirectingFormatter<MatchServerEvent, MatchServerEvent>() },
-        };
+            baseMap = baseMap.Concat(baseMap.Select(t => (t.baseType, t.baseType)));
+
+            return new Dictionary<Type, IMessagePackFormatter>(baseMap.Select(t =>
+            {
+                var formatter = (IMessagePackFormatter)Activator.CreateInstance(typeof(TypeRedirectingFormatter<,>).MakeGenericType(t.derivedType, t.baseType));
+                return new KeyValuePair<Type, IMessagePackFormatter>(t.derivedType, formatter);
+            }));
+        }
 
         public IMessagePackFormatter<T> GetFormatter<T>()
         {
