@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty
@@ -32,11 +31,6 @@ namespace osu.Game.Rulesets.Difficulty
         public Mod[] Mods { get; set; }
 
         /// <summary>
-        /// The skills resulting from the difficulty calculation.
-        /// </summary>
-        public Skill[] Skills { get; set; }
-
-        /// <summary>
         /// The combined star rating of all skill.
         /// </summary>
         [JsonProperty("star_rating", Order = -3)]
@@ -59,12 +53,10 @@ namespace osu.Game.Rulesets.Difficulty
         /// Creates new <see cref="DifficultyAttributes"/>.
         /// </summary>
         /// <param name="mods">The mods which were applied to the beatmap.</param>
-        /// <param name="skills">The skills resulting from the difficulty calculation.</param>
         /// <param name="starRating">The combined star rating of all skills.</param>
-        public DifficultyAttributes(Mod[] mods, Skill[] skills, double starRating)
+        public DifficultyAttributes(Mod[] mods, double starRating)
         {
             Mods = mods;
-            Skills = skills;
             StarRating = starRating;
         }
 
