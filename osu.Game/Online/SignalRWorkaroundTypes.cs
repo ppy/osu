@@ -20,7 +20,6 @@ namespace osu.Game.Online
             (typeof(ChangeTeamRequest), typeof(MatchUserRequest)),
             (typeof(TeamVersusRoomState), typeof(MatchRoomState)),
             (typeof(TeamVersusUserState), typeof(MatchUserState)),
-            (typeof(MatchServerEvent), typeof(MatchServerEvent)),
         };
     }
 }
