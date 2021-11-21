@@ -17,7 +17,7 @@ namespace osu.Game.Online
     public class SignalRDerivedTypeWorkaroundJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType) =>
-            SignalRWorkaroundTypes.BASE_DERIVED.Any(t =>
+            SignalRWorkaroundTypes.BASE_TYPE_MAPPING.Any(t =>
                 objectType == t.baseType ||
                 objectType == t.derivedType);
 
@@ -30,7 +30,7 @@ namespace osu.Game.Online
 
             string type = (string)obj[@"$dtype"]!;
 
-            var resolvedType = SignalRWorkaroundTypes.BASE_DERIVED.Select(t => t.derivedType).Single(t => t.Name == type);
+            var resolvedType = SignalRWorkaroundTypes.BASE_TYPE_MAPPING.Select(t => t.derivedType).Single(t => t.Name == type);
 
             object? instance = Activator.CreateInstance(resolvedType);
 
