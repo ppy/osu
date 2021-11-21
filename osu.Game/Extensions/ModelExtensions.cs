@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.IO;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -14,6 +16,13 @@ namespace osu.Game.Extensions
 {
     public static class ModelExtensions
     {
+        /// <summary>
+        /// Get the relative path in osu! storage for this file.
+        /// </summary>
+        /// <param name="fileInfo">The file info.</param>
+        /// <returns>A relative file path.</returns>
+        public static string GetStoragePath(this IFileInfo fileInfo) => Path.Combine(fileInfo.Hash.Remove(1), fileInfo.Hash.Remove(2), fileInfo.Hash);
+
         /// <summary>
         /// Returns a user-facing string representing the <paramref name="model"/>.
         /// </summary>
