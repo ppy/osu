@@ -109,7 +109,6 @@ namespace osu.Game.Tests.Visual.Navigation
                 {
                     Hash = Guid.NewGuid().ToString(),
                     OnlineID = i,
-                    Metadata = metadata,
                     Beatmaps =
                     {
                         new BeatmapInfo
