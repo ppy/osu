@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private RulesetStore rulesets;
 
         private readonly Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
-        private readonly HashSet<int> eagerSelectedIDs = new HashSet<int>();
+        private readonly HashSet<Guid> eagerSelectedIDs = new HashSet<Guid>();
 
         private BeatmapInfo currentSelection => carousel.SelectedBeatmapInfo;
 
