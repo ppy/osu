@@ -58,7 +58,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 OnlineID = 10,
                 Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                Metadata = metadata,
                 DateAdded = DateTimeOffset.UtcNow
             };
 

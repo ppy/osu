@@ -97,7 +97,6 @@ namespace osu.Game.Tests.Resources
                 OnlineID = setId,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 DateAdded = DateTimeOffset.UtcNow,
-                Metadata = metadata
             };
 
             foreach (var b in getBeatmaps(difficultyCount ?? RNG.Next(1, 20)))

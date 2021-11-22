@@ -154,7 +154,6 @@ namespace osu.Game.Tests.Online
                 Debug.Assert(info.BeatmapSet != null);
 
                 info.BeatmapSet.Beatmaps.Add(info);
-                info.BeatmapSet.Metadata = info.Metadata;
                 info.MD5Hash = stream.ComputeMD5Hash();
                 info.Hash = stream.ComputeSHA2Hash();
             }
