@@ -697,6 +697,7 @@ namespace osu.Game.Online.Multiplayer
             Room.Settings = settings;
             APIRoom.Name.Value = Room.Settings.Name;
             APIRoom.Password.Value = Room.Settings.Password;
+            APIRoom.QueueMode.Value = Room.Settings.QueueMode;
             RoomUpdated?.Invoke();
 
             CurrentMatchPlayingItem.Value = APIRoom.Playlist.SingleOrDefault(p => p.ID == settings.PlaylistItemId);
