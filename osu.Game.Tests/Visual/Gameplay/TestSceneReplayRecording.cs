@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     new Drawable[]
                     {
-                        recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                        recordingManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
                             Recorder = new TestReplayRecorder(new Score
                             {
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     },
                     new Drawable[]
                     {
-                        playbackManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                        playbackManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
                             ReplayInputHandler = new TestFramedReplayInputHandler(replay)
                             {
