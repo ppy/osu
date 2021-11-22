@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Set beatmap", () => Beatmap.Value = new DummyWorkingBeatmap(Audio, null)
             {
-                BeatmapInfo = { OnlineID = hasOnlineId ? 1234 : (int?)null }
+                BeatmapInfo = { OnlineID = hasOnlineId ? 1234 : -1 }
             });
 
             AddStep("Run command", () => Add(new NowPlayingCommand()));

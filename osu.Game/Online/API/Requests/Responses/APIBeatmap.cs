@@ -98,7 +98,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public string MD5Hash => Checksum;
 
-        public IRulesetInfo Ruleset => new RulesetInfo { ID = RulesetID };
+        public IRulesetInfo Ruleset => new RulesetInfo { OnlineID = RulesetID };
 
         [JsonIgnore]
         public string Hash => throw new NotImplementedException();
