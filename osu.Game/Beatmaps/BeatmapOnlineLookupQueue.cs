@@ -103,7 +103,7 @@ namespace osu.Game.Beatmaps
 
             void fail(Exception e)
             {
-                beatmapInfo.OnlineID = null;
+                beatmapInfo.OnlineID = -1;
                 logForModel(set, $"Online retrieval failed for {beatmapInfo} ({e.Message})");
             }
         }
@@ -161,7 +161,7 @@ namespace osu.Game.Beatmaps
 
             if (string.IsNullOrEmpty(beatmapInfo.MD5Hash)
                 && string.IsNullOrEmpty(beatmapInfo.Path)
-                && beatmapInfo.OnlineID == null)
+                && beatmapInfo.OnlineID <= 0)
                 return false;
 
             try
@@ -175,7 +175,7 @@ namespace osu.Game.Beatmaps
                         cmd.CommandText = "SELECT beatmapset_id, beatmap_id, approved, user_id FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineID OR filename = @Path";
 
                         cmd.Parameters.Add(new SqliteParameter("@MD5Hash", beatmapInfo.MD5Hash));
-                        cmd.Parameters.Add(new SqliteParameter("@OnlineID", beatmapInfo.OnlineID ?? (object)DBNull.Value));
+                        cmd.Parameters.Add(new SqliteParameter("@OnlineID", beatmapInfo.OnlineID));
                         cmd.Parameters.Add(new SqliteParameter("@Path", beatmapInfo.Path));
 
                         using (var reader = cmd.ExecuteReader())

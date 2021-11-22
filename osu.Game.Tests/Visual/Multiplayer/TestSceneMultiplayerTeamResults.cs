@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 PlaylistItem playlistItem = new PlaylistItem
                 {
-                    BeatmapID = beatmapInfo.OnlineID ?? -1,
+                    BeatmapID = beatmapInfo.OnlineID,
                 };
 
                 SortedDictionary<int, BindableInt> teamScores = new SortedDictionary<int, BindableInt>
