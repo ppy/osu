@@ -240,7 +240,7 @@ namespace osu.Game.Stores
                         ArtistUnicode = decoded.Metadata.ArtistUnicode,
                         Author =
                         {
-                            OnlineID = decoded.Metadata.Author.Id,
+                            OnlineID = decoded.Metadata.Author.OnlineID,
                             Username = decoded.Metadata.Author.Username
                         },
                         Source = decoded.Metadata.Source,
@@ -254,7 +254,7 @@ namespace osu.Game.Stores
                     {
                         Hash = hash,
                         DifficultyName = decodedInfo.DifficultyName,
-                        OnlineID = decodedInfo.OnlineID ?? -1,
+                        OnlineID = decodedInfo.OnlineID,
                         AudioLeadIn = decodedInfo.AudioLeadIn,
                         StackLeniency = decodedInfo.StackLeniency,
                         SpecialStyle = decodedInfo.SpecialStyle,
