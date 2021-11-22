@@ -456,7 +456,8 @@ namespace osu.Game
                         {
                             Key = dkb.Key,
                             Value = dkb.StringValue,
-                            RulesetID = dkb.RulesetID.Value,
+                            // important: this RulesetStore must be the EF one.
+                            RulesetName = RulesetStore.GetRuleset(dkb.RulesetID.Value).ShortName,
                             Variant = dkb.Variant ?? 0,
                         });
                     }
