@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -409,10 +410,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var set = TestResources.CreateTestBeatmapSetInfo();
 
                 if (i == 4)
-                    set.Metadata.Artist = zzz_string;
+                    set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_string);
 
                 if (i == 16)
-                    set.Metadata.AuthorString = zzz_string;
+                    set.Beatmaps.ForEach(b => b.Metadata.AuthorString = zzz_string);
 
                 sets.Add(set);
             }
@@ -432,13 +433,19 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 0; i < 20; i++)
             {
+                // index + 1 because we are using OnlineID which should never be zero.
                 var set = TestResources.CreateTestBeatmapSetInfo();
-                set.Metadata.Artist = "same artist";
-                set.Metadata.Title = "same title";
+
+                // only need to set the first as they are a shared reference.
+                var beatmap = set.Beatmaps.First();
+
+                beatmap.Metadata.Artist = "same artist";
+                beatmap.Metadata.Title = "same title";
+
                 sets.Add(set);
             }
 
-            int idOffset = sets.First().OnlineID ?? 0;
+            int idOffset = sets.First().OnlineID;
 
             loadBeatmaps(sets);
 
@@ -674,7 +681,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AddStep("Restore different ruleset filter", () =>
                 {
                     carousel.Filter(new FilterCriteria { Ruleset = rulesets.GetRuleset(1) }, false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.OnlineID ?? -1);
+                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
                 });
 
                 AddAssert("selection changed", () => !carousel.SelectedBeatmapInfo.Equals(manySets.First().Beatmaps.First()));
