@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFirstItemSelectedByDefault()
         {
-            AddAssert("first item selected", () => Client.CurrentMatchPlayingItem.Value == Client.APIRoom?.Playlist[0]);
+            AddAssert("first item selected", () => Client.CurrentMatchPlayingItem.Value?.ID == Client.APIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             selectNewItem(() => InitialBeatmap);
 
-            AddAssert("playlist item still selected", () => Client.CurrentMatchPlayingItem.Value == Client.APIRoom?.Playlist[0]);
+            AddAssert("playlist item still selected", () => Client.CurrentMatchPlayingItem.Value?.ID == Client.APIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             selectNewItem(() => OtherBeatmap);
 
-            AddAssert("playlist item still selected", () => Client.CurrentMatchPlayingItem.Value == Client.APIRoom?.Playlist[0]);
+            AddAssert("playlist item still selected", () => Client.CurrentMatchPlayingItem.Value?.ID == Client.APIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("playlist contains two items", () => Client.APIRoom?.Playlist.Count == 2);
             AddAssert("first playlist item expired", () => Client.APIRoom?.Playlist[0].Expired == true);
             AddAssert("second playlist item not expired", () => Client.APIRoom?.Playlist[1].Expired == false);
-            AddAssert("second playlist item selected", () => Client.CurrentMatchPlayingItem.Value == Client.APIRoom?.Playlist[1]);
+            AddAssert("second playlist item selected", () => Client.CurrentMatchPlayingItem.Value?.ID == Client.APIRoom?.Playlist[1].ID);
         }
 
         [Test]
