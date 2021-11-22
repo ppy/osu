@@ -33,10 +33,12 @@ namespace osu.Game.Online.Multiplayer
         public event Action? RoomUpdated;
 
         public event Action<MultiplayerRoomUser>? UserJoined;
-
         public event Action<MultiplayerRoomUser>? UserLeft;
-
         public event Action<MultiplayerRoomUser>? UserKicked;
+
+        public event Action<MultiplayerPlaylistItem>? ItemAdded;
+        public event Action<long>? ItemRemoved;
+        public event Action<MultiplayerPlaylistItem>? ItemChanged;
 
         /// <summary>
         /// Invoked when the multiplayer server requests the current beatmap to be loaded into play.
@@ -619,6 +621,7 @@ namespace osu.Game.Online.Multiplayer
                 Room.Playlist.Add(item);
                 APIRoom.Playlist.Add(playlistItem);
 
+                ItemAdded?.Invoke(item);
                 RoomUpdated?.Invoke();
             });
         }
@@ -638,6 +641,7 @@ namespace osu.Game.Online.Multiplayer
                 Room.Playlist.Remove(Room.Playlist.Single(existing => existing.ID == playlistItemId));
                 APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItemId);
 
+                ItemRemoved?.Invoke(playlistItemId);
                 RoomUpdated?.Invoke();
             });
 
@@ -668,6 +672,7 @@ namespace osu.Game.Online.Multiplayer
                 if (CurrentMatchPlayingItem.Value?.ID == playlistItem.ID)
                     CurrentMatchPlayingItem.Value = playlistItem;
 
+                ItemChanged?.Invoke(item);
                 RoomUpdated?.Invoke();
             });
         }
