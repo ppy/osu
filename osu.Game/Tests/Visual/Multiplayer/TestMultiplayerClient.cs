@@ -43,6 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private MultiplayerPlaylistItem? currentItem => Room?.Playlist[currentIndex];
 
         private readonly TestMultiplayerRoomManager roomManager;
+        private readonly List<MultiplayerPlaylistItem> serverSidePlaylist = new List<MultiplayerPlaylistItem>();
         private int currentIndex;
 
         public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
@@ -162,6 +163,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (password != apiRoom.Password.Value)
                 throw new InvalidOperationException("Invalid password.");
 
+            serverSidePlaylist.Clear();
+            serverSidePlaylist.AddRange(apiRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)));
+
             var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
                 User = api.LocalUser.Value
@@ -176,7 +180,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Password = password,
                     QueueMode = apiRoom.QueueMode.Value
                 },
-                Playlist = apiRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
+                Playlist = serverSidePlaylist.ToList(),
                 Users = { localUser },
                 Host = localUser
             };
@@ -306,7 +310,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     // In host-only mode, the current item is re-used.
                     item.ID = currentItem.ID;
 
-                    Room.Playlist[currentIndex] = item;
+                    serverSidePlaylist[currentIndex] = item;
                     await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
 
                     // Note: Unlike the server, this is the easiest way to update the current item at this point.
@@ -314,9 +318,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     break;
 
                 default:
-                    item.ID = Room.Playlist.Last().ID + 1;
+                    item.ID = serverSidePlaylist.Last().ID + 1;
 
-                    Room.Playlist.Add(item);
+                    serverSidePlaylist.Add(item);
                     await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
 
                     await updateCurrentItem(Room).ConfigureAwait(false);
@@ -371,7 +375,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(currentItem != null);
 
             // When changing to host-only mode, ensure that at least one non-expired playlist item exists by duplicating the current item.
-            if (newMode == QueueMode.HostOnly && Room.Playlist.All(item => item.Expired))
+            if (newMode == QueueMode.HostOnly && serverSidePlaylist.All(item => item.Expired))
                 await duplicateCurrentItem().ConfigureAwait(false);
 
             // When changing modes, items could have been added (above) or the queueing order could have changed.
@@ -403,7 +407,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             var newItem = new MultiplayerPlaylistItem
             {
-                ID = Room.Playlist.Last().ID + 1,
+                ID = serverSidePlaylist.Last().ID + 1,
                 BeatmapID = currentItem.BeatmapID,
                 BeatmapChecksum = currentItem.BeatmapChecksum,
                 RulesetID = currentItem.RulesetID,
@@ -411,7 +415,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AllowedMods = currentItem.AllowedMods
             };
 
-            Room.Playlist.Add(newItem);
+            serverSidePlaylist.Add(newItem);
             await ((IMultiplayerClient)this).PlaylistItemAdded(newItem).ConfigureAwait(false);
         }
 
@@ -423,7 +427,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 default:
                     // Pick the single non-expired playlist item.
-                    newItem = room.Playlist.FirstOrDefault(i => !i.Expired) ?? room.Playlist.Last();
+                    newItem = serverSidePlaylist.FirstOrDefault(i => !i.Expired) ?? serverSidePlaylist.Last();
                     break;
 
                 case QueueMode.AllPlayersRoundRobin:
@@ -431,7 +435,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     throw new NotImplementedException();
             }
 
-            currentIndex = room.Playlist.IndexOf(newItem);
+            currentIndex = serverSidePlaylist.IndexOf(newItem);
 
             long lastItem = room.Settings.PlaylistItemId;
             room.Settings.PlaylistItemId = newItem.ID;
