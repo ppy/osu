@@ -378,11 +378,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 var rulesetBeatmapSet = TestResources.CreateTestBeatmapSetInfo(1);
                 var taikoRuleset = rulesets.AvailableRulesets.ElementAt(1);
-                rulesetBeatmapSet.Beatmaps.ForEach(b =>
-                {
-                    b.Ruleset = taikoRuleset;
-                    b.RulesetID = 1;
-                });
+                rulesetBeatmapSet.Beatmaps.ForEach(b => b.Ruleset = taikoRuleset);
 
                 sets.Add(rulesetBeatmapSet);
             });
