@@ -370,25 +370,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
-            if (newMode == QueueMode.HostOnly)
-            {
-                // Remove all but the current and expired items. The current item may be re-used for host-only mode if it's non-expired.
-                for (int i = 0; i < Room.Playlist.Count; i++)
-                {
-                    var item = Room.Playlist[i];
-
-                    if (item.Expired || item.ID == Room.Settings.PlaylistItemId)
-                        continue;
-
-                    Room.Playlist.RemoveAt(i--);
-
-                    await ((IMultiplayerClient)this).PlaylistItemRemoved(item.ID).ConfigureAwait(false);
-                }
-
-                // Always ensure that at least one non-expired item exists by duplicating the current item if required.
-                if (currentItem.Expired)
-                    await duplicateCurrentItem().ConfigureAwait(false);
-            }
+            // When changing to host-only mode, ensure that at least one non-expired playlist item exists by duplicating the current item.
+            if (newMode == QueueMode.HostOnly && Room.Playlist.All(item => item.Expired))
+                await duplicateCurrentItem().ConfigureAwait(false);
 
             // When changing modes, items could have been added (above) or the queueing order could have changed.
             await updateCurrentItem(Room).ConfigureAwait(false);
