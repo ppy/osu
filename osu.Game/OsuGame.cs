@@ -4,59 +4,58 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using osu.Framework.Configuration;
-using osu.Framework.Screens;
-using osu.Game.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays;
-using osu.Framework.Logging;
-using osu.Framework.Allocation;
-using osu.Game.Overlays.Toolbar;
-using osu.Game.Screens;
-using osu.Game.Screens.Menu;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Input.Bindings;
-using osu.Game.Online.Chat;
-using osu.Game.Overlays.Music;
-using osu.Game.Skinning;
-using osuTK.Graphics;
-using osu.Game.Overlays.Volume;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Scoring;
-using osu.Game.Screens.Play;
-using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Select;
-using osu.Game.Updater;
-using osu.Game.Utils;
-using LogLevel = osu.Framework.Logging.LogLevel;
-using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Music;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.Toolbar;
+using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
+using osu.Game.Screens;
+using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select;
+using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
+using osu.Game.Updater;
 using osu.Game.Users;
+using osu.Game.Utils;
+using osuTK.Graphics;
 
 namespace osu.Game
 {
@@ -158,7 +157,7 @@ namespace osu.Game
         [CanBeNull]
         private IntroScreen introScreen;
 
-        private Bindable<int> configRuleset;
+        private Bindable<string> configRuleset;
 
         private Bindable<float> uiScale;
 
@@ -222,10 +221,13 @@ namespace osu.Game
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
             // bind config int to database RulesetInfo
-            configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
+            configRuleset = LocalConfig.GetBindable<string>(OsuSetting.Ruleset);
             uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
 
-            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
+            var preferredRuleset = int.TryParse(configRuleset.Value, out int rulesetId)
+                // int parsing can be removed 20220522
+                ? RulesetStore.GetRuleset(rulesetId)
+                : RulesetStore.GetRuleset(configRuleset.Value);
 
             try
             {
@@ -238,7 +240,7 @@ namespace osu.Game
                 Ruleset.Value = RulesetStore.AvailableRulesets.First();
             }
 
-            Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
+            Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ShortName;
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
