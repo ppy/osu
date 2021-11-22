@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestItemsClearedWhenSwitchToHostOnlyMode()
+        public void TestItemsNotClearedWhenSwitchToHostOnlyMode()
         {
             addItem(() => OtherBeatmap);
             addItem(() => InitialBeatmap);
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             RunGameplay();
 
             AddStep("change queue mode", () => Client.ChangeSettings(queueMode: QueueMode.HostOnly));
-            AddAssert("playlist has 2 items", () => Client.APIRoom?.Playlist.Count == 2);
+            AddAssert("playlist has 3 items", () => Client.APIRoom?.Playlist.Count == 3);
             AddAssert("playlist item is the other beatmap", () => Client.CurrentMatchPlayingItem.Value?.BeatmapID == OtherBeatmap.OnlineID);
             AddAssert("playlist item is not expired", () => Client.APIRoom?.Playlist[1].Expired == false);
         }
