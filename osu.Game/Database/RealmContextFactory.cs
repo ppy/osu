@@ -153,13 +153,13 @@ namespace osu.Game.Database
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
         {
-            for (ulong i = lastSchemaVersion; i <= schema_version; i++)
+            for (ulong i = lastSchemaVersion + 1; i <= schema_version; i++)
                 applyMigrationsForVersion(migration, i);
         }
 
-        private void applyMigrationsForVersion(Migration migration, ulong version)
+        private void applyMigrationsForVersion(Migration migration, ulong targetVersion)
         {
-            switch (version)
+            switch (targetVersion)
             {
                 case 7:
                     convertOnlineIDs<RealmBeatmap>();
