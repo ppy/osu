@@ -187,8 +187,9 @@ namespace osu.Game
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
 
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client"));
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", RulesetStore));
 
             dependencies.CacheAs(Storage);
 
@@ -227,7 +228,6 @@ namespace osu.Game
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
             dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
