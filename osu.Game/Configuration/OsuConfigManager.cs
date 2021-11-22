@@ -26,7 +26,7 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
-            SetDefault(OsuSetting.Ruleset, 0, 0, int.MaxValue);
+            SetDefault(OsuSetting.Ruleset, string.Empty);
             SetDefault(OsuSetting.Skin, 0, -1, int.MaxValue);
 
             SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
