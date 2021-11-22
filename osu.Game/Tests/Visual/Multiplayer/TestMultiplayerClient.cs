@@ -40,10 +40,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        private MultiplayerPlaylistItem? currentItem => Room?.Playlist[currentIndex];
-
         private readonly TestMultiplayerRoomManager roomManager;
+
+        /// <summary>
+        /// Guaranteed up-to-date playlist.
+        /// </summary>
         private readonly List<MultiplayerPlaylistItem> serverSidePlaylist = new List<MultiplayerPlaylistItem>();
+
+        private MultiplayerPlaylistItem? currentItem => Room?.Playlist[currentIndex];
         private int currentIndex;
 
         public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
