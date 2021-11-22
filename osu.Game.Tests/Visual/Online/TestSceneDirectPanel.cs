@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     new APIBeatmap
                     {
-                        RulesetID = Ruleset.Value.ID ?? 0,
+                        RulesetID = Ruleset.Value.OnlineID,
                         DifficultyName = "Test",
                         StarRating = 6.42,
                     }
