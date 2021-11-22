@@ -1,9 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -25,8 +23,6 @@ namespace osu.Game.Screens.OnlinePlay
         {
             this.allowEdit = allowEdit;
             this.allowSelection = allowSelection;
-
-            ((ReversibleFillFlowContainer)ListContainer).Reverse = reverse;
         }
 
         protected override void LoadComplete()
@@ -51,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay
             d.ScrollbarVisible = false;
         });
 
-        protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new ReversibleFillFlowContainer
+        protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
             Spacing = new Vector2(0, 2)
         };
@@ -73,23 +69,6 @@ namespace osu.Game.Screens.OnlinePlay
             }
 
             Items.Remove(item);
-        }
-
-        private class ReversibleFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
-        {
-            private bool reverse;
-
-            public bool Reverse
-            {
-                get => reverse;
-                set
-                {
-                    reverse = value;
-                    Invalidate();
-                }
-            }
-
-            public override IEnumerable<Drawable> FlowingChildren => Reverse ? base.FlowingChildren.OrderBy(d => -GetLayoutPosition(d)) : base.FlowingChildren;
         }
     }
 }
