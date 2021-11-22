@@ -37,7 +37,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private BeatmapInfo exampleBeatmapInfo => new BeatmapInfo
         {
-            RulesetID = 0,
             Ruleset = rulesets.AvailableRulesets.First(),
             BaseDifficulty = new BeatmapDifficulty
             {

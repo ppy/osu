@@ -458,7 +458,7 @@ namespace osu.Game
 
                 // Use all beatmaps if predicate matched nothing
                 if (beatmaps.Count == 0)
-                    beatmaps = databasedSet.Beatmaps;
+                    beatmaps = databasedSet.Beatmaps.ToList();
 
                 // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
                 var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
