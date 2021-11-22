@@ -49,6 +49,10 @@ namespace osu.Game.Rulesets
         {
             get
             {
+                // Is the case for many test usages.
+                if (string.IsNullOrEmpty(ShortName))
+                    return CreateAllMods();
+
                 if (!mod_reference_cache.TryGetValue(ShortName, out var mods))
                     mod_reference_cache[ShortName] = mods = CreateAllMods().Cast<IMod>().ToArray();
 
