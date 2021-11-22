@@ -584,7 +584,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 for (int i = 0; i <= 2; i++)
                 {
                     testMixed.Beatmaps[i].Ruleset = rulesets.AvailableRulesets.ElementAt(i);
-                    testMixed.Beatmaps[i].RulesetID = i;
                 }
 
                 carousel.UpdateBeatmapSet(testMixed);
@@ -606,7 +605,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 testSingle.Beatmaps.ForEach(b =>
                 {
                     b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
-                    b.RulesetID = b.Ruleset.ID ?? 1;
                 });
 
                 carousel.UpdateBeatmapSet(testSingle);
