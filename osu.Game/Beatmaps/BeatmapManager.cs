@@ -18,6 +18,7 @@ using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
@@ -73,7 +74,11 @@ namespace osu.Game.Beatmaps
         {
             var metadata = new BeatmapMetadata
             {
-                Author = user,
+                Author = new RealmUser
+                {
+                    OnlineID = user.OnlineID,
+                    Username = user.Username,
+                }
             };
 
             var set = new BeatmapSetInfo
