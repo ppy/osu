@@ -13,6 +13,7 @@ using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Rulesets;
 using Realms;
 
 #nullable enable
@@ -30,6 +31,8 @@ namespace osu.Game.Database
         /// The filename of this realm.
         /// </summary>
         public readonly string Filename;
+
+        private readonly RulesetStore? rulesets;
 
         /// <summary>
         /// Version history:
@@ -72,9 +75,10 @@ namespace osu.Game.Database
             }
         }
 
-        public RealmContextFactory(Storage storage, string filename)
+        public RealmContextFactory(Storage storage, string filename, RulesetStore? rulesets = null)
         {
             this.storage = storage;
+            this.rulesets = rulesets;
 
             Filename = filename;
 
