@@ -585,7 +585,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestHideSetSelectsCorrectBeatmap()
         {
-            int? previousID = null;
+            Guid? previousID = null;
             createSongSelect();
             addRulesetImportStep(0);
             AddStep("Move to last difficulty", () => songSelect.Carousel.SelectBeatmap(songSelect.Carousel.BeatmapSets.First().Beatmaps.Last()));
