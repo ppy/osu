@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
 #nullable enable
@@ -184,6 +185,34 @@ namespace osu.Game.Utils
                     // fall back for non-bindable cases.
                     return setting;
             }
+        }
+
+        /// <summary>
+        /// Verifies all proposed mods are valid for a given ruleset and returns instantiated <see cref="Mod"/>s for further processing.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to verify mods against.</param>
+        /// <param name="proposedMods">The proposed mods.</param>
+        /// <param name="valid">Mods instantiated from <paramref name="proposedMods"/> which were valid for the given <paramref name="ruleset"/>.</param>
+        /// <returns>Whether all <paramref name="proposedMods"/> were valid for the given <paramref name="ruleset"/>.</returns>
+        public static bool InstantiateValidModsForRuleset(Ruleset ruleset, IEnumerable<APIMod> proposedMods, out List<Mod> valid)
+        {
+            valid = new List<Mod>();
+            bool proposedWereValid = true;
+
+            foreach (var apiMod in proposedMods)
+            {
+                try
+                {
+                    // will throw if invalid
+                    valid.Add(apiMod.ToMod(ruleset));
+                }
+                catch
+                {
+                    proposedWereValid = false;
+                }
+            }
+
+            return proposedWereValid;
         }
     }
 }
