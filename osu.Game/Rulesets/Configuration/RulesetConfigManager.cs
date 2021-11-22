@@ -20,16 +20,13 @@ namespace osu.Game.Rulesets.Configuration
 
         private List<RealmRulesetSetting> databasedSettings = new List<RealmRulesetSetting>();
 
-        private readonly int rulesetId;
+        private readonly string rulesetName;
 
         protected RulesetConfigManager(SettingsStore store, RulesetInfo ruleset, int? variant = null)
         {
             realmFactory = store?.Realm;
 
-            if (realmFactory != null && !ruleset.ID.HasValue)
-                throw new InvalidOperationException("Attempted to add databased settings for a non-databased ruleset");
-
-            rulesetId = ruleset.ID ?? -1;
+            rulesetName = ruleset.ShortName;
 
             this.variant = variant ?? 0;
 
@@ -43,7 +40,7 @@ namespace osu.Game.Rulesets.Configuration
             if (realmFactory != null)
             {
                 // As long as RulesetConfigCache exists, there is no need to subscribe to realm events.
-                databasedSettings = realmFactory.Context.All<RealmRulesetSetting>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
+                databasedSettings = realmFactory.Context.All<RealmRulesetSetting>().Where(b => b.RulesetName == rulesetName && b.Variant == variant).ToList();
             }
         }
 
@@ -68,7 +65,7 @@ namespace osu.Game.Rulesets.Configuration
                 {
                     foreach (var c in changed)
                     {
-                        var setting = realm.All<RealmRulesetSetting>().First(s => s.RulesetID == rulesetId && s.Variant == variant && s.Key == c.ToString());
+                        var setting = realm.All<RealmRulesetSetting>().First(s => s.RulesetName == rulesetName && s.Variant == variant && s.Key == c.ToString());
 
                         setting.Value = ConfigStore[c].ToString();
                     }
@@ -94,7 +91,7 @@ namespace osu.Game.Rulesets.Configuration
                 {
                     Key = lookup.ToString(),
                     Value = bindable.Value.ToString(),
-                    RulesetID = rulesetId,
+                    RulesetName = rulesetName,
                     Variant = variant,
                 };
 
