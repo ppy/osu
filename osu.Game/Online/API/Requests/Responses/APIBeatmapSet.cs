@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
+using osu.Game.Models;
 
 #nullable enable
 
@@ -123,8 +124,11 @@ namespace osu.Game.Online.API.Requests.Responses
             TitleUnicode = TitleUnicode,
             Artist = Artist,
             ArtistUnicode = ArtistUnicode,
-            AuthorID = AuthorID,
-            Author = Author,
+            Author = new RealmUser
+            {
+                OnlineID = Author.OnlineID,
+                Username = Author.Username
+            },
             Source = Source,
             Tags = Tags,
         };
