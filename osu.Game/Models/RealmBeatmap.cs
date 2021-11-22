@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
@@ -34,6 +35,8 @@ namespace osu.Game.Models
         public RealmBeatmapMetadata Metadata { get; set; } = null!;
 
         public RealmBeatmapSet? BeatmapSet { get; set; }
+
+        public RealmNamedFileUsage? File => BeatmapSet?.Files.First(f => f.File.Hash == Hash);
 
         public BeatmapSetOnlineStatus Status
         {
