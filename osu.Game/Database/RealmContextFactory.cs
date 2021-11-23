@@ -33,10 +33,10 @@ namespace osu.Game.Database
 
         /// <summary>
         /// Version history:
-        /// 6  First tracked version (~20211018)
-        /// 7  Changed OnlineID fields to non-nullable to add indexing support (20211018)
-        /// 8  Rebind scroll adjust keys to not have control modifier (20211029)
-        /// 9  Converted BeatmapMetadata.Author from string to RealmUser (20211104)
+        /// 6    ~2021-10-18   First tracked version.
+        /// 7    2021-10-18    Changed OnlineID fields to non-nullable to add indexing support.
+        /// 8    2021-10-29    Rebind scroll adjust keys to not have control modifier.
+        /// 9    2021-11-04    Converted BeatmapMetadata.Author from string to RealmUser.
         /// </summary>
         private const int schema_version = 9;
 
