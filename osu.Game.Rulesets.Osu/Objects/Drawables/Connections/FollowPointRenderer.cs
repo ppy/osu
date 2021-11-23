@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Pooling;
+using osu.Game.Rulesets.Osu.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
@@ -22,12 +23,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         private DrawablePool<FollowPointConnection> connectionPool;
         private DrawablePool<FollowPoint> pointPool;
 
+        private readonly Bindable<bool> showFollowpoints = new Bindable<bool>(true);
+
         private readonly List<FollowPointLifetimeEntry> lifetimeEntries = new List<FollowPointLifetimeEntry>();
         private readonly Dictionary<HitObject, IBindable> startTimeMap = new Dictionary<HitObject, IBindable>();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuRulesetConfigManager rulesetConfig)
         {
+            rulesetConfig?.BindWith(OsuRulesetSetting.ShowFollowpoints, showFollowpoints);
+
             InternalChildren = new Drawable[]
             {
                 connectionPool = new DrawablePool<FollowPointConnection>(1, 200),
@@ -37,6 +42,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         public void AddFollowPoints(OsuHitObject hitObject)
         {
+            if (showFollowpoints.Value == false)
+                return;
+
             addEntry(hitObject);
 
             var startTimeBindable = hitObject.StartTimeBindable.GetBoundCopy();
@@ -46,6 +54,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         public void RemoveFollowPoints(OsuHitObject hitObject)
         {
+            if (showFollowpoints.Value == false)
+                return;
+
             removeEntry(hitObject);
 
             startTimeMap[hitObject].UnbindAll();
