@@ -25,7 +25,7 @@ namespace osu.Game.Skinning
                 resources,
                 // A default legacy skin may still have a skin.ini if it is modified by the user.
                 // We must specify the stream directly as we are redirecting storage to the osu-resources location for other files.
-                new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files).GetStream("skin.ini")
+                new LegacySkinResourceStore(skin, resources.Files).GetStream("skin.ini")
             )
         {
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
