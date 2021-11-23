@@ -1,33 +1,32 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
-using osu.Game.Skinning;
-using Realms;
 
-#nullable enable
-
-namespace osu.Game.Models
+namespace osu.Game.Skinning
 {
-    [ExcludeFromDynamicCompile]
-    [MapTo("Skin")]
-    public class RealmSkin : RealmObject, IHasRealmFiles, IEquatable<RealmSkin>, IHasGuidPrimaryKey, ISoftDelete
+    [Table(@"SkinInfo")]
+    public class EFSkinInfo : IHasFiles<SkinFileInfo>, IEquatable<EFSkinInfo>, IHasPrimaryKey, ISoftDelete
     {
-        public Guid ID { get; set; }
+        internal const int DEFAULT_SKIN = 0;
+        internal const int CLASSIC_SKIN = -1;
+        internal const int RANDOM_SKIN = -2;
+
+        public int ID { get; set; }
 
         public string Name { get; set; } = string.Empty;
 
         public string Creator { get; set; } = string.Empty;
 
-        public string Hash { get; set; } = string.Empty;
+        public string Hash { get; set; }
 
-        public string InstantiationInfo { get; set; } = string.Empty;
+        public string InstantiationInfo { get; set; }
 
         public virtual Skin CreateInstance(IStorageResourceProvider resources)
         {
@@ -39,28 +38,23 @@ namespace osu.Game.Models
             return (Skin)Activator.CreateInstance(type, this, resources);
         }
 
-        public IList<RealmNamedFileUsage> Files { get; } = null!;
+        public List<SkinFileInfo> Files { get; set; } = new List<SkinFileInfo>();
 
         public bool DeletePending { get; set; }
 
-        public static RealmSkin Default { get; } = new RealmSkin
+        public static EFSkinInfo Default { get; } = new EFSkinInfo
         {
+            ID = DEFAULT_SKIN,
             Name = "osu! (triangles)",
             Creator = "team osu!",
             InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
         };
 
-        public bool Equals(RealmSkin? other)
-        {
-            if (ReferenceEquals(this, other)) return true;
-            if (other == null) return false;
-
-            return ID == other.ID;
-        }
+        public bool Equals(EFSkinInfo other) => other != null && ID == other.ID;
 
         public override string ToString()
         {
-            string author = string.IsNullOrEmpty(Creator) ? string.Empty : $"({Creator})";
+            string author = Creator == null ? string.Empty : $"({Creator})";
             return $"{Name} {author}".Trim();
         }
     }
