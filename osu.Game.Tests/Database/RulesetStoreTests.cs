@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Rulesets;
-using osu.Game.Stores;
 
 namespace osu.Game.Tests.Database
 {
@@ -15,7 +14,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realmFactory, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realmFactory, storage);
+                var rulesets = new RulesetStore(realmFactory, storage);
 
                 Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
                 Assert.AreEqual(4, realmFactory.Context.All<RulesetInfo>().Count());
@@ -27,8 +26,8 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realmFactory, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realmFactory, storage);
-                var rulesets2 = new RealmRulesetStore(realmFactory, storage);
+                var rulesets = new RulesetStore(realmFactory, storage);
+                var rulesets2 = new RulesetStore(realmFactory, storage);
 
                 Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
                 Assert.AreEqual(4, rulesets2.AvailableRulesets.Count());
@@ -43,7 +42,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realmFactory, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realmFactory, storage);
+                var rulesets = new RulesetStore(realmFactory, storage);
 
                 Assert.IsFalse(rulesets.AvailableRulesets.First().IsManaged);
                 Assert.IsFalse(rulesets.GetRuleset(0)?.IsManaged);
