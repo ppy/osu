@@ -60,5 +60,27 @@ namespace osu.Game.Models
             InstantiationInfo = InstantiationInfo,
             Available = Available
         };
+
+        public Ruleset CreateInstance()
+        {
+            if (!Available)
+                throw new RulesetLoadException(@"Ruleset not available");
+
+            var type = Type.GetType(InstantiationInfo);
+
+            if (type == null)
+                throw new RulesetLoadException(@"Type lookup failure");
+
+            var ruleset = Activator.CreateInstance(type) as Ruleset;
+
+            if (ruleset == null)
+                throw new RulesetLoadException(@"Instantiation failure");
+
+            // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
+            // TODO: figure if we still want/need this after switching to realm.
+            // ruleset.RulesetInfo = this;
+
+            return ruleset;
+        }
     }
 }
