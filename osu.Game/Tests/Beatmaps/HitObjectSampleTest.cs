@@ -15,6 +15,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
+using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Ranking;
@@ -88,11 +89,7 @@ namespace osu.Game.Tests.Beatmaps
             AddStep("setup skins", () =>
             {
                 userSkinInfo.Files.Clear();
-                userSkinInfo.Files.Add(new SkinFileInfo
-                {
-                    Filename = userFile,
-                    FileInfo = new IO.FileInfo { Hash = userFile }
-                });
+                userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
 
                 beatmapInfo.BeatmapSet.Files.Clear();
                 beatmapInfo.BeatmapSet.Files.Add(new BeatmapSetFileInfo
