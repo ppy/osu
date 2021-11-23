@@ -41,6 +41,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Cursor trail",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Followpoints",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.ShowFollowpoints)
+                },
                 new SettingsEnumDropdown<PlayfieldBorderStyle>
                 {
                     LabelText = "Playfield border style",
