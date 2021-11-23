@@ -64,15 +64,32 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected virtual bool UseOnlineAPI => false;
 
+        /// <summary>
+        /// A database context factory to be used by test runs. Can be isolated and reset by setting <see cref="UseFreshStoragePerRun"/> to <c>true</c>.
+        /// </summary>
+        /// <remarks>
+        /// In interactive runs (ie. VisualTests) this will use the user's database if <see cref="UseFreshStoragePerRun"/> is not set to <c>true</c>.
+        /// </remarks>
         protected DatabaseContextFactory ContextFactory => contextFactory.Value;
 
         private Lazy<DatabaseContextFactory> contextFactory;
 
+        /// <summary>
+        /// Whether a fresh storage should be initialised per test (method) run.
+        /// </summary>
+        /// <remarks>
+        /// By default (ie. if not set to <c>true</c>):
+        /// - in interactive runs, the user's storage will be used
+        /// - in headless runs, a shared temporary storage will be used per test class.
+        /// </remarks>
         protected virtual bool UseFreshStoragePerRun => false;
 
         /// <summary>
         /// A storage to be used by test runs. Can be isolated by setting <see cref="UseFreshStoragePerRun"/> to <c>true</c>.
         /// </summary>
+        /// <remarks>
+        /// In interactive runs (ie. VisualTests) this will use the user's storage if <see cref="UseFreshStoragePerRun"/> is not set to <c>true</c>.
+        /// </remarks>
         protected Storage LocalStorage => localStorage.Value;
 
         private Lazy<Storage> localStorage;
