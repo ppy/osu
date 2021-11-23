@@ -43,13 +43,6 @@ namespace osu.Game.Tests.Visual
 
         protected new OsuScreenDependencies Dependencies { get; private set; }
 
-        private DrawableRulesetDependencies rulesetDependencies;
-
-        private Lazy<Storage> localStorage;
-        protected Storage LocalStorage => localStorage.Value;
-
-        private Lazy<DatabaseContextFactory> contextFactory;
-
         protected IResourceStore<byte[]> Resources;
 
         protected IAPIProvider API
@@ -65,23 +58,32 @@ namespace osu.Game.Tests.Visual
 
         private DummyAPIAccess dummyAPI;
 
-        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
-
         /// <summary>
         /// Whether this test scene requires real-world API access.
         /// If true, this will bypass the local <see cref="DummyAPIAccess"/> and use the <see cref="OsuGameBase"/> provided one.
         /// </summary>
         protected virtual bool UseOnlineAPI => false;
 
+        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
+
+        private Lazy<DatabaseContextFactory> contextFactory;
+
+        protected virtual bool UseFreshStoragePerRun => false;
+
         /// <summary>
-        /// When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
-        /// This is because the host is recycled per TestScene execution in headless at an nunit level.
+        /// A storage to be used by test runs. Can be isolated by setting <see cref="UseFreshStoragePerRun"/> to <c>true</c>.
         /// </summary>
-        private Storage isolatedHostStorage;
+        protected Storage LocalStorage => localStorage.Value;
+
+        private Lazy<Storage> localStorage;
+
+        private Storage headlessHostStorage;
+
+        private DrawableRulesetDependencies rulesetDependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
+            headlessHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
 
             Resources = parent.Get<OsuGameBase>().Resources;
 
@@ -132,8 +134,6 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
-        protected virtual bool UseFreshStoragePerRun => false;
-
         public virtual void RecycleLocalStorage(bool isDisposing)
         {
             if (localStorage?.IsValueCreated == true)
@@ -153,8 +153,8 @@ namespace osu.Game.Tests.Visual
                 // When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
                 // This is because the host is recycled per TestScene execution in headless at an nunit level.
                 // Importantly, we can't use this optimisation when `UseFreshStoragePerRun` is true, as it doesn't reset per test method.
-                if (!UseFreshStoragePerRun && isolatedHostStorage != null)
-                    return isolatedHostStorage;
+                if (!UseFreshStoragePerRun && headlessHostStorage != null)
+                    return headlessHostStorage;
 
                 return new TemporaryNativeStorage($"{GetType().Name}-{Guid.NewGuid()}");
             });
