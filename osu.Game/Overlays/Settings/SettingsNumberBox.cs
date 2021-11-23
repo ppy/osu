@@ -35,7 +35,6 @@ namespace osu.Game.Overlays.Settings
                 {
                     numberBox = new OutlinedNumberBox
                     {
-                        LengthLimit = 9, // limited to less than a value that could overflow int32 backing.
                         Margin = new MarginPadding { Top = 5 },
                         RelativeSizeAxes = Axes.X,
                         CommitOnFocusLost = true
@@ -44,12 +43,19 @@ namespace osu.Game.Overlays.Settings
 
                 numberBox.Current.BindValueChanged(e =>
                 {
-                    int? value = null;
+                    if (string.IsNullOrEmpty(e.NewValue))
+                    {
+                        Current.Value = null;
+                        return;
+                    }
 
                     if (int.TryParse(e.NewValue, out int intVal))
-                        value = intVal;
+                        Current.Value = intVal;
+                    else
+                        numberBox.NotifyInputError();
 
-                    current.Value = value;
+                    // trigger Current again to either restore the previous text box value, or to reformat the new value via .ToString().
+                    Current.TriggerChange();
                 });
 
                 Current.BindValueChanged(e =>
@@ -62,6 +68,8 @@ namespace osu.Game.Overlays.Settings
         private class OutlinedNumberBox : OutlinedTextBox
         {
             protected override bool CanAddCharacter(char character) => char.IsNumber(character);
+
+            public new void NotifyInputError() => base.NotifyInputError();
         }
     }
 }
