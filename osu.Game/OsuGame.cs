@@ -161,7 +161,7 @@ namespace osu.Game
 
         private Bindable<float> uiScale;
 
-        private Bindable<int> configSkin;
+        private Bindable<string> configSkin;
 
         private readonly string[] args;
 
@@ -243,27 +243,23 @@ namespace osu.Game
             Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ShortName;
 
             // bind config int to database SkinInfo
-            configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
-            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID;
+            configSkin = LocalConfig.GetBindable<string>(OsuSetting.Skin);
+            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
             configSkin.ValueChanged += skinId =>
             {
-                var skinInfo = SkinManager.Query(s => s.ID == skinId.NewValue);
+                // TODO: migrate the user skin selection to the new ID format.
+                SkinInfo skinInfo = null;
+
+                if (Guid.TryParse(skinId.NewValue, out var guid))
+                    skinInfo = SkinManager.Query(s => s.ID == guid);
 
                 if (skinInfo == null)
                 {
-                    switch (skinId.NewValue)
-                    {
-                        case -1:
-                            skinInfo = DefaultLegacySkin.Info;
-                            break;
-
-                        default:
-                            skinInfo = SkinInfo.Default;
-                            break;
-                    }
+                    if (guid == SkinInfo.CLASSIC_SKIN)
+                        skinInfo = DefaultLegacySkin.Info;
                 }
 
-                SkinManager.CurrentSkinInfo.Value = skinInfo;
+                SkinManager.CurrentSkinInfo.Value = skinInfo ?? SkinInfo.Default;
             };
             configSkin.TriggerChange();
 
