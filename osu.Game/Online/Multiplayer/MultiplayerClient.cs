@@ -164,7 +164,6 @@ namespace osu.Game.Online.Multiplayer
 
                     OnRoomJoined();
                 }, cancellationSource.Token).ConfigureAwait(false);
-
             }, cancellationSource.Token).ConfigureAwait(false);
         }
 
