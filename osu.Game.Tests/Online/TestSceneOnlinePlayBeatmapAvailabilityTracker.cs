@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Online
 
             public Task<ILive<BeatmapSetInfo>> CurrentImportTask { get; private set; }
 
-            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
+            public TestBeatmapManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
                 : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
             {
             }
