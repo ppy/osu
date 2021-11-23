@@ -188,7 +188,11 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client"));
+            runMigrations();
+
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
+
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", contextFactory));
 
             dependencies.CacheAs(Storage);
 
@@ -202,8 +206,6 @@ namespace osu.Game
             InitialiseFonts();
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
-
-            runMigrations();
 
             dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Resources, Audio));
             dependencies.CacheAs<ISkinSource>(SkinManager);
@@ -227,7 +229,6 @@ namespace osu.Game
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
             dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
@@ -456,7 +457,8 @@ namespace osu.Game
                         {
                             Key = dkb.Key,
                             Value = dkb.StringValue,
-                            RulesetID = dkb.RulesetID.Value,
+                            // important: this RulesetStore must be the EF one.
+                            RulesetName = RulesetStore.GetRuleset(dkb.RulesetID.Value).ShortName,
                             Variant = dkb.Variant ?? 0,
                         });
                     }
