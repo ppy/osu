@@ -81,8 +81,7 @@ namespace osu.Game.Tests.Visual
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            if (!UseFreshStoragePerRun)
-                isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
+            isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
 
             Resources = parent.Get<OsuGameBase>().Resources;
 
@@ -149,8 +148,16 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            localStorage =
-                new Lazy<Storage>(() => isolatedHostStorage ?? new TemporaryNativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            localStorage = new Lazy<Storage>(() =>
+            {
+                // When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
+                // This is because the host is recycled per TestScene execution in headless at an nunit level.
+                // Importantly, we can't use this optimisation when `UseFreshStoragePerRun` is true, as it doesn't reset per test method.
+                if (!UseFreshStoragePerRun && isolatedHostStorage != null)
+                    return isolatedHostStorage;
+
+                return new TemporaryNativeStorage($"{GetType().Name}-{Guid.NewGuid()}");
+            });
         }
 
         [Resolved]
