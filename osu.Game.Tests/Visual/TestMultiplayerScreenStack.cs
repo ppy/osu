@@ -7,7 +7,6 @@ using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -77,7 +76,6 @@ namespace osu.Game.Tests.Visual
         {
             public new TestMultiplayerRoomManager RoomManager { get; private set; }
             public TestRoomRequestsHandler RequestsHandler { get; private set; }
-            public new OngoingOperationTracker OngoingOperationTracker => base.OngoingOperationTracker;
 
             protected override RoomManager CreateRoomManager() => RoomManager = new TestMultiplayerRoomManager(RequestsHandler = new TestRoomRequestsHandler());
         }

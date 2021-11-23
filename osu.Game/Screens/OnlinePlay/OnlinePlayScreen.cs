@@ -38,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay
         protected RoomManager RoomManager { get; private set; }
 
         [Cached]
-        protected readonly OngoingOperationTracker OngoingOperationTracker = new OngoingOperationTracker();
+        private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
         [Resolved(CanBeNull = true)]
         private MusicController music { get; set; }
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay
                     screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both },
                     new Header(ScreenTitle, screenStack),
                     RoomManager,
-                    OngoingOperationTracker
+                    ongoingOperationTracker
                 }
             };
         }
