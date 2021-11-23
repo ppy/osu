@@ -21,7 +21,7 @@ namespace osu.Game.Skinning
         protected override bool UseCustomSampleBanks => true;
 
         public LegacyBeatmapSkin(BeatmapInfo beatmapInfo, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(createSkinInfo(beatmapInfo), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmapInfo.BeatmapSet, storage), resources, beatmapInfo.Path)
+            : base(createSkinInfo(beatmapInfo), new LegacySkinResourceStore(beatmapInfo.BeatmapSet, storage), resources, beatmapInfo.Path)
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
