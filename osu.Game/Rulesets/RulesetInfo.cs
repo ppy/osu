@@ -10,7 +10,7 @@ using osu.Framework.Testing;
 namespace osu.Game.Rulesets
 {
     [ExcludeFromDynamicCompile]
-    public class RulesetInfo : IEquatable<RulesetInfo>, IRulesetInfo
+    public sealed class RulesetInfo : IEquatable<RulesetInfo>, IRulesetInfo
     {
         public int? ID { get; set; }
 
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets
         public bool Available { get; set; }
 
         // TODO: this should probably be moved to RulesetStore.
-        public virtual Ruleset CreateInstance()
+        public Ruleset CreateInstance()
         {
             if (!Available) return null;
 
