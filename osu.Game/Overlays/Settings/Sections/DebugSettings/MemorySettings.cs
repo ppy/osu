@@ -8,7 +8,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Localisation;
 
-namespace osu.Game.Overlays.Settings.Sections.Debug
+namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
     public class MemorySettings : SettingsSubsection
     {
