@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Background
         private void setCustomSkin()
         {
             // feign a skin switch. this doesn't do anything except force CurrentSkin to become a LegacySkin.
-            AddStep("set custom skin", () => skins.CurrentSkinInfo.Value = new SkinInfo { ID = 5 });
+            AddStep("set custom skin", () => skins.CurrentSkinInfo.Value = new SkinInfo());
         }
 
         private void setDefaultSkin() => AddStep("set default skin", () => skins.CurrentSkinInfo.SetDefault());

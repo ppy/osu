@@ -181,14 +181,14 @@ namespace osu.Game.Tests.Skins.IO
         {
             Assert.That(import2.ID, Is.Not.EqualTo(import1.ID));
             Assert.That(import2.Hash, Is.Not.EqualTo(import1.Hash));
-            Assert.That(import2.Files.Select(f => f.FileInfoID), Is.Not.EquivalentTo(import1.Files.Select(f => f.FileInfoID)));
+            Assert.That(import2.Files.First(), Is.Not.EqualTo(import1.Files.First()));
         }
 
         private void assertImportedOnce(SkinInfo import1, SkinInfo import2)
         {
             Assert.That(import2.ID, Is.EqualTo(import1.ID));
             Assert.That(import2.Hash, Is.EqualTo(import1.Hash));
-            Assert.That(import2.Files.Select(f => f.FileInfoID), Is.EquivalentTo(import1.Files.Select(f => f.FileInfoID)));
+            Assert.That(import2.Files.First(), Is.EqualTo(import1.Files.First()));
         }
 
         private MemoryStream createEmptyOsk()

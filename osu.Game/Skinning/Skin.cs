@@ -64,7 +64,7 @@ namespace osu.Game.Skinning
                 if (fileInfo == null)
                     continue;
 
-                byte[] bytes = resources?.Files.Get(fileInfo.FileInfo.GetStoragePath());
+                byte[] bytes = resources?.Files.Get(fileInfo.File.GetStoragePath());
 
                 if (bytes == null)
                     continue;
@@ -94,7 +94,7 @@ namespace osu.Game.Skinning
 
         private Stream getConfigurationStream()
         {
-            string path = SkinInfo.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase))?.FileInfo.GetStoragePath();
+            string path = SkinInfo.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
 
             if (string.IsNullOrEmpty(path))
                 return null;
