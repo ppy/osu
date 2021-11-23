@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Settings
             currentValueIs(int.MaxValue);
             currentTextIs(int.MaxValue.ToString());
 
-            inputText((long)int.MaxValue + 1.ToString());
+            inputText(smallestOverflowValue.ToString());
             currentValueIs(int.MaxValue);
             currentTextIs(int.MaxValue.ToString());
 
@@ -74,5 +74,10 @@ namespace osu.Game.Tests.Visual.Settings
         private void inputText(string text) => AddStep($"set textbox text to {text}", () => textBox.Text = text);
         private void currentValueIs(int? value) => AddAssert($"current value is {value?.ToString() ?? "null"}", () => numberBox.Current.Value == value);
         private void currentTextIs(string value) => AddAssert($"current text is {value}", () => textBox.Text == value);
+
+        /// <summary>
+        /// The smallest number that overflows <see langword="int"/>.
+        /// </summary>
+        private static long smallestOverflowValue => 1L + int.MaxValue;
     }
 }
