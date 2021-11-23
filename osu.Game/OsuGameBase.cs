@@ -187,6 +187,9 @@ namespace osu.Game
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
+
+            runMigrations();
+
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", RulesetStore));
@@ -203,8 +206,6 @@ namespace osu.Game
             InitialiseFonts();
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
-
-            runMigrations();
 
             dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Resources, Audio));
             dependencies.CacheAs<ISkinSource>(SkinManager);
