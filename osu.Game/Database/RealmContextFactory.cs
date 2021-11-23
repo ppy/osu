@@ -96,6 +96,9 @@ namespace osu.Game.Database
                 Filename += realm_extension;
 
             cleanupPendingDeletions();
+
+            // run after the above operation to ensure realm is already in a good (fully migrated) state.
+            migrateDataFromEF();
         }
 
         private void cleanupPendingDeletions()
@@ -161,6 +164,54 @@ namespace osu.Game.Database
                 SchemaVersion = schema_version,
                 MigrationCallback = onMigration,
             };
+        }
+
+        private void migrateDataFromEF()
+        {
+            if (efContextFactory == null)
+                return;
+
+            using (var db = efContextFactory.GetForWrite())
+            {
+                // migrate ruleset settings. can be removed 20220315.
+                var existingSettings = db.Context.DatabasedSetting;
+
+                // previous entries in EF are removed post migration.
+                if (!existingSettings.Any())
+                    return;
+
+                using (var realm = CreateContext())
+                using (var transaction = realm.BeginWrite())
+                {
+                    // only migrate data if the realm database is empty.
+                    if (!realm.All<RealmRulesetSetting>().Any())
+                    {
+                        foreach (var dkb in existingSettings)
+                        {
+                            if (dkb.RulesetID == null)
+                                continue;
+
+                            string? shortName = getRulesetShortNameFromLegacyID(dkb.RulesetID.Value);
+
+                            if (string.IsNullOrEmpty(shortName))
+                                continue;
+
+                            realm.Add(new RealmRulesetSetting
+                            {
+                                Key = dkb.Key,
+                                Value = dkb.StringValue,
+                                // important: this RulesetStore must be the EF one.
+                                RulesetName = shortName,
+                                Variant = dkb.Variant ?? 0,
+                            });
+                        }
+                    }
+
+                    db.Context.RemoveRange(existingSettings);
+
+                    transaction.Commit();
+                }
+            }
         }
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
