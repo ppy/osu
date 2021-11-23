@@ -49,8 +49,8 @@ namespace osu.Game.Database
         /// </summary>
         private readonly SemaphoreSlim contextCreationLock = new SemaphoreSlim(1);
 
-        private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>("Realm", "Dirty Refreshes");
-        private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>("Realm", "Contexts (Created)");
+        private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>(@"Realm", @"Dirty Refreshes");
+        private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
 
         private readonly object contextLock = new object();
         private Realm? context;
@@ -60,14 +60,14 @@ namespace osu.Game.Database
             get
             {
                 if (!ThreadSafety.IsUpdateThread)
-                    throw new InvalidOperationException($"Use {nameof(CreateContext)} when performing realm operations from a non-update thread");
+                    throw new InvalidOperationException(@$"Use {nameof(CreateContext)} when performing realm operations from a non-update thread");
 
                 lock (contextLock)
                 {
                     if (context == null)
                     {
                         context = CreateContext();
-                        Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
+                        Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
                     }
 
                     // creating a context will ensure our schema is up-to-date and migrated.
@@ -76,6 +76,12 @@ namespace osu.Game.Database
             }
         }
 
+        /// <summary>
+        /// Construct a new instance of a realm context factory.
+        /// </summary>
+        /// <param name="storage">The game storage which will be used to create the realm backing file.</param>
+        /// <param name="filename">The filename to use for the realm backing file. A ".realm" extension will be added automatically if not specified.</param>
+        /// <param name="efContextFactory">An EF factory used only for migration purposes.</param>
         public RealmContextFactory(Storage storage, string filename, IDatabaseContextFactory? efContextFactory = null)
         {
             this.storage = storage;
@@ -83,7 +89,7 @@ namespace osu.Game.Database
 
             Filename = filename;
 
-            const string realm_extension = ".realm";
+            const string realm_extension = @".realm";
 
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
@@ -286,7 +292,7 @@ namespace osu.Game.Database
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
             if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException($"{nameof(BlockAllOperations)} must be called from the update thread.");
+                throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
             Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
@@ -310,7 +316,7 @@ namespace osu.Game.Database
                     timeout -= sleep_length;
 
                     if (timeout < 0)
-                        throw new TimeoutException("Took too long to acquire lock");
+                        throw new TimeoutException(@"Took too long to acquire lock");
                 }
             }
             catch
