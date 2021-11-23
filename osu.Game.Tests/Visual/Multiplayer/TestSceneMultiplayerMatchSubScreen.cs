@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             });
 
-            AddUntilStep("wait for join", () => Client.Room != null);
+            AddUntilStep("wait for join", () => RoomJoined);
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for room join", () => Client.Room != null);
+            AddUntilStep("wait for room join", () => RoomJoined);
 
             AddStep("join other user (ready)", () =>
             {
