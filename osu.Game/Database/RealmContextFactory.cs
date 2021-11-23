@@ -14,7 +14,6 @@ using osu.Framework.Statistics;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
-using osu.Game.Rulesets;
 using Realms;
 
 #nullable enable
@@ -33,7 +32,7 @@ namespace osu.Game.Database
         /// </summary>
         public readonly string Filename;
 
-        private readonly RulesetStore? rulesets;
+        private readonly IDatabaseContextFactory? efContextFactory;
 
         /// <summary>
         /// Version history:
@@ -77,10 +76,10 @@ namespace osu.Game.Database
             }
         }
 
-        public RealmContextFactory(Storage storage, string filename, RulesetStore? rulesets = null)
+        public RealmContextFactory(Storage storage, string filename, IDatabaseContextFactory? efContextFactory = null)
         {
             this.storage = storage;
-            this.rulesets = rulesets;
+            this.efContextFactory = efContextFactory;
 
             Filename = filename;
 
@@ -252,7 +251,7 @@ namespace osu.Game.Database
                         var newItem = newSettings.ElementAt(i);
 
                         long rulesetId = oldItem.RulesetID;
-                        string? rulesetName = rulesets?.GetRuleset((int)rulesetId)?.ShortName;
+                        string? rulesetName = getRulesetShortNameFromLegacyID(rulesetId);
 
                         if (string.IsNullOrEmpty(rulesetName))
                             migration.NewRealm.Remove(newItem);
@@ -262,6 +261,15 @@ namespace osu.Game.Database
 
                     break;
             }
+        }
+
+        private string? getRulesetShortNameFromLegacyID(long rulesetId)
+        {
+            if (efContextFactory == null)
+                return null;
+
+            using (var efContext = efContextFactory.Get())
+                return efContext.RulesetInfo.First(r => r.ID == rulesetId)?.ShortName;
         }
 
         /// <summary>
