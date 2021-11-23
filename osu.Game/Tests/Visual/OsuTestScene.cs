@@ -90,11 +90,6 @@ namespace osu.Game.Tests.Visual
             {
                 var factory = new DatabaseContextFactory(LocalStorage);
 
-                // only reset the database if not using the host storage.
-                // if we reset the host storage, it will delete global key bindings.
-                if (isolatedHostStorage == null)
-                    factory.ResetDatabase();
-
                 using (var usage = factory.Get())
                     usage.Migrate();
                 return factory;
