@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -198,11 +199,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }, users);
         }
 
-        private void addClickButtonStep() => AddStep("click button", () =>
+        private void addClickButtonStep()
         {
-            InputManager.MoveMouseTo(button);
-            InputManager.Click(MouseButton.Left);
-        });
+            AddUntilStep("wait for button to be ready", () => button.ChildrenOfType<Button>().Single().Enabled.Value);
+            AddStep("click button", () =>
+            {
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+        }
 
         private void verifyGameplayStartFlow()
         {
