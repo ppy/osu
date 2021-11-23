@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for join", () => Client.Room != null);
+            AddUntilStep("wait for join", () => RoomManager.RoomJoined);
         }
 
         [Test]
