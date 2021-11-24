@@ -41,8 +41,9 @@ namespace osu.Game.Database
         /// 8    2021-10-29    Rebind scroll adjust keys to not have control modifier.
         /// 9    2021-11-04    Converted BeatmapMetadata.Author from string to RealmUser.
         /// 10   2021-11-22    Use ShortName instead of RulesetID for ruleset settings.
+        /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
         /// </summary>
-        private const int schema_version = 10;
+        private const int schema_version = 11;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
@@ -94,7 +95,12 @@ namespace osu.Game.Database
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
 
+            // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
             cleanupPendingDeletions();
+
+            // Data migration is handled separately from schema migrations.
+            // This is required as the user may be initialising realm for the first time ever, which would result in no schema migrations running.
+            migrateDataFromEF();
         }
 
         private void cleanupPendingDeletions()
@@ -160,6 +166,53 @@ namespace osu.Game.Database
                 SchemaVersion = schema_version,
                 MigrationCallback = onMigration,
             };
+        }
+
+        private void migrateDataFromEF()
+        {
+            if (efContextFactory == null)
+                return;
+
+            using (var db = efContextFactory.GetForWrite())
+            {
+                // migrate ruleset settings. can be removed 20220315.
+                var existingSettings = db.Context.DatabasedSetting;
+
+                // previous entries in EF are removed post migration.
+                if (!existingSettings.Any())
+                    return;
+
+                using (var realm = CreateContext())
+                using (var transaction = realm.BeginWrite())
+                {
+                    // only migrate data if the realm database is empty.
+                    if (!realm.All<RealmRulesetSetting>().Any())
+                    {
+                        foreach (var dkb in existingSettings)
+                        {
+                            if (dkb.RulesetID == null)
+                                continue;
+
+                            string? shortName = getRulesetShortNameFromLegacyID(dkb.RulesetID.Value);
+
+                            if (string.IsNullOrEmpty(shortName))
+                                continue;
+
+                            realm.Add(new RealmRulesetSetting
+                            {
+                                Key = dkb.Key,
+                                Value = dkb.StringValue,
+                                RulesetName = shortName,
+                                Variant = dkb.Variant ?? 0,
+                            });
+                        }
+                    }
+
+                    db.Context.RemoveRange(existingSettings);
+
+                    transaction.Commit();
+                }
+            }
         }
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
@@ -255,6 +308,31 @@ namespace osu.Game.Database
                     {
                         dynamic? oldItem = oldSettings.ElementAt(i);
                         var newItem = newSettings.ElementAt(i);
+
+                        long rulesetId = oldItem.RulesetID;
+                        string? rulesetName = getRulesetShortNameFromLegacyID(rulesetId);
+
+                        if (string.IsNullOrEmpty(rulesetName))
+                            migration.NewRealm.Remove(newItem);
+                        else
+                            newItem.RulesetName = rulesetName;
+                    }
+
+                    break;
+
+                case 11:
+                    string keyBindingClassName = getMappedOrOriginalName(typeof(RealmKeyBinding));
+
+                    var oldKeyBindings = migration.OldRealm.DynamicApi.All(keyBindingClassName);
+                    var newKeyBindings = migration.NewRealm.All<RealmKeyBinding>().ToList();
+
+                    for (int i = 0; i < newKeyBindings.Count; i++)
+                    {
+                        dynamic? oldItem = oldKeyBindings.ElementAt(i);
+                        var newItem = newKeyBindings.ElementAt(i);
+
+                        if (oldItem.RulesetID == null)
+                            continue;
 
                         long rulesetId = oldItem.RulesetID;
                         string? rulesetName = getRulesetShortNameFromLegacyID(rulesetId);

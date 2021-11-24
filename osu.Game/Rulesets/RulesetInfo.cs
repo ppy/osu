@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 
 namespace osu.Game.Rulesets
@@ -26,9 +26,18 @@ namespace osu.Game.Rulesets
         // TODO: this should probably be moved to RulesetStore.
         public Ruleset CreateInstance()
         {
-            if (!Available) return null;
+            if (!Available)
+                throw new RulesetLoadException(@"Ruleset not available");
 
-            var ruleset = (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo).AsNonNull());
+            var type = Type.GetType(InstantiationInfo);
+
+            if (type == null)
+                throw new RulesetLoadException(@"Type lookup failure");
+
+            var ruleset = Activator.CreateInstance(type) as Ruleset;
+
+            if (ruleset == null)
+                throw new RulesetLoadException(@"Instantiation failure");
 
             // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
             ruleset.RulesetInfo = this;
@@ -57,7 +66,12 @@ namespace osu.Game.Rulesets
 
         #region Implementation of IHasOnlineID
 
-        public int OnlineID => ID ?? -1;
+        [NotMapped]
+        public int OnlineID
+        {
+            get => ID ?? -1;
+            set => ID = value >= 0 ? value : (int?)null;
+        }
 
         #endregion
     }
