@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osuTK.Audio;
-using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -33,14 +32,7 @@ namespace osu.Game.Tests.Editing.Checks
                 {
                     BeatmapSet = new BeatmapSetInfo
                     {
-                        Files =
-                        {
-                            new BeatmapSetFileInfo
-                            {
-                                Filename = "abc123.wav",
-                                FileInfo = new FileInfo { Hash = "abcdef" }
-                            }
-                        }
+                        Files = { CheckTestHelpers.CreateMockFile("wav") }
                     }
                 }
             };
@@ -54,11 +46,7 @@ namespace osu.Game.Tests.Editing.Checks
         public void TestDifferentExtension()
         {
             beatmap.BeatmapInfo.BeatmapSet.Files.Clear();
-            beatmap.BeatmapInfo.BeatmapSet.Files.Add(new BeatmapSetFileInfo
-            {
-                Filename = "abc123.jpg",
-                FileInfo = new FileInfo { Hash = "abcdef" }
-            });
+            beatmap.BeatmapInfo.BeatmapSet.Files.Add(CheckTestHelpers.CreateMockFile("jpg"));
 
             // Should fail to load, but not produce an error due to the extension not being expected to load.
             Assert.IsEmpty(check.Run(getContext(null, allowMissing: true)));

@@ -12,7 +12,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
-using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -25,25 +24,17 @@ namespace osu.Game.Tests.Editing.Checks
         [SetUp]
         public void Setup()
         {
+            var file = CheckTestHelpers.CreateMockFile("jpg");
+
             check = new CheckBackgroundQuality();
             beatmap = new Beatmap<HitObject>
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    Metadata = new BeatmapMetadata { BackgroundFile = "abc123.jpg" },
+                    Metadata = new BeatmapMetadata { BackgroundFile = file.Filename },
                     BeatmapSet = new BeatmapSetInfo
                     {
-                        Files =
-                        {
-                            new BeatmapSetFileInfo
-                            {
-                                Filename = "abc123.jpg",
-                                FileInfo = new FileInfo
-                                {
-                                    Hash = "abcdef"
-                                }
-                            }
-                        }
+                        Files = { file }
                     }
                 }
             };
