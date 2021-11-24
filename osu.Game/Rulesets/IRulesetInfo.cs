@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Database;
 
 #nullable enable
@@ -28,20 +27,6 @@ namespace osu.Game.Rulesets
         /// </summary>
         string InstantiationInfo { get; }
 
-        Ruleset? CreateInstance()
-        {
-            var type = Type.GetType(InstantiationInfo);
-
-            if (type == null)
-                return null;
-
-            var ruleset = Activator.CreateInstance(type) as Ruleset;
-
-            // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
-            // TODO: figure if we still want/need this after switching to realm.
-            // ruleset.RulesetInfo = this;
-
-            return ruleset;
-        }
+        Ruleset CreateInstance();
     }
 }
