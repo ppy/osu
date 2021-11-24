@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IBeatmapSetInfo
 
-        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata;
+        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata ?? Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
         IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
 
