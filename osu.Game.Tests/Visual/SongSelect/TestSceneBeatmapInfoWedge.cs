@@ -220,7 +220,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Title = "Verrrrry long Title"
                     },
                     DifficultyName = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Version",
-                    Status = BeatmapSetOnlineStatus.Graveyard,
+                    Status = BeatmapOnlineStatus.Graveyard,
                 },
             };
         }

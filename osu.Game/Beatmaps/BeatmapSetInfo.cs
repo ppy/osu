@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
         [NotNull]
         public List<BeatmapInfo> Beatmaps { get; } = new List<BeatmapInfo>();
 
-        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
+        public BeatmapOnlineStatus Status { get; set; } = BeatmapOnlineStatus.None;
 
         public List<BeatmapSetFileInfo> Files { get; } = new List<BeatmapSetFileInfo>();
 
