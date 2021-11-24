@@ -269,7 +269,6 @@ namespace osu.Game.Database
                     break;
 
                 case 11:
-
                     string keyBindingClassName = getMappedOrOriginalName(typeof(RealmKeyBinding));
 
                     var oldKeyBindings = migration.OldRealm.DynamicApi.All(keyBindingClassName);
