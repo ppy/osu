@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             const int total_set_count = 200;
 
             for (int i = 0; i < total_set_count; i++)
-                sets.Add(TestResources.CreateTestBeatmapSetInfo(i + 1));
+                sets.Add(TestResources.CreateTestBeatmapSetInfo());
 
             loadBeatmaps(sets);
 
@@ -406,8 +406,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 0; i < 20; i++)
             {
-                // index + 1 because we are using OnlineID which should never be zero.
-                var set = TestResources.CreateTestBeatmapSetInfo(i + 1);
+                var set = TestResources.CreateTestBeatmapSetInfo();
 
                 if (i == 4)
                     set.Metadata.Artist = zzz_string;
@@ -433,8 +432,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 0; i < 20; i++)
             {
-                // index + 1 because we are using OnlineID which should never be zero.
-                var set = TestResources.CreateTestBeatmapSetInfo(i + 1);
+                var set = TestResources.CreateTestBeatmapSetInfo();
                 set.Metadata.Artist = "same artist";
                 set.Metadata.Title = "same title";
                 sets.Add(set);
