@@ -846,8 +846,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             var beatmapSet = new BeatmapSetInfo
             {
+                ID = id,
                 OnlineID = id,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
+                Metadata = metadata,
             };
 
             foreach (var b in getBeatmaps(randomDifficultyCount ? RNG.Next(1, 20) : 3, metadata))
@@ -899,6 +901,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 OnlineID = id,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
+                Metadata = metadata,
             };
 
             for (int b = 1; b < 101; b++)

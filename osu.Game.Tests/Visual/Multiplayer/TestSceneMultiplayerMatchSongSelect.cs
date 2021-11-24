@@ -47,10 +47,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             beatmaps = new List<BeatmapInfo>();
 
+            var metadata = new BeatmapMetadata
+            {
+                Artist = "Some Artist",
+                Title = "Some Beatmap",
+                AuthorString = "Some Author"
+            };
+
             var beatmapSetInfo = new BeatmapSetInfo
             {
                 OnlineID = 10,
                 Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                Metadata = metadata,
                 DateAdded = DateTimeOffset.UtcNow
             };
 
@@ -60,13 +68,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 int length = RNG.Next(30000, 200000);
                 double bpm = RNG.NextSingle(80, 200);
-
-                var metadata = new BeatmapMetadata
-                {
-                    Artist = "Some Artist",
-                    Title = "Some Beatmap",
-                    AuthorString = "Some Author"
-                };
 
                 var beatmap = new BeatmapInfo
                 {

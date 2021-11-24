@@ -907,19 +907,20 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             int setId = getImportId();
 
-            var beatmapSet = new BeatmapSetInfo
-            {
-                OnlineID = setId,
-                Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
-                DateAdded = DateTimeOffset.UtcNow,
-            };
-
             var metadata = new BeatmapMetadata
             {
                 // Create random metadata, then we can check if sorting works based on these
                 Artist = "Some Artist " + RNG.Next(0, 9),
                 Title = $"Some Song (set id {setId})",
                 AuthorString = "Some Guy " + RNG.Next(0, 9),
+            };
+
+            var beatmapSet = new BeatmapSetInfo
+            {
+                OnlineID = setId,
+                Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
+                DateAdded = DateTimeOffset.UtcNow,
+                Metadata = metadata
             };
 
             for (int i = 0; i < countPerRuleset; i++)

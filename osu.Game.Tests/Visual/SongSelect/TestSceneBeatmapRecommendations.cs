@@ -182,6 +182,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 Hash = Guid.NewGuid().ToString(),
                 OnlineID = importID,
+                Metadata = metadata,
             };
 
             beatmapSet.Beatmaps.AddRange(difficultyRulesets.Select((ruleset, difficultyIndex) => new BeatmapInfo
