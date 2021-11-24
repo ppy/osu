@@ -907,7 +907,20 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             int setId = getImportId();
 
-            var beatmaps = new List<BeatmapInfo>();
+            var beatmapSet = new BeatmapSetInfo
+            {
+                OnlineID = setId,
+                Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
+                DateAdded = DateTimeOffset.UtcNow,
+            };
+
+            var metadata = new BeatmapMetadata
+            {
+                // Create random metadata, then we can check if sorting works based on these
+                Artist = "Some Artist " + RNG.Next(0, 9),
+                Title = $"Some Song (set id {setId})",
+                AuthorString = "Some Guy " + RNG.Next(0, 9),
+            };
 
             for (int i = 0; i < countPerRuleset; i++)
             {
@@ -916,12 +929,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                 int length = RNG.Next(30000, 200000);
                 double bpm = RNG.NextSingle(80, 200);
 
-                beatmaps.Add(new BeatmapInfo
+                beatmapSet.Beatmaps.Add(new BeatmapInfo
                 {
                     Ruleset = getRuleset(),
                     OnlineID = beatmapId,
                     DifficultyName = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                     Length = length,
+                    Metadata = metadata,
                     BPM = bpm,
                     BaseDifficulty = new BeatmapDifficulty
                     {
@@ -930,20 +944,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 });
             }
 
-            return new BeatmapSetInfo
-            {
-                OnlineID = setId,
-                Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
-                Metadata = new BeatmapMetadata
-                {
-                    // Create random metadata, then we can check if sorting works based on these
-                    Artist = "Some Artist " + RNG.Next(0, 9),
-                    Title = $"Some Song (set id {setId}, max bpm {beatmaps.Max(b => b.BPM):0.#})",
-                    AuthorString = "Some Guy " + RNG.Next(0, 9),
-                },
-                Beatmaps = beatmaps,
-                DateAdded = DateTimeOffset.UtcNow,
-            };
+            return beatmapSet;
         }
 
         protected override void Dispose(bool isDisposing)
