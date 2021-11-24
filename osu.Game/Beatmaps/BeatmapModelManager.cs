@@ -370,7 +370,6 @@ namespace osu.Game.Beatmaps
             return new BeatmapSetInfo
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID,
-                Beatmaps = new List<BeatmapInfo>(),
                 Metadata = beatmap.Metadata,
                 DateAdded = DateTimeOffset.UtcNow
             };
