@@ -59,7 +59,7 @@ namespace osu.Game.Skinning
                 string filename = $"{skinnableTarget}.json";
 
                 // skininfo files may be null for default skin.
-                var fileInfo = SkinInfo.Files?.FirstOrDefault(f => f.Filename == filename);
+                var fileInfo = SkinInfo.Files.FirstOrDefault(f => f.Filename == filename);
 
                 if (fileInfo == null)
                     continue;

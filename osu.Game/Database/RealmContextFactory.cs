@@ -42,8 +42,9 @@ namespace osu.Game.Database
         /// 9    2021-11-04    Converted BeatmapMetadata.Author from string to RealmUser.
         /// 10   2021-11-22    Use ShortName instead of RulesetID for ruleset settings.
         /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
+        /// 12   2021-11-24    Add Status to RealmBeatmapSet.
         /// </summary>
-        private const int schema_version = 11;
+        private const int schema_version = 12;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.

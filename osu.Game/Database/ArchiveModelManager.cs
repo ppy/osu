@@ -392,7 +392,8 @@ namespace osu.Game.Database
             {
                 LogForModel(item, @"Beginning import...");
 
-                item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
+                if (archive != null)
+                    item.Files.AddRange(createFileInfos(archive, Files));
                 item.Hash = ComputeHash(item);
 
                 await Populate(item, archive, cancellationToken).ConfigureAwait(false);
