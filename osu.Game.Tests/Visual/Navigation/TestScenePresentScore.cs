@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
@@ -41,7 +40,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     Hash = Guid.NewGuid().ToString(),
                     OnlineID = 1,
                     Metadata = metadata,
-                    Beatmaps = new List<BeatmapInfo>
+                    Beatmaps =
                     {
                         new BeatmapInfo
                         {
