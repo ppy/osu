@@ -41,8 +41,9 @@ namespace osu.Game.Database
         /// 8    2021-10-29    Rebind scroll adjust keys to not have control modifier.
         /// 9    2021-11-04    Converted BeatmapMetadata.Author from string to RealmUser.
         /// 10   2021-11-22    Use ShortName instead of RulesetID for ruleset settings.
+        /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
         /// </summary>
-        private const int schema_version = 10;
+        private const int schema_version = 11;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
@@ -255,6 +256,31 @@ namespace osu.Game.Database
                     {
                         dynamic? oldItem = oldSettings.ElementAt(i);
                         var newItem = newSettings.ElementAt(i);
+
+                        long rulesetId = oldItem.RulesetID;
+                        string? rulesetName = getRulesetShortNameFromLegacyID(rulesetId);
+
+                        if (string.IsNullOrEmpty(rulesetName))
+                            migration.NewRealm.Remove(newItem);
+                        else
+                            newItem.RulesetName = rulesetName;
+                    }
+
+                    break;
+
+                case 11:
+                    string keyBindingClassName = getMappedOrOriginalName(typeof(RealmKeyBinding));
+
+                    var oldKeyBindings = migration.OldRealm.DynamicApi.All(keyBindingClassName);
+                    var newKeyBindings = migration.NewRealm.All<RealmKeyBinding>().ToList();
+
+                    for (int i = 0; i < newKeyBindings.Count; i++)
+                    {
+                        dynamic? oldItem = oldKeyBindings.ElementAt(i);
+                        var newItem = newKeyBindings.ElementAt(i);
+
+                        if (oldItem.RulesetID == null)
+                            continue;
 
                         long rulesetId = oldItem.RulesetID;
                         string? rulesetName = getRulesetShortNameFromLegacyID(rulesetId);
