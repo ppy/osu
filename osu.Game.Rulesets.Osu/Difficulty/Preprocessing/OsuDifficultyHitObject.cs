@@ -29,12 +29,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double JumpDistance { get; private set; }
 
         /// <summary>
-        /// Minimum distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
+        /// Normalised minimum distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
+        /// <remarks>
+        /// This is bounded by <see cref="JumpDistance"/>, but may be smaller if a more natural path is able to be taken through a preceding slider.
+        /// </remarks>
         public double MovementDistance { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed since the end time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// The time taken to travel through <see cref="MovementDistance"/>, with a minimum value of 25ms.
         /// </summary>
         public double MovementTime { get; private set; }
 
@@ -44,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double TravelDistance { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed between the start and end time of this <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// The time taken to travel through <see cref="TravelDistance"/>, with a minimum value of 25ms for a non-zero distance.
         /// </summary>
         public double TravelTime { get; private set; }
 
