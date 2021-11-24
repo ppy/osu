@@ -2,10 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Threading;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.Resources
 {
@@ -56,5 +64,78 @@ namespace osu.Game.Tests.Resources
         }
 
         private static string getTempFilename() => temp_storage.GetFullPath(Guid.NewGuid() + ".osz");
+
+        private static int importId;
+
+        /// <summary>
+        /// Create a test beatmap set model.
+        /// </summary>
+        /// <param name="difficultyCount">Number of difficulties. If null, a random number between 1 and 20 will be used.</param>
+        /// <param name="rulesets">Rulesets to cycle through when creating difficulties. If <c>null</c>, osu! ruleset will be used.</param>
+        public static BeatmapSetInfo CreateTestBeatmapSetInfo(int? difficultyCount = null, RulesetInfo[] rulesets = null)
+        {
+            int j = 0;
+            RulesetInfo getRuleset() => rulesets?[j++ % rulesets.Length] ?? new OsuRuleset().RulesetInfo;
+
+            int setId = Interlocked.Increment(ref importId);
+
+            var metadata = new BeatmapMetadata
+            {
+                // Create random metadata, then we can check if sorting works based on these
+                Artist = "Some Artist " + RNG.Next(0, 9),
+                Title = $"Some Song (set id {setId}) {Guid.NewGuid()}",
+                AuthorString = "Some Guy " + RNG.Next(0, 9),
+            };
+
+            var beatmapSet = new BeatmapSetInfo
+            {
+                OnlineID = setId,
+                Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
+                DateAdded = DateTimeOffset.UtcNow,
+                Metadata = metadata
+            };
+
+            foreach (var b in getBeatmaps(difficultyCount ?? RNG.Next(1, 20)))
+                beatmapSet.Beatmaps.Add(b);
+
+            return beatmapSet;
+
+            IEnumerable<BeatmapInfo> getBeatmaps(int count)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    int beatmapId = setId * 1000 + i;
+
+                    int length = RNG.Next(30000, 200000);
+                    double bpm = RNG.NextSingle(80, 200);
+
+                    float diff = (float)i / count * 10;
+
+                    string version = "Normal";
+                    if (diff > 6.6)
+                        version = "Insane";
+                    else if (diff > 3.3)
+                        version = "Hard";
+
+                    var rulesetInfo = getRuleset();
+
+                    yield return new BeatmapInfo
+                    {
+                        OnlineID = beatmapId,
+                        DifficultyName = $"{version} {beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
+                        StarRating = diff,
+                        Length = length,
+                        BPM = bpm,
+                        Ruleset = rulesetInfo,
+                        RulesetID = rulesetInfo.ID ?? -1,
+                        Metadata = metadata,
+                        BaseDifficulty = new BeatmapDifficulty
+                        {
+                            OverallDifficulty = diff,
+                        }
+                    };
+                }
+            }
+        }
     }
 }
