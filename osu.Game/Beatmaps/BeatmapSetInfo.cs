@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps
 
         public BeatmapMetadata Metadata { get; set; }
 
-        public List<BeatmapInfo> Beatmaps { get; set; }
+        public List<BeatmapInfo> Beatmaps { get; } = new List<BeatmapInfo>();
 
         public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
 
