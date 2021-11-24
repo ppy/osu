@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
-using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -34,11 +33,7 @@ namespace osu.Game.Tests.Editing.Checks
                     {
                         Files =
                         {
-                            new BeatmapSetFileInfo
-                            {
-                                Filename = "abc123.mp4",
-                                FileInfo = new FileInfo { Hash = "abcdef" }
-                            }
+                            CheckTestHelpers.CreateMockFile("mp4"),
                         }
                     }
                 }
