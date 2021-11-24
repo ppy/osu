@@ -23,6 +23,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
 {
     public class TestSceneBeatmapCard : OsuTestScene
     {
+        /// <summary>
+        /// All cards on this scene use a common online ID to ensure that map download, preview tracks, etc. can be tested manually with online sources.
+        /// </summary>
+        private const int online_id = 163112;
+
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         private APIBeatmapSet[] testCases;
@@ -38,7 +43,6 @@ namespace osu.Game.Tests.Visual.Beatmaps
             var normal = CreateAPIBeatmapSet(Ruleset.Value);
             normal.HasVideo = true;
             normal.HasStoryboard = true;
-            normal.OnlineID = 241526;
 
             var withStatistics = CreateAPIBeatmapSet(Ruleset.Value);
             withStatistics.Title = withStatistics.TitleUnicode = "play favourite stats";
@@ -106,6 +110,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 explicitFeaturedMap,
                 longName
             };
+
+            foreach (var testCase in testCases)
+                testCase.OnlineID = online_id;
         }
 
         private APIBeatmapSet getUndownloadableBeatmapSet() => new APIBeatmapSet
@@ -191,9 +198,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
         private void ensureSoleilyRemoved()
         {
             AddUntilStep("ensure manager loaded", () => beatmaps != null);
-            AddStep("remove soleily", () =>
+            AddStep("remove map", () =>
             {
-                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineID == 241526);
+                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineID == online_id);
 
                 if (beatmap != null) beatmaps.Delete(beatmap);
             });
