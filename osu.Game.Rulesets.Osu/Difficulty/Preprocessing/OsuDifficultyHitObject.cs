@@ -102,14 +102,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double lastTravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
                 MovementTime = Math.Max(MovementTime - lastTravelTime, min_delta_time);
 
-                // Jump distance from the slider tail to the next object, as opposed to the lazy position of JumpDistance.
-                float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
+                //
+                // We'll try to better approximate the real movements a player will take in patterns following on from sliders. Consider the following slider-to-object patterns:
+                //
+                // 1.  <======o==>
+                //            | /
+                //            o
+                //
+                // 2.  <======o==>---o
+                //            |______|
+                //
+                // Where "<==>" represents a slider, and "o" represents where the cursor needs to be for either hitobject (for a slider, this is the lazy cursor position).
+                //
+                // Case (1) is an anti-flow pattern, where players will cut the slider short in order to move to the next object. The jump pattern is (o--o).
+                // Case (2) is a flow pattern, where players will follow the slider through to its visual extent. The jump pattern is (>--o).
+                //
+                // A lenience is applied by assuming that the player jumps the minimum of these two distances in all cases.
+                //
 
-                // For hitobjects which continue in the direction of the slider, the player will normally follow through the slider,
-                // such that they're not jumping from the lazy position but rather from very close to (or the end of) the slider.
-                // In such cases, a leniency is applied by also considering the jump distance from the tail of the slider, and taking the minimum jump distance.
-                // Additional distance is removed based on position of jump relative to slider follow circle radius.
-                // JumpDistance is the leniency distance beyond the assumed_slider_radius. tailJumpDistance is maximum_slider_radius since the full distance of radial leniency is still possible.
+                float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
                 MovementDistance = Math.Max(0, Math.Min(MovementDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
 
