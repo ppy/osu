@@ -95,9 +95,11 @@ namespace osu.Game.Database
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
 
+            // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
             cleanupPendingDeletions();
 
-            // run after the above operation to ensure realm is already in a good (fully migrated) state.
+            // Data migration is handled separately from schema migrations.
+            // This is required as the user may be initialising realm for the first time ever, which would result in no schema migrations running.
             migrateDataFromEF();
         }
 
