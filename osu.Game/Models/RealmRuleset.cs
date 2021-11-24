@@ -25,12 +25,12 @@ namespace osu.Game.Models
 
         public string InstantiationInfo { get; set; } = string.Empty;
 
-        public RealmRuleset(string shortName, string name, string instantiationInfo, int? onlineID = null)
+        public RealmRuleset(string shortName, string name, string instantiationInfo, int onlineID)
         {
             ShortName = shortName;
             Name = name;
             InstantiationInfo = instantiationInfo;
-            OnlineID = onlineID ?? -1;
+            OnlineID = onlineID;
         }
 
         [UsedImplicitly]

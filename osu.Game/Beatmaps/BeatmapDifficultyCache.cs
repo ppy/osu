@@ -349,7 +349,7 @@ namespace osu.Game.Beatmaps
                 var hashCode = new HashCode();
 
                 hashCode.Add(BeatmapInfo.ID);
-                hashCode.Add(Ruleset.ID);
+                hashCode.Add(Ruleset.ShortName);
 
                 foreach (var mod in OrderedMods)
                     hashCode.Add(mod);

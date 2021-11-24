@@ -83,7 +83,7 @@ namespace osu.Game.Beatmaps
             requestedUserId = api.LocalUser.Value.Id;
 
             // only query API for built-in rulesets
-            rulesets.AvailableRulesets.Where(ruleset => ruleset.ID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID).ForEach(rulesetInfo =>
+            rulesets.AvailableRulesets.Where(ruleset => ruleset.OnlineID >= 0 && ruleset.OnlineID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID).ForEach(rulesetInfo =>
             {
                 var req = new GetUserRequest(api.LocalUser.Value.Id, rulesetInfo);
 
