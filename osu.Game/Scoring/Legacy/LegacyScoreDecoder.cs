@@ -140,7 +140,7 @@ namespace osu.Game.Scoring.Legacy
             int countGeki = score.GetCountGeki() ?? 0;
             int countKatu = score.GetCountKatu() ?? 0;
 
-            switch (score.Ruleset.ID)
+            switch (score.Ruleset.OnlineID)
             {
                 case 0:
                 {

@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Menus
             // ensure we have at least two beatmaps available to identify the direction the music controller navigated to.
             AddRepeatStep("import beatmap", () => Game.BeatmapManager.Import(new BeatmapSetInfo
             {
-                Beatmaps = new List<BeatmapInfo>
+                Beatmaps =
                 {
                     new BeatmapInfo
                     {

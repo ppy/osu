@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     switch (req)
                     {
                         case GetUserRequest userRequest:
-                            userRequest.TriggerSuccess(getUser(userRequest.Ruleset.ID));
+                            userRequest.TriggerSuccess(getUser(userRequest.Ruleset.OnlineID));
                             return true;
                     }
 
@@ -183,16 +183,17 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Hash = Guid.NewGuid().ToString(),
                 OnlineID = importID,
                 Metadata = metadata,
-                Beatmaps = difficultyRulesets.Select((ruleset, difficultyIndex) => new BeatmapInfo
-                {
-                    OnlineID = importID * 1024 + difficultyIndex,
-                    Metadata = metadata,
-                    BaseDifficulty = new BeatmapDifficulty(),
-                    Ruleset = ruleset,
-                    StarRating = difficultyIndex + 1,
-                    DifficultyName = $"SR{difficultyIndex + 1}"
-                }).ToList()
             };
+
+            beatmapSet.Beatmaps.AddRange(difficultyRulesets.Select((ruleset, difficultyIndex) => new BeatmapInfo
+            {
+                OnlineID = importID * 1024 + difficultyIndex,
+                Metadata = metadata,
+                BaseDifficulty = new BeatmapDifficulty(),
+                Ruleset = ruleset,
+                StarRating = difficultyIndex + 1,
+                DifficultyName = $"SR{difficultyIndex + 1}"
+            }));
 
             return Game.BeatmapManager.Import(beatmapSet).Result.Value;
         }

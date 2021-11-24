@@ -82,7 +82,7 @@ namespace osu.Game.Beatmaps
         protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             if (archive != null)
-                beatmapSet.Beatmaps = createBeatmapDifficulties(beatmapSet.Files);
+                beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet.Files));
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
@@ -208,7 +208,7 @@ namespace osu.Game.Beatmaps
 
                 using (ContextFactory.GetForWrite())
                 {
-                    beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == beatmapInfo.ID);
+                    beatmapInfo = setInfo.Beatmaps.Single(b => b.Equals(beatmapInfo));
 
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 
@@ -370,7 +370,6 @@ namespace osu.Game.Beatmaps
             return new BeatmapSetInfo
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID,
-                Beatmaps = new List<BeatmapInfo>(),
                 Metadata = beatmap.Metadata,
                 DateAdded = DateTimeOffset.UtcNow
             };

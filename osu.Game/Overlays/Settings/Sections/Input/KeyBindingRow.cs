@@ -524,7 +524,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
-                if (KeyBinding.RulesetID != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
+                if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
                     return;
 
                 KeyBinding.KeyCombination = newCombination;
