@@ -282,9 +282,6 @@ namespace osu.Game.Stores
         {
             var rulesetInstance = ((IRulesetInfo)beatmap.Ruleset).CreateInstance();
 
-            if (rulesetInstance == null)
-                return;
-
             decoded.BeatmapInfo.Ruleset = rulesetInstance.RulesetInfo;
 
             // TODO: this should be done in a better place once we actually need to dynamically update it.
