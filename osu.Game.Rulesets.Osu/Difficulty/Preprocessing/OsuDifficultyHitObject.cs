@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (lastObject is Slider lastSlider)
             {
                 double lastTravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
-                MovementTime = Math.Max(MovementTime - lastTravelTime, min_delta_time);
+                MovementTime = Math.Max(StrainTime - lastTravelTime, min_delta_time);
 
                 //
                 // We'll try to better approximate the real movements a player will take in patterns following on from sliders. Consider the following slider-to-object patterns:
@@ -117,14 +117,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 //
                 // Where "<==>" represents a slider, and "o" represents where the cursor needs to be for either hitobject (for a slider, this is the lazy cursor position).
                 //
-                // Case (1) is an anti-flow pattern, where players will cut the slider short in order to move to the next object. The jump pattern is (o--o).
-                // Case (2) is a flow pattern, where players will follow the slider through to its visual extent. The jump pattern is (>--o).
+                // The pattern (o--o) has distance JumpDistance.
+                // The pattern (>--o) is a new distance we'll call "tailJumpDistance".
+                //
+                // Case (1) is an anti-flow pattern, where players will cut the slider short in order to move to the next object. The most natural jump pattern is (o--o).
+                // Case (2) is a flow pattern, where players will follow the slider through to its visual extent. The most natural jump pattern is (>--o).
                 //
                 // A lenience is applied by assuming that the player jumps the minimum of these two distances in all cases.
                 //
 
                 float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
-                MovementDistance = Math.Max(0, Math.Min(MovementDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
+                MovementDistance = Math.Max(0, Math.Min(JumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
