@@ -394,7 +394,7 @@ namespace osu.Game.Online.Leaderboards
                 if (Score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
 
-                if (Score.Files?.Count > 0)
+                if (Score.Files.Count > 0)
                     items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(Score)));
 
                 if (Score.ID != 0)

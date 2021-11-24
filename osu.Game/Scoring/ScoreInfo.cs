@@ -160,7 +160,7 @@ namespace osu.Game.Scoring
         [NotMapped]
         public List<HitEvent> HitEvents { get; set; }
 
-        public List<ScoreFileInfo> Files { get; set; }
+        public List<ScoreFileInfo> Files { get; } = new List<ScoreFileInfo>();
 
         public string Hash { get; set; }
 
