@@ -55,8 +55,6 @@ namespace osu.Game.Beatmaps
 
         public void Invalidate(BeatmapSetInfo info)
         {
-            if (info.Beatmaps == null) return;
-
             foreach (var b in info.Beatmaps)
                 Invalidate(b);
         }
