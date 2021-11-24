@@ -197,7 +197,8 @@ namespace osu.Game.Screens.Select
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
-            int? previouslySelectedID = null;
+            Guid? previouslySelectedID = null;
+
             CarouselBeatmapSet existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.Equals(beatmapSet));
 
             // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
@@ -626,9 +627,9 @@ namespace osu.Game.Screens.Select
             if (beatmapSet.Beatmaps.All(b => b.Hidden))
                 return null;
 
-            // todo: remove the need for this.
-            foreach (var b in beatmapSet.Beatmaps)
-                b.Metadata ??= beatmapSet.Metadata;
+            // todo: probably not required any more.
+            // foreach (var b in beatmapSet.Beatmaps)
+            //     b.Metadata ??= beatmapSet.Metadata;
 
             var set = new CarouselBeatmapSet(beatmapSet)
             {

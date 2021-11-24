@@ -78,7 +78,7 @@ namespace osu.Game.Input.Bindings
         {
             var defaults = DefaultKeyBindings.ToList();
 
-            if (ruleset != null && !ruleset.ID.HasValue)
+            if (ruleset != null && !ruleset.IsManaged)
                 // some tests instantiate a ruleset which is not present in the database.
                 // in these cases we still want key bindings to work, but matching to database instances would result in none being present,
                 // so let's populate the defaults directly.

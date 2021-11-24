@@ -226,8 +226,8 @@ namespace osu.Game.Screens.Play
             // ensure the score is in a consistent state with the current player.
             Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
-            if (ruleset.RulesetInfo.ID != null)
-                Score.ScoreInfo.RulesetID = ruleset.RulesetInfo.ID.Value;
+            if (ruleset.RulesetInfo.OnlineID >= 0)
+                Score.ScoreInfo.RulesetID = ruleset.RulesetInfo.OnlineID;
             Score.ScoreInfo.Mods = gameplayMods;
 
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score));
@@ -487,6 +487,9 @@ namespace osu.Game.Screens.Play
 
                 var rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
                 ruleset = rulesetInfo.CreateInstance();
+
+                if (ruleset == null)
+                    throw new RulesetLoadException("Instantiation failure");
 
                 try
                 {

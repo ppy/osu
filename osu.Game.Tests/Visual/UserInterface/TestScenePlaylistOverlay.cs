@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(item.ScreenSpaceDrawQuad.Centre);
             });
 
-            AddAssert("song 1 is 5th", () => beatmapSets[4] == first);
+            AddAssert("song 1 is 5th", () => beatmapSets[4].Equals(first));
 
             AddStep("release handle", () => InputManager.ReleaseButton(MouseButton.Left));
         }
