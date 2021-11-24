@@ -74,6 +74,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private void setDistances(double clockRate)
         {
+            if (BaseObject is Slider currentSlider)
+            {
+                computeSliderCursorPosition(currentSlider);
+                TravelDistance = currentSlider.LazyTravelDistance;
+                TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, min_delta_time);
+            }
+
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
             if (BaseObject is Spinner || lastObject is Spinner)
                 return;
@@ -85,13 +92,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
                 scalingFactor *= 1 + smallCircleBonus;
-            }
-
-            if (BaseObject is Slider currentSlider)
-            {
-                computeSliderCursorPosition(currentSlider);
-                TravelDistance = currentSlider.LazyTravelDistance;
-                TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, min_delta_time);
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
