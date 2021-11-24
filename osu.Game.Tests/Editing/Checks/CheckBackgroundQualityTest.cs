@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Editing.Checks
                     Metadata = new BeatmapMetadata { BackgroundFile = "abc123.jpg" },
                     BeatmapSet = new BeatmapSetInfo
                     {
-                        Files = new List<BeatmapSetFileInfo>(new[]
+                        Files =
                         {
                             new BeatmapSetFileInfo
                             {
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Editing.Checks
                                     Hash = "abcdef"
                                 }
                             }
-                        })
+                        }
                     }
                 }
             };
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             // While this is a problem, it is out of scope for this check and is caught by a different one.
             beatmap.Metadata.BackgroundFile = string.Empty;
-            var context = getContext(null, new MemoryStream(System.Array.Empty<byte>()));
+            var context = getContext(null, new MemoryStream(Array.Empty<byte>()));
 
             Assert.That(check.Run(context), Is.Empty);
         }

@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Moq;
@@ -33,14 +32,14 @@ namespace osu.Game.Tests.Editing.Checks
                 {
                     BeatmapSet = new BeatmapSetInfo
                     {
-                        Files = new List<BeatmapSetFileInfo>(new[]
+                        Files =
                         {
                             new BeatmapSetFileInfo
                             {
                                 Filename = "abc123.mp4",
                                 FileInfo = new FileInfo { Hash = "abcdef" }
                             }
-                        })
+                        }
                     }
                 }
             };
