@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Music
 
             filter.Search.OnCommit += (sender, newText) =>
             {
-                BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
+                BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps.FirstOrDefault();
 
                 if (toSelect != null)
                 {
