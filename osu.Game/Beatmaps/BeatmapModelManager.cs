@@ -208,7 +208,7 @@ namespace osu.Game.Beatmaps
 
                 using (ContextFactory.GetForWrite())
                 {
-                    beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == beatmapInfo.ID);
+                    beatmapInfo = setInfo.Beatmaps.Single(b => b.Equals(beatmapInfo));
 
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 
