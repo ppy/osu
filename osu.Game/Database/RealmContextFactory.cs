@@ -349,7 +349,7 @@ namespace osu.Game.Database
         }
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
-            efContextFactory?.Get().RulesetInfo.First(r => r.ID == rulesetId)?.ShortName;
+            efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
         /// <summary>
         /// Flush any active contexts and block any further writes.

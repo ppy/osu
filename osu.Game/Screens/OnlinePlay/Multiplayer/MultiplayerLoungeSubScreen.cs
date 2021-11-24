@@ -93,6 +93,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (!isConnected.Value)
                     return Task.CompletedTask;
 
+                if (client.Room != null)
+                    return Task.CompletedTask;
+
                 return base.Poll();
             }
         }
