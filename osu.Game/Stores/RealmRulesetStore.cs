@@ -117,8 +117,8 @@ namespace osu.Game.Stores
                     // add all legacy rulesets first to ensure they have exclusive choice of primary key.
                     foreach (var r in instances.Where(r => r is ILegacyRuleset))
                     {
-                        if (realm.All<RealmRuleset>().FirstOrDefault(rr => rr.OnlineID == r.RulesetInfo.ID) == null)
-                            realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.ID));
+                        if (realm.All<RealmRuleset>().FirstOrDefault(rr => rr.OnlineID == r.RulesetInfo.OnlineID) == null)
+                            realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.OnlineID));
                     }
 
                     // add any other rulesets which have assemblies present but are not yet in the database.
@@ -136,7 +136,7 @@ namespace osu.Game.Stores
                                 existingSameShortName.InstantiationInfo = r.RulesetInfo.InstantiationInfo;
                             }
                             else
-                                realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.ID));
+                                realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.OnlineID));
                         }
                     }
 
