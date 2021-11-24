@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
@@ -65,7 +66,12 @@ namespace osu.Game.Rulesets
 
         #region Implementation of IHasOnlineID
 
-        public int OnlineID => ID ?? -1;
+        [NotMapped]
+        public int OnlineID
+        {
+            get => ID ?? -1;
+            set => ID = value >= 0 ? value : (int?)null;
+        }
 
         #endregion
     }
