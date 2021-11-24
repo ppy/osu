@@ -146,7 +146,7 @@ namespace osu.Game.Online.API.Requests.Responses
             return scoreInfo;
         }
 
-        public IRulesetInfo Ruleset => new RulesetInfo { ID = RulesetID };
+        public IRulesetInfo Ruleset => new RulesetInfo { OnlineID = RulesetID };
 
         IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
     }
