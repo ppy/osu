@@ -78,6 +78,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("playlist item is not expired", () => Client.APIRoom?.Playlist[1].Expired == false);
         }
 
+        [Test]
+        public void TestCorrectItemSelectedAfterNewItemAdded()
+        {
+            addItem(() => OtherBeatmap);
+            AddAssert("selected beatmap is initial beatmap", () => Beatmap.Value.BeatmapInfo.OnlineID == InitialBeatmap.OnlineID);
+        }
+
         private void addItem(Func<BeatmapInfo> beatmap)
         {
             AddStep("click edit button", () =>
