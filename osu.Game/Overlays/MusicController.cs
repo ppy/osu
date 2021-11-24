@@ -111,7 +111,7 @@ namespace osu.Game.Overlays
             beatmapSets.Add(set);
         });
 
-        private void beatmapRemoved(BeatmapSetInfo set) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
+        private void beatmapRemoved(BeatmapSetInfo set) => Schedule(() => beatmapSets.RemoveAll(s => s.Equals(set)));
 
         private ScheduledDelegate seekDelegate;
 
@@ -228,7 +228,7 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Prev;
 
-            var playable = BeatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? BeatmapSets.LastOrDefault();
+            var playable = BeatmapSets.TakeWhile(i => !i.Equals(current.BeatmapSetInfo)).LastOrDefault() ?? BeatmapSets.LastOrDefault();
 
             if (playable != null)
             {
@@ -259,7 +259,7 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Next;
 
-            var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
+            var playable = BeatmapSets.SkipWhile(i => !i.Equals(current.BeatmapSetInfo)).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
 
             if (playable != null)
             {
@@ -309,8 +309,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     // figure out the best direction based on order in playlist.
-                    int last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    int next = newWorking == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != newWorking.BeatmapSetInfo?.ID).Count();
+                    int last = BeatmapSets.TakeWhile(b => !b.Equals(current.BeatmapSetInfo)).Count();
+                    int next = newWorking == null ? -1 : BeatmapSets.TakeWhile(b => !b.Equals(newWorking.BeatmapSetInfo)).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }

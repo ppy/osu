@@ -108,7 +108,10 @@ namespace osu.Desktop
                 presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
 
             // update ruleset
-            presence.Assets.SmallImageKey = ruleset.Value.ID <= 3 ? $"mode_{ruleset.Value.ID}" : "mode_custom";
+            int onlineID = ruleset.Value.OnlineID;
+            bool isLegacyRuleset = onlineID >= 0 && onlineID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID;
+
+            presence.Assets.SmallImageKey = isLegacyRuleset ? $"mode_{onlineID}" : "mode_custom";
             presence.Assets.SmallImageText = ruleset.Value.Name;
 
             client.SetPresence(presence);

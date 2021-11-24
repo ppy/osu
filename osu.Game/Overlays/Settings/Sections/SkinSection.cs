@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Settings.Sections
             skinDropdown.Items = newDropdownItems;
         }
 
-        private void itemRemoved(SkinInfo item) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != item.ID).ToArray());
+        private void itemRemoved(SkinInfo item) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => !i.Equals(item)).ToArray());
 
         private void sortUserSkins(List<SkinInfo> skinsList)
         {

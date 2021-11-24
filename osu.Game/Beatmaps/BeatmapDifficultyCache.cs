@@ -340,8 +340,8 @@ namespace osu.Game.Beatmaps
             }
 
             public bool Equals(DifficultyCacheLookup other)
-                => BeatmapInfo.ID == other.BeatmapInfo.ID
-                   && Ruleset.ID == other.Ruleset.ID
+                => BeatmapInfo.Equals(other.BeatmapInfo)
+                   && Ruleset.Equals(other.Ruleset)
                    && OrderedMods.SequenceEqual(other.OrderedMods);
 
             public override int GetHashCode()
@@ -349,7 +349,7 @@ namespace osu.Game.Beatmaps
                 var hashCode = new HashCode();
 
                 hashCode.Add(BeatmapInfo.ID);
-                hashCode.Add(Ruleset.ID);
+                hashCode.Add(Ruleset.ShortName);
 
                 foreach (var mod in OrderedMods)
                     hashCode.Add(mod);

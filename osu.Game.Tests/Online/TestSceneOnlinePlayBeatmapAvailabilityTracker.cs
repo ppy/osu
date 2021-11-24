@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -143,7 +143,10 @@ namespace osu.Game.Tests.Online
                 var beatmap = decoder.Decode(reader);
 
                 info = beatmap.BeatmapInfo;
-                info.BeatmapSet.Beatmaps = new List<BeatmapInfo> { info };
+
+                Debug.Assert(info.BeatmapSet != null);
+
+                info.BeatmapSet.Beatmaps.Add(info);
                 info.BeatmapSet.Metadata = info.Metadata;
                 info.MD5Hash = stream.ComputeMD5Hash();
                 info.Hash = stream.ComputeSHA2Hash();
