@@ -51,9 +51,6 @@ namespace osu.Game.Rulesets
         /// <exception cref="InvalidOperationException">If <paramref name="ruleset"/> doesn't have a valid <see cref="RulesetInfo.ID"/>.</exception>
         public IRulesetConfigManager GetConfigFor(Ruleset ruleset)
         {
-            if (string.IsNullOrEmpty(ruleset.ShortName))
-                return null;
-
             if (!configCache.TryGetValue(ruleset.RulesetInfo.ShortName, out var config))
                 // any ruleset request which wasn't initialised on startup should not be stored to realm.
                 // this should only be used by tests.
