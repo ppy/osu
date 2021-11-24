@@ -262,8 +262,6 @@ namespace osu.Game
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
-            migrateDataToRealm();
-
             dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(realmFactory, RulesetStore));
 
             var powerStatus = CreateBatteryInfo();
@@ -439,35 +437,6 @@ namespace osu.Game
 
         private void migrateDataToRealm()
         {
-            using (var db = contextFactory.GetForWrite())
-            using (var realm = realmFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
-            {
-                // migrate ruleset settings. can be removed 20220315.
-                var existingSettings = db.Context.DatabasedSetting;
-
-                // only migrate data if the realm database is empty.
-                if (!realm.All<RealmRulesetSetting>().Any())
-                {
-                    foreach (var dkb in existingSettings)
-                    {
-                        if (dkb.RulesetID == null) continue;
-
-                        realm.Add(new RealmRulesetSetting
-                        {
-                            Key = dkb.Key,
-                            Value = dkb.StringValue,
-                            // important: this RulesetStore must be the EF one.
-                            RulesetName = RulesetStore.GetRuleset(dkb.RulesetID.Value).ShortName,
-                            Variant = dkb.Variant ?? 0,
-                        });
-                    }
-                }
-
-                db.Context.RemoveRange(existingSettings);
-
-                transaction.Commit();
-            }
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
