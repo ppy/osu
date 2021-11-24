@@ -39,12 +39,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double MovementTime { get; private set; }
 
         /// <summary>
-        /// Normalized distance between the start and end position of the previous <see cref="OsuDifficultyHitObject"/>.
+        /// Normalized distance between the start and end position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double TravelDistance { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/> to the end time of the same previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// Milliseconds elapsed between the start and end time of this <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
         public double TravelTime { get; private set; }
 
@@ -84,15 +84,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
+            if (BaseObject is Slider currentSlider)
+            {
+                computeSliderCursorPosition(currentSlider);
+                TravelDistance = currentSlider.LazyTravelDistance;
+                TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, min_delta_time);
+            }
+
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
+
             JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            MovementTime = StrainTime;
+            MovementDistance = JumpDistance;
 
             if (lastObject is Slider lastSlider)
             {
-                computeSliderCursorPosition(lastSlider);
-                TravelDistance = lastSlider.LazyTravelDistance;
-                TravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
-                MovementTime = Math.Max(StrainTime - TravelTime, min_delta_time);
+                double lastTravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
+                MovementTime = Math.Max(MovementTime - lastTravelTime, min_delta_time);
 
                 // Jump distance from the slider tail to the next object, as opposed to the lazy position of JumpDistance.
                 float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
@@ -102,12 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // In such cases, a leniency is applied by also considering the jump distance from the tail of the slider, and taking the minimum jump distance.
                 // Additional distance is removed based on position of jump relative to slider follow circle radius.
                 // JumpDistance is the leniency distance beyond the assumed_slider_radius. tailJumpDistance is maximum_slider_radius since the full distance of radial leniency is still possible.
-                MovementDistance = Math.Max(0, Math.Min(JumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
-            }
-            else
-            {
-                MovementTime = StrainTime;
-                MovementDistance = JumpDistance;
+                MovementDistance = Math.Max(0, Math.Min(MovementDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
