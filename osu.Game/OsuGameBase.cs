@@ -214,7 +214,7 @@ namespace osu.Game
             SkinManager.ItemRemoved += item => Schedule(() =>
             {
                 // check the removed skin is not the current user choice. if it is, switch back to default.
-                if (item.ID == SkinManager.CurrentSkinInfo.Value.ID)
+                if (item.Equals(SkinManager.CurrentSkinInfo.Value))
                     SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
             });
 
