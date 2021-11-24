@@ -19,6 +19,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 
         /// <summary>
+        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// </summary>
+        public readonly double StrainTime;
+
+        /// <summary>
         /// Normalized distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double JumpDistance { get; private set; }
@@ -29,20 +34,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double MovementDistance { get; private set; }
 
         /// <summary>
-        /// Normalized distance between the start and end position of the previous <see cref="OsuDifficultyHitObject"/>.
-        /// </summary>
-        public double TravelDistance { get; private set; }
-
-        /// <summary>
-        /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
-        /// Calculated as the angle between the circles (current-2, current-1, current).
-        /// </summary>
-        public double? Angle { get; private set; }
-
-        /// <summary>
         /// Milliseconds elapsed since the end time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
         public double MovementTime { get; private set; }
+
+        /// <summary>
+        /// Normalized distance between the start and end position of the previous <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        public double TravelDistance { get; private set; }
 
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/> to the end time of the same previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
@@ -50,9 +49,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double TravelTime { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
+        /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
-        public readonly double StrainTime;
+        public double? Angle { get; private set; }
 
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
