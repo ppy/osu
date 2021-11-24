@@ -26,7 +26,7 @@ namespace osu.Game.Models
 
         public DateTimeOffset DateAdded { get; set; }
 
-        public IBeatmapMetadataInfo? Metadata => Beatmaps.FirstOrDefault()?.Metadata;
+        public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new RealmBeatmapMetadata();
 
         public IList<RealmBeatmap> Beatmaps { get; } = null!;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Models
             return ID == other.ID;
         }
 
-        public override string ToString() => Metadata?.GetDisplayString() ?? base.ToString();
+        public override string ToString() => Metadata.GetDisplayString();
 
         public bool Equals(IBeatmapSetInfo? other) => other is RealmBeatmapSet b && Equals(b);
 

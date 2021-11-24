@@ -183,7 +183,7 @@ namespace osu.Game.Rulesets
             {
                 Name = Description,
                 ShortName = ShortName,
-                ID = (this as ILegacyRuleset)?.LegacyID,
+                OnlineID = (this as ILegacyRuleset)?.LegacyID ?? -1,
                 InstantiationInfo = GetType().GetInvariantInstantiationInfo(),
                 Available = true,
             };
