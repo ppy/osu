@@ -143,7 +143,6 @@ namespace osu.Game.Tests.Online
                 var beatmap = decoder.Decode(reader);
 
                 info = beatmap.BeatmapInfo;
-                info.Metadata = info.Metadata;
 
                 Debug.Assert(info.BeatmapSet != null);
 

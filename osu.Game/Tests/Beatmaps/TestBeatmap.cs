@@ -33,7 +33,6 @@ namespace osu.Game.Tests.Beatmaps
 
             BeatmapInfo.Ruleset = ruleset;
             BeatmapInfo.RulesetID = ruleset.ID ?? 0;
-            BeatmapInfo.Metadata = BeatmapInfo.Metadata;
             BeatmapInfo.Length = 75000;
             BeatmapInfo.OnlineInfo = new APIBeatmap();
             BeatmapInfo.OnlineID = Interlocked.Increment(ref onlineBeatmapID);
