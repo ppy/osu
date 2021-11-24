@@ -39,9 +39,9 @@ namespace osu.Game.Models
         [Ignored]
         public RealmNamedFileUsage? File => BeatmapSet?.Files.First(f => f.File.Hash == Hash);
 
-        public BeatmapSetOnlineStatus Status
+        public BeatmapOnlineStatus Status
         {
-            get => (BeatmapSetOnlineStatus)StatusInt;
+            get => (BeatmapOnlineStatus)StatusInt;
             set => StatusInt = (int)value;
         }
 

@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (BeatmapInfo.OnlineID == null || BeatmapInfo?.Status <= BeatmapSetOnlineStatus.Pending)
+            if (BeatmapInfo.OnlineID == null || BeatmapInfo?.Status <= BeatmapOnlineStatus.Pending)
             {
                 PlaceholderState = PlaceholderState.Unavailable;
                 return null;

@@ -550,7 +550,7 @@ namespace osu.Game.Tests.Database
                         new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata)
                         {
                             OnlineID = 2,
-                            Status = BeatmapSetOnlineStatus.Loved,
+                            Status = BeatmapOnlineStatus.Loved,
                         }
                     }
                 };
