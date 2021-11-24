@@ -596,7 +596,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             {
                                 OnlineID = 2,
                                 Metadata = metadata,
-                                Status = BeatmapSetOnlineStatus.Loved,
+                                Status = BeatmapOnlineStatus.Loved,
                                 BaseDifficulty = difficulty
                             }
                         }
