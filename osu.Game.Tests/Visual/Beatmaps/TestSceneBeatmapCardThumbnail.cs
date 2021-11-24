@@ -27,11 +27,17 @@ namespace osu.Game.Tests.Visual.Beatmaps
         {
             BeatmapCardThumbnail thumbnail = null;
 
-            AddStep("create thumbnail", () => Child = thumbnail = new BeatmapCardThumbnail(CreateAPIBeatmapSet(Ruleset.Value))
+            AddStep("create thumbnail", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(200)
+                var beatmapSet = CreateAPIBeatmapSet(Ruleset.Value);
+                beatmapSet.OnlineID = 241526; // ID hardcoded to ensure that the preview track exists online.
+
+                Child = thumbnail = new BeatmapCardThumbnail(beatmapSet)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(200)
+                };
             });
             AddStep("enable dim", () => thumbnail.Dimmed.Value = true);
             AddUntilStep("button visible", () => playButton.IsPresent);
