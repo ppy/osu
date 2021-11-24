@@ -72,7 +72,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
                 RoomManager.CreateRoom(newRoom);
             });
 
-            AddUntilStep("wait for room join", () => Client.Room != null);
+            AddUntilStep("wait for room join", () => RoomJoined);
             checkPlayingUserCount(1);
         }
 

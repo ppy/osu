@@ -3,7 +3,6 @@
 
 using System.IO;
 using NUnit.Framework;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Tournament.IO;
@@ -20,7 +19,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
             // don't use clean run because files are being written before osu! launches.
             using (HeadlessGameHost host = new HeadlessGameHost(nameof(CheckIPCLocation)))
             {
-                string basePath = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(CheckIPCLocation));
+                string basePath = CustomTourneyDirectoryTest.PrepareBasePath(nameof(CheckIPCLocation));
 
                 // Set up a fake IPC client for the IPC Storage to switch to.
                 string testStableInstallDirectory = Path.Combine(basePath, "stable-ce");
@@ -42,9 +41,16 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 }
                 finally
                 {
-                    host.Storage.DeleteDirectory(testStableInstallDirectory);
-                    host.Storage.DeleteDirectory("tournaments");
                     host.Exit();
+
+                    try
+                    {
+                        if (Directory.Exists(basePath))
+                            Directory.Delete(basePath, true);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
         }
