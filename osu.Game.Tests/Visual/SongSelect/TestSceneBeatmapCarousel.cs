@@ -836,23 +836,27 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private BeatmapSetInfo createTestBeatmapSet(int id, bool randomDifficultyCount = false)
         {
-            return new BeatmapSetInfo
+            var metadata = new BeatmapMetadata
             {
-                ID = id,
+                // Create random metadata, then we can check if sorting works based on these
+                Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
+                Title = $"test set #{id}!",
+                AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
+            };
+
+            var beatmapSet = new BeatmapSetInfo
+            {
                 OnlineID = id,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
-                Metadata = new BeatmapMetadata
-                {
-                    // Create random metadata, then we can check if sorting works based on these
-                    Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
-                    Title = $"test set #{id}!",
-                    AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
-                },
-                Beatmaps = getBeatmaps(randomDifficultyCount ? RNG.Next(1, 20) : 3).ToList()
             };
+
+            foreach (var b in getBeatmaps(randomDifficultyCount ? RNG.Next(1, 20) : 3, metadata))
+                beatmapSet.Beatmaps.Add(b);
+
+            return beatmapSet;
         }
 
-        private IEnumerable<BeatmapInfo> getBeatmaps(int count)
+        private IEnumerable<BeatmapInfo> getBeatmaps(int count, BeatmapMetadata metadata)
         {
             int id = 0;
 
@@ -872,6 +876,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     DifficultyName = version,
                     StarRating = diff,
                     Ruleset = new OsuRuleset().RulesetInfo,
+                    Metadata = metadata,
                     BaseDifficulty = new BeatmapDifficulty
                     {
                         OverallDifficulty = diff,
@@ -882,19 +887,18 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private BeatmapSetInfo createTestBeatmapSetWithManyDifficulties(int id)
         {
+            var metadata = new BeatmapMetadata
+            {
+                // Create random metadata, then we can check if sorting works based on these
+                Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
+                Title = $"test set #{id}!",
+                AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
+            };
+
             var toReturn = new BeatmapSetInfo
             {
-                ID = id,
                 OnlineID = id,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
-                Metadata = new BeatmapMetadata
-                {
-                    // Create random metadata, then we can check if sorting works based on these
-                    Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
-                    Title = $"test set #{id}!",
-                    AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
-                },
-                Beatmaps = new List<BeatmapInfo>(),
             };
 
             for (int b = 1; b < 101; b++)
@@ -902,10 +906,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 toReturn.Beatmaps.Add(new BeatmapInfo
                 {
                     OnlineID = b * 10,
-                    Path = $"extra{b}.osu",
                     DifficultyName = $"Extra {b}",
                     Ruleset = rulesets.GetRuleset((b - 1) % 4),
                     StarRating = 2,
+                    Metadata = metadata,
                     BaseDifficulty = new BeatmapDifficulty
                     {
                         OverallDifficulty = 3.5f,

@@ -47,6 +47,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             beatmaps = new List<BeatmapInfo>();
 
+            var beatmapSetInfo = new BeatmapSetInfo
+            {
+                OnlineID = 10,
+                Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                DateAdded = DateTimeOffset.UtcNow
+            };
+
             for (int i = 0; i < 8; ++i)
             {
                 int beatmapId = 10 * 10 + i;
@@ -54,29 +61,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 int length = RNG.Next(30000, 200000);
                 double bpm = RNG.NextSingle(80, 200);
 
-                beatmaps.Add(new BeatmapInfo
+                var metadata = new BeatmapMetadata
+                {
+                    Artist = "Some Artist",
+                    Title = "Some Beatmap",
+                    AuthorString = "Some Author"
+                };
+
+                var beatmap = new BeatmapInfo
                 {
                     Ruleset = rulesets.GetRuleset(i % 4),
                     OnlineID = beatmapId,
                     Length = length,
                     BPM = bpm,
+                    Metadata = metadata,
                     BaseDifficulty = new BeatmapDifficulty()
-                });
+                };
+
+                beatmaps.Add(beatmap);
+                beatmapSetInfo.Beatmaps.Add(beatmap);
             }
 
-            manager.Import(new BeatmapSetInfo
-            {
-                OnlineID = 10,
-                Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                Metadata = new BeatmapMetadata
-                {
-                    Artist = "Some Artist",
-                    Title = "Some Beatmap",
-                    AuthorString = "Some Author"
-                },
-                Beatmaps = beatmaps,
-                DateAdded = DateTimeOffset.UtcNow
-            }).Wait();
+            manager.Import(beatmapSetInfo).Wait();
         }
 
         public override void SetUpSteps()
