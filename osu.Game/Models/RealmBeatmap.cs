@@ -46,7 +46,7 @@ namespace osu.Game.Models
         }
 
         [MapTo(nameof(Status))]
-        public int StatusInt { get; set; }
+        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
 
         [Indexed]
         public int OnlineID { get; set; } = -1;
