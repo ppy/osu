@@ -200,7 +200,6 @@ namespace osu.Game.Database
                             {
                                 Key = dkb.Key,
                                 Value = dkb.StringValue,
-                                // important: this RulesetStore must be the EF one.
                                 RulesetName = shortName,
                                 Variant = dkb.Variant ?? 0,
                             });
