@@ -36,7 +36,7 @@ namespace osu.Game.Skinning
             return (Skin)Activator.CreateInstance(type, this, resources);
         }
 
-        public List<SkinFileInfo> Files { get; set; } = new List<SkinFileInfo>();
+        public List<SkinFileInfo> Files { get; } = new List<SkinFileInfo>();
 
         public bool DeletePending { get; set; }
 
