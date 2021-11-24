@@ -302,6 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
+            updateWorkingBeatmap();
             beginHandlingTrack();
             Scheduler.AddOnce(UpdateMods);
         }
