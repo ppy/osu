@@ -39,7 +39,7 @@ namespace osu.Game.Models
         }
 
         [MapTo(nameof(Status))]
-        public int StatusInt { get; set; }
+        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
 
         public bool DeletePending { get; set; }
 
