@@ -6,7 +6,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps
 {
-    public enum BeatmapSetOnlineStatus
+    public enum BeatmapOnlineStatus
     {
         None = -3,
 
@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
 
     public static class BeatmapSetOnlineStatusExtensions
     {
-        public static bool GrantsPerformancePoints(this BeatmapSetOnlineStatus status)
-            => status == BeatmapSetOnlineStatus.Ranked || status == BeatmapSetOnlineStatus.Approved;
+        public static bool GrantsPerformancePoints(this BeatmapOnlineStatus status)
+            => status == BeatmapOnlineStatus.Ranked || status == BeatmapOnlineStatus.Approved;
     }
 }

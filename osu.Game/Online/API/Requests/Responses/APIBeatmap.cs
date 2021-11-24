@@ -20,7 +20,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineBeatmapSetID { get; set; }
 
         [JsonProperty(@"status")]
-        public BeatmapSetOnlineStatus Status { get; set; }
+        public BeatmapOnlineStatus Status { get; set; }
 
         [JsonProperty("checksum")]
         public string Checksum { get; set; } = string.Empty;

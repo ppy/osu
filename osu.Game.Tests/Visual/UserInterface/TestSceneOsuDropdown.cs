@@ -10,7 +10,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     public class TestSceneOsuDropdown : ThemeComparisonTestScene
     {
         protected override Drawable CreateContent() =>
-            new OsuEnumDropdown<BeatmapSetOnlineStatus>
+            new OsuEnumDropdown<BeatmapOnlineStatus>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
