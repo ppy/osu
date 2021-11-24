@@ -24,9 +24,6 @@ namespace osu.Game.Skinning
 
         protected override IEnumerable<string> GetFilenames(string name)
         {
-            if (source.Files == null)
-                yield break;
-
             foreach (string filename in base.GetFilenames(name))
             {
                 string path = getPathForFile(filename.ToStandardisedPath());
