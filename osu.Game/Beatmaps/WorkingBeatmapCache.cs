@@ -65,7 +65,7 @@ namespace osu.Game.Beatmaps
         {
             lock (workingCache)
             {
-                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+                var working = workingCache.FirstOrDefault(w => info.Equals(w.BeatmapInfo));
 
                 if (working != null)
                 {
@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps
 
             lock (workingCache)
             {
-                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+                var working = workingCache.FirstOrDefault(w => beatmapInfo.Equals(w.BeatmapInfo));
 
                 if (working != null)
                     return working;
