@@ -226,7 +226,7 @@ namespace osu.Game.Tests.Visual
             return new APIBeatmapSet
             {
                 OnlineID = ((IBeatmapSetInfo)beatmap.BeatmapSet).OnlineID,
-                Status = BeatmapSetOnlineStatus.Ranked,
+                Status = BeatmapOnlineStatus.Ranked,
                 Covers = new BeatmapSetOnlineCovers
                 {
                     Cover = "https://assets.ppy.sh/beatmaps/163112/covers/cover.jpg",

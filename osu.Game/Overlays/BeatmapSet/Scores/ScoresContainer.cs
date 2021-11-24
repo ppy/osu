@@ -244,7 +244,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             noScoresPlaceholder.Hide();
 
-            if (Beatmap.Value == null || Beatmap.Value.OnlineID <= 0 || (Beatmap.Value?.BeatmapSet as IBeatmapSetOnlineInfo)?.Status <= BeatmapSetOnlineStatus.Pending)
+            if (Beatmap.Value == null || Beatmap.Value.OnlineID <= 0 || (Beatmap.Value?.BeatmapSet as IBeatmapSetOnlineInfo)?.Status <= BeatmapOnlineStatus.Pending)
             {
                 Scores = null;
                 Hide();

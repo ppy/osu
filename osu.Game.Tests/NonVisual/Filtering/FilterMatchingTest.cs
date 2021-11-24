@@ -38,7 +38,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Length = 2500,
             BPM = 160,
             BeatDivisor = 12,
-            Status = BeatmapSetOnlineStatus.Loved
+            Status = BeatmapOnlineStatus.Loved
         };
 
         [Test]
