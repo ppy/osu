@@ -505,7 +505,7 @@ namespace osu.Game.Tests.Database
             RunTestWithRealmAsync(async (realmFactory, storage) =>
             {
                 using var importer = new NonOptimisedBeatmapImporter(realmFactory, storage);
-                using var store = new RealmRulesetStore(realmFactory, storage);
+                using var store = new RulesetStore(realmFactory, storage);
 
                 var imported = await LoadOszIntoStore(importer, realmFactory.Context);
 

@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
+    public class BeatmapManager : IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, RealmNamedFileUsage>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         public ITrackStore BeatmapTrackStore { get; }
 
@@ -294,12 +294,12 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelFileManager<in BeatmapSetInfo,in BeatmapSetFileInfo>
 
-        public void ReplaceFile(BeatmapSetInfo model, BeatmapSetFileInfo file, Stream contents)
+        public void ReplaceFile(BeatmapSetInfo model, RealmNamedFileUsage file, Stream contents)
         {
             beatmapModelManager.ReplaceFile(model, file, contents);
         }
 
-        public void DeleteFile(BeatmapSetInfo model, BeatmapSetFileInfo file)
+        public void DeleteFile(BeatmapSetInfo model, RealmNamedFileUsage file)
         {
             beatmapModelManager.DeleteFile(model, file);
         }

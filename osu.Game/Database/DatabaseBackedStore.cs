@@ -11,7 +11,7 @@ namespace osu.Game.Database
     {
         protected readonly Storage Storage;
 
-        protected readonly IDatabaseContextFactory ContextFactory;
+        protected readonly RealmContextFactory ContextFactory;
 
         /// <summary>
         /// Refresh an instance potentially from a different thread with a local context-tracked instance.
@@ -36,7 +36,7 @@ namespace osu.Game.Database
             }
         }
 
-        protected DatabaseBackedStore(IDatabaseContextFactory contextFactory, Storage storage = null)
+        protected DatabaseBackedStore(RealmContextFactory contextFactory, Storage storage = null)
         {
             ContextFactory = contextFactory;
             Storage = storage;

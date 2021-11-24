@@ -190,9 +190,6 @@ namespace osu.Game
 
             runMigrations();
 
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
-            dependencies.CacheAs<IRulesetStore>(RulesetStore);
-
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", contextFactory));
 
             new EFToRealmMigrator(contextFactory, realmFactory, LocalConfig).Run();
@@ -227,23 +224,11 @@ namespace osu.Game
             dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, realmFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realmFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
-
-            // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
-            // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
-            // allow lookups to be done on the child (ScoreManager in this case) to perform the cascading delete.
-            List<ScoreInfo> getBeatmapScores(BeatmapSetInfo set)
-            {
-                var beatmapIds = BeatmapManager.QueryBeatmaps(b => b.BeatmapSetInfoID == set.ID).Select(b => b.ID).ToList();
-                return ScoreManager.QueryScores(s => beatmapIds.Contains(s.BeatmapInfo.ID)).ToList();
-            }
-
-            BeatmapManager.ItemRemoved += item => ScoreManager.Delete(getBeatmapScores(item), true);
-            BeatmapManager.ItemUpdated += item => ScoreManager.Undelete(getBeatmapScores(item), true);
 
             dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
             AddInternal(difficultyCache);
@@ -438,7 +423,9 @@ namespace osu.Game
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
-            if (r.NewValue?.Available != true)
+            Ruleset instance;
+
+            if (r.NewValue?.Available != true || (instance = r.NewValue.CreateInstance()) == null)
             {
                 // reject the change if the ruleset is not available.
                 Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
@@ -448,7 +435,9 @@ namespace osu.Game
             var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
 
             foreach (ModType type in Enum.GetValues(typeof(ModType)))
-                dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
+            {
+                dict[type] = instance.GetModsFor(type).ToList();
+            }
 
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
@@ -489,7 +478,6 @@ namespace osu.Game
 
             contextFactory?.FlushConnections();
 
-            realmRulesetStore?.Dispose();
             realmFactory?.Dispose();
         }
     }

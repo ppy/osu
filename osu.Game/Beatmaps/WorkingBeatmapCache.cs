@@ -79,7 +79,7 @@ namespace osu.Game.Beatmaps
             // if there are no files, presume the full beatmap info has not yet been fetched from the database.
             if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
             {
-                int lookupId = beatmapInfo.ID;
+                var lookupId = beatmapInfo.ID;
                 beatmapInfo = BeatmapManager.QueryBeatmap(b => b.ID == lookupId);
             }
 
@@ -93,7 +93,8 @@ namespace osu.Game.Beatmaps
                 if (working != null)
                     return working;
 
-                beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
+                // TODO: is this still required..?
+                //beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
                 workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
 
