@@ -102,75 +102,74 @@ namespace osu.Game.Stores
 
         private void addMissingRulesets()
         {
-            realmFactory.Context.Write(realm =>
+            using (var context = realmFactory.CreateContext())
             {
-                var rulesets = realm.All<RealmRuleset>();
-
-                List<Ruleset> instances = loadedAssemblies.Values
-                                                          .Select(r => Activator.CreateInstance(r) as Ruleset)
-                                                          .Where(r => r != null)
-                                                          .Select(r => r.AsNonNull())
-                                                          .ToList();
-
-                // add all legacy rulesets first to ensure they have exclusive choice of primary key.
-                foreach (var r in instances.Where(r => r is ILegacyRuleset))
+                context.Write(realm =>
                 {
-                    if (realm.All<RealmRuleset>().FirstOrDefault(rr => rr.OnlineID == r.RulesetInfo.ID) == null)
-                        realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.ID));
-                }
+                    var rulesets = realm.All<RealmRuleset>();
 
-                // add any other rulesets which have assemblies present but are not yet in the database.
-                foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
-                {
-                    if (rulesets.FirstOrDefault(ri => ri.InstantiationInfo.Equals(r.RulesetInfo.InstantiationInfo, StringComparison.Ordinal)) == null)
+                    List<Ruleset> instances = loadedAssemblies.Values
+                                                              .Select(r => Activator.CreateInstance(r) as Ruleset)
+                                                              .Where(r => r != null)
+                                                              .Select(r => r.AsNonNull())
+                                                              .ToList();
+
+                    // add all legacy rulesets first to ensure they have exclusive choice of primary key.
+                    foreach (var r in instances.Where(r => r is ILegacyRuleset))
                     {
-                        var existingSameShortName = rulesets.FirstOrDefault(ri => ri.ShortName == r.RulesetInfo.ShortName);
+                        if (realm.All<RealmRuleset>().FirstOrDefault(rr => rr.OnlineID == r.RulesetInfo.OnlineID) == null)
+                            realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.OnlineID));
+                    }
 
-                        if (existingSameShortName != null)
+                    // add any other rulesets which have assemblies present but are not yet in the database.
+                    foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
+                    {
+                        if (rulesets.FirstOrDefault(ri => ri.InstantiationInfo.Equals(r.RulesetInfo.InstantiationInfo, StringComparison.Ordinal)) == null)
                         {
-                            // even if a matching InstantiationInfo was not found, there may be an existing ruleset with the same ShortName.
-                            // this generally means the user or ruleset provider has renamed their dll but the underlying ruleset is *likely* the same one.
-                            // in such cases, update the instantiation info of the existing entry to point to the new one.
-                            existingSameShortName.InstantiationInfo = r.RulesetInfo.InstantiationInfo;
+                            var existingSameShortName = rulesets.FirstOrDefault(ri => ri.ShortName == r.RulesetInfo.ShortName);
+
+                            if (existingSameShortName != null)
+                            {
+                                // even if a matching InstantiationInfo was not found, there may be an existing ruleset with the same ShortName.
+                                // this generally means the user or ruleset provider has renamed their dll but the underlying ruleset is *likely* the same one.
+                                // in such cases, update the instantiation info of the existing entry to point to the new one.
+                                existingSameShortName.InstantiationInfo = r.RulesetInfo.InstantiationInfo;
+                            }
+                            else
+                                realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.OnlineID));
                         }
-                        else
-                            realm.Add(new RealmRuleset(r.RulesetInfo.ShortName, r.RulesetInfo.Name, r.RulesetInfo.InstantiationInfo, r.RulesetInfo.ID));
                     }
-                }
 
-                List<RealmRuleset> detachedRulesets = new List<RealmRuleset>();
+                    List<RealmRuleset> detachedRulesets = new List<RealmRuleset>();
 
-                // perform a consistency check and detach final rulesets from realm for cross-thread runtime usage.
-                foreach (var r in rulesets)
-                {
-                    try
+                    // perform a consistency check and detach final rulesets from realm for cross-thread runtime usage.
+                    foreach (var r in rulesets)
                     {
-                        var type = Type.GetType(r.InstantiationInfo);
+                        try
+                        {
+                            var resolvedType = Type.GetType(r.InstantiationInfo)
+                                               ?? throw new RulesetLoadException(@"Type could not be resolved");
 
-                        if (type == null)
-                            throw new InvalidOperationException(@"Type resolution failure.");
+                            var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
+                                               ?? throw new RulesetLoadException(@"Instantiation failure");
 
-                        var rInstance = (Activator.CreateInstance(type) as Ruleset)?.RulesetInfo;
+                            r.Name = instanceInfo.Name;
+                            r.ShortName = instanceInfo.ShortName;
+                            r.InstantiationInfo = instanceInfo.InstantiationInfo;
+                            r.Available = true;
 
-                        if (rInstance == null)
-                            throw new InvalidOperationException(@"Instantiation failure.");
-
-                        r.Name = rInstance.Name;
-                        r.ShortName = rInstance.ShortName;
-                        r.InstantiationInfo = rInstance.InstantiationInfo;
-                        r.Available = true;
-
-                        detachedRulesets.Add(r.Clone());
+                            detachedRulesets.Add(r.Clone());
+                        }
+                        catch (Exception ex)
+                        {
+                            r.Available = false;
+                            Logger.Log($"Could not load ruleset {r}: {ex.Message}");
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        r.Available = false;
-                        Logger.Log($"Could not load ruleset {r}: {ex.Message}");
-                    }
-                }
 
-                availableRulesets.AddRange(detachedRulesets);
-            });
+                    availableRulesets.AddRange(detachedRulesets);
+                });
+            }
         }
 
         private void loadFromAppDomain()

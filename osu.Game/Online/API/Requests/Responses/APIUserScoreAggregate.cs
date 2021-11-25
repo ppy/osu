@@ -3,7 +3,6 @@
 
 using Newtonsoft.Json;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -31,7 +30,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public long UserID { get; set; }
 
         [JsonProperty("user")]
-        public User User { get; set; }
+        public APIUser User { get; set; }
 
         [JsonProperty("position")]
         public int? Position { get; set; }

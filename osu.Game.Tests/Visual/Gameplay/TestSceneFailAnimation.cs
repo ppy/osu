@@ -31,11 +31,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
             AddUntilStep("wait for fail overlay", () => ((FailPlayer)Player).FailOverlay.State.Value == Visibility.Visible);
+
+            // The pause screen and fail animation both ramp frequency.
+            // This tests to ensure that it doesn't reset during that handoff.
+            AddAssert("frequency only ever decreased", () => !((FailPlayer)Player).FrequencyIncreased);
         }
 
         private class FailPlayer : TestPlayer
         {
             public new FailOverlay FailOverlay => base.FailOverlay;
+
+            public bool FrequencyIncreased { get; private set; }
 
             public FailPlayer()
                 : base(false, false)
@@ -46,6 +52,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 base.LoadComplete();
                 HealthProcessor.FailConditions += (_, __) => true;
+            }
+
+            private double lastFrequency = double.MaxValue;
+
+            protected override void Update()
+            {
+                base.Update();
+
+                double freq = Beatmap.Value.Track.AggregateFrequency.Value;
+
+                FrequencyIncreased |= freq > lastFrequency;
+
+                lastFrequency = freq;
             }
         }
     }

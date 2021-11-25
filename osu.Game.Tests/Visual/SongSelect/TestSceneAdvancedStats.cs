@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 OverallDifficulty = 5.7f,
                 ApproachRate = 3.5f
             },
-            StarDifficulty = 4.5f
+            StarRating = 4.5f
         };
 
         [Test]
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     OverallDifficulty = 4.5f,
                     ApproachRate = 3.1f
                 },
-                StarDifficulty = 8
+                StarRating = 8
             });
 
             AddAssert("first bar text is Key Count", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == "Key Count");

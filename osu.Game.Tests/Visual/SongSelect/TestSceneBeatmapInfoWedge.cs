@@ -198,8 +198,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Title = $"{ruleset.ShortName}Title"
                     },
                     Ruleset = ruleset,
-                    StarDifficulty = 6,
-                    Version = $"{ruleset.ShortName}Version",
+                    StarRating = 6,
+                    DifficultyName = $"{ruleset.ShortName}Version",
                     BaseDifficulty = new BeatmapDifficulty()
                 },
                 HitObjects = objects
@@ -219,8 +219,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Source = "Verrrrry long Source",
                         Title = "Verrrrry long Title"
                     },
-                    Version = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Version",
-                    Status = BeatmapSetOnlineStatus.Graveyard,
+                    DifficultyName = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Version",
+                    Status = BeatmapOnlineStatus.Graveyard,
                 },
             };
         }

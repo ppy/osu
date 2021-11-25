@@ -14,6 +14,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -21,7 +22,6 @@ using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
@@ -260,7 +260,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
                     TotalScore = userScore.TotalScore - i,
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 2,
                         Username = $"peppy{i}",
@@ -278,7 +278,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
                     TotalScore = userScore.TotalScore + i,
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 2,
                         Username = $"peppy{i}",
@@ -314,7 +314,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     Rank = ScoreRank.X,
                     MaxCombo = 1000,
                     TotalScore = startTotalScore + (sort == "score_asc" ? i : -i),
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 2,
                         Username = $"peppy{i}",

@@ -15,6 +15,7 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Game.Audio;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 
@@ -58,12 +59,12 @@ namespace osu.Game.Skinning
                 string filename = $"{skinnableTarget}.json";
 
                 // skininfo files may be null for default skin.
-                var fileInfo = SkinInfo.Files?.FirstOrDefault(f => f.Filename == filename);
+                var fileInfo = SkinInfo.Files.FirstOrDefault(f => f.Filename == filename);
 
                 if (fileInfo == null)
                     continue;
 
-                byte[] bytes = resources?.Files.Get(fileInfo.FileInfo.StoragePath);
+                byte[] bytes = resources?.Files.Get(fileInfo.FileInfo.GetStoragePath());
 
                 if (bytes == null)
                     continue;
@@ -93,7 +94,7 @@ namespace osu.Game.Skinning
 
         private Stream getConfigurationStream()
         {
-            string path = SkinInfo.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            string path = SkinInfo.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase))?.FileInfo.GetStoragePath();
 
             if (string.IsNullOrEmpty(path))
                 return null;

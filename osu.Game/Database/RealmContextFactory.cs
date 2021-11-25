@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
@@ -10,8 +11,10 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Stores;
 using Realms;
 
 #nullable enable
@@ -30,21 +33,27 @@ namespace osu.Game.Database
         /// </summary>
         public readonly string Filename;
 
+        private readonly IDatabaseContextFactory? efContextFactory;
+
         /// <summary>
         /// Version history:
-        /// 6  First tracked version (~20211018)
-        /// 7  Changed OnlineID fields to non-nullable to add indexing support (20211018)
-        /// 8  Rebind scroll adjust keys to not have control modifier (20211029)
+        /// 6    ~2021-10-18   First tracked version.
+        /// 7    2021-10-18    Changed OnlineID fields to non-nullable to add indexing support.
+        /// 8    2021-10-29    Rebind scroll adjust keys to not have control modifier.
+        /// 9    2021-11-04    Converted BeatmapMetadata.Author from string to RealmUser.
+        /// 10   2021-11-22    Use ShortName instead of RulesetID for ruleset settings.
+        /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
+        /// 12   2021-11-24    Add Status to RealmBeatmapSet.
         /// </summary>
-        private const int schema_version = 8;
+        private const int schema_version = 12;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
         /// </summary>
         private readonly SemaphoreSlim contextCreationLock = new SemaphoreSlim(1);
 
-        private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>("Realm", "Dirty Refreshes");
-        private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>("Realm", "Contexts (Created)");
+        private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>(@"Realm", @"Dirty Refreshes");
+        private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
 
         private readonly object contextLock = new object();
         private Realm? context;
@@ -54,14 +63,14 @@ namespace osu.Game.Database
             get
             {
                 if (!ThreadSafety.IsUpdateThread)
-                    throw new InvalidOperationException($"Use {nameof(CreateContext)} when performing realm operations from a non-update thread");
+                    throw new InvalidOperationException(@$"Use {nameof(CreateContext)} when performing realm operations from a non-update thread");
 
                 lock (contextLock)
                 {
                     if (context == null)
                     {
                         context = CreateContext();
-                        Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
+                        Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
                     }
 
                     // creating a context will ensure our schema is up-to-date and migrated.
@@ -70,18 +79,30 @@ namespace osu.Game.Database
             }
         }
 
-        public RealmContextFactory(Storage storage, string filename)
+        /// <summary>
+        /// Construct a new instance of a realm context factory.
+        /// </summary>
+        /// <param name="storage">The game storage which will be used to create the realm backing file.</param>
+        /// <param name="filename">The filename to use for the realm backing file. A ".realm" extension will be added automatically if not specified.</param>
+        /// <param name="efContextFactory">An EF factory used only for migration purposes.</param>
+        public RealmContextFactory(Storage storage, string filename, IDatabaseContextFactory? efContextFactory = null)
         {
             this.storage = storage;
+            this.efContextFactory = efContextFactory;
 
             Filename = filename;
 
-            const string realm_extension = ".realm";
+            const string realm_extension = @".realm";
 
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
 
+            // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
             cleanupPendingDeletions();
+
+            // Data migration is handled separately from schema migrations.
+            // This is required as the user may be initialising realm for the first time ever, which would result in no schema migrations running.
+            migrateDataFromEF();
         }
 
         private void cleanupPendingDeletions()
@@ -101,6 +122,10 @@ namespace osu.Game.Database
 
                 transaction.Commit();
             }
+
+            // clean up files after dropping any pending deletions.
+            // in the future we may want to only do this when the game is idle, rather than on every startup.
+            new RealmFileStore(this, storage).Cleanup();
         }
 
         /// <summary>
@@ -149,54 +174,187 @@ namespace osu.Game.Database
             };
         }
 
-        private void onMigration(Migration migration, ulong lastSchemaVersion)
+        private void migrateDataFromEF()
         {
-            if (lastSchemaVersion < 8)
+            if (efContextFactory == null)
+                return;
+
+            using (var db = efContextFactory.GetForWrite())
             {
-                // Ctrl -/+ now adjusts UI scale so let's clear any bindings which overlap these combinations.
-                // New defaults will be populated by the key store afterwards.
-                var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
+                // migrate ruleset settings. can be removed 20220315.
+                var existingSettings = db.Context.DatabasedSetting;
 
-                var increaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.IncreaseScrollSpeed);
-                if (increaseSpeedBinding != null && increaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Plus }))
-                    migration.NewRealm.Remove(increaseSpeedBinding);
+                // previous entries in EF are removed post migration.
+                if (!existingSettings.Any())
+                    return;
 
-                var decreaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.DecreaseScrollSpeed);
-                if (decreaseSpeedBinding != null && decreaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Minus }))
-                    migration.NewRealm.Remove(decreaseSpeedBinding);
-            }
-
-            if (lastSchemaVersion < 7)
-            {
-                convertOnlineIDs<RealmBeatmap>();
-                convertOnlineIDs<RealmBeatmapSet>();
-                convertOnlineIDs<RealmRuleset>();
-
-                void convertOnlineIDs<T>() where T : RealmObject
+                using (var realm = CreateContext())
+                using (var transaction = realm.BeginWrite())
                 {
-                    string className = typeof(T).Name.Replace(@"Realm", string.Empty);
-
-                    // version was not bumped when the beatmap/ruleset models were added
-                    // therefore we must manually check for their presence to avoid throwing on the `DynamicApi` calls.
-                    if (!migration.OldRealm.Schema.TryFindObjectSchema(className, out _))
-                        return;
-
-                    var oldItems = migration.OldRealm.DynamicApi.All(className);
-                    var newItems = migration.NewRealm.DynamicApi.All(className);
-
-                    int itemCount = newItems.Count();
-
-                    for (int i = 0; i < itemCount; i++)
+                    // only migrate data if the realm database is empty.
+                    if (!realm.All<RealmRulesetSetting>().Any())
                     {
-                        dynamic? oldItem = oldItems.ElementAt(i);
-                        dynamic? newItem = newItems.ElementAt(i);
+                        foreach (var dkb in existingSettings)
+                        {
+                            if (dkb.RulesetID == null)
+                                continue;
 
-                        long? nullableOnlineID = oldItem?.OnlineID;
-                        newItem.OnlineID = (int)(nullableOnlineID ?? -1);
+                            string? shortName = getRulesetShortNameFromLegacyID(dkb.RulesetID.Value);
+
+                            if (string.IsNullOrEmpty(shortName))
+                                continue;
+
+                            realm.Add(new RealmRulesetSetting
+                            {
+                                Key = dkb.Key,
+                                Value = dkb.StringValue,
+                                RulesetName = shortName,
+                                Variant = dkb.Variant ?? 0,
+                            });
+                        }
                     }
+
+                    db.Context.RemoveRange(existingSettings);
+
+                    transaction.Commit();
                 }
             }
         }
+
+        private void onMigration(Migration migration, ulong lastSchemaVersion)
+        {
+            for (ulong i = lastSchemaVersion + 1; i <= schema_version; i++)
+                applyMigrationsForVersion(migration, i);
+        }
+
+        private void applyMigrationsForVersion(Migration migration, ulong targetVersion)
+        {
+            switch (targetVersion)
+            {
+                case 7:
+                    convertOnlineIDs<RealmBeatmap>();
+                    convertOnlineIDs<RealmBeatmapSet>();
+                    convertOnlineIDs<RealmRuleset>();
+
+                    void convertOnlineIDs<T>() where T : RealmObject
+                    {
+                        string className = getMappedOrOriginalName(typeof(T));
+
+                        // version was not bumped when the beatmap/ruleset models were added
+                        // therefore we must manually check for their presence to avoid throwing on the `DynamicApi` calls.
+                        if (!migration.OldRealm.Schema.TryFindObjectSchema(className, out _))
+                            return;
+
+                        var oldItems = migration.OldRealm.DynamicApi.All(className);
+                        var newItems = migration.NewRealm.DynamicApi.All(className);
+
+                        int itemCount = newItems.Count();
+
+                        for (int i = 0; i < itemCount; i++)
+                        {
+                            dynamic? oldItem = oldItems.ElementAt(i);
+                            dynamic? newItem = newItems.ElementAt(i);
+
+                            long? nullableOnlineID = oldItem?.OnlineID;
+                            newItem.OnlineID = (int)(nullableOnlineID ?? -1);
+                        }
+                    }
+
+                    break;
+
+                case 8:
+                    // Ctrl -/+ now adjusts UI scale so let's clear any bindings which overlap these combinations.
+                    // New defaults will be populated by the key store afterwards.
+                    var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
+
+                    var increaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.IncreaseScrollSpeed);
+                    if (increaseSpeedBinding != null && increaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Plus }))
+                        migration.NewRealm.Remove(increaseSpeedBinding);
+
+                    var decreaseSpeedBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.DecreaseScrollSpeed);
+                    if (decreaseSpeedBinding != null && decreaseSpeedBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Minus }))
+                        migration.NewRealm.Remove(decreaseSpeedBinding);
+
+                    break;
+
+                case 9:
+                    // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
+                    string metadataClassName = getMappedOrOriginalName(typeof(RealmBeatmapMetadata));
+
+                    // May be coming from a version before `RealmBeatmapMetadata` existed.
+                    if (!migration.OldRealm.Schema.TryFindObjectSchema(metadataClassName, out _))
+                        return;
+
+                    var oldMetadata = migration.OldRealm.DynamicApi.All(metadataClassName);
+                    var newMetadata = migration.NewRealm.All<RealmBeatmapMetadata>();
+
+                    int metadataCount = newMetadata.Count();
+
+                    for (int i = 0; i < metadataCount; i++)
+                    {
+                        dynamic? oldItem = oldMetadata.ElementAt(i);
+                        var newItem = newMetadata.ElementAt(i);
+
+                        string username = oldItem.Author;
+                        newItem.Author = new RealmUser
+                        {
+                            Username = username
+                        };
+                    }
+
+                    break;
+
+                case 10:
+                    string rulesetSettingClassName = getMappedOrOriginalName(typeof(RealmRulesetSetting));
+
+                    var oldSettings = migration.OldRealm.DynamicApi.All(rulesetSettingClassName);
+                    var newSettings = migration.NewRealm.All<RealmRulesetSetting>().ToList();
+
+                    for (int i = 0; i < newSettings.Count; i++)
+                    {
+                        dynamic? oldItem = oldSettings.ElementAt(i);
+                        var newItem = newSettings.ElementAt(i);
+
+                        long rulesetId = oldItem.RulesetID;
+                        string? rulesetName = getRulesetShortNameFromLegacyID(rulesetId);
+
+                        if (string.IsNullOrEmpty(rulesetName))
+                            migration.NewRealm.Remove(newItem);
+                        else
+                            newItem.RulesetName = rulesetName;
+                    }
+
+                    break;
+
+                case 11:
+                    string keyBindingClassName = getMappedOrOriginalName(typeof(RealmKeyBinding));
+
+                    var oldKeyBindings = migration.OldRealm.DynamicApi.All(keyBindingClassName);
+                    var newKeyBindings = migration.NewRealm.All<RealmKeyBinding>().ToList();
+
+                    for (int i = 0; i < newKeyBindings.Count; i++)
+                    {
+                        dynamic? oldItem = oldKeyBindings.ElementAt(i);
+                        var newItem = newKeyBindings.ElementAt(i);
+
+                        if (oldItem.RulesetID == null)
+                            continue;
+
+                        long rulesetId = oldItem.RulesetID;
+                        string? rulesetName = getRulesetShortNameFromLegacyID(rulesetId);
+
+                        if (string.IsNullOrEmpty(rulesetName))
+                            migration.NewRealm.Remove(newItem);
+                        else
+                            newItem.RulesetName = rulesetName;
+                    }
+
+                    break;
+            }
+        }
+
+        private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
+            efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
         /// <summary>
         /// Flush any active contexts and block any further writes.
@@ -212,7 +370,7 @@ namespace osu.Game.Database
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
             if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException($"{nameof(BlockAllOperations)} must be called from the update thread.");
+                throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
             Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
@@ -236,7 +394,7 @@ namespace osu.Game.Database
                     timeout -= sleep_length;
 
                     if (timeout < 0)
-                        throw new TimeoutException("Took too long to acquire lock");
+                        throw new TimeoutException(@"Took too long to acquire lock");
                 }
             }
             catch
@@ -251,6 +409,9 @@ namespace osu.Game.Database
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
             });
         }
+
+        // https://github.com/realm/realm-dotnet/blob/32f4ebcc88b3e80a3b254412665340cd9f3bd6b5/Realm/Realm/Extensions/ReflectionExtensions.cs#L46
+        private static string getMappedOrOriginalName(MemberInfo member) => member.GetCustomAttribute<MapToAttribute>()?.Mapping ?? member.Name;
 
         private bool isDisposed;
 

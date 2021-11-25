@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -27,7 +26,6 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -35,6 +33,8 @@ namespace osu.Game.Screens.OnlinePlay
 {
     public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>
     {
+        public const float HEIGHT = 50;
+
         public Action<PlaylistItem> RequestDeletion;
 
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
@@ -46,8 +46,10 @@ namespace osu.Game.Screens.OnlinePlay
         private ExplicitContentBeatmapPill explicitContentPill;
         private ModDisplay modDisplay;
 
+        private readonly IBindable<bool> valid = new Bindable<bool>();
+
         private readonly Bindable<IBeatmapInfo> beatmap = new Bindable<IBeatmapInfo>();
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly Bindable<IRulesetInfo> ruleset = new Bindable<IRulesetInfo>();
         private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
 
         public readonly PlaylistItem Item;
@@ -67,14 +69,21 @@ namespace osu.Game.Screens.OnlinePlay
             this.allowSelection = allowSelection;
 
             beatmap.BindTo(item.Beatmap);
+            valid.BindTo(item.Valid);
             ruleset.BindTo(item.Ruleset);
             requiredMods.BindTo(item.RequiredMods);
 
             ShowDragHandle.Value = allowEdit;
+
+            if (item.Expired)
+                Colour = OsuColour.Gray(0.5f);
         }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             if (!allowEdit)
                 HandleColour = HandleColour.Opacity(0);
@@ -86,27 +95,43 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(selected => maskingContainer.BorderThickness = selected.NewValue == Model ? 5 : 0, true);
+            SelectedItem.BindValueChanged(selected =>
+            {
+                bool isCurrent = selected.NewValue == Model;
 
-            beatmap.BindValueChanged(_ => scheduleRefresh());
-            ruleset.BindValueChanged(_ => scheduleRefresh());
+                if (!valid.Value)
+                {
+                    // Don't allow selection when not valid.
+                    if (isCurrent)
+                    {
+                        SelectedItem.Value = selected.OldValue;
+                    }
 
-            requiredMods.CollectionChanged += (_, __) => scheduleRefresh();
+                    // Don't update border when not valid (the border is displaying this fact).
+                    return;
+                }
+
+                maskingContainer.BorderThickness = isCurrent ? 5 : 0;
+            }, true);
+
+            beatmap.BindValueChanged(_ => Scheduler.AddOnce(refresh));
+            ruleset.BindValueChanged(_ => Scheduler.AddOnce(refresh));
+            valid.BindValueChanged(_ => Scheduler.AddOnce(refresh));
+            requiredMods.CollectionChanged += (_, __) => Scheduler.AddOnce(refresh);
 
             refresh();
         }
 
-        private ScheduledDelegate scheduledRefresh;
         private PanelBackground panelBackground;
-
-        private void scheduleRefresh()
-        {
-            scheduledRefresh?.Cancel();
-            scheduledRefresh = Schedule(refresh);
-        }
 
         private void refresh()
         {
+            if (!valid.Value)
+            {
+                maskingContainer.BorderThickness = 5;
+                maskingContainer.BorderColour = colours.Red;
+            }
+
             difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(32) };
 
             panelBackground.Beatmap.Value = Item.Beatmap.Value;
@@ -119,10 +144,10 @@ namespace osu.Game.Screens.OnlinePlay
 
             authorText.Clear();
 
-            if (!string.IsNullOrEmpty(Item.Beatmap.Value?.Metadata.Author))
+            if (!string.IsNullOrEmpty(Item.Beatmap.Value?.Metadata.Author.Username))
             {
                 authorText.AddText("mapped by ");
-                authorText.AddUserLink(new User { Username = Item.Beatmap.Value.Metadata.Author });
+                authorText.AddUserLink(Item.Beatmap.Value.Metadata.Author);
             }
 
             bool hasExplicitContent = (Item.Beatmap.Value.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
@@ -138,7 +163,7 @@ namespace osu.Game.Screens.OnlinePlay
             return maskingContainer = new Container
             {
                 RelativeSizeAxes = Axes.X,
-                Height = 50,
+                Height = HEIGHT,
                 Masking = true,
                 CornerRadius = 10,
                 Children = new Drawable[]
@@ -279,7 +304,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (allowSelection)
+            if (allowSelection && valid.Value)
                 SelectedItem.Value = Model;
             return true;
         }

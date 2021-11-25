@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Navigation
             Player player = null;
             ResultsScreen results = null;
 
-            WorkingBeatmap beatmap() => Game.Beatmap.Value;
+            IWorkingBeatmap beatmap() => Game.Beatmap.Value;
 
             PushAndConfirm(() => new TestPlaySongSelect());
 
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             Player player = null;
 
-            WorkingBeatmap beatmap() => Game.Beatmap.Value;
+            IWorkingBeatmap beatmap() => Game.Beatmap.Value;
 
             PushAndConfirm(() => new TestPlaySongSelect());
 
@@ -257,7 +257,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
 
-            AddAssert("Ruleset changed to osu!taiko", () => Game.Toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single().Current.Value.ID == 1);
+            AddAssert("Ruleset changed to osu!taiko", () => Game.Toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single().Current.Value.OnlineID == 1);
 
             AddAssert("Mods overlay still visible", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
         }
@@ -278,7 +278,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
 
-            AddAssert("Ruleset changed to osu!taiko", () => Game.Toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single().Current.Value.ID == 1);
+            AddAssert("Ruleset changed to osu!taiko", () => Game.Toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single().Current.Value.OnlineID == 1);
 
             AddAssert("Options overlay still visible", () => songSelect.BeatmapOptionsOverlay.State.Value == Visibility.Visible);
         }

@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var score = decoder.Parse(resourceStream);
 
-                Assert.AreEqual(3, score.ScoreInfo.Ruleset.ID);
+                Assert.AreEqual(3, score.ScoreInfo.Ruleset.OnlineID);
 
                 Assert.AreEqual(2, score.ScoreInfo.Statistics[HitResult.Great]);
                 Assert.AreEqual(1, score.ScoreInfo.Statistics[HitResult.Good]);

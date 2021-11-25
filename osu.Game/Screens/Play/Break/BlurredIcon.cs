@@ -32,9 +32,9 @@ namespace osu.Game.Screens.Play.Break
         }
 
         public BlurredIcon()
+            : base(cachedFrameBuffer: true)
         {
             RelativePositionAxes = Axes.X;
-            CacheDrawnFrameBuffer = true;
             Child = icon = new SpriteIcon
             {
                 Origin = Anchor.Centre,

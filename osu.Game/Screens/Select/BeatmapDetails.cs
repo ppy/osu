@@ -41,13 +41,13 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private BeatmapInfo beatmapInfo;
+        private IBeatmapInfo beatmapInfo;
 
         private APIFailTimes failTimes;
 
         private int[] ratings;
 
-        public BeatmapInfo BeatmapInfo
+        public IBeatmapInfo BeatmapInfo
         {
             get => beatmapInfo;
             set
@@ -56,8 +56,11 @@ namespace osu.Game.Screens.Select
 
                 beatmapInfo = value;
 
-                failTimes = beatmapInfo?.OnlineInfo?.FailTimes;
-                ratings = beatmapInfo?.BeatmapSet?.OnlineInfo?.Ratings;
+                var onlineInfo = beatmapInfo as IBeatmapOnlineInfo;
+                var onlineSetInfo = beatmapInfo.BeatmapSet as IBeatmapSetOnlineInfo;
+
+                failTimes = onlineInfo?.FailTimes;
+                ratings = onlineSetInfo?.Ratings;
 
                 Scheduler.AddOnce(updateStatistics);
             }
@@ -178,9 +181,9 @@ namespace osu.Game.Screens.Select
         private void updateStatistics()
         {
             advanced.BeatmapInfo = BeatmapInfo;
-            description.Text = BeatmapInfo?.Version;
-            source.Text = BeatmapInfo?.Metadata?.Source;
-            tags.Text = BeatmapInfo?.Metadata?.Tags;
+            description.Text = BeatmapInfo?.DifficultyName;
+            source.Text = BeatmapInfo?.Metadata.Source;
+            tags.Text = BeatmapInfo?.Metadata.Tags;
 
             // failTimes may have been previously fetched
             if (ratings != null && failTimes != null)
@@ -189,8 +192,8 @@ namespace osu.Game.Screens.Select
                 return;
             }
 
-            // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
-            if (BeatmapInfo?.OnlineBeatmapID == null || api.State.Value == APIState.Offline)
+            // for now, let's early abort if an OnlineID is not present (should have been populated at import time).
+            if (BeatmapInfo == null || BeatmapInfo.OnlineID <= 0 || api.State.Value == APIState.Offline)
             {
                 updateMetrics();
                 return;

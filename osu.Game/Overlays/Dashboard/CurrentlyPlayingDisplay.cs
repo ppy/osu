@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
@@ -91,7 +92,7 @@ namespace osu.Game.Overlays.Dashboard
             }
         });
 
-        private PlayingUserPanel createUserPanel(User user) =>
+        private PlayingUserPanel createUserPanel(APIUser user) =>
             new PlayingUserPanel(user).With(panel =>
             {
                 panel.Anchor = Anchor.TopCentre;
@@ -100,12 +101,12 @@ namespace osu.Game.Overlays.Dashboard
 
         private class PlayingUserPanel : CompositeDrawable
         {
-            public readonly User User;
+            public readonly APIUser User;
 
             [Resolved(canBeNull: true)]
             private OsuGame game { get; set; }
 
-            public PlayingUserPanel(User user)
+            public PlayingUserPanel(APIUser user)
             {
                 User = user;
 

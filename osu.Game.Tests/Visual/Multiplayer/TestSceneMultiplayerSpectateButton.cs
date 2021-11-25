@@ -14,12 +14,12 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Input;
 
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestReadyButtonEnabledWhenHostAndUsersReady()
         {
-            AddStep("add user", () => Client.AddUser(new User { Id = PLAYER_1_ID }));
+            AddStep("add user", () => Client.AddUser(new APIUser { Id = PLAYER_1_ID }));
             AddStep("set user ready", () => Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
 
             addClickSpectateButtonStep();
@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add user and transfer host", () =>
             {
-                Client.AddUser(new User { Id = PLAYER_1_ID });
+                Client.AddUser(new APIUser { Id = PLAYER_1_ID });
                 Client.TransferHost(PLAYER_1_ID);
             });
 

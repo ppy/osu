@@ -11,12 +11,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.IO.Archives;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Scores.IO
 {
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Scores.IO
                         Accuracy = 0.8,
                         MaxCombo = 500,
                         Combo = 250,
-                        User = new User { Username = "Test user" },
+                        User = new APIUser { Username = "Test user" },
                         Date = DateTimeOffset.Now,
                         OnlineScoreID = 12345,
                     };
@@ -142,7 +142,7 @@ namespace osu.Game.Tests.Scores.IO
                     var scoreManager = osu.Dependencies.Get<ScoreManager>();
 
                     beatmapManager.Delete(beatmapManager.QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == imported.BeatmapInfo.ID)));
-                    Assert.That(scoreManager.Query(s => s.ID == imported.ID).DeletePending, Is.EqualTo(true));
+                    Assert.That(scoreManager.Query(s => s.Equals(imported)).DeletePending, Is.EqualTo(true));
 
                     var secondImport = await LoadScoreIntoOsu(osu, imported);
                     Assert.That(secondImport, Is.Null);

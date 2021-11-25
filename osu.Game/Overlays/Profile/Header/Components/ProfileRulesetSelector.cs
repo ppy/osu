@@ -3,14 +3,14 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
-using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class ProfileRulesetSelector : OverlayRulesetSelector
     {
-        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
         protected override void LoadComplete()
         {
@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         public void SetDefaultRuleset(RulesetInfo ruleset)
         {
             foreach (var tabItem in TabContainer)
-                ((ProfileRulesetTabItem)tabItem).IsDefault = ((ProfileRulesetTabItem)tabItem).Value.ID == ruleset.ID;
+                ((ProfileRulesetTabItem)tabItem).IsDefault = ((ProfileRulesetTabItem)tabItem).Value.Equals(ruleset);
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ProfileRulesetTabItem(value);

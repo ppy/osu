@@ -4,11 +4,11 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Tests.Visual.Spectator;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public override void SetUpSteps()
         {
-            AddStep("set dummy user", () => dummyAPIAccess.LocalUser.Value = new User
+            AddStep("set dummy user", () => dummyAPIAccess.LocalUser.Value = new APIUser
             {
                 Id = dummy_user_id,
                 Username = "DummyUser"
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestClientSendsCorrectRuleset()
         {
             AddUntilStep("spectator client sending frames", () => spectatorClient.PlayingUserStates.ContainsKey(dummy_user_id));
-            AddAssert("spectator client sent correct ruleset", () => spectatorClient.PlayingUserStates[dummy_user_id].RulesetID == Ruleset.Value.ID);
+            AddAssert("spectator client sent correct ruleset", () => spectatorClient.PlayingUserStates[dummy_user_id].RulesetID == Ruleset.Value.OnlineID);
         }
 
         public override void TearDownSteps()

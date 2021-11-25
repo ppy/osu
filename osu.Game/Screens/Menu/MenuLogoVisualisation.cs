@@ -4,15 +4,15 @@
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osu.Game.Online.API;
-using osu.Game.Users;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Screens.Menu
 {
     internal class MenuLogoVisualisation : LogoVisualisation
     {
-        private IBindable<User> user;
+        private IBindable<APIUser> user;
         private Bindable<Skin> skin;
 
         [BackgroundDependencyLoader]

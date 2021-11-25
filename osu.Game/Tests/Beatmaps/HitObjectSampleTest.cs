@@ -21,7 +21,6 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Beatmaps
 {
@@ -39,10 +38,7 @@ namespace osu.Game.Tests.Beatmaps
         private readonly BeatmapInfo beatmapInfo = new BeatmapInfo
         {
             BeatmapSet = new BeatmapSetInfo(),
-            Metadata = new BeatmapMetadata
-            {
-                Author = User.SYSTEM_USER
-            }
+            Metadata = new BeatmapMetadata(),
         };
 
         private readonly TestResourceStore userSkinResourceStore = new TestResourceStore();
@@ -91,23 +87,19 @@ namespace osu.Game.Tests.Beatmaps
         {
             AddStep("setup skins", () =>
             {
-                userSkinInfo.Files = new List<SkinFileInfo>
+                userSkinInfo.Files.Clear();
+                userSkinInfo.Files.Add(new SkinFileInfo
                 {
-                    new SkinFileInfo
-                    {
-                        Filename = userFile,
-                        FileInfo = new IO.FileInfo { Hash = userFile }
-                    }
-                };
+                    Filename = userFile,
+                    FileInfo = new IO.FileInfo { Hash = userFile }
+                });
 
-                beatmapInfo.BeatmapSet.Files = new List<BeatmapSetFileInfo>
+                beatmapInfo.BeatmapSet.Files.Clear();
+                beatmapInfo.BeatmapSet.Files.Add(new BeatmapSetFileInfo
                 {
-                    new BeatmapSetFileInfo
-                    {
-                        Filename = beatmapFile,
-                        FileInfo = new IO.FileInfo { Hash = beatmapFile }
-                    }
-                };
+                    Filename = beatmapFile,
+                    FileInfo = new IO.FileInfo { Hash = beatmapFile }
+                });
 
                 // Need to refresh the cached skin source to refresh the skin resource store.
                 dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, this));

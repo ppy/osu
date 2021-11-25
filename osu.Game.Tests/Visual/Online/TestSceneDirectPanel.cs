@@ -10,8 +10,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
-using osu.Game.Users;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Online
                 Title = "undownloadable beatmap",
                 Artist = "test",
                 Source = "more tests",
-                Author = new User
+                Author = new APIUser
                 {
                     Username = "BanchoBot",
                     Id = 3,
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     new APIBeatmap
                     {
-                        RulesetID = Ruleset.Value.ID ?? 0,
+                        RulesetID = Ruleset.Value.OnlineID,
                         DifficultyName = "Test",
                         StarRating = 6.42,
                     }
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Online
                     Title = "undownloadable beatmap",
                     Artist = "test",
                     Source = "more tests",
-                    Author = new User
+                    Author = new APIUser
                     {
                         Username = "BanchoBot",
                         Id = 3,

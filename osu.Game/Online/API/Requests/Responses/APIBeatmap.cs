@@ -4,6 +4,7 @@
 using System;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 
 #nullable enable
@@ -19,7 +20,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineBeatmapSetID { get; set; }
 
         [JsonProperty(@"status")]
-        public BeatmapSetOnlineStatus Status { get; set; }
+        public BeatmapOnlineStatus Status { get; set; }
 
         [JsonProperty("checksum")]
         public string Checksum { get; set; } = string.Empty;
@@ -81,34 +82,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public double BPM { get; set; }
 
-        public virtual BeatmapInfo ToBeatmapInfo(RulesetStore rulesets)
-        {
-            var set = BeatmapSet?.ToBeatmapSet(rulesets);
-
-            return new BeatmapInfo
-            {
-                Metadata = set?.Metadata ?? new BeatmapMetadata(),
-                Ruleset = rulesets.GetRuleset(RulesetID),
-                StarDifficulty = StarRating,
-                OnlineBeatmapID = OnlineID,
-                Version = DifficultyName,
-                // this is actually an incorrect mapping (Length is calculated as drain length in lazer's import process, see BeatmapManager.calculateLength).
-                Length = Length,
-                Status = Status,
-                MD5Hash = Checksum,
-                BeatmapSet = set,
-                MaxCombo = MaxCombo,
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    DrainRate = DrainRate,
-                    CircleSize = CircleSize,
-                    ApproachRate = ApproachRate,
-                    OverallDifficulty = OverallDifficulty,
-                },
-                OnlineInfo = this,
-            };
-        }
-
         #region Implementation of IBeatmapInfo
 
         public IBeatmapMetadataInfo Metadata => (BeatmapSet as IBeatmapSetInfo)?.Metadata ?? new BeatmapMetadata();
@@ -125,11 +98,13 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public string MD5Hash => Checksum;
 
-        public IRulesetInfo Ruleset => new RulesetInfo { ID = RulesetID };
+        public IRulesetInfo Ruleset => new RulesetInfo { OnlineID = RulesetID };
 
         [JsonIgnore]
         public string Hash => throw new NotImplementedException();
 
         #endregion
+
+        public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && this.MatchesOnlineID(b);
     }
 }

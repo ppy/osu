@@ -11,7 +11,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
@@ -56,9 +58,6 @@ namespace osu.Game.Overlays.Settings.Sections
         [Resolved]
         private SkinManager skins { get; set; }
 
-        private IBindable<WeakReference<SkinInfo>> managerUpdated;
-        private IBindable<WeakReference<SkinInfo>> managerRemoved;
-
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
         {
@@ -76,11 +75,8 @@ namespace osu.Game.Overlays.Settings.Sections
                 new ExportSkinButton(),
             };
 
-            managerUpdated = skins.ItemUpdated.GetBoundCopy();
-            managerUpdated.BindValueChanged(itemUpdated);
-
-            managerRemoved = skins.ItemRemoved.GetBoundCopy();
-            managerRemoved.BindValueChanged(itemRemoved);
+            skins.ItemUpdated += itemUpdated;
+            skins.ItemRemoved += itemRemoved;
 
             config.BindWith(OsuSetting.Skin, configBindable);
 
@@ -129,11 +125,7 @@ namespace osu.Game.Overlays.Settings.Sections
             skinDropdown.Items = skinItems;
         }
 
-        private void itemUpdated(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
-        {
-            if (weakItem.NewValue.TryGetTarget(out var item))
-                Schedule(() => addItem(item));
-        }
+        private void itemUpdated(SkinInfo item) => Schedule(() => addItem(item));
 
         private void addItem(SkinInfo item)
         {
@@ -142,17 +134,24 @@ namespace osu.Game.Overlays.Settings.Sections
             skinDropdown.Items = newDropdownItems;
         }
 
-        private void itemRemoved(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
-        {
-            if (weakItem.NewValue.TryGetTarget(out var item))
-                Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != item.ID).ToArray());
-        }
+        private void itemRemoved(SkinInfo item) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => !i.Equals(item)).ToArray());
 
         private void sortUserSkins(List<SkinInfo> skinsList)
         {
             // Sort user skins separately from built-in skins
             skinsList.Sort(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex,
                 Comparer<SkinInfo>.Create((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skins != null)
+            {
+                skins.ItemUpdated -= itemUpdated;
+                skins.ItemRemoved -= itemRemoved;
+            }
         }
 
         private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
@@ -170,6 +169,9 @@ namespace osu.Game.Overlays.Settings.Sections
             [Resolved]
             private SkinManager skins { get; set; }
 
+            [Resolved]
+            private Storage storage { get; set; }
+
             private Bindable<Skin> currentSkin;
 
             [BackgroundDependencyLoader]
@@ -186,7 +188,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 try
                 {
-                    skins.Export(currentSkin.Value.SkinInfo);
+                    new LegacySkinExporter(storage).Export(currentSkin.Value.SkinInfo);
                 }
                 catch (Exception e)
                 {

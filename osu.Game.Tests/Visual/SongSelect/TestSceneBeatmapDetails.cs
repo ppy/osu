@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -32,159 +31,112 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestAllMetrics()
         {
-            AddStep("all metrics", () => details.BeatmapInfo = new BeatmapInfo
+            AddStep("all metrics", () => details.BeatmapInfo = new APIBeatmap
             {
-                BeatmapSet = new BeatmapSetInfo
-                {
-                    OnlineInfo = new APIBeatmapSet
-                    {
-                        Ratings = Enumerable.Range(0, 11).ToArray(),
-                    }
-                },
-                Version = "All Metrics",
-                Metadata = new BeatmapMetadata
+                BeatmapSet = new APIBeatmapSet
                 {
                     Source = "osu!",
                     Tags = "this beatmap has all the metrics",
+                    Ratings = Enumerable.Range(0, 11).ToArray(),
                 },
-                BaseDifficulty = new BeatmapDifficulty
+                DifficultyName = "All Metrics",
+                CircleSize = 7,
+                DrainRate = 1,
+                OverallDifficulty = 5.7f,
+                ApproachRate = 3.5f,
+                StarRating = 5.3f,
+                FailTimes = new APIFailTimes
                 {
-                    CircleSize = 7,
-                    DrainRate = 1,
-                    OverallDifficulty = 5.7f,
-                    ApproachRate = 3.5f,
+                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                 },
-                StarDifficulty = 5.3f,
-                Ruleset = new OsuRuleset().RulesetInfo,
-                OnlineInfo = new APIBeatmap
-                {
-                    FailTimes = new APIFailTimes
-                    {
-                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                    },
-                }
             });
         }
 
         [Test]
         public void TestAllMetricsExceptSource()
         {
-            AddStep("all except source", () => details.BeatmapInfo = new BeatmapInfo
+            AddStep("all except source", () => details.BeatmapInfo = new APIBeatmap
             {
-                BeatmapSet = new BeatmapSetInfo
-                {
-                    OnlineInfo = new APIBeatmapSet
-                    {
-                        Ratings = Enumerable.Range(0, 11).ToArray(),
-                    }
-                },
-                Version = "All Metrics",
-                Metadata = new BeatmapMetadata
+                BeatmapSet = new APIBeatmapSet
                 {
                     Tags = "this beatmap has all the metrics",
+                    Ratings = Enumerable.Range(0, 11).ToArray(),
                 },
-                BaseDifficulty = new BeatmapDifficulty
+                DifficultyName = "All Metrics",
+                CircleSize = 7,
+                DrainRate = 1,
+                OverallDifficulty = 5.7f,
+                ApproachRate = 3.5f,
+                StarRating = 5.3f,
+                FailTimes = new APIFailTimes
                 {
-                    CircleSize = 7,
-                    DrainRate = 1,
-                    OverallDifficulty = 5.7f,
-                    ApproachRate = 3.5f,
+                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                 },
-                StarDifficulty = 5.3f,
-                Ruleset = new OsuRuleset().RulesetInfo,
-                OnlineInfo = new APIBeatmap
-                {
-                    FailTimes = new APIFailTimes
-                    {
-                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                    },
-                }
             });
         }
 
         [Test]
         public void TestOnlyRatings()
         {
-            AddStep("ratings", () => details.BeatmapInfo = new BeatmapInfo
+            AddStep("ratings", () => details.BeatmapInfo = new APIBeatmap
             {
-                BeatmapSet = new BeatmapSetInfo
+                BeatmapSet = new APIBeatmapSet
                 {
-                    OnlineInfo = new APIBeatmapSet
-                    {
-                        Ratings = Enumerable.Range(0, 11).ToArray(),
-                    }
-                },
-                Version = "Only Ratings",
-                Metadata = new BeatmapMetadata
-                {
+                    Ratings = Enumerable.Range(0, 11).ToArray(),
                     Source = "osu!",
                     Tags = "this beatmap has ratings metrics but not retries or fails",
                 },
-                Ruleset = new OsuRuleset().RulesetInfo,
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    CircleSize = 6,
-                    DrainRate = 9,
-                    OverallDifficulty = 6,
-                    ApproachRate = 6,
-                },
-                StarDifficulty = 4.8f,
+                DifficultyName = "Only Ratings",
+                CircleSize = 6,
+                DrainRate = 9,
+                OverallDifficulty = 6,
+                ApproachRate = 6,
+                StarRating = 4.8f,
             });
         }
 
         [Test]
         public void TestOnlyFailsAndRetries()
         {
-            AddStep("fails retries", () => details.BeatmapInfo = new BeatmapInfo
+            AddStep("fails retries", () => details.BeatmapInfo = new APIBeatmap
             {
-                Version = "Only Retries and Fails",
-                Metadata = new BeatmapMetadata
+                DifficultyName = "Only Retries and Fails",
+                BeatmapSet = new APIBeatmapSet
                 {
                     Source = "osu!",
                     Tags = "this beatmap has retries and fails but no ratings",
                 },
-                BaseDifficulty = new BeatmapDifficulty
+                CircleSize = 3.7f,
+                DrainRate = 6,
+                OverallDifficulty = 6,
+                ApproachRate = 7,
+                StarRating = 2.91f,
+                FailTimes = new APIFailTimes
                 {
-                    CircleSize = 3.7f,
-                    DrainRate = 6,
-                    OverallDifficulty = 6,
-                    ApproachRate = 7,
+                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                 },
-                Ruleset = new OsuRuleset().RulesetInfo,
-                StarDifficulty = 2.91f,
-                OnlineInfo = new APIBeatmap
-                {
-                    FailTimes = new APIFailTimes
-                    {
-                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                    },
-                }
             });
         }
 
         [Test]
         public void TestNoMetrics()
         {
-            AddStep("no metrics", () => details.BeatmapInfo = new BeatmapInfo
+            AddStep("no metrics", () => details.BeatmapInfo = new APIBeatmap
             {
-                Version = "No Metrics",
-                Metadata = new BeatmapMetadata
+                DifficultyName = "No Metrics",
+                BeatmapSet = new APIBeatmapSet
                 {
                     Source = "osu!",
                     Tags = "this beatmap has no metrics",
                 },
-                Ruleset = new OsuRuleset().RulesetInfo,
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    CircleSize = 5,
-                    DrainRate = 5,
-                    OverallDifficulty = 5.5f,
-                    ApproachRate = 6.5f,
-                },
-                StarDifficulty = 1.97f,
+                CircleSize = 5,
+                DrainRate = 5,
+                OverallDifficulty = 5.5f,
+                ApproachRate = 6.5f,
+                StarRating = 1.97f,
             });
         }
 
@@ -197,10 +149,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestOnlineMetrics()
         {
-            AddStep("online ratings/retries/fails", () => details.BeatmapInfo = new BeatmapInfo
+            AddStep("online ratings/retries/fails", () => details.BeatmapInfo = new APIBeatmap
             {
-                OnlineBeatmapID = 162,
-                Ruleset = new OsuRuleset().RulesetInfo
+                OnlineID = 162,
             });
             AddStep("set online", () => api.SetState(APIState.Online));
             AddStep("set offline", () => api.SetState(APIState.Offline));

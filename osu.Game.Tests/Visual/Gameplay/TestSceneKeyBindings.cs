@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) =>
                 throw new System.NotImplementedException();
 
-            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) =>
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) =>
                 throw new System.NotImplementedException();
 
             public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
@@ -83,6 +83,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool OnPressed(KeyBindingPressEvent<TestAction> e)
             {
+                if (e.Repeat)
+                    return false;
+
                 ReceivedAction = e.Action == TestAction.Down;
                 return true;
             }

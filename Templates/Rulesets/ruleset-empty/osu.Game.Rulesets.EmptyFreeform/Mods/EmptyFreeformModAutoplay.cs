@@ -3,10 +3,10 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.EmptyFreeform.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.EmptyFreeform.Mods
 {
@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.EmptyFreeform.Mods
         {
             ScoreInfo = new ScoreInfo
             {
-                User = new User { Username = "sample" },
+                User = new APIUser { Username = "sample" },
             },
             Replay = new EmptyFreeformAutoGenerator(beatmap).Generate(),
         };
