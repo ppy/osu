@@ -4,17 +4,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -26,6 +30,7 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
@@ -34,6 +39,7 @@ namespace osu.Game.Screens.OnlinePlay
     public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>
     {
         public const float HEIGHT = 50;
+        public const float ICON_HEIGHT = 34;
 
         public Action<PlaylistItem> RequestDeletion;
 
@@ -45,6 +51,7 @@ namespace osu.Game.Screens.OnlinePlay
         private LinkFlowContainer authorText;
         private ExplicitContentBeatmapPill explicitContentPill;
         private ModDisplay modDisplay;
+        private UpdateableAvatar ownerAvatar;
 
         private readonly IBindable<bool> valid = new Bindable<bool>();
 
@@ -53,6 +60,12 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
 
         public readonly PlaylistItem Item;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved]
+        private UserLookupCache userLookupCache { get; set; }
 
         private readonly bool allowEdit;
         private readonly bool allowSelection;
@@ -78,9 +91,6 @@ namespace osu.Game.Screens.OnlinePlay
             if (item.Expired)
                 Colour = OsuColour.Gray(0.5f);
         }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -132,7 +142,8 @@ namespace osu.Game.Screens.OnlinePlay
                 maskingContainer.BorderColour = colours.Red;
             }
 
-            difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(32) };
+            userLookupCache.GetUserAsync(Item.OwnerID).ContinueWith(u => Schedule(() => ownerAvatar.User = u.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+            difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(ICON_HEIGHT) };
 
             panelBackground.Beatmap.Value = Item.Beatmap.Value;
 
@@ -184,6 +195,7 @@ namespace osu.Game.Screens.OnlinePlay
                         ColumnDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.AutoSize),
                             new Dimension(),
                             new Dimension(GridSizeMode.AutoSize),
                         },
@@ -191,12 +203,21 @@ namespace osu.Game.Screens.OnlinePlay
                         {
                             new Drawable[]
                             {
+                                ownerAvatar = new OwnerAvatar
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(ICON_HEIGHT),
+                                    Margin = new MarginPadding { Left = 8, Right = 8, },
+                                    Masking = true,
+                                    CornerRadius = 4,
+                                },
                                 difficultyIconContainer = new Container
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     AutoSizeAxes = Axes.Both,
-                                    Margin = new MarginPadding { Left = 8, Right = 8, },
+                                    Margin = new MarginPadding { Right = 8 },
                                 },
                                 new FillFlowContainer
                                 {
@@ -415,6 +436,32 @@ namespace osu.Game.Screens.OnlinePlay
                 // manual binding required as playlists don't expose IBeatmapInfo currently.
                 // may be removed in the future if this changes.
                 Beatmap.BindValueChanged(beatmap => backgroundSprite.Beatmap.Value = beatmap.NewValue);
+            }
+        }
+
+        private class OwnerAvatar : UpdateableAvatar, IHasTooltip
+        {
+            public OwnerAvatar()
+            {
+                AddInternal(new TooltipArea(this)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = -1
+                });
+            }
+
+            public LocalisableString TooltipText => User == null ? "loading user..." : $"queued by {User.Username}";
+
+            private class TooltipArea : Component, IHasTooltip
+            {
+                private readonly OwnerAvatar avatar;
+
+                public TooltipArea(OwnerAvatar avatar)
+                {
+                    this.avatar = avatar;
+                }
+
+                public LocalisableString TooltipText => avatar.TooltipText;
             }
         }
     }
