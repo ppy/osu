@@ -14,6 +14,7 @@ using osu.Framework.Statistics;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Stores;
 using Realms;
 
 #nullable enable
@@ -121,6 +122,10 @@ namespace osu.Game.Database
 
                 transaction.Commit();
             }
+
+            // clean up files after dropping any pending deletions.
+            // in the future we may want to only do this when the game is idle, rather than on every startup.
+            new RealmFileStore(this, storage).Cleanup();
         }
 
         /// <summary>

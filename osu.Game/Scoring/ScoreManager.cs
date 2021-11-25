@@ -24,7 +24,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : IModelManager<ScoreInfo>, IModelImporter<ScoreInfo>, IModelFileManager<ScoreInfo, ScoreFileInfo>, IModelDownloader<IScoreInfo>
+    public class ScoreManager : IModelManager<ScoreInfo>, IModelImporter<ScoreInfo>, IModelDownloader<IScoreInfo>
     {
         private readonly Scheduler scheduler;
         private readonly Func<BeatmapDifficultyCache> difficulties;
@@ -332,25 +332,6 @@ namespace osu.Game.Scoring
         public bool IsAvailableLocally(ScoreInfo model)
         {
             return scoreModelManager.IsAvailableLocally(model);
-        }
-
-        #endregion
-
-        #region Implementation of IModelFileManager<in ScoreInfo,in ScoreFileInfo>
-
-        public void ReplaceFile(ScoreInfo model, ScoreFileInfo file, Stream contents, string filename = null)
-        {
-            scoreModelManager.ReplaceFile(model, file, contents, filename);
-        }
-
-        public void DeleteFile(ScoreInfo model, ScoreFileInfo file)
-        {
-            scoreModelManager.DeleteFile(model, file);
-        }
-
-        public void AddFile(ScoreInfo model, Stream contents, string filename)
-        {
-            scoreModelManager.AddFile(model, contents, filename);
         }
 
         #endregion
