@@ -70,6 +70,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
             AddWaitStep("wait some", 3);
             AddAssert("button still visible", () => playButton.IsPresent);
 
+            // The track plays in real-time, so we need to check for progress in increments to avoid timeout.
+            AddUntilStep("progress > 0.25", () => thumbnail.ChildrenOfType<PlayButton>().Single().Progress.Value > 0.25);
+            AddUntilStep("progress > 0.5", () => thumbnail.ChildrenOfType<PlayButton>().Single().Progress.Value > 0.5);
+            AddUntilStep("progress > 0.75", () => thumbnail.ChildrenOfType<PlayButton>().Single().Progress.Value > 0.75);
+
             AddUntilStep("wait for track to end", () => !playButton.Playing.Value);
             AddUntilStep("button hidden", () => !playButton.IsPresent);
         }
