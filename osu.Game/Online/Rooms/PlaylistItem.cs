@@ -18,6 +18,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("id")]
         public long ID { get; set; }
 
+        [JsonProperty("owner_id")]
+        public int OwnerID { get; set; }
+
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
 
