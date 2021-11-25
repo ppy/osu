@@ -14,6 +14,8 @@ jobs:
       #无法将框架克隆到/home/runner/work/osu以外，用此办法暂时规避
       - name: 移动项目
         run: |
+          ls
+          echo "$pwd"
           mkdir mfosu
           mv ./* mfosu || true
           mv ./.* mfosu
