@@ -10,8 +10,8 @@ namespace osu.Game.Database
     {
         protected override string FileExtension => ".osk";
 
-        public LegacySkinExporter(Storage storage, IModelManager<SkinInfo> manager)
-            : base(storage, manager)
+        public LegacySkinExporter(Storage storage)
+            : base(storage)
         {
         }
     }

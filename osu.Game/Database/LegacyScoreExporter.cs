@@ -13,8 +13,8 @@ namespace osu.Game.Database
     {
         protected override string FileExtension => ".osr";
 
-        public LegacyScoreExporter(Storage storage, IModelManager<ScoreInfo> manager)
-            : base(storage, manager)
+        public LegacyScoreExporter(Storage storage)
+            : base(storage)
         {
         }
 

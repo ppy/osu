@@ -19,16 +19,12 @@ namespace osu.Game.Database
         /// </summary>
         protected abstract string FileExtension { get; }
 
-        protected readonly IModelManager<TModel> Manager;
-
         protected readonly Storage UserFileStorage;
 
         private readonly Storage exportStorage;
 
-        protected LegacyExporter(Storage storage, IModelManager<TModel> manager)
+        protected LegacyExporter(Storage storage)
         {
-            Manager = manager;
-
             exportStorage = storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
