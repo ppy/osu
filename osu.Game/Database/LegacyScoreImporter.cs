@@ -7,7 +7,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Database
 {
-    public class StableScoreImporter : StableImporter<ScoreInfo>
+    public class LegacyScoreImporter : LegacyImporter<ScoreInfo>
     {
         protected override string ImportFromStablePath => Path.Combine("Data", "r");
 
@@ -15,7 +15,7 @@ namespace osu.Game.Database
             => storage.GetFiles(ImportFromStablePath).Where(p => Importer.HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false))
                       .Select(path => storage.GetFullPath(path));
 
-        public StableScoreImporter(IModelImporter<ScoreInfo> importer)
+        public LegacyScoreImporter(IModelImporter<ScoreInfo> importer)
             : base(importer)
         {
         }

@@ -19,7 +19,10 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
-    public class StableImportManager : Component
+    /// <summary>
+    /// Handles migration of legacy user data from osu-stable.
+    /// </summary>
+    public class LeagcyImportManager : Component
     {
         [Resolved]
         private SkinManager skins { get; set; }
@@ -51,9 +54,9 @@ namespace osu.Game.Database
             var stableStorage = await getStableStorage().ConfigureAwait(false);
             var importTasks = new List<Task>();
 
-            var beatmapImporter = new StableBeatmapImporter(beatmaps);
-            var skinImporter = new StableSkinImporter(skins);
-            var scoreImporter = new StableScoreImporter(scores);
+            var beatmapImporter = new LegacyBeatmapImporter(beatmaps);
+            var skinImporter = new LegacySkinImporter(skins);
+            var scoreImporter = new LegacyScoreImporter(scores);
 
             Task beatmapImportTask = Task.CompletedTask;
             if (content.HasFlagFast(StableContent.Beatmaps))

@@ -4,13 +4,13 @@ using osu.Game.IO;
 
 namespace osu.Game.Database
 {
-    public class StableBeatmapImporter : StableImporter<BeatmapSetInfo>
+    public class LegacyBeatmapImporter : LegacyImporter<BeatmapSetInfo>
     {
         protected override string ImportFromStablePath => ".";
 
         protected override Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage.GetSongStorage();
 
-        public StableBeatmapImporter(IModelImporter<BeatmapSetInfo> importer)
+        public LegacyBeatmapImporter(IModelImporter<BeatmapSetInfo> importer)
             : base(importer)
         {
         }
