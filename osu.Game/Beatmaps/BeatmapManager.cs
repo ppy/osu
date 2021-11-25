@@ -225,11 +225,6 @@ namespace osu.Game.Beatmaps
             remove => beatmapModelManager.ItemRemoved -= value;
         }
 
-        public Task ImportFromStableAsync(StableStorage stableStorage)
-        {
-            return beatmapModelManager.ImportFromStableAsync(stableStorage);
-        }
-
         public void Export(BeatmapSetInfo item)
         {
             beatmapModelManager.Export(item);

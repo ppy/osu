@@ -26,8 +26,6 @@ namespace osu.Game.Scoring
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
 
-        protected override string ImportFromStablePath => Path.Combine("Data", "r");
-
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
@@ -81,9 +79,5 @@ namespace osu.Game.Scoring
             using (var inputStream = Files.Storage.GetStream(file.FileInfo.GetStoragePath()))
                 inputStream.CopyTo(outputStream);
         }
-
-        protected override IEnumerable<string> GetStableImportPaths(Storage storage)
-            => storage.GetFiles(ImportFromStablePath).Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false))
-                      .Select(path => storage.GetFullPath(path));
     }
 }

@@ -729,45 +729,11 @@ namespace osu.Game.Database
         #region osu-stable import
 
         /// <summary>
-        /// The relative path from osu-stable's data directory to import items from.
-        /// </summary>
-        protected virtual string ImportFromStablePath => null;
-
-        /// <summary>
-        /// Select paths to import from stable where all paths should be absolute. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
-        /// </summary>
-        protected virtual IEnumerable<string> GetStableImportPaths(Storage storage) => storage.GetDirectories(ImportFromStablePath)
-                                                                                              .Select(path => storage.GetFullPath(path));
-
-        /// <summary>
         /// Whether this specified path should be removed after successful import.
         /// </summary>
         /// <param name="path">The path for consideration. May be a file or a directory.</param>
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
-
-        public Task ImportFromStableAsync(StableStorage stableStorage)
-        {
-            var storage = PrepareStableStorage(stableStorage);
-
-            // Handle situations like when the user does not have a Skins folder.
-            if (!storage.ExistsDirectory(ImportFromStablePath))
-            {
-                string fullPath = storage.GetFullPath(ImportFromStablePath);
-
-                Logger.Log(@$"Folder ""{fullPath}"" not available in the target osu!stable installation to import {HumanisedModelName}s.", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
-            return Task.Run(async () => await Import(GetStableImportPaths(storage).ToArray()).ConfigureAwait(false));
-        }
-
-        /// <summary>
-        /// Run any required traversal operations on the stable storage location before performing operations.
-        /// </summary>
-        /// <param name="stableStorage">The stable storage.</param>
-        /// <returns>The usable storage. Return the unchanged <paramref name="stableStorage"/> if no traversal is required.</returns>
-        protected virtual Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage;
 
         #endregion
 

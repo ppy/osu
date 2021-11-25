@@ -15,7 +15,6 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
@@ -261,11 +260,6 @@ namespace osu.Game.Scoring
         {
             add => scoreModelManager.ItemRemoved += value;
             remove => scoreModelManager.ItemRemoved -= value;
-        }
-
-        public Task ImportFromStableAsync(StableStorage stableStorage)
-        {
-            return scoreModelManager.ImportFromStableAsync(stableStorage);
         }
 
         public void Export(ScoreInfo item)
