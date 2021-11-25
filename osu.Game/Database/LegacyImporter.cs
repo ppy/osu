@@ -11,9 +11,9 @@ using osu.Game.IO;
 namespace osu.Game.Database
 {
     /// <summary>
-    /// A class which handled importing various user data from osu-stable.
+    /// A class which handles importing legacy user data of a single type from osu-stable.
     /// </summary>
-    public class StableImporter<TModel>
+    public abstract class LegacyImporter<TModel>
         where TModel : class
     {
         /// <summary>
@@ -29,7 +29,7 @@ namespace osu.Game.Database
 
         protected readonly IModelImporter<TModel> Importer;
 
-        public StableImporter(IModelImporter<TModel> importer)
+        protected LegacyImporter(IModelImporter<TModel> importer)
         {
             Importer = importer;
         }

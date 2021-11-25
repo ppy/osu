@@ -116,7 +116,7 @@ namespace osu.Game
         private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
 
         [Cached]
-        private readonly StableImportManager stableImportManager = new StableImportManager();
+        private readonly LeagcyImportManager leagcyImportManager = new LeagcyImportManager();
 
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
@@ -782,7 +782,7 @@ namespace osu.Game
                 PostNotification = n => Notifications.Post(n),
             }, Add, true);
 
-            loadComponentSingleFile(stableImportManager, Add);
+            loadComponentSingleFile(leagcyImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
