@@ -656,6 +656,7 @@ namespace osu.Game
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PostImport = items => PresentBeatmap(items.First().Value);
 
+            BeatmapDownloader.PostNotification = n => Notifications.Post(n);
             ScoreManager.PostNotification = n => Notifications.Post(n);
             ScoreManager.PostImport = items => PresentScore(items.First().Value);
 

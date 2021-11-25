@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         private Bindable<bool> preferNoVideo = null!;
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; } = null!;
+        private BeatmapModelDownloader beatmaps { get; set; } = null!;
 
         public DownloadButton(APIBeatmapSet beatmapSet)
         {
