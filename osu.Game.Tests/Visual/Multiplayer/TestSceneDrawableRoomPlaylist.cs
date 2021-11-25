@@ -13,6 +13,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
@@ -33,6 +34,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private BeatmapManager manager;
         private RulesetStore rulesets;
+
+        [Cached(typeof(UserLookupCache))]
+        private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -343,6 +347,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     playlist.Items.Add(new PlaylistItem
                     {
                         ID = i,
+                        OwnerID = 2,
                         Beatmap =
                         {
                             Value = i % 2 == 1
@@ -390,6 +395,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     playlist.Items.Add(new PlaylistItem
                     {
                         ID = index++,
+                        OwnerID = 2,
                         Beatmap = { Value = b },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         RequiredMods =
