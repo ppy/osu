@@ -45,8 +45,9 @@ jobs:
           ls
           echo "pwd: $PWD"
 
-      #- name: 构建
-      #  run: dotnet build osu.Desktop -c Release
+      - name: 构建
+        working-directory: ./mfosu
+        run: dotnet build osu.Desktop -c Release
 
   #From .github/workflows_/ci.yml
   build-android:
