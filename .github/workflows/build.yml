@@ -61,8 +61,9 @@ jobs:
       - name: 移动项目
         run: |
           mkdir mfosu
-          mv ./* mfosu || true
-          mv ./.* mfosu
+          mv ./* mfosu || true #忽略错误，通配符会匹配mfosu
+          mv ./.* mfosu || true #忽略错误，bash会把"."" 和 ".."也归进mv目标里
+          if [ ! "$(ls)" == "mfosu" ]; then false; fi #检查当前目录，应当只有mfosu
 
       - name: 下载框架
         uses: actions/checkout@v2
