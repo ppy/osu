@@ -95,7 +95,7 @@ namespace osu.Game.Beatmaps
 
         IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata ?? Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
-        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #endregion
     }

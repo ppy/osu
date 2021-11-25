@@ -257,5 +257,7 @@ namespace osu.Game.Scoring
         bool IScoreInfo.HasReplay => Files.Any();
 
         #endregion
+
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
     }
 }
