@@ -49,8 +49,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliders)
             {
-                double movementVelocity = osuCurrObj.MovementDistance / osuCurrObj.MovementTime; // calculate the movement velocity from slider end to current object
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
+                double movementVelocity = osuCurrObj.MovementDistance / osuCurrObj.MovementTime; // calculate the movement velocity from slider end to current object
 
                 currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }
@@ -60,8 +60,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (osuLastLastObj.BaseObject is Slider && withSliders)
             {
-                double movementVelocity = osuLastObj.MovementDistance / osuLastObj.MovementTime;
                 double travelVelocity = osuLastLastObj.TravelDistance / osuLastLastObj.TravelTime;
+                double movementVelocity = osuLastObj.MovementDistance / osuLastObj.MovementTime;
 
                 prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
             }
