@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -13,7 +12,6 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
@@ -69,15 +67,5 @@ namespace osu.Game.Scoring
         protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
             => base.CheckLocalAvailability(model, items)
                || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
-
-        public override void ExportModelTo(ScoreInfo model, Stream outputStream)
-        {
-            var file = model.Files.SingleOrDefault();
-            if (file == null)
-                return;
-
-            using (var inputStream = Files.Storage.GetStream(file.FileInfo.GetStoragePath()))
-                inputStream.CopyTo(outputStream);
-        }
     }
 }
