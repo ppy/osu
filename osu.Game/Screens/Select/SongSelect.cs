@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select
 
         protected virtual bool ShowFooter => true;
 
-        protected virtual bool DisplayStableImportPrompt => leagcyImportManager?.SupportsImportFromStable == true;
+        protected virtual bool DisplayStableImportPrompt => legacyImportManager?.SupportsImportFromStable == true;
 
         public override bool? AllowTrackAdjustments => true;
 
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Select
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private LeagcyImportManager leagcyImportManager { get; set; }
+        private LegacyImportManager legacyImportManager { get; set; }
 
         protected ModSelectOverlay ModSelect { get; private set; }
 
@@ -297,7 +297,7 @@ namespace osu.Game.Screens.Select
                     {
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
-                            Task.Run(() => leagcyImportManager.ImportFromStableAsync(StableContent.All));
+                            Task.Run(() => legacyImportManager.ImportFromStableAsync(StableContent.All));
                         }));
                     }
                 });
