@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -260,16 +259,6 @@ namespace osu.Game.Scoring
         {
             add => scoreModelManager.ItemRemoved += value;
             remove => scoreModelManager.ItemRemoved -= value;
-        }
-
-        public void Export(ScoreInfo item)
-        {
-            scoreModelManager.Export(item);
-        }
-
-        public void ExportModelTo(ScoreInfo model, Stream outputStream)
-        {
-            scoreModelManager.ExportModelTo(model, outputStream);
         }
 
         public void Update(ScoreInfo item)

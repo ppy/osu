@@ -11,7 +11,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
@@ -167,6 +169,9 @@ namespace osu.Game.Overlays.Settings.Sections
             [Resolved]
             private SkinManager skins { get; set; }
 
+            [Resolved]
+            private Storage storage { get; set; }
+
             private Bindable<Skin> currentSkin;
 
             [BackgroundDependencyLoader]
@@ -183,7 +188,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 try
                 {
-                    skins.Export(currentSkin.Value.SkinInfo);
+                    new LegacySkinExporter(storage).Export(currentSkin.Value.SkinInfo);
                 }
                 catch (Exception e)
                 {
