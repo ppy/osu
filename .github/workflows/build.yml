@@ -1,5 +1,4 @@
 name: dotnet
-
 on: [push, pull_request]
 
 jobs:
@@ -20,7 +19,7 @@ jobs:
           path: 'osu-framework'
 
       - name: 检查目录结构
-      - run: |
+        run: |
           ls
           echo "pwd: $PWD"
 
@@ -33,7 +32,7 @@ jobs:
         run: dotnet restore
 
       - name: 再次检查目录结构
-      - run: |
+        run: |
           ls
           echo "pwd: $PWD"
 
