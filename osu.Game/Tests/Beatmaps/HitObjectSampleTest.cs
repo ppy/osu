@@ -15,7 +15,6 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Ranking;
@@ -39,10 +38,7 @@ namespace osu.Game.Tests.Beatmaps
         private readonly BeatmapInfo beatmapInfo = new BeatmapInfo
         {
             BeatmapSet = new BeatmapSetInfo(),
-            Metadata = new BeatmapMetadata
-            {
-                Author = APIUser.SYSTEM_USER
-            }
+            Metadata = new BeatmapMetadata(),
         };
 
         private readonly TestResourceStore userSkinResourceStore = new TestResourceStore();

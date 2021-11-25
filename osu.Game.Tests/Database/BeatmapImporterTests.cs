@@ -75,6 +75,24 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestAccessFileAfterImport()
+        {
+            RunTestWithRealmAsync(async (realmFactory, storage) =>
+            {
+                using var importer = new BeatmapImporter(realmFactory, storage);
+                using var store = new RealmRulesetStore(realmFactory, storage);
+
+                var imported = await LoadOszIntoStore(importer, realmFactory.Context);
+
+                var beatmap = imported.Beatmaps.First();
+                var file = beatmap.File;
+
+                Assert.NotNull(file);
+                Assert.AreEqual(beatmap.Hash, file!.File.Hash);
+            });
+        }
+
+        [Test]
         public void TestImportThenDelete()
         {
             RunTestWithRealmAsync(async (realmFactory, storage) =>
@@ -532,7 +550,7 @@ namespace osu.Game.Tests.Database
                         new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata)
                         {
                             OnlineID = 2,
-                            Status = BeatmapSetOnlineStatus.Loved,
+                            Status = BeatmapOnlineStatus.Loved,
                         }
                     }
                 };

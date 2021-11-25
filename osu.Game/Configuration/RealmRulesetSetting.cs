@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using osu.Game.Database;
 using Realms;
 
 #nullable enable
@@ -10,13 +8,10 @@ using Realms;
 namespace osu.Game.Configuration
 {
     [MapTo(@"RulesetSetting")]
-    public class RealmRulesetSetting : RealmObject, IHasGuidPrimaryKey
+    public class RealmRulesetSetting : RealmObject
     {
-        [PrimaryKey]
-        public Guid ID { get; set; } = Guid.NewGuid();
-
         [Indexed]
-        public int RulesetID { get; set; }
+        public string RulesetName { get; set; } = string.Empty;
 
         [Indexed]
         public int Variant { get; set; }
