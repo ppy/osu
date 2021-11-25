@@ -1050,7 +1050,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private static void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
         {
-            Assert.AreEqual(expected, osu.Dependencies.Get<FileStore>().QueryFiles(f => f.ReferenceCount == 1).Count());
+            Assert.AreEqual(expected, osu.Dependencies.Get<DatabaseContextFactory>().Get().FileInfo.Count(f => f.ReferenceCount == 1));
         }
 
         private static void ensureLoaded(OsuGameBase osu, int timeout = 60000)
