@@ -4,7 +4,7 @@ using osu.Game.IO;
 
 namespace osu.Game.Database
 {
-    public class LegacyBeatmapImporter : LegacyImporter<BeatmapSetInfo>
+    public class LegacyBeatmapImporter : LegacyModelImporter<BeatmapSetInfo>
     {
         protected override string ImportFromStablePath => ".";
 

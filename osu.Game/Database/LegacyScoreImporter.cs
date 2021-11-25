@@ -7,7 +7,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Database
 {
-    public class LegacyScoreImporter : LegacyImporter<ScoreInfo>
+    public class LegacyScoreImporter : LegacyModelImporter<ScoreInfo>
     {
         protected override string ImportFromStablePath => Path.Combine("Data", "r");
 

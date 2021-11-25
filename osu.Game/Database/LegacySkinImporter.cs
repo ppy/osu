@@ -2,7 +2,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
-    public class LegacySkinImporter : LegacyImporter<SkinInfo>
+    public class LegacySkinImporter : LegacyModelImporter<SkinInfo>
     {
         protected override string ImportFromStablePath => "Skins";
 
