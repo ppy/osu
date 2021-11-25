@@ -34,8 +34,6 @@ namespace osu.Game.Skinning
 
         protected override string[] HashableFileTypes => new[] { ".ini", ".json" };
 
-        protected override string ImportFromStablePath => "Skins";
-
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == @".osk";
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name ?? @"No name" };
