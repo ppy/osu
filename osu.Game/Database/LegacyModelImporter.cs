@@ -13,7 +13,7 @@ namespace osu.Game.Database
     /// <summary>
     /// A class which handles importing legacy user data of a single type from osu-stable.
     /// </summary>
-    public abstract class LegacyImporter<TModel>
+    public abstract class LegacyModelImporter<TModel>
         where TModel : class
     {
         /// <summary>
@@ -29,7 +29,7 @@ namespace osu.Game.Database
 
         protected readonly IModelImporter<TModel> Importer;
 
-        protected LegacyImporter(IModelImporter<TModel> importer)
+        protected LegacyModelImporter(IModelImporter<TModel> importer)
         {
             Importer = importer;
         }
