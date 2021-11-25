@@ -14,6 +14,7 @@ using osu.Framework.Statistics;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Stores;
 using Realms;
 
 #nullable enable
@@ -106,6 +107,8 @@ namespace osu.Game.Database
 
         private void cleanupPendingDeletions()
         {
+            new RealmFileStore(this, storage).Cleanup();
+
             using (var realm = CreateContext())
             using (var transaction = realm.BeginWrite())
             {
