@@ -18,15 +18,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Skinning
 {
@@ -38,7 +37,7 @@ namespace osu.Game.Skinning
     /// For gameplay components, see <see cref="RulesetSkinProvidingContainer"/> which adds extra legacy and toggle logic that may affect the lookup process.
     /// </remarks>
     [ExcludeFromDynamicCompile]
-    public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource, IStorageResourceProvider
+    public class SkinManager : ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>, IModelManager<SkinInfo>
     {
         private readonly AudioManager audio;
 
@@ -49,11 +48,11 @@ namespace osu.Game.Skinning
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
 
-        public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
+        private readonly SkinModelManager skinModelManager;
 
-        protected override string[] HashableFileTypes => new[] { ".ini", ".json" };
+        private readonly SkinStore skinStore;
 
-        protected override string ImportFromStablePath => "Skins";
+        private readonly IResourceStore<byte[]> userFiles;
 
         /// <summary>
         /// The default skin.
@@ -66,11 +65,15 @@ namespace osu.Game.Skinning
         public Skin DefaultLegacySkin { get; }
 
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, GameHost host, IResourceStore<byte[]> resources, AudioManager audio)
-            : base(storage, contextFactory, new SkinStore(contextFactory, storage), host)
         {
             this.audio = audio;
             this.host = host;
             this.resources = resources;
+
+            skinStore = new SkinStore(contextFactory, storage);
+            userFiles = new FileStore(contextFactory, storage).Store;
+
+            skinModelManager = new SkinModelManager(storage, contextFactory, skinStore, host, this);
 
             DefaultLegacySkin = new DefaultLegacySkin(this);
             DefaultSkin = new DefaultSkin(this);
@@ -85,30 +88,7 @@ namespace osu.Game.Skinning
 
                 SourceChanged?.Invoke();
             };
-
-            // can be removed 20220420.
-            populateMissingHashes();
         }
-
-        private void populateMissingHashes()
-        {
-            var skinsWithoutHashes = ModelStore.ConsumableItems.Where(i => i.Hash == null).ToArray();
-
-            foreach (SkinInfo skin in skinsWithoutHashes)
-            {
-                try
-                {
-                    Update(skin);
-                }
-                catch (Exception e)
-                {
-                    Delete(skin);
-                    Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
-                }
-            }
-        }
-
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == @".osk";
 
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.
@@ -129,15 +109,15 @@ namespace osu.Game.Skinning
         public List<SkinInfo> GetAllUserSkins(bool includeFiles = false)
         {
             if (includeFiles)
-                return ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+                return skinStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
 
-            return ModelStore.Items.Where(s => !s.DeletePending).ToList();
+            return skinStore.Items.Where(s => !s.DeletePending).ToList();
         }
 
         public void SelectRandomSkin()
         {
             // choose from only user skins, removing the current selection to ensure a new one is chosen.
-            var randomChoices = ModelStore.Items.Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+            var randomChoices = skinStore.Items.Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
 
             if (randomChoices.Length == 0)
             {
@@ -146,137 +126,7 @@ namespace osu.Game.Skinning
             }
 
             var chosen = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
-            CurrentSkinInfo.Value = ModelStore.ConsumableItems.Single(i => i.ID == chosen.ID);
-        }
-
-        protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name ?? @"No name" };
-
-        private const string unknown_creator_string = @"Unknown";
-
-        protected override bool HasCustomHashFunction => true;
-
-        protected override string ComputeHash(SkinInfo item)
-        {
-            var instance = GetSkin(item);
-
-            // This function can be run on fresh import or save. The logic here ensures a skin.ini file is in a good state for both operations.
-
-            // `Skin` will parse the skin.ini and populate `Skin.Configuration` during construction above.
-            string skinIniSourcedName = instance.Configuration.SkinInfo.Name;
-            string skinIniSourcedCreator = instance.Configuration.SkinInfo.Creator;
-            string archiveName = item.Name.Replace(@".osk", string.Empty, StringComparison.OrdinalIgnoreCase);
-
-            bool isImport = item.ID == 0;
-
-            if (isImport)
-            {
-                item.Name = !string.IsNullOrEmpty(skinIniSourcedName) ? skinIniSourcedName : archiveName;
-                item.Creator = !string.IsNullOrEmpty(skinIniSourcedCreator) ? skinIniSourcedCreator : unknown_creator_string;
-
-                // For imports, we want to use the archive or folder name as part of the metadata, in addition to any existing skin.ini metadata.
-                // In an ideal world, skin.ini would be the only source of metadata, but a lot of skin creators and users don't update it when making modifications.
-                // In both of these cases, the expectation from the user is that the filename or folder name is displayed somewhere to identify the skin.
-                if (archiveName != item.Name)
-                    item.Name = @$"{item.Name} [{archiveName}]";
-            }
-
-            // By this point, the metadata in SkinInfo will be correct.
-            // Regardless of whether this is an import or not, let's write the skin.ini if non-existing or non-matching.
-            // This is (weirdly) done inside ComputeHash to avoid adding a new method to handle this case. After switching to realm it can be moved into another place.
-            if (skinIniSourcedName != item.Name)
-                updateSkinIniMetadata(item);
-
-            return base.ComputeHash(item);
-        }
-
-        private void updateSkinIniMetadata(SkinInfo item)
-        {
-            string nameLine = @$"Name: {item.Name}";
-            string authorLine = @$"Author: {item.Creator}";
-
-            string[] newLines =
-            {
-                @"// The following content was automatically added by osu! during import, based on filename / folder metadata.",
-                @"[General]",
-                nameLine,
-                authorLine,
-            };
-
-            var existingFile = item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase));
-
-            if (existingFile == null)
-            {
-                // In the case a skin doesn't have a skin.ini yet, let's create one.
-                writeNewSkinIni();
-                return;
-            }
-
-            using (Stream stream = new MemoryStream())
-            {
-                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                {
-                    using (var existingStream = Files.Storage.GetStream(existingFile.FileInfo.GetStoragePath()))
-                    using (var sr = new StreamReader(existingStream))
-                    {
-                        string line;
-                        while ((line = sr.ReadLine()) != null)
-                            sw.WriteLine(line);
-                    }
-
-                    sw.WriteLine();
-
-                    foreach (string line in newLines)
-                        sw.WriteLine(line);
-                }
-
-                ReplaceFile(item, existingFile, stream);
-
-                // can be removed 20220502.
-                if (!ensureIniWasUpdated(item))
-                {
-                    Logger.Log($"Skin {item}'s skin.ini had issues and has been removed. Please report this and provide the problematic skin.", LoggingTarget.Database, LogLevel.Important);
-
-                    DeleteFile(item, item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase)));
-                    writeNewSkinIni();
-                }
-            }
-
-            void writeNewSkinIni()
-            {
-                using (Stream stream = new MemoryStream())
-                {
-                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    {
-                        foreach (string line in newLines)
-                            sw.WriteLine(line);
-                    }
-
-                    AddFile(item, stream, @"skin.ini");
-                }
-            }
-        }
-
-        private bool ensureIniWasUpdated(SkinInfo item)
-        {
-            // This is a final consistency check to ensure that hash computation doesn't enter an infinite loop.
-            // With other changes to the surrounding code this should never be hit, but until we are 101% sure that there
-            // are no other cases let's avoid a hard startup crash by bailing and alerting.
-
-            var instance = GetSkin(item);
-
-            return instance.Configuration.SkinInfo.Name == item.Name;
-        }
-
-        protected override Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
-        {
-            var instance = GetSkin(model);
-
-            model.InstantiationInfo ??= instance.GetType().GetInvariantInstantiationInfo();
-
-            model.Name = instance.Configuration.SkinInfo.Name;
-            model.Creator = instance.Configuration.SkinInfo.Creator;
-
-            return Task.CompletedTask;
+            CurrentSkinInfo.Value = skinStore.ConsumableItems.Single(i => i.ID == chosen.ID);
         }
 
         /// <summary>
@@ -297,7 +147,7 @@ namespace osu.Game.Skinning
             var skin = CurrentSkin.Value;
 
             // if the user is attempting to save one of the default skin implementations, create a copy first.
-            CurrentSkinInfo.Value = Import(new SkinInfo
+            CurrentSkinInfo.Value = skinModelManager.Import(new SkinInfo
             {
                 Name = skin.SkinInfo.Name + @" (modified)",
                 Creator = skin.SkinInfo.Creator,
@@ -321,9 +171,9 @@ namespace osu.Game.Skinning
                     var oldFile = skin.SkinInfo.Files.FirstOrDefault(f => f.Filename == filename);
 
                     if (oldFile != null)
-                        ReplaceFile(skin.SkinInfo, oldFile, streamContent, oldFile.Filename);
+                        skinModelManager.ReplaceFile(skin.SkinInfo, oldFile, streamContent, oldFile.Filename);
                     else
-                        AddFile(skin.SkinInfo, streamContent, filename);
+                        skinModelManager.AddFile(skin.SkinInfo, streamContent, filename);
                 }
             }
         }
@@ -333,7 +183,7 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public SkinInfo Query(Expression<Func<SkinInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
+        public SkinInfo Query(Expression<Func<SkinInfo, bool>> query) => skinStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
 
         public event Action SourceChanged;
 
@@ -386,8 +236,115 @@ namespace osu.Game.Skinning
 
         AudioManager IStorageResourceProvider.AudioManager => audio;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
-        IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
+        IResourceStore<byte[]> IStorageResourceProvider.Files => userFiles;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+
+        #endregion
+
+        #region Implementation of IModelImporter<SkinInfo>
+
+        public Action<Notification> PostNotification
+        {
+            set => skinModelManager.PostNotification = value;
+        }
+
+        public Action<IEnumerable<ILive<SkinInfo>>> PostImport
+        {
+            set => skinModelManager.PostImport = value;
+        }
+
+        public Task Import(params string[] paths)
+        {
+            return skinModelManager.Import(paths);
+        }
+
+        public Task Import(params ImportTask[] tasks)
+        {
+            return skinModelManager.Import(tasks);
+        }
+
+        public IEnumerable<string> HandledExtensions => skinModelManager.HandledExtensions;
+
+        public Task<IEnumerable<ILive<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        {
+            return skinModelManager.Import(notification, tasks);
+        }
+
+        public Task<ILive<SkinInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        {
+            return skinModelManager.Import(task, lowPriority, cancellationToken);
+        }
+
+        public Task<ILive<SkinInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        {
+            return skinModelManager.Import(archive, lowPriority, cancellationToken);
+        }
+
+        public Task<ILive<SkinInfo>> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        {
+            return skinModelManager.Import(item, archive, lowPriority, cancellationToken);
+        }
+
+        #endregion
+
+        #region Implementation of IModelManager<SkinInfo>
+
+        public event Action<SkinInfo> ItemUpdated
+        {
+            add => skinModelManager.ItemUpdated += value;
+            remove => skinModelManager.ItemUpdated -= value;
+        }
+
+        public event Action<SkinInfo> ItemRemoved
+        {
+            add => skinModelManager.ItemRemoved += value;
+            remove => skinModelManager.ItemRemoved -= value;
+        }
+
+        public Task ImportFromStableAsync(StableStorage stableStorage)
+        {
+            return skinModelManager.ImportFromStableAsync(stableStorage);
+        }
+
+        public void Export(SkinInfo item)
+        {
+            skinModelManager.Export(item);
+        }
+
+        public void ExportModelTo(SkinInfo model, Stream outputStream)
+        {
+            skinModelManager.ExportModelTo(model, outputStream);
+        }
+
+        public void Update(SkinInfo item)
+        {
+            skinModelManager.Update(item);
+        }
+
+        public bool Delete(SkinInfo item)
+        {
+            return skinModelManager.Delete(item);
+        }
+
+        public void Delete(List<SkinInfo> items, bool silent = false)
+        {
+            skinModelManager.Delete(items, silent);
+        }
+
+        public void Undelete(List<SkinInfo> items, bool silent = false)
+        {
+            skinModelManager.Undelete(items, silent);
+        }
+
+        public void Undelete(SkinInfo item)
+        {
+            skinModelManager.Undelete(item);
+        }
+
+        public bool IsAvailableLocally(SkinInfo model)
+        {
+            return skinModelManager.IsAvailableLocally(model);
+        }
 
         #endregion
     }
