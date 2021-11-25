@@ -16,7 +16,7 @@ jobs:
         with:
           repository: 'MATRIX-feather/osu-framework'
           ref: 'custom'
-          path: 'osu-framework'
+          path: '../osu-framework'
 
       - name: 检查目录结构
         run: |
@@ -53,7 +53,7 @@ jobs:
         with:
           repository: 'MATRIX-feather/osu-framework'
           ref: 'custom'
-          path: 'osu-framework'
+          path: '../osu-framework'
 
       # Pin Xamarin.Android version to 11.2 for now to avoid build failures caused by a Xamarin-side regression.
       # See: https://github.com/xamarin/xamarin-android/issues/6284
