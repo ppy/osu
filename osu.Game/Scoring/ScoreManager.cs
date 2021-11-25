@@ -262,16 +262,6 @@ namespace osu.Game.Scoring
             remove => scoreModelManager.ItemRemoved -= value;
         }
 
-        public void Export(ScoreInfo item)
-        {
-            scoreModelManager.Export(item);
-        }
-
-        public void ExportModelTo(ScoreInfo model, Stream outputStream)
-        {
-            scoreModelManager.ExportModelTo(model, outputStream);
-        }
-
         public void Update(ScoreInfo item)
         {
             scoreModelManager.Update(item);
