@@ -162,11 +162,10 @@ namespace osu.Game.Online.Multiplayer
                     foreach (var user in joinedRoom.Users)
                         updateUserPlayingState(user.UserID, user.State);
 
+                    updateLocalRoomSettings(joinedRoom.Settings);
+
                     OnRoomJoined();
                 }, cancellationSource.Token).ConfigureAwait(false);
-
-                // Update room settings.
-                await updateLocalRoomSettings(joinedRoom.Settings, cancellationSource.Token).ConfigureAwait(false);
             }, cancellationSource.Token).ConfigureAwait(false);
         }
 
@@ -449,8 +448,7 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.SettingsChanged(MultiplayerRoomSettings newSettings)
         {
-            // Do not return this task, as it will cause tests to deadlock.
-            updateLocalRoomSettings(newSettings);
+            Scheduler.Add(() => updateLocalRoomSettings(newSettings));
             return Task.CompletedTask;
         }
 
@@ -690,8 +688,7 @@ namespace osu.Game.Online.Multiplayer
         /// This updates both the joined <see cref="MultiplayerRoom"/> and the respective API <see cref="Room"/>.
         /// </remarks>
         /// <param name="settings">The new <see cref="MultiplayerRoomSettings"/> to update from.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the update.</param>
-        private Task updateLocalRoomSettings(MultiplayerRoomSettings settings, CancellationToken cancellationToken = default) => scheduleAsync(() =>
+        private void updateLocalRoomSettings(MultiplayerRoomSettings settings)
         {
             if (Room == null)
                 return;
@@ -702,10 +699,11 @@ namespace osu.Game.Online.Multiplayer
             Room.Settings = settings;
             APIRoom.Name.Value = Room.Settings.Name;
             APIRoom.Password.Value = Room.Settings.Password;
+            APIRoom.QueueMode.Value = Room.Settings.QueueMode;
             RoomUpdated?.Invoke();
 
             CurrentMatchPlayingItem.Value = APIRoom.Playlist.SingleOrDefault(p => p.ID == settings.PlaylistItemId);
-        }, cancellationToken);
+        }
 
         private async Task<PlaylistItem> createPlaylistItem(MultiplayerPlaylistItem item)
         {

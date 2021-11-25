@@ -63,6 +63,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("second playlist item changed", () => Client.APIRoom?.Playlist[1].Beatmap.Value != firstBeatmap);
         }
 
+        [Test]
+        public void TestSettingsUpdatedWhenChangingQueueMode()
+        {
+            AddStep("change queue mode", () => Client.ChangeSettings(new MultiplayerRoomSettings
+            {
+                QueueMode = QueueMode.AllPlayers
+            }));
+
+            AddUntilStep("api room updated", () => Client.APIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+        }
+
         private void selectNewItem(Func<BeatmapInfo> beatmap)
         {
             AddStep("click edit button", () =>

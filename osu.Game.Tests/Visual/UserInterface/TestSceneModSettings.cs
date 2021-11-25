@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void SetUp() => Schedule(() =>
         {
             SelectedMods.Value = Array.Empty<Mod>();
-            Ruleset.Value = new TestRulesetInfo();
+            Ruleset.Value = CreateTestRulesetInfo();
         });
 
         [Test]
@@ -170,40 +170,32 @@ namespace osu.Game.Tests.Visual.UserInterface
                 ModSettingsContainer.Parent.Width = newWidth;
         }
 
-        public class TestRulesetInfo : RulesetInfo
+        public static RulesetInfo CreateTestRulesetInfo() => new TestCustomisableModRuleset().RulesetInfo;
+
+        public class TestCustomisableModRuleset : Ruleset
         {
-            public override Ruleset CreateInstance() => new TestCustomisableModRuleset();
-
-            public TestRulesetInfo()
+            public override IEnumerable<Mod> GetModsFor(ModType type)
             {
-                Available = true;
-            }
-
-            public class TestCustomisableModRuleset : Ruleset
-            {
-                public override IEnumerable<Mod> GetModsFor(ModType type)
+                if (type == ModType.Conversion)
                 {
-                    if (type == ModType.Conversion)
+                    return new Mod[]
                     {
-                        return new Mod[]
-                        {
-                            new TestModCustomisable1(),
-                            new TestModCustomisable2()
-                        };
-                    }
-
-                    return Array.Empty<Mod>();
+                        new TestModCustomisable1(),
+                        new TestModCustomisable2()
+                    };
                 }
 
-                public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
-
-                public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
-
-                public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
-
-                public override string Description { get; } = "test";
-                public override string ShortName { get; } = "tst";
+                return Array.Empty<Mod>();
             }
+
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
+
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
+
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
+
+            public override string Description { get; } = "test";
+            public override string ShortName { get; } = "tst";
         }
 
         private class TestModCustomisable1 : TestModCustomisable

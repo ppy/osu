@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NuGet.Packaging;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -282,9 +281,6 @@ namespace osu.Game.Stores
         private void updateBeatmapStatistics(RealmBeatmap beatmap, IBeatmap decoded)
         {
             var rulesetInstance = ((IRulesetInfo)beatmap.Ruleset).CreateInstance();
-
-            if (rulesetInstance == null)
-                return;
 
             decoded.BeatmapInfo.Ruleset = rulesetInstance.RulesetInfo;
 

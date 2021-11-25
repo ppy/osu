@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestBeatmapStates()
         {
-            foreach (BeatmapSetOnlineStatus status in Enum.GetValues(typeof(BeatmapSetOnlineStatus)))
+            foreach (BeatmapOnlineStatus status in Enum.GetValues(typeof(BeatmapOnlineStatus)))
                 AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
         }
 
@@ -384,7 +384,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private void showBeatmapWithStatus(BeatmapSetOnlineStatus status)
+        private void showBeatmapWithStatus(BeatmapOnlineStatus status)
         {
             leaderboard.BeatmapInfo = new BeatmapInfo
             {

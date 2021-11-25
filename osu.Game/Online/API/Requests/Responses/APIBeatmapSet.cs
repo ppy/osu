@@ -21,7 +21,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineID { get; set; }
 
         [JsonProperty(@"status")]
-        public BeatmapSetOnlineStatus Status { get; set; }
+        public BeatmapOnlineStatus Status { get; set; }
 
         [JsonProperty(@"preview_url")]
         public string Preview { get; set; } = string.Empty;
