@@ -11,12 +11,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      #无法将框架克隆到/home/runner/work/osu以外，用此办法暂时规避
+      - name: 移动项目
+        run: |
+          mkdir mfosu
+          mv ./* mfosu || true
+          mv ./.* mfosu
+
       - name: 下载框架
         uses: actions/checkout@v2
         with:
           repository: 'MATRIX-feather/osu-framework'
           ref: 'custom'
-          path: '../osu-framework'
+          path: 'osu-framework'
 
       - name: 检查目录结构
         run: |
@@ -29,6 +36,7 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: 解决依赖
+        working-directory: ./mfosu
         run: dotnet restore
 
       - name: 再次检查目录结构
@@ -48,12 +56,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      #无法将框架克隆到/home/runner/work/osu以外，用此办法暂时规避
+      - name: 移动项目
+        run: |
+          mkdir mfosu
+          mv ./* mfosu || true
+          mv ./.* mfosu
+
       - name: 下载框架
         uses: actions/checkout@v2
         with:
           repository: 'MATRIX-feather/osu-framework'
           ref: 'custom'
-          path: '../osu-framework'
+          path: 'osu-framework'
 
       # Pin Xamarin.Android version to 11.2 for now to avoid build failures caused by a Xamarin-side regression.
       # See: https://github.com/xamarin/xamarin-android/issues/6284
@@ -71,4 +86,5 @@ jobs:
       # cannot accept .sln(f) files as arguments.
       # Build just the main game for now.
       - name: Build
+        working-directory: ./mfosu
         run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
