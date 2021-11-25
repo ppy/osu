@@ -225,16 +225,6 @@ namespace osu.Game.Beatmaps
             remove => beatmapModelManager.ItemRemoved -= value;
         }
 
-        public void Export(BeatmapSetInfo item)
-        {
-            beatmapModelManager.Export(item);
-        }
-
-        public void ExportModelTo(BeatmapSetInfo model, Stream outputStream)
-        {
-            beatmapModelManager.ExportModelTo(model, outputStream);
-        }
-
         public void Update(BeatmapSetInfo item)
         {
             beatmapModelManager.Update(item);
