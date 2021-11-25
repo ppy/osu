@@ -78,6 +78,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = (float) Math.Pow(normalized_radius / (float)BaseObject.Radius, 1.15);
 
+            // 35 means almost 4.2 CS
             if (BaseObject.Radius < 35)
             {
                 float smallCircleBonus = Math.Min(35 - (float)BaseObject.Radius, 0) / 40;
