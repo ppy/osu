@@ -49,6 +49,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        [Resolved]
+        private BeatmapModelDownloader beatmapDownloader { get; set; }
+
         private Container beatmapPanelContainer;
         private TriangleButton watchButton;
         private SettingsCheckbox automaticDownload;
@@ -244,7 +247,7 @@ namespace osu.Game.Screens.Play
             if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmapSet.OnlineID }))
                 return;
 
-            beatmaps.Download(beatmapSet);
+            beatmapDownloader.Download(beatmapSet);
         }
 
         public override bool OnExiting(IScreen next)
