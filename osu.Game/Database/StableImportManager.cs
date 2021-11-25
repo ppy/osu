@@ -51,18 +51,22 @@ namespace osu.Game.Database
             var stableStorage = await getStableStorage().ConfigureAwait(false);
             var importTasks = new List<Task>();
 
+            var beatmapImporter = new StableBeatmapImporter(beatmaps);
+            var skinImporter = new StableSkinImporter(skins);
+            var scoreImporter = new StableScoreImporter(scores);
+
             Task beatmapImportTask = Task.CompletedTask;
             if (content.HasFlagFast(StableContent.Beatmaps))
-                importTasks.Add(beatmapImportTask = beatmaps.ImportFromStableAsync(stableStorage));
+                importTasks.Add(beatmapImportTask = beatmapImporter.ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Skins))
-                importTasks.Add(skins.ImportFromStableAsync(stableStorage));
+                importTasks.Add(skinImporter.ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Collections))
                 importTasks.Add(beatmapImportTask.ContinueWith(_ => collections.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
 
             if (content.HasFlagFast(StableContent.Scores))
-                importTasks.Add(beatmapImportTask.ContinueWith(_ => scores.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
+                importTasks.Add(beatmapImportTask.ContinueWith(_ => scoreImporter.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
 
             await Task.WhenAll(importTasks.ToArray()).ConfigureAwait(false);
         }
