@@ -758,7 +758,7 @@ namespace osu.Game.Screens.Edit
         private void exportBeatmap()
         {
             Save();
-            new LegacyBeatmapExporter(storage, beatmapManager).Export(Beatmap.Value.BeatmapSetInfo);
+            new LegacyBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
         }
 
         private void updateLastSavedHash()

@@ -10,8 +10,8 @@ namespace osu.Game.Database
     {
         protected override string FileExtension => ".osz";
 
-        public LegacyBeatmapExporter(Storage storage, IModelManager<BeatmapSetInfo> manager)
-            : base(storage, manager)
+        public LegacyBeatmapExporter(Storage storage)
+            : base(storage)
         {
         }
     }

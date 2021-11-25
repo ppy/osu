@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 try
                 {
-                    new LegacySkinExporter(storage, skins).Export(currentSkin.Value.SkinInfo);
+                    new LegacySkinExporter(storage).Export(currentSkin.Value.SkinInfo);
                 }
                 catch (Exception e)
                 {
