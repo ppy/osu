@@ -76,6 +76,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public virtual bool AllowEditing => true;
 
+        public bool BeatmapSetsLoaded => IsLoaded && Carousel?.BeatmapSetsLoaded == true;
+
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
 
