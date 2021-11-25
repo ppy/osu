@@ -86,9 +86,13 @@ namespace osu.Game.Stores
 
         public void Cleanup()
         {
-            var realm = realmFactory.Context;
+            Logger.Log(@"Beginning realm file store cleanup");
+
+            int totalFiles = 0;
+            int removedFiles = 0;
 
             // can potentially be run asynchronously, although we will need to consider operation order for disk deletion vs realm removal.
+            using (var realm = realmFactory.CreateContext())
             using (var transaction = realm.BeginWrite())
             {
                 // TODO: consider using a realm native query to avoid iterating all files (https://github.com/realm/realm-dotnet/issues/2659#issuecomment-927823707)
@@ -96,11 +100,14 @@ namespace osu.Game.Stores
 
                 foreach (var file in files)
                 {
+                    totalFiles++;
+
                     if (file.BacklinksCount > 0)
                         continue;
 
                     try
                     {
+                        removedFiles++;
                         Storage.Delete(file.GetStoragePath());
                         realm.Remove(file);
                     }
@@ -112,6 +119,8 @@ namespace osu.Game.Stores
 
                 transaction.Commit();
             }
+
+            Logger.Log($@"Finished realm file store cleanup ({removedFiles} of {totalFiles} deleted)");
         }
     }
 }
