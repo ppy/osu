@@ -107,8 +107,6 @@ namespace osu.Game.Database
 
         private void cleanupPendingDeletions()
         {
-            new RealmFileStore(this, storage).Cleanup();
-
             using (var realm = CreateContext())
             using (var transaction = realm.BeginWrite())
             {
@@ -124,6 +122,10 @@ namespace osu.Game.Database
 
                 transaction.Commit();
             }
+
+            // clean up files after dropping any pending deletions.
+            // in the future we may want to only do this when the game is idle, rather than on every startup.
+            new RealmFileStore(this, storage).Cleanup();
         }
 
         /// <summary>
