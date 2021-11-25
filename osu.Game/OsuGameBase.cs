@@ -100,6 +100,8 @@ namespace osu.Game
 
         protected ScoreManager ScoreManager { get; private set; }
 
+        protected ScoreModelDownloader ScoreDownloader { get; private set; }
+
         protected SkinManager SkinManager { get; private set; }
 
         protected RulesetStore RulesetStore { get; private set; }
@@ -234,10 +236,12 @@ namespace osu.Game
             dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API, Host));
+            dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API, Host));
+
             // the following realm components are not actively used yet, but initialised and kept up to date for initial testing.
             realmRulesetStore = new RealmRulesetStore(realmFactory, Storage);
 
