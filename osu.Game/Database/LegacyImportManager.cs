@@ -22,7 +22,7 @@ namespace osu.Game.Database
     /// <summary>
     /// Handles migration of legacy user data from osu-stable.
     /// </summary>
-    public class LeagcyImportManager : Component
+    public class LegacyImportManager : Component
     {
         [Resolved]
         private SkinManager skins { get; set; }
