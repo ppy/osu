@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public BindableFloat Scale { get; } = new BindableFloat(4)
         {
             Precision = 0.1f,
-            MinValue = 2,
+            MinValue = 1.5f,
             MaxValue = 10,
         };
 
@@ -58,6 +58,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case AnimationStyle.Accelerate1:
                     return Easing.In;
 
+                case AnimationStyle.Linear:
+                    return Easing.None;
+
                 case AnimationStyle.Accelerate2:
                     return Easing.InCubic;
 
@@ -86,6 +89,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public enum AnimationStyle
         {
+            Linear,
             Gravity,
             InOut1,
             InOut2,
