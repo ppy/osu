@@ -54,6 +54,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         protected readonly SpriteIcon Icon;
 
+        protected override Container<Drawable> Content => content;
+
         private readonly Container content;
 
         protected BeatmapCardIconButton()
@@ -61,7 +63,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             Origin = Anchor.Centre;
             Anchor = Anchor.Centre;
 
-            Child = content = new Container
+            base.Content.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
@@ -75,7 +77,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                         Anchor = Anchor.Centre
                     }
                 }
-            };
+            });
 
             Size = new Vector2(24);
             IconSize = 12;
