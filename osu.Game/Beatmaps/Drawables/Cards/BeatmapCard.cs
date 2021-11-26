@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -41,27 +43,23 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private readonly BeatmapDownloadTracker downloadTracker;
 
-        private BeatmapCardThumbnail thumbnail;
-        private FillFlowContainer leftIconArea;
+        private BeatmapCardThumbnail thumbnail = null!;
 
-        private Container rightAreaBackground;
-        private Container<BeatmapCardIconButton> rightAreaButtons;
+        private Container rightAreaBackground = null!;
+        private Container<BeatmapCardIconButton> rightAreaButtons = null!;
 
-        private Container mainContent;
-        private BeatmapCardContentBackground mainContentBackground;
+        private Container mainContent = null!;
+        private BeatmapCardContentBackground mainContentBackground = null!;
+        private FillFlowContainer<BeatmapCardStatistic> statisticsContainer = null!;
 
-        private GridContainer titleContainer;
-        private GridContainer artistContainer;
-        private FillFlowContainer<BeatmapCardStatistic> statisticsContainer;
-
-        private FillFlowContainer idleBottomContent;
-        private BeatmapCardDownloadProgressBar downloadProgressBar;
+        private FillFlowContainer idleBottomContent = null!;
+        private BeatmapCardDownloadProgressBar downloadProgressBar = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public BeatmapCard(APIBeatmapSet beatmapSet)
             : base(HoverSampleSet.Submit)
@@ -71,13 +69,17 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             downloadTracker = new BeatmapDownloadTracker(beatmapSet);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load(BeatmapSetOverlay? beatmapSetOverlay)
         {
             Width = width;
             Height = height;
             CornerRadius = corner_radius;
             Masking = true;
+
+            FillFlowContainer leftIconArea;
+            GridContainer titleContainer;
+            GridContainer artistContainer;
 
             InternalChildren = new Drawable[]
             {
@@ -335,6 +337,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Margin = new MarginPadding { Left = 5 }
                 };
             }
+
+            Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmapSet.OnlineID);
         }
 
         protected override void LoadComplete()
