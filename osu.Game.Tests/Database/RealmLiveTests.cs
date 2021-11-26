@@ -31,6 +31,23 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestAccessNonManaged()
+        {
+            var beatmap = new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
+            var liveBeatmap = beatmap.ToLive();
+
+            Assert.IsFalse(beatmap.Hidden);
+            Assert.IsFalse(liveBeatmap.Value.Hidden);
+            Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+
+            Assert.Throws<InvalidOperationException>(() => liveBeatmap.PerformWrite(l => l.Hidden = true));
+
+            Assert.IsFalse(beatmap.Hidden);
+            Assert.IsFalse(liveBeatmap.Value.Hidden);
+            Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+        }
+
+        [Test]
         public void TestValueAccessWithOpenContext()
         {
             RunTestWithRealm((realmFactory, _) =>

@@ -9,6 +9,7 @@ namespace osu.Game.Database
     {
         public EntityFrameworkLive(T item)
         {
+            IsManaged = true; // no way to really know.
             Value = item;
         }
 
@@ -28,6 +29,8 @@ namespace osu.Game.Database
         {
             perform(Value);
         }
+
+        public bool IsManaged { get; }
 
         public T Value { get; }
     }
