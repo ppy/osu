@@ -13,6 +13,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
@@ -22,6 +23,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Input;
 
@@ -33,6 +35,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private BeatmapManager manager;
         private RulesetStore rulesets;
+
+        [Cached(typeof(UserLookupCache))]
+        private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -304,6 +309,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
         }
 
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestWithOwner(bool withOwner)
+        {
+            createPlaylist(false, false, withOwner);
+
+            AddAssert("owner visible", () => playlist.ChildrenOfType<UpdateableAvatar>().All(a => a.IsPresent == withOwner));
+        }
+
         private void moveToItem(int index, Vector2? offset = null)
             => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DifficultyIcon>().ElementAt(index), offset));
 
@@ -327,11 +341,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible",
                 () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
 
-        private void createPlaylist(bool allowEdit, bool allowSelection)
+        private void createPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
         {
             AddStep("create playlist", () =>
             {
-                Child = playlist = new TestPlaylist(allowEdit, allowSelection)
+                Child = playlist = new TestPlaylist(allowEdit, allowSelection, showItemOwner)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -343,6 +357,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     playlist.Items.Add(new PlaylistItem
                     {
                         ID = i,
+                        OwnerID = 2,
                         Beatmap =
                         {
                             Value = i % 2 == 1
@@ -390,6 +405,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     playlist.Items.Add(new PlaylistItem
                     {
                         ID = index++,
+                        OwnerID = 2,
                         Beatmap = { Value = b },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         RequiredMods =
@@ -409,8 +425,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             public new IReadOnlyDictionary<PlaylistItem, RearrangeableListItem<PlaylistItem>> ItemMap => base.ItemMap;
 
-            public TestPlaylist(bool allowEdit, bool allowSelection)
-                : base(allowEdit, allowSelection)
+            public TestPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
+                : base(allowEdit, allowSelection, showItemOwner: showItemOwner)
             {
             }
         }

@@ -718,6 +718,7 @@ namespace osu.Game.Online.Multiplayer
             var playlistItem = new PlaylistItem
             {
                 ID = item.ID,
+                OwnerID = item.OwnerID,
                 Beatmap = { Value = beatmap },
                 Ruleset = { Value = ruleset },
                 Expired = item.Expired
