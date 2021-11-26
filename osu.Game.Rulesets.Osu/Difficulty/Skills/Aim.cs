@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private double skillMultiplier => 23.25;
+        private double skillMultiplier => 22.75;
         private double strainDecayBase => 0.15;
 
         private double calculateDefaultVelocity(double distance, double strainTime)

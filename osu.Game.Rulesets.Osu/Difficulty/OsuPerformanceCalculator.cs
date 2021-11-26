@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor = 0.2 * (Attributes.ApproachRate - 10.33);
+                approachRateFactor = 0.1 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor = 0.1 * (8.0 - Attributes.ApproachRate);
 
@@ -147,8 +147,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.SpeedStrain / 0.0675) - 4.0, 3.0) / 100000.0;
 
             // Longer maps are worth more.
-            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
-                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 3000.0) +
+                                 (totalHits > 3000 ? Math.Log10(totalHits / 3000.0) * 0.5 : 0.0);
             speedValue *= lengthBonus;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
