@@ -69,10 +69,11 @@ namespace osu.Game.Screens.OnlinePlay
 
         private readonly bool allowEdit;
         private readonly bool allowSelection;
+        private readonly bool showItemOwner;
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => allowEdit || !allowSelection || SelectedItem.Value == Model;
 
-        public DrawableRoomPlaylistItem(PlaylistItem item, bool allowEdit, bool allowSelection)
+        public DrawableRoomPlaylistItem(PlaylistItem item, bool allowEdit, bool allowSelection, bool showItemOwner)
             : base(item)
         {
             Item = item;
@@ -80,6 +81,7 @@ namespace osu.Game.Screens.OnlinePlay
             // TODO: edit support should be moved out into a derived class
             this.allowEdit = allowEdit;
             this.allowSelection = allowSelection;
+            this.showItemOwner = showItemOwner;
 
             beatmap.BindTo(item.Beatmap);
             valid.BindTo(item.Valid);
@@ -142,7 +144,12 @@ namespace osu.Game.Screens.OnlinePlay
                 maskingContainer.BorderColour = colours.Red;
             }
 
-            userLookupCache.GetUserAsync(Item.OwnerID).ContinueWith(u => Schedule(() => ownerAvatar.User = u.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+            if (showItemOwner)
+            {
+                ownerAvatar.Show();
+                userLookupCache.GetUserAsync(Item.OwnerID).ContinueWith(u => Schedule(() => ownerAvatar.User = u.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+            }
+
             difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(ICON_HEIGHT) };
 
             panelBackground.Beatmap.Value = Item.Beatmap.Value;
@@ -271,7 +278,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Direction = FillDirection.Horizontal,
-                                    Margin = new MarginPadding { Left = 8 },
+                                    Margin = new MarginPadding { Horizontal = 8 },
                                     AutoSizeAxes = Axes.Both,
                                     Spacing = new Vector2(5),
                                     ChildrenEnumerable = CreateButtons().Select(button => button.With(b =>
@@ -285,9 +292,10 @@ namespace osu.Game.Screens.OnlinePlay
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(ICON_HEIGHT),
-                                    Margin = new MarginPadding { Left = 8, Right = 8, },
+                                    Margin = new MarginPadding { Right = 8 },
                                     Masking = true,
                                     CornerRadius = 4,
+                                    Alpha = showItemOwner ? 1 : 0
                                 },
                             }
                         }
