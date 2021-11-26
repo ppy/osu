@@ -572,7 +572,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("add mixed ruleset beatmapset", () =>
             {
-                testMixed = TestResources.CreateTestBeatmapSetInfo();
+                testMixed = TestResources.CreateTestBeatmapSetInfo(3);
 
                 for (int i = 0; i <= 2; i++)
                 {
@@ -595,7 +595,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             BeatmapSetInfo testSingle = null;
             AddStep("add single ruleset beatmapset", () =>
             {
-                testSingle = TestResources.CreateTestBeatmapSetInfo();
+                testSingle = TestResources.CreateTestBeatmapSetInfo(3);
                 testSingle.Beatmaps.ForEach(b =>
                 {
                     b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
@@ -615,7 +615,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
 
             for (int i = 1; i <= 50; i++)
-                manySets.Add(TestResources.CreateTestBeatmapSetInfo(i));
+                manySets.Add(TestResources.CreateTestBeatmapSetInfo(3));
 
             loadBeatmaps(manySets);
 

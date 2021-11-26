@@ -136,7 +136,7 @@ namespace osu.Game.Online.API.Requests.Responses
         IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => metadata;
 
         DateTimeOffset IBeatmapSetInfo.DateAdded => throw new NotImplementedException();
-        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => throw new NotImplementedException();
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxStarDifficulty => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxLength => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxBPM => BPM;

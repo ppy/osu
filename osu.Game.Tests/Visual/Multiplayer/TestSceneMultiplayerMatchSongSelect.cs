@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value)));
-            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen());
+            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
         }
 
         [Test]
