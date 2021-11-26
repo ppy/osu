@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                     TooltipText = string.Empty;
                     spinner.Show();
                     Icon.Hide();
-                    return;
+                    break;
 
                 case DownloadState.LocallyAvailable:
                     Action = null;
