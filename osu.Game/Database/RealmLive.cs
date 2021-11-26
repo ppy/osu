@@ -100,10 +100,11 @@ namespace osu.Game.Database
                 if (originalDataValid)
                     return data;
 
-                T retrieved;
+                if (!isCorrectThread)
+                    throw new InvalidOperationException($"Can't use {nameof(Value)} unless on the same thread the original data was fetched from.");
 
-                using (var realm = Realm.GetInstance(data.Realm.Config))
-                    retrieved = realm.Find<T>(ID);
+                var realm = Realm.GetInstance(data.Realm.Config);
+                var retrieved = realm.Find<T>(ID);
 
                 if (!retrieved.IsValid)
                     throw new InvalidOperationException("Attempted to access value without an open context");
