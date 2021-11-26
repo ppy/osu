@@ -112,7 +112,10 @@ namespace osu.Game.Database
             }
         }
 
-        private bool originalDataValid => !IsManaged || (isCorrectThread && data.IsValid);
+        // TODO: Revisit adding these conditionals back as an optimisation: || (isCorrectThread && data.IsValid);
+        // They have temporarily been removed due to an oversight involving .AsQueryable, see https://github.com/realm/realm-dotnet/discussions/2734.
+        // This means we are fetching a new context every `PerformRead` or `PerformWrite`, even when on the correct thread.
+        private bool originalDataValid => !IsManaged;
 
         // this matches realm's internal thread validation (see https://github.com/realm/realm-dotnet/blob/903b4d0b304f887e37e2d905384fb572a6496e70/Realm/Realm/Native/SynchronizationContextScheduler.cs#L72)
         private bool isCorrectThread
