@@ -195,29 +195,20 @@ namespace osu.Game.Screens.OnlinePlay
                         ColumnDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.AutoSize),
                             new Dimension(),
                             new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.AutoSize)
                         },
                         Content = new[]
                         {
                             new Drawable[]
                             {
-                                ownerAvatar = new OwnerAvatar
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Size = new Vector2(ICON_HEIGHT),
-                                    Margin = new MarginPadding { Left = 8, Right = 8, },
-                                    Masking = true,
-                                    CornerRadius = 4,
-                                },
                                 difficultyIconContainer = new Container
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     AutoSizeAxes = Axes.Both,
-                                    Margin = new MarginPadding { Right = 8 },
+                                    Margin = new MarginPadding { Left = 8, Right = 8 },
                                 },
                                 new FillFlowContainer
                                 {
@@ -280,7 +271,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Direction = FillDirection.Horizontal,
-                                    Margin = new MarginPadding { Left = 8, Right = 10, },
+                                    Margin = new MarginPadding { Left = 8 },
                                     AutoSizeAxes = Axes.Both,
                                     Spacing = new Vector2(5),
                                     ChildrenEnumerable = CreateButtons().Select(button => button.With(b =>
@@ -288,7 +279,16 @@ namespace osu.Game.Screens.OnlinePlay
                                         b.Anchor = Anchor.Centre;
                                         b.Origin = Anchor.Centre;
                                     }))
-                                }
+                                },
+                                ownerAvatar = new OwnerAvatar
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(ICON_HEIGHT),
+                                    Margin = new MarginPadding { Left = 8, Right = 8, },
+                                    Masking = true,
+                                    CornerRadius = 4,
+                                },
                             }
                         }
                     },
