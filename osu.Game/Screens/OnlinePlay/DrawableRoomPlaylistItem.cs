@@ -147,7 +147,8 @@ namespace osu.Game.Screens.OnlinePlay
             if (showItemOwner)
             {
                 ownerAvatar.Show();
-                userLookupCache.GetUserAsync(Item.OwnerID).ContinueWith(u => Schedule(() => ownerAvatar.User = u.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+                userLookupCache.GetUserAsync(Item.OwnerID)
+                               .ContinueWith(u => Schedule(() => ownerAvatar.User = u.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
 
             difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(ICON_HEIGHT) };
@@ -458,7 +459,7 @@ namespace osu.Game.Screens.OnlinePlay
                 });
             }
 
-            public LocalisableString TooltipText => User == null ? "loading user..." : $"queued by {User.Username}";
+            public LocalisableString TooltipText => User == null ? string.Empty : $"queued by {User.Username}";
 
             private class TooltipArea : Component, IHasTooltip
             {
