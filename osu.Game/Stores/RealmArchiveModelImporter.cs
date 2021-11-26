@@ -387,7 +387,9 @@ namespace osu.Game.Stores
                             if (CanReuseExisting(existing, item))
                             {
                                 LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+
                                 existing.DeletePending = false;
+                                transaction.Commit();
 
                                 return existing.ToLive();
                             }
