@@ -3,6 +3,8 @@
 
 using System;
 
+#nullable enable
+
 namespace osu.Game.Database
 {
     public class EntityFrameworkLive<T> : ILive<T> where T : class
@@ -30,5 +32,7 @@ namespace osu.Game.Database
         }
 
         public T Value { get; }
+
+        public bool Equals(ILive<T>? other) => ID == other?.ID;
     }
 }
