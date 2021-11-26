@@ -20,11 +20,13 @@ namespace osu.Game.Screens.OnlinePlay
 
         private readonly bool allowEdit;
         private readonly bool allowSelection;
+        private readonly bool showItemOwner;
 
-        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection, bool reverse = false)
+        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection, bool reverse = false, bool showItemOwner = false)
         {
             this.allowEdit = allowEdit;
             this.allowSelection = allowSelection;
+            this.showItemOwner = showItemOwner;
 
             ((ReversibleFillFlowContainer)ListContainer).Reverse = reverse;
         }
@@ -56,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay
             Spacing = new Vector2(0, 2)
         };
 
-        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection)
+        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection, showItemOwner)
         {
             SelectedItem = { BindTarget = SelectedItem },
             RequestDeletion = requestDeletion
