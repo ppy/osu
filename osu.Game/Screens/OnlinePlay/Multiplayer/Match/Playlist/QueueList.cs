@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -50,66 +50,35 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                                                         .OrderBy(item => item.Model.ID);
 
                         case Game.Online.Multiplayer.QueueMode.AllPlayersRoundRobin:
-                            // TODO: THIS IS SO INEFFICIENT, can it be done any better?
+                            RearrangeableListItem<PlaylistItem>[] allItems = AliveInternalChildren
+                                                                             .Where(d => d.IsPresent)
+                                                                             .OfType<RearrangeableListItem<PlaylistItem>>()
+                                                                             .OrderBy(item => item.Model.ID)
+                                                                             .ToArray();
 
-                            // Group all items by their owners.
-                            var groups = AliveInternalChildren.Where(d => d.IsPresent)
-                                                              .OfType<RearrangeableListItem<PlaylistItem>>()
-                                                              .GroupBy(item => item.Model.OwnerID)
-                                                              .Select(g => g.ToArray())
-                                                              .ToArray();
-
-                            if (groups.Length == 0)
+                            int totalCount = allItems.Length;
+                            if (totalCount == 0)
                                 return Enumerable.Empty<Drawable>();
 
-                            // Find the initial picking order for the groups. The group with the smallest 'weight' picks first.
-                            int[] groupWeights = new int[groups.Length];
+                            Dictionary<int, int> perUserCounts = allItems
+                                                                 .Select(item => item.Model.OwnerID)
+                                                                 .Distinct()
+                                                                 .ToDictionary(u => u, _ => 0);
 
-                            for (int i = 0; i < groups.Length; i++)
+                            List<Drawable> result = new List<Drawable>();
+
+                            while (totalCount-- > 0)
                             {
-                                groupWeights[i] = groups[i].Count(item => item.Model.Expired);
-                                groups[i] = groups[i].Where(item => !item.Model.Expired).ToArray();
-                            }
+                                var candidateItem = allItems
+                                                    .Where(item => item != null)
+                                                    .OrderBy(item => perUserCounts[item.Model.OwnerID])
+                                                    .First();
 
-                            var result = new List<Drawable>();
+                                int itemIndex = Array.IndexOf(allItems, candidateItem);
 
-                            // Simulate the playlist by picking in order from the smallest-weighted room each time until no longer able to.
-                            while (true)
-                            {
-                                var candidateGroup = groups
-                                                     // Map each group to an index.
-                                                     .Select((items, index) => new { index, items })
-                                                     // Order groups by their weights.
-                                                     .OrderBy(group => groupWeights[group.index])
-                                                     // Select the first group with remaining items (null is set from previous iterations).
-                                                     .FirstOrDefault(group => group.items.Any(i => i != null));
-
-                                // Iteration ends when all groups have been exhausted of items.
-                                if (candidateGroup == null)
-                                    break;
-
-                                // Find the index of the first non-null (i.e. unused) item in the group.
-                                int candidateItemIndex = 0;
-                                RearrangeableListItem<PlaylistItem> candidateItem = null;
-
-                                for (int i = 0; i < candidateGroup.items.Length; i++)
-                                {
-                                    if (candidateGroup.items[i] != null)
-                                    {
-                                        candidateItemIndex = i;
-                                        candidateItem = candidateGroup.items[i];
-                                    }
-                                }
-
-                                // The item is guaranteed to not be expired, since we've previously removed all expired items.
-                                Debug.Assert(candidateItem?.Model.Expired == false);
-
-                                // Add the item to the result set.
-                                result.Add(candidateItem);
-
-                                // Update the group for the next iteration.
-                                candidateGroup.items[candidateItemIndex] = null;
-                                groupWeights[candidateGroup.index]++;
+                                result.Add(allItems[itemIndex]);
+                                perUserCounts[candidateItem.Model.OwnerID]++;
+                                allItems[itemIndex] = null;
                             }
 
                             return result;
