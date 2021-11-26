@@ -36,8 +36,7 @@ namespace osu.Game.Beatmaps
 
         public BeatmapOnlineStatus Status { get; set; } = BeatmapOnlineStatus.None;
 
-        [NotNull]
-        public List<BeatmapSetFileInfo> Files { get; set; } = new List<BeatmapSetFileInfo>();
+        public List<BeatmapSetFileInfo> Files { get; } = new List<BeatmapSetFileInfo>();
 
         /// <summary>
         /// The maximum star difficulty of all beatmaps in this set.
@@ -96,7 +95,7 @@ namespace osu.Game.Beatmaps
 
         IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata ?? Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
-        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #endregion
     }
