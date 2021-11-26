@@ -107,5 +107,7 @@ namespace osu.Game.Database
         // this matches realm's internal thread validation (see https://github.com/realm/realm-dotnet/blob/903b4d0b304f887e37e2d905384fb572a6496e70/Realm/Realm/Native/SynchronizationContextScheduler.cs#L72)
         private bool isCorrectThread
             => (fetchedContext != null && SynchronizationContext.Current == fetchedContext) || fetchedThreadId == Thread.CurrentThread.ManagedThreadId;
+
+        public bool Equals(ILive<T>? other) => ID == other?.ID;
     }
 }
