@@ -12,9 +12,9 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public class TestSceneBeatmapManager : OsuTestScene
+    public class TestSceneBeatmapDownloading : OsuTestScene
     {
-        private BeatmapManager beatmaps;
+        private BeatmapModelDownloader beatmaps;
         private ProgressNotification recentNotification;
 
         private static readonly BeatmapSetInfo test_db_model = new BeatmapSetInfo
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Online
         };
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps)
+        private void load(BeatmapModelDownloader beatmaps)
         {
             this.beatmaps = beatmaps;
 

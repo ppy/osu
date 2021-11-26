@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps
     /// Handles ef-core storage of beatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapModelManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IBeatmapModelManager
+    public class BeatmapModelManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -57,10 +57,6 @@ namespace osu.Game.Beatmaps
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
-
-        protected override string ImportFromStablePath => ".";
-
-        protected override Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage.GetSongStorage();
 
         private readonly BeatmapStore beatmaps;
         private readonly RulesetStore rulesets;
@@ -216,7 +212,7 @@ namespace osu.Game.Beatmaps
                     var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
 
                     // metadata may have changed; update the path with the standard format.
-                    beatmapInfo.Path = GetValidFilename($"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.DifficultyName}].osu");
+                    beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
 
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 

@@ -12,7 +12,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// A representation of a collection of beatmap difficulties, generally packaged as an ".osz" archive.
     /// </summary>
-    public interface IBeatmapSetInfo : IHasOnlineID<int>, IEquatable<IBeatmapSetInfo>
+    public interface IBeatmapSetInfo : IHasOnlineID<int>, IEquatable<IBeatmapSetInfo>, IHasNamedFiles
     {
         /// <summary>
         /// The date when this beatmap was imported.
@@ -28,11 +28,6 @@ namespace osu.Game.Beatmaps
         /// All beatmaps contained in this set.
         /// </summary>
         IEnumerable<IBeatmapInfo> Beatmaps { get; }
-
-        /// <summary>
-        /// All files used by this set.
-        /// </summary>
-        IEnumerable<INamedFileUsage> Files { get; }
 
         /// <summary>
         /// The maximum star difficulty of all beatmaps in this set.
