@@ -89,7 +89,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public enum AnimationStyle
         {
-            Linear,
             Gravity,
             InOut1,
             InOut2,
@@ -99,6 +98,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             Decelerate1,
             Decelerate2,
             Decelerate3,
+            Linear,
         }
     }
 }
