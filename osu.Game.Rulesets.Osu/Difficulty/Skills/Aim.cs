@@ -25,13 +25,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override int HistoryLength => 2;
 
         private const double wide_angle_multiplier = 1.5;
-        private const double acute_angle_multiplier = 2.0;
+        private const double acute_angle_multiplier = 4.0;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.75;
 
         private double currentStrain;
 
-        private double skillMultiplier => 22.75;
+        private double skillMultiplier => 23.25;
         private double strainDecayBase => 0.15;
 
         private double calculateDefaultVelocity(double distance, double strainTime)
