@@ -33,6 +33,11 @@ namespace osu.Game.Database
         void PerformWrite(Action<T> perform);
 
         /// <summary>
+        /// Whether this instance is tracking data which is managed by the database backing.
+        /// </summary>
+        bool IsManaged { get; }
+
+        /// <summary>
         /// Resolve the value of this instance on the current thread's context.
         /// </summary>
         /// <remarks>
