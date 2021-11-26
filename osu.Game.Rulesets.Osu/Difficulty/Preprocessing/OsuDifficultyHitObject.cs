@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // 35 means almost 4.2 CS
             if (BaseObject.Radius < 35)
             {
-                float smallCircleBonus = Math.Max(35 - (float)BaseObject.Radius, 0) / 40;
+                float smallCircleBonus = Math.Max(35 - (float)BaseObject.Radius, 0) / 80;
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
