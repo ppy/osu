@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -75,6 +76,24 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             IdleContent.FadeTo(showProgress ? 0 : 1, TRANSITION_DURATION, Easing.OutQuint);
             DownloadInProgressContent.FadeTo(showProgress ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
+        }
+
+        /// <summary>
+        /// Creates a beatmap card of the given <paramref name="size"/> for the supplied <paramref name="beatmapSet"/>.
+        /// </summary>
+        public static BeatmapCard Create(APIBeatmapSet beatmapSet, BeatmapCardSize size, bool allowExpansion = true)
+        {
+            switch (size)
+            {
+                case BeatmapCardSize.Normal:
+                    return new BeatmapCardNormal(beatmapSet, allowExpansion);
+
+                case BeatmapCardSize.Extra:
+                    return new BeatmapCardExtra(beatmapSet, allowExpansion);
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(size), size, @"Unsupported card size");
+            }
         }
     }
 }
