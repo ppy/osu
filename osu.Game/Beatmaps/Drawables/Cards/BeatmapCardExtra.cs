@@ -229,17 +229,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                 },
                                             }
                                         },
-                                        new LinkFlowContainer(s =>
-                                        {
-                                            s.Shadow = false;
-                                            s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold);
-                                        }).With(d =>
-                                        {
-                                            d.AutoSizeAxes = Axes.Both;
-                                            d.Margin = new MarginPadding { Top = 2 };
-                                            d.AddText("mapped by ", t => t.Colour = colourProvider.Content2);
-                                            d.AddUserLink(beatmapSet.Author);
-                                        }),
                                     }
                                 },
                                 new Container
@@ -265,6 +254,17 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             AlwaysPresent = true,
                                             Children = new Drawable[]
                                             {
+                                                new LinkFlowContainer(s =>
+                                                {
+                                                    s.Shadow = false;
+                                                    s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold);
+                                                }).With(d =>
+                                                {
+                                                    d.AutoSizeAxes = Axes.Both;
+                                                    d.Margin = new MarginPadding { Top = 2 };
+                                                    d.AddText("mapped by ", t => t.Colour = colourProvider.Content2);
+                                                    d.AddUserLink(beatmapSet.Author);
+                                                }),
                                                 statisticsContainer = new FillFlowContainer<BeatmapCardStatistic>
                                                 {
                                                     RelativeSizeAxes = Axes.X,
