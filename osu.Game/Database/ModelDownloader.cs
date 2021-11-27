@@ -57,7 +57,7 @@ namespace osu.Game.Database
             if (!canDownload(model)) return false;
 
             var request = accel
-                ? CreateAccelDownloadRequest(model, minimiseDownloadSize)
+                ? CreateAccelDownloadRequest(model, minimiseDownloadSize) ?? CreateDownloadRequest(model, minimiseDownloadSize)
                 : CreateDownloadRequest(model, minimiseDownloadSize);
 
             accel = false;

@@ -22,13 +22,6 @@ namespace osu.Game.Database
         {
             this.minimiseDownloadSize = minimiseDownloadSize;
             config = MConfigManager.GetInstance();
-        }
-
-        private string getTarget() => $@"{(minimiseDownloadSize ? "novideo" : "full")}/{Model.OnlineID}";
-
-        private string selectUri()
-        {
-            string result;
 
             var dict = new Dictionary<string, object>
             {
@@ -37,15 +30,17 @@ namespace osu.Game.Database
                 ["TARGET"] = getTarget()
             };
 
-            if (!config.Get<string>(MSetting.AccelSource).TryParse(dict, out result, out _))
+            if (!config.Get<string>(MSetting.AccelSource).TryParse(dict, out uri, out _))
                 throw new ParseFailedException("加速地址解析失败, 请检查您的设置。");
-
-            return result;
         }
+
+        private string getTarget() => $@"{(minimiseDownloadSize ? "novideo" : "full")}/{Model.OnlineID}";
+
+        private readonly string uri;
 
         protected override string Target => getTarget();
 
-        protected override string Uri => selectUri();
+        protected override string Uri => uri;
 
         protected override WebRequest CreateWebRequest()
         {
