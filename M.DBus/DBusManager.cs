@@ -105,9 +105,9 @@ namespace M.DBus
         public async Task GetAllServices()
         {
             await currentConnection.ListServicesAsync().ConfigureAwait(false);
-            var services = await currentConnection.ListServicesAsync().ConfigureAwait(false);
+            string[] services = await currentConnection.ListServicesAsync().ConfigureAwait(false);
 
-            foreach (var service in services) Logger.Log(service);
+            foreach (string service in services) Logger.Log(service);
         }
 
         private void onServiceNameChanged(ServiceOwnerChangedEventArgs args)
@@ -190,7 +190,7 @@ namespace M.DBus
 
         private async Task registerToConection(IDBusObject dBusObject)
         {
-            var targetName = registerDictionary[dBusObject];
+            string targetName = registerDictionary[dBusObject];
             await currentConnection.RegisterObjectAsync(dBusObject).ConfigureAwait(false);
 
             await currentConnection.RegisterServiceAsync(targetName).ConfigureAwait(false);
@@ -226,7 +226,7 @@ namespace M.DBus
                 });
             }
             else
-                throw new InvalidOperationException("尝试反注册一个不存在的DBus物件");
+                throw new InvalidOperationException($"尝试反注册一个不存在的DBus物件: {dBusObject.ObjectPath}");
         }
 
         private async Task unRegisterFromConnection(IDBusObject dBusObject)
