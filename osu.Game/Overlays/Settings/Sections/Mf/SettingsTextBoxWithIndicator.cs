@@ -46,7 +46,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             })
             {
                 AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X
+                RelativeSizeAxes = Axes.X,
+                Y = -2
             };
 
             public Indicator(ParseState state = ParseState.Working, string result = "等待解析...", List<string> errors = null)
