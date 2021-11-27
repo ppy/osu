@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -90,6 +90,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public enum AnimationStyle
         {
             Gravity,
+            Linear,
             InOut1,
             InOut2,
             Accelerate1,
@@ -98,7 +99,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             Decelerate1,
             Decelerate2,
             Decelerate3,
-            Linear,
         }
     }
 }
