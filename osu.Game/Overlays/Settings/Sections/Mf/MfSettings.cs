@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 }
             };
 
-            accelTextBox.Current.BindValueChanged(onAccelUrlChanged);
+            accelTextBox.Current.BindValueChanged(onAccelUrlChanged, true);
         }
 
         private void onAccelUrlChanged(ValueChangedEvent<string> v)
