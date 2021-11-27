@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
@@ -29,7 +28,7 @@ namespace osu.Game.Database
 
         protected readonly List<ArchiveDownloadRequest<T>> CurrentDownloads = new List<ArchiveDownloadRequest<T>>();
 
-        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider api, IIpcHost importHost = null)
+        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider api)
         {
             this.importer = importer;
             this.api = api;
@@ -53,7 +52,7 @@ namespace osu.Game.Database
         /// <param name="model">The <typeparamref name="T"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Upstream arg</param>
         /// <returns>Whether the download was started.</returns>
-        public bool Download(T model, bool minimiseDownloadSize)
+        public bool Download(T model, bool minimiseDownloadSize = false)
         {
             if (!canDownload(model)) return false;
 
@@ -118,7 +117,7 @@ namespace osu.Game.Database
             }
         }
 
-        public bool AccelDownload(T model, bool minimiseDownloadSize)
+        public bool AccelDownload(T model, bool minimiseDownloadSize = false)
         {
             accel = true;
             return Download(model, minimiseDownloadSize);

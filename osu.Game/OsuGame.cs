@@ -34,17 +34,21 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Input.Bindings;
+using osu.Game.IO;
+using osu.Game.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Music;
-using osu.Game.Skinning;
-using osuTK.Graphics;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Volume;
+using osu.Game.Performance;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -53,15 +57,11 @@ using osu.Game.Screens.Select;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
-using osu.Game.Database;
-using osu.Game.Extensions;
-using osu.Game.IO;
 using osu.Game.Screens.LLin.Plugins;
-using osu.Game.Localisation;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Performance;
+using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game
 {
@@ -125,7 +125,7 @@ namespace osu.Game
         private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
 
         [Cached]
-        private readonly StableImportManager stableImportManager = new StableImportManager();
+        private readonly LegacyImportManager legacyImportManager = new LegacyImportManager();
 
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
@@ -175,7 +175,7 @@ namespace osu.Game
         [CanBeNull]
         private IntroScreen introScreen;
 
-        private Bindable<int> configRuleset;
+        private Bindable<string> configRuleset;
 
         private Bindable<float> uiScale;
 
@@ -276,10 +276,13 @@ namespace osu.Game
             dependencies.Cache(mvisPlManager = new LLinPluginManager());
 
             // bind config int to database RulesetInfo
-            configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
+            configRuleset = LocalConfig.GetBindable<string>(OsuSetting.Ruleset);
             uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
 
-            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
+            var preferredRuleset = int.TryParse(configRuleset.Value, out int rulesetId)
+                // int parsing can be removed 20220522
+                ? RulesetStore.GetRuleset(rulesetId)
+                : RulesetStore.GetRuleset(configRuleset.Value);
 
             try
             {
@@ -292,7 +295,7 @@ namespace osu.Game
                 Ruleset.Value = RulesetStore.AvailableRulesets.First();
             }
 
-            Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
+            Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ShortName;
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
@@ -714,6 +717,9 @@ namespace osu.Game
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PostImport = items => PresentBeatmap(items.First().Value);
 
+            BeatmapDownloader.PostNotification = n => Notifications.Post(n);
+            ScoreDownloader.PostNotification = n => Notifications.Post(n);
+
             ScoreManager.PostNotification = n => Notifications.Post(n);
             ScoreManager.PostImport = items => PresentScore(items.First().Value);
 
@@ -844,7 +850,7 @@ namespace osu.Game
                 PostNotification = n => Notifications.Post(n),
             }, Add, true);
 
-            loadComponentSingleFile(stableImportManager, Add);
+            loadComponentSingleFile(legacyImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 

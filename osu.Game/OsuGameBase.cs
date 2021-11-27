@@ -99,7 +99,11 @@ namespace osu.Game
 
         protected BeatmapManager BeatmapManager { get; private set; }
 
+        protected BeatmapModelDownloader BeatmapDownloader { get; private set; }
+
         protected ScoreManager ScoreManager { get; private set; }
+
+        protected ScoreModelDownloader ScoreDownloader { get; private set; }
 
         protected SkinManager SkinManager { get; private set; }
 
@@ -192,7 +196,11 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client"));
+            runMigrations();
+
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
+
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", contextFactory));
 
             dependencies.CacheAs(Storage);
 
@@ -216,8 +224,6 @@ namespace osu.Game
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
-            runMigrations();
-
             dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Resources, Audio));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
@@ -225,7 +231,7 @@ namespace osu.Game
             SkinManager.ItemRemoved += item => Schedule(() =>
             {
                 // check the removed skin is not the current user choice. if it is, switch back to default.
-                if (item.ID == SkinManager.CurrentSkinInfo.Value.ID)
+                if (item.Equals(SkinManager.CurrentSkinInfo.Value))
                     SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
             });
 
@@ -240,12 +246,14 @@ namespace osu.Game
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
             dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
+
+            dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
+            dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
 
             // the following realm components are not actively used yet, but initialised and kept up to date for initial testing.
             realmRulesetStore = new RealmRulesetStore(realmFactory, Storage);
@@ -277,8 +285,6 @@ namespace osu.Game
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
-
-            migrateDataToRealm();
 
             dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(realmFactory, RulesetStore));
 
@@ -457,34 +463,6 @@ namespace osu.Game
 
         private void migrateDataToRealm()
         {
-            using (var db = contextFactory.GetForWrite())
-            using (var realm = realmFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
-            {
-                // migrate ruleset settings. can be removed 20220315.
-                var existingSettings = db.Context.DatabasedSetting;
-
-                // only migrate data if the realm database is empty.
-                if (!realm.All<RealmRulesetSetting>().Any())
-                {
-                    foreach (var dkb in existingSettings)
-                    {
-                        if (dkb.RulesetID == null) continue;
-
-                        realm.Add(new RealmRulesetSetting
-                        {
-                            Key = dkb.Key,
-                            Value = dkb.StringValue,
-                            RulesetID = dkb.RulesetID.Value,
-                            Variant = dkb.Variant ?? 0,
-                        });
-                    }
-                }
-
-                db.Context.RemoveRange(existingSettings);
-
-                transaction.Commit();
-            }
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)

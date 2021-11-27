@@ -18,6 +18,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("id")]
         public long ID { get; set; }
 
+        [JsonProperty("owner_id")]
+        public int OwnerID { get; set; }
+
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
 
@@ -103,6 +106,12 @@ namespace osu.Game.Online.Rooms
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeapiBeatmap() => false;
 
-        public bool Equals(PlaylistItem other) => ID == other?.ID && BeatmapID == other.BeatmapID && RulesetID == other.RulesetID;
+        public bool Equals(PlaylistItem other)
+            => ID == other?.ID
+               && BeatmapID == other.BeatmapID
+               && RulesetID == other.RulesetID
+               && Expired == other.Expired
+               && allowedMods.SequenceEqual(other.allowedMods)
+               && requiredMods.SequenceEqual(other.requiredMods);
     }
 }

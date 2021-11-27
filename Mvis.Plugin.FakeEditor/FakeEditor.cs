@@ -95,6 +95,8 @@ namespace Mvis.Plugin.FakeEditor
             base.UnLoad();
         }
 
+        private readonly DummyRuleset dummyRuleset = new DummyRuleset();
+
         private void initDependencies(WorkingBeatmap beatmap)
         {
             this.beatmap = beatmap;
@@ -106,7 +108,7 @@ namespace Mvis.Plugin.FakeEditor
 
             if (EditorClock == null)
             {
-                AddInternal(EditorClock = new EditorClock(beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset ?? new DummyRulesetInfo()), beatDivisor)
+                AddInternal(EditorClock = new EditorClock(beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset ?? dummyRuleset.RulesetInfo), beatDivisor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

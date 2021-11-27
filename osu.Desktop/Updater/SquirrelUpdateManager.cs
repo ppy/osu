@@ -103,7 +103,10 @@ namespace osu.Desktop.Updater
                     }
                     else
                     {
+                        // In the case of an error, a separate notification will be displayed.
                         notification.State = ProgressNotificationState.Cancelled;
+                        notification.Close();
+
                         Logger.Error(e, @"update failed!");
                     }
                 }

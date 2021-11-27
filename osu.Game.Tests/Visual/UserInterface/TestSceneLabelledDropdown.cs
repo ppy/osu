@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         [Test]
         public void TestLabelledEnumDropdown()
-            => AddStep(@"create dropdown", () => Child = new LabelledEnumDropdown<BeatmapSetOnlineStatus>
+            => AddStep(@"create dropdown", () => Child = new LabelledEnumDropdown<BeatmapOnlineStatus>
             {
                 Label = @"Beatmap status",
                 Description = @"This is a description"

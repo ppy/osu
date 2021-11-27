@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using M.DBus.Utils.Canonical.DBusMenuFlags;
-using NuGet.Packaging;
 using osu.Framework.Logging;
 
 namespace M.DBus.Tray
@@ -90,7 +89,11 @@ namespace M.DBus.Tray
                         subMenus.Add(subEntry.ToDbusObject(subEntry.ChildId, maxOrder, out additDict));
 
                         //将循环调用返回的 额外词典 加进要返回的 词典 中
-                        additionalEntries.AddRange(additDict);
+
+                        foreach (var entryData in additDict)
+                        {
+                            additionalEntries.Add(entryData);
+                        }
 
                         //当前的最大id += 多出的目录数量 + 额外目录的数量
                         maxOrder += additDict.Count;

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using MessagePack;
 using Newtonsoft.Json;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -49,6 +50,9 @@ namespace osu.Game.Online.Multiplayer
 
         [Key(5)]
         public MatchRoomState? MatchState { get; set; }
+
+        [Key(6)]
+        public IList<MultiplayerPlaylistItem> Playlist { get; set; } = new List<MultiplayerPlaylistItem>();
 
         [JsonConstructor]
         [SerializationConstructor]

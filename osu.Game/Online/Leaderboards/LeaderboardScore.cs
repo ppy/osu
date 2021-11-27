@@ -16,6 +16,8 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Mf;
@@ -71,6 +73,9 @@ namespace osu.Game.Online.Leaderboards
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
+
+        [Resolved]
+        private Storage storage { get; set; }
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true, bool isSongSelect = false)
         {
@@ -417,8 +422,8 @@ namespace osu.Game.Online.Leaderboards
                 if (Score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
                     items.Add(new OsuMenuItem("使用这些mod游玩", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
 
-                if (Score.Files?.Count > 0)
-                    items.Add(new OsuMenuItem("导出", MenuItemType.Standard, () => scoreManager.Export(Score)));
+                if (Score.Files.Count > 0)
+                    items.Add(new OsuMenuItem("导出", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
 
                 if (Score.ID != 0)
                     items.Add(new OsuMenuItem("删除", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));

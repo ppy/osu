@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     apiRoom.HasPassword.Value = !string.IsNullOrEmpty(createRoomRequest.Room.Password.Value);
                     apiRoom.Password.Value = createRoomRequest.Room.Password.Value;
 
-                    AddServerSideRoom(apiRoom);
+                    AddServerSideRoom(apiRoom, localUser);
 
                     var responseRoom = new APICreatedRoom();
                     responseRoom.CopyFrom(createResponseRoom(apiRoom, false));
@@ -125,11 +125,17 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// Adds a room to a local "server-side" list that's returned when a <see cref="GetRoomsRequest"/> is fired.
         /// </summary>
         /// <param name="room">The room.</param>
-        public void AddServerSideRoom(Room room)
+        /// <param name="host">The room host.</param>
+        public void AddServerSideRoom(Room room, APIUser host)
         {
             room.RoomID.Value ??= currentRoomId++;
+            room.Host.Value = host;
+
             for (int i = 0; i < room.Playlist.Count; i++)
+            {
                 room.Playlist[i].ID = currentPlaylistItemId++;
+                room.Playlist[i].OwnerID = room.Host.Value.OnlineID;
+            }
 
             serverSideRooms.Add(room);
         }

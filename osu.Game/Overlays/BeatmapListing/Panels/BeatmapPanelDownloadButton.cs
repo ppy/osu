@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, BeatmapManager beatmaps, OsuConfigManager osuConfig, MConfigManager mConfig)
+        private void load(OsuGame game, BeatmapModelDownloader beatmaps, OsuConfigManager osuConfig, MConfigManager mConfig)
         {
             noVideoSetting = osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
