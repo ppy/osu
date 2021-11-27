@@ -338,7 +338,7 @@ namespace osu.Game.Screens.OnlinePlay
             return true;
         }
 
-        private sealed class PlaylistDownloadButton : BeatmapPanelDownloadButton
+        private sealed class PlaylistDownloadButton : BeatmapDownloadButton
         {
             private readonly PlaylistItem playlistItem;
 

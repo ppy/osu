@@ -285,7 +285,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new BeatmapPanelDownloadButton(BeatmapSet.Value)
+                    downloadButtonsContainer.Child = new BeatmapDownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y,

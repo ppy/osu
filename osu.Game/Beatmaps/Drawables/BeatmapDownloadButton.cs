@@ -15,7 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class BeatmapPanelDownloadButton : CompositeDrawable
+    public class BeatmapDownloadButton : CompositeDrawable
     {
         protected bool DownloadEnabled => button.Enabled.Value;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         private readonly IBeatmapSetInfo beatmapSet;
 
-        public BeatmapPanelDownloadButton(IBeatmapSetInfo beatmapSet)
+        public BeatmapDownloadButton(IBeatmapSetInfo beatmapSet)
         {
             this.beatmapSet = beatmapSet;
 
