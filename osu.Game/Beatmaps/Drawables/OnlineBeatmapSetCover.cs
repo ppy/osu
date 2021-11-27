@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             string resource = null;
 
-            switch (mfconfig.Get<bool>(MSetting.UseSayobot))
+            switch (mfconfig.Get<bool>(MSetting.UseAccelForDefault))
             {
                 case true:
                     string targetID = set.Covers.Card;

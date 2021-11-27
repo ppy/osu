@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps
             new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
 
         protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateAccelDownloadRequest(IBeatmapSetInfo model, bool isMini)
-            => new SayoDownloadBeatmapSetRequest(model, isMini);
+            => new AccelDownloadBeatmapSetRequest(model, isMini);
 
         public override ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model)
             => CurrentDownloads.Find(r => r.Model.OnlineID == model.OnlineID);

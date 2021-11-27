@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
 
                     default:
-                        if (mConfig.Get<bool>(MSetting.UseSayobot))
+                        if (mConfig.Get<bool>(MSetting.UseAccelForDefault))
                             beatmaps.AccelDownload(beatmapSet, noVideoSetting.Value);
                         else
                             beatmaps.Download(beatmapSet, noVideoSetting.Value);

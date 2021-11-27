@@ -17,9 +17,13 @@ namespace osu.Game.Configuration
     {
         protected override string Filename => "mf.ini";
 
+        private static MConfigManager instance;
+        public static MConfigManager GetInstance() => instance;
+
         public MConfigManager(Storage storage)
             : base(storage)
         {
+            instance = this;
         }
 
         protected override void InitialiseDefaults()
@@ -27,8 +31,9 @@ namespace osu.Game.Configuration
             base.InitialiseDefaults();
 
             //Other Settings
-            SetDefault(MSetting.UseSayobot, false);
+            SetDefault(MSetting.UseAccelForDefault, true);
             SetDefault(MSetting.DoNotShowDisclaimer, false);
+            SetDefault(MSetting.AccelSource, "https://txy1.sayobot.cn/beatmaps/download/[TARGET]");
 
             //UI Settings
             SetDefault(MSetting.OptUI, true);
@@ -73,7 +78,7 @@ namespace osu.Game.Configuration
             //Gamemode集成
             SetDefault(MSetting.Gamemode, GamemodeActivateCondition.InGame);
 
-            var isLinuxPlatform = RuntimeInfo.OS == RuntimeInfo.Platform.Linux;
+            bool isLinuxPlatform = RuntimeInfo.OS == RuntimeInfo.Platform.Linux;
 
             //DBus集成
             SetDefault(MSetting.DBusIntegration, isLinuxPlatform);
@@ -112,6 +117,7 @@ namespace osu.Game.Configuration
         OptUI,
         TrianglesEnabled,
         UseSayobot,
+        UseAccelForDefault,
         MvisBgBlur,
         MvisStoryboardProxy,
         MvisIdleBgDim,
@@ -145,7 +151,8 @@ namespace osu.Game.Configuration
         MprisUseAvatarlogoAsCover,
         EnableTray,
         EnableSystemNotifications,
-        TrayIconName
+        TrayIconName,
+        AccelSource
     }
 
     public enum GamemodeActivateCondition
