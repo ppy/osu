@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource("Style", "Change the animation style of the approach circles.", 1)]
-        public Bindable<AnimationStyle> Style { get; } = new Bindable<AnimationStyle>();
+        public Bindable<AnimationStyle> Style { get; } = new Bindable<AnimationStyle>(AnimationStyle.Gravity);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
@@ -89,8 +89,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public enum AnimationStyle
         {
-            Gravity,
             Linear,
+            Gravity,           
             InOut1,
             InOut2,
             Accelerate1,
