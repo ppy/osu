@@ -121,7 +121,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             RelativeSizeAxes = Axes.Y,
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
-                            Padding = new MarginPadding { Vertical = 17.5f },
+                            Padding = new MarginPadding { Vertical = 35 },
                             Child = rightAreaButtons = new Container<BeatmapCardIconButton>
                             {
                                 RelativeSizeAxes = Axes.Both,
