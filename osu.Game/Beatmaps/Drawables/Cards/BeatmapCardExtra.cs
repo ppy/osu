@@ -30,8 +30,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 {
     public class BeatmapCardExtra : OsuClickableContainer
     {
-        private const float width = 408;
-        private const float height = 100;
+        private const float width = 475;
+        private const float height = 140;
         private const float icon_area_width = 30;
 
         public Bindable<bool> Expanded { get; } = new BindableBool();
