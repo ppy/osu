@@ -50,6 +50,7 @@ namespace osu.Game.Screens.OnlinePlay
         private LinkFlowContainer authorText;
         private ExplicitContentBeatmapPill explicitContentPill;
         private ModDisplay modDisplay;
+        private FillFlowContainer buttonsFlow;
         private UpdateableAvatar ownerAvatar;
 
         private readonly IBindable<bool> valid = new Bindable<bool>();
@@ -150,15 +151,22 @@ namespace osu.Game.Screens.OnlinePlay
                                .ContinueWith(u => Schedule(() => ownerAvatar.User = u.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
 
-            difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(ICON_HEIGHT) };
+            if (Item.Beatmap.Value != null)
+                difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(ICON_HEIGHT) };
+            else
+                difficultyIconContainer.Clear();
 
             panelBackground.Beatmap.Value = Item.Beatmap.Value;
 
             beatmapText.Clear();
-            beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineID.ToString(), null, text =>
+
+            if (Item.Beatmap.Value != null)
             {
-                text.Truncate = true;
-            });
+                beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineID.ToString(), null, text =>
+                {
+                    text.Truncate = true;
+                });
+            }
 
             authorText.Clear();
 
@@ -168,10 +176,13 @@ namespace osu.Game.Screens.OnlinePlay
                 authorText.AddUserLink(Item.Beatmap.Value.Metadata.Author);
             }
 
-            bool hasExplicitContent = (Item.Beatmap.Value.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
+            bool hasExplicitContent = (Item.Beatmap.Value?.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
             explicitContentPill.Alpha = hasExplicitContent ? 1 : 0;
 
             modDisplay.Current.Value = requiredMods.ToArray();
+
+            buttonsFlow.Clear();
+            buttonsFlow.ChildrenEnumerable = CreateButtons();
         }
 
         protected override Drawable CreateContent()
@@ -273,7 +284,7 @@ namespace osu.Game.Screens.OnlinePlay
                                         }
                                     }
                                 },
-                                new FillFlowContainer
+                                buttonsFlow = new FillFlowContainer
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
@@ -305,9 +316,9 @@ namespace osu.Game.Screens.OnlinePlay
         }
 
         protected virtual IEnumerable<Drawable> CreateButtons() =>
-            new Drawable[]
+            new[]
             {
-                new PlaylistDownloadButton(Item),
+                Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),
                 new PlaylistRemoveButton
                 {
                     Size = new Vector2(30, 30),
