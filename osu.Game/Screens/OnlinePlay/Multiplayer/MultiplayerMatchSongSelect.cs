@@ -3,12 +3,14 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -57,7 +59,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 loadingLayer.Show();
 
-                client.ChangeSettings(item: item).ContinueWith(t =>
+                client.AddPlaylistItem(new MultiplayerPlaylistItem
+                {
+                    BeatmapID = item.BeatmapID,
+                    BeatmapChecksum = item.Beatmap.Value.MD5Hash,
+                    RulesetID = item.RulesetID,
+                    RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray(),
+                    AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray()
+                }).ContinueWith(t =>
                 {
                     Schedule(() =>
                     {

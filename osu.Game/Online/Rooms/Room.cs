@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Utils;
 
@@ -71,6 +72,18 @@ namespace osu.Game.Online.Rooms
         {
             get => Type.Value;
             set => Type.Value = value;
+        }
+
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
+
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("queue_mode")]
+        private QueueMode queueMode
+        {
+            get => QueueMode.Value;
+            set => QueueMode.Value = value;
         }
 
         [Cached]
@@ -169,6 +182,7 @@ namespace osu.Game.Online.Rooms
             ParticipantCount.Value = other.ParticipantCount.Value;
             EndDate.Value = other.EndDate.Value;
             UserScore.Value = other.UserScore.Value;
+            QueueMode.Value = other.QueueMode.Value;
 
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();

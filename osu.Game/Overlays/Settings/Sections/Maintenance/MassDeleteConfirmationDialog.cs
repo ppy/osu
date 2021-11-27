@@ -7,9 +7,9 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class DeleteAllBeatmapsDialog : PopupDialog
+    public class MassDeleteConfirmationDialog : PopupDialog
     {
-        public DeleteAllBeatmapsDialog(Action deleteAction)
+        public MassDeleteConfirmationDialog(Action deleteAction)
         {
             BodyText = "所有东西?";
 

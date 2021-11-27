@@ -38,7 +38,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         {
             using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestCustomDirectory))) // don't use clean run as we are writing a config file.
             {
-                string osuDesktopStorage = basePath(nameof(TestCustomDirectory));
+                string osuDesktopStorage = PrepareBasePath(nameof(TestCustomDirectory));
                 const string custom_tournament = "custom";
 
                 // need access before the game has constructed its own storage yet.
@@ -60,6 +60,15 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 finally
                 {
                     host.Exit();
+
+                    try
+                    {
+                        if (Directory.Exists(osuDesktopStorage))
+                            Directory.Delete(osuDesktopStorage, true);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
         }
@@ -69,7 +78,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         {
             using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestMigration))) // don't use clean run as we are writing test files for migration.
             {
-                string osuRoot = basePath(nameof(TestMigration));
+                string osuRoot = PrepareBasePath(nameof(TestMigration));
                 string configFile = Path.Combine(osuRoot, "tournament.ini");
 
                 if (File.Exists(configFile))
@@ -136,18 +145,29 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 }
                 finally
                 {
+                    host.Exit();
+
                     try
                     {
-                        host.Storage.Delete("tournament.ini");
-                        host.Storage.DeleteDirectory("tournaments");
+                        if (Directory.Exists(osuRoot))
+                            Directory.Delete(osuRoot, true);
                     }
-                    catch { }
-
-                    host.Exit();
+                    catch
+                    {
+                    }
                 }
             }
         }
 
-        private string basePath(string testInstance) => Path.Combine(RuntimeInfo.StartupDirectory, "headless", testInstance);
+        public static string PrepareBasePath(string testInstance)
+        {
+            string basePath = Path.Combine(RuntimeInfo.StartupDirectory, "headless", testInstance);
+
+            // manually clean before starting in case there are left-over files at the test site.
+            if (Directory.Exists(basePath))
+                Directory.Delete(basePath, true);
+
+            return basePath;
+        }
     }
 }
