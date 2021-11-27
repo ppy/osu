@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -76,8 +77,10 @@ namespace osu.Game.Screens.Play
             this.targetUser = targetUser;
         }
 
+        private Bindable<bool> useAccelDownload;
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, MConfigManager mConfig)
         {
             InternalChild = new Container
             {
@@ -163,6 +166,8 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+
+            useAccelDownload = mConfig.GetBindable<bool>(MSetting.UseSayobot);
         }
 
         protected override void LoadComplete()
@@ -251,7 +256,10 @@ namespace osu.Game.Screens.Play
             if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmapSet.OnlineID }))
                 return;
 
-            beatmapDownloader.Download(beatmapSet);
+            if (useAccelDownload.Value)
+                beatmapDownloader.AccelDownload(beatmapSet);
+            else
+                beatmapDownloader.Download(beatmapSet);
         }
 
         public override bool OnExiting(IScreen next)

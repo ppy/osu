@@ -52,7 +52,7 @@ namespace osu.Game.Database
         /// <param name="model">The <typeparamref name="T"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Upstream arg</param>
         /// <returns>Whether the download was started.</returns>
-        public bool Download(T model, bool minimiseDownloadSize)
+        public bool Download(T model, bool minimiseDownloadSize = false)
         {
             if (!canDownload(model)) return false;
 
@@ -117,7 +117,7 @@ namespace osu.Game.Database
             }
         }
 
-        public bool AccelDownload(T model, bool minimiseDownloadSize)
+        public bool AccelDownload(T model, bool minimiseDownloadSize = false)
         {
             accel = true;
             return Download(model, minimiseDownloadSize);
