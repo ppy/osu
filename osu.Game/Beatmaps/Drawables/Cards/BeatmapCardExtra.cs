@@ -3,7 +3,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -50,7 +49,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private Container mainContent = null!;
         private BeatmapCardContentBackground mainContentBackground = null!;
-        private FillFlowContainer<BeatmapCardStatistic> statisticsContainer = null!;
+        private GridContainer statisticsContainer = null!;
 
         private FillFlowContainer idleBottomContent = null!;
         private BeatmapCardDownloadProgressBar downloadProgressBar = null!;
@@ -274,15 +273,26 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                     d.AddText("mapped by ", t => t.Colour = colourProvider.Content2);
                                                     d.AddUserLink(beatmapSet.Author);
                                                 }),
-                                                statisticsContainer = new FillFlowContainer<BeatmapCardStatistic>
+                                                statisticsContainer = new GridContainer
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(10, 0),
-                                                    Alpha = 0,
-                                                    AlwaysPresent = true,
-                                                    ChildrenEnumerable = createStatistics()
+                                                    RowDimensions = new[]
+                                                    {
+                                                        new Dimension(GridSizeMode.AutoSize),
+                                                        new Dimension(GridSizeMode.AutoSize)
+                                                    },
+                                                    ColumnDimensions = new[]
+                                                    {
+                                                        new Dimension(GridSizeMode.AutoSize),
+                                                        new Dimension(GridSizeMode.AutoSize),
+                                                        new Dimension()
+                                                    },
+                                                    Content = new[]
+                                                    {
+                                                        new Drawable[3],
+                                                        new Drawable[3]
+                                                    }
                                                 },
                                                 new BeatmapCardExtraInfoRow(beatmapSet)
                                                 {
@@ -352,6 +362,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 };
             }
 
+            createStatistics();
+
             Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmapSet.OnlineID);
         }
 
@@ -384,22 +396,32 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             return BeatmapsetsStrings.ShowDetailsByArtist(romanisableArtist);
         }
 
-        private IEnumerable<BeatmapCardStatistic> createStatistics()
+        private void createStatistics()
         {
+            BeatmapCardStatistic withMargin(BeatmapCardStatistic original)
+            {
+                original.Margin = new MarginPadding { Right = 10 };
+                return original;
+            }
+
+            statisticsContainer.Content[0][0] = withMargin(new FavouritesStatistic(beatmapSet)
+            {
+                Current = favouriteState,
+            });
+
+            statisticsContainer.Content[1][0] = withMargin(new PlayCountStatistic(beatmapSet));
+
             if (beatmapSet.HypeStatus != null)
-                yield return new HypesStatistic(beatmapSet.HypeStatus);
+                statisticsContainer.Content[0][1] = withMargin(new HypesStatistic(beatmapSet.HypeStatus));
 
             // web does not show nominations unless hypes are also present.
             // see: https://github.com/ppy/osu-web/blob/8ed7d071fd1d3eaa7e43cf0e4ff55ca2fef9c07c/resources/assets/lib/beatmapset-panel.tsx#L443
             if (beatmapSet.HypeStatus != null && beatmapSet.NominationStatus != null)
-                yield return new NominationsStatistic(beatmapSet.NominationStatus);
-
-            yield return new FavouritesStatistic(beatmapSet) { Current = favouriteState };
-            yield return new PlayCountStatistic(beatmapSet);
+                statisticsContainer.Content[1][1] = withMargin(new NominationsStatistic(beatmapSet.NominationStatus));
 
             var dateStatistic = BeatmapCardDateStatistic.CreateFor(beatmapSet);
             if (dateStatistic != null)
-                yield return dateStatistic;
+                statisticsContainer.Content[0][2] = withMargin(dateStatistic);
         }
 
         private void updateState()
@@ -418,8 +440,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             mainContent.ResizeWidthTo(targetWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             mainContentBackground.Dimmed.Value = showDetails;
-
-            statisticsContainer.FadeTo(showDetails ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
 
             rightAreaBackground.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             rightAreaButtons.FadeTo(showDetails ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
