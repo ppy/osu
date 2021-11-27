@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
 
         private Drawable currentContent;
         private Container panelTarget;
-        private FillFlowContainer<BeatmapCardNormal> foundContent;
+        private FillFlowContainer<BeatmapCard> foundContent;
         private NotFoundDrawable notFoundContent;
         private SupporterRequiredDrawable supporterRequiredContent;
         private BeatmapListingFilterControl filterControl;
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
                                 Padding = new MarginPadding { Horizontal = 20 },
                                 Children = new Drawable[]
                                 {
-                                    foundContent = new FillFlowContainer<BeatmapCardNormal>(),
+                                    foundContent = new FillFlowContainer<BeatmapCard>(),
                                     notFoundContent = new NotFoundDrawable(),
                                     supporterRequiredContent = new SupporterRequiredDrawable(),
                                 }
@@ -135,11 +135,11 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            var newPanels = searchResult.Results.Select(b => new BeatmapCardNormal(b)
+            var newPanels = searchResult.Results.Select(b => BeatmapCard.Create(b, filterControl.CardSize.Value).With(card =>
             {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-            });
+                card.Anchor = Anchor.TopCentre;
+                card.Origin = Anchor.TopCentre;
+            }));
 
             if (filterControl.CurrentPage == 0)
             {
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays
 
                 // spawn new children with the contained so we only clear old content at the last moment.
                 // reverse ID flow is required for correct Z-ordering of the cards' expandable content (last card should be front-most).
-                var content = new ReverseChildIDFillFlowContainer<BeatmapCardNormal>
+                var content = new ReverseChildIDFillFlowContainer<BeatmapCard>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
