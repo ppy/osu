@@ -262,5 +262,19 @@ namespace osu.Game.Tests.Visual.Beatmaps
             });
             AddToggleStep("disable/enable expansion", disabled => this.ChildrenOfType<BeatmapCard>().ForEach(card => card.Expanded.Disabled = disabled));
         }
+
+        [Test]
+        public void TestExtra()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCardExtra(beatmapSetInfo));
+
+            AddToggleStep("toggle expanded state", expanded =>
+            {
+                var card = this.ChildrenOfType<BeatmapCardExtra>().Last();
+                if (!card.Expanded.Disabled)
+                    card.Expanded.Value = expanded;
+            });
+            AddToggleStep("disable/enable expansion", disabled => this.ChildrenOfType<BeatmapCardExtra>().ForEach(card => card.Expanded.Disabled = disabled));
+        }
     }
 }
