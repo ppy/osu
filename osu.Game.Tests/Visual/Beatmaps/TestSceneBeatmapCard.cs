@@ -97,6 +97,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             var longName = CreateAPIBeatmapSet(Ruleset.Value);
             longName.Title = longName.TitleUnicode = "this track has an incredibly and implausibly long title";
             longName.Artist = longName.ArtistUnicode = "and this artist! who would have thunk it. it's really such a long name.";
+            longName.Source = "wow. even the source field has an impossibly long string in it. this really takes the cake, doesn't it?";
             longName.HasExplicitContent = true;
             longName.TrackId = 444;
 

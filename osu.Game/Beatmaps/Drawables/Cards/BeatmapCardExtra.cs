@@ -229,6 +229,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                 },
                                             }
                                         },
+                                        new OsuSpriteText
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Truncate = true,
+                                            Text = beatmapSet.Source,
+                                            Shadow = false,
+                                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                                            Colour = colourProvider.Content2
+                                        },
                                     }
                                 },
                                 new Container
