@@ -171,6 +171,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
+            config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
 
             // Explicit non-virtual function call.
             base.AddInternal(Samples = new PausableSkinnableSound());
@@ -534,9 +535,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="position">The lookup X position. Generally should be <see cref="SamplePlaybackPosition"/>.</param>
         protected double CalculateSamplePlaybackBalance(double position)
         {
-            float balance_adjust_amount = positionalHitsoundsLevel.Value;
+            float balance_adjust_amount = positionalHitsoundsLevel.Value*2;
 
-            return balance_adjust_amount * (userPositionalHitSounds.Value ? position - 0.5f : 0);
+            return balance_adjust_amount * (true ? position - 0.5f : 0);
         }
 
         /// <summary>
