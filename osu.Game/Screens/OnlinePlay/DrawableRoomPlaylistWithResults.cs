@@ -19,13 +19,16 @@ namespace osu.Game.Screens.OnlinePlay
     {
         public Action<PlaylistItem> RequestShowResults;
 
-        public DrawableRoomPlaylistWithResults()
-            : base(false, true)
+        private readonly bool showItemOwner;
+
+        public DrawableRoomPlaylistWithResults(bool showItemOwner = false)
+            : base(false, true, showItemOwner: showItemOwner)
         {
+            this.showItemOwner = showItemOwner;
         }
 
         protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) =>
-            new DrawableRoomPlaylistItemWithResults(item, false, true)
+            new DrawableRoomPlaylistItemWithResults(item, false, true, showItemOwner)
             {
                 RequestShowResults = () => RequestShowResults(item),
                 SelectedItem = { BindTarget = SelectedItem },
@@ -35,8 +38,8 @@ namespace osu.Game.Screens.OnlinePlay
         {
             public Action RequestShowResults;
 
-            public DrawableRoomPlaylistItemWithResults(PlaylistItem item, bool allowEdit, bool allowSelection)
-                : base(item, allowEdit, allowSelection)
+            public DrawableRoomPlaylistItemWithResults(PlaylistItem item, bool allowEdit, bool allowSelection, bool showItemOwner)
+                : base(item, allowEdit, allowSelection, showItemOwner)
             {
             }
 

@@ -76,7 +76,6 @@ namespace osu.Game.Models
         public bool Equals(IBeatmapSetInfo? other) => other is RealmBeatmapSet b && Equals(b);
 
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
-
-        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
     }
 }
