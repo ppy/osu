@@ -52,23 +52,26 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             switch (style)
             {
-                default:
+                case AnimationStyle.Linear:
                     return Easing.None;
+
+                case AnimationStyle.Gravity:
+                    return Easing.InBack;
+
+                case AnimationStyle.InOut1:
+                    return Easing.InOutCubic;
+
+                case AnimationStyle.InOut2:
+                    return Easing.InOutQuint;
 
                 case AnimationStyle.Accelerate1:
                     return Easing.In;
-
-                case AnimationStyle.Linear:
-                    return Easing.None;
 
                 case AnimationStyle.Accelerate2:
                     return Easing.InCubic;
 
                 case AnimationStyle.Accelerate3:
                     return Easing.InQuint;
-
-                case AnimationStyle.Gravity:
-                    return Easing.InBack;
 
                 case AnimationStyle.Decelerate1:
                     return Easing.Out;
@@ -79,11 +82,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case AnimationStyle.Decelerate3:
                     return Easing.OutQuint;
 
-                case AnimationStyle.InOut1:
-                    return Easing.InOutCubic;
-
-                case AnimationStyle.InOut2:
-                    return Easing.InOutQuint;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(style), style, @"Unsupported animation style");
             }
         }
 
