@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading;
+using Markdig.Helpers;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
@@ -25,63 +26,139 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
             if (lyricResponseRoot?.Lyrics == null) return result;
 
+            //蠢办法，但起码比之前有用(
             //先处理原始歌词信息
-            foreach (var s in lyricResponseRoot.Lyrics)
+            foreach (string lyricString in lyricResponseRoot.Lyrics)
             {
-                //忽略目前暂时不会处理的信息
-                if (skipProcess(s)) continue;
-
                 //创建currentLrc
-                var currentLrc = new Lyric();
+                //可能存在一行歌词多个时间，所以先创建列表
+                List<Lyric> lyrics = new List<Lyric>();
 
-                var ss = splitString(s);
+                //Logger.Log($"处理歌词: {lyricString}");
 
-                //获取歌词
-                //设置原始歌词和歌词时间
-                currentLrc.Content = ss[1];
+                bool propertyDetected = false;
+                string propertyName = string.Empty;
+                string lyricContent = string.Empty;
 
-                currentLrc.Time = toMs(ss[0]);
+                //处理属性
+                foreach (char c in lyricString)
+                {
+                    if (c == '[')
+                    {
+                        propertyDetected = true;
+                        continue;
+                    }
 
-                //通过歌词时间查找翻译
-                result.Add(currentLrc);
+                    //如果检测到']'，那么退出属性检测并处理结果
+                    if (c == ']' && propertyDetected)
+                    {
+                        propertyDetected = false;
+
+                        //处理属性
+
+                        //时间
+                        string timeProperty = propertyName.Replace(":", ".");
+
+                        //如果是时间属性
+                        if (timeProperty[0].IsDigit())
+                        {
+                            lyrics.Add(new Lyric
+                            {
+                                Time = toMs(timeProperty)
+                            });
+                        }
+
+                        //todo: 在此放置对其他属性的处理逻辑
+
+                        //清空属性名称
+                        propertyName = string.Empty;
+
+                        //继续
+                        continue;
+                    }
+
+                    //如果是属性，那么添加字符到propertyName，反之则是lyricContent
+                    if (propertyDetected) propertyName = propertyName + c;
+                    else lyricContent = lyricContent + c;
+
+                    //Logger.Log($"原始歌词: propertyName: {propertyName} | lyricContent: {lyricContent}");
+                }
+
+                //最后，设置歌词内容并添加到result
+                foreach (var lyric in lyrics)
+                {
+                    lyric.Content = lyricContent;
+                    //Logger.Log($"添加歌词: {lyric}");
+
+                    result.Add(lyric);
+                }
             }
 
             //再处理翻译歌词
             if (lyricResponseRoot.Tlyrics != null)
             {
-                foreach (var tlyric in lyricResponseRoot.Tlyrics)
+                foreach (string tlyricString in lyricResponseRoot.Tlyrics)
                 {
-                    if (skipProcess(tlyric)) continue;
+                    bool propertyDetected = false;
+                    string propertyName = string.Empty;
+                    string lyricContent = string.Empty;
 
-                    var str = splitString(tlyric);
-                    var tms = toMs(str[0]);
+                    IList<int> times = new List<int>();
 
-                    foreach (var lrc in result.FindAll(l => l.Time == tms))
-                        lrc.TranslatedString = str[1];
+                    //Logger.Log($"处理翻译歌词: {tlyricString}");
+
+                    //处理属性
+                    foreach (char c in tlyricString)
+                    {
+                        if (c == '[')
+                        {
+                            propertyDetected = true;
+                            continue;
+                        }
+
+                        //如果检测到']'，那么退出属性检测并处理结果
+                        if (c == ']' && propertyDetected)
+                        {
+                            propertyDetected = false;
+
+                            //处理属性
+
+                            //时间
+                            string timeProperty = propertyName.Replace(":", ".");
+
+                            //如果是时间属性
+                            if (timeProperty[0].IsDigit())
+                            {
+                                //添加当前时间到times
+                                times.Add(toMs(timeProperty));
+                            }
+
+                            //todo: 在此放置对其他属性的处理逻辑
+
+                            //清空属性名称
+                            propertyName = string.Empty;
+
+                            //继续
+                            continue;
+                        }
+
+                        //如果是属性，那么添加字符到propertyName，反之则是lyricContent
+                        if (propertyDetected) propertyName = propertyName + c;
+                        else lyricContent = lyricContent + c;
+                    }
+
+                    foreach (int time in times)
+                    {
+                        foreach (var lrc in result.FindAll(l => l.Time == time))
+                        {
+                            lrc.TranslatedString = lyricContent;
+                            //Logger.Log($"设置歌词歌词: {lrc}");
+                        }
+                    }
                 }
             }
 
-            return result;
-        }
-
-        /// <param name="src">要处理的lrc信息</param>
-        /// <returns>
-        /// [0]: 时间信息"xx.xx.xx"<br/>
-        /// [1]: 歌词</returns>
-        private string[] splitString(string src)
-        {
-            string[] result = { "", "" };
-
-            //时间
-            result[0] = src.Split(']')
-                           .First() //通过分割第一个向左中括号可以得到时间"[xx:xx.xx"
-                           .Replace("[", "") //将"["去除
-                           .Replace(":", "."); //替换":"为"."，节省后续时间
-
-            //内容
-            result[1] = src.Replace(
-                src.Split(']').First() + ']',
-                string.Empty);
+            result.Sort((l1, l2) => l2.CompareTo(l1));
 
             return result;
         }
@@ -89,7 +166,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         private int toMs(string src)
         {
             int result;
-            var source = src.Split('.');
+            string[] source = src.Split('.');
 
             try
             {
@@ -99,32 +176,16 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"解析歌词行\"{src}\"失败");
-                result = 0;
+                string reason = e.Message;
+
+                if (e is FormatException)
+                    reason = "格式有误, 请检查原歌词是否正确";
+
+                Logger.Error(e, $"无法将\"{src}\"转换为歌词时间: {reason}");
+                result = int.MaxValue;
             }
 
             return result;
-        }
-
-        private readonly string[] noProcessStrings =
-        {
-            "by",
-            "ti",
-            "ar",
-            "al",
-            "offset"
-        };
-
-        private bool skipProcess(string s)
-        {
-            foreach (var nps in noProcessStrings)
-            {
-                if (s.StartsWith($"[{nps}", StringComparison.Ordinal)) return true;
-            }
-
-            if (string.IsNullOrEmpty(s)) return true;
-
-            return false;
         }
 
         #endregion

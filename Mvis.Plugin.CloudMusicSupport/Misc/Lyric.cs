@@ -2,7 +2,7 @@ using System;
 
 namespace Mvis.Plugin.CloudMusicSupport.Misc
 {
-    public class Lyric : IEquatable<Lyric>
+    public class Lyric : IEquatable<Lyric>, IComparable<Lyric>
     {
         public double Time;
         public string Content = string.Empty;
@@ -26,6 +26,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc
             if (ReferenceEquals(this, other)) return true;
 
             return Time == other.Time && Content == other.Content && TranslatedString == other.TranslatedString;
+        }
+
+        public int CompareTo(Lyric other)
+        {
+            if (other == null) return 1;
+
+            return other.Time.CompareTo(Time);
         }
 
         public override bool Equals(object obj)
