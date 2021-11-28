@@ -10,7 +10,7 @@ using osu.Game.IO;
 
 namespace osu.Game.Skinning
 {
-    public class SkinInfo : IHasFiles<SkinFileInfo>, IEquatable<SkinInfo>, IHasPrimaryKey, ISoftDelete
+    public class SkinInfo : IHasFiles<SkinFileInfo>, IEquatable<SkinInfo>, IHasPrimaryKey, ISoftDelete, IHasNamedFiles
     {
         internal const int DEFAULT_SKIN = 0;
         internal const int CLASSIC_SKIN = -1;
@@ -55,5 +55,7 @@ namespace osu.Game.Skinning
             string author = Creator == null ? string.Empty : $"({Creator})";
             return $"{Name} {author}".Trim();
         }
+
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
     }
 }
