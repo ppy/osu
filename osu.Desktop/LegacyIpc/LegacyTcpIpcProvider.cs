@@ -13,6 +13,7 @@ namespace osu.Desktop.LegacyIpc
         public new Func<object, object> MessageReceived;
 
         public LegacyTcpIpcProvider()
+            : base(45357)
         {
             base.MessageReceived += msg =>
             {
