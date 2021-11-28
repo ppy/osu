@@ -24,12 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             positionalHitsoundsLevel = osuConfig.GetBindable<float>(OsuSetting.PositionalHitsoundsLevel);
             Children = new Drawable[]
-            {
-                new SettingsCheckbox
-                {
-                    LabelText = GameplaySettingsStrings.PositionalHitsounds,
-                    Current = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
-                },
+            {                
                 positionalHitsoundsSettings = new FillFlowContainer<SettingsSlider<float>>
                 {
                     Direction = FillDirection.Vertical,
