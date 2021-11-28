@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Desktop.LegacyIpc;
 using osu.Framework;
 using osu.Framework.Development;
 using osu.Framework.Logging;
@@ -26,6 +27,8 @@ namespace osu.Desktop
     public static class Program
     {
         private const string base_game_name = @"osu";
+
+        private static LegacyTcpIpcProvider legacyIpcProvider;
 
         [STAThread]
         public static void Main(string[] args)
@@ -59,33 +62,26 @@ namespace osu.Desktop
                         gameName = $"{base_game_name}-{clientID}";
                         break;
 
-                    case "--osu-stable-difficulty-stream":
-                        while (true)
+                    case "--legacy-ipc-server":
+                        using (legacyIpcProvider = new LegacyTcpIpcProvider())
                         {
-                            try
-                            {
-                                string beatmapFile = Console.ReadLine() ?? string.Empty;
-                                int rulesetId = int.Parse(Console.ReadLine() ?? string.Empty);
-                                LegacyMods legacyMods = (LegacyMods)int.Parse(Console.ReadLine() ?? string.Empty);
-
-                                Ruleset ruleset = rulesetId switch
-                                {
-                                    0 => new OsuRuleset(),
-                                    1 => new TaikoRuleset(),
-                                    2 => new CatchRuleset(),
-                                    3 => new ManiaRuleset(),
-                                    _ => throw new ArgumentException("Invalid ruleset id")
-                                };
-
-                                Mod[] mods = ruleset.ConvertFromLegacyMods(legacyMods).ToArray();
-                                WorkingBeatmap beatmap = new FlatFileWorkingBeatmap(beatmapFile, _ => ruleset);
-                                Console.WriteLine(ruleset.CreateDifficultyCalculator(beatmap).Calculate(mods).StarRating);
-                            }
-                            catch
-                            {
-                                Console.WriteLine(0);
-                            }
+                            legacyIpcProvider.MessageReceived += onLegacyIpcMessageReceived;
+                            legacyIpcProvider.Bind();
+                            legacyIpcProvider.StartAsync().Wait();
                         }
+
+                        return;
+
+                    case "--legacy-ipc-client":
+                        using (legacyIpcProvider = new LegacyTcpIpcProvider())
+                        {
+                            Console.WriteLine(legacyIpcProvider.SendMessageWithResponseAsync<LegacyIpcDifficultyCalculationResponse>(new LegacyIpcDifficultyCalculationRequest
+                            {
+                                BeatmapFile = "/home/smgi/Downloads/osu_files/129891.osu",
+                            }).Result.StarRating);
+                        }
+
+                        return;
                 }
             }
 
@@ -141,13 +137,39 @@ namespace osu.Desktop
 
             return continueExecution;
         }
-    }
 
-    // Note: Keep in osu.Desktop namespace, or update osu!stable also.
-    public class DifficultyCalculationMessage
-    {
-        public string BeatmapFile { get; set; }
-        public int RulesetId { get; set; }
-        public int Mods { get; set; }
+        private static object onLegacyIpcMessageReceived(object message)
+        {
+            switch (message)
+            {
+                case LegacyIpcDifficultyCalculationRequest req:
+                    try
+                    {
+                        Ruleset ruleset = req.RulesetId switch
+                        {
+                            0 => new OsuRuleset(),
+                            1 => new TaikoRuleset(),
+                            2 => new CatchRuleset(),
+                            3 => new ManiaRuleset(),
+                            _ => throw new ArgumentException("Invalid ruleset id")
+                        };
+
+                        Mod[] mods = ruleset.ConvertFromLegacyMods((LegacyMods)req.Mods).ToArray();
+                        WorkingBeatmap beatmap = new FlatFileWorkingBeatmap(req.BeatmapFile, _ => ruleset);
+
+                        return new LegacyIpcDifficultyCalculationResponse
+                        {
+                            StarRating = ruleset.CreateDifficultyCalculator(beatmap).Calculate(mods).StarRating
+                        };
+                    }
+                    catch
+                    {
+                        return new LegacyIpcDifficultyCalculationResponse();
+                    }
+            }
+
+            Console.WriteLine("Type not matched.");
+            return null;
+        }
     }
 }
