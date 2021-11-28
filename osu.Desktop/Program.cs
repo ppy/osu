@@ -28,6 +28,8 @@ namespace osu.Desktop
     {
         private const string base_game_name = @"osu";
 
+        private static LegacyTcpIpcProvider legacyIpc;
+
         [STAThread]
         public static void Main(string[] args)
         {
@@ -92,10 +94,18 @@ namespace osu.Desktop
 
                 if (host.IsPrimaryInstance)
                 {
-                    var legacyIpc = new LegacyTcpIpcProvider();
-                    legacyIpc.MessageReceived += onLegacyIpcMessageReceived;
-                    legacyIpc.Bind();
-                    legacyIpc.StartAsync();
+                    try
+                    {
+                        Logger.Log("Starting legacy IPC provider...");
+                        legacyIpc = new LegacyTcpIpcProvider();
+                        legacyIpc.MessageReceived += onLegacyIpcMessageReceived;
+                        legacyIpc.Bind();
+                        legacyIpc.StartAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "Failed to start legacy IPC provider");
+                    }
                 }
 
                 if (tournamentClient)

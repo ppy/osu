@@ -13,7 +13,7 @@ namespace osu.Desktop.LegacyIpc
     /// </summary>
     public class LegacyTcpIpcProvider : TcpIpcProvider
     {
-        private static readonly Logger logger = Logger.GetLogger("ipc");
+        private static readonly Logger logger = Logger.GetLogger("legacy-ipc");
 
         /// <summary>
         /// Invoked when a message is received from a legacy client.
@@ -27,7 +27,8 @@ namespace osu.Desktop.LegacyIpc
             {
                 try
                 {
-                    logger.Add($"Processing incoming IPC message: {msg.Value}");
+                    logger.Add($"Processing legacy IPC message...");
+                    logger.Add($"\t{msg.Value}", LogLevel.Debug);
 
                     var legacyData = ((JObject)msg.Value).ToObject<LegacyIpcMessage.Data>();
                     object value = parseObject((JObject)legacyData!.MessageData, legacyData.MessageType);
