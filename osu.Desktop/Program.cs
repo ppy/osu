@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Desktop.LegacyIpc;
@@ -11,15 +10,7 @@ using osu.Framework;
 using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.IPC;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Catch;
-using osu.Game.Rulesets.Mania;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Taiko;
 using osu.Game.Tournament;
 
 namespace osu.Desktop
@@ -98,7 +89,6 @@ namespace osu.Desktop
                     {
                         Logger.Log("Starting legacy IPC provider...");
                         legacyIpc = new LegacyTcpIpcProvider();
-                        legacyIpc.MessageReceived += onLegacyIpcMessageReceived;
                         legacyIpc.Bind();
                         legacyIpc.StartAsync();
                     }
@@ -131,40 +121,6 @@ namespace osu.Desktop
             Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
 
             return continueExecution;
-        }
-
-        private static object onLegacyIpcMessageReceived(object message)
-        {
-            switch (message)
-            {
-                case LegacyIpcDifficultyCalculationRequest req:
-                    try
-                    {
-                        Ruleset ruleset = req.RulesetId switch
-                        {
-                            0 => new OsuRuleset(),
-                            1 => new TaikoRuleset(),
-                            2 => new CatchRuleset(),
-                            3 => new ManiaRuleset(),
-                            _ => throw new ArgumentException("Invalid ruleset id")
-                        };
-
-                        Mod[] mods = ruleset.ConvertFromLegacyMods((LegacyMods)req.Mods).ToArray();
-                        WorkingBeatmap beatmap = new FlatFileWorkingBeatmap(req.BeatmapFile, _ => ruleset);
-
-                        return new LegacyIpcDifficultyCalculationResponse
-                        {
-                            StarRating = ruleset.CreateDifficultyCalculator(beatmap).Calculate(mods).StarRating
-                        };
-                    }
-                    catch
-                    {
-                        return new LegacyIpcDifficultyCalculationResponse();
-                    }
-            }
-
-            Console.WriteLine("Type not matched.");
-            return null;
         }
     }
 }
