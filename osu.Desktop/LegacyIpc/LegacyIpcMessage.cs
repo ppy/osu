@@ -23,6 +23,7 @@ namespace osu.Desktop.LegacyIpc
 
         public new object Value
         {
+            get => base.Value;
             set => base.Value = new Data
             {
                 MessageType = value.GetType().Name,
