@@ -15,13 +15,11 @@ namespace osu.Game.Database
     {
         private readonly bool minimiseDownloadSize;
 
-        private readonly MConfigManager config;
-
         public AccelDownloadBeatmapSetRequest(IBeatmapSetInfo set, bool minimiseDownloadSize)
             : base(set)
         {
             this.minimiseDownloadSize = minimiseDownloadSize;
-            config = MConfigManager.GetInstance();
+            var config = MConfigManager.GetInstance();
 
             var dict = new Dictionary<string, object>
             {
@@ -128,6 +126,9 @@ namespace osu.Game.Database
                 errors.Add("存在未闭合的括号");
                 return false;
             }
+
+            if (errors.Count > 5)
+                errors.Add("错误/警告有点多, 您确定这是正确的地址吗?");
 
             return true;
         }

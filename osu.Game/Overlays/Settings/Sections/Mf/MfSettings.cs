@@ -95,8 +95,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             var dict = new Dictionary<string, object>
             {
                 ["BID"] = 114514,
-                ["NOVIDEO"] = "(novideo 或 full)",
-                ["TARGET"] = "(novideo 或 full)/114514 (图号)"
+                ["NOVIDEO"] = "[novideo 或 full]",
+                ["TARGET"] = "[novideo 或 full]/[图号]"
             };
 
             List<string> errors;

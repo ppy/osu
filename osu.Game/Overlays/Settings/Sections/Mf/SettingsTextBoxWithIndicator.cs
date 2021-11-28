@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             {
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                Y = -2
+                Y = -3
             };
 
             public Indicator(ParseState state = ParseState.Working, string result = "等待解析...", List<string> errors = null)
@@ -74,8 +74,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
             public void UpdateInfo(ParseState newState, string result, List<string> errors = null)
             {
-                this.FlashColour(Color4.White, 1000, Easing.OutQuint);
-
                 string errorsText = string.Empty;
 
                 if (errors != null)
@@ -96,9 +94,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
                     case ParseState.Success:
                         iconDisplay.Icon = errors?.Count > 0 ? FontAwesome.Solid.Exclamation : FontAwesome.Solid.Check;
-                        textDisplay.Text = errors?.Count > 0
-                            ? errorsText
-                            : $"解析完毕, 最终URL将会是 {result}";
+                        textDisplay.Text = errorsText + "\n" + $"解析完毕, 最终URL将会是 {result}";
 
                         this.FadeColour(errors?.Count > 0
                             ? Color4.Gold
@@ -111,6 +107,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                         this.FadeTo(0.8f, 300, Easing.OutQuint);
                         break;
                 }
+
+                this.FlashColour(Color4.White, 500, Easing.OutQuint);
             }
         }
     }

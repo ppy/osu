@@ -34,6 +34,7 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.UseAccelForDefault, true);
             SetDefault(MSetting.DoNotShowDisclaimer, false);
             SetDefault(MSetting.AccelSource, "https://txy1.sayobot.cn/beatmaps/download/[TARGET]");
+            SetDefault(MSetting.UseAccelSetToOldOption, false);
 
             //UI Settings
             SetDefault(MSetting.OptUI, true);
@@ -71,10 +72,6 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.PreferredFont, "Torus");
             SetDefault(MSetting.LoaderBackgroundColor, "#000000");
 
-            //Deprecated
-            SetDefault(MSetting.FadeOutWindowWhenExiting, false);
-            SetDefault(MSetting.FadeInWindowWhenEntering, false);
-
             //Gamemode集成
             SetDefault(MSetting.Gamemode, GamemodeActivateCondition.InGame);
 
@@ -89,9 +86,6 @@ namespace osu.Game.Configuration
 
             //Mpris
             SetDefault(MSetting.MprisUseAvatarlogoAsCover, true);
-
-            if (Get<bool>(MSetting.FadeOutWindowWhenExiting) || Get<bool>(MSetting.FadeInWindowWhenEntering))
-                SetValue(MSetting.AllowWindowFadeEffect, true);
         }
 
         public Color4 GetCustomLoaderColor()
@@ -116,7 +110,6 @@ namespace osu.Game.Configuration
     {
         OptUI,
         TrianglesEnabled,
-        UseSayobot,
         UseAccelForDefault,
         MvisBgBlur,
         MvisStoryboardProxy,
@@ -137,8 +130,6 @@ namespace osu.Game.Configuration
         CustomWindowIconPath,
         UseCustomGreetingPicture,
         AllowWindowFadeEffect,
-        FadeOutWindowWhenExiting,
-        FadeInWindowWhenEntering,
         UseSystemCursor,
         PreferredFont,
         MvisCurrentAudioProvider,
@@ -152,7 +143,8 @@ namespace osu.Game.Configuration
         EnableTray,
         EnableSystemNotifications,
         TrayIconName,
-        AccelSource
+        AccelSource,
+        UseAccelSetToOldOption
     }
 
     public enum GamemodeActivateCondition
