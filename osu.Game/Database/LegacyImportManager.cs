@@ -19,7 +19,10 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
-    public class StableImportManager : Component
+    /// <summary>
+    /// Handles migration of legacy user data from osu-stable.
+    /// </summary>
+    public class LegacyImportManager : Component
     {
         [Resolved]
         private SkinManager skins { get; set; }
@@ -53,16 +56,16 @@ namespace osu.Game.Database
 
             Task beatmapImportTask = Task.CompletedTask;
             if (content.HasFlagFast(StableContent.Beatmaps))
-                importTasks.Add(beatmapImportTask = beatmaps.ImportFromStableAsync(stableStorage));
+                importTasks.Add(beatmapImportTask = new LegacyBeatmapImporter(beatmaps).ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Skins))
-                importTasks.Add(skins.ImportFromStableAsync(stableStorage));
+                importTasks.Add(new LegacySkinImporter(skins).ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Collections))
                 importTasks.Add(beatmapImportTask.ContinueWith(_ => collections.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
 
             if (content.HasFlagFast(StableContent.Scores))
-                importTasks.Add(beatmapImportTask.ContinueWith(_ => scores.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
+                importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyScoreImporter(scores).ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
 
             await Task.WhenAll(importTasks.ToArray()).ConfigureAwait(false);
         }

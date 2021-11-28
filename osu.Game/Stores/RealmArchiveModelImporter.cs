@@ -253,7 +253,7 @@ namespace osu.Game.Stores
             var scheduledImport = Task.Factory.StartNew(async () => await Import(model, archive, lowPriority, cancellationToken).ConfigureAwait(false),
                 cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap();
 
-            return await scheduledImport.ConfigureAwait(true);
+            return await scheduledImport.ConfigureAwait(false);
         }
 
         /// <summary>

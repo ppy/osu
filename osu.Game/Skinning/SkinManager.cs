@@ -301,21 +301,6 @@ namespace osu.Game.Skinning
             remove => skinModelManager.ItemRemoved -= value;
         }
 
-        public Task ImportFromStableAsync(StableStorage stableStorage)
-        {
-            return skinModelManager.ImportFromStableAsync(stableStorage);
-        }
-
-        public void Export(SkinInfo item)
-        {
-            skinModelManager.Export(item);
-        }
-
-        public void ExportModelTo(SkinInfo model, Stream outputStream)
-        {
-            skinModelManager.ExportModelTo(model, outputStream);
-        }
-
         public void Update(SkinInfo item)
         {
             skinModelManager.Update(item);

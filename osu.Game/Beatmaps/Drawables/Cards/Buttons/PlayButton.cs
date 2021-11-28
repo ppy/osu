@@ -97,6 +97,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             if (previewTrack == null)
             {
                 toggleLoading(true);
+
                 LoadComponentAsync(previewTrack = previewTrackManager.Get(beatmapSetInfo), onPreviewLoaded);
             }
             else
@@ -112,18 +113,23 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         private void onPreviewLoaded(PreviewTrack loadedPreview)
         {
-            // another async load might have completed before this one.
-            // if so, do not make any changes.
-            if (loadedPreview != previewTrack)
-                return;
+            // Make sure that we schedule to after the next audio frame to fix crashes in single-threaded execution.
+            // See: https://github.com/ppy/osu-framework/issues/4692
+            Schedule(() =>
+            {
+                // another async load might have completed before this one.
+                // if so, do not make any changes.
+                if (loadedPreview != previewTrack)
+                    return;
 
-            AddInternal(loadedPreview);
-            toggleLoading(false);
+                AddInternal(loadedPreview);
+                toggleLoading(false);
 
-            loadedPreview.Stopped += () => Schedule(() => Playing.Value = false);
+                loadedPreview.Stopped += () => Schedule(() => Playing.Value = false);
 
-            if (Playing.Value)
-                tryStartPreview();
+                if (Playing.Value)
+                    tryStartPreview();
+            });
         }
 
         private void tryStartPreview()
