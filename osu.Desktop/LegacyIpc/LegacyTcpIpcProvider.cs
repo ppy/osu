@@ -38,7 +38,7 @@ namespace osu.Desktop.LegacyIpc
                 }
                 catch (Exception ex)
                 {
-                    logger.Add("Processing IPC message failed!", exception: ex);
+                    logger.Add($"Processing IPC message failed: {msg.Value}", exception: ex);
                     return null;
                 }
             };
