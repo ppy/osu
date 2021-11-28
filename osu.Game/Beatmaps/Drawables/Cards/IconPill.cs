@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.BeatmapListing.Panels
+namespace osu.Game.Beatmaps.Drawables.Cards
 {
     public class IconPill : CircularContainer
     {
