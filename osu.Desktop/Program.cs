@@ -61,27 +61,6 @@ namespace osu.Desktop
 
                         gameName = $"{base_game_name}-{clientID}";
                         break;
-
-                    case "--legacy-ipc-server":
-                        using (legacyIpcProvider = new LegacyTcpIpcProvider())
-                        {
-                            legacyIpcProvider.MessageReceived += onLegacyIpcMessageReceived;
-                            legacyIpcProvider.Bind();
-                            legacyIpcProvider.StartAsync().Wait();
-                        }
-
-                        return;
-
-                    case "--legacy-ipc-client":
-                        using (legacyIpcProvider = new LegacyTcpIpcProvider())
-                        {
-                            Console.WriteLine(legacyIpcProvider.SendMessageWithResponseAsync<LegacyIpcDifficultyCalculationResponse>(new LegacyIpcDifficultyCalculationRequest
-                            {
-                                BeatmapFile = "/home/smgi/Downloads/osu_files/129891.osu",
-                            }).Result.StarRating);
-                        }
-
-                        return;
                 }
             }
 
@@ -111,6 +90,14 @@ namespace osu.Desktop
                         Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
                         return;
                     }
+                }
+
+                if (host.IsPrimaryInstance)
+                {
+                    var legacyIpc = new LegacyTcpIpcProvider();
+                    legacyIpc.MessageReceived += onLegacyIpcMessageReceived;
+                    legacyIpc.Bind();
+                    legacyIpc.StartAsync();
                 }
 
                 if (tournamentClient)
