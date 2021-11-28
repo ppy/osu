@@ -170,9 +170,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
             try
             {
-                result = int.Parse(source[0]) * 60000
-                         + int.Parse(source[1]) * 1000
-                         + int.Parse(source[2]);
+                result = int.Parse(source.ElementAtOrDefault(0) ?? "0") * 60000
+                         + int.Parse(source.ElementAtOrDefault(1) ?? "0") * 1000
+                         + int.Parse(source.ElementAtOrDefault(2) ?? "0");
             }
             catch (Exception e)
             {
