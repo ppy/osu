@@ -124,6 +124,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
         private readonly BindableList<HitSampleInfo> samplesBindable = new BindableList<HitSampleInfo>();
+        private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
 
         private readonly Bindable<float> positionalHitsoundsLevel = new Bindable<float>();        
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
