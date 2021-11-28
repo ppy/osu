@@ -2,14 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 
 namespace osu.Desktop.LegacyIpc
 {
+    /// <summary>
+    /// Provides IPC to legacy osu! clients.
+    /// </summary>
     public class LegacyTcpIpcProvider : TcpIpcProvider
     {
+        private static readonly Logger logger = Logger.GetLogger("ipc");
+
+        /// <summary>
+        /// Invoked when a message is received from a legacy client.
+        /// </summary>
         public new Func<object, object> MessageReceived;
 
         public LegacyTcpIpcProvider()
@@ -19,34 +27,21 @@ namespace osu.Desktop.LegacyIpc
             {
                 try
                 {
+                    logger.Add($"Processing incoming IPC message: {msg.Value}");
+
                     var legacyData = ((JObject)msg.Value).ToObject<LegacyIpcMessage.Data>();
-                    object value = parseObject((JObject)legacyData.MessageData, legacyData.MessageType);
+                    object value = parseObject((JObject)legacyData!.MessageData, legacyData.MessageType);
 
                     object result = MessageReceived?.Invoke(value);
                     return result != null ? new LegacyIpcMessage { Value = result } : null;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    logger.Add("Processing IPC message failed!", exception: ex);
+                    return null;
                 }
-
-                return null;
             };
         }
-
-        public Task SendMessageAsync(object message) => base.SendMessageAsync(new LegacyIpcMessage { Value = message });
-
-        public async Task<T> SendMessageWithResponseAsync<T>(object message)
-        {
-            var result = await base.SendMessageWithResponseAsync(new LegacyIpcMessage { Value = message }).ConfigureAwait(false);
-
-            var legacyData = ((JObject)result.Value).ToObject<LegacyIpcMessage.Data>();
-            return (T)parseObject((JObject)legacyData.MessageData, legacyData.MessageType);
-        }
-
-        public new Task SendMessageAsync(IpcMessage message) => throw new InvalidOperationException("Use typed overloads.");
-
-        public new Task<IpcMessage> SendMessageWithResponseAsync(IpcMessage message) => throw new InvalidOperationException("Use typed overloads.");
 
         private object parseObject(JObject value, string type)
         {

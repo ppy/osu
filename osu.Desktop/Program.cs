@@ -28,8 +28,6 @@ namespace osu.Desktop
     {
         private const string base_game_name = @"osu";
 
-        private static LegacyTcpIpcProvider legacyIpcProvider;
-
         [STAThread]
         public static void Main(string[] args)
         {
