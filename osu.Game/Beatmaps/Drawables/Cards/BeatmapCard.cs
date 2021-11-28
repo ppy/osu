@@ -276,29 +276,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                     AlwaysPresent = true,
                                                     ChildrenEnumerable = createStatistics()
                                                 },
-                                                new FillFlowContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(4, 0),
-                                                    Children = new Drawable[]
-                                                    {
-                                                        new BeatmapSetOnlineStatusPill
-                                                        {
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Status = beatmapSet.Status,
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft
-                                                        },
-                                                        new DifficultySpectrumDisplay(beatmapSet)
-                                                        {
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            DotSize = new Vector2(6, 12)
-                                                        }
-                                                    }
-                                                }
+                                                new BeatmapCardExtraInfoRow(beatmapSet)
                                             }
                                         },
                                         downloadProgressBar = new BeatmapCardDownloadProgressBar
