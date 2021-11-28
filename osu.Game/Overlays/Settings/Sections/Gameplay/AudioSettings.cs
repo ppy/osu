@@ -9,7 +9,6 @@ using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Framework.Graphics.Containers;
 
-
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public class AudioSettings : SettingsSubsection
@@ -19,7 +18,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         private Bindable<float> positionalHitsoundsLevel;
 
         private FillFlowContainer<SettingsSlider<float>> positionalHitsoundsSettings;
-
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config,OsuConfigManager osuConfig)
