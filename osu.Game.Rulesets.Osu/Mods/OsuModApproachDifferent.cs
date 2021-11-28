@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public enum AnimationStyle
         {
             Linear,
-            Gravity,           
+            Gravity,
             InOut1,
             InOut2,
             Accelerate1,
