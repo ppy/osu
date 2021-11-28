@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osuTK.Graphics;
+using osu.Game.Overlays.Settings.Sections.Gameplay;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -124,6 +125,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
         private readonly BindableList<HitSampleInfo> samplesBindable = new BindableList<HitSampleInfo>();
         private readonly Bindable<bool> userPositionalHitSounds = new Bindable<bool>();
+        private readonly Bindable<float> positionalHitsoundsLevel = new Bindable<float>();
 
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
         private readonly Bindable<int> comboIndexWithOffsetsBindable = new Bindable<int>();
@@ -532,7 +534,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="position">The lookup X position. Generally should be <see cref="SamplePlaybackPosition"/>.</param>
         protected double CalculateSamplePlaybackBalance(double position)
         {
-            const float balance_adjust_amount = 0.4f;
+            float balance_adjust_amount = positionalHitsoundsLevel.Value;
 
             return balance_adjust_amount * (userPositionalHitSounds.Value ? position - 0.5f : 0);
         }
