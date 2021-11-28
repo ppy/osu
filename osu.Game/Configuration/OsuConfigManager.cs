@@ -97,6 +97,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MenuParallax, true);
 
             // Gameplay
+            SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.8f, 0.1f, 1f);
             SetDefault(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
@@ -251,6 +252,7 @@ namespace osu.Game.Configuration
         BlurLevel,
         LightenDuringBreaks,
         ShowStoryboard,
+        PositionalHitsoundsLevel,
         KeyOverlay,
         PositionalHitSounds,
         AlwaysPlayFirstComboBreak,

@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
+using osu.Framework.Graphics.Containers;
+
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
@@ -13,15 +16,38 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
     {
         protected override LocalisableString Header => GameplaySettingsStrings.AudioHeader;
 
+        private Bindable<float> positionalHitsoundsLevel;
+
+        private FillFlowContainer<SettingsSlider<float>> positionalHitsoundsSettings;
+
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config,OsuConfigManager osuConfig)
         {
+            positionalHitsoundsLevel = osuConfig.GetBindable<float>(OsuSetting.PositionalHitsoundsLevel);
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.PositionalHitsounds,
                     Current = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
+                },
+                positionalHitsoundsSettings = new FillFlowContainer<SettingsSlider<float>>
+                {
+                    Direction = FillDirection.Vertical,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Masking = true,
+                    Children = new[]
+                    {
+                        new SettingsSlider<float>
+                        {
+                            LabelText = AudioSettingsStrings.PositionalLevel,
+                            Current = positionalHitsoundsLevel,
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true,
+                        },
+                    }
                 },
                 new SettingsCheckbox
                 {
