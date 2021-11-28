@@ -16,9 +16,11 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
@@ -62,6 +64,9 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved]
+        private Storage storage { get; set; }
 
         [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
@@ -753,7 +758,7 @@ namespace osu.Game.Screens.Edit
         private void exportBeatmap()
         {
             Save();
-            beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+            new LegacyBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
         }
 
         private void updateLastSavedHash()

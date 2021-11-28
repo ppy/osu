@@ -299,7 +299,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return ((IMultiplayerClient)this).LoadRequested();
         }
 
-        public override async Task AddPlaylistItem(MultiplayerPlaylistItem item)
+        public async Task AddUserPlaylistItem(int userId, MultiplayerPlaylistItem item)
         {
             Debug.Assert(Room != null);
             Debug.Assert(APIRoom != null);
@@ -313,6 +313,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 case QueueMode.HostOnly:
                     // In host-only mode, the current item is re-used.
                     item.ID = currentItem.ID;
+                    item.OwnerID = currentItem.OwnerID;
 
                     serverSidePlaylist[currentIndex] = item;
                     await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
@@ -323,6 +324,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 default:
                     item.ID = serverSidePlaylist.Last().ID + 1;
+                    item.OwnerID = userId;
 
                     serverSidePlaylist.Add(item);
                     await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
@@ -331,6 +333,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     break;
             }
         }
+
+        public override Task AddPlaylistItem(MultiplayerPlaylistItem item) => AddUserPlaylistItem(api.LocalUser.Value.OnlineID, item);
 
         protected override Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
         {

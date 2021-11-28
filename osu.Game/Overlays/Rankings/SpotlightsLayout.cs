@@ -13,9 +13,9 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 using System.Linq;
 using System.Threading;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.BeatmapListing.Panels;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Rankings
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(10),
-                    Children = response.BeatmapSets.Select(b => new GridBeatmapPanel(b)
+                    Children = response.BeatmapSets.Select(b => new BeatmapCard(b)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,

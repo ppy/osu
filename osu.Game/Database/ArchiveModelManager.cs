@@ -20,7 +20,6 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
-using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Database
 {
@@ -82,8 +81,6 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
-        private readonly Storage exportStorage;
-
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
@@ -91,8 +88,6 @@ namespace osu.Game.Database
             ModelStore = modelStore;
             ModelStore.ItemUpdated += item => handleEvent(() => ItemUpdated?.Invoke(item));
             ModelStore.ItemRemoved += item => handleEvent(() => ItemRemoved?.Invoke(item));
-
-            exportStorage = storage.GetStorageForDirectory(@"exports");
 
             Files = new FileStore(contextFactory, storage);
 
@@ -453,41 +448,6 @@ namespace osu.Game.Database
         }, cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap().ConfigureAwait(false);
 
         /// <summary>
-        /// Exports an item to a legacy (.zip based) package.
-        /// </summary>
-        /// <param name="item">The item to export.</param>
-        public void Export(TModel item)
-        {
-            var retrievedItem = ModelStore.ConsumableItems.FirstOrDefault(s => s.ID == item.ID);
-
-            if (retrievedItem == null)
-                throw new ArgumentException(@"Specified model could not be found", nameof(item));
-
-            string filename = $"{GetValidFilename(item.ToString())}{HandledExtensions.First()}";
-
-            using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
-                ExportModelTo(retrievedItem, stream);
-
-            exportStorage.PresentFileExternally(filename);
-        }
-
-        /// <summary>
-        /// Exports an item to the given output stream.
-        /// </summary>
-        /// <param name="model">The item to export.</param>
-        /// <param name="outputStream">The output stream to export to.</param>
-        public virtual void ExportModelTo(TModel model, Stream outputStream)
-        {
-            using (var archive = ZipArchive.Create())
-            {
-                foreach (var file in model.Files)
-                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.GetStoragePath()));
-
-                archive.SaveTo(outputStream);
-            }
-        }
-
-        /// <summary>
         /// Replace an existing file with a new version.
         /// </summary>
         /// <param name="model">The item to operate on.</param>
@@ -729,45 +689,11 @@ namespace osu.Game.Database
         #region osu-stable import
 
         /// <summary>
-        /// The relative path from osu-stable's data directory to import items from.
-        /// </summary>
-        protected virtual string ImportFromStablePath => null;
-
-        /// <summary>
-        /// Select paths to import from stable where all paths should be absolute. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
-        /// </summary>
-        protected virtual IEnumerable<string> GetStableImportPaths(Storage storage) => storage.GetDirectories(ImportFromStablePath)
-                                                                                              .Select(path => storage.GetFullPath(path));
-
-        /// <summary>
         /// Whether this specified path should be removed after successful import.
         /// </summary>
         /// <param name="path">The path for consideration. May be a file or a directory.</param>
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
-
-        public Task ImportFromStableAsync(StableStorage stableStorage)
-        {
-            var storage = PrepareStableStorage(stableStorage);
-
-            // Handle situations like when the user does not have a Skins folder.
-            if (!storage.ExistsDirectory(ImportFromStablePath))
-            {
-                string fullPath = storage.GetFullPath(ImportFromStablePath);
-
-                Logger.Log(@$"Folder ""{fullPath}"" not available in the target osu!stable installation to import {HumanisedModelName}s.", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
-            return Task.Run(async () => await Import(GetStableImportPaths(storage).ToArray()).ConfigureAwait(false));
-        }
-
-        /// <summary>
-        /// Run any required traversal operations on the stable storage location before performing operations.
-        /// </summary>
-        /// <param name="stableStorage">The stable storage.</param>
-        /// <returns>The usable storage. Return the unchanged <paramref name="stableStorage"/> if no traversal is required.</returns>
-        protected virtual Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage;
 
         #endregion
 
@@ -908,19 +834,6 @@ namespace osu.Game.Database
             // therefore, let's use a guaranteed unique hash.
             // this doesn't follow the SHA2 hashing schema intentionally, so such entries on the data store can be identified.
             return Guid.NewGuid().ToString();
-        }
-
-        private readonly char[] invalidFilenameCharacters = Path.GetInvalidFileNameChars()
-                                                                // Backslash is added to avoid issues when exporting to zip.
-                                                                // See SharpCompress filename normalisation https://github.com/adamhathcock/sharpcompress/blob/a1e7c0068db814c9aa78d86a94ccd1c761af74bd/src/SharpCompress/Writers/Zip/ZipWriter.cs#L143.
-                                                                .Append('\\')
-                                                                .ToArray();
-
-        protected string GetValidFilename(string filename)
-        {
-            foreach (char c in invalidFilenameCharacters)
-                filename = filename.Replace(c, '_');
-            return filename;
         }
     }
 }
