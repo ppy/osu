@@ -307,6 +307,9 @@ namespace osu.Game.Database
                 case 10:
                     string rulesetSettingClassName = getMappedOrOriginalName(typeof(RealmRulesetSetting));
 
+                    if (!migration.OldRealm.Schema.TryFindObjectSchema(rulesetSettingClassName, out _))
+                        return;
+
                     var oldSettings = migration.OldRealm.DynamicApi.All(rulesetSettingClassName);
                     var newSettings = migration.NewRealm.All<RealmRulesetSetting>().ToList();
 
@@ -328,6 +331,9 @@ namespace osu.Game.Database
 
                 case 11:
                     string keyBindingClassName = getMappedOrOriginalName(typeof(RealmKeyBinding));
+
+                    if (!migration.OldRealm.Schema.TryFindObjectSchema(keyBindingClassName, out _))
+                        return;
 
                     var oldKeyBindings = migration.OldRealm.DynamicApi.All(keyBindingClassName);
                     var newKeyBindings = migration.NewRealm.All<RealmKeyBinding>().ToList();
