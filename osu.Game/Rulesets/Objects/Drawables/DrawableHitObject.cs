@@ -124,10 +124,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
         private readonly BindableList<HitSampleInfo> samplesBindable = new BindableList<HitSampleInfo>();
-        private readonly Bindable<bool> userPositionalHitSounds = new Bindable<bool>();
-        private readonly Bindable<float> positionalHitsoundsLevel = new Bindable<float>();
 
-        private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
+        private readonly Bindable<float> positionalHitsoundsLevel = new Bindable<float>();        private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
         private readonly Bindable<int> comboIndexWithOffsetsBindable = new Bindable<int>();
 
         protected override bool RequiresChildrenUpdate => true;
@@ -170,7 +168,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
-            config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
             config.BindWith(OsuSetting.PositionalHitsoundsLevel, positionalHitsoundsLevel);
 
             // Explicit non-virtual function call.
@@ -535,9 +532,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="position">The lookup X position. Generally should be <see cref="SamplePlaybackPosition"/>.</param>
         protected double CalculateSamplePlaybackBalance(double position)
         {
+            double returnedvalue;
             float balance_adjust_amount = positionalHitsoundsLevel.Value*2;
-
-            return balance_adjust_amount * (true ? position - 0.5f : 0);
+            returnedvalue = balance_adjust_amount *(position - 0.5f );
+            
+            return returnedvalue;
         }
 
         /// <summary>

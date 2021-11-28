@@ -97,7 +97,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MenuParallax, true);
 
             // Gameplay
-            SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.8f, 0, 1);
+            SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
             SetDefault(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
@@ -109,7 +109,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
-            SetDefault(OsuSetting.PositionalHitSounds, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
             SetDefault(OsuSetting.FloatingComments, false);
@@ -254,7 +253,6 @@ namespace osu.Game.Configuration
         ShowStoryboard,
         PositionalHitsoundsLevel,
         KeyOverlay,
-        PositionalHitSounds,
         AlwaysPlayFirstComboBreak,
         FloatingComments,
         HUDVisibilityMode,
