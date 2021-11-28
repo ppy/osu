@@ -40,9 +40,6 @@ namespace Mvis.Plugin.StoryboardSupport
         [Resolved]
         private MusicController music { get; set; }
 
-        [Resolved]
-        private Bindable<WorkingBeatmap> currentBeatmap { get; set; }
-
         public override int Version => 8;
 
         public BackgroundStoryBoardLoader()
@@ -158,6 +155,7 @@ namespace Mvis.Plugin.StoryboardSupport
 
             sbLoaded.Value = true;
             NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
+            StoryboardReplacesBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
 
             if (LLin != null)
                 LLin.OnSeek += Seek;
@@ -180,7 +178,7 @@ namespace Mvis.Plugin.StoryboardSupport
                 if (NeedToHideTriangles.Value) LLin.RequestCleanBackground(this);
                 else LLin.RequestNonCleanBackground(this);
 
-                if (targetBeatmap.Storyboard.ReplacesBackground) LLin.RequestBlackBackground(this);
+                if (StoryboardReplacesBackground.Value) LLin.RequestBlackBackground(this);
                 else LLin.RequestNonBlackBackground(this);
             }
 

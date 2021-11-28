@@ -231,9 +231,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             currentLyricRequest?.Dispose();
 
             //处理要搜索的歌名: "艺术家 标题"
-            var title = beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title;
-            var artist = beatmap.Metadata.ArtistUnicode ?? beatmap.Metadata.Artist;
-            var target = encoder.Encode($"{artist} {title}");
+            string title = beatmap.Metadata.TitleUnicode;
+            string artist = beatmap.Metadata.ArtistUnicode;
+            string target = encoder.Encode($"{artist} {title}");
 
             var req = new OsuJsonWebRequest<ResponseRoot>(
                 $"https://music.163.com/api/search/get/web?hlpretag=&hlposttag=&s={target}&type=1&total=true&limit=1");
@@ -275,14 +275,14 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
         private void onRequestFinish(ResponseRoot responseRoot, Action<List<Lyric>> onFinish, Action<string> onFail)
         {
-            if (responseRoot.Result.SongCount <= 0)
+            if ((responseRoot.Result?.SongCount ?? 0) <= 0)
             {
                 onFail?.Invoke("未搜索到对应歌曲!");
                 return;
             }
 
-            var id = responseRoot.Result.Songs.First().ID;
-            var target = $"https://music.163.com/api/song/lyric?os=pc&id={id}&lv=-1&kv=-1&tv=-1";
+            int id = responseRoot.Result.Songs.First().ID;
+            string target = $"https://music.163.com/api/song/lyric?os=pc&id={id}&lv=-1&kv=-1&tv=-1";
             var req = new OsuJsonWebRequest<LyricResponseRoot>(target);
             req.Finished += () => onFinish?.Invoke(parse(req.ResponseObject));
             req.Failed += e => Logger.Error(e, "获取歌词失败");
@@ -302,9 +302,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         {
             try
             {
-                var target = $"custom/lyrics/beatmap-{working.BeatmapSetInfo.ID}.json";
+                string target = $"custom/lyrics/beatmap-{working.BeatmapSetInfo.ID}.json";
 
-                var content = File.ReadAllText(storage.GetFullPath(target, true));
+                string content = File.ReadAllText(storage.GetFullPath(target, true));
 
                 if (string.IsNullOrEmpty(content))
                 {
@@ -326,14 +326,14 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         {
             try
             {
-                var target = $"custom/lyrics/beatmap-{working.BeatmapSetInfo.ID}.json";
+                string target = $"custom/lyrics/beatmap-{working.BeatmapSetInfo.ID}.json";
 
                 var lrc = new LyricInfo();
                 var tLrc = new LyricInfo();
 
                 foreach (var l in lyrics)
                 {
-                    var time = "[" + TimeSpan.FromMilliseconds(l.Time).ToString("mm\\:ss\\.fff") + "]";
+                    string time = "[" + TimeSpan.FromMilliseconds(l.Time).ToString("mm\\:ss\\.fff") + "]";
                     lrc.RawLyric +=
                         time
                         + l.Content
@@ -345,7 +345,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                         + "\n";
                 }
 
-                var serializeObject = JsonConvert.SerializeObject(new LyricResponseRoot
+                string serializeObject = JsonConvert.SerializeObject(new LyricResponseRoot
                 {
                     RawLyric = lrc,
                     RawTLyric = tLrc

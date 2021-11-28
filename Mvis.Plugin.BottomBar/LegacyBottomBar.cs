@@ -135,7 +135,7 @@ namespace Mvis.Plugin.BottomBar
             progressBar.MoveToY(4f, 300, Easing.OutQuint);
         }
 
-        public bool OkForHide() => IsHovered;
+        public bool OkForHide() => !IsHovered;
 
         private void checkForPluginControls(IFunctionProvider provider)
         {

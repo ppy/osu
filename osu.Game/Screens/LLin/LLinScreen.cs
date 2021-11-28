@@ -610,10 +610,13 @@ namespace osu.Game.Screens.LLin
                         //隐藏侧边栏
                         sidebar.ShowComponent(null);
 
+                        lockButton.Bindable.Disabled = false;
                         lockButton.Bindable.Value = true;
 
                         //防止手机端无法恢复界面
                         lockButton.Bindable.Disabled = RuntimeInfo.IsDesktop;
+
+                        currentFunctionBar.ShowFunctionControlTemporary();
                     },
                     Description = LLinBaseStrings.HideAndLockInterface,
                     Type = FunctionType.Misc
@@ -642,7 +645,7 @@ namespace osu.Game.Screens.LLin
                 lockButton = new ToggleableFakeButton
                 {
                     Description = LLinBaseStrings.LockInterface,
-                    Action = currentFunctionBar.ShowFunctionControlTemporary,
+                    Action = () => currentFunctionBar.ShowFunctionControlTemporary(),
                     Type = FunctionType.Plugin,
                     Icon = FontAwesome.Solid.Lock
                 }
@@ -794,6 +797,8 @@ namespace osu.Game.Screens.LLin
                 changeFunctionBarProvider(pluginManager.GetFunctionBarProviderByPath(v.NewValue));
             }, true);
 
+            blackBackground.BindValueChanged(_ => applyBackgroundBrightness());
+
             base.LoadComplete();
         }
 
@@ -925,7 +930,7 @@ namespace osu.Game.Screens.LLin
             currentFunctionBar.ShowFunctionControlTemporary();
 
             //如果界面已隐藏、不是强制显示并且已经锁定变更
-            if (!forceActive && lockButton.Bindable.Disabled && InterfacesHidden) return;
+            if (!forceActive && lockButton.Bindable.Value && InterfacesHidden) return;
 
             currentFunctionBar.Show();
             applyBackgroundBrightness();
