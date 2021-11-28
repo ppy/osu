@@ -15,6 +15,9 @@ namespace osu.Game.Online
         [Resolved(CanBeNull = true)]
         protected BeatmapManager? Manager { get; private set; }
 
+        [Resolved(CanBeNull = true)]
+        protected BeatmapModelDownloader? Downloader { get; private set; }
+
         private ArchiveDownloadRequest<IBeatmapSetInfo>? attachedRequest;
 
         public BeatmapDownloadTracker(IBeatmapSetInfo trackedItem)
@@ -25,7 +28,7 @@ namespace osu.Game.Online
         [BackgroundDependencyLoader(true)]
         private void load()
         {
-            if (Manager == null)
+            if (Manager == null || Downloader == null)
                 return;
 
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
@@ -34,10 +37,10 @@ namespace osu.Game.Online
             if (Manager.IsAvailableLocally(beatmapSetInfo))
                 UpdateState(DownloadState.LocallyAvailable);
             else
-                attachDownload(Manager.GetExistingDownload(beatmapSetInfo));
+                attachDownload(Downloader.GetExistingDownload(beatmapSetInfo));
 
-            Manager.DownloadBegan += downloadBegan;
-            Manager.DownloadFailed += downloadFailed;
+            Downloader.DownloadBegan += downloadBegan;
+            Downloader.DownloadFailed += downloadFailed;
             Manager.ItemUpdated += itemUpdated;
             Manager.ItemRemoved += itemRemoved;
         }
@@ -115,10 +118,14 @@ namespace osu.Game.Online
             base.Dispose(isDisposing);
             attachDownload(null);
 
+            if (Downloader != null)
+            {
+                Downloader.DownloadBegan -= downloadBegan;
+                Downloader.DownloadFailed -= downloadFailed;
+            }
+
             if (Manager != null)
             {
-                Manager.DownloadBegan -= downloadBegan;
-                Manager.DownloadFailed -= downloadFailed;
                 Manager.ItemUpdated -= itemUpdated;
                 Manager.ItemRemoved -= itemRemoved;
             }

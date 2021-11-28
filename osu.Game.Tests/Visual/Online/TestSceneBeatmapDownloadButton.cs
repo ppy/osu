@@ -6,15 +6,15 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Tests.Resources;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneDirectDownloadButton : OsuTestScene
+    public class TestSceneBeatmapDownloadButton : OsuTestScene
     {
         private TestDownloadButton downloadButton;
 
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.Online
             return apiBeatmapSet;
         }
 
-        private class TestDownloadButton : BeatmapPanelDownloadButton
+        private class TestDownloadButton : BeatmapDownloadButton
         {
             public new bool DownloadEnabled => base.DownloadEnabled;
 
