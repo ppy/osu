@@ -3,13 +3,22 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.IPC;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Tournament;
 
 namespace osu.Desktop
@@ -19,7 +28,7 @@ namespace osu.Desktop
         private const string base_game_name = @"osu";
 
         [STAThread]
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
             // Back up the cwd before DesktopGameHost changes it
             string cwd = Environment.CurrentDirectory;
@@ -49,6 +58,34 @@ namespace osu.Desktop
 
                         gameName = $"{base_game_name}-{clientID}";
                         break;
+
+                    case "--osu-stable-difficulty-stream":
+                        while (true)
+                        {
+                            try
+                            {
+                                string beatmapFile = Console.ReadLine() ?? string.Empty;
+                                int rulesetId = int.Parse(Console.ReadLine() ?? string.Empty);
+                                LegacyMods legacyMods = (LegacyMods)int.Parse(Console.ReadLine() ?? string.Empty);
+
+                                Ruleset ruleset = rulesetId switch
+                                {
+                                    0 => new OsuRuleset(),
+                                    1 => new TaikoRuleset(),
+                                    2 => new CatchRuleset(),
+                                    3 => new ManiaRuleset(),
+                                    _ => throw new ArgumentException("Invalid ruleset id")
+                                };
+
+                                Mod[] mods = ruleset.ConvertFromLegacyMods(legacyMods).ToArray();
+                                WorkingBeatmap beatmap = new FlatFileWorkingBeatmap(beatmapFile, _ => ruleset);
+                                Console.WriteLine(ruleset.CreateDifficultyCalculator(beatmap).Calculate(mods).StarRating);
+                            }
+                            catch
+                            {
+                                Console.WriteLine(0);
+                            }
+                        }
                 }
             }
 
@@ -69,14 +106,14 @@ namespace osu.Desktop
                                 throw new TimeoutException(@"IPC took too long to send");
                         }
 
-                        return 0;
+                        return;
                     }
 
                     // we want to allow multiple instances to be started when in debug.
                     if (!DebugUtils.IsDebugBuild)
                     {
                         Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
-                        return 0;
+                        return;
                     }
                 }
 
@@ -84,8 +121,6 @@ namespace osu.Desktop
                     host.Run(new TournamentGame());
                 else
                     host.Run(new OsuGameDesktop(args));
-
-                return 0;
             }
         }
 
@@ -106,5 +141,13 @@ namespace osu.Desktop
 
             return continueExecution;
         }
+    }
+
+    // Note: Keep in osu.Desktop namespace, or update osu!stable also.
+    public class DifficultyCalculationMessage
+    {
+        public string BeatmapFile { get; set; }
+        public int RulesetId { get; set; }
+        public int Mods { get; set; }
     }
 }
