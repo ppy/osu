@@ -160,6 +160,7 @@ namespace osu.Game.Database
                 if (!currentThreadCanCreateContexts.Value)
                 {
                     contextCreationLock.Wait();
+                    currentThreadCanCreateContexts.Value = true;
                     tookSemaphoreLock = true;
                 }
                 else
@@ -167,7 +168,6 @@ namespace osu.Game.Database
                     // the semaphore is used to handle blocking of all context creation during certain periods.
                     // once the semaphore has been taken by this code section, it is safe to create further contexts on the same thread.
                     // this can happen if a realm subscription is active and triggers a callback which has user code that calls `CreateContext`.
-                    currentThreadCanCreateContexts.Value = true;
                 }
 
                 contexts_created.Value++;
