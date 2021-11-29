@@ -38,6 +38,8 @@ namespace osu.Game.Skinning
     {
         private readonly AudioManager audio;
 
+        private readonly Scheduler scheduler;
+
         private readonly GameHost host;
 
         private readonly IResourceStore<byte[]> resources;
@@ -64,6 +66,7 @@ namespace osu.Game.Skinning
         {
             this.contextFactory = contextFactory;
             this.audio = audio;
+            this.scheduler = scheduler;
             this.host = host;
             this.resources = resources;
 
@@ -84,15 +87,6 @@ namespace osu.Game.Skinning
 
                 SourceChanged?.Invoke();
             };
-
-            // needs to be done here rather than inside SkinManager to ensure thread safety of CurrentSkinInfo.
-            ItemRemoved += item => scheduler.Add(() =>
-            {
-                // TODO: fix.
-                // check the removed skin is not the current user choice. if it is, switch back to default.
-                // if (item.Equals(CurrentSkinInfo.Value))
-                //     CurrentSkinInfo.Value = SkinInfo.Default;
-            });
         }
 
         /// <summary>
@@ -283,23 +277,18 @@ namespace osu.Game.Skinning
 
         #region Implementation of IModelManager<SkinInfo>
 
-        public event Action<SkinInfo> ItemUpdated
-        {
-            add => skinModelManager.ItemUpdated += value;
-            remove => skinModelManager.ItemUpdated -= value;
-        }
-
-        public event Action<SkinInfo> ItemRemoved
-        {
-            add => skinModelManager.ItemRemoved += value;
-            remove => skinModelManager.ItemRemoved -= value;
-        }
-
-        public void Delete(Expression<Func<SkinInfo, bool>> filter, bool silent = false)
+        public void Delete([CanBeNull] Expression<Func<SkinInfo, bool>> filter = null, bool silent = false)
         {
             using (var context = contextFactory.CreateContext())
             {
                 var items = context.All<SkinInfo>().Where(filter).ToList();
+
+                // check the removed skin is not the current user choice. if it is, switch back to default.
+                Guid currentUserSkin = CurrentSkinInfo.Value.ID;
+
+                if (items.Any(s => s.ID == currentUserSkin))
+                    scheduler.Add(() => CurrentSkinInfo.Value = SkinInfo.Default.ToLive());
+
                 skinModelManager.Delete(items, silent);
             }
         }

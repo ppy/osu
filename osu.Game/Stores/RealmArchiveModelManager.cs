@@ -24,8 +24,21 @@ namespace osu.Game.Stores
     public abstract class RealmArchiveModelManager<TModel> : RealmArchiveModelImporter<TModel>, IModelManager<TModel>, IModelFileManager<TModel, RealmNamedFileUsage>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
-        public event Action<TModel>? ItemUpdated;
-        public event Action<TModel>? ItemRemoved;
+        public event Action<TModel>? ItemUpdated
+        {
+            // This may be brought back for beatmaps to ease integration.
+            // The eventual goal would be not requiring this and using realm subscriptions in its place.
+            add => throw new NotImplementedException();
+            remove => throw new NotImplementedException();
+        }
+
+        public event Action<TModel>? ItemRemoved
+        {
+            // This may be brought back for beatmaps to ease integration.
+            // The eventual goal would be not requiring this and using realm subscriptions in its place.
+            add => throw new NotImplementedException();
+            remove => throw new NotImplementedException();
+        }
 
         private readonly RealmFileStore realmFileStore;
 
@@ -64,11 +77,7 @@ namespace osu.Game.Stores
 
         public override async Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
-            var imported = await base.Import(item, archive, lowPriority, cancellationToken).ConfigureAwait(false);
-
-            imported?.PerformRead(i => ItemUpdated?.Invoke(i.Detach()));
-
-            return imported;
+            return await base.Import(item, archive, lowPriority, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -150,7 +159,6 @@ namespace osu.Game.Stores
                 return false;
 
             item.Realm.Write(r => item.DeletePending = true);
-            ItemRemoved?.Invoke(item.Detach());
             return true;
         }
 
@@ -160,10 +168,9 @@ namespace osu.Game.Stores
                 return;
 
             item.Realm.Write(r => item.DeletePending = false);
-            ItemUpdated?.Invoke(item);
         }
 
-        public virtual bool IsAvailableLocally(TModel model) => false; // TODO: implement
+        public virtual bool IsAvailableLocally(TModel model) => false; // Not relevant for skins since they can't be downloaded yet.
 
         public void Update(TModel skin)
         {

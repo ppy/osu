@@ -18,6 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
+using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -43,20 +44,14 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private List<ILive<SkinInfo>> skinItems;
 
-        private int firstNonDefaultSkinIndex
-        {
-            get
-            {
-                int index = skinItems.FindIndex(s => s.ID == SkinInfo.CLASSIC_SKIN);
-                if (index < 0)
-                    index = skinItems.Count;
-
-                return index;
-            }
-        }
-
         [Resolved]
         private SkinManager skins { get; set; }
+
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
+
+        private IDisposable realmSubscription;
+        private IQueryable<SkinInfo> realmSkins;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
@@ -75,9 +70,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 new ExportSkinButton(),
             };
 
-            skins.ItemUpdated += itemUpdated;
-            skins.ItemRemoved += itemRemoved;
-
             config.BindWith(OsuSetting.Skin, configBindable);
         }
 
@@ -86,6 +78,21 @@ namespace osu.Game.Overlays.Settings.Sections
             base.LoadComplete();
 
             skinDropdown.Current = dropdownBindable;
+
+            realmSkins = realmFactory.Context.All<SkinInfo>()
+                                     .Where(s => !s.DeletePending)
+                                     .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
+
+            realmSubscription = realmSkins
+                .SubscribeForNotifications((sender, changes, error) =>
+                {
+                    if (changes == null)
+                        return;
+
+                    // Eventually this should be handling the individual changes rather than refreshing the whole dropdown.
+                    updateItems();
+                });
+
             updateItems();
 
             // Todo: This should not be necessary when OsuConfigManager is databased
@@ -97,7 +104,16 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 if (skin.NewValue.Equals(random_skin_info))
                 {
+                    var skinBefore = skins.CurrentSkinInfo.Value;
+
                     skins.SelectRandomSkin();
+
+                    if (skinBefore == skins.CurrentSkinInfo.Value)
+                    {
+                        // the random selection didn't change the skin, so we should manually update the dropdown to match.
+                        dropdownBindable.Value = skins.CurrentSkinInfo.Value;
+                    }
+
                     return;
                 }
 
@@ -111,12 +127,13 @@ namespace osu.Game.Overlays.Settings.Sections
 
             var skin = skinDropdown.Items.FirstOrDefault(s => s.ID == configId);
 
+            // TODO: i don't think this will be required any more.
             if (skin == null)
             {
                 // there may be a thread race condition where an item is selected that hasn't yet been added to the dropdown.
                 // to avoid adding complexity, let's just ensure the item is added so we can perform the selection.
                 skin = skins.Query(s => s.ID == configId);
-                addItem(skin);
+                updateItems();
             }
 
             dropdownBindable.Value = skin;
@@ -124,47 +141,20 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateItems()
         {
-            skinItems = skins.GetAllUsableSkins();
-            skinItems.Insert(firstNonDefaultSkinIndex, random_skin_info);
-            sortUserSkins(skinItems);
+            skinItems = realmSkins.ToLive();
+
+            skinItems.Insert(0, SkinInfo.Default.ToLive());
+            skinItems.Insert(1, DefaultLegacySkin.Info.ToLive());
+            skinItems.Insert(2, random_skin_info);
+
             skinDropdown.Items = skinItems;
-        }
-
-        private void itemUpdated(SkinInfo item) => Schedule(() => addItem(item.ToLive()));
-
-        private void addItem(ILive<SkinInfo> item)
-        {
-            List<ILive<SkinInfo>> newDropdownItems = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToList();
-            sortUserSkins(newDropdownItems);
-            skinDropdown.Items = newDropdownItems;
-        }
-
-        private void itemRemoved(SkinInfo item) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => !i.ID.Equals(item.ID)).ToArray());
-
-        private void sortUserSkins(List<ILive<SkinInfo>> skinsList)
-        {
-            try
-            {
-                // Sort user skins separately from built-in skins
-                skinsList.Sort(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex,
-                    Comparer<ILive<SkinInfo>>.Create((a, b) =>
-                    {
-                        // o_________________________o
-                        return a.PerformRead(ai => b.PerformRead(bi => string.Compare(ai.Name, bi.Name, StringComparison.OrdinalIgnoreCase)));
-                    }));
-            }
-            catch { }
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (skins != null)
-            {
-                skins.ItemUpdated -= itemUpdated;
-                skins.ItemRemoved -= itemRemoved;
-            }
+            realmSubscription?.Dispose();
         }
 
         private class SkinSettingsDropdown : SettingsDropdown<ILive<SkinInfo>>
@@ -192,6 +182,11 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 Text = SkinSettingsStrings.ExportSkinButton;
                 Action = export;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();
                 currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => s.IsManaged), true);
