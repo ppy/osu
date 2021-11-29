@@ -9,7 +9,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
+using osu.Game.Configuration.AccelUtils;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         {
             target.ChangeState(SettingsTextBoxWithIndicator.ParseState.Working, null);
 
-            List<string> errors;
+            IList<string> errors;
             string parseResult;
             bool success = v.NewValue.TryParseAccelUrl(dummy_beatmap_info, out parseResult, out errors, overrides);
 

@@ -11,7 +11,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
+using osu.Game.Configuration.AccelUtils;
 
 namespace osu.Game.Audio
 {

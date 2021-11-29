@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using M.DBus;
 using osu.Framework.IO.Network;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Configuration.AccelUtils;
 using osu.Game.Online.API;
 
 namespace osu.Game.Database
@@ -24,8 +21,7 @@ namespace osu.Game.Database
             var dict = new Dictionary<string, object>
             {
                 ["BID"] = Model.OnlineID,
-                ["NOVIDEO"] = (minimiseDownloadSize ? "novideo" : "full"),
-                ["TARGET"] = getTarget()
+                ["NOVIDEO"] = minimiseDownloadSize
             };
 
             if (!config.Get<string>(MSetting.AccelSource).TryParseAccelUrl(dict, out uri, out _))
@@ -48,203 +44,6 @@ namespace osu.Game.Database
         }
 
         protected override string FileExtension => ".osz";
-    }
-
-    public static class AccelExtensions
-    {
-        /// <summary>
-        /// 所有已知的属性
-        /// </summary>
-        public static readonly string[] VAILD_PROPERTIES =
-        {
-            "BID",
-            "NOVIDEO",
-            "TARGET"
-        };
-
-        /// <summary>
-        /// 尝试将给定的Url解析成加速地址
-        /// </summary>
-        /// <param name="url">要解析的地址</param>
-        /// <param name="data">一个字典，其中的键必须能在 <see cref="VAILD_PROPERTIES"/> 中查找到 </param>
-        /// <param name="result">解析结果</param>
-        /// <param name="errors">错误/警告列表</param>
-        /// <returns>解析是否成功</returns>
-        /// <exception cref="ArgumentNullException">地址为空</exception>
-        public static bool TryParseAccelUrl(this string url,
-                                            IDictionary<string, object> data,
-                                            out string result,
-                                            out List<string> errors)
-        {
-            bool propertyDetected = false;
-            string propertyName = string.Empty;
-
-            errors = new List<string>();
-            result = url;
-
-            if (string.IsNullOrEmpty(url))
-            {
-                errors.Add("地址为空");
-                return false;
-            }
-
-            foreach (char c in url)
-            {
-                //如果检测到'['，那么进入属性检测
-                if (c == '[' && !propertyDetected)
-                {
-                    propertyDetected = true;
-                    continue;
-                }
-
-                //如果检测到']'，那么退出属性检测并处理结果
-                if (c == ']' && propertyDetected)
-                {
-                    propertyDetected = false;
-
-                    //如果属性名未知，跳过并添加错误信息
-                    if (!VAILD_PROPERTIES.Contains(propertyName))
-                    {
-                        errors.Add($"未知的属性: {propertyName}");
-                        propertyName = string.Empty;
-                        continue;
-                    }
-
-                    //查询值
-                    object value;
-                    data.TryGetValue(propertyName, out value);
-
-                    if (value == null)
-                    {
-                        throw new ArgumentNullException(
-                            $"加速地址解析失败: 与 {propertyName} 对应的值是 null, 请将此错误报告给MATRIX-feather");
-                    }
-
-                    //替换字符串
-                    result = result.Replace($"[{propertyName}]", value.ToString());
-
-                    //清空属性名称
-                    propertyName = string.Empty;
-
-                    //继续
-                    continue;
-                }
-
-                //添加字符到名称
-                if (propertyDetected) propertyName = propertyName + c;
-            }
-
-            //检测未闭合的括号
-            if (propertyDetected)
-            {
-                errors.Add("存在未闭合的括号");
-                return false;
-            }
-
-            if (errors.Count > 5)
-                errors.Add("错误/警告有点多, 您确定这是正确的地址吗?");
-
-            return true;
-        }
-
-        /// <summary>
-        /// 尝试将给定的Url解析成加速地址
-        /// </summary>
-        /// <param name="url">要解析的地址</param>
-        /// <param name="beatmapInfo">谱面信息，传入此值将自动生成字典</param>
-        /// <param name="result">解析结果</param>
-        /// <param name="errors">错误/警告列表</param>
-        /// <param name="overrides">覆盖内容，将用于替换或补全自动生成字典中的值</param>
-        /// <returns>解析是否成功</returns>
-        /// <exception cref="ArgumentNullException">地址为空</exception>
-        public static bool TryParseAccelUrl(this string url,
-                                            IBeatmapInfo beatmapInfo,
-                                            out string result,
-                                            out List<string> errors,
-                                            IDictionary<string, object> overrides = null)
-        {
-            string novideo = OsuConfigManager.Instance.Get<bool>(OsuSetting.PreferNoVideo) ? "novideo" : "full";
-            var dict = new Dictionary<string, object>
-            {
-                ["BID"] = beatmapInfo.OnlineID,
-                ["NOVIDEO"] = novideo,
-                ["TARGET"] = $"{novideo}/{beatmapInfo.OnlineID}"
-            };
-
-            if (overrides != null)
-            {
-                foreach (var kvp in overrides)
-                {
-                    dict[kvp.Key] = kvp.Value;
-                }
-            }
-
-            return url.TryParseAccelUrl(dict, out result, out errors);
-        }
-
-        /// <summary>
-        /// 尝试将给定的Url解析成加速地址
-        /// </summary>
-        /// <param name="url">要解析的地址</param>
-        /// <param name="beatmapSetInfo">谱面信息，传入此值将自动生成字典</param>
-        /// <param name="result">解析结果</param>
-        /// <param name="errors">错误/警告列表</param>
-        /// <param name="overrides">覆盖内容，将用于替换或补全自动生成字典中的值</param>
-        /// <returns>解析是否成功</returns>
-        /// <exception cref="ArgumentNullException">地址为空</exception>
-        public static bool TryParseAccelUrl(this string url,
-                                            IBeatmapSetInfo beatmapSetInfo,
-                                            out string result,
-                                            out List<string> errors,
-                                            IDictionary<string, object> overrides = null)
-        {
-            string novideo = OsuConfigManager.Instance.Get<bool>(OsuSetting.PreferNoVideo) ? "novideo" : "full";
-            var dict = new Dictionary<string, object>
-            {
-                ["BID"] = beatmapSetInfo.OnlineID,
-                ["NOVIDEO"] = novideo,
-                ["TARGET"] = $"{novideo}/{beatmapSetInfo.OnlineID}"
-            };
-
-            if (overrides != null)
-            {
-                foreach (var kvp in overrides)
-                {
-                    dict[kvp.Key] = kvp.Value;
-                }
-            }
-
-            return url.TryParseAccelUrl(dict, out result, out errors);
-        }
-
-        /// <summary>
-        /// From <see cref="ServiceUtils.GetValueFor"/>
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
-        private static object getValueFor(string name, IBeatmapSetInfo info)
-        {
-            var members = info.GetType().GetMembers();
-
-            try
-            {
-                object value = null;
-
-                var targetMember = (MemberInfo)members.FirstOrDefault(m => m.Name == name);
-
-                if (targetMember != null && targetMember is PropertyInfo propertyInfo)
-                    value = propertyInfo.GetValue(info);
-
-                return value;
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, $"未能在{info}中查找 {name}: {e.Message}");
-            }
-
-            return "errno";
-        }
     }
 
     public class ParseFailedException : Exception

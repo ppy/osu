@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             FlowContent.Add(currentIndicator = new Indicator());
         }
 
-        public void ChangeState(ParseState state, string result, List<string> errors = null)
+        public void ChangeState(ParseState state, string result, IList<string> errors = null)
         {
             currentIndicator.UpdateInfo(state, result, errors);
         }
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             [Resolved]
             private OsuColour colors { get; set; }
 
-            public void UpdateInfo(ParseState newState, string result, List<string> errors = null)
+            public void UpdateInfo(ParseState newState, string result, IList<string> errors = null)
             {
                 string errorsText = string.Empty;
 

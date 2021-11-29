@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
-using osu.Game.Database;
+using osu.Game.Configuration.AccelUtils;
 
 namespace osu.Game.Beatmaps.Drawables
 {
