@@ -211,16 +211,8 @@ namespace osu.Game
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Resources, Audio));
+            dependencies.Cache(SkinManager = new SkinManager(Storage, realmFactory, Host, Resources, Audio, Scheduler));
             dependencies.CacheAs<ISkinSource>(SkinManager);
-
-            // needs to be done here rather than inside SkinManager to ensure thread safety of CurrentSkinInfo.
-            SkinManager.ItemRemoved += item => Schedule(() =>
-            {
-                // check the removed skin is not the current user choice. if it is, switch back to default.
-                if (item.Equals(SkinManager.CurrentSkinInfo.Value))
-                    SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
-            });
 
             EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
