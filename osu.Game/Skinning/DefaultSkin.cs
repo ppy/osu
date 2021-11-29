@@ -26,7 +26,7 @@ namespace osu.Game.Skinning
         private readonly IStorageResourceProvider resources;
 
         public DefaultSkin(IStorageResourceProvider resources)
-            : this(SkinInfo.Default, resources)
+            : this(osu.Game.Skinning.SkinInfo.Default, resources)
         {
         }
 
