@@ -28,7 +28,7 @@ namespace osu.Game.Database
                 ["TARGET"] = getTarget()
             };
 
-            if (!config.Get<string>(MSetting.AccelSource).TryParse(dict, out uri, out _))
+            if (!config.Get<string>(MSetting.AccelSource).TryParseAccelUrl(dict, out uri, out _))
                 throw new ParseFailedException("加速地址解析失败, 请检查您的设置。");
         }
 
@@ -52,6 +52,9 @@ namespace osu.Game.Database
 
     public static class AccelExtensions
     {
+        /// <summary>
+        /// 所有已知的属性
+        /// </summary>
         public static readonly string[] VAILD_PROPERTIES =
         {
             "BID",
@@ -59,8 +62,19 @@ namespace osu.Game.Database
             "TARGET"
         };
 
-        //尝试将给定的Url解析成加速地址
-        public static bool TryParse(this string url, IDictionary<string, object> data, out string result, out List<string> errors)
+        /// <summary>
+        /// 尝试将给定的Url解析成加速地址
+        /// </summary>
+        /// <param name="url">要解析的地址</param>
+        /// <param name="data">一个字典，其中的键必须能在 <see cref="VAILD_PROPERTIES"/> 中查找到 </param>
+        /// <param name="result">解析结果</param>
+        /// <param name="errors">错误/警告列表</param>
+        /// <returns>解析是否成功</returns>
+        /// <exception cref="ArgumentNullException">地址为空</exception>
+        public static bool TryParseAccelUrl(this string url,
+                                            IDictionary<string, object> data,
+                                            out string result,
+                                            out List<string> errors)
         {
             bool propertyDetected = false;
             string propertyName = string.Empty;
@@ -131,6 +145,76 @@ namespace osu.Game.Database
                 errors.Add("错误/警告有点多, 您确定这是正确的地址吗?");
 
             return true;
+        }
+
+        /// <summary>
+        /// 尝试将给定的Url解析成加速地址
+        /// </summary>
+        /// <param name="url">要解析的地址</param>
+        /// <param name="beatmapInfo">谱面信息，传入此值将自动生成字典</param>
+        /// <param name="result">解析结果</param>
+        /// <param name="errors">错误/警告列表</param>
+        /// <param name="overrides">覆盖内容，将用于替换或补全自动生成字典中的值</param>
+        /// <returns>解析是否成功</returns>
+        /// <exception cref="ArgumentNullException">地址为空</exception>
+        public static bool TryParseAccelUrl(this string url,
+                                            IBeatmapInfo beatmapInfo,
+                                            out string result,
+                                            out List<string> errors,
+                                            IDictionary<string, object> overrides = null)
+        {
+            string novideo = OsuConfigManager.Instance.Get<bool>(OsuSetting.PreferNoVideo) ? "novideo" : "full";
+            var dict = new Dictionary<string, object>
+            {
+                ["BID"] = beatmapInfo.OnlineID,
+                ["NOVIDEO"] = novideo,
+                ["TARGET"] = $"{novideo}/{beatmapInfo.OnlineID}"
+            };
+
+            if (overrides != null)
+            {
+                foreach (var kvp in overrides)
+                {
+                    dict[kvp.Key] = kvp.Value;
+                }
+            }
+
+            return url.TryParseAccelUrl(dict, out result, out errors);
+        }
+
+        /// <summary>
+        /// 尝试将给定的Url解析成加速地址
+        /// </summary>
+        /// <param name="url">要解析的地址</param>
+        /// <param name="beatmapSetInfo">谱面信息，传入此值将自动生成字典</param>
+        /// <param name="result">解析结果</param>
+        /// <param name="errors">错误/警告列表</param>
+        /// <param name="overrides">覆盖内容，将用于替换或补全自动生成字典中的值</param>
+        /// <returns>解析是否成功</returns>
+        /// <exception cref="ArgumentNullException">地址为空</exception>
+        public static bool TryParseAccelUrl(this string url,
+                                            IBeatmapSetInfo beatmapSetInfo,
+                                            out string result,
+                                            out List<string> errors,
+                                            IDictionary<string, object> overrides = null)
+        {
+            string novideo = OsuConfigManager.Instance.Get<bool>(OsuSetting.PreferNoVideo) ? "novideo" : "full";
+            var dict = new Dictionary<string, object>
+            {
+                ["BID"] = beatmapSetInfo.OnlineID,
+                ["NOVIDEO"] = novideo,
+                ["TARGET"] = $"{novideo}/{beatmapSetInfo.OnlineID}"
+            };
+
+            if (overrides != null)
+            {
+                foreach (var kvp in overrides)
+                {
+                    dict[kvp.Key] = kvp.Value;
+                }
+            }
+
+            return url.TryParseAccelUrl(dict, out result, out errors);
         }
 
         /// <summary>

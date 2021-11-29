@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 
@@ -16,6 +17,9 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
     {
         private SettingsCheckbox systemCursor;
         private SettingsTextBoxWithIndicator accelTextBox;
+        private SettingsTextBoxWithIndicator previewAccelTextBox;
+        private SettingsTextBoxWithIndicator coverAccelTextBox;
+
         protected override LocalisableString Header => "Mf-osu";
 
         [BackgroundDependencyLoader]
@@ -74,36 +78,53 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "默认使用下载加速",
-                    TooltipText = "启用后谱面信息界面以外的下图功能将默认使用指定的加速源。 这也将影响所有谱面预览和封面功能, 但不会影响已完成或正在进行中的请求",
+                    LabelText = "默认使用加速源",
+                    TooltipText = "启用后所有谱面预览和封面将优先从指定的加速源获取, 该选项不会影响正在进行中的请求",
                     Current = config.GetBindable<bool>(MSetting.UseAccelForDefault)
                 },
                 accelTextBox = new SettingsTextBoxWithIndicator
                 {
-                    LabelText = "加速源",
+                    LabelText = "下载加速源",
                     Current = config.GetBindable<string>(MSetting.AccelSource)
+                },
+                previewAccelTextBox = new SettingsTextBoxWithIndicator
+                {
+                    LabelText = "音频预览加速源",
+                    Current = config.GetBindable<string>(MSetting.TrackPreviewAccelSource)
+                },
+                coverAccelTextBox = new SettingsTextBoxWithIndicator
+                {
+                    LabelText = "封面加速源",
+                    Current = config.GetBindable<string>(MSetting.CoverAccelSource)
                 }
             };
 
-            accelTextBox.Current.BindValueChanged(onAccelUrlChanged, true);
+            accelTextBox.Current.BindValueChanged(v => onPreviewOrCoverAccelChanged(v, accelTextBox), true);
+            previewAccelTextBox.Current.BindValueChanged(v => onPreviewOrCoverAccelChanged(v, previewAccelTextBox, dictOverrides), true);
+            coverAccelTextBox.Current.BindValueChanged(v => onPreviewOrCoverAccelChanged(v, coverAccelTextBox, dictOverrides), true);
         }
 
-        private void onAccelUrlChanged(ValueChangedEvent<string> v)
+        private static readonly IBeatmapInfo dummy_beatmap_info = new BeatmapInfo
         {
-            accelTextBox.ChangeState(SettingsTextBoxWithIndicator.ParseState.Working, null);
+            OnlineID = 114514
+        };
 
-            var dict = new Dictionary<string, object>
-            {
-                ["BID"] = 114514,
-                ["NOVIDEO"] = "[novideo 或 full]",
-                ["TARGET"] = "[novideo 或 full]/[图号]"
-            };
+        private readonly IDictionary<string, object> dictOverrides = new Dictionary<string, object>
+        {
+            ["TARGET"] = dummy_beatmap_info.OnlineID
+        };
+
+        private void onPreviewOrCoverAccelChanged(ValueChangedEvent<string> v,
+                                                  SettingsTextBoxWithIndicator target,
+                                                  IDictionary<string, object> overrides = null)
+        {
+            target.ChangeState(SettingsTextBoxWithIndicator.ParseState.Working, null);
 
             List<string> errors;
             string parseResult;
-            bool success = v.NewValue.TryParse(dict, out parseResult, out errors);
+            bool success = v.NewValue.TryParseAccelUrl(dummy_beatmap_info, out parseResult, out errors, overrides);
 
-            accelTextBox.ChangeState(success
+            target.ChangeState(success
                 ? SettingsTextBoxWithIndicator.ParseState.Success
                 : SettingsTextBoxWithIndicator.ParseState.Failed, parseResult, errors);
         }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -9,6 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Database;
 
 namespace osu.Game.Audio
 {
@@ -112,6 +115,20 @@ namespace osu.Game.Audio
 
             private string trackUri()
             {
+                if (MConfig.Get<bool>(MSetting.UseAccelForDefault))
+                {
+                    string result;
+                    bool success = MConfig.Get<string>(MSetting.TrackPreviewAccelSource).TryParseAccelUrl(beatmapSetInfo, out result, out _, new Dictionary<string, object>
+                    {
+                        ["TARGET"] = beatmapSetInfo.OnlineID
+                    });
+
+                    if (success)
+                        return result;
+
+                    Logger.Log("解析音频预览加速地址失败, 请检查相关设置", level: LogLevel.Important);
+                }
+
                 return $@"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineID}.mp3";
             }
 

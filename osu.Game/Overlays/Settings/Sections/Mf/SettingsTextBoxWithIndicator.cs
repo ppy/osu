@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
                     case ParseState.Success:
                         iconDisplay.Icon = errors?.Count > 0 ? FontAwesome.Solid.Exclamation : FontAwesome.Solid.Check;
-                        textDisplay.Text = errorsText + "\n" + $"解析完毕, 最终URL将会是 {result}";
+                        textDisplay.Text = errorsText + "\n" + $"解析完毕, 最终URL将类似于 {result}";
 
                         this.FadeColour(errors?.Count > 0
                             ? Color4.Gold

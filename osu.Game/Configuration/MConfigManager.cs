@@ -34,6 +34,8 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.UseAccelForDefault, true);
             SetDefault(MSetting.DoNotShowDisclaimer, false);
             SetDefault(MSetting.AccelSource, "https://txy1.sayobot.cn/beatmaps/download/[TARGET]");
+            SetDefault(MSetting.CoverAccelSource, "https://a.sayobot.cn/beatmaps/[TARGET]/covers/cover.jpg"); //不加.jpg日志会刷Texture could not be loaded via STB
+            SetDefault(MSetting.TrackPreviewAccelSource, "https://a.sayobot.cn/preview/[TARGET].mp3");
             SetDefault(MSetting.UseAccelSetToOldOption, false);
 
             //UI Settings
@@ -144,7 +146,9 @@ namespace osu.Game.Configuration
         EnableSystemNotifications,
         TrayIconName,
         AccelSource,
-        UseAccelSetToOldOption
+        UseAccelSetToOldOption,
+        CoverAccelSource,
+        TrackPreviewAccelSource
     }
 
     public enum GamemodeActivateCondition

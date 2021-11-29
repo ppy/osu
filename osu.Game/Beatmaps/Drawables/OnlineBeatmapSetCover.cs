@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
+using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -25,50 +28,46 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(LargeTextureStore textures, MConfigManager mfconfig)
+        private void load(LargeTextureStore textures, MConfigManager mConfig)
         {
             string resource = null;
 
-            switch (mfconfig.Get<bool>(MSetting.UseAccelForDefault))
+            if (mConfig.Get<bool>(MSetting.UseAccelForDefault))
             {
-                case true:
-                    string targetID = set.Covers.Card;
-                    targetID = targetID.Replace("https://assets.ppy.sh/beatmaps/", "").Split('/')[0];
+                string targetID = set.Covers.Card;
+                targetID = targetID.Replace("https://assets.ppy.sh/beatmaps/", "").Split('/')[0];
 
-                    switch (type)
-                    {
-                        case BeatmapSetCoverType.Cover:
-                            resource = $"https://a.sayobot.cn/beatmaps/{targetID}/covers/cover.jpg";
-                            break;
+                var dict = new Dictionary<string, object>
+                {
+                    ["BID"] = targetID,
+                    ["TARGET"] = targetID
+                };
 
-                        case BeatmapSetCoverType.Card:
-                            resource = $"https://a.sayobot.cn/beatmaps/{targetID}/covers/cover.jpg";
-                            break;
+                string result;
+                bool success = mConfig.Get<string>(MSetting.CoverAccelSource).TryParseAccelUrl(dict, out result, out _);
 
-                        case BeatmapSetCoverType.List:
-                            resource = $"https://a.sayobot.cn/beatmaps/{targetID}/covers/cover.jpg";
-                            break;
-                    }
+                if (success)
+                    resource = result;
+                else
+                    Logger.Log("解析封面加速地址失败, 请检查相关设置", level: LogLevel.Important);
+            }
 
-                    break;
+            if (resource == null)
+            {
+                switch (type)
+                {
+                    case BeatmapSetCoverType.Cover:
+                        resource = set.Covers.Cover;
+                        break;
 
-                default:
-                    switch (type)
-                    {
-                        case BeatmapSetCoverType.Cover:
-                            resource = set.Covers.Cover;
-                            break;
+                    case BeatmapSetCoverType.Card:
+                        resource = set.Covers.Card;
+                        break;
 
-                        case BeatmapSetCoverType.Card:
-                            resource = set.Covers.Card;
-                            break;
-
-                        case BeatmapSetCoverType.List:
-                            resource = set.Covers.List;
-                            break;
-                    }
-
-                    break;
+                    case BeatmapSetCoverType.List:
+                        resource = set.Covers.List;
+                        break;
+                }
             }
 
             if (resource != null)
