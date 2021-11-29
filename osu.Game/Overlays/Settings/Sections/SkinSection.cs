@@ -96,11 +96,9 @@ namespace osu.Game.Overlays.Settings.Sections
 
             updateItems();
 
-            // Todo: This should not be necessary when OsuConfigManager is databased
-            if (!Guid.TryParse(configBindable.Value, out var configId) || skinDropdown.Items.All(s => s.ID != configId))
-                configBindable.Value = string.Empty;
+            configBindable.BindValueChanged(id => Scheduler.AddOnce(updateSelectedSkinFromConfig));
+            updateSelectedSkinFromConfig();
 
-            configBindable.BindValueChanged(id => Scheduler.AddOnce(updateSelectedSkinFromConfig), true);
             dropdownBindable.BindValueChanged(skin =>
             {
                 if (skin.NewValue.Equals(random_skin_info))
@@ -124,20 +122,12 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateSelectedSkinFromConfig()
         {
-            if (!Guid.TryParse(configBindable.Value, out var configId)) return;
+            ILive<SkinInfo> skin = null;
 
-            var skin = skinDropdown.Items.FirstOrDefault(s => s.ID == configId);
+            if (Guid.TryParse(configBindable.Value, out var configId))
+                skin = skinDropdown.Items.FirstOrDefault(s => s.ID == configId);
 
-            // TODO: i don't think this will be required any more.
-            if (skin == null)
-            {
-                // there may be a thread race condition where an item is selected that hasn't yet been added to the dropdown.
-                // to avoid adding complexity, let's just ensure the item is added so we can perform the selection.
-                skin = skins.Query(s => s.ID == configId);
-                updateItems();
-            }
-
-            dropdownBindable.Value = skin;
+            dropdownBindable.Value = skin ?? skinDropdown.Items.First();
         }
 
         private void updateItems()
