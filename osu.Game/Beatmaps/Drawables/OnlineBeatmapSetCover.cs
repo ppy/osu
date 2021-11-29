@@ -39,8 +39,7 @@ namespace osu.Game.Beatmaps.Drawables
 
                 var dict = new Dictionary<string, object>
                 {
-                    ["BID"] = targetID,
-                    ["TARGET"] = targetID
+                    ["BID"] = targetID
                 };
 
                 string result;

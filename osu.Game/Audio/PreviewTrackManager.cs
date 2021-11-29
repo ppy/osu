@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -118,10 +117,7 @@ namespace osu.Game.Audio
                 if (MConfig.Get<bool>(MSetting.UseAccelForDefault))
                 {
                     string result;
-                    bool success = MConfig.Get<string>(MSetting.TrackPreviewAccelSource).TryParseAccelUrl(beatmapSetInfo, out result, out _, new Dictionary<string, object>
-                    {
-                        ["TARGET"] = beatmapSetInfo.OnlineID
-                    });
+                    bool success = MConfig.Get<string>(MSetting.TrackPreviewAccelSource).TryParseAccelUrl(beatmapSetInfo, out result, out _);
 
                     if (success)
                         return result;

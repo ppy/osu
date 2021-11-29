@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
         private readonly IDictionary<string, object> dictOverrides = new Dictionary<string, object>
         {
-            ["TARGET"] = dummy_beatmap_info.OnlineID
+            ["NOVIDEO"] = "此选项不适用于预览或封面"
         };
 
         private void onPreviewOrCoverAccelChanged(ValueChangedEvent<string> v,

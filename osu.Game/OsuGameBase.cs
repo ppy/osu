@@ -44,6 +44,7 @@ using osu.Game.Stores;
 using osu.Game.Utils;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 using M.Resources;
+using osu.Game.Configuration.AccelUtils;
 using osu.Game.Screens;
 
 namespace osu.Game
@@ -221,6 +222,9 @@ namespace osu.Game
             var customStore = new CustomFontStore(Storage, this);
             largeStore.AddStore(new TextureLoaderStore(customStore));
             dependencies.Cache(customStore);
+
+            //初始化加速地址扩展处理器Store
+            dependencies.Cache(new ExtensionHandlerStore(Storage, this));
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
