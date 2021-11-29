@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Rankings
             Children = new Drawable[]
             {
                 new ScoresTable(1, response.Users),
-                new FillFlowContainer
+                new ReverseChildIDFillFlowContainer<BeatmapCard>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,

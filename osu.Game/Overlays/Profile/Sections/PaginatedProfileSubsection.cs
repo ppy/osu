@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected int VisiblePages;
         protected int ItemsPerPage;
 
-        protected FillFlowContainer ItemsContainer { get; private set; }
+        protected ReverseChildIDFillFlowContainer<Drawable> ItemsContainer { get; private set; }
 
         private APIRequest<List<TModel>> retrievalRequest;
         private CancellationTokenSource loadCancellation;
@@ -48,11 +49,12 @@ namespace osu.Game.Overlays.Profile.Sections
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                ItemsContainer = new FillFlowContainer
+                ItemsContainer = new ReverseChildIDFillFlowContainer<Drawable>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(0, 2),
+                    Depth = float.MinValue
                 },
                 moreButton = new ShowMoreButton
                 {
