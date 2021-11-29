@@ -52,7 +52,7 @@ namespace osu.Game.Database
         /// </summary>
         private readonly SemaphoreSlim contextCreationLock = new SemaphoreSlim(1);
 
-        private bool canCreateContexts;
+        private ThreadLocal<bool> currentThreadCanCreateContexts = new ThreadLocal<bool>();
 
         private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>(@"Realm", @"Dirty Refreshes");
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
@@ -155,13 +155,13 @@ namespace osu.Game.Database
 
             try
             {
-                if (!canCreateContexts)
+                if (!currentThreadCanCreateContexts.Value)
                     contextCreationLock.Wait();
 
                 // the semaphore is used to stop all context creation.
                 // once the semaphore has been taken by this code section, it is safe to create further contexts.
                 // this can happen if a realm subscription is active and triggers a callback which has user code that calls `CreateContext`.
-                canCreateContexts = true;
+                currentThreadCanCreateContexts.Value = true;
 
                 contexts_created.Value++;
 
@@ -170,7 +170,7 @@ namespace osu.Game.Database
             finally
             {
                 contextCreationLock.Release();
-                canCreateContexts = false;
+                currentThreadCanCreateContexts.Value = false;
             }
         }
 
