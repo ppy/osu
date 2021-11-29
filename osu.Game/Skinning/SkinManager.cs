@@ -45,7 +45,11 @@ namespace osu.Game.Skinning
         private readonly IResourceStore<byte[]> resources;
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
-        public readonly Bindable<ILive<SkinInfo>> CurrentSkinInfo = new Bindable<ILive<SkinInfo>>(SkinInfo.Default.ToLive()) { Default = SkinInfo.Default.ToLive() };
+
+        public readonly Bindable<ILive<SkinInfo>> CurrentSkinInfo = new Bindable<ILive<SkinInfo>>(Skinning.DefaultSkin.CreateInfo().ToLive())
+        {
+            Default = Skinning.DefaultSkin.CreateInfo().ToLive()
+        };
 
         private readonly SkinModelManager skinModelManager;
         private readonly RealmContextFactory contextFactory;
@@ -74,8 +78,24 @@ namespace osu.Game.Skinning
 
             skinModelManager = new SkinModelManager(storage, contextFactory, host, this);
 
-            DefaultLegacySkin = new DefaultLegacySkin(this);
-            DefaultSkin = new DefaultSkin(this);
+            var defaultSkins = new[]
+            {
+                DefaultLegacySkin = new DefaultLegacySkin(this),
+                DefaultSkin = new DefaultSkin(this),
+            };
+
+            // Ensure the default entries are present.
+            using (var context = contextFactory.CreateContext())
+            using (var transaction = context.BeginWrite())
+            {
+                foreach (var skin in defaultSkins)
+                {
+                    if (context.Find<SkinInfo>(skin.SkinInfo.ID) == null)
+                        context.Add(skin.SkinInfo.Value);
+                }
+
+                transaction.Commit();
+            }
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
 
@@ -89,21 +109,6 @@ namespace osu.Game.Skinning
             };
         }
 
-        /// <summary>
-        /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the non-databased default skins.
-        /// </summary>
-        /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
-        public List<ILive<SkinInfo>> GetAllUsableSkins()
-        {
-            using (var context = contextFactory.CreateContext())
-            {
-                var userSkins = context.All<SkinInfo>().Where(s => !s.DeletePending).ToLive();
-                userSkins.Insert(0, DefaultSkin.SkinInfo);
-                userSkins.Insert(1, DefaultLegacySkin.SkinInfo);
-                return userSkins;
-            }
-        }
-
         public void SelectRandomSkin()
         {
             using (var context = contextFactory.CreateContext())
@@ -113,7 +118,7 @@ namespace osu.Game.Skinning
 
                 if (randomChoices.Length == 0)
                 {
-                    CurrentSkinInfo.Value = SkinInfo.Default.ToLive();
+                    CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLive();
                     return;
                 }
 
