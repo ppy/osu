@@ -32,16 +32,16 @@ namespace osu.Game.Overlays.Settings.Sections
             Icon = FontAwesome.Solid.PaintBrush
         };
 
-        private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
+        private readonly Bindable<ILive<SkinInfo>> dropdownBindable = new Bindable<ILive<SkinInfo>> { Default = SkinInfo.Default.ToLive() };
         private readonly Bindable<string> configBindable = new Bindable<string>();
 
-        private static readonly SkinInfo random_skin_info = new SkinInfo
+        private static readonly ILive<SkinInfo> random_skin_info = new SkinInfo
         {
             ID = SkinInfo.RANDOM_SKIN,
             Name = "<Random Skin>",
-        };
+        }.ToLive();
 
-        private List<SkinInfo> skinItems;
+        private List<ILive<SkinInfo>> skinItems;
 
         private int firstNonDefaultSkinIndex
         {
@@ -79,6 +79,11 @@ namespace osu.Game.Overlays.Settings.Sections
             skins.ItemRemoved += itemRemoved;
 
             config.BindWith(OsuSetting.Skin, configBindable);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             skinDropdown.Current = dropdownBindable;
             updateItems();
@@ -125,22 +130,30 @@ namespace osu.Game.Overlays.Settings.Sections
             skinDropdown.Items = skinItems;
         }
 
-        private void itemUpdated(SkinInfo item) => Schedule(() => addItem(item));
+        private void itemUpdated(SkinInfo item) => Schedule(() => addItem(item.ToLive()));
 
-        private void addItem(SkinInfo item)
+        private void addItem(ILive<SkinInfo> item)
         {
-            List<SkinInfo> newDropdownItems = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToList();
+            List<ILive<SkinInfo>> newDropdownItems = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToList();
             sortUserSkins(newDropdownItems);
             skinDropdown.Items = newDropdownItems;
         }
 
-        private void itemRemoved(SkinInfo item) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => !i.Equals(item)).ToArray());
+        private void itemRemoved(SkinInfo item) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => !i.ID.Equals(item.ID)).ToArray());
 
-        private void sortUserSkins(List<SkinInfo> skinsList)
+        private void sortUserSkins(List<ILive<SkinInfo>> skinsList)
         {
-            // Sort user skins separately from built-in skins
-            skinsList.Sort(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex,
-                Comparer<SkinInfo>.Create((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase)));
+            try
+            {
+                // Sort user skins separately from built-in skins
+                skinsList.Sort(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex,
+                    Comparer<ILive<SkinInfo>>.Create((a, b) =>
+                    {
+                        // o_________________________o
+                        return a.PerformRead(ai => b.PerformRead(bi => string.Compare(ai.Name, bi.Name, StringComparison.OrdinalIgnoreCase)));
+                    }));
+            }
+            catch { }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -154,13 +167,13 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
+        private class SkinSettingsDropdown : SettingsDropdown<ILive<SkinInfo>>
         {
-            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl();
+            protected override OsuDropdown<ILive<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
 
             private class SkinDropdownControl : DropdownControl
             {
-                protected override LocalisableString GenerateItemText(SkinInfo item) => item.ToString();
+                protected override LocalisableString GenerateItemText(ILive<SkinInfo> item) => item.ToString();
             }
         }
 
@@ -181,14 +194,14 @@ namespace osu.Game.Overlays.Settings.Sections
                 Action = export;
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();
-                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.IsManaged, true);
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => s.IsManaged), true);
             }
 
             private void export()
             {
                 try
                 {
-                    new LegacySkinExporter(storage).Export(currentSkin.Value.SkinInfo);
+                    currentSkin.Value.SkinInfo.PerformRead(s => new LegacySkinExporter(storage).Export(s));
                 }
                 catch (Exception e)
                 {
