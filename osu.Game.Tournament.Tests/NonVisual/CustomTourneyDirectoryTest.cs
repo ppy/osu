@@ -87,9 +87,9 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 // Recreate the old setup that uses "tournament" as the base path.
                 string oldPath = Path.Combine(osuRoot, "tournament");
 
-                string videosPath = Path.Combine(oldPath, "videos");
-                string modsPath = Path.Combine(oldPath, "mods");
-                string flagsPath = Path.Combine(oldPath, "flags");
+                string videosPath = Path.Combine(oldPath, "Videos");
+                string modsPath = Path.Combine(oldPath, "Mods");
+                string flagsPath = Path.Combine(oldPath, "Flags");
 
                 Directory.CreateDirectory(videosPath);
                 Directory.CreateDirectory(modsPath);
@@ -123,9 +123,9 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                     string migratedPath = Path.Combine(host.Storage.GetFullPath("."), "tournaments", "default");
 
-                    videosPath = Path.Combine(migratedPath, "videos");
-                    modsPath = Path.Combine(migratedPath, "mods");
-                    flagsPath = Path.Combine(migratedPath, "flags");
+                    videosPath = Path.Combine(migratedPath, "Videos");
+                    modsPath = Path.Combine(migratedPath, "Mods");
+                    flagsPath = Path.Combine(migratedPath, "Flags");
 
                     videoFile = Path.Combine(videosPath, "video.mp4");
                     modFile = Path.Combine(modsPath, "mod.png");
