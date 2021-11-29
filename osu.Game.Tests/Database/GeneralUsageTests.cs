@@ -36,34 +36,36 @@ namespace osu.Game.Tests.Database
             });
         }
 
+        /// <summary>
+        /// Test to ensure that a `CreateContext` call nested inside a subscription doesn't cause any deadlocks
+        /// due to context fetching semaphores.
+        /// </summary>
         [Test]
-        public void TestNestedContextCreation()
+        public void TestNestedContextCreationWithSubscription()
         {
             RunTestWithRealm((realmFactory, _) =>
             {
-                var mainContext = realmFactory.Context;
                 bool callbackRan = false;
 
-                var subscription = mainContext.All<RealmBeatmap>().SubscribeForNotifications((sender, changes, error) =>
+                using (var context = realmFactory.CreateContext())
                 {
-                    realmFactory.CreateContext();
-                    callbackRan = true;
-                });
-
-                Task.Factory.StartNew(() =>
-                {
-                    using (var threadContext = realmFactory.CreateContext())
+                    var subscription = context.All<RealmBeatmap>().SubscribeForNotifications((sender, changes, error) =>
                     {
-                        threadContext.Write(r => r.Add(new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata())));
-                    }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                        using (realmFactory.CreateContext())
+                        {
+                            callbackRan = true;
+                        }
+                    });
 
-                // will create a context but also run the callback above (Refresh is implicitly run when getting a new context).
-                realmFactory.CreateContext();
+                    // Force the callback above to run.
+                    using (realmFactory.CreateContext())
+                    {
+                    }
+
+                    subscription.Dispose();
+                }
 
                 Assert.IsTrue(callbackRan);
-
-                subscription.Dispose();
             });
         }
 
