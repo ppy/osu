@@ -82,19 +82,29 @@ namespace osu.Game.Tests.Database
 
                 Task.Factory.StartNew(() =>
                 {
-                    Assert.DoesNotThrow(() =>
+                    // TODO: The commented code is the behaviour we hope to obtain, but is temporarily disabled.
+                    // See https://github.com/ppy/osu/pull/15851
+                    using (realmFactory.CreateContext())
                     {
-                        using (realmFactory.CreateContext())
+                        Assert.Throws<InvalidOperationException>(() =>
                         {
-                            var resolved = liveBeatmap.Value;
+                            var __ = liveBeatmap.Value;
+                        });
+                    }
 
-                            Assert.IsTrue(resolved.Realm.IsClosed);
-                            Assert.IsTrue(resolved.IsValid);
-
-                            // can access properties without a crash.
-                            Assert.IsFalse(resolved.Hidden);
-                        }
-                    });
+                    // Assert.DoesNotThrow(() =>
+                    // {
+                    //     using (realmFactory.CreateContext())
+                    //     {
+                    //         var resolved = liveBeatmap.Value;
+                    //
+                    //         Assert.IsTrue(resolved.Realm.IsClosed);
+                    //         Assert.IsTrue(resolved.IsValid);
+                    //
+                    //         // can access properties without a crash.
+                    //         Assert.IsFalse(resolved.Hidden);
+                    //     }
+                    // });
                 }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
             });
         }
@@ -215,23 +225,29 @@ namespace osu.Game.Tests.Database
                     Assert.AreEqual(0, updateThreadContext.All<RealmBeatmap>().Count());
                     Assert.AreEqual(0, changesTriggered);
 
-                    var resolved = liveBeatmap.Value;
-
-                    // retrieval causes an implicit refresh. even changes that aren't related to the retrieval are fired at this point.
-                    Assert.AreEqual(2, updateThreadContext.All<RealmBeatmap>().Count());
-                    Assert.AreEqual(1, changesTriggered);
-
-                    // even though the realm that this instance was resolved for was closed, it's still valid.
-                    Assert.IsTrue(resolved.Realm.IsClosed);
-                    Assert.IsTrue(resolved.IsValid);
-
-                    // can access properties without a crash.
-                    Assert.IsFalse(resolved.Hidden);
-
-                    updateThreadContext.Write(r =>
+                    // TODO: Originally the following was using `liveBeatmap.Value`. This has been temporarily disabled.
+                    // See https://github.com/ppy/osu/pull/15851
+                    liveBeatmap.PerformRead(resolved =>
                     {
-                        // can use with the main context.
-                        r.Remove(resolved);
+                        // retrieval causes an implicit refresh. even changes that aren't related to the retrieval are fired at this point.
+                        // ReSharper disable once AccessToDisposedClosure
+                        Assert.AreEqual(2, updateThreadContext.All<RealmBeatmap>().Count());
+                        Assert.AreEqual(1, changesTriggered);
+
+                        // TODO: as above, temporarily disabled as it doesn't make sense inside a `PerformRead`.
+                        // // even though the realm that this instance was resolved for was closed, it's still valid.
+                        // Assert.IsTrue(resolved.Realm.IsClosed);
+                        // Assert.IsTrue(resolved.IsValid);
+
+                        // can access properties without a crash.
+                        Assert.IsFalse(resolved.Hidden);
+
+                        // ReSharper disable once AccessToDisposedClosure
+                        updateThreadContext.Write(r =>
+                        {
+                            // can use with the main context.
+                            r.Remove(resolved);
+                        });
                     });
                 }
 
