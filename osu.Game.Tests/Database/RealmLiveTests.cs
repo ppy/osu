@@ -30,6 +30,22 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestAccessAfterAttach()
+        {
+            RunTestWithRealm((realmFactory, _) =>
+            {
+                var beatmap = new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
+
+                var liveBeatmap = beatmap.ToLive();
+
+                using (var context = realmFactory.CreateContext())
+                    context.Write(r => r.Add(beatmap));
+
+                Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+            });
+        }
+
+        [Test]
         public void TestAccessNonManaged()
         {
             var beatmap = new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
