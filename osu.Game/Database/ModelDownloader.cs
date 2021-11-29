@@ -60,11 +60,6 @@ namespace osu.Game.Database
                 ? CreateAccelDownloadRequest(model, minimiseDownloadSize) ?? CreateDownloadRequest(model, minimiseDownloadSize)
                 : CreateDownloadRequest(model, minimiseDownloadSize);
 
-            if (accel)
-                request.Failure += onAccelFail;
-
-            accel = false;
-
             DownloadNotification notification = new DownloadNotification
             {
                 Text = $"正在下载 {request.Model.GetDisplayString()}",
@@ -93,6 +88,11 @@ namespace osu.Game.Database
 
             request.Failure += triggerFailure;
 
+            if (accel)
+                request.Failure += onAccelFail;
+
+            accel = false;
+
             notification.CancelRequested += () =>
             {
                 request.Cancel();
@@ -119,11 +119,9 @@ namespace osu.Game.Database
                     Logger.Error(error, $"{importer.HumanisedModelName.Titleize()} 下载失败!");
             }
 
-            void onAccelFail(Exception e)
+            void onAccelFail(Exception _)
             {
-                if (!(e is OperationCanceledException))
-                    Logger.Error(e, $"加速下载失败, 将尝试从官网下载: {e.Message}");
-
+                Logger.Log("加速下载失败, 将尝试通过官网下载", level: LogLevel.Important);
                 Download(model, minimiseDownloadSize);
             }
         }
