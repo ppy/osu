@@ -60,6 +60,9 @@ namespace osu.Game.Database
                 ? CreateAccelDownloadRequest(model, minimiseDownloadSize) ?? CreateDownloadRequest(model, minimiseDownloadSize)
                 : CreateDownloadRequest(model, minimiseDownloadSize);
 
+            if (accel)
+                request.Failure += onAccelFail;
+
             accel = false;
 
             DownloadNotification notification = new DownloadNotification
@@ -89,9 +92,6 @@ namespace osu.Game.Database
             };
 
             request.Failure += triggerFailure;
-
-            if (accel)
-                request.Failure += onAccelFail;
 
             notification.CancelRequested += () =>
             {
