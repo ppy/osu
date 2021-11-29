@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Configuration.AccelUtils
@@ -14,14 +15,23 @@ namespace osu.Game.Configuration.AccelUtils
 
         public bool Process(string name, ref object value, ref IList<string> errors)
         {
-            //chimu的
-            if (name == "NOVIDEO")
+            try
             {
-                value = value != null && (bool)value
-                    ? "?n=0"
-                    : "?n=1";
+                //chimu的
+                if (name == "NOVIDEO")
+                {
+                    value = value != null && (bool)value
+                        ? "?n=0"
+                        : "?n=1";
 
-                return true;
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                errors.Add($"转换失败: {e.Message}");
+                value = null;
+                return false;
             }
 
             return false;
