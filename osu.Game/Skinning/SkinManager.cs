@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -286,15 +287,18 @@ namespace osu.Game.Skinning
         {
             using (var context = contextFactory.CreateContext())
             {
-                var items = context.All<SkinInfo>().Where(filter).ToList();
+                var items = context.All<SkinInfo>()
+                                   .Where(s => !s.Protected && !s.DeletePending);
+                if (filter != null)
+                    items = items.Where(filter);
 
                 // check the removed skin is not the current user choice. if it is, switch back to default.
                 Guid currentUserSkin = CurrentSkinInfo.Value.ID;
 
                 if (items.Any(s => s.ID == currentUserSkin))
-                    scheduler.Add(() => CurrentSkinInfo.Value = SkinInfo.Default.ToLive());
+                    scheduler.Add(() => CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLive());
 
-                skinModelManager.Delete(items, silent);
+                skinModelManager.Delete(items.ToList(), silent);
             }
         }
 

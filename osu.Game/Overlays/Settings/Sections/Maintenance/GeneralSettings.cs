@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         deleteSkinsButton.Enabled.Value = false;
                         Task.Run(() =>
                         {
-                            skins.Delete(s => !s.DeletePending);
+                            skins.Delete();
                         }).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
                     }));
                 }
