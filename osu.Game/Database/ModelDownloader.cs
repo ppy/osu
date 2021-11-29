@@ -89,7 +89,9 @@ namespace osu.Game.Database
             };
 
             request.Failure += triggerFailure;
-            request.Failure += onAccelFail;
+
+            if (accel)
+                request.Failure += onAccelFail;
 
             notification.CancelRequested += () =>
             {
