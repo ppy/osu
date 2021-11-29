@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -52,7 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 AddStep("setup skins", () =>
                 {
-                    skinManager.CurrentSkinInfo.Value = gameCurrentSkin;
+                    skinManager.CurrentSkinInfo.Value = gameCurrentSkin.ToLive();
                     currentBeatmapSkin = getBeatmapSkin();
                 });
             });

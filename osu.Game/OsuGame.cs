@@ -248,7 +248,7 @@ namespace osu.Game
             configSkin.ValueChanged += skinId =>
             {
                 // TODO: migrate the user skin selection to the new ID format.
-                SkinInfo skinInfo = null;
+                ILive<SkinInfo> skinInfo = null;
 
                 if (Guid.TryParse(skinId.NewValue, out var guid))
                     skinInfo = SkinManager.Query(s => s.ID == guid);
@@ -256,10 +256,10 @@ namespace osu.Game
                 if (skinInfo == null)
                 {
                     if (guid == SkinInfo.CLASSIC_SKIN)
-                        skinInfo = DefaultLegacySkin.Info;
+                        skinInfo = DefaultLegacySkin.Info.ToLive();
                 }
 
-                SkinManager.CurrentSkinInfo.Value = skinInfo ?? SkinInfo.Default;
+                SkinManager.CurrentSkinInfo.Value = skinInfo ?? SkinInfo.Default.ToLive();
             };
             configSkin.TriggerChange();
 

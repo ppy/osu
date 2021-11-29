@@ -46,7 +46,7 @@ namespace osu.Game.Skinning
         private readonly IResourceStore<byte[]> resources;
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
-        public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
+        public readonly Bindable<ILive<SkinInfo>> CurrentSkinInfo = new Bindable<ILive<SkinInfo>>(SkinInfo.Default.ToLive()) { Default = SkinInfo.Default.ToLive() };
 
         private readonly SkinModelManager skinModelManager;
 
