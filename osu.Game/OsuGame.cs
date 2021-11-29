@@ -256,10 +256,10 @@ namespace osu.Game
                 if (skinInfo == null)
                 {
                     if (guid == SkinInfo.CLASSIC_SKIN)
-                        skinInfo = DefaultLegacySkin.Info.ToLive();
+                        skinInfo = DefaultLegacySkin.CreateInfo().ToLive();
                 }
 
-                SkinManager.CurrentSkinInfo.Value = skinInfo ?? SkinInfo.Default.ToLive();
+                SkinManager.CurrentSkinInfo.Value = skinInfo ?? DefaultSkin.CreateInfo().ToLive();
             };
             configSkin.TriggerChange();
 
@@ -660,7 +660,7 @@ namespace osu.Game
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
-            LocalConfig.LookupSkinName = id => SkinManager.GetAllUsableSkins().FirstOrDefault(s => s.ID == id)?.ToString() ?? "Unknown";
+            LocalConfig.LookupSkinName = id => SkinManager.Query(s => s.ID == id)?.ToString() ?? "Unknown";
 
             LocalConfig.LookupKeyBindings = l =>
             {

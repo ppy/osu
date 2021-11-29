@@ -56,13 +56,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestDefaultSkin()
         {
-            AddStep("set default skin", () => skins.CurrentSkinInfo.Value = SkinInfo.Default.ToLive());
+            AddStep("set default skin", () => skins.CurrentSkinInfo.Value = DefaultSkin.CreateInfo().ToLive());
         }
 
         [Test]
         public void TestLegacySkin()
         {
-            AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.Info.ToLive());
+            AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.CreateInfo().ToLive());
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Models;
 using Realms;
@@ -32,6 +31,8 @@ namespace osu.Game.Skinning
 
         public string Hash { get; set; } = string.Empty;
 
+        public bool Protected { get; set; }
+
         public string InstantiationInfo { get; set; } = string.Empty;
 
         public virtual Skin CreateInstance(IStorageResourceProvider resources)
@@ -47,14 +48,6 @@ namespace osu.Game.Skinning
         public IList<RealmNamedFileUsage> Files { get; } = null!;
 
         public bool DeletePending { get; set; }
-
-        public static SkinInfo Default { get; } = new SkinInfo
-        {
-            ID = DEFAULT_SKIN,
-            Name = "osu! (triangles)",
-            Creator = "team osu!",
-            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
-        };
 
         public bool Equals(SkinInfo? other)
         {

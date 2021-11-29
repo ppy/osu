@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections
             Icon = FontAwesome.Solid.PaintBrush
         };
 
-        private readonly Bindable<ILive<SkinInfo>> dropdownBindable = new Bindable<ILive<SkinInfo>> { Default = SkinInfo.Default.ToLive() };
+        private readonly Bindable<ILive<SkinInfo>> dropdownBindable = new Bindable<ILive<SkinInfo>> { Default = DefaultSkin.CreateInfo().ToLive() };
         private readonly Bindable<string> configBindable = new Bindable<string>();
 
         private static readonly ILive<SkinInfo> random_skin_info = new SkinInfo
@@ -81,7 +81,8 @@ namespace osu.Game.Overlays.Settings.Sections
 
             realmSkins = realmFactory.Context.All<SkinInfo>()
                                      .Where(s => !s.DeletePending)
-                                     .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
+                                     .OrderBy(s => s.Protected)
+                                     .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
 
             realmSubscription = realmSkins
                 .SubscribeForNotifications((sender, changes, error) =>
@@ -141,11 +142,11 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateItems()
         {
+            int protectedCount = realmSkins.Count(s => s.Protected);
+
             skinItems = realmSkins.ToLive();
 
-            skinItems.Insert(0, SkinInfo.Default.ToLive());
-            skinItems.Insert(1, DefaultLegacySkin.Info.ToLive());
-            skinItems.Insert(2, random_skin_info);
+            skinItems.Insert(protectedCount, random_skin_info);
 
             skinDropdown.Items = skinItems;
         }
