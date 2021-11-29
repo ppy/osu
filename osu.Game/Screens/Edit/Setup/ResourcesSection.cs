@@ -78,9 +78,9 @@ namespace osu.Game.Screens.Edit.Setup
             using (var stream = info.OpenRead())
             {
                 if (oldFile != null)
-                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
-                else
-                    beatmaps.AddFile(set, stream, info.Name);
+                    beatmaps.DeleteFile(set, oldFile);
+
+                beatmaps.AddFile(set, stream, info.Name);
             }
 
             working.Value.Metadata.BackgroundFile = info.Name;
@@ -105,9 +105,8 @@ namespace osu.Game.Screens.Edit.Setup
             using (var stream = info.OpenRead())
             {
                 if (oldFile != null)
-                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
-                else
-                    beatmaps.AddFile(set, stream, info.Name);
+                    beatmaps.DeleteFile(set, oldFile);
+                beatmaps.AddFile(set, stream, info.Name);
             }
 
             working.Value.Metadata.AudioFile = info.Name;
