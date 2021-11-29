@@ -14,6 +14,7 @@ using osu.Framework.Statistics;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Skinning;
 using osu.Game.Stores;
 using Realms;
 
@@ -121,6 +122,11 @@ namespace osu.Game.Database
 
                     realm.Remove(s);
                 }
+
+                var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
+
+                foreach (var s in pendingDeleteSkins)
+                    realm.Remove(s);
 
                 transaction.Commit();
             }
