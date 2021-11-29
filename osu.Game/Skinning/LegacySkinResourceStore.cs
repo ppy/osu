@@ -13,9 +13,9 @@ namespace osu.Game.Skinning
 {
     public class LegacySkinResourceStore : ResourceStore<byte[]>
     {
-        private readonly IHasRealmFiles source;
+        private readonly IHasNamedFiles source;
 
-        public LegacySkinResourceStore(IHasRealmFiles source, IResourceStore<byte[]> underlyingStore)
+        public LegacySkinResourceStore(IHasNamedFiles source, IResourceStore<byte[]> underlyingStore)
             : base(underlyingStore)
         {
             this.source = source;
@@ -32,7 +32,7 @@ namespace osu.Game.Skinning
         }
 
         private string getPathForFile(string filename) =>
-            source.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.GetStoragePath();
+            source.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
 
         public override IEnumerable<string> GetAvailableResources() => source.Files.Select(f => f.Filename);
     }
