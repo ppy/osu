@@ -12,6 +12,7 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -474,7 +475,7 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
-        public void TestImportThenDeleteThenImport()
+        public void TestImportThenDeleteThenImportOptimisedPath()
         {
             RunTestWithRealmAsync(async (realmFactory, storage) =>
             {
@@ -485,11 +486,39 @@ namespace osu.Game.Tests.Database
 
                 deleteBeatmapSet(imported, realmFactory.Context);
 
+                Assert.IsTrue(imported.DeletePending);
+
                 var importedSecondTime = await LoadOszIntoStore(importer, realmFactory.Context);
 
                 // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
                 Assert.IsTrue(imported.ID == importedSecondTime.ID);
                 Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
+                Assert.IsFalse(imported.DeletePending);
+                Assert.IsFalse(importedSecondTime.DeletePending);
+            });
+        }
+
+        [Test]
+        public void TestImportThenDeleteThenImportNonOptimisedPath()
+        {
+            RunTestWithRealmAsync(async (realmFactory, storage) =>
+            {
+                using var importer = new NonOptimisedBeatmapImporter(realmFactory, storage);
+                using var store = new RealmRulesetStore(realmFactory, storage);
+
+                var imported = await LoadOszIntoStore(importer, realmFactory.Context);
+
+                deleteBeatmapSet(imported, realmFactory.Context);
+
+                Assert.IsTrue(imported.DeletePending);
+
+                var importedSecondTime = await LoadOszIntoStore(importer, realmFactory.Context);
+
+                // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
+                Assert.IsTrue(imported.ID == importedSecondTime.ID);
+                Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
+                Assert.IsFalse(imported.DeletePending);
+                Assert.IsFalse(importedSecondTime.DeletePending);
             });
         }
 
@@ -866,6 +895,16 @@ namespace osu.Game.Tests.Database
             }
 
             Assert.Fail(failureMessage);
+        }
+
+        public class NonOptimisedBeatmapImporter : BeatmapImporter
+        {
+            public NonOptimisedBeatmapImporter(RealmContextFactory realmFactory, Storage storage)
+                : base(realmFactory, storage)
+            {
+            }
+
+            protected override bool HasCustomHashFunction => true;
         }
     }
 }
