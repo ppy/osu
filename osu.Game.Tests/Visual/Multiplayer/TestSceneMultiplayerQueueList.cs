@@ -32,6 +32,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             };
         });
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            // Not scheduled since this should affect buttons added by the current test.
+            currentItemId = 0;
+        }
+
         [Test]
         public void TestItemsAddedToEndInHostOnlyMode()
         {
