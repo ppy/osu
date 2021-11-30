@@ -198,6 +198,8 @@ namespace osu.Game
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", contextFactory));
 
+            new EFToRealmMigrator(contextFactory, realmFactory, LocalConfig).Run();
+
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
