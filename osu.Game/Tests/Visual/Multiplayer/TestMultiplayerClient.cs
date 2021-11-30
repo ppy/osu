@@ -347,11 +347,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             return Task.FromResult(new APIBeatmap
             {
-                BeatmapSet = new APIBeatmapSet
-                {
-                    OnlineID = set.OnlineID,
-                },
-                OnlineID = set.Beatmaps.First().OnlineID
+                BeatmapSet = new APIBeatmapSet { OnlineID = set.OnlineID },
+                OnlineID = beatmapId,
+                Checksum = set.Beatmaps.First(b => b.OnlineID == beatmapId).MD5Hash
             });
         }
 
