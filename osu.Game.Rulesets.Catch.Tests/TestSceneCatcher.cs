@@ -169,6 +169,28 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [Test]
+        public void TestLastBananaShouldClearPlateOnMiss()
+        {
+            AddStep("catch fruit", () => attemptCatch(new Fruit()));
+            checkPlate(1);
+            AddStep("miss banana", () => attemptCatch(new Banana { X = 100 }));
+            checkPlate(1);
+            AddStep("miss last banana", () => attemptCatch(new Banana { LastInCombo = true, X = 100 }));
+            checkPlate(0);
+        }
+
+        [Test]
+        public void TestLastBananaShouldClearPlateOnCatch()
+        {
+            AddStep("catch fruit", () => attemptCatch(new Fruit()));
+            checkPlate(1);
+            AddStep("catch banana", () => attemptCatch(new Banana()));
+            checkPlate(2);
+            AddStep("catch last banana", () => attemptCatch(new Banana { LastInCombo = true }));
+            checkPlate(0);
+        }
+
+        [Test]
         public void TestCatcherRandomStacking()
         {
             AddStep("catch more fruits", () => attemptCatch(() => new Fruit

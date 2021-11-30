@@ -211,7 +211,7 @@ namespace osu.Game.Screens.OnlinePlay
                 ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
         }
 
-        protected IScreen CurrentSubScreen => screenStack.CurrentScreen;
+        public IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
         protected abstract string ScreenTitle { get; }
 

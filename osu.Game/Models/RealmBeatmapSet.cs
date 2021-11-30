@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using Realms;
 
 #nullable enable
@@ -25,11 +26,20 @@ namespace osu.Game.Models
 
         public DateTimeOffset DateAdded { get; set; }
 
-        public IBeatmapMetadataInfo? Metadata => Beatmaps.FirstOrDefault()?.Metadata;
+        public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new RealmBeatmapMetadata();
 
         public IList<RealmBeatmap> Beatmaps { get; } = null!;
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
+
+        public BeatmapOnlineStatus Status
+        {
+            get => (BeatmapOnlineStatus)StatusInt;
+            set => StatusInt = (int)value;
+        }
+
+        [MapTo(nameof(Status))]
+        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
 
         public bool DeletePending { get; set; }
 
@@ -51,29 +61,21 @@ namespace osu.Game.Models
         /// The path returned is relative to the user file storage.
         /// </summary>
         /// <param name="filename">The name of the file to get the storage path of.</param>
-        public string? GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.File.StoragePath;
-
-        public override string ToString() => Metadata?.ToString() ?? base.ToString();
+        public string? GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
 
         public bool Equals(RealmBeatmapSet? other)
         {
-            if (other == null)
-                return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
-            if (IsManaged && other.IsManaged)
-                return ID == other.ID;
-
-            if (OnlineID > 0 && other.OnlineID > 0)
-                return OnlineID == other.OnlineID;
-
-            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
-                return Hash == other.Hash;
-
-            return ReferenceEquals(this, other);
+            return ID == other.ID;
         }
 
-        IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
+        public override string ToString() => Metadata.GetDisplayString();
 
-        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
+        public bool Equals(IBeatmapSetInfo? other) => other is RealmBeatmapSet b && Equals(b);
+
+        IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
     }
 }

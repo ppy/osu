@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NuGet.Packaging;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -18,6 +17,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
@@ -63,7 +63,7 @@ namespace osu.Game.Stores
 
             validateOnlineIds(beatmapSet, realm);
 
-            bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
+            bool hadOnlineIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
 
             if (onlineLookupQueue != null)
             {
@@ -72,7 +72,7 @@ namespace osu.Game.Stores
             }
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
-            if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
+            if (hadOnlineIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
             {
                 if (beatmapSet.OnlineID > 0)
                 {
@@ -182,7 +182,7 @@ namespace osu.Game.Stores
 
             return new RealmBeatmapSet
             {
-                OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID ?? -1,
+                OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID ?? -1,
                 // Metadata = beatmap.Metadata,
                 DateAdded = DateTimeOffset.UtcNow
             };
@@ -197,7 +197,7 @@ namespace osu.Game.Stores
 
             foreach (var file in files.Where(f => f.Filename.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)))
             {
-                using (var memoryStream = new MemoryStream(Files.Store.Get(file.File.StoragePath))) // we need a memory stream so we can seek
+                using (var memoryStream = new MemoryStream(Files.Store.Get(file.File.GetStoragePath()))) // we need a memory stream so we can seek
                 {
                     IBeatmap decoded;
                     using (var lineReader = new LineBufferedReader(memoryStream, true))
@@ -254,7 +254,7 @@ namespace osu.Game.Stores
                     {
                         Hash = hash,
                         DifficultyName = decodedInfo.DifficultyName,
-                        OnlineID = decodedInfo.OnlineBeatmapID ?? -1,
+                        OnlineID = decodedInfo.OnlineID ?? -1,
                         AudioLeadIn = decodedInfo.AudioLeadIn,
                         StackLeniency = decodedInfo.StackLeniency,
                         SpecialStyle = decodedInfo.SpecialStyle,
@@ -281,9 +281,6 @@ namespace osu.Game.Stores
         private void updateBeatmapStatistics(RealmBeatmap beatmap, IBeatmap decoded)
         {
             var rulesetInstance = ((IRulesetInfo)beatmap.Ruleset).CreateInstance();
-
-            if (rulesetInstance == null)
-                return;
 
             decoded.BeatmapInfo.Ruleset = rulesetInstance.RulesetInfo;
 

@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Moq;
@@ -13,7 +12,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
-using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -33,14 +31,10 @@ namespace osu.Game.Tests.Editing.Checks
                 {
                     BeatmapSet = new BeatmapSetInfo
                     {
-                        Files = new List<BeatmapSetFileInfo>(new[]
+                        Files =
                         {
-                            new BeatmapSetFileInfo
-                            {
-                                Filename = "abc123.mp4",
-                                FileInfo = new FileInfo { Hash = "abcdef" }
-                            }
-                        })
+                            CheckTestHelpers.CreateMockFile("mp4"),
+                        }
                     }
                 }
             };

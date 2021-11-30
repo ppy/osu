@@ -17,6 +17,8 @@ namespace osu.Game.Database
     {
         public Guid ID { get; }
 
+        public bool IsManaged => data.IsManaged;
+
         private readonly SynchronizationContext? fetchedContext;
         private readonly int fetchedThreadId;
 
@@ -33,8 +35,11 @@ namespace osu.Game.Database
         {
             this.data = data;
 
-            fetchedContext = SynchronizationContext.Current;
-            fetchedThreadId = Thread.CurrentThread.ManagedThreadId;
+            if (data.IsManaged)
+            {
+                fetchedContext = SynchronizationContext.Current;
+                fetchedThreadId = Thread.CurrentThread.ManagedThreadId;
+            }
 
             ID = data.ID;
         }
@@ -75,13 +80,18 @@ namespace osu.Game.Database
         /// Perform a write operation on this live object.
         /// </summary>
         /// <param name="perform">The action to perform.</param>
-        public void PerformWrite(Action<T> perform) =>
+        public void PerformWrite(Action<T> perform)
+        {
+            if (!IsManaged)
+                throw new InvalidOperationException("Can't perform writes on a non-managed underlying value");
+
             PerformRead(t =>
             {
                 var transaction = t.Realm.BeginWrite();
                 perform(t);
                 transaction.Commit();
             });
+        }
 
         public T Value
         {
@@ -102,10 +112,12 @@ namespace osu.Game.Database
             }
         }
 
-        private bool originalDataValid => isCorrectThread && data.IsValid;
+        private bool originalDataValid => !IsManaged || (isCorrectThread && data.IsValid);
 
         // this matches realm's internal thread validation (see https://github.com/realm/realm-dotnet/blob/903b4d0b304f887e37e2d905384fb572a6496e70/Realm/Realm/Native/SynchronizationContextScheduler.cs#L72)
         private bool isCorrectThread
             => (fetchedContext != null && SynchronizationContext.Current == fetchedContext) || fetchedThreadId == Thread.CurrentThread.ManagedThreadId;
+
+        public bool Equals(ILive<T>? other) => ID == other?.ID;
     }
 }

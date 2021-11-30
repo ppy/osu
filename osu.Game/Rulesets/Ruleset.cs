@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets
     {
         public RulesetInfo RulesetInfo { get; internal set; }
 
-        private static readonly ConcurrentDictionary<int, IMod[]> mod_reference_cache = new ConcurrentDictionary<int, IMod[]>();
+        private static readonly ConcurrentDictionary<string, IMod[]> mod_reference_cache = new ConcurrentDictionary<string, IMod[]>();
 
         /// <summary>
         /// A queryable source containing all available mods.
@@ -49,11 +49,12 @@ namespace osu.Game.Rulesets
         {
             get
             {
-                if (!(RulesetInfo.ID is int id))
+                // Is the case for many test usages.
+                if (string.IsNullOrEmpty(ShortName))
                     return CreateAllMods();
 
-                if (!mod_reference_cache.TryGetValue(id, out var mods))
-                    mod_reference_cache[id] = mods = CreateAllMods().Cast<IMod>().ToArray();
+                if (!mod_reference_cache.TryGetValue(ShortName, out var mods))
+                    mod_reference_cache[ShortName] = mods = CreateAllMods().Cast<IMod>().ToArray();
 
                 return mods;
             }
@@ -182,7 +183,7 @@ namespace osu.Game.Rulesets
             {
                 Name = Description,
                 ShortName = ShortName,
-                ID = (this as ILegacyRuleset)?.LegacyID,
+                OnlineID = (this as ILegacyRuleset)?.LegacyID ?? -1,
                 InstantiationInfo = GetType().GetInvariantInstantiationInfo(),
                 Available = true,
             };
@@ -222,7 +223,7 @@ namespace osu.Game.Rulesets
         /// <returns>The <see cref="IBeatmapProcessor"/>.</returns>
         public virtual IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => null;
 
-        public abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
+        public abstract DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap);
 
         /// <summary>
         /// Optionally creates a <see cref="PerformanceCalculator"/> to generate performance data from the provided score.
@@ -240,7 +241,7 @@ namespace osu.Game.Rulesets
         /// <param name="score">The score to be processed.</param>
         /// <returns>A performance calculator instance for the provided score.</returns>
         [CanBeNull]
-        public PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score)
+        public PerformanceCalculator CreatePerformanceCalculator(IWorkingBeatmap beatmap, ScoreInfo score)
         {
             var difficultyCalculator = CreateDifficultyCalculator(beatmap);
             var difficultyAttributes = difficultyCalculator.Calculate(score.Mods);

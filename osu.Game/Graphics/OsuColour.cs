@@ -52,15 +52,18 @@ namespace osu.Game.Graphics
 
         public Color4 ForStarDifficulty(double starDifficulty) => ColourUtils.SampleFromLinearGradient(new[]
         {
-            (1.5f, Color4Extensions.FromHex("4fc0ff")),
+            (0.1f, Color4Extensions.FromHex("aaaaaa")),
+            (0.1f, Color4Extensions.FromHex("4290fb")),
+            (1.25f, Color4Extensions.FromHex("4fc0ff")),
             (2.0f, Color4Extensions.FromHex("4fffd5")),
             (2.5f, Color4Extensions.FromHex("7cff4f")),
-            (3.25f, Color4Extensions.FromHex("f6f05c")),
-            (4.5f, Color4Extensions.FromHex("ff8068")),
-            (6.0f, Color4Extensions.FromHex("ff3c71")),
-            (7.0f, Color4Extensions.FromHex("6563de")),
-            (8.0f, Color4Extensions.FromHex("18158e")),
-            (8.0f, Color4.Black),
+            (3.3f, Color4Extensions.FromHex("f6f05c")),
+            (4.2f, Color4Extensions.FromHex("ff8068")),
+            (4.9f, Color4Extensions.FromHex("ff4e6f")),
+            (5.8f, Color4Extensions.FromHex("c645b8")),
+            (6.7f, Color4Extensions.FromHex("6563de")),
+            (7.7f, Color4Extensions.FromHex("18158e")),
+            (9.0f, Color4.Black),
         }, (float)Math.Round(starDifficulty, 2, MidpointRounding.AwayFromZero));
 
         /// <summary>
@@ -119,34 +122,34 @@ namespace osu.Game.Graphics
         }
 
         /// <summary>
-        /// Retrieves a colour for the given <see cref="BeatmapSetOnlineStatus"/>.
+        /// Retrieves a colour for the given <see cref="BeatmapOnlineStatus"/>.
         /// A <see langword="null"/> value indicates that a "background" shade from the local <see cref="OverlayColourProvider"/>
         /// (or another fallback colour) should be used.
         /// </summary>
         /// <remarks>
         /// Sourced from web: https://github.com/ppy/osu-web/blob/007eebb1916ed5cb6a7866d82d8011b1060a945e/resources/assets/less/layout.less#L36-L50
         /// </remarks>
-        public static Color4? ForBeatmapSetOnlineStatus(BeatmapSetOnlineStatus status)
+        public static Color4? ForBeatmapSetOnlineStatus(BeatmapOnlineStatus status)
         {
             switch (status)
             {
-                case BeatmapSetOnlineStatus.Ranked:
-                case BeatmapSetOnlineStatus.Approved:
+                case BeatmapOnlineStatus.Ranked:
+                case BeatmapOnlineStatus.Approved:
                     return Color4Extensions.FromHex(@"b3ff66");
 
-                case BeatmapSetOnlineStatus.Loved:
+                case BeatmapOnlineStatus.Loved:
                     return Color4Extensions.FromHex(@"ff66ab");
 
-                case BeatmapSetOnlineStatus.Qualified:
+                case BeatmapOnlineStatus.Qualified:
                     return Color4Extensions.FromHex(@"66ccff");
 
-                case BeatmapSetOnlineStatus.Pending:
+                case BeatmapOnlineStatus.Pending:
                     return Color4Extensions.FromHex(@"ffd966");
 
-                case BeatmapSetOnlineStatus.WIP:
+                case BeatmapOnlineStatus.WIP:
                     return Color4Extensions.FromHex(@"ff9966");
 
-                case BeatmapSetOnlineStatus.Graveyard:
+                case BeatmapOnlineStatus.Graveyard:
                     return Color4.Black;
 
                 default:

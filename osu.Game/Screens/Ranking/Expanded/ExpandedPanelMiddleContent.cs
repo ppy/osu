@@ -143,14 +143,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
                                 Spacing = new Vector2(5, 0),
-                                Children = new Drawable[]
-                                {
-                                    new StarRatingDisplay(starDifficulty)
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft
-                                    },
-                                }
                             },
                             new FillFlowContainer
                             {
@@ -230,6 +222,15 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             if (score.Date != default)
                 AddInternal(new PlayedOnText(score.Date));
+
+            if (starDifficulty != null)
+            {
+                starAndModDisplay.Add(new StarRatingDisplay(starDifficulty.Value)
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft
+                });
+            }
 
             if (score.Mods.Any())
             {

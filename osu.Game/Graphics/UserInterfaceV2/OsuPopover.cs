@@ -58,6 +58,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (State.Value == Visibility.Hidden)
                 return false;
 

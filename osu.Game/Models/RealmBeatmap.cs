@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
@@ -20,7 +21,7 @@ namespace osu.Game.Models
     [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("Beatmap")]
-    public class RealmBeatmap : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo
+    public class RealmBeatmap : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<RealmBeatmap>
     {
         [PrimaryKey]
         public Guid ID { get; set; } = Guid.NewGuid();
@@ -35,14 +36,17 @@ namespace osu.Game.Models
 
         public RealmBeatmapSet? BeatmapSet { get; set; }
 
-        public BeatmapSetOnlineStatus Status
+        [Ignored]
+        public RealmNamedFileUsage? File => BeatmapSet?.Files.First(f => f.File.Hash == Hash);
+
+        public BeatmapOnlineStatus Status
         {
-            get => (BeatmapSetOnlineStatus)StatusInt;
+            get => (BeatmapOnlineStatus)StatusInt;
             set => StatusInt = (int)value;
         }
 
         [MapTo(nameof(Status))]
-        public int StatusInt { get; set; }
+        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
 
         [Indexed]
         public int OnlineID { get; set; } = -1;
@@ -97,6 +101,16 @@ namespace osu.Game.Models
         public double TimelineZoom { get; set; }
 
         #endregion
+
+        public bool Equals(RealmBeatmap? other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
+
+            return ID == other.ID;
+        }
+
+        public bool Equals(IBeatmapInfo? other) => other is RealmBeatmap b && Equals(b);
 
         public bool AudioEquals(RealmBeatmap? other) => other != null
                                                         && BeatmapSet != null

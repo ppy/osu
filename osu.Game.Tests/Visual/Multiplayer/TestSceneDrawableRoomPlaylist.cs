@@ -13,15 +13,16 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Input;
 
@@ -33,6 +34,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private BeatmapManager manager;
         private RulesetStore rulesets;
+
+        [Cached(typeof(UserLookupCache))]
+        private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -62,6 +66,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             moveToItem(0);
             assertHandleVisibility(0, true);
             assertDeleteButtonVisibility(0, true);
+
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
+        }
+
+        [Test]
+        public void TestMarkInvalid()
+        {
+            createPlaylist(true, true);
+
+            AddStep("mark item 0 as invalid", () => playlist.Items[0].MarkInvalid());
+
+            moveToItem(0);
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
@@ -218,7 +235,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertDownloadButtonVisible(false);
 
             void assertDownloadButtonVisible(bool visible) => AddUntilStep($"download button {(visible ? "shown" : "hidden")}",
-                () => playlist.ChildrenOfType<BeatmapPanelDownloadButton>().Single().Alpha == (visible ? 1 : 0));
+                () => playlist.ChildrenOfType<BeatmapDownloadButton>().Single().Alpha == (visible ? 1 : 0));
         }
 
         [Test]
@@ -232,7 +249,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             createPlaylist(byOnlineId, byChecksum);
 
-            AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapPanelDownloadButton>().All(d => d.IsPresent));
+            AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadButton>().All(d => d.IsPresent));
         }
 
         [Test]
@@ -245,6 +262,59 @@ namespace osu.Game.Tests.Visual.Multiplayer
             beatmap.BeatmapSet.HasExplicitContent = true;
 
             createPlaylist(beatmap);
+        }
+
+        [Test]
+        public void TestExpiredItems()
+        {
+            AddStep("create playlist", () =>
+            {
+                Child = playlist = new TestPlaylist(false, false)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(500, 300),
+                    Items =
+                    {
+                        new PlaylistItem
+                        {
+                            ID = 0,
+                            Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                            Expired = true,
+                            RequiredMods =
+                            {
+                                new OsuModHardRock(),
+                                new OsuModDoubleTime(),
+                                new OsuModAutoplay()
+                            }
+                        },
+                        new PlaylistItem
+                        {
+                            ID = 1,
+                            Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                            RequiredMods =
+                            {
+                                new OsuModHardRock(),
+                                new OsuModDoubleTime(),
+                                new OsuModAutoplay()
+                            }
+                        }
+                    }
+                };
+            });
+
+            AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestWithOwner(bool withOwner)
+        {
+            createPlaylist(false, false, withOwner);
+
+            AddAssert("owner visible", () => playlist.ChildrenOfType<UpdateableAvatar>().All(a => a.IsPresent == withOwner));
         }
 
         private void moveToItem(int index, Vector2? offset = null)
@@ -267,13 +337,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 () => (playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>.PlaylistItemHandle>().ElementAt(index).Alpha > 0) == visible);
 
         private void assertDeleteButtonVisibility(int index, bool visible)
-            => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible", () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
+            => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible",
+                () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
 
-        private void createPlaylist(bool allowEdit, bool allowSelection)
+        private void createPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
         {
             AddStep("create playlist", () =>
             {
-                Child = playlist = new TestPlaylist(allowEdit, allowSelection)
+                Child = playlist = new TestPlaylist(allowEdit, allowSelection, showItemOwner)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -285,6 +356,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     playlist.Items.Add(new PlaylistItem
                     {
                         ID = i,
+                        OwnerID = 2,
                         Beatmap =
                         {
                             Value = i % 2 == 1
@@ -332,6 +404,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     playlist.Items.Add(new PlaylistItem
                     {
                         ID = index++,
+                        OwnerID = 2,
                         Beatmap = { Value = b },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         RequiredMods =
@@ -351,8 +424,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             public new IReadOnlyDictionary<PlaylistItem, RearrangeableListItem<PlaylistItem>> ItemMap => base.ItemMap;
 
-            public TestPlaylist(bool allowEdit, bool allowSelection)
-                : base(allowEdit, allowSelection)
+            public TestPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
+                : base(allowEdit, allowSelection, showItemOwner: showItemOwner)
             {
             }
         }

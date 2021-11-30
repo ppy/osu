@@ -200,7 +200,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     OnlineID = i * 10,
                     DifficultyName = $"Test #{i}",
-                    RulesetID = Ruleset.Value.ID ?? -1,
+                    RulesetID = Ruleset.Value.OnlineID,
                     StarRating = 2 + i * 0.1,
                     OverallDifficulty = 3.5f,
                     FailTimes = new APIFailTimes
