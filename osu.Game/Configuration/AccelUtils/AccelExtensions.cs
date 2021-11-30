@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Configuration.AccelUtils
@@ -17,11 +17,10 @@ namespace osu.Game.Configuration.AccelUtils
         /// <summary>
         /// 所有已知的属性
         /// </summary>
-        private static readonly string[] vaild_properties =
+        private static readonly IList<string> vaild_properties = new List<string>
         {
             "BID",
-            "NOVIDEO",
-            "AUTO"
+            "NOVIDEO"
         };
 
         /// <summary>
@@ -71,8 +70,22 @@ namespace osu.Game.Configuration.AccelUtils
 
                     propertyInfo.name = propertyInfo.name.ToUpper();
 
-                    if (!vaild_properties.Contains(propertyInfo.name))
-                        errors.Add($"未知的属性: {propertyInfo.name}");
+                    if (!vaild_properties.Contains(propertyInfo.name) && !noSuggestion)
+                    {
+                        string suggestion = "输入建议: ";
+                        bool haveSuggestion = false;
+
+                        foreach (string propertyName in vaild_properties)
+                        {
+                            if (propertyName.StartsWith(propertyInfo.name, StringComparison.Ordinal))
+                            {
+                                haveSuggestion = true;
+                                suggestion += $" {propertyName}";
+                            }
+                        }
+
+                        errors.Add(haveSuggestion ? suggestion : $"未知的属性: {propertyInfo.name}");
+                    }
 
                     //查询值
                     object value;
@@ -92,26 +105,41 @@ namespace osu.Game.Configuration.AccelUtils
                         if (!vaildExtension && !noSuggestion)
                         {
                             string suggestion = "输入建议: ";
+                            bool haveSuggestion = false;
 
                             foreach (var hdlr in ExtensionHandlers.Values)
                             {
                                 if (hdlr.ExtensionName.StartsWith(propertyInfo.extensionName, StringComparison.Ordinal))
-                                    suggestion += $" {hdlr.ExtensionName}({hdlr.HandlerName}) ";
+                                {
+                                    haveSuggestion = true;
+                                    suggestion += $" {hdlr.ExtensionName}({hdlr.HandlerName})";
+                                }
                             }
 
-                            errors.Add(suggestion);
+                            errors.Add(haveSuggestion ? suggestion : $"未找到与 {propertyInfo.extensionName} 对应的处理器, 它将保持原始状态");
                         }
 
                         if (vaildExtension)
                         {
-                            if (!handler.Process(propertyInfo.name, ref value, ref errors))
-                                errors.Add($"处理器\"{handler.HandlerName}\"不支持属性{propertyInfo.name}");
+                            try
+                            {
+                                if (!handler.Process(propertyInfo.name, ref value, ref errors))
+                                    errors.Add($"处理器\"{handler.HandlerName}\"不支持属性{propertyInfo.name}");
+                            }
+                            catch (Exception e)
+                            {
+                                errors.Add($"处理器 \"{handler.HandlerName}\" 产生了异常: {e.Message}");
+
+                                Logger.Log($"处理器 \"{handler.HandlerName}\" 产生了异常: {e.Message}");
+                                Logger.Log(e.StackTrace);
+                                return false;
+                            }
                         }
-                        else errors.Add($"未找到与 {propertyInfo.extensionName} 对应的处理器, 它将保持原始状态");
                     }
 
-                    if (value != null)
-                        result = result.Replace($"[{propertyInfo.name}{propertyInfo.extensionName}]", value.ToString());
+                    //如果value是null，则将其赋值为"null"
+                    value ??= "null";
+                    result = result.Replace($"[{propertyInfo.name}{propertyInfo.extensionName}]", value.ToString());
 
                     //清空属性名称
                     propertyInfo.name = string.Empty;
@@ -151,13 +179,15 @@ namespace osu.Game.Configuration.AccelUtils
         /// <param name="result">解析结果</param>
         /// <param name="errors">错误/警告列表</param>
         /// <param name="overrides">覆盖内容，将用于替换或补全自动生成字典中的值</param>
+        /// <param name="noSuggestion">禁用用户警告</param>
         /// <returns>解析是否成功</returns>
         /// <exception cref="ArgumentNullException">地址为空</exception>
         public static bool TryParseAccelUrl(this string url,
                                             IBeatmapInfo beatmapInfo,
                                             out string result,
                                             out IList<string> errors,
-                                            IDictionary<string, object> overrides = null)
+                                            IDictionary<string, object> overrides = null,
+                                            bool noSuggestion = false)
         {
             var dict = new Dictionary<string, object>
             {
@@ -173,7 +203,7 @@ namespace osu.Game.Configuration.AccelUtils
                 }
             }
 
-            return url.TryParseAccelUrl(dict, out result, out errors);
+            return url.TryParseAccelUrl(dict, out result, out errors, noSuggestion);
         }
 
         /// <summary>
@@ -184,13 +214,15 @@ namespace osu.Game.Configuration.AccelUtils
         /// <param name="result">解析结果</param>
         /// <param name="errors">错误/警告列表</param>
         /// <param name="overrides">覆盖内容，将用于替换或补全自动生成字典中的值</param>
+        /// <param name="noSuggestion">禁用用户警告</param>
         /// <returns>解析是否成功</returns>
         /// <exception cref="ArgumentNullException">地址为空</exception>
         public static bool TryParseAccelUrl(this string url,
                                             IBeatmapSetInfo beatmapSetInfo,
                                             out string result,
                                             out IList<string> errors,
-                                            IDictionary<string, object> overrides = null)
+                                            IDictionary<string, object> overrides = null,
+                                            bool noSuggestion = false)
         {
             var dict = new Dictionary<string, object>
             {
@@ -206,7 +238,7 @@ namespace osu.Game.Configuration.AccelUtils
                 }
             }
 
-            return url.TryParseAccelUrl(dict, out result, out errors);
+            return url.TryParseAccelUrl(dict, out result, out errors, noSuggestion);
         }
 
         public static bool AddHandler(IExtensionHandler handler)
@@ -214,6 +246,13 @@ namespace osu.Game.Configuration.AccelUtils
             if (ExtensionHandlers.ContainsKey(handler.ExtensionName)) return false;
 
             ExtensionHandlers.Add(handler.ExtensionName, handler);
+
+            foreach (string propertyName in handler.SupportedProperties)
+            {
+                if (!vaild_properties.Contains(propertyName))
+                    vaild_properties.Add(propertyName);
+            }
+
             return true;
         }
     }

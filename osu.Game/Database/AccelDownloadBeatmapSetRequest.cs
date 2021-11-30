@@ -24,7 +24,7 @@ namespace osu.Game.Database
                 ["NOVIDEO"] = minimiseDownloadSize
             };
 
-            if (!config.Get<string>(MSetting.AccelSource).TryParseAccelUrl(dict, out uri, out _))
+            if (!config.Get<string>(MSetting.AccelSource).TryParseAccelUrl(dict, out uri, out _, true))
                 throw new ParseFailedException("加速地址解析失败, 请检查您的设置。");
         }
 

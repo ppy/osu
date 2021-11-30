@@ -224,7 +224,7 @@ namespace osu.Game
             dependencies.Cache(customStore);
 
             //初始化加速地址扩展处理器Store
-            dependencies.Cache(new ExtensionHandlerStore(Storage, this));
+            dependencies.Cache(new ExtensionHandlerStore(Storage));
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 

@@ -5,6 +5,7 @@ namespace osu.Game.Configuration.AccelUtils
     public class NumberExtensionHandler : IExtensionHandler
     {
         public string ExtensionName => Extensionname;
+        public string[] SupportedProperties => null;
         public string HandlerName => Handlername;
 
         //绕过问题: 无法在非静态上下文中访问静态属性

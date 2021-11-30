@@ -15,15 +15,12 @@ namespace osu.Game.Configuration.AccelUtils
 {
     internal class ExtensionHandlerStore : NamespacedResourceStore<byte[]>
     {
-        private readonly OsuGameBase gameBase;
         private readonly Storage customStorage;
         private readonly Dictionary<Assembly, Type> loadedAssemblies = new Dictionary<Assembly, Type>();
 
-        public ExtensionHandlerStore(Storage storage, OsuGameBase gameBase)
+        public ExtensionHandlerStore(Storage storage)
             : base(new StorageBackedResourceStore(storage), "custom")
         {
-            this.gameBase = gameBase;
-
             customStorage = storage.GetStorageForDirectory("custom");
 
             prepareLoad();
@@ -103,9 +100,9 @@ namespace osu.Game.Configuration.AccelUtils
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    //Logger.Log($"case: 尝试加载 {type}");
+                    //Logger.Log($"case: 尝试加载 {type} ... {ok}");
 
-                    if (type == typeof(IExtensionHandler))
+                    if (type.GetInterfaces().Contains(typeof(IExtensionHandler)))
                     {
                         loadedAssemblies[assembly] = type;
                         //Logger.Log($"{type}是插件Provider");
@@ -137,7 +134,6 @@ namespace osu.Game.Configuration.AccelUtils
             {
                 var handlerInstance = (IExtensionHandler)Activator.CreateInstance(type);
                 AccelExtensionsUtil.AddHandler(handlerInstance);
-                //Logger.Log($"[OK] 载入 {fullName}");
             }
             catch (Exception e)
             {

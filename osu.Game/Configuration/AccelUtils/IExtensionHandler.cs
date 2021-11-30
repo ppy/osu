@@ -11,6 +11,11 @@ namespace osu.Game.Configuration.AccelUtils
         public string ExtensionName { get; }
 
         /// <summary>
+        /// 处理器支持的属性
+        /// </summary>
+        public string[] SupportedProperties { get; }
+
+        /// <summary>
         /// 处理器名称
         /// </summary>
         public string HandlerName { get; }

@@ -43,7 +43,7 @@ namespace osu.Game.Beatmaps.Drawables
                 };
 
                 string result;
-                bool success = mConfig.Get<string>(MSetting.CoverAccelSource).TryParseAccelUrl(dict, out result, out _);
+                bool success = mConfig.Get<string>(MSetting.CoverAccelSource).TryParseAccelUrl(dict, out result, out _, true);
 
                 if (success)
                     resource = result;
