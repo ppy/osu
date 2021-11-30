@@ -71,9 +71,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             setDistances(clockRate);
         }
 
-        public double Opacity(double T, bool hidden)
+        public double Opacity(double mapTime, bool hidden)
         {
-            double ms = (BaseObject.StartTime - T) / clockRate;
+            double ms = (BaseObject.StartTime - mapTime) / clockRate;
             if (ms < 0)
                 return 0.0;
             double preemptTime = BaseObject.TimePreempt / clockRate;
