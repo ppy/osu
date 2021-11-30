@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -24,6 +25,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
@@ -66,6 +68,13 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
+
+        [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; }
+
+        private PanelBackground panelBackground;
+
+        private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty);
 
         private readonly bool allowEdit;
         private readonly bool allowSelection;
@@ -131,10 +140,26 @@ namespace osu.Game.Screens.OnlinePlay
             valid.BindValueChanged(_ => Scheduler.AddOnce(refresh));
             requiredMods.CollectionChanged += (_, __) => Scheduler.AddOnce(refresh);
 
+            onScreenLoader.DelayedLoadStarted += _ =>
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        var user = await userLookupCache.GetUserAsync(Item.OwnerID).ConfigureAwait(false);
+                        Schedule(() => ownerAvatar.User = user);
+
+                        await multiplayerClient.PopulateBeatmap(Item).ConfigureAwait(false);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Error while populating playlist item {e}");
+                    }
+                });
+            };
+
             refresh();
         }
-
-        private PanelBackground panelBackground;
 
         private void refresh()
         {
@@ -142,13 +167,6 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 maskingContainer.BorderThickness = 5;
                 maskingContainer.BorderColour = colours.Red;
-            }
-
-            if (showItemOwner)
-            {
-                ownerAvatar.Show();
-                userLookupCache.GetUserAsync(Item.OwnerID)
-                               .ContinueWith(u => Schedule(() => ownerAvatar.User = u.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
 
             if (Item.Beatmap.Value != null)
@@ -203,6 +221,7 @@ namespace osu.Game.Screens.OnlinePlay
                         Alpha = 0,
                         AlwaysPresent = true
                     },
+                    onScreenLoader,
                     panelBackground = new PanelBackground
                     {
                         RelativeSizeAxes = Axes.Both,
