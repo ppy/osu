@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using osu.Game.Database;
 using osu.Game.IO;
 
@@ -12,6 +13,8 @@ namespace osu.Game.Skinning
         public int ID { get; set; }
 
         public int SkinInfoID { get; set; }
+
+        public EFSkinInfo SkinInfo { get; set; }
 
         public int FileInfoID { get; set; }
 
