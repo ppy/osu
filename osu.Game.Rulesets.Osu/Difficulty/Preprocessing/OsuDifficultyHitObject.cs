@@ -76,6 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double ms = (BaseObject.StartTime - mapTime) / clockRate;
             if (ms < 0)
                 return 0.0;
+
             double preemptTime = BaseObject.TimePreempt / clockRate;
             double fadeInTime = BaseObject.TimeFadeIn / clockRate;
 
