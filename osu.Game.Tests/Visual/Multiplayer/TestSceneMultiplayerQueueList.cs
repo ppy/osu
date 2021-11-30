@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public void SetUpSteps()
         {
-            // Not scheduled since this should affect buttons added by the current test.
+            // Not inside a step since this is used to affect steps added by the current test.
             currentItemId = 0;
         }
 
