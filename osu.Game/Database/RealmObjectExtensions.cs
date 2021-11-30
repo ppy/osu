@@ -49,13 +49,13 @@ namespace osu.Game.Database
             return mapper.Map<T>(item);
         }
 
-        public static List<RealmLive<T>> ToLive<T>(this IEnumerable<T> realmList)
+        public static List<ILive<T>> ToLive<T>(this IEnumerable<T> realmList)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return realmList.Select(l => new RealmLive<T>(l)).ToList();
+            return realmList.Select(l => new RealmLive<T>(l)).Cast<ILive<T>>().ToList();
         }
 
-        public static RealmLive<T> ToLive<T>(this T realmObject)
+        public static ILive<T> ToLive<T>(this T realmObject)
             where T : RealmObject, IHasGuidPrimaryKey
         {
             return new RealmLive<T>(realmObject);

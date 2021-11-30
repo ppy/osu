@@ -171,7 +171,7 @@ namespace osu.Game.Skinning
                     var oldFile = skin.SkinInfo.Files.FirstOrDefault(f => f.Filename == filename);
 
                     if (oldFile != null)
-                        skinModelManager.ReplaceFile(skin.SkinInfo, oldFile, streamContent, oldFile.Filename);
+                        skinModelManager.ReplaceFile(skin.SkinInfo, oldFile, streamContent);
                     else
                         skinModelManager.AddFile(skin.SkinInfo, streamContent, filename);
                 }
