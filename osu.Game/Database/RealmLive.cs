@@ -95,8 +95,7 @@ namespace osu.Game.Database
                     throw new InvalidOperationException($"Can't use {nameof(Value)} on managed objects from non-update threads");
 
                 // When using Value, we rely on garbage collection for the realm instance used to retrieve the instance.
-                // As we are sure that this is on the same thread
-
+                // As we are sure that this is on the update thread, there should always be an open and constantly refreshing realm instance to ensure file size growth is a non-issue.
                 var realm = Realm.GetInstance(data.Realm.Config);
 
                 return realm.Find<T>(ID);
