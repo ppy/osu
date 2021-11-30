@@ -135,6 +135,7 @@ namespace osu.Game.Database
 
             modelBuilder.Entity<EFSkinInfo>().HasIndex(b => b.Hash).IsUnique();
             modelBuilder.Entity<EFSkinInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<EFSkinInfo>().HasMany(s => s.Files).WithOne(f => f.SkinInfo);
 
             modelBuilder.Entity<DatabasedSetting>().HasIndex(b => new { b.RulesetID, b.Variant });
 
