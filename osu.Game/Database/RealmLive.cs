@@ -17,7 +17,7 @@ namespace osu.Game.Database
     {
         public Guid ID { get; }
 
-        public bool IsManaged { get; }
+        public bool IsManaged => data.IsManaged;
 
         private readonly SynchronizationContext? fetchedContext;
         private readonly int fetchedThreadId;
@@ -37,8 +37,6 @@ namespace osu.Game.Database
 
             if (data.IsManaged)
             {
-                IsManaged = true;
-
                 fetchedContext = SynchronizationContext.Current;
                 fetchedThreadId = Thread.CurrentThread.ManagedThreadId;
             }
