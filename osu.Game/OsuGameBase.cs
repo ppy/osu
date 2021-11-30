@@ -442,10 +442,6 @@ namespace osu.Game
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
-        private void migrateDataToRealm()
-        {
-        }
-
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
             if (r.NewValue?.Available != true)
