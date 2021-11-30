@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -119,6 +120,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             PlaylistItem item9 = addItemStep(3);
             assertPositionStep(item9, 8);
+        }
+
+        [Test]
+        public void TestItemsReorderedWhenQueueModeChanged()
+        {
+            changeQueueModeStep(QueueMode.AllPlayers);
+
+            var items = new List<PlaylistItem>();
+
+            for (int i = 0; i < 8; i++)
+                items.Add(addItemStep(i <= 3 ? 1 : 2));
+
+            for (int i = 0; i < 8; i++)
+                assertPositionStep(items[i], i);
+
+            changeQueueModeStep(QueueMode.AllPlayersRoundRobin);
+
+            for (int i = 0; i < 4; i++)
+            {
+                assertPositionStep(items[i], i * 2); // Items by user 1.
+                assertPositionStep(items[i + 4], i * 2 + 1); // Items by user 2.
+            }
         }
 
         /// <summary>
