@@ -1,5 +1,4 @@
 name: dotnet
-
 on: [push, pull_request]
 
 jobs:
@@ -12,6 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      #无法将框架克隆到/home/runner/work/osu以外，用此办法暂时规避
+      - name: 移动项目
+        run: |
+          mkdir mfosu
+          mv ./* mfosu || true #忽略错误，通配符会匹配mfosu
+          mv ./.* mfosu || true #忽略错误，bash会把"."" 和 ".."也归进mv目标里
+          if [ ! "$(ls)" == "mfosu" ]; then false; fi #检查当前目录，应当只有mfosu
+
       - name: 下载框架
         uses: actions/checkout@v2
         with:
@@ -20,7 +27,7 @@ jobs:
           path: 'osu-framework'
 
       - name: 检查目录结构
-      - run: |
+        run: |
           ls
           echo "pwd: $PWD"
 
@@ -30,15 +37,17 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: 解决依赖
+        working-directory: ./mfosu
         run: dotnet restore
 
       - name: 再次检查目录结构
-      - run: |
+        run: |
           ls
           echo "pwd: $PWD"
 
-      #- name: 构建
-      #  run: dotnet build osu.Desktop -c Release
+      - name: 构建
+        working-directory: ./mfosu
+        run: dotnet build osu.Desktop -c Release
 
   #From .github/workflows_/ci.yml
   build-android:
@@ -48,6 +57,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      #无法将框架克隆到/home/runner/work/osu以外，用此办法暂时规避
+      - name: 移动项目
+        run: |
+          mkdir mfosu
+          mv ./* mfosu || true #忽略错误，通配符会匹配mfosu
+          mv ./.* mfosu || true #忽略错误，bash会把"."" 和 ".."也归进mv目标里
+          if [ ! "$(ls)" == "mfosu" ]; then false; fi #检查当前目录，应当只有mfosu
 
       - name: 下载框架
         uses: actions/checkout@v2
@@ -72,4 +89,5 @@ jobs:
       # cannot accept .sln(f) files as arguments.
       # Build just the main game for now.
       - name: Build
+        working-directory: ./mfosu
         run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
