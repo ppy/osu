@@ -162,7 +162,7 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.AddPlaylistItem), item);
         }
 
-        protected override Task<APIBeatmap> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
+        protected override Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default)
         {
             return beatmapLookupCache.GetBeatmapAsync(beatmapId, cancellationToken);
         }

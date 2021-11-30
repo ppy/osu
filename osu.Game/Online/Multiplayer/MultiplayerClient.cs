@@ -702,7 +702,7 @@ namespace osu.Game.Online.Multiplayer
 
         private async Task<PlaylistItem> createPlaylistItem(MultiplayerPlaylistItem item)
         {
-            var apiBeatmap = await GetOnlineBeatmapSet(item.BeatmapID).ConfigureAwait(false);
+            var apiBeatmap = await GetAPIBeatmap(item.BeatmapID).ConfigureAwait(false);
 
             var ruleset = Rulesets.GetRuleset(item.RulesetID);
             var rulesetInstance = ruleset.CreateInstance();
@@ -728,7 +728,7 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="beatmapId">The beatmap ID.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>The <see cref="APIBeatmap"/> retrieval task.</returns>
-        protected abstract Task<APIBeatmap> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
+        protected abstract Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.
