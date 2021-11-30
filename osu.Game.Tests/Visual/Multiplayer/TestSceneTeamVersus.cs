@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestSettingsUpdatedWhenChangingQueueMode()
+        public void TestSettingsUpdatedWhenChangingMatchType()
         {
             createRoom(() => new Room
             {
