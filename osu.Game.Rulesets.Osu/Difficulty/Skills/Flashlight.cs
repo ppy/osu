@@ -45,11 +45,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 var osuPrevious = (OsuDifficultyHitObject)Previous[i];
                 var osuPreviousHitObject = (OsuHitObject)(osuPrevious.BaseObject);
 
+                OsuDifficultyHitObject osuLastPrevious;
+                if (i == 0)
+                    osuLastPrevious = osuCurrent;
+                else
+                    osuLastPrevious = (OsuDifficultyHitObject)Previous[i - 1];
+
                 if (!(osuPrevious.BaseObject is Spinner))
                 {
                     double jumpDistance = (osuHitObject.StackedPosition - osuPreviousHitObject.EndPosition).Length;
 
-                    cumulativeStrainTime += osuPrevious.StrainTime;
+                    cumulativeStrainTime += osuLastPrevious.StrainTime;
 
                     // We want to nerf objects that can be easily seen within the Flashlight circle radius.
                     if (i == 0)
