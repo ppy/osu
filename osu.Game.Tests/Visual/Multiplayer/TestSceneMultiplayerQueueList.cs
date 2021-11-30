@@ -104,9 +104,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // User 1.
 
+            // This item is added to the end rather than injected between item4 and item5, since both users have an equal number
+            // of added items at this point and this user was the last of the two to add an item.
             PlaylistItem item6 = addItemStep(1);
-            assertPositionStep(item6, 4);
-            assertPositionStep(item5, 5);
+            assertPositionStep(item6, 5);
 
             // User 3.
 
