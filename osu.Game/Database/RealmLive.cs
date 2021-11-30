@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Threading;
+using osu.Framework.Development;
 using Realms;
 
 #nullable enable
@@ -17,10 +17,7 @@ namespace osu.Game.Database
     {
         public Guid ID { get; }
 
-        public bool IsManaged { get; }
-
-        private readonly SynchronizationContext? fetchedContext;
-        private readonly int fetchedThreadId;
+        public bool IsManaged => data.IsManaged;
 
         /// <summary>
         /// The original live data used to create this instance.
@@ -35,14 +32,6 @@ namespace osu.Game.Database
         {
             this.data = data;
 
-            if (data.IsManaged)
-            {
-                IsManaged = true;
-
-                fetchedContext = SynchronizationContext.Current;
-                fetchedThreadId = Thread.CurrentThread.ManagedThreadId;
-            }
-
             ID = data.ID;
         }
 
@@ -52,7 +41,7 @@ namespace osu.Game.Database
         /// <param name="perform">The action to perform.</param>
         public void PerformRead(Action<T> perform)
         {
-            if (originalDataValid)
+            if (!IsManaged)
             {
                 perform(data);
                 return;
@@ -71,7 +60,7 @@ namespace osu.Game.Database
             if (typeof(RealmObjectBase).IsAssignableFrom(typeof(TReturn)))
                 throw new InvalidOperationException($"Realm live objects should not exit the scope of {nameof(PerformRead)}.");
 
-            if (originalDataValid)
+            if (!IsManaged)
                 return perform(data);
 
             using (var realm = Realm.GetInstance(data.Realm.Config))
@@ -99,30 +88,20 @@ namespace osu.Game.Database
         {
             get
             {
-                if (originalDataValid)
+                if (!IsManaged)
                     return data;
 
-                if (!isCorrectThread)
-                    throw new InvalidOperationException($"Can't use {nameof(Value)} unless on the same thread the original data was fetched from.");
+                if (!ThreadSafety.IsUpdateThread)
+                    throw new InvalidOperationException($"Can't use {nameof(Value)} on managed objects from non-update threads");
+
+                // When using Value, we rely on garbage collection for the realm instance used to retrieve the instance.
+                // As we are sure that this is on the same thread
 
                 var realm = Realm.GetInstance(data.Realm.Config);
-                var retrieved = realm.Find<T>(ID);
 
-                if (!retrieved.IsValid)
-                    throw new InvalidOperationException("Attempted to access value without an open context");
-
-                return retrieved;
+                return realm.Find<T>(ID);
             }
         }
-
-        // TODO: Revisit adding these conditionals back as an optimisation: || (isCorrectThread && data.IsValid);
-        // They have temporarily been removed due to an oversight involving .AsQueryable, see https://github.com/realm/realm-dotnet/discussions/2734.
-        // This means we are fetching a new context every `PerformRead` or `PerformWrite`, even when on the correct thread.
-        private bool originalDataValid => !IsManaged;
-
-        // this matches realm's internal thread validation (see https://github.com/realm/realm-dotnet/blob/903b4d0b304f887e37e2d905384fb572a6496e70/Realm/Realm/Native/SynchronizationContextScheduler.cs#L72)
-        private bool isCorrectThread
-            => (fetchedContext != null && SynchronizationContext.Current == fetchedContext) || fetchedThreadId == Thread.CurrentThread.ManagedThreadId;
 
         public bool Equals(ILive<T>? other) => ID == other?.ID;
     }
