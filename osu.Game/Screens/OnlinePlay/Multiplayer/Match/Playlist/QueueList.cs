@@ -67,6 +67,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
                             List<Drawable> result = new List<Drawable>();
 
+                            // Run a simulation...
+                            // In every iteration, pick the first available item from the user with the lowest number of items in the queue to add to the result set.
+                            // If multiple users have the same number of items in the queue, then the item with the lowest ID is chosen.
+                            // Todo: This could probably be more efficient, likely at the cost of increased complexity.
                             while (totalCount-- > 0)
                             {
                                 var candidateItem = allItems
