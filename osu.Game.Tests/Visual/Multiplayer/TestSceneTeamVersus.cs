@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -116,6 +117,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("user still on team 0", () => (client.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+        }
+
+        [Test]
+        public void TestSettingsUpdatedWhenChangingQueueMode()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Type = { Value = MatchType.TeamVersus }
+            });
+
+            AddUntilStep("match type versus", () => client.APIRoom?.Type.Value == MatchType.HeadToHead);
+
+            AddStep("change match type", () => client.ChangeSettings(new MultiplayerRoomSettings
+            {
+                MatchType = MatchType.TeamVersus
+            }));
+
+            AddUntilStep("api room updated", () => client.APIRoom?.Type.Value == MatchType.TeamVersus);
         }
 
         [Test]
