@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,13 +18,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osuTK;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
-using osuTK.Graphics;
 using DownloadButton = osu.Game.Beatmaps.Drawables.Cards.Buttons.DownloadButton;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
@@ -34,85 +35,113 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private const float width = 408;
         private const float height = 100;
         private const float corner_radius = 10;
+        private const float icon_area_width = 30;
 
         private readonly APIBeatmapSet beatmapSet;
         private readonly Bindable<BeatmapSetFavouriteState> favouriteState;
 
-        private UpdateableOnlineBeatmapSetCover leftCover;
-        private FillFlowContainer leftIconArea;
+        private readonly BeatmapDownloadTracker downloadTracker;
 
-        private Container rightButtonArea;
+        private BeatmapCardThumbnail thumbnail = null!;
 
-        private Container mainContent;
-        private BeatmapCardContentBackground mainContentBackground;
+        private Container rightAreaBackground = null!;
+        private Container<BeatmapCardIconButton> rightAreaButtons = null!;
 
-        private GridContainer titleContainer;
-        private GridContainer artistContainer;
-        private FillFlowContainer<BeatmapCardStatistic> statisticsContainer;
+        private Container mainContent = null!;
+        private BeatmapCardContentBackground mainContentBackground = null!;
+        private FillFlowContainer<BeatmapCardStatistic> statisticsContainer = null!;
+
+        private FillFlowContainer idleBottomContent = null!;
+        private BeatmapCardDownloadProgressBar downloadProgressBar = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public BeatmapCard(APIBeatmapSet beatmapSet)
             : base(HoverSampleSet.Submit)
         {
             this.beatmapSet = beatmapSet;
             favouriteState = new Bindable<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(beatmapSet.HasFavourited, beatmapSet.FavouriteCount));
+            downloadTracker = new BeatmapDownloadTracker(beatmapSet);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load(BeatmapSetOverlay? beatmapSetOverlay)
         {
             Width = width;
             Height = height;
             CornerRadius = corner_radius;
             Masking = true;
 
+            FillFlowContainer leftIconArea;
+            GridContainer titleContainer;
+            GridContainer artistContainer;
+
             InternalChildren = new Drawable[]
             {
-                new Box
+                downloadTracker,
+                rightAreaBackground = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3
+                    RelativeSizeAxes = Axes.Y,
+                    Width = icon_area_width + 2 * corner_radius,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    // workaround for masking artifacts at the top & bottom of card,
+                    // which become especially visible on downloaded beatmaps (when the icon area has a lime background).
+                    Padding = new MarginPadding { Vertical = 1 },
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.White
+                    },
                 },
-                new Container
+                thumbnail = new BeatmapCardThumbnail(beatmapSet)
                 {
                     Name = @"Left (icon) area",
                     Size = new Vector2(height),
-                    Children = new Drawable[]
+                    Padding = new MarginPadding { Right = corner_radius },
+                    Child = leftIconArea = new FillFlowContainer
                     {
-                        leftCover = new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            OnlineInfo = beatmapSet
-                        },
-                        leftIconArea = new FillFlowContainer
-                        {
-                            Margin = new MarginPadding(5),
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(1)
-                        }
+                        Margin = new MarginPadding(5),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(1)
                     }
                 },
-                rightButtonArea = new Container
+                new Container
                 {
                     Name = @"Right (button) area",
                     Width = 30,
                     RelativeSizeAxes = Axes.Y,
                     Origin = Anchor.TopRight,
                     Anchor = Anchor.TopRight,
-                    Child = new FillFlowContainer<BeatmapCardIconButton>
+                    Padding = new MarginPadding { Vertical = 17.5f },
+                    Child = rightAreaButtons = new Container<BeatmapCardIconButton>
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 14),
+                        RelativeSizeAxes = Axes.Both,
                         Children = new BeatmapCardIconButton[]
                         {
-                            new FavouriteButton(beatmapSet) { Current = favouriteState },
+                            new FavouriteButton(beatmapSet)
+                            {
+                                Current = favouriteState,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre
+                            },
                             new DownloadButton(beatmapSet)
+                            {
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                State = { BindTarget = downloadTracker.State }
+                            },
+                            new GoToBeatmapButton(beatmapSet)
+                            {
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                State = { BindTarget = downloadTracker.State }
+                            }
                         }
                     }
                 },
@@ -207,45 +236,74 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                     d.AddText("mapped by ", t => t.Colour = colourProvider.Content2);
                                     d.AddUserLink(beatmapSet.Author);
                                 }),
-                                statisticsContainer = new FillFlowContainer<BeatmapCardStatistic>
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(10, 0),
-                                    Alpha = 0,
-                                    ChildrenEnumerable = createStatistics()
-                                }
                             }
                         },
-                        new FillFlowContainer
+                        new Container
                         {
                             Name = @"Bottom content",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Horizontal,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
                             Padding = new MarginPadding
                             {
                                 Horizontal = 10,
                                 Vertical = 4
                             },
-                            Spacing = new Vector2(4, 0),
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
                             Children = new Drawable[]
                             {
-                                new BeatmapSetOnlineStatusPill
+                                idleBottomContent = new FillFlowContainer
                                 {
-                                    AutoSizeAxes = Axes.Both,
-                                    Status = beatmapSet.Status,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, 3),
+                                    AlwaysPresent = true,
+                                    Children = new Drawable[]
+                                    {
+                                        statisticsContainer = new FillFlowContainer<BeatmapCardStatistic>
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(10, 0),
+                                            Alpha = 0,
+                                            AlwaysPresent = true,
+                                            ChildrenEnumerable = createStatistics()
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(4, 0),
+                                            Children = new Drawable[]
+                                            {
+                                                new BeatmapSetOnlineStatusPill
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Status = beatmapSet.Status,
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft
+                                                },
+                                                new DifficultySpectrumDisplay(beatmapSet)
+                                                {
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                    DotSize = new Vector2(6, 12)
+                                                }
+                                            }
+                                        }
+                                    }
                                 },
-                                new DifficultySpectrumDisplay(beatmapSet)
+                                downloadProgressBar = new BeatmapCardDownloadProgressBar
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    DotSize = new Vector2(6, 12)
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 6,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    State = { BindTarget = downloadTracker.State },
+                                    Progress = { BindTarget = downloadTracker.Progress }
                                 }
                             }
                         }
@@ -254,10 +312,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             };
 
             if (beatmapSet.HasVideo)
-                leftIconArea.Add(new IconPill(FontAwesome.Solid.Film));
+                leftIconArea.Add(new IconPill(FontAwesome.Solid.Film) { IconSize = new Vector2(20) });
 
             if (beatmapSet.HasStoryboard)
-                leftIconArea.Add(new IconPill(FontAwesome.Solid.Image));
+                leftIconArea.Add(new IconPill(FontAwesome.Solid.Image) { IconSize = new Vector2(20) });
 
             if (beatmapSet.HasExplicitContent)
             {
@@ -278,12 +336,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Margin = new MarginPadding { Left = 5 }
                 };
             }
+
+            Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmapSet.OnlineID);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateState();
+
+            downloadTracker.State.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
         }
 
@@ -327,14 +388,28 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             float targetWidth = width - height;
             if (IsHovered)
-                targetWidth -= 20;
+                targetWidth = targetWidth - icon_area_width + corner_radius;
+
+            thumbnail.Dimmed.Value = IsHovered;
 
             mainContent.ResizeWidthTo(targetWidth, TRANSITION_DURATION, Easing.OutQuint);
             mainContentBackground.Dimmed.Value = IsHovered;
 
-            leftCover.FadeColour(IsHovered ? OsuColour.Gray(0.2f) : Color4.White, TRANSITION_DURATION, Easing.OutQuint);
             statisticsContainer.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
-            rightButtonArea.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
+
+            rightAreaBackground.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, TRANSITION_DURATION, Easing.OutQuint);
+            rightAreaButtons.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
+
+            foreach (var button in rightAreaButtons)
+            {
+                button.IdleColour = downloadTracker.State.Value != DownloadState.LocallyAvailable ? colourProvider.Light1 : colourProvider.Background3;
+                button.HoverColour = downloadTracker.State.Value != DownloadState.LocallyAvailable ? colourProvider.Content1 : colourProvider.Foreground1;
+            }
+
+            bool showProgress = downloadTracker.State.Value == DownloadState.Downloading || downloadTracker.State.Value == DownloadState.Importing;
+
+            idleBottomContent.FadeTo(showProgress ? 0 : 1, TRANSITION_DURATION, Easing.OutQuint);
+            downloadProgressBar.FadeTo(showProgress ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }

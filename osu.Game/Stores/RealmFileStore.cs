@@ -10,6 +10,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Models;
 using Realms;
 
@@ -64,7 +65,7 @@ namespace osu.Game.Stores
         {
             data.Seek(0, SeekOrigin.Begin);
 
-            using (var output = Storage.GetStream(file.StoragePath, FileAccess.Write))
+            using (var output = Storage.GetStream(file.GetStoragePath(), FileAccess.Write))
                 data.CopyTo(output);
 
             data.Seek(0, SeekOrigin.Begin);
@@ -72,7 +73,7 @@ namespace osu.Game.Stores
 
         private bool checkFileExistsAndMatchesHash(RealmFile file)
         {
-            string path = file.StoragePath;
+            string path = file.GetStoragePath();
 
             // we may be re-adding a file to fix missing store entries.
             if (!Storage.Exists(path))
@@ -85,9 +86,13 @@ namespace osu.Game.Stores
 
         public void Cleanup()
         {
-            var realm = realmFactory.Context;
+            Logger.Log(@"Beginning realm file store cleanup");
+
+            int totalFiles = 0;
+            int removedFiles = 0;
 
             // can potentially be run asynchronously, although we will need to consider operation order for disk deletion vs realm removal.
+            using (var realm = realmFactory.CreateContext())
             using (var transaction = realm.BeginWrite())
             {
                 // TODO: consider using a realm native query to avoid iterating all files (https://github.com/realm/realm-dotnet/issues/2659#issuecomment-927823707)
@@ -95,12 +100,15 @@ namespace osu.Game.Stores
 
                 foreach (var file in files)
                 {
+                    totalFiles++;
+
                     if (file.BacklinksCount > 0)
                         continue;
 
                     try
                     {
-                        Storage.Delete(file.StoragePath);
+                        removedFiles++;
+                        Storage.Delete(file.GetStoragePath());
                         realm.Remove(file);
                     }
                     catch (Exception e)
@@ -111,6 +119,8 @@ namespace osu.Game.Stores
 
                 transaction.Commit();
             }
+
+            Logger.Log($@"Finished realm file store cleanup ({removedFiles} of {totalFiles} deleted)");
         }
     }
 }

@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
@@ -29,7 +28,7 @@ namespace osu.Game.Database
 
         protected readonly List<ArchiveDownloadRequest<T>> CurrentDownloads = new List<ArchiveDownloadRequest<T>>();
 
-        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider api, IIpcHost importHost = null)
+        protected ModelDownloader(IModelImporter<TModel> importer, IAPIProvider api)
         {
             this.importer = importer;
             this.api = api;

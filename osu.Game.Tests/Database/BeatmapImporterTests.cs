@@ -12,8 +12,10 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
@@ -70,6 +72,24 @@ namespace osu.Game.Tests.Database
                 using var store = new RealmRulesetStore(realmFactory, storage);
 
                 await LoadOszIntoStore(importer, realmFactory.Context);
+            });
+        }
+
+        [Test]
+        public void TestAccessFileAfterImport()
+        {
+            RunTestWithRealmAsync(async (realmFactory, storage) =>
+            {
+                using var importer = new BeatmapImporter(realmFactory, storage);
+                using var store = new RealmRulesetStore(realmFactory, storage);
+
+                var imported = await LoadOszIntoStore(importer, realmFactory.Context);
+
+                var beatmap = imported.Beatmaps.First();
+                var file = beatmap.File;
+
+                Assert.NotNull(file);
+                Assert.AreEqual(beatmap.Hash, file!.File.Hash);
             });
         }
 
@@ -348,15 +368,15 @@ namespace osu.Game.Tests.Database
                 var firstFile = imported.Files.First();
 
                 long originalLength;
-                using (var stream = storage.GetStream(firstFile.File.StoragePath))
+                using (var stream = storage.GetStream(firstFile.File.GetStoragePath()))
                     originalLength = stream.Length;
 
-                using (var stream = storage.GetStream(firstFile.File.StoragePath, FileAccess.Write, FileMode.Create))
+                using (var stream = storage.GetStream(firstFile.File.GetStoragePath(), FileAccess.Write, FileMode.Create))
                     stream.WriteByte(0);
 
                 var importedSecondTime = await LoadOszIntoStore(importer, realmFactory.Context);
 
-                using (var stream = storage.GetStream(firstFile.File.StoragePath))
+                using (var stream = storage.GetStream(firstFile.File.GetStoragePath()))
                     Assert.AreEqual(stream.Length, originalLength, "Corruption was not fixed on second import");
 
                 // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
@@ -455,7 +475,7 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
-        public void TestImportThenDeleteThenImport()
+        public void TestImportThenDeleteThenImportOptimisedPath()
         {
             RunTestWithRealmAsync(async (realmFactory, storage) =>
             {
@@ -466,11 +486,39 @@ namespace osu.Game.Tests.Database
 
                 deleteBeatmapSet(imported, realmFactory.Context);
 
+                Assert.IsTrue(imported.DeletePending);
+
                 var importedSecondTime = await LoadOszIntoStore(importer, realmFactory.Context);
 
                 // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
                 Assert.IsTrue(imported.ID == importedSecondTime.ID);
                 Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
+                Assert.IsFalse(imported.DeletePending);
+                Assert.IsFalse(importedSecondTime.DeletePending);
+            });
+        }
+
+        [Test]
+        public void TestImportThenDeleteThenImportNonOptimisedPath()
+        {
+            RunTestWithRealmAsync(async (realmFactory, storage) =>
+            {
+                using var importer = new NonOptimisedBeatmapImporter(realmFactory, storage);
+                using var store = new RealmRulesetStore(realmFactory, storage);
+
+                var imported = await LoadOszIntoStore(importer, realmFactory.Context);
+
+                deleteBeatmapSet(imported, realmFactory.Context);
+
+                Assert.IsTrue(imported.DeletePending);
+
+                var importedSecondTime = await LoadOszIntoStore(importer, realmFactory.Context);
+
+                // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
+                Assert.IsTrue(imported.ID == importedSecondTime.ID);
+                Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
+                Assert.IsFalse(imported.DeletePending);
+                Assert.IsFalse(importedSecondTime.DeletePending);
             });
         }
 
@@ -531,7 +579,7 @@ namespace osu.Game.Tests.Database
                         new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata)
                         {
                             OnlineID = 2,
-                            Status = BeatmapSetOnlineStatus.Loved,
+                            Status = BeatmapOnlineStatus.Loved,
                         }
                     }
                 };
@@ -847,6 +895,16 @@ namespace osu.Game.Tests.Database
             }
 
             Assert.Fail(failureMessage);
+        }
+
+        public class NonOptimisedBeatmapImporter : BeatmapImporter
+        {
+            public NonOptimisedBeatmapImporter(RealmContextFactory realmFactory, Storage storage)
+                : base(realmFactory, storage)
+            {
+            }
+
+            protected override bool HasCustomHashFunction => true;
         }
     }
 }

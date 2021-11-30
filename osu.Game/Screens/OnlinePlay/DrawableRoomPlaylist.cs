@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -18,11 +20,15 @@ namespace osu.Game.Screens.OnlinePlay
 
         private readonly bool allowEdit;
         private readonly bool allowSelection;
+        private readonly bool showItemOwner;
 
-        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection)
+        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection, bool reverse = false, bool showItemOwner = false)
         {
             this.allowEdit = allowEdit;
             this.allowSelection = allowSelection;
+            this.showItemOwner = showItemOwner;
+
+            ((ReversibleFillFlowContainer)ListContainer).Reverse = reverse;
         }
 
         protected override void LoadComplete()
@@ -35,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Remove:
-                        if (args.OldItems.Contains(SelectedItem))
+                        if (allowSelection && args.OldItems.Contains(SelectedItem))
                             SelectedItem.Value = null;
                         break;
                 }
@@ -47,14 +53,12 @@ namespace osu.Game.Screens.OnlinePlay
             d.ScrollbarVisible = false;
         });
 
-        protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<PlaylistItem>>
+        protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new ReversibleFillFlowContainer
         {
-            LayoutDuration = 200,
-            LayoutEasing = Easing.OutQuint,
             Spacing = new Vector2(0, 2)
         };
 
-        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection)
+        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection, showItemOwner)
         {
             SelectedItem = { BindTarget = SelectedItem },
             RequestDeletion = requestDeletion
@@ -62,7 +66,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void requestDeletion(PlaylistItem item)
         {
-            if (SelectedItem.Value == item)
+            if (allowSelection && SelectedItem.Value == item)
             {
                 if (Items.Count == 1)
                     SelectedItem.Value = null;
@@ -71,6 +75,23 @@ namespace osu.Game.Screens.OnlinePlay
             }
 
             Items.Remove(item);
+        }
+
+        private class ReversibleFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
+        {
+            private bool reverse;
+
+            public bool Reverse
+            {
+                get => reverse;
+                set
+                {
+                    reverse = value;
+                    Invalidate();
+                }
+            }
+
+            public override IEnumerable<Drawable> FlowingChildren => Reverse ? base.FlowingChildren.OrderBy(d => -GetLayoutPosition(d)) : base.FlowingChildren;
         }
     }
 }

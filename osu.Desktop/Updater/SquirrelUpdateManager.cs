@@ -103,7 +103,10 @@ namespace osu.Desktop.Updater
                     }
                     else
                     {
+                        // In the case of an error, a separate notification will be displayed.
                         notification.State = ProgressNotificationState.Cancelled;
+                        notification.Close();
+
                         Logger.Error(e, @"update failed!");
                     }
                 }
@@ -182,6 +185,19 @@ namespace osu.Desktop.Updater
                         Size = new Vector2(20),
                     }
                 });
+            }
+
+            public override void Close()
+            {
+                // cancelling updates is not currently supported by the underlying updater.
+                // only allow dismissing for now.
+
+                switch (State)
+                {
+                    case ProgressNotificationState.Cancelled:
+                        base.Close();
+                        break;
+                }
             }
         }
 

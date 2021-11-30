@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match;
 
@@ -59,11 +60,14 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room))]
         protected Bindable<RoomAvailability> Availability { get; private set; }
 
-        [Resolved(typeof(Room), nameof(Room.Password))]
+        [Resolved(typeof(Room))]
         public Bindable<string> Password { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<TimeSpan?> Duration { get; private set; }
+
+        [Resolved(typeof(Room))]
+        protected Bindable<QueueMode> QueueMode { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private IBindable<PlaylistItem> subScreenSelectedItem { get; set; }

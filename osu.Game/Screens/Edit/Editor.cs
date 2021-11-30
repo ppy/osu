@@ -16,9 +16,11 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
@@ -31,6 +33,7 @@ using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
+using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
@@ -61,6 +64,9 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved]
+        private Storage storage { get; set; }
 
         [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
@@ -325,6 +331,19 @@ namespace osu.Game.Screens.Edit
         public void UpdateClockSource() => clock.ChangeSource(Beatmap.Value.Track);
 
         /// <summary>
+        /// Creates an <see cref="EditorState"/> instance representing the current state of the editor.
+        /// </summary>
+        /// <param name="nextBeatmap">
+        /// The next beatmap to be shown, in the case of difficulty switch.
+        /// <see langword="null"/> indicates that the beatmap will not be changing.
+        /// </param>
+        public EditorState GetState([CanBeNull] BeatmapInfo nextBeatmap = null) => new EditorState
+        {
+            Time = clock.CurrentTimeAccurate,
+            ClipboardContent = nextBeatmap == null || editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
+        };
+
+        /// <summary>
         /// Restore the editor to a provided state.
         /// </summary>
         /// <param name="state">The state to restore.</param>
@@ -379,6 +398,9 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case PlatformAction.Save:
+                    if (e.Repeat)
+                        return false;
+
                     Save();
                     return true;
             }
@@ -443,6 +465,9 @@ namespace osu.Game.Screens.Edit
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.Back:
@@ -486,7 +511,18 @@ namespace osu.Game.Screens.Edit
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+            dimBackground();
+            resetTrack(true);
+        }
 
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+            dimBackground();
+        }
+
+        private void dimBackground()
+        {
             ApplyToBackground(b =>
             {
                 // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
@@ -495,8 +531,6 @@ namespace osu.Game.Screens.Edit
                 b.IgnoreUserSettings.Value = true;
                 b.BlurAmount.Value = 0;
             });
-
-            resetTrack(true);
         }
 
         public override bool OnExiting(IScreen next)
@@ -535,9 +569,9 @@ namespace osu.Game.Screens.Edit
 
         public override void OnSuspending(IScreen next)
         {
-            refetchBeatmap();
-
             base.OnSuspending(next);
+            clock.Stop();
+            refetchBeatmap();
         }
 
         private void refetchBeatmap()
@@ -724,7 +758,7 @@ namespace osu.Game.Screens.Edit
         private void exportBeatmap()
         {
             Save();
-            beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+            new LegacyBeatmapExporter(storage).Export(Beatmap.Value.BeatmapSetInfo);
         }
 
         private void updateLastSavedHash()
@@ -770,11 +804,7 @@ namespace osu.Game.Screens.Edit
             return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, new EditorState
-        {
-            Time = clock.CurrentTimeAccurate,
-            ClipboardContent = editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
-        });
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, GetState(nextBeatmap));
 
         private void cancelExit()
         {
@@ -797,7 +827,7 @@ namespace osu.Game.Screens.Edit
                 pushEditorPlayer();
             }
 
-            void pushEditorPlayer() => this.Push(new PlayerLoader(() => new EditorPlayer()));
+            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(this));
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

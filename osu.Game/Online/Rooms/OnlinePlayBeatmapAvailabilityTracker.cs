@@ -113,7 +113,7 @@ namespace osu.Game.Online.Rooms
             int onlineId = SelectedItem.Value.Beatmap.Value.OnlineID;
             string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
 
-            return beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == onlineId && b.MD5Hash == checksum && !b.BeatmapSet.DeletePending) != null;
+            return beatmapManager.QueryBeatmap(b => b.OnlineID == onlineId && b.MD5Hash == checksum && !b.BeatmapSet.DeletePending) != null;
         }
     }
 }

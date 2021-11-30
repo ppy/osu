@@ -31,7 +31,7 @@ namespace osu.Game.Tournament.Components
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, LadderInfo ladderInfo)
         {
-            var customTexture = textures.Get($"mods/{modAcronym}");
+            var customTexture = textures.Get($"Mods/{modAcronym}");
 
             if (customTexture != null)
             {

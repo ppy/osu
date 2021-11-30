@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Spectate
                 if (!playingUserStates.TryGetValue(userId, out var userState))
                     continue;
 
-                if (beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID == userState.BeatmapID))
+                if (beatmapSet.Beatmaps.Any(b => b.OnlineID == userState.BeatmapID))
                     updateGameplayState(userId);
             }
         }
@@ -146,11 +146,11 @@ namespace osu.Game.Screens.Spectate
             var user = userMap[userId];
             var spectatorState = playingUserStates[userId];
 
-            var resolvedRuleset = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == spectatorState.RulesetID)?.CreateInstance();
+            var resolvedRuleset = rulesets.AvailableRulesets.FirstOrDefault(r => r.OnlineID == spectatorState.RulesetID)?.CreateInstance();
             if (resolvedRuleset == null)
                 return;
 
-            var resolvedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == spectatorState.BeatmapID);
+            var resolvedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineID == spectatorState.BeatmapID);
             if (resolvedBeatmap == null)
                 return;
 

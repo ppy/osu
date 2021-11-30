@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     new Drawable[]
                     {
-                        recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                        recordingManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
                             Recorder = recorder = new TestReplayRecorder
                             {
@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     },
                     new Drawable[]
                     {
-                        playbackManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                        playbackManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
                             Clock = new FramedClock(manualClock),
                             ReplayInputHandler = replayHandler = new TestFramedReplayInputHandler(replay)
@@ -283,6 +283,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool OnPressed(KeyBindingPressEvent<TestAction> e)
             {
+                if (e.Repeat)
+                    return false;
+
                 box.Colour = Color4.White;
                 return true;
             }

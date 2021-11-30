@@ -14,7 +14,6 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
-using osu.Game.Extensions;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -204,11 +203,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (e.Action)
             {
                 case GlobalAction.IncreaseScrollSpeed:
-                    scheduleScrollSpeedAdjustment(1);
+                    AdjustScrollSpeed(1);
                     return true;
 
                 case GlobalAction.DecreaseScrollSpeed:
-                    scheduleScrollSpeedAdjustment(-1);
+                    AdjustScrollSpeed(-1);
                     return true;
             }
 
@@ -221,12 +220,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             scheduledScrollSpeedAdjustment?.Cancel();
             scheduledScrollSpeedAdjustment = null;
-        }
-
-        private void scheduleScrollSpeedAdjustment(int amount)
-        {
-            scheduledScrollSpeedAdjustment?.Cancel();
-            scheduledScrollSpeedAdjustment = this.BeginKeyRepeat(Scheduler, () => AdjustScrollSpeed(amount));
         }
 
         private class LocalScrollingInfo : IScrollingInfo

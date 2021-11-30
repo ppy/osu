@@ -16,6 +16,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
@@ -363,15 +364,15 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var files = osu.Dependencies.Get<FileStore>();
 
                     long originalLength;
-                    using (var stream = files.Storage.GetStream(firstFile.FileInfo.StoragePath))
+                    using (var stream = files.Storage.GetStream(firstFile.FileInfo.GetStoragePath()))
                         originalLength = stream.Length;
 
-                    using (var stream = files.Storage.GetStream(firstFile.FileInfo.StoragePath, FileAccess.Write, FileMode.Create))
+                    using (var stream = files.Storage.GetStream(firstFile.FileInfo.GetStoragePath(), FileAccess.Write, FileMode.Create))
                         stream.WriteByte(0);
 
                     var importedSecondTime = await LoadOszIntoOsu(osu);
 
-                    using (var stream = files.Storage.GetStream(firstFile.FileInfo.StoragePath))
+                    using (var stream = files.Storage.GetStream(firstFile.FileInfo.GetStoragePath()))
                         Assert.AreEqual(stream.Length, originalLength, "Corruption was not fixed on second import");
 
                     // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
@@ -542,7 +543,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var imported = await LoadOszIntoOsu(osu);
 
                     foreach (var b in imported.Beatmaps)
-                        b.OnlineBeatmapID = null;
+                        b.OnlineID = null;
 
                     osu.Dependencies.Get<BeatmapManager>().Update(imported);
 
@@ -581,21 +582,21 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     var toImport = new BeatmapSetInfo
                     {
-                        OnlineBeatmapSetID = 1,
+                        OnlineID = 1,
                         Metadata = metadata,
-                        Beatmaps = new List<BeatmapInfo>
+                        Beatmaps =
                         {
                             new BeatmapInfo
                             {
-                                OnlineBeatmapID = 2,
+                                OnlineID = 2,
                                 Metadata = metadata,
                                 BaseDifficulty = difficulty
                             },
                             new BeatmapInfo
                             {
-                                OnlineBeatmapID = 2,
+                                OnlineID = 2,
                                 Metadata = metadata,
-                                Status = BeatmapSetOnlineStatus.Loved,
+                                Status = BeatmapOnlineStatus.Loved,
                                 BaseDifficulty = difficulty
                             }
                         }
@@ -606,8 +607,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var imported = await manager.Import(toImport);
 
                     Assert.NotNull(imported);
-                    Assert.AreEqual(null, imported.Value.Beatmaps[0].OnlineBeatmapID);
-                    Assert.AreEqual(null, imported.Value.Beatmaps[1].OnlineBeatmapID);
+                    Assert.AreEqual(null, imported.Value.Beatmaps[0].OnlineID);
+                    Assert.AreEqual(null, imported.Value.Beatmaps[1].OnlineID);
                 }
                 finally
                 {
@@ -1049,20 +1050,20 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private static void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
         {
-            Assert.AreEqual(expected, osu.Dependencies.Get<FileStore>().QueryFiles(f => f.ReferenceCount == 1).Count());
+            Assert.AreEqual(expected, osu.Dependencies.Get<DatabaseContextFactory>().Get().FileInfo.Count(f => f.ReferenceCount == 1));
         }
 
         private static void ensureLoaded(OsuGameBase osu, int timeout = 60000)
         {
             IEnumerable<BeatmapSetInfo> resultSets = null;
             var store = osu.Dependencies.Get<BeatmapManager>();
-            waitForOrAssert(() => (resultSets = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526)).Any(),
+            waitForOrAssert(() => (resultSets = store.QueryBeatmapSets(s => s.OnlineID == 241526)).Any(),
                 @"BeatmapSet did not import to the database in allocated time.", timeout);
 
             // ensure we were stored to beatmap database backing...
             Assert.IsTrue(resultSets.Count() == 1, $@"Incorrect result count found ({resultSets.Count()} but should be 1).");
-            IEnumerable<BeatmapInfo> queryBeatmaps() => store.QueryBeatmaps(s => s.BeatmapSet.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0);
-            IEnumerable<BeatmapSetInfo> queryBeatmapSets() => store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526);
+            IEnumerable<BeatmapInfo> queryBeatmaps() => store.QueryBeatmaps(s => s.BeatmapSet.OnlineID == 241526 && s.BaseDifficultyID > 0);
+            IEnumerable<BeatmapSetInfo> queryBeatmapSets() => store.QueryBeatmapSets(s => s.OnlineID == 241526);
 
             // if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
             waitForOrAssert(() => queryBeatmaps().Count() == 12,
@@ -1078,7 +1079,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var set = queryBeatmapSets().First();
             foreach (BeatmapInfo b in set.Beatmaps)
-                Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID));
+                Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineID == b.OnlineID));
             Assert.IsTrue(set.Beatmaps.Count > 0);
             var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Any() == true);
