@@ -453,13 +453,12 @@ namespace osu.Game.Database
         /// <param name="model">The item to operate on.</param>
         /// <param name="file">The existing file to be replaced.</param>
         /// <param name="contents">The new file contents.</param>
-        /// <param name="filename">An optional filename for the new file. Will use the previous filename if not specified.</param>
-        public void ReplaceFile(TModel model, TFileModel file, Stream contents, string filename = null)
+        public void ReplaceFile(TModel model, TFileModel file, Stream contents)
         {
             using (ContextFactory.GetForWrite())
             {
                 DeleteFile(model, file);
-                AddFile(model, contents, filename ?? file.Filename);
+                AddFile(model, contents, file.Filename);
             }
         }
 
