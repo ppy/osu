@@ -125,17 +125,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
-                Type = { Value = MatchType.TeamVersus }
+                Type = { Value = MatchType.HeadToHead },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
             });
 
-            AddUntilStep("match type versus", () => client.APIRoom?.Type.Value == MatchType.HeadToHead);
+            AddUntilStep("match type head to head", () => client.APIRoom?.Type.Value == MatchType.HeadToHead);
 
             AddStep("change match type", () => client.ChangeSettings(new MultiplayerRoomSettings
             {
                 MatchType = MatchType.TeamVersus
             }));
 
-            AddUntilStep("api room updated", () => client.APIRoom?.Type.Value == MatchType.TeamVersus);
+            AddUntilStep("api room updated to team versus", () => client.APIRoom?.Type.Value == MatchType.TeamVersus);
         }
 
         [Test]
