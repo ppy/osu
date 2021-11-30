@@ -56,14 +56,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
-        private readonly double clockRate;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastLastObject, HitObject lastObject, double clockRate)
             : base(hitObject, lastObject, clockRate)
         {
             this.lastLastObject = (OsuHitObject)lastLastObject;
             this.lastObject = (OsuHitObject)lastObject;
-            this.clockRate = clockRate;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, min_delta_time);
@@ -73,12 +71,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         public double Opacity(double mapTime, bool hidden)
         {
-            double ms = (BaseObject.StartTime - mapTime) / clockRate;
+            double ms = BaseObject.StartTime - mapTime;
             if (ms < 0)
                 return 0.0;
 
-            double preemptTime = BaseObject.TimePreempt / clockRate;
-            double fadeInTime = BaseObject.TimeFadeIn / clockRate;
+            double preemptTime = BaseObject.TimePreempt;
+            double fadeInTime = BaseObject.TimeFadeIn;
 
             if (hidden)
                 return Math.Clamp(Math.Min((1.0 - ms / preemptTime) * 2.5, (ms / preemptTime - 0.3) * (1.0 / 0.3)), 0.0, 1.0);
