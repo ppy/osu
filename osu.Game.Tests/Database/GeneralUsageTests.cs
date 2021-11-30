@@ -5,7 +5,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using osu.Game.Database;
 using osu.Game.Models;
 using Realms;
 
