@@ -702,15 +702,7 @@ namespace osu.Game.Online.Multiplayer
 
         private async Task<PlaylistItem> createPlaylistItem(MultiplayerPlaylistItem item)
         {
-            var set = await GetOnlineBeatmapSet(item.BeatmapID).ConfigureAwait(false);
-
-            // The incoming response is deserialised without circular reference handling currently.
-            // Because we require using metadata from this instance, populate the nested beatmaps' sets manually here.
-            foreach (var b in set.Beatmaps)
-                b.BeatmapSet = set;
-
-            var beatmap = set.Beatmaps.Single(b => b.OnlineID == item.BeatmapID);
-            beatmap.Checksum = item.BeatmapChecksum;
+            var apiBeatmap = await GetOnlineBeatmapSet(item.BeatmapID).ConfigureAwait(false);
 
             var ruleset = Rulesets.GetRuleset(item.RulesetID);
             var rulesetInstance = ruleset.CreateInstance();
@@ -719,7 +711,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 ID = item.ID,
                 OwnerID = item.OwnerID,
-                Beatmap = { Value = beatmap },
+                Beatmap = { Value = apiBeatmap },
                 Ruleset = { Value = ruleset },
                 Expired = item.Expired
             };
@@ -731,12 +723,12 @@ namespace osu.Game.Online.Multiplayer
         }
 
         /// <summary>
-        /// Retrieves a <see cref="APIBeatmapSet"/> from an online source.
+        /// Retrieves a <see cref="APIBeatmap"/> from an online source.
         /// </summary>
-        /// <param name="beatmapId">The beatmap set ID.</param>
+        /// <param name="beatmapId">The beatmap ID.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
-        /// <returns>The <see cref="APIBeatmapSet"/> retrieval task.</returns>
-        protected abstract Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
+        /// <returns>The <see cref="APIBeatmap"/> retrieval task.</returns>
+        protected abstract Task<APIBeatmap> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.
