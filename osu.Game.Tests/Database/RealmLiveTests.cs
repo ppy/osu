@@ -63,53 +63,6 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
-        public void TestValueAccessWithOpenContext()
-        {
-            RunTestWithRealm((realmFactory, _) =>
-            {
-                ILive<RealmBeatmap>? liveBeatmap = null;
-                Task.Factory.StartNew(() =>
-                {
-                    using (var threadContext = realmFactory.CreateContext())
-                    {
-                        var beatmap = threadContext.Write(r => r.Add(new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata())));
-
-                        liveBeatmap = beatmap.ToLive();
-                    }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
-
-                Debug.Assert(liveBeatmap != null);
-
-                Task.Factory.StartNew(() =>
-                {
-                    // TODO: The commented code is the behaviour we hope to obtain, but is temporarily disabled.
-                    // See https://github.com/ppy/osu/pull/15851
-                    using (realmFactory.CreateContext())
-                    {
-                        Assert.Throws<InvalidOperationException>(() =>
-                        {
-                            var __ = liveBeatmap.Value;
-                        });
-                    }
-
-                    // Assert.DoesNotThrow(() =>
-                    // {
-                    //     using (realmFactory.CreateContext())
-                    //     {
-                    //         var resolved = liveBeatmap.Value;
-                    //
-                    //         Assert.IsTrue(resolved.Realm.IsClosed);
-                    //         Assert.IsTrue(resolved.IsValid);
-                    //
-                    //         // can access properties without a crash.
-                    //         Assert.IsFalse(resolved.Hidden);
-                    //     }
-                    // });
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
-            });
-        }
-
-        [Test]
         public void TestScopedReadWithoutContext()
         {
             RunTestWithRealm((realmFactory, _) =>
@@ -160,6 +113,60 @@ namespace osu.Game.Tests.Database
                 {
                     liveBeatmap.PerformWrite(beatmap => { beatmap.Hidden = true; });
                     liveBeatmap.PerformRead(beatmap => { Assert.IsTrue(beatmap.Hidden); });
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+            });
+        }
+
+        [Test]
+        public void TestValueAccessNonManaged()
+        {
+            RunTestWithRealm((realmFactory, _) =>
+            {
+                var beatmap = new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
+                var liveBeatmap = beatmap.ToLive();
+
+                Assert.DoesNotThrow(() =>
+                {
+                    var __ = liveBeatmap.Value;
+                });
+            });
+        }
+
+        [Test]
+        public void TestValueAccessWithOpenContextFails()
+        {
+            RunTestWithRealm((realmFactory, _) =>
+            {
+                ILive<RealmBeatmap>? liveBeatmap = null;
+
+                Task.Factory.StartNew(() =>
+                {
+                    using (var threadContext = realmFactory.CreateContext())
+                    {
+                        var beatmap = threadContext.Write(r => r.Add(new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata())));
+
+                        liveBeatmap = beatmap.ToLive();
+                    }
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+
+                Debug.Assert(liveBeatmap != null);
+
+                Task.Factory.StartNew(() =>
+                {
+                    // Can't be used, without a valid context.
+                    Assert.Throws<InvalidOperationException>(() =>
+                    {
+                        var __ = liveBeatmap.Value;
+                    });
+
+                    // Can't be used, even from within a valid context.
+                    using (realmFactory.CreateContext())
+                    {
+                        Assert.Throws<InvalidOperationException>(() =>
+                        {
+                            var __ = liveBeatmap.Value;
+                        });
+                    }
                 }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
             });
         }
@@ -225,19 +232,12 @@ namespace osu.Game.Tests.Database
                     Assert.AreEqual(0, updateThreadContext.All<RealmBeatmap>().Count());
                     Assert.AreEqual(0, changesTriggered);
 
-                    // TODO: Originally the following was using `liveBeatmap.Value`. This has been temporarily disabled.
-                    // See https://github.com/ppy/osu/pull/15851
                     liveBeatmap.PerformRead(resolved =>
                     {
                         // retrieval causes an implicit refresh. even changes that aren't related to the retrieval are fired at this point.
                         // ReSharper disable once AccessToDisposedClosure
                         Assert.AreEqual(2, updateThreadContext.All<RealmBeatmap>().Count());
                         Assert.AreEqual(1, changesTriggered);
-
-                        // TODO: as above, temporarily disabled as it doesn't make sense inside a `PerformRead`.
-                        // // even though the realm that this instance was resolved for was closed, it's still valid.
-                        // Assert.IsTrue(resolved.Realm.IsClosed);
-                        // Assert.IsTrue(resolved.IsValid);
 
                         // can access properties without a crash.
                         Assert.IsFalse(resolved.Hidden);
