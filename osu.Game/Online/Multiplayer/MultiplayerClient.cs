@@ -444,10 +444,18 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.SettingsChanged(MultiplayerRoomSettings newSettings)
+        async Task IMultiplayerClient.SettingsChanged(MultiplayerRoomSettings newSettings)
         {
+            Debug.Assert(APIRoom != null);
+            Debug.Assert(Room != null);
+
+            // ensure the new selected item is populated immediately.
+            var playlistItem = APIRoom.Playlist.SingleOrDefault(p => p.ID == newSettings.PlaylistItemId);
+
+            if (playlistItem != null)
+                await PopulateBeatmap(playlistItem).ConfigureAwait(false);
+
             Scheduler.Add(() => updateLocalRoomSettings(newSettings));
-            return Task.CompletedTask;
         }
 
         Task IMultiplayerClient.UserStateChanged(int userId, MultiplayerUserState state)
@@ -700,7 +708,7 @@ namespace osu.Game.Online.Multiplayer
             CurrentMatchPlayingItem.Value = APIRoom.Playlist.SingleOrDefault(p => p.ID == settings.PlaylistItemId);
         }
 
-        private async Task<PlaylistItem> createPlaylistItem(MultiplayerPlaylistItem item, bool populateImmediately)
+        private async Task<PlaylistItem> createPlaylistItem(MultiplayerPlaylistItem item, bool populateBeatmapImmediately)
         {
             var ruleset = Rulesets.GetRuleset(item.RulesetID);
             var rulesetInstance = ruleset.CreateInstance();
@@ -708,6 +716,7 @@ namespace osu.Game.Online.Multiplayer
             var playlistItem = new PlaylistItem
             {
                 ID = item.ID,
+                BeatmapID = item.BeatmapID,
                 OwnerID = item.OwnerID,
                 Ruleset = { Value = ruleset },
                 Expired = item.Expired
@@ -716,23 +725,18 @@ namespace osu.Game.Online.Multiplayer
             playlistItem.RequiredMods.AddRange(item.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
             playlistItem.AllowedMods.AddRange(item.AllowedMods.Select(m => m.ToMod(rulesetInstance)));
 
-            if (populateImmediately)
-            {
-                await populateFromOnline(item, playlistItem).ConfigureAwait(false);
-            }
-            else
-            {
-                // to avoid blocking other operations (like the initial room join), schedule online population to happen in the background.
-                // ReSharper disable once AsyncVoidLambda
-                Schedule(async () => await populateFromOnline(item, playlistItem).ConfigureAwait(false));
-            }
+            if (populateBeatmapImmediately)
+                await PopulateBeatmap(playlistItem).ConfigureAwait(false);
 
             return playlistItem;
         }
 
-        private async Task populateFromOnline(MultiplayerPlaylistItem item, PlaylistItem playlistItem)
+        public async Task PopulateBeatmap(PlaylistItem item)
         {
-            playlistItem.Beatmap.Value = await GetAPIBeatmap(item.BeatmapID).ConfigureAwait(false);
+            if (item.Beatmap.Value != null)
+                return;
+
+            item.Beatmap.Value = await GetAPIBeatmap(item.BeatmapID).ConfigureAwait(false);
         }
 
         /// <summary>
