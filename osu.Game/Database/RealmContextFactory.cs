@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Input.Bindings;
@@ -205,6 +206,61 @@ namespace osu.Game.Database
                 return;
 
             using (var db = efContextFactory.GetForWrite())
+            {
+                migrateSettings(db);
+                migrateSkins(db);
+            }
+
+            void migrateSkins(DatabaseWriteUsage db)
+            {
+                // migrate ruleset settings. can be removed 20220530.
+                var existingSkins = db.Context.SkinInfo
+                                      .Include(s => s.Files)
+                                      .ThenInclude(f => f.FileInfo);
+
+                // previous entries in EF are removed post migration.
+                if (!existingSkins.Any())
+                    return;
+
+                using (var realm = CreateContext())
+                using (var transaction = realm.BeginWrite())
+                {
+                    // only migrate data if the realm database is empty.
+                    if (!realm.All<SkinInfo>().Any(s => !s.Protected))
+                    {
+                        foreach (var skin in existingSkins)
+                        {
+                            var realmSkin = new SkinInfo
+                            {
+                                Name = skin.Name,
+                                Creator = skin.Creator,
+                                Hash = skin.Hash,
+                                Protected = false,
+                                InstantiationInfo = skin.InstantiationInfo,
+                            };
+
+                            foreach (var file in skin.Files)
+                            {
+                                var realmFile = realm.Find<RealmFile>(file.FileInfo.Hash);
+
+                                if (realmFile == null)
+                                    realm.Add(realmFile = new RealmFile { Hash = file.FileInfo.Hash });
+
+                                realmSkin.Files.Add(new RealmNamedFileUsage(realmFile, file.Filename));
+                            }
+
+                            realm.Add(realmSkin);
+                        }
+                    }
+
+                    db.Context.RemoveRange(existingSkins);
+                    // Intentionally don't clean up the files, so they don't get purged by EF.
+
+                    transaction.Commit();
+                }
+            }
+
+            void migrateSettings(DatabaseWriteUsage db)
             {
                 // migrate ruleset settings. can be removed 20220315.
                 var existingSettings = db.Context.DatabasedSetting;
