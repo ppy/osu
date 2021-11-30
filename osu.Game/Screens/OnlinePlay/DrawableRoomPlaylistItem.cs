@@ -80,6 +80,8 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly bool allowSelection;
         private readonly bool showItemOwner;
 
+        private FillFlowContainer mainFillFlow;
+
         protected override bool ShouldBeConsideredForInput(Drawable child) => allowEdit || !allowSelection || SelectedItem.Value == Model;
 
         public DrawableRoomPlaylistItem(PlaylistItem item, bool allowEdit, bool allowSelection, bool showItemOwner)
@@ -201,6 +203,9 @@ namespace osu.Game.Screens.OnlinePlay
 
             buttonsFlow.Clear();
             buttonsFlow.ChildrenEnumerable = CreateButtons();
+
+            difficultyIconContainer.FadeInFromZero(500, Easing.OutQuint);
+            mainFillFlow.FadeInFromZero(500, Easing.OutQuint);
         }
 
         protected override Drawable CreateContent()
@@ -247,7 +252,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     AutoSizeAxes = Axes.Both,
                                     Margin = new MarginPadding { Left = 8, Right = 8 },
                                 },
-                                new FillFlowContainer
+                                mainFillFlow = new FillFlowContainer
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
