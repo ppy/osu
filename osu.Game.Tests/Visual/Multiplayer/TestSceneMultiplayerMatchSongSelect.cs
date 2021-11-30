@@ -144,7 +144,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set mods", () => SelectedMods.Value = new[] { new TaikoModDoubleTime() });
 
             AddStep("confirm selection", () => songSelect.FinaliseSelection());
-            AddStep("exit song select", () => songSelect.Exit());
+
+            AddUntilStep("song select exited", () => !songSelect.IsCurrentScreen());
 
             AddAssert("beatmap not changed", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
             AddAssert("ruleset not changed", () => Ruleset.Value.Equals(new TaikoRuleset().RulesetInfo));
