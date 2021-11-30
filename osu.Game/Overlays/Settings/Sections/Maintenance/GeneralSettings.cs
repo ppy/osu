@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllBeatmaps,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteBeatmapsButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllScores,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteScoresButton.Enabled.Value = false;
                         Task.Run(() => scores.Delete(scores.GetAllUsableScores())).ContinueWith(t => Schedule(() => deleteScoresButton.Enabled.Value = true));
@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllSkins,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteSkinsButton.Enabled.Value = false;
                         Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Text = MaintenanceSettingsStrings.DeleteAllCollections,
                     Action = () =>
                     {
-                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(collectionManager.DeleteAll));
+                        dialogOverlay?.Push(new MassDeleteConfirmationDialog(collectionManager.DeleteAll));
                     }
                 });
             }

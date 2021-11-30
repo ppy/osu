@@ -25,7 +25,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -147,7 +146,8 @@ namespace osu.Game.Screens.OnlinePlay
             if (showItemOwner)
             {
                 ownerAvatar.Show();
-                userLookupCache.GetUserAsync(Item.OwnerID).ContinueWith(u => Schedule(() => ownerAvatar.User = u.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+                userLookupCache.GetUserAsync(Item.OwnerID)
+                               .ContinueWith(u => Schedule(() => ownerAvatar.User = u.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
 
             difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(ICON_HEIGHT) };
@@ -338,7 +338,7 @@ namespace osu.Game.Screens.OnlinePlay
             return true;
         }
 
-        private sealed class PlaylistDownloadButton : BeatmapPanelDownloadButton
+        private sealed class PlaylistDownloadButton : BeatmapDownloadButton
         {
             private readonly PlaylistItem playlistItem;
 
@@ -458,7 +458,7 @@ namespace osu.Game.Screens.OnlinePlay
                 });
             }
 
-            public LocalisableString TooltipText => User == null ? "loading user..." : $"queued by {User.Username}";
+            public LocalisableString TooltipText => User == null ? string.Empty : $"queued by {User.Username}";
 
             private class TooltipArea : Component, IHasTooltip
             {
