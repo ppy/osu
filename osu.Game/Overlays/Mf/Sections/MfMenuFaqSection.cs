@@ -8,7 +8,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Mf.TextBox;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mf.Sections
 {
@@ -83,13 +82,11 @@ namespace osu.Game.Overlays.Mf.Sections
                                 },
                                 new MfMenuDropDownTextBoxContainer
                                 {
-                                    Title = "我想要xxx功能，给你钱你做不?",
+                                    Title = "接受定制吗？",
                                     Child = new OsuSpriteText
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Text = "我不做，同时也不接受任何定制客户端的请求，请不要再问我了。",
-                                        Colour = Color4.Gold,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Black)
+                                        Text = "不接受"
                                     }
                                 }
                             }
