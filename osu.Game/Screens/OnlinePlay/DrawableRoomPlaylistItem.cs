@@ -151,8 +151,11 @@ namespace osu.Game.Screens.OnlinePlay
                 {
                     try
                     {
-                        var foundUser = await userLookupCache.GetUserAsync(Item.OwnerID).ConfigureAwait(false);
-                        Schedule(() => ownerAvatar.User = foundUser);
+                        if (showItemOwner)
+                        {
+                            var foundUser = await userLookupCache.GetUserAsync(Item.OwnerID).ConfigureAwait(false);
+                            Schedule(() => ownerAvatar.User = foundUser);
+                        }
 
                         var foundBeatmap = await beatmapLookupCache.GetBeatmapAsync(Item.BeatmapID).ConfigureAwait(false);
                         Schedule(() => Item.Beatmap.Value = foundBeatmap);
