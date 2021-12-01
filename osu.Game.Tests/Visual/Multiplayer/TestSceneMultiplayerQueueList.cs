@@ -181,6 +181,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private void changeQueueModeStep(QueueMode newMode) => AddStep($"change queue mode to {newMode}", () => list.QueueMode.Value = newMode);
+        private void changeQueueModeStep(QueueMode newMode) => AddStep($"change queue mode to {newMode}", () => SelectedRoom.Value.QueueMode.Value = newMode);
     }
 }
