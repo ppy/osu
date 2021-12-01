@@ -127,6 +127,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("item 1 not in lists", () => !inHistoryList(0) && !inQueueList(0));
         }
 
+        [Ignore("Expired items are initially removed from the room.")]
         [Test]
         public void TestJoinRoomWithMixedItemsAddedInCorrectLists()
         {
