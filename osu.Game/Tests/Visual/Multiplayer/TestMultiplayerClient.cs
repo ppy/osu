@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                             ((IMultiplayerClient)this).ResultsReady();
 
-                            finishCurrentItem().Wait();
+                            FinishCurrentItem().Wait();
                         }
 
                         break;
@@ -390,7 +390,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await updateCurrentItem(Room).ConfigureAwait(false);
         }
 
-        private async Task finishCurrentItem()
+        public async Task FinishCurrentItem()
         {
             Debug.Assert(Room != null);
             Debug.Assert(APIRoom != null);
