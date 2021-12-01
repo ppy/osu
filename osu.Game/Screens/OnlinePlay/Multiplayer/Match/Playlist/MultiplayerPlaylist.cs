@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 
@@ -14,6 +13,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 {
     public class MultiplayerPlaylist : MultiplayerRoomComposite
     {
+        public readonly Bindable<MultiplayerPlaylistDisplayMode> DisplayMode = new Bindable<MultiplayerPlaylistDisplayMode>();
+
         private MultiplayerQueueList queueList;
         private MultiplayerHistoryList historyList;
         private bool firstPopulation = true;
@@ -21,14 +22,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         [BackgroundDependencyLoader]
         private void load()
         {
-            TabControl<DisplayMode> displayModeTabControl;
-
             InternalChildren = new Drawable[]
             {
-                displayModeTabControl = new OsuTabControl<DisplayMode>
+                new OsuTabControl<MultiplayerPlaylistDisplayMode>
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 25
+                    Height = 25,
+                    Current = { BindTarget = DisplayMode }
                 },
                 new Container
                 {
@@ -49,14 +49,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                     }
                 }
             };
-
-            displayModeTabControl.Current.BindValueChanged(onDisplayModeChanged, true);
         }
 
-        private void onDisplayModeChanged(ValueChangedEvent<DisplayMode> mode)
+        protected override void LoadComplete()
         {
-            historyList.FadeTo(mode.NewValue == DisplayMode.History ? 1 : 0, 100);
-            queueList.FadeTo(mode.NewValue == DisplayMode.Queue ? 1 : 0, 100);
+            base.LoadComplete();
+
+            DisplayMode.BindValueChanged(onDisplayModeChanged, true);
+        }
+
+        private void onDisplayModeChanged(ValueChangedEvent<MultiplayerPlaylistDisplayMode> mode)
+        {
+            historyList.FadeTo(mode.NewValue == MultiplayerPlaylistDisplayMode.History ? 1 : 0, 100);
+            queueList.FadeTo(mode.NewValue == MultiplayerPlaylistDisplayMode.Queue ? 1 : 0, 100);
         }
 
         protected override void OnRoomUpdated()
@@ -106,12 +111,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
             PlaylistItemRemoved(item.ID);
             PlaylistItemAdded(item);
-        }
-
-        private enum DisplayMode
-        {
-            Queue,
-            History,
         }
     }
 }

@@ -22,6 +22,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerPlaylist : MultiplayerTestScene
     {
+        private MultiplayerPlaylist list;
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
@@ -37,7 +38,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            Child = new MultiplayerPlaylist
+            Child = list = new MultiplayerPlaylist
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -175,47 +176,57 @@ namespace osu.Game.Tests.Visual.Multiplayer
         /// </summary>
         /// <param name="playlistItemId">The item id.</param>
         /// <param name="visualIndex">The index at which the item should appear visually. The item with index 0 is at the top of the list.</param>
-        private void assertItemInQueueListStep(int playlistItemId, int visualIndex) => AddUntilStep($"{playlistItemId} in queue at pos = {visualIndex}", () =>
+        private void assertItemInQueueListStep(int playlistItemId, int visualIndex)
         {
-            return !inHistoryList(playlistItemId)
-                   && this.ChildrenOfType<MultiplayerQueueList>()
-                          .Single()
-                          .ChildrenOfType<DrawableRoomPlaylistItem>()
-                          .OrderBy(drawable => drawable.Position.Y)
-                          .TakeWhile(drawable => drawable.Item.ID != playlistItemId)
-                          .Count() == visualIndex;
-        });
+            changeDisplayModeStep(MultiplayerPlaylistDisplayMode.Queue);
+
+            AddUntilStep($"{playlistItemId} in queue at pos = {visualIndex}", () =>
+            {
+                return !inHistoryList(playlistItemId)
+                       && this.ChildrenOfType<MultiplayerQueueList>()
+                              .Single()
+                              .ChildrenOfType<DrawableRoomPlaylistItem>()
+                              .OrderBy(drawable => drawable.Position.Y)
+                              .TakeWhile(drawable => drawable.Item.ID != playlistItemId)
+                              .Count() == visualIndex;
+            });
+        }
 
         /// <summary>
         /// Asserts the position of a given playlist item in the history list.
         /// </summary>
         /// <param name="playlistItemId">The item id.</param>
         /// <param name="visualIndex">The index at which the item should appear visually. The item with index 0 is at the top of the list.</param>
-        private void assertItemInHistoryListStep(int playlistItemId, int visualIndex) => AddUntilStep($"{playlistItemId} in history at pos = {visualIndex}", () =>
+        private void assertItemInHistoryListStep(int playlistItemId, int visualIndex)
         {
-            return !inQueueList(playlistItemId)
-                   && this.ChildrenOfType<MultiplayerHistoryList>()
-                          .Single()
-                          .ChildrenOfType<DrawableRoomPlaylistItem>()
-                          .OrderBy(drawable => drawable.Position.Y)
-                          .TakeWhile(drawable => drawable.Item.ID != playlistItemId)
-                          .Count() == visualIndex;
-        });
+            changeDisplayModeStep(MultiplayerPlaylistDisplayMode.History);
+
+            AddUntilStep($"{playlistItemId} in history at pos = {visualIndex}", () =>
+            {
+                return !inQueueList(playlistItemId)
+                       && this.ChildrenOfType<MultiplayerHistoryList>()
+                              .Single()
+                              .ChildrenOfType<DrawableRoomPlaylistItem>()
+                              .OrderBy(drawable => drawable.Position.Y)
+                              .TakeWhile(drawable => drawable.Item.ID != playlistItemId)
+                              .Count() == visualIndex;
+            });
+        }
+
+        private void changeDisplayModeStep(MultiplayerPlaylistDisplayMode mode) => AddStep($"change list to {mode}", () => list.DisplayMode.Value = mode);
 
         private bool inQueueList(int playlistItemId)
         {
             return this.ChildrenOfType<MultiplayerQueueList>()
                        .Single()
-                       .ChildrenOfType<DrawableRoomPlaylistItem>()
-                       .Any(i => i.Item.ID == playlistItemId);
+                       .Items.Any(i => i.ID == playlistItemId);
         }
 
         private bool inHistoryList(int playlistItemId)
         {
             return this.ChildrenOfType<MultiplayerHistoryList>()
                        .Single()
-                       .ChildrenOfType<DrawableRoomPlaylistItem>()
-                       .Any(i => i.Item.ID == playlistItemId);
+                       .Items.Any(i => i.ID == playlistItemId);
         }
     }
 }
