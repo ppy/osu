@@ -102,6 +102,9 @@ namespace osu.Game.Database
                 }
             }
 
+            if (beatmapTasks.Count == 0)
+                return;
+
             // Query the beatmaps.
             var request = new GetBeatmapsRequest(beatmapTasks.Keys.ToArray());
 
