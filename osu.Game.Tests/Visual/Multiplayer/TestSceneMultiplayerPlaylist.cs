@@ -114,6 +114,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestListsClearedWhenRoomLeft()
+        {
+            addItemStep();
+            AddStep("finish current item", () => Client.FinishCurrentItem());
+
+            AddStep("leave room", () => RoomManager.PartRoom());
+            AddUntilStep("wait for room part", () => Client.Room == null);
+
+            AddUntilStep("item 0 not in lists", () => !inHistoryList(0) && !inQueueList(0));
+            AddUntilStep("item 1 not in lists", () => !inHistoryList(0) && !inQueueList(0));
+        }
+
+        [Test]
         public void TestJoinRoomWithMixedItemsAddedInCorrectLists()
         {
             AddStep("leave room", () => RoomManager.PartRoom());
@@ -212,7 +225,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 base.OnRoomUpdated();
 
                 if (Room == null)
+                {
+                    historyList.Items.Clear();
+                    queueList.Items.Clear();
                     return;
+                }
 
                 if (!firstPopulation) return;
 
