@@ -13,6 +13,9 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 {
+    /// <summary>
+    /// A gameplay-ordered list of <see cref="DrawableRoomPlaylistItem"/>s.
+    /// </summary>
     public class MultiplayerQueueList : DrawableRoomPlaylist
     {
         public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();

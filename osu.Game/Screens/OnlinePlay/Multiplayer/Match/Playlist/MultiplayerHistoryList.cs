@@ -10,6 +10,9 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 {
+    /// <summary>
+    /// A historically-ordered list of <see cref="DrawableRoomPlaylistItem"/>s.
+    /// </summary>
     public class MultiplayerHistoryList : DrawableRoomPlaylist
     {
         public MultiplayerHistoryList()
