@@ -15,13 +15,13 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerQueueList : OsuTestScene
+    public class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
         private MultiplayerQueueList list;
         private int currentItemId;
 
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
             Child = list = new MultiplayerQueueList
             {
@@ -34,8 +34,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         });
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
             // Not inside a step since this is used to affect steps added by the current test.
             currentItemId = 0;
         }
