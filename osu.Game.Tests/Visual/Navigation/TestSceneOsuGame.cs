@@ -16,7 +16,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -25,6 +24,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
+using osu.Game.Stores;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.Visual.Navigation
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(ISkinSource),
             typeof(IAPIProvider),
             typeof(RulesetStore),
-            typeof(FileStore),
+            typeof(RealmFileStore),
             typeof(ScoreManager),
             typeof(BeatmapManager),
             typeof(IRulesetConfigCache),
