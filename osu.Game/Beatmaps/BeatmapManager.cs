@@ -24,6 +24,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
+using osu.Game.Stores;
 
 namespace osu.Game.Beatmaps
 {
@@ -42,7 +43,7 @@ namespace osu.Game.Beatmaps
 
         public BeatmapManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
         {
-            var userResources = new FileStore(contextFactory, storage).Store;
+            var userResources = new RealmFileStore(contextFactory, storage).Store;
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 

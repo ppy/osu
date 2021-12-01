@@ -143,8 +143,6 @@ namespace osu.Game
         private UserLookupCache userCache;
         private BeatmapLookupCache beatmapCache;
 
-        private FileStore fileStore;
-
         private RulesetConfigCache rulesetConfigCache;
 
         private SpectatorClient spectatorClient;
@@ -226,8 +224,6 @@ namespace osu.Game
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
-            dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
-
             dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
@@ -284,8 +280,6 @@ namespace osu.Game
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
-
-            fileStore.Cleanup();
 
             // add api components to hierarchy.
             if (API is APIAccess apiAccess)
