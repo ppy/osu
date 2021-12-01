@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Volume
@@ -14,6 +16,13 @@ namespace osu.Game.Overlays.Volume
     {
         public Func<GlobalAction, bool> ActionRequested;
         public Func<GlobalAction, float, bool, bool> ScrollActionRequested;
+        public Bindable<double> VolumeScrollMultiplierAmount = new Bindable<double>();
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.VolumeScrollMultiplier, VolumeScrollMultiplierAmount);
+        }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
@@ -41,7 +50,7 @@ namespace osu.Game.Overlays.Volume
                 return false;
 
             // forward any unhandled mouse scroll events to the volume control.
-            ScrollActionRequested?.Invoke(GlobalAction.IncreaseVolume, e.ScrollDelta.Y, e.IsPrecise);
+            ScrollActionRequested?.Invoke(GlobalAction.IncreaseVolume, (float)VolumeScrollMultiplierAmount.Value * e.ScrollDelta.Y, e.IsPrecise);
             return true;
         }
 

@@ -55,6 +55,11 @@ namespace osu.Game.Localisation
         public static LocalisableString OffsetHeader => new TranslatableString(getKey(@"offset_header"), @"Offset Adjustment");
 
         /// <summary>
+        /// "Volume Scroll Multiplier"
+        /// </summary>
+        public static LocalisableString VolumeScrollMultiplier => new TranslatableString(getKey(@"volume_scroll_multiplier"), @"Volume Scroll Multiplier");
+
+        /// <summary>
         /// "Audio offset"
         /// </summary>
         public static LocalisableString AudioOffset => new TranslatableString(getKey(@"audio_offset"), @"Audio offset");
