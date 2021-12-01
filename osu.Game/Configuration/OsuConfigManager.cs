@@ -17,6 +17,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Skinning;
 
 namespace osu.Game.Configuration
 {
@@ -27,7 +28,7 @@ namespace osu.Game.Configuration
         {
             // UI/selection defaults
             SetDefault(OsuSetting.Ruleset, string.Empty);
-            SetDefault(OsuSetting.Skin, string.Empty);
+            SetDefault(OsuSetting.Skin, SkinInfo.DEFAULT_SKIN.ToString());
 
             SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
