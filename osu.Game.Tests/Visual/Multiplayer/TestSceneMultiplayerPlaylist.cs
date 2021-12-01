@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         new Drawable[]
                         {
-                            multiplayerQueueList = new MultiplayerQueueList(false, false, true)
+                            multiplayerQueueList = new MultiplayerQueueList
                             {
                                 RelativeSizeAxes = Axes.Both
                             },
