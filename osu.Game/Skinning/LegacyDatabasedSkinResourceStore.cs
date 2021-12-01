@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Game.Extensions;
@@ -19,15 +21,24 @@ namespace osu.Game.Skinning
         public LegacyDatabasedSkinResourceStore(SkinInfo source, IResourceStore<byte[]> underlyingStore)
             : base(underlyingStore)
         {
-            subscription = source.Files.SubscribeForNotifications((sender, changes, error) =>
+            // Subscribing to non-managed instances doesn't work.
+            // In this usage, the skin may be non-managed in tests.
+            if (source.IsManaged)
             {
-                if (changes == null)
-                    return;
+                // Subscriptions can only work on the main thread.
+                Debug.Assert(ThreadSafety.IsUpdateThread);
 
-                // If a large number of changes are made on skin files, this may be better suited to being cleared here
-                // and reinitialised on next usage.
-                initialiseFileCache(source);
-            });
+                subscription = source.Files
+                                     .AsRealmCollection().SubscribeForNotifications((sender, changes, error) =>
+                                     {
+                                         if (changes == null)
+                                             return;
+
+                                         // If a large number of changes are made on skin files, this may be better suited to being cleared here
+                                         // and reinitialised on next usage.
+                                         initialiseFileCache(source);
+                                     });
+            }
 
             initialiseFileCache(source);
         }
