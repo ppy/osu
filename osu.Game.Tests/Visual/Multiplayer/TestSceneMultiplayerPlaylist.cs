@@ -16,6 +16,7 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -131,6 +132,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("leave room", () => RoomManager.PartRoom());
             AddUntilStep("wait for room part", () => Client.Room == null);
+
+            AddStep("join room with items", () =>
+            {
+                RoomManager.CreateRoom(new Room
+                {
+                    Name = { Value = "test name" },
+                    Playlist =
+                    {
+                        new PlaylistItem
+                        {
+                            Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
+                            Ruleset = { Value = Ruleset.Value }
+                        },
+                        new PlaylistItem
+                        {
+                            Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
+                            Ruleset = { Value = Ruleset.Value },
+                            Expired = true
+                        }
+                    }
+                });
+            });
+
+            AddUntilStep("wait for room join", () => RoomJoined);
+
+            assertItemInQueueListStep(1, 0);
+            assertItemInHistoryListStep(2, 0);
         }
 
         /// <summary>
@@ -228,15 +256,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     historyList.Items.Clear();
                     queueList.Items.Clear();
+                    firstPopulation = true;
                     return;
                 }
 
-                if (!firstPopulation) return;
+                if (firstPopulation)
+                {
+                    foreach (var item in Room.Playlist)
+                        PlaylistItemAdded(item);
 
-                foreach (var item in Room.Playlist)
-                    PlaylistItemAdded(item);
-
-                firstPopulation = false;
+                    firstPopulation = false;
+                }
             }
 
             protected override void PlaylistItemAdded(MultiplayerPlaylistItem item)
