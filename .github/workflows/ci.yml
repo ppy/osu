@@ -77,10 +77,6 @@ jobs:
         run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
 
   build-only-ios:
-    # While this workflow technically *can* run, it fails as iOS builds are blocked by multiple issues.
-    # See https://github.com/ppy/osu-framework/issues/4677 for the details.
-    # The job can be unblocked once those issues are resolved and game deployments can happen again.
-    if: false
     name: Build only (iOS)
     runs-on: macos-latest
     timeout-minutes: 60

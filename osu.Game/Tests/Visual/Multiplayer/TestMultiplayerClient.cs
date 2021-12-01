@@ -336,7 +336,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task AddPlaylistItem(MultiplayerPlaylistItem item) => AddUserPlaylistItem(api.LocalUser.Value.OnlineID, item);
 
-        protected override Task<APIBeatmapSet> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
+        protected override Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default)
         {
             IBeatmapSetInfo? set = roomManager.ServerSideRooms.SelectMany(r => r.Playlist)
                                               .FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
@@ -345,13 +345,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (set == null)
                 throw new InvalidOperationException("Beatmap not found.");
 
-            var apiSet = new APIBeatmapSet
+            return Task.FromResult(new APIBeatmap
             {
-                OnlineID = set.OnlineID,
-                Beatmaps = set.Beatmaps.Select(b => new APIBeatmap { OnlineID = b.OnlineID }).ToArray(),
-            };
-
-            return Task.FromResult(apiSet);
+                BeatmapSet = new APIBeatmapSet { OnlineID = set.OnlineID },
+                OnlineID = beatmapId,
+                Checksum = set.Beatmaps.First(b => b.OnlineID == beatmapId).MD5Hash
+            });
         }
 
         private async Task changeMatchType(MatchType type)
