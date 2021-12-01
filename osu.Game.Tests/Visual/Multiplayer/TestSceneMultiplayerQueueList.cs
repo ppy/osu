@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = list = new MultiplayerQueueList(false, false)
+            Child = list = new MultiplayerQueueList
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
