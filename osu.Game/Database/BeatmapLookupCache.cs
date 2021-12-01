@@ -85,7 +85,7 @@ namespace osu.Game.Database
             // Grab at most 50 unique beatmap IDs from the queue.
             lock (taskAssignmentLock)
             {
-                while (pendingBeatmapTasks.Count > 0 && beatmapTasks.Count < 1)
+                while (pendingBeatmapTasks.Count > 0 && beatmapTasks.Count < 50)
                 {
                     (int id, TaskCompletionSource<APIBeatmap> task) next = pendingBeatmapTasks.Dequeue();
 
@@ -102,8 +102,11 @@ namespace osu.Game.Database
                 }
             }
 
+            if (beatmapTasks.Count == 0)
+                return;
+
             // Query the beatmaps.
-            var request = new GetBeatmapRequest(new APIBeatmap { OnlineID = beatmapTasks.Keys.First() });
+            var request = new GetBeatmapsRequest(beatmapTasks.Keys.ToArray());
 
             // rather than queueing, we maintain our own single-threaded request stream.
             // todo: we probably want retry logic here.
@@ -117,16 +120,19 @@ namespace osu.Game.Database
                     createNewTask();
             }
 
-            List<APIBeatmap> foundBeatmaps = new List<APIBeatmap> { request.Response };
+            List<APIBeatmap> foundBeatmaps = request.Response?.Beatmaps;
 
-            foreach (var beatmap in foundBeatmaps)
+            if (foundBeatmaps != null)
             {
-                if (beatmapTasks.TryGetValue(beatmap.OnlineID, out var tasks))
+                foreach (var beatmap in foundBeatmaps)
                 {
-                    foreach (var task in tasks)
-                        task.SetResult(beatmap);
+                    if (beatmapTasks.TryGetValue(beatmap.OnlineID, out var tasks))
+                    {
+                        foreach (var task in tasks)
+                            task.SetResult(beatmap);
 
-                    beatmapTasks.Remove(beatmap.OnlineID);
+                        beatmapTasks.Remove(beatmap.OnlineID);
+                    }
                 }
             }
 
