@@ -3,6 +3,9 @@
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 {
+    /// <summary>
+    /// The type of list displayed in a <see cref="MultiplayerPlaylist"/>.
+    /// </summary>
     public enum MultiplayerPlaylistDisplayMode
     {
         Queue,

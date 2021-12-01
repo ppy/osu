@@ -7,10 +7,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 {
+    /// <summary>
+    /// The multiplayer playlist, containing lists to show the items from a <see cref="MultiplayerRoom"/> in both gameplay-order and historical-order.
+    /// </summary>
     public class MultiplayerPlaylist : MultiplayerRoomComposite
     {
         public readonly Bindable<MultiplayerPlaylistDisplayMode> DisplayMode = new Bindable<MultiplayerPlaylistDisplayMode>();
@@ -56,7 +60,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             DisplayMode.BindValueChanged(onDisplayModeChanged, true);
         }
 
