@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     public class MultiplayerHistoryList : DrawableRoomPlaylist
     {
         public MultiplayerHistoryList()
-            : base(false, false, false, true)
+            : base(false, false, true)
         {
         }
 
