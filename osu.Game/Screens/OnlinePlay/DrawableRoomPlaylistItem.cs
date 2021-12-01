@@ -70,6 +70,9 @@ namespace osu.Game.Screens.OnlinePlay
         private UserLookupCache userLookupCache { get; set; }
 
         [Resolved]
+        private BeatmapLookupCache beatmapLookupCache { get; set; }
+
+        [Resolved]
         private MultiplayerClient multiplayerClient { get; set; }
 
         private PanelBackground panelBackground;
@@ -148,10 +151,11 @@ namespace osu.Game.Screens.OnlinePlay
                 {
                     try
                     {
-                        var user = await userLookupCache.GetUserAsync(Item.OwnerID).ConfigureAwait(false);
-                        Schedule(() => ownerAvatar.User = user);
+                        var foundUser = await userLookupCache.GetUserAsync(Item.OwnerID).ConfigureAwait(false);
+                        Schedule(() => ownerAvatar.User = foundUser);
 
-                        await multiplayerClient.PopulateBeatmap(Item).ConfigureAwait(false);
+                        var foundBeatmap = await beatmapLookupCache.GetBeatmapAsync(Item.BeatmapID).ConfigureAwait(false);
+                        Schedule(() => Item.Beatmap.Value = foundBeatmap);
                     }
                     catch (Exception e)
                     {
