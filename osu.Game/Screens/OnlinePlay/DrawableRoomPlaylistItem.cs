@@ -77,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private PanelBackground panelBackground;
 
-        private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty);
+        private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
 
         private readonly bool allowEdit;
         private readonly bool allowSelection;
