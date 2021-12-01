@@ -19,8 +19,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     /// </summary>
     public class MultiplayerQueueList : DrawableRoomPlaylist
     {
-        public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
-
         public MultiplayerQueueList()
             : base(false, false, true)
         {
@@ -28,13 +26,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new QueueFillFlowContainer
         {
-            QueueMode = { BindTarget = QueueMode },
             Spacing = new Vector2(0, 2)
         };
 
         private class QueueFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
-            public readonly IBindable<QueueMode> QueueMode = new Bindable<QueueMode>();
+            [Resolved(typeof(Room), nameof(Room.QueueMode))]
+            private Bindable<QueueMode> queueMode { get; set; }
 
             [Resolved(typeof(Room), nameof(Room.Playlist))]
             private BindableList<PlaylistItem> roomPlaylist { get; set; }
@@ -42,21 +40,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                QueueMode.BindValueChanged(_ => InvalidateLayout());
+                queueMode.BindValueChanged(_ => InvalidateLayout());
             }
 
             public override IEnumerable<Drawable> FlowingChildren
             {
                 get
                 {
-                    switch (QueueMode.Value)
+                    switch (queueMode.Value)
                     {
                         default:
                             return AliveInternalChildren.Where(d => d.IsPresent)
                                                         .OfType<RearrangeableListItem<PlaylistItem>>()
                                                         .OrderBy(item => item.Model.ID);
 
-                        case Game.Online.Multiplayer.QueueMode.AllPlayersRoundRobin:
+                        case QueueMode.AllPlayersRoundRobin:
                             RearrangeableListItem<PlaylistItem>[] items = AliveInternalChildren
                                                                           .Where(d => d.IsPresent)
                                                                           .OfType<RearrangeableListItem<PlaylistItem>>()
