@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public class MultiplayerPlaylist : MultiplayerRoomComposite
         {
-            private QueueList queueList;
+            private MultiplayerQueueList multiplayerQueueList;
             private DrawableRoomPlaylist historyList;
             private bool firstPopulation = true;
 
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         new Drawable[]
                         {
-                            queueList = new QueueList(false, false, true)
+                            multiplayerQueueList = new MultiplayerQueueList(false, false, true)
                             {
                                 RelativeSizeAxes = Axes.Both
                             },
@@ -123,14 +123,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 if (item.Expired)
                     historyList.Items.Add(getPlaylistItem(item));
                 else
-                    queueList.Items.Add(getPlaylistItem(item));
+                    multiplayerQueueList.Items.Add(getPlaylistItem(item));
             }
 
             protected override void PlaylistItemRemoved(long item)
             {
                 base.PlaylistItemRemoved(item);
 
-                queueList.Items.RemoveAll(i => i.ID == item);
+                multiplayerQueueList.Items.RemoveAll(i => i.ID == item);
             }
 
             protected override void PlaylistItemChanged(MultiplayerPlaylistItem item)

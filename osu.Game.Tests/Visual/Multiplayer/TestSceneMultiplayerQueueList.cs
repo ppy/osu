@@ -17,13 +17,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerQueueList : OsuTestScene
     {
-        private QueueList list;
+        private MultiplayerQueueList list;
         private int currentItemId;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = list = new QueueList(false, false)
+            Child = list = new MultiplayerQueueList(false, false)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

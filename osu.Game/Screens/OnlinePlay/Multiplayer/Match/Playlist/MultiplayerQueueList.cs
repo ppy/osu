@@ -13,11 +13,11 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 {
-    public class QueueList : DrawableRoomPlaylist
+    public class MultiplayerQueueList : DrawableRoomPlaylist
     {
         public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
 
-        public QueueList(bool allowEdit, bool allowSelection, bool reverse = false)
+        public MultiplayerQueueList(bool allowEdit, bool allowSelection, bool reverse = false)
             : base(allowEdit, allowSelection, reverse)
         {
         }
