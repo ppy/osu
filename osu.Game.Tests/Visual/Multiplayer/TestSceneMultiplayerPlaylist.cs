@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -14,7 +13,6 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay;
-using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
@@ -218,85 +216,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                        .Single()
                        .ChildrenOfType<DrawableRoomPlaylistItem>()
                        .Any(i => i.Item.ID == playlistItemId);
-        }
-
-        public class MultiplayerPlaylist : MultiplayerRoomComposite
-        {
-            private MultiplayerQueueList queueList;
-            private MultiplayerHistoryList historyList;
-            private bool firstPopulation = true;
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                InternalChild = new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            queueList = new MultiplayerQueueList
-                            {
-                                RelativeSizeAxes = Axes.Both
-                            },
-                            historyList = new MultiplayerHistoryList
-                            {
-                                RelativeSizeAxes = Axes.Both
-                            }
-                        }
-                    }
-                };
-            }
-
-            protected override void OnRoomUpdated()
-            {
-                base.OnRoomUpdated();
-
-                if (Room == null)
-                {
-                    historyList.Items.Clear();
-                    queueList.Items.Clear();
-                    firstPopulation = true;
-                    return;
-                }
-
-                if (firstPopulation)
-                {
-                    foreach (var item in Room.Playlist)
-                        PlaylistItemAdded(item);
-
-                    firstPopulation = false;
-                }
-            }
-
-            protected override void PlaylistItemAdded(MultiplayerPlaylistItem item)
-            {
-                base.PlaylistItemAdded(item);
-
-                var apiItem = Playlist.Single(i => i.ID == item.ID);
-
-                if (item.Expired)
-                    historyList.Items.Add(apiItem);
-                else
-                    queueList.Items.Add(apiItem);
-            }
-
-            protected override void PlaylistItemRemoved(long item)
-            {
-                base.PlaylistItemRemoved(item);
-
-                queueList.Items.RemoveAll(i => i.ID == item);
-                historyList.Items.RemoveAll(i => i.ID == item);
-            }
-
-            protected override void PlaylistItemChanged(MultiplayerPlaylistItem item)
-            {
-                base.PlaylistItemChanged(item);
-
-                PlaylistItemRemoved(item.ID);
-                PlaylistItemAdded(item);
-            }
         }
     }
 }
