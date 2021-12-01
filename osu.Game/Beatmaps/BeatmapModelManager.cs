@@ -24,6 +24,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
+using osu.Game.Stores;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Beatmaps
@@ -32,7 +33,7 @@ namespace osu.Game.Beatmaps
     /// Handles ef-core storage of beatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapModelManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
+    public class BeatmapModelManager : RealmArchiveModelManager<BeatmapSetInfo>
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
