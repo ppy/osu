@@ -135,7 +135,7 @@ namespace osu.Game.Database
             where T : RealmObjectBase
         {
             // Subscribing to non-managed instances doesn't work.
-            // In this usage, the skin may be non-managed in tests.
+            // In this usage, the instance may be non-managed in tests.
             if (!(list is IRealmCollection<T> realmCollection))
                 return null;
 
@@ -162,7 +162,7 @@ namespace osu.Game.Database
             where T : RealmObjectBase
         {
             // Subscribing to non-managed instances doesn't work.
-            // In this usage, the skin may be non-managed in tests.
+            // In this usage, the instance may be non-managed in tests.
             if (!(list is IRealmCollection<T> realmCollection))
                 return null;
 
