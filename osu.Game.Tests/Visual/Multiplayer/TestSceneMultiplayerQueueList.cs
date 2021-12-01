@@ -146,21 +146,51 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
         }
 
+        [Test]
+        public void TestPreviouslyExpiredItemsConsideredInRoundRobinMode()
+        {
+            changeQueueModeStep(QueueMode.AllPlayersRoundRobin);
+
+            // User 1.
+
+            addItemStep(1, true);
+            addItemStep(1, true);
+            PlaylistItem item3 = addItemStep(1);
+            PlaylistItem item4 = addItemStep(1);
+
+            // User2.
+
+            PlaylistItem item5 = addItemStep(2);
+            PlaylistItem item6 = addItemStep(2);
+
+            assertPositionStep(item5, 0);
+            assertPositionStep(item6, 1);
+            assertPositionStep(item3, 2);
+            assertPositionStep(item4, 3);
+        }
+
         /// <summary>
         /// Adds a step to create a new playlist item.
         /// </summary>
         /// <param name="ownerId">The item owner.</param>
+        /// <param name="expired">Whether the item should be added in an expired state.</param>
         /// <returns>The playlist item's ID.</returns>
-        private PlaylistItem addItemStep(int ownerId)
+        private PlaylistItem addItemStep(int ownerId, bool expired = false)
         {
             var item = new PlaylistItem
             {
                 ID = ++currentItemId,
                 OwnerID = ownerId,
-                Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo, false).BeatmapInfo }
+                Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo, false).BeatmapInfo },
+                Expired = expired
             };
 
-            AddStep($"add {{ item: {item.ID}, user: {ownerId} }}", () => list.Items.Add(item));
+            AddStep($"add {{ item: {item.ID}, user: {ownerId} }}", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(item);
+                if (!expired)
+                    list.Items.Add(item);
+            });
 
             return item;
         }
