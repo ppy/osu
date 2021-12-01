@@ -40,11 +40,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                         queueList = new MultiplayerQueueList
                         {
                             RelativeSizeAxes = Axes.Both,
+                            SelectedItem = { BindTarget = SelectedItem }
                         },
                         historyList = new MultiplayerHistoryList
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
+                            SelectedItem = { BindTarget = SelectedItem }
                         }
                     }
                 }
