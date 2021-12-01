@@ -18,7 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
 
         public MultiplayerQueueList()
-            : base(false, false, false, true)
+            : base(false, false, true)
         {
         }
 

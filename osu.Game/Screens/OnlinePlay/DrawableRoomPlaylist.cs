@@ -20,7 +20,7 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly bool allowSelection;
         private readonly bool showItemOwner;
 
-        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection, bool reverse = false, bool showItemOwner = false)
+        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
         {
             this.allowEdit = allowEdit;
             this.allowSelection = allowSelection;
