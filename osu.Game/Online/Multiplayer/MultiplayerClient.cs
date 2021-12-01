@@ -444,18 +444,28 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        async Task IMultiplayerClient.SettingsChanged(MultiplayerRoomSettings newSettings)
+        Task IMultiplayerClient.SettingsChanged(MultiplayerRoomSettings newSettings)
         {
             Debug.Assert(APIRoom != null);
             Debug.Assert(Room != null);
 
-            // ensure the new selected item is populated immediately.
-            var playlistItem = APIRoom.Playlist.SingleOrDefault(p => p.ID == newSettings.PlaylistItemId);
+            Scheduler.Add(() =>
+            {
+                // ensure the new selected item is populated immediately.
+                var playlistItem = APIRoom.Playlist.SingleOrDefault(p => p.ID == newSettings.PlaylistItemId);
 
-            if (playlistItem != null)
-                await PopulateBeatmap(playlistItem).ConfigureAwait(false);
+                if (playlistItem != null)
+                {
+                    GetAPIBeatmap(playlistItem.BeatmapID).ContinueWith(b =>
+                    {
+                        Scheduler.Add(() => playlistItem.Beatmap.Value = b.Result);
+                    }, TaskContinuationOptions.OnlyOnRanToCompletion);
+                }
 
-            Scheduler.Add(() => updateLocalRoomSettings(newSettings));
+                updateLocalRoomSettings(newSettings);
+            });
+
+            return Task.CompletedTask;
         }
 
         Task IMultiplayerClient.UserStateChanged(int userId, MultiplayerUserState state)
@@ -727,17 +737,9 @@ namespace osu.Game.Online.Multiplayer
             playlistItem.AllowedMods.AddRange(item.AllowedMods.Select(m => m.ToMod(rulesetInstance)));
 
             if (populateBeatmapImmediately)
-                await PopulateBeatmap(playlistItem).ConfigureAwait(false);
+                playlistItem.Beatmap.Value = await GetAPIBeatmap(item.BeatmapID).ConfigureAwait(false);
 
             return playlistItem;
-        }
-
-        public async Task PopulateBeatmap(PlaylistItem item)
-        {
-            if (item.Beatmap.Value != null)
-                return;
-
-            item.Beatmap.Value = await GetAPIBeatmap(item.BeatmapID).ConfigureAwait(false);
         }
 
         /// <summary>
