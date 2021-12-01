@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -35,6 +36,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         {
             public readonly IBindable<QueueMode> QueueMode = new Bindable<QueueMode>();
 
+            [Resolved(typeof(Room), nameof(Room.Playlist))]
+            private BindableList<PlaylistItem> roomPlaylist { get; set; }
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
@@ -53,20 +57,25 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                                                         .OrderBy(item => item.Model.ID);
 
                         case Game.Online.Multiplayer.QueueMode.AllPlayersRoundRobin:
-                            RearrangeableListItem<PlaylistItem>[] allItems = AliveInternalChildren
-                                                                             .Where(d => d.IsPresent)
-                                                                             .OfType<RearrangeableListItem<PlaylistItem>>()
-                                                                             .OrderBy(item => item.Model.ID)
-                                                                             .ToArray();
+                            RearrangeableListItem<PlaylistItem>[] items = AliveInternalChildren
+                                                                          .Where(d => d.IsPresent)
+                                                                          .OfType<RearrangeableListItem<PlaylistItem>>()
+                                                                          .OrderBy(item => item.Model.ID)
+                                                                          .ToArray();
 
-                            int totalCount = allItems.Length;
+                            int totalCount = items.Length;
                             if (totalCount == 0)
                                 return Enumerable.Empty<Drawable>();
 
-                            Dictionary<int, int> perUserCounts = allItems
-                                                                 .Select(item => item.Model.OwnerID)
-                                                                 .Distinct()
-                                                                 .ToDictionary(u => u, _ => 0);
+                            // Count of "expired" items per user.
+                            Dictionary<int, int> perUserCounts = roomPlaylist
+                                                                 .Where(item => item.Expired)
+                                                                 .GroupBy(item => item.OwnerID)
+                                                                 .ToDictionary(group => group.Key, group => group.Count());
+
+                            // Fill the count dictionary with zeroes for all users with no currently expired items.
+                            foreach (var item in items)
+                                perUserCounts.TryAdd(item.Model.OwnerID, 0);
 
                             List<Drawable> result = new List<Drawable>();
 
@@ -76,16 +85,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                             // Todo: This could probably be more efficient, likely at the cost of increased complexity.
                             while (totalCount-- > 0)
                             {
-                                var candidateItem = allItems
+                                var candidateItem = items
                                                     .Where(item => item != null)
                                                     .OrderBy(item => perUserCounts[item.Model.OwnerID])
                                                     .First();
 
-                                int itemIndex = Array.IndexOf(allItems, candidateItem);
+                                int itemIndex = Array.IndexOf(items, candidateItem);
 
-                                result.Add(allItems[itemIndex]);
+                                result.Add(items[itemIndex]);
                                 perUserCounts[candidateItem.Model.OwnerID]++;
-                                allItems[itemIndex] = null;
+                                items[itemIndex] = null;
                             }
 
                             return result;
