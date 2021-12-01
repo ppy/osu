@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -28,9 +27,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
         private BeatmapInfo importedBeatmap;
-
-        [Cached(typeof(UserLookupCache))]
-        private UserLookupCache lookupCache = new TestUserLookupCache();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -60,22 +56,132 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
                 importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
             });
+
+            AddStep("change to all players mode", () => Client.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }));
         }
 
         [Test]
-        public void DoTest()
+        public void TestNonExpiredItemsAddedToQueueList()
         {
-            AddStep("change to round robin mode", () => Client.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayersRoundRobin }));
-            AddStep("add playlist item for user 1", () => Client.AddPlaylistItem(new MultiplayerPlaylistItem
-            {
-                BeatmapID = importedBeatmap.OnlineID!.Value
-            }));
+            assertItemInQueueListStep(1, 0);
+
+            addItemStep();
+            assertItemInQueueListStep(2, 1);
+
+            addItemStep();
+            assertItemInQueueListStep(3, 2);
+        }
+
+        [Test]
+        public void TestExpiredItemsAddedToHistoryList()
+        {
+            assertItemInQueueListStep(1, 0);
+
+            addItemStep(true);
+            assertItemInHistoryListStep(2, 0);
+
+            addItemStep(true);
+            assertItemInHistoryListStep(3, 0);
+            assertItemInHistoryListStep(2, 1);
+
+            // Initial item is still in the queue.
+            assertItemInQueueListStep(1, 0);
+        }
+
+        [Test]
+        public void TestExpiredItemsMoveToQueueList()
+        {
+            addItemStep();
+            addItemStep();
+
+            AddStep("finish current item", () => Client.FinishCurrentItem());
+
+            assertItemInHistoryListStep(1, 0);
+            assertItemInQueueListStep(2, 0);
+            assertItemInQueueListStep(3, 1);
+
+            AddStep("finish current item", () => Client.FinishCurrentItem());
+
+            assertItemInHistoryListStep(2, 0);
+            assertItemInHistoryListStep(1, 1);
+            assertItemInQueueListStep(3, 0);
+
+            AddStep("finish current item", () => Client.FinishCurrentItem());
+
+            assertItemInHistoryListStep(3, 0);
+            assertItemInHistoryListStep(2, 1);
+            assertItemInHistoryListStep(1, 2);
+        }
+
+        [Test]
+        public void TestJoinRoomWithMixedItemsAddedInCorrectLists()
+        {
+            AddStep("leave room", () => RoomManager.PartRoom());
+            AddUntilStep("wait for room part", () => Client.Room == null);
+        }
+
+        /// <summary>
+        /// Adds a step to create a new playlist item.
+        /// </summary>
+        private void addItemStep(bool expired = false) => AddStep("add item", () => Client.AddPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem
+        {
+            Beatmap = { Value = importedBeatmap },
+            BeatmapID = importedBeatmap.OnlineID ?? -1,
+            Expired = expired
+        })));
+
+        /// <summary>
+        /// Asserts the position of a given playlist item in the queue list.
+        /// </summary>
+        /// <param name="playlistItemId">The item id.</param>
+        /// <param name="visualIndex">The index at which the item should appear visually. The item with index 0 is at the top of the list.</param>
+        private void assertItemInQueueListStep(int playlistItemId, int visualIndex) => AddUntilStep($"{playlistItemId} in queue at pos = {visualIndex}", () =>
+        {
+            return !inHistoryList(playlistItemId)
+                   && this.ChildrenOfType<MultiplayerQueueList>()
+                          .Single()
+                          .ChildrenOfType<DrawableRoomPlaylistItem>()
+                          .OrderBy(drawable => drawable.Position.Y)
+                          .TakeWhile(drawable => drawable.Item.ID != playlistItemId)
+                          .Count() == visualIndex;
+        });
+
+        /// <summary>
+        /// Asserts the position of a given playlist item in the history list.
+        /// </summary>
+        /// <param name="playlistItemId">The item id.</param>
+        /// <param name="visualIndex">The index at which the item should appear visually. The item with index 0 is at the top of the list.</param>
+        private void assertItemInHistoryListStep(int playlistItemId, int visualIndex) => AddUntilStep($"{playlistItemId} in history at pos = {visualIndex}", () =>
+        {
+            return !inQueueList(playlistItemId)
+                   && this.ChildrenOfType<MultiplayerHistoryList>()
+                          .Single()
+                          .ChildrenOfType<DrawableRoomPlaylistItem>()
+                          .OrderBy(drawable => drawable.Position.Y)
+                          .TakeWhile(drawable => drawable.Item.ID != playlistItemId)
+                          .Count() == visualIndex;
+        });
+
+        private bool inQueueList(int playlistItemId)
+        {
+            return this.ChildrenOfType<MultiplayerQueueList>()
+                       .Single()
+                       .ChildrenOfType<DrawableRoomPlaylistItem>()
+                       .Any(i => i.Item.ID == playlistItemId);
+        }
+
+        private bool inHistoryList(int playlistItemId)
+        {
+            return this.ChildrenOfType<MultiplayerHistoryList>()
+                       .Single()
+                       .ChildrenOfType<DrawableRoomPlaylistItem>()
+                       .Any(i => i.Item.ID == playlistItemId);
         }
 
         public class MultiplayerPlaylist : MultiplayerRoomComposite
         {
-            private MultiplayerQueueList multiplayerQueueList;
-            private DrawableRoomPlaylist historyList;
+            private MultiplayerQueueList queueList;
+            private MultiplayerHistoryList historyList;
             private bool firstPopulation = true;
 
             [BackgroundDependencyLoader]
@@ -88,11 +194,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         new Drawable[]
                         {
-                            multiplayerQueueList = new MultiplayerQueueList
+                            queueList = new MultiplayerQueueList
                             {
                                 RelativeSizeAxes = Axes.Both
                             },
-                            historyList = new DrawableRoomPlaylist(false, false, true)
+                            historyList = new MultiplayerHistoryList
                             {
                                 RelativeSizeAxes = Axes.Both
                             }
@@ -120,17 +226,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 base.PlaylistItemAdded(item);
 
+                var apiItem = Playlist.Single(i => i.ID == item.ID);
+
                 if (item.Expired)
-                    historyList.Items.Add(getPlaylistItem(item));
+                    historyList.Items.Add(apiItem);
                 else
-                    multiplayerQueueList.Items.Add(getPlaylistItem(item));
+                    queueList.Items.Add(apiItem);
             }
 
             protected override void PlaylistItemRemoved(long item)
             {
                 base.PlaylistItemRemoved(item);
 
-                multiplayerQueueList.Items.RemoveAll(i => i.ID == item);
+                queueList.Items.RemoveAll(i => i.ID == item);
+                historyList.Items.RemoveAll(i => i.ID == item);
             }
 
             protected override void PlaylistItemChanged(MultiplayerPlaylistItem item)
@@ -140,8 +249,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 PlaylistItemRemoved(item.ID);
                 PlaylistItemAdded(item);
             }
-
-            private PlaylistItem getPlaylistItem(MultiplayerPlaylistItem item) => Playlist.Single(i => i.ID == item.ID);
         }
     }
 }
