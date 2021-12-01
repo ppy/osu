@@ -142,16 +142,16 @@ namespace osu.Game.Tests.NonVisual
         {
             Assert.AreEqual(expectedCombinations.Length, actualCombinations.Length);
 
-            foreach (Type[] expected in expectedCombinations)
+            Assert.Multiple(() =>
             {
-                Type[] actualTypes = ModUtils.FlattenMods(actualCombinations).Select(m => m.GetType()).ToArray();
-
-                Assert.Multiple(() =>
+                for (int i = 0; i < expectedCombinations.Length; ++i)
                 {
-                    foreach (var expectedType in expected)
-                        Assert.Contains(expectedType, actualTypes);
-                });
-            }
+                    Type[] expectedTypes = expectedCombinations[i];
+                    Type[] actualTypes = ModUtils.FlattenMod(actualCombinations[i]).Select(m => m.GetType()).ToArray();
+
+                    Assert.That(expectedTypes, Is.EquivalentTo(actualTypes));
+                }
+            });
         }
 
         private class ModA : Mod
