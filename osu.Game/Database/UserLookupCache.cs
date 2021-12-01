@@ -100,6 +100,9 @@ namespace osu.Game.Database
                 }
             }
 
+            if (userTasks.Count == 0)
+                return;
+
             // Query the users.
             var request = new GetUsersRequest(userTasks.Keys.ToArray());
 

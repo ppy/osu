@@ -52,6 +52,8 @@ namespace osu.Game.Database
         /// </summary>
         private readonly SemaphoreSlim contextCreationLock = new SemaphoreSlim(1);
 
+        private readonly ThreadLocal<bool> currentThreadCanCreateContexts = new ThreadLocal<bool>();
+
         private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>(@"Realm", @"Dirty Refreshes");
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
 
@@ -151,9 +153,22 @@ namespace osu.Game.Database
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
+            bool tookSemaphoreLock = false;
+
             try
             {
-                contextCreationLock.Wait();
+                if (!currentThreadCanCreateContexts.Value)
+                {
+                    contextCreationLock.Wait();
+                    currentThreadCanCreateContexts.Value = true;
+                    tookSemaphoreLock = true;
+                }
+                else
+                {
+                    // the semaphore is used to handle blocking of all context creation during certain periods.
+                    // once the semaphore has been taken by this code section, it is safe to create further contexts on the same thread.
+                    // this can happen if a realm subscription is active and triggers a callback which has user code that calls `CreateContext`.
+                }
 
                 contexts_created.Value++;
 
@@ -161,7 +176,11 @@ namespace osu.Game.Database
             }
             finally
             {
-                contextCreationLock.Release();
+                if (tookSemaphoreLock)
+                {
+                    contextCreationLock.Release();
+                    currentThreadCanCreateContexts.Value = false;
+                }
             }
         }
 
