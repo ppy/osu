@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
             realmSkins = realmFactory.Context.All<SkinInfo>()
                                      .Where(s => !s.DeletePending)
-                                     .OrderBy(s => s.Protected)
+                                     .OrderByDescending(s => s.Protected) // protected skins should be at the top.
                                      .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
 
             realmSubscription = realmSkins
