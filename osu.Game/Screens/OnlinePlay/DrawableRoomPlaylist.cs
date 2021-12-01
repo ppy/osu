@@ -25,8 +25,6 @@ namespace osu.Game.Screens.OnlinePlay
             this.allowEdit = allowEdit;
             this.allowSelection = allowSelection;
             this.showItemOwner = showItemOwner;
-
-            ((ReversibleFillFlowContainer)ListContainer).Reverse = reverse;
         }
 
         protected override void LoadComplete()
