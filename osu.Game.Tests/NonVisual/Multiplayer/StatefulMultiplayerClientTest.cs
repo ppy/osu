@@ -17,6 +17,27 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
     public class StatefulMultiplayerClientTest : MultiplayerTestScene
     {
         [Test]
+        public void TestUserAddedOnJoin()
+        {
+            var user = new APIUser { Id = 33 };
+
+            AddRepeatStep("add user multiple times", () => Client.AddUser(user), 3);
+            AddAssert("room has 2 users", () => Client.Room?.Users.Count == 2);
+        }
+
+        [Test]
+        public void TestUserRemovedOnLeave()
+        {
+            var user = new APIUser { Id = 44 };
+
+            AddStep("add user", () => Client.AddUser(user));
+            AddAssert("room has 2 users", () => Client.Room?.Users.Count == 2);
+
+            AddRepeatStep("remove user multiple times", () => Client.RemoveUser(user), 3);
+            AddAssert("room has 1 user", () => Client.Room?.Users.Count == 1);
+        }
+
+        [Test]
         public void TestPlayingUserTracking()
         {
             int id = 2000;
