@@ -39,6 +39,15 @@ namespace osu.Game.Online.Rooms
         [Key(7)]
         public bool Expired { get; set; }
 
+        /// <summary>
+        /// The order in which this <see cref="MultiplayerPlaylistItem"/> will be played, starting from 0 and increasing for items which will be played later.
+        /// </summary>
+        /// <remarks>
+        /// Undefined value for items which are expired.
+        /// </remarks>
+        [Key(8)]
+        public int GameplayOrder { get; set; }
+
         public MultiplayerPlaylistItem()
         {
         }
@@ -52,6 +61,7 @@ namespace osu.Game.Online.Rooms
             RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray();
             AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray();
             Expired = item.Expired;
+            GameplayOrder = item.GameplayOrder;
         }
     }
 }
