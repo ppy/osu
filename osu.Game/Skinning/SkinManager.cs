@@ -144,7 +144,7 @@ namespace osu.Game.Skinning
         {
             CurrentSkinInfo.Value.PerformRead(s =>
             {
-                if (s.IsManaged)
+                if (!s.Protected)
                     return;
 
                 // if the user is attempting to save one of the default skin implementations, create a copy first.

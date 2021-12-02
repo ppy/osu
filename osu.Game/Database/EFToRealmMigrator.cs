@@ -63,6 +63,7 @@ namespace osu.Game.Database
             using (var transaction = realm.BeginWrite())
             {
                 // only migrate data if the realm database is empty.
+                // note that this cannot be written as: `realm.All<SkinInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
                 if (!realm.All<SkinInfo>().Any(s => !s.Protected))
                 {
                     foreach (var skin in existingSkins)

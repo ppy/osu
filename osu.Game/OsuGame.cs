@@ -247,7 +247,6 @@ namespace osu.Game
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
             configSkin.ValueChanged += skinId =>
             {
-                // TODO: migrate the user skin selection to the new ID format.
                 ILive<SkinInfo> skinInfo = null;
 
                 if (Guid.TryParse(skinId.NewValue, out var guid))
