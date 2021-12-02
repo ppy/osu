@@ -35,9 +35,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void invokeUserJoined(MultiplayerRoomUser user) => Scheduler.AddOnce(UserJoined, user);
         private void invokeUserKicked(MultiplayerRoomUser user) => Scheduler.AddOnce(UserKicked, user);
         private void invokeUserLeft(MultiplayerRoomUser user) => Scheduler.AddOnce(UserLeft, user);
-        private void invokeItemAdded(MultiplayerPlaylistItem item) => Scheduler.AddOnce(PlaylistItemAdded, item);
-        private void invokeItemRemoved(long item) => Scheduler.AddOnce(PlaylistItemRemoved, item);
-        private void invokeItemChanged(MultiplayerPlaylistItem item) => Scheduler.AddOnce(PlaylistItemChanged, item);
+        private void invokeItemAdded(MultiplayerPlaylistItem item) => Schedule(() => PlaylistItemAdded(item));
+        private void invokeItemRemoved(long item) => Schedule(() => PlaylistItemRemoved(item));
+        private void invokeItemChanged(MultiplayerPlaylistItem item) => Schedule(() => PlaylistItemChanged(item));
 
         /// <summary>
         /// Invoked when a user has joined the room.
