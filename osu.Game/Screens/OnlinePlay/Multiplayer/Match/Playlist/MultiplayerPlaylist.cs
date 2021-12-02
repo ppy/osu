@@ -26,18 +26,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         [BackgroundDependencyLoader]
         private void load()
         {
+            const float tab_control_height = 25;
+
             InternalChildren = new Drawable[]
             {
                 new OsuTabControl<MultiplayerPlaylistDisplayMode>
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 25,
+                    Height = tab_control_height,
                     Current = { BindTarget = DisplayMode }
                 },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 27 },
+                    Padding = new MarginPadding { Top = tab_control_height + 5 },
                     Masking = true,
                     Children = new Drawable[]
                     {
