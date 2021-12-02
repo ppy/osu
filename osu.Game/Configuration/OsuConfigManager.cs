@@ -75,7 +75,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
-            SetDefault(OsuSetting.VolumeScrollMultiplier, 1.0, 0.5, 10.0, 0.5);
+            SetDefault(OsuSetting.VolumeScrollMultiplier, 1.0, 1, 5, 1);
 
             // Input
             SetDefault(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
