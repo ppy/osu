@@ -52,10 +52,10 @@ namespace osu.Game.Stores
             item.Realm.Write(() => DeleteFile(item, file, item.Realm));
 
         public void ReplaceFile(TModel item, RealmNamedFileUsage file, Stream contents)
-            => item.Realm.Write(() => ReplaceFile(item, file, contents, item.Realm));
+            => item.Realm.Write(() => ReplaceFile(file, contents, item.Realm));
 
-        public void AddFile(TModel item, Stream stream, string filename)
-            => item.Realm.Write(() => AddFile(item, stream, filename, item.Realm));
+        public void AddFile(TModel item, Stream contents, string filename)
+            => item.Realm.Write(() => AddFile(item, contents, filename, item.Realm));
 
         /// <summary>
         /// Delete a file from within an ongoing realm transaction.
@@ -68,7 +68,7 @@ namespace osu.Game.Stores
         /// <summary>
         /// Replace a file from within an ongoing realm transaction.
         /// </summary>
-        protected void ReplaceFile(TModel model, RealmNamedFileUsage file, Stream contents, Realm realm)
+        protected void ReplaceFile(RealmNamedFileUsage file, Stream contents, Realm realm)
         {
             file.File = realmFileStore.Add(contents, realm);
         }
@@ -76,17 +76,17 @@ namespace osu.Game.Stores
         /// <summary>
         /// Add a file from within an ongoing realm transaction. If the file already exists, it is overwritten.
         /// </summary>
-        protected void AddFile(TModel item, Stream stream, string filename, Realm realm)
+        protected void AddFile(TModel item, Stream contents, string filename, Realm realm)
         {
             var existing = item.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase));
 
             if (existing != null)
             {
-                ReplaceFile(item, existing, stream, realm);
+                ReplaceFile(existing, contents, realm);
                 return;
             }
 
-            var file = realmFileStore.Add(stream, realm);
+            var file = realmFileStore.Add(contents, realm);
             var namedUsage = new RealmNamedFileUsage(file, filename);
 
             item.Files.Add(namedUsage);
