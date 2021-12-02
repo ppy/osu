@@ -57,7 +57,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Volume Scroll Multiplier"
         /// </summary>
-        public static LocalisableString VolumeScrollMultiplier => new TranslatableString(getKey(@"volume_scroll_multiplier"), @"Volume Scroll Multiplier");
+        public static LocalisableString VolumeScrollMultiplier => new TranslatableString(getKey(@"volume_scroll_multiplier"), @"Volume scroll multiplier");
 
         /// <summary>
         /// "Audio offset"
