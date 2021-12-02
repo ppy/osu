@@ -32,12 +32,34 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public event Action? RoomUpdated;
 
+        /// <summary>
+        /// Invoked when a new user joins the room.
+        /// </summary>
         public event Action<MultiplayerRoomUser>? UserJoined;
+
+        /// <summary>
+        /// Invoked when a user leaves the room of their own accord.
+        /// </summary>
         public event Action<MultiplayerRoomUser>? UserLeft;
+
+        /// <summary>
+        /// Invoked when a user was kicked from the room forcefully.
+        /// </summary>
         public event Action<MultiplayerRoomUser>? UserKicked;
 
+        /// <summary>
+        /// Invoked when a new item is added to the playlist.
+        /// </summary>
         public event Action<MultiplayerPlaylistItem>? ItemAdded;
+
+        /// <summary>
+        /// Invoked when a playlist item is removed from the playlist. The provided <c>long</c> is the playlist's item ID.
+        /// </summary>
         public event Action<long>? ItemRemoved;
+
+        /// <summary>
+        /// Invoked when a playlist item's details change.
+        /// </summary>
         public event Action<MultiplayerPlaylistItem>? ItemChanged;
 
         /// <summary>
