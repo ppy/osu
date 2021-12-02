@@ -33,6 +33,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("expired")]
         public bool Expired { get; set; }
 
+        [JsonProperty("gameplay_order")]
+        public int GameplayOrder { get; set; }
+
         [JsonIgnore]
         public IBindable<bool> Valid => valid;
 
