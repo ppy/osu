@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 base.LoadComplete();
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();
-                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => s.IsManaged), true);
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
             }
 
             private void export()
