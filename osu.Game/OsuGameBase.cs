@@ -142,6 +142,7 @@ namespace osu.Game
         private BeatmapDifficultyCache difficultyCache;
 
         private UserLookupCache userCache;
+        private BeatmapLookupCache beatmapCache;
 
         private FileStore fileStore;
 
@@ -258,6 +259,9 @@ namespace osu.Game
 
             dependencies.Cache(userCache = new UserLookupCache());
             AddInternal(userCache);
+
+            dependencies.Cache(beatmapCache = new BeatmapLookupCache());
+            AddInternal(beatmapCache);
 
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
