@@ -74,10 +74,18 @@ namespace osu.Game.Stores
         }
 
         /// <summary>
-        /// Add a file from within an ongoing realm transaction.
+        /// Add a file from within an ongoing realm transaction. If the file already exists, it is overwritten.
         /// </summary>
         protected void AddFile(TModel item, Stream stream, string filename, Realm realm)
         {
+            var existing = item.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase));
+
+            if (existing != null)
+            {
+                ReplaceFile(item, existing, stream, realm);
+                return;
+            }
+
             var file = realmFileStore.Add(stream, realm);
             var namedUsage = new RealmNamedFileUsage(file, filename);
 
