@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
@@ -14,9 +13,9 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 
-namespace osu.Game.Overlays.BeatmapListing.Panels
+namespace osu.Game.Beatmaps.Drawables
 {
-    public class BeatmapPanelDownloadButton : CompositeDrawable
+    public class BeatmapDownloadButton : CompositeDrawable
     {
         protected bool DownloadEnabled => button.Enabled.Value;
 
@@ -35,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         private readonly IBeatmapSetInfo beatmapSet;
 
-        public BeatmapPanelDownloadButton(IBeatmapSetInfo beatmapSet)
+        public BeatmapDownloadButton(IBeatmapSetInfo beatmapSet)
         {
             this.beatmapSet = beatmapSet;
 
