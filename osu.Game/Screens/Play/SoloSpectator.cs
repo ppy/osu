@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            useAccelDownload = mConfig.GetBindable<bool>(MSetting.UseSayobot);
+            useAccelDownload = mConfig.GetBindable<bool>(MSetting.UseAccelForDefault);
         }
 
         protected override void LoadComplete()

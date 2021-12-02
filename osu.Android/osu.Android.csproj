@@ -34,6 +34,38 @@
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\osu-framework\osu.Framework.Android\osu.Framework.Android.csproj">
+      <Project>{c5bddb48-6717-4830-bd88-d130421149b0}</Project>
+      <Name>osu.Framework.Android</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\M.Resources\M.Resources.csproj">
+      <Project>{0b00e068-854f-4e2b-826e-d6c1cfc02490}</Project>
+      <Name>M.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mvis.Plugin.CloudMusicSupport\Mvis.Plugin.CloudMusicSupport.csproj">
+      <Project>{3c648555-1db7-4dfa-ab2d-da29affbf29b}</Project>
+      <Name>Mvis.Plugin.CloudMusicSupport</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mvis.Plugin.CollectionSupport\Mvis.Plugin.CollectionSupport.csproj">
+      <Project>{6fb5d57f-19b7-4a6c-9cf2-d35f52faa1a6}</Project>
+      <Name>Mvis.Plugin.CollectionSupport</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mvis.Plugin.FakeEditor\Mvis.Plugin.FakeEditor.csproj">
+      <Project>{84fb1585-4d6a-47ae-b29e-cee1f6bcc302}</Project>
+      <Name>Mvis.Plugin.FakeEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mvis.Plugin.SandboxToPanel\Mvis.Plugin.SandboxToPanel.csproj">
+      <Project>{0de09bf5-5630-424a-a98d-23a390299178}</Project>
+      <Name>Mvis.Plugin.RulesetPanel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mvis.Plugin.StoryboardSupport\Mvis.Plugin.StoryboardSupport.csproj">
+      <Project>{6b5ab791-dbf4-4e80-bd5e-4dfb5719b86e}</Project>
+      <Name>Mvis.Plugin.StoryboardSupport</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mvis.Plugin.Yasp\Mvis.Plugin.Yasp.csproj">
+      <Project>{ee35bf67-5705-405e-b403-f63ebf206aa5}</Project>
+      <Name>Mvis.Plugin.Yasp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj">
       <Project>{58f6c80c-1253-4a0e-a465-b8c85ebeadf3}</Project>
       <Name>osu.Game.Rulesets.Catch</Name>

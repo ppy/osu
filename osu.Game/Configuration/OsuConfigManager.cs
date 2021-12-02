@@ -23,6 +23,8 @@ namespace osu.Game.Configuration
     [ExcludeFromDynamicCompile]
     public class OsuConfigManager : IniConfigManager<OsuSetting>
     {
+        public static OsuConfigManager Instance;
+
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
@@ -154,6 +156,7 @@ namespace osu.Game.Configuration
         public OsuConfigManager(Storage storage)
             : base(storage)
         {
+            Instance = this;
             Migrate();
         }
 

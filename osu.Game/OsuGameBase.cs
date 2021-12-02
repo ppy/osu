@@ -44,6 +44,7 @@ using osu.Game.Stores;
 using osu.Game.Utils;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 using M.Resources;
+using osu.Game.Configuration.AccelUtils;
 using osu.Game.Screens;
 
 namespace osu.Game
@@ -145,6 +146,7 @@ namespace osu.Game
         private BeatmapDifficultyCache difficultyCache;
 
         private UserLookupCache userCache;
+        private BeatmapLookupCache beatmapCache;
 
         private FileStore fileStore;
 
@@ -222,6 +224,9 @@ namespace osu.Game
             largeStore.AddStore(new TextureLoaderStore(customStore));
             dependencies.Cache(customStore);
 
+            //初始化加速地址扩展处理器Store
+            dependencies.Cache(new ExtensionHandlerStore(Storage));
+
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
             dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Resources, Audio));
@@ -281,6 +286,9 @@ namespace osu.Game
             var helper = new CustomFontHelper();
             dependencies.Cache(helper);
             AddInternal(helper);
+
+            dependencies.Cache(beatmapCache = new BeatmapLookupCache());
+            AddInternal(beatmapCache);
 
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
@@ -394,6 +402,13 @@ namespace osu.Game
             FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            realmFactory.Refresh();
+        }
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -460,10 +475,6 @@ namespace osu.Game
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
-
-        private void migrateDataToRealm()
-        {
-        }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {

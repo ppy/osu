@@ -17,9 +17,13 @@ namespace osu.Game.Configuration
     {
         protected override string Filename => "mf.ini";
 
+        private static MConfigManager instance;
+        public static MConfigManager GetInstance() => instance;
+
         public MConfigManager(Storage storage)
             : base(storage)
         {
+            instance = this;
         }
 
         protected override void InitialiseDefaults()
@@ -27,8 +31,12 @@ namespace osu.Game.Configuration
             base.InitialiseDefaults();
 
             //Other Settings
-            SetDefault(MSetting.UseSayobot, false);
+            SetDefault(MSetting.UseAccelForDefault, true);
             SetDefault(MSetting.DoNotShowDisclaimer, false);
+            SetDefault(MSetting.AccelSource, "https://txy1.sayobot.cn/beatmaps/download/[NOVIDEO_SAYO]/[BID]");
+            SetDefault(MSetting.CoverAccelSource, "https://a.sayobot.cn/beatmaps/[BID]/covers/cover.jpg"); //不加.jpg日志会刷Texture could not be loaded via STB
+            SetDefault(MSetting.TrackPreviewAccelSource, "https://a.sayobot.cn/preview/[BID].mp3");
+            SetDefault(MSetting.UseAccelSetToOldOption, false);
 
             //UI Settings
             SetDefault(MSetting.OptUI, true);
@@ -66,14 +74,10 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.PreferredFont, "Torus");
             SetDefault(MSetting.LoaderBackgroundColor, "#000000");
 
-            //Deprecated
-            SetDefault(MSetting.FadeOutWindowWhenExiting, false);
-            SetDefault(MSetting.FadeInWindowWhenEntering, false);
-
             //Gamemode集成
             SetDefault(MSetting.Gamemode, GamemodeActivateCondition.InGame);
 
-            var isLinuxPlatform = RuntimeInfo.OS == RuntimeInfo.Platform.Linux;
+            bool isLinuxPlatform = RuntimeInfo.OS == RuntimeInfo.Platform.Linux;
 
             //DBus集成
             SetDefault(MSetting.DBusIntegration, isLinuxPlatform);
@@ -84,9 +88,6 @@ namespace osu.Game.Configuration
 
             //Mpris
             SetDefault(MSetting.MprisUseAvatarlogoAsCover, true);
-
-            if (Get<bool>(MSetting.FadeOutWindowWhenExiting) || Get<bool>(MSetting.FadeInWindowWhenEntering))
-                SetValue(MSetting.AllowWindowFadeEffect, true);
         }
 
         public Color4 GetCustomLoaderColor()
@@ -111,7 +112,7 @@ namespace osu.Game.Configuration
     {
         OptUI,
         TrianglesEnabled,
-        UseSayobot,
+        UseAccelForDefault,
         MvisBgBlur,
         MvisStoryboardProxy,
         MvisIdleBgDim,
@@ -131,8 +132,6 @@ namespace osu.Game.Configuration
         CustomWindowIconPath,
         UseCustomGreetingPicture,
         AllowWindowFadeEffect,
-        FadeOutWindowWhenExiting,
-        FadeInWindowWhenEntering,
         UseSystemCursor,
         PreferredFont,
         MvisCurrentAudioProvider,
@@ -145,7 +144,11 @@ namespace osu.Game.Configuration
         MprisUseAvatarlogoAsCover,
         EnableTray,
         EnableSystemNotifications,
-        TrayIconName
+        TrayIconName,
+        AccelSource,
+        UseAccelSetToOldOption,
+        CoverAccelSource,
+        TrackPreviewAccelSource
     }
 
     public enum GamemodeActivateCondition

@@ -26,6 +26,7 @@
       "Mvis.Plugin.FakeEditor\\Mvis.Plugin.FakeEditor.csproj",
       "Mvis.Plugin.BottomBar\\Mvis.Plugin.BottomBar.csproj",
       "Mvis.Plugin.Example\\Mvis.Plugin.Example.csproj",
+      "M.AccelPlugin.Example\\M.AccelPlugin.Example.csproj",
       "..\\osu-framework\\osu.Framework\\osu.Framework.csproj",
       "..\\osu-framework\\osu.Framework.NativeLibs\\osu.Framework.NativeLibs.csproj",
       "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform\\osu.Game.Rulesets.EmptyFreeform.csproj",

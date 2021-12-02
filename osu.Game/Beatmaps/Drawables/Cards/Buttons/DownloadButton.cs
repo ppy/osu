@@ -31,6 +31,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         [Resolved]
         private BeatmapModelDownloader beatmaps { get; set; } = null!;
 
+        [Resolved]
+        private MConfigManager mConfig { get; set; } = null!;
+
         public DownloadButton(APIBeatmapSet beatmapSet)
         {
             Icon.Icon = FontAwesome.Solid.Download;
@@ -80,7 +83,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                         return;
                     }
 
-                    Action = () => beatmaps.Download(beatmapSet, preferNoVideo.Value);
+                    Action = () =>
+                    {
+                        if (mConfig.Get<bool>(MSetting.UseAccelForDefault))
+                            beatmaps.AccelDownload(beatmapSet, preferNoVideo.Value);
+                        else
+                            beatmaps.Download(beatmapSet, preferNoVideo.Value);
+                    };
                     this.FadeIn(BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
                     spinner.Hide();
                     Icon.Show();
