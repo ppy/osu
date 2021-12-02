@@ -5,8 +5,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Game.Database;
 using osu.Game.Models;
-using Realms;
 
 #nullable enable
 
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Database
 
                 using (var context = realmFactory.CreateContext())
                 {
-                    var subscription = context.All<RealmBeatmap>().SubscribeForNotifications((sender, changes, error) =>
+                    var subscription = context.All<RealmBeatmap>().QueryAsyncWithNotifications((sender, changes, error) =>
                     {
                         using (realmFactory.CreateContext())
                         {
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Database
                     {
                     }
 
-                    subscription.Dispose();
+                    subscription?.Dispose();
                 }
 
                 Assert.IsTrue(callbackRan);
