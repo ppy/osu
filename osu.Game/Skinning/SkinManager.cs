@@ -156,7 +156,13 @@ namespace osu.Game.Skinning
                 }).Result;
 
                 if (result != null)
+                {
+                    // save once to ensure the required json content is populated.
+                    // currently this only happens on save.
+                    result.PerformRead(skin => Save(skin.CreateInstance(this)));
+
                     CurrentSkinInfo.Value = result;
+                }
             });
         }
 
