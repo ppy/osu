@@ -57,17 +57,26 @@ namespace osu.Game.Stores
         public void AddFile(TModel item, Stream stream, string filename)
             => item.Realm.Write(() => AddFile(item, stream, filename, item.Realm));
 
-        public void DeleteFile(TModel item, RealmNamedFileUsage file, Realm realm)
+        /// <summary>
+        /// Delete a file from within an ongoing realm transaction.
+        /// </summary>
+        protected void DeleteFile(TModel item, RealmNamedFileUsage file, Realm realm)
         {
             item.Files.Remove(file);
         }
 
-        public void ReplaceFile(TModel model, RealmNamedFileUsage file, Stream contents, Realm realm)
+        /// <summary>
+        /// Replace a file from within an ongoing realm transaction.
+        /// </summary>
+        protected void ReplaceFile(TModel model, RealmNamedFileUsage file, Stream contents, Realm realm)
         {
             file.File = realmFileStore.Add(contents, realm);
         }
 
-        public void AddFile(TModel item, Stream stream, string filename, Realm realm)
+        /// <summary>
+        /// Add a file from within an ongoing realm transaction.
+        /// </summary>
+        protected void AddFile(TModel item, Stream stream, string filename, Realm realm)
         {
             var file = realmFileStore.Add(stream, realm);
             var namedUsage = new RealmNamedFileUsage(file, filename);

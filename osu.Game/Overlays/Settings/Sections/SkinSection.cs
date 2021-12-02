@@ -18,7 +18,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
-using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -81,11 +80,11 @@ namespace osu.Game.Overlays.Settings.Sections
 
             realmSkins = realmFactory.Context.All<SkinInfo>()
                                      .Where(s => !s.DeletePending)
-                                     .OrderBy(s => s.Protected)
+                                     .OrderByDescending(s => s.Protected) // protected skins should be at the top.
                                      .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
 
             realmSubscription = realmSkins
-                .SubscribeForNotifications((sender, changes, error) =>
+                .QueryAsyncWithNotifications((sender, changes, error) =>
                 {
                     if (changes == null)
                         return;
@@ -158,7 +157,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        private class ExportSkinButton : SettingsButton
+        public class ExportSkinButton : SettingsButton
         {
             [Resolved]
             private SkinManager skins { get; set; }
@@ -180,7 +179,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 base.LoadComplete();
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();
-                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => s.IsManaged), true);
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
             }
 
             private void export()
