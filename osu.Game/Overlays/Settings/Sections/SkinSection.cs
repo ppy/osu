@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        private class ExportSkinButton : SettingsButton
+        public class ExportSkinButton : SettingsButton
         {
             [Resolved]
             private SkinManager skins { get; set; }
