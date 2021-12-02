@@ -128,7 +128,7 @@ namespace osu.Game.Skinning
                             sw.WriteLine(line);
                     }
 
-                    ReplaceFile(item, existingFile, stream, realm);
+                    ReplaceFile(existingFile, stream, realm);
 
                     // can be removed 20220502.
                     if (!ensureIniWasUpdated(item))
@@ -214,7 +214,7 @@ namespace osu.Game.Skinning
                         var oldFile = s.Files.FirstOrDefault(f => f.Filename == filename);
 
                         if (oldFile != null)
-                            ReplaceFile(s, oldFile, streamContent, s.Realm);
+                            ReplaceFile(oldFile, streamContent, s.Realm);
                         else
                             AddFile(s, streamContent, filename, s.Realm);
                     }
