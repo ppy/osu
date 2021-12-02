@@ -458,11 +458,17 @@ namespace osu.Game.Online.Multiplayer
                 {
                     GetAPIBeatmap(playlistItem.BeatmapID).ContinueWith(b =>
                     {
-                        Scheduler.Add(() => playlistItem.Beatmap.Value = b.Result);
-                    }, TaskContinuationOptions.OnlyOnRanToCompletion);
-                }
+                        bool success = b.IsCompletedSuccessfully;
 
-                updateLocalRoomSettings(newSettings);
+                        Scheduler.Add(() =>
+                        {
+                            if (success)
+                                playlistItem.Beatmap.Value = b.Result;
+
+                            updateLocalRoomSettings(newSettings);
+                        });
+                    });
+                }
             });
 
             return Task.CompletedTask;
