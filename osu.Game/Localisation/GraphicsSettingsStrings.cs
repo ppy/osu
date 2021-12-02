@@ -122,12 +122,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Video"
         /// </summary>
-        public static LocalisableString VideoHeader => new TranslatableString(getKey(@"video_header"), @"Video");
+        public static LocalisableString VideoHeader => new TranslatableString(getKey(@"video_header"), @"视频");
 
         /// <summary>
         /// "Use hardware acceleration"
         /// </summary>
-        public static LocalisableString UseHardwareAcceleration => new TranslatableString(getKey(@"use_hardware_acceleration"), @"Use hardware acceleration");
+        public static LocalisableString UseHardwareAcceleration => new TranslatableString(getKey(@"use_hardware_acceleration"), @"使用硬件加速");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
