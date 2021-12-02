@@ -18,7 +18,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
-using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -85,7 +84,7 @@ namespace osu.Game.Overlays.Settings.Sections
                                      .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
 
             realmSubscription = realmSkins
-                .SubscribeForNotifications((sender, changes, error) =>
+                .QueryAsyncWithNotifications((sender, changes, error) =>
                 {
                     if (changes == null)
                         return;
