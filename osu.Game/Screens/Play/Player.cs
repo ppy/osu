@@ -768,7 +768,15 @@ namespace osu.Game.Screens.Play
             Scheduler.Add(resultsDisplayDelegate);
         }
 
-        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // During pause, allow global volume adjust regardless of settings.
+            if (GameplayClockContainer.IsPaused.Value)
+                return false;
+
+            // Block global volume adjust if the user has asked for it (special case when holding "Alt").
+            return mouseWheelDisabled.Value && !e.AltPressed;
+        }
 
         #region Fail Logic
 
