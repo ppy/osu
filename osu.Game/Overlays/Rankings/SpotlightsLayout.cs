@@ -29,9 +29,6 @@ namespace osu.Game.Overlays.Rankings
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
         private CancellationTokenSource cancellationToken;
         private GetSpotlightRankingsRequest getRankingsRequest;
         private GetSpotlightsRequest spotlightsRequest;
