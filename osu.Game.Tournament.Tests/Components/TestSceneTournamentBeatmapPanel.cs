@@ -3,28 +3,20 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament.Tests.Components
 {
     public class TestSceneTournamentBeatmapPanel : TournamentTestScene
     {
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
             var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = 1091460 });
             req.Success += success;
-            api.Queue(req);
+            API.Queue(req);
         }
 
         private void success(APIBeatmap beatmap)
