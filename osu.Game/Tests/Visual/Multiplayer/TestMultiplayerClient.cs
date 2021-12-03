@@ -400,7 +400,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // Expire the current playlist item.
             currentItem.Expired = true;
-            currentItem.UpdatedAt = DateTimeOffset.Now;
+            currentItem.PlayedAt = DateTimeOffset.Now;
 
             await ((IMultiplayerClient)this).PlaylistItemChanged(currentItem).ConfigureAwait(false);
             await updatePlaylistOrder(Room).ConfigureAwait(false);
@@ -430,9 +430,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Debug.Assert(Room != null);
 
-            // Some tests can add items in already-expired states.
-            item.UpdatedAt = DateTimeOffset.Now;
-
             // Add the item to the list first in order to compute gameplay order.
             serverSidePlaylist.Add(item);
             await updatePlaylistOrder(Room).ConfigureAwait(false);
@@ -443,8 +440,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private async Task updateCurrentItem(MultiplayerRoom room, bool notify = true)
         {
-            // The playlist is already in correct gameplay order, so pick the next non-expired item or default to the last item.
-            MultiplayerPlaylistItem nextItem = serverSidePlaylist.FirstOrDefault(i => !i.Expired) ?? room.Playlist.Last();
+            MultiplayerPlaylistItem nextItem = serverSidePlaylist
+                                               .Where(i => !i.Expired)
+                                               .OrderBy(i => i.PlaylistOrder)
+                                               .FirstOrDefault()
+                                               ?? room.Playlist.Last();
+
             currentIndex = serverSidePlaylist.IndexOf(nextItem);
 
             long lastItem = room.Settings.PlaylistItemId;
@@ -494,29 +495,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     break;
             }
 
-            // For expired items, it's important that they're ordered in ascending order such that the last updated item is the last in the list.
-            // This is so that the updated_at database column doesn't get refreshed as a result of change in ordering.
-            List<MultiplayerPlaylistItem> orderedExpiredItems = serverSidePlaylist.Where(item => item.Expired).OrderBy(item => item.UpdatedAt).ToList();
-            for (int i = 0; i < orderedExpiredItems.Count; i++)
-                await setOrder(orderedExpiredItems[i], (ushort)i).ConfigureAwait(false);
-
             for (int i = 0; i < orderedActiveItems.Count; i++)
-                await setOrder(orderedActiveItems[i], (ushort)i).ConfigureAwait(false);
-
-            serverSidePlaylist.Clear();
-            serverSidePlaylist.AddRange(orderedExpiredItems);
-            serverSidePlaylist.AddRange(orderedActiveItems);
-
-            async Task setOrder(MultiplayerPlaylistItem item, ushort order)
             {
-                if (item.PlaylistOrder == order)
-                    return;
+                var item = orderedActiveItems[i];
 
-                item.PlaylistOrder = order;
+                if (item.PlaylistOrder == i)
+                    continue;
+
+                item.PlaylistOrder = (ushort)i;
 
                 // Items which have an ID of 0 are not in the database, so avoid propagating database/hub events for them.
                 if (item.ID <= 0)
-                    return;
+                    continue;
 
                 await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
             }
