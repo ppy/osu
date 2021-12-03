@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests;
@@ -32,9 +33,9 @@ namespace osu.Game.Tournament
         private DependencyContainer dependencies;
         private FileBasedIPC ipc;
 
-        protected Task BracketLoadTask => taskCompletionSource.Task;
+        protected Task BracketLoadTask => bracketLoadTaskCompletionSource.Task;
 
-        private readonly TaskCompletionSource<bool> taskCompletionSource = new TaskCompletionSource<bool>();
+        private readonly TaskCompletionSource<bool> bracketLoadTaskCompletionSource = new TaskCompletionSource<bool>();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -144,7 +145,7 @@ namespace osu.Game.Tournament
             }
             catch (Exception e)
             {
-                taskCompletionSource.SetException(e);
+                bracketLoadTaskCompletionSource.SetException(e);
                 return;
             }
 
@@ -156,7 +157,7 @@ namespace osu.Game.Tournament
                 dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
                 Add(ipc);
 
-                taskCompletionSource.SetResult(true);
+                bracketLoadTaskCompletionSource.SetResult(true);
 
                 initialisationText.Expire();
             });
@@ -292,6 +293,12 @@ namespace osu.Game.Tournament
 
         protected virtual void SaveChanges()
         {
+            if (!bracketLoadTaskCompletionSource.Task.IsCompletedSuccessfully)
+            {
+                Logger.Log("Inhibiting bracket save as bracket parsing failed");
+                return;
+            }
+
             foreach (var r in ladder.Rounds)
                 r.Matches = ladder.Matches.Where(p => p.Round.Value == r).Select(p => p.ID).ToList();
 
