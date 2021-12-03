@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Ranking
     public class TestSceneContractedPanelMiddleContent : OsuTestScene
     {
         [Resolved]
-        private RulesetStore rulesetStore { get; set; }
+        private IRulesetStore rulesetStore { get; set; }
 
         [Test]
         public void TestShowPanel()

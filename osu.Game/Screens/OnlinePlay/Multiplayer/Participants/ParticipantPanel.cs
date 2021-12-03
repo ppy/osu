@@ -35,7 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         private SpriteIcon crown;
 
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             const double fade_time = 50;
 
             // Todo: Should use the room's selected item to determine ruleset.
-            var ruleset = rulesets.GetRuleset(0).CreateInstance();
+            var ruleset = rulesets.GetRuleset(0)?.CreateInstance();
 
             int? currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank;
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
