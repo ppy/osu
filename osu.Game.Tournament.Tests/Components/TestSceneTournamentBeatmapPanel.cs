@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament.Tests.Components
@@ -15,9 +14,6 @@ namespace osu.Game.Tournament.Tests.Components
     {
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
