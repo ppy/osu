@@ -26,7 +26,7 @@ namespace osu.Game.Tournament
     [Cached(typeof(TournamentGameBase))]
     public class TournamentGameBase : OsuGameBase
     {
-        private const string bracket_filename = "bracket.json";
+        public const string BRACKET_FILENAME = @"bracket.json";
         private LadderInfo ladder;
         private TournamentStorage storage;
         private DependencyContainer dependencies;
@@ -71,9 +71,9 @@ namespace osu.Game.Tournament
         {
             try
             {
-                if (storage.Exists(bracket_filename))
+                if (storage.Exists(BRACKET_FILENAME))
                 {
-                    using (Stream stream = storage.GetStream(bracket_filename, FileAccess.Read, FileMode.Open))
+                    using (Stream stream = storage.GetStream(BRACKET_FILENAME, FileAccess.Read, FileMode.Open))
                     using (var sr = new StreamReader(stream))
                         ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd(), new JsonPointConverter());
                 }
@@ -309,7 +309,7 @@ namespace osu.Game.Tournament
                     Converters = new JsonConverter[] { new JsonPointConverter() }
                 });
 
-            using (var stream = storage.GetStream(bracket_filename, FileAccess.Write, FileMode.Create))
+            using (var stream = storage.GetStream(BRACKET_FILENAME, FileAccess.Write, FileMode.Create))
             using (var sw = new StreamWriter(stream))
                 sw.Write(serialisedLadder);
         }
