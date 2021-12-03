@@ -142,6 +142,7 @@ namespace osu.Game
         private BeatmapDifficultyCache difficultyCache;
 
         private UserLookupCache userCache;
+        private BeatmapLookupCache beatmapCache;
 
         private FileStore fileStore;
 
@@ -265,6 +266,9 @@ namespace osu.Game
             dependencies.Cache(userCache = new UserLookupCache());
             AddInternal(userCache);
 
+            dependencies.Cache(beatmapCache = new BeatmapLookupCache());
+            AddInternal(beatmapCache);
+
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
@@ -377,6 +381,13 @@ namespace osu.Game
             FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            realmFactory.Refresh();
+        }
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -441,10 +452,6 @@ namespace osu.Game
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
-
-        private void migrateDataToRealm()
-        {
-        }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
