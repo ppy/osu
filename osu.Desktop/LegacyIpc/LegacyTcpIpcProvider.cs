@@ -36,6 +36,7 @@ namespace osu.Desktop.LegacyIpc
                     logger.Add("Processing legacy IPC message...");
                     logger.Add($"    {msg.Value}", LogLevel.Debug);
 
+                    // See explanation in LegacyIpcMessage for why this is done this way.
                     var legacyData = ((JObject)msg.Value).ToObject<LegacyIpcMessage.Data>();
                     object value = parseObject((JObject)legacyData!.MessageData, legacyData.MessageType);
 
