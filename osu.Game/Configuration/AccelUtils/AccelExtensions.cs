@@ -68,6 +68,8 @@ namespace osu.Game.Configuration.AccelUtils
                 {
                     propertyDetectState = 0;
 
+                    //替换值的时候使用
+                    string propertyNameInput = propertyInfo.name;
                     propertyInfo.name = propertyInfo.name.ToUpper();
 
                     if (!vaild_properties.Contains(propertyInfo.name) && !noSuggestion)
@@ -139,7 +141,7 @@ namespace osu.Game.Configuration.AccelUtils
 
                     //如果value是null，则将其赋值为"null"
                     value ??= "null";
-                    result = result.Replace($"[{propertyInfo.name}{propertyInfo.extensionName}]", value.ToString());
+                    result = result.Replace($"[{propertyNameInput}{propertyInfo.extensionName}]", value.ToString());
 
                     //清空属性名称
                     propertyInfo.name = string.Empty;
