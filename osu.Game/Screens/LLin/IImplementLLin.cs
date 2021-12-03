@@ -1,7 +1,9 @@
 using System;
+using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.LLin.Misc;
@@ -206,6 +208,68 @@ namespace osu.Game.Screens.LLin
         /// <param name="sender">请求发起方</param>
         /// <returns>请求是否被接受</returns>
         public bool RequestNonCleanBackground(LLinPlugin sender);
+
+        #endregion
+
+        #region 对话框
+
+        /// <summary>
+        /// 向用户推送对话框
+        /// </summary>
+        /// <param name="sender">对话框发起方</param>
+        /// <param name="icon">对话框图标</param>
+        /// <param name="title">要显示的对话框标题</param>
+        /// <param name="text">要显示的对话框文本</param>
+        /// <param name="options">对话框的选项</param>
+        /// <remarks>实现时最好在title前加上"来自插件xxx"这类的字样</remarks>
+        /// <remarks>如果发起方不合法(如：不在MvisPluginmanager.GetAllPlugins(false)给出的列表中)，则抛出InvaildOperationException</remarks>
+        /// <exception cref="InvalidOperationException">插件不合法</exception>
+        public void PushDialog(LLinPlugin sender, IconUsage icon, LocalisableString title, LocalisableString text, DialogOption[] options);
+
+        #endregion
+
+        #region 通知
+
+        /// <summary>
+        /// 发送一条通知
+        /// </summary>
+        /// <param name="sender">通知发送方</param>
+        /// <param name="icon">通知图标</param>
+        /// <param name="message">要显示的消息内容</param>
+        /// <exception cref="InvalidOperationException">插件不合法</exception>
+        public void PostNotification(LLinPlugin sender, IconUsage icon, LocalisableString message);
+
+        /// <summary>
+        /// 发送一条进度通知
+        /// </summary>
+        /// <param name="sender">通知发送方</param>
+        /// <param name="icon">通知图标</param>
+        /// <param name="message">要显示的消息内容</param>
+        /// <param name="completionMessage">完成时显示的内容</param>
+        /// <returns>id: 通知Id, cancellationToken用于取消进度/任务的<see cref="CancellationToken"/>></returns>
+        /// <remarks>实现IImplementLLin的对象可以不具备设置通知图标的功能</remarks>
+        /// <exception cref="InvalidOperationException">插件不合法</exception>
+        public (uint id, CancellationToken cancellationToken) PostProgressNotification(LLinPlugin sender, IconUsage icon, LocalisableString message, LocalisableString completionMessage);
+
+        /// <summary>
+        /// 更新一条进度通知
+        /// </summary>
+        /// <param name="sender">更新请求发起方</param>
+        /// <param name="targetID">通知ID</param>
+        /// <param name="progress">新的进度，在0~1(0%~100%)之间</param>
+        /// <returns>更新是否成功</returns>
+        /// <exception cref="InvalidOperationException">插件不合法</exception>
+        public bool UpdateProgressNotification(LLinPlugin sender, uint targetID, float progress);
+
+        /// <summary>
+        /// 更新一条进度通知
+        /// </summary>
+        /// <param name="sender">更新请求发起方</param>
+        /// <param name="targetID">通知ID</param>
+        /// <param name="state">新的状态</param>
+        /// <returns>更新是否成功</returns>
+        /// <exception cref="InvalidOperationException">插件不合法</exception>
+        public bool UpdateProgressNotification(LLinPlugin sender, uint targetID, ProgressState state);
 
         #endregion
     }

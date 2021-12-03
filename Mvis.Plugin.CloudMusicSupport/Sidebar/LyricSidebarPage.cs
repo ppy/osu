@@ -6,11 +6,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 using osu.Game.Screens.LLin;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Types;
@@ -32,15 +30,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
         [Resolved]
         private IImplementLLin mvisScreen { get; set; }
-
-        [Resolved]
-        private Storage storage { get; set; }
-
-        [Resolved]
-        private DialogOverlay dialog { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private GameHost host { get; set; }
 
         private LyricPlugin plugin => (LyricPlugin)Plugin;
 

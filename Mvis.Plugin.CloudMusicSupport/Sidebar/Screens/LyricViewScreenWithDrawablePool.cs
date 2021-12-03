@@ -9,9 +9,8 @@ using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.LLin;
+using osu.Game.Screens.LLin.Plugins;
 using osuTK;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
@@ -19,13 +18,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
     public class LyricViewScreenWithDrawablePool : LyricScreenWithDrawablePool<LyricPiece>
     {
         [Resolved]
-        private IImplementLLin mvisScreen { get; set; }
+        private IImplementLLin llin { get; set; }
+
+        [Resolved]
+        private CustomColourProvider colourProvider { get; set; }
 
         [Resolved]
         private LyricPlugin plugin { get; set; }
-
-        [Resolved]
-        private DialogOverlay dialog { get; set; }
 
         [Resolved]
         private GameHost host { get; set; }
@@ -54,11 +53,23 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                 Icon = FontAwesome.Solid.CloudDownloadAlt,
                 Size = new Vector2(45),
                 TooltipText = CloudMusicStrings.RefetchLyric,
-                Action = () => dialog.Push
-                (
-                    new ConfirmDialog(CloudMusicStrings.RefetchLyric.ToString(),
-                        () => plugin.RefreshLyric(true))
-                )
+                Action = () => llin.PushDialog(plugin,
+                    FontAwesome.Solid.ExclamationTriangle,
+                    CloudMusicStrings.RefetchLyric,
+                    "要继续吗?", new[]
+                    {
+                        new DialogOption
+                        {
+                            Text = "是的，我确定",
+                            Action = () => plugin.RefreshLyric(true),
+                            Type = OptionType.Confirm
+                        },
+                        new DialogOption
+                        {
+                            Text = osu.Game.Localisation.CommonStrings.Cancel,
+                            Type = OptionType.Cancel
+                        }
+                    })
             },
             new IconButton
             {

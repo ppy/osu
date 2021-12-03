@@ -40,7 +40,7 @@ namespace Mvis.Plugin.StoryboardSupport
         [Resolved]
         private MusicController music { get; set; }
 
-        public override int Version => 8;
+        public override int Version => 9;
 
         public BackgroundStoryBoardLoader()
         {
