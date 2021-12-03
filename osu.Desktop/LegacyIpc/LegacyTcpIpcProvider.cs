@@ -26,15 +26,10 @@ namespace osu.Desktop.LegacyIpc
     {
         private static readonly Logger logger = Logger.GetLogger("legacy-ipc");
 
-        /// <summary>
-        /// Invoked when a message is received from a legacy client.
-        /// </summary>
-        public new Func<object, object>? MessageReceived;
-
         public LegacyTcpIpcProvider()
             : base(45357)
         {
-            base.MessageReceived += msg =>
+            MessageReceived += msg =>
             {
                 try
                 {
