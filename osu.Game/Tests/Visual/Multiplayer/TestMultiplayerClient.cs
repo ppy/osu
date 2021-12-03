@@ -316,7 +316,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 case QueueMode.HostOnly:
                     // In host-only mode, the current item is re-used.
                     item.ID = currentItem.ID;
-                    item.GameplayOrder = currentItem.GameplayOrder;
+                    item.PlaylistOrder = currentItem.PlaylistOrder;
 
                     serverSidePlaylist[currentIndex] = item;
                     await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
@@ -488,10 +488,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             for (int i = 0; i < orderedItems.Count; i++)
             {
                 // Items which are already ordered correct don't need to be updated.
-                if (orderedItems[i].GameplayOrder == i)
+                if (orderedItems[i].PlaylistOrder == i)
                     continue;
 
-                orderedItems[i].GameplayOrder = i;
+                orderedItems[i].PlaylistOrder = (ushort)i;
 
                 // Items which have an ID of 0 are not in the database, so avoid propagating database/hub events for them.
                 if (orderedItems[i].ID <= 0)

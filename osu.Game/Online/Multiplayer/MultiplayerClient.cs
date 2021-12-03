@@ -742,7 +742,7 @@ namespace osu.Game.Online.Multiplayer
                 Beatmap = { Value = apiBeatmap },
                 Ruleset = { Value = ruleset },
                 Expired = item.Expired,
-                GameplayOrder = item.GameplayOrder
+                PlaylistOrder = item.PlaylistOrder
             };
 
             playlistItem.RequiredMods.AddRange(item.RequiredMods.Select(m => m.ToMod(rulesetInstance)));

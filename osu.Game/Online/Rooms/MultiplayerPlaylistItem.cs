@@ -43,7 +43,7 @@ namespace osu.Game.Online.Rooms
         /// The order in which this <see cref="MultiplayerPlaylistItem"/> will be played, starting from 0 and increasing for items which will be played later.
         /// </summary>
         [Key(8)]
-        public int GameplayOrder { get; set; }
+        public ushort PlaylistOrder { get; set; }
 
         /// <summary>
         /// The date when this <see cref="MultiplayerPlaylistItem"/> was last updated.
@@ -65,7 +65,7 @@ namespace osu.Game.Online.Rooms
             RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray();
             AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray();
             Expired = item.Expired;
-            GameplayOrder = item.GameplayOrder;
+            PlaylistOrder = item.PlaylistOrder ?? 0;
         }
     }
 }

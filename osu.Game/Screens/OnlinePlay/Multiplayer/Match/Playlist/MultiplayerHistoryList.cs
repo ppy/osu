@@ -27,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         private class HistoryFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
-            public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.OfType<RearrangeableListItem<PlaylistItem>>().OrderByDescending(item => item.Model.GameplayOrder);
+            public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.OfType<RearrangeableListItem<PlaylistItem>>().OrderByDescending(item => item.Model.PlaylistOrder);
         }
     }
 }
