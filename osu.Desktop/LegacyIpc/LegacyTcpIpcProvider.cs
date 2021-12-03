@@ -89,10 +89,10 @@ namespace osu.Desktop.LegacyIpc
                     {
                         return new LegacyIpcDifficultyCalculationResponse();
                     }
-            }
 
-            Console.WriteLine("Type not matched.");
-            return null;
+                default:
+                    throw new ArgumentException($"Unsupported message type {message}");
+            }
         }
 
         private static Ruleset getLegacyRulesetFromID(int rulesetId)
