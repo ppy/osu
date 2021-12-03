@@ -75,14 +75,7 @@ namespace osu.Desktop.LegacyIpc
                 case LegacyIpcDifficultyCalculationRequest req:
                     try
                     {
-                        Ruleset ruleset = req.RulesetId switch
-                        {
-                            0 => new OsuRuleset(),
-                            1 => new TaikoRuleset(),
-                            2 => new CatchRuleset(),
-                            3 => new ManiaRuleset(),
-                            _ => throw new ArgumentException("Invalid ruleset id")
-                        };
+                        var ruleset = getLegacyRulesetFromID(req.RulesetId);
 
                         Mod[] mods = ruleset.ConvertFromLegacyMods((LegacyMods)req.Mods).ToArray();
                         WorkingBeatmap beatmap = new FlatFileWorkingBeatmap(req.BeatmapFile, _ => ruleset);
@@ -100,6 +93,27 @@ namespace osu.Desktop.LegacyIpc
 
             Console.WriteLine("Type not matched.");
             return null;
+        }
+
+        private static Ruleset getLegacyRulesetFromID(int rulesetId)
+        {
+            switch (rulesetId)
+            {
+                case 0:
+                    return new OsuRuleset();
+
+                case 1:
+                    return new TaikoRuleset();
+
+                case 2:
+                    return new CatchRuleset();
+
+                case 3:
+                    return new ManiaRuleset();
+
+                default:
+                    throw new ArgumentException("Invalid ruleset id");
+            }
         }
     }
 }
