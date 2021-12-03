@@ -15,6 +15,8 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
 
+#nullable enable
+
 namespace osu.Desktop.LegacyIpc
 {
     /// <summary>
@@ -27,7 +29,7 @@ namespace osu.Desktop.LegacyIpc
         /// <summary>
         /// Invoked when a message is received from a legacy client.
         /// </summary>
-        public new Func<object, object> MessageReceived;
+        public new Func<object, object>? MessageReceived;
 
         public LegacyTcpIpcProvider()
             : base(45357)
@@ -42,8 +44,10 @@ namespace osu.Desktop.LegacyIpc
                     var legacyData = ((JObject)msg.Value).ToObject<LegacyIpcMessage.Data>();
                     object value = parseObject((JObject)legacyData!.MessageData, legacyData.MessageType);
 
-                    object result = onLegacyIpcMessageReceived(value);
-                    return result != null ? new LegacyIpcMessage { Value = result } : null;
+                    return new LegacyIpcMessage
+                    {
+                        Value = onLegacyIpcMessageReceived(value)
+                    };
                 }
                 catch (Exception ex)
                 {
@@ -58,10 +62,12 @@ namespace osu.Desktop.LegacyIpc
             switch (type)
             {
                 case nameof(LegacyIpcDifficultyCalculationRequest):
-                    return value.ToObject<LegacyIpcDifficultyCalculationRequest>();
+                    return value.ToObject<LegacyIpcDifficultyCalculationRequest>()
+                           ?? throw new InvalidOperationException($"Failed to parse request {value}");
 
                 case nameof(LegacyIpcDifficultyCalculationResponse):
-                    return value.ToObject<LegacyIpcDifficultyCalculationResponse>();
+                    return value.ToObject<LegacyIpcDifficultyCalculationResponse>()
+                           ?? throw new InvalidOperationException($"Failed to parse request {value}");
 
                 default:
                     throw new ArgumentException($"Unsupported object type {type}");
