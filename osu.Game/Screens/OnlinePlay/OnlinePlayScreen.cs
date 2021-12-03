@@ -40,17 +40,8 @@ namespace osu.Game.Screens.OnlinePlay
         [Cached]
         private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
-        [Resolved(CanBeNull = true)]
-        private MusicController music { get; set; }
-
-        [Resolved]
-        private OsuGameBase game { get; set; }
-
         [Resolved]
         protected IAPIProvider API { get; private set; }
-
-        [Resolved(CanBeNull = true)]
-        private OsuLogo logo { get; set; }
 
         protected OnlinePlayScreen()
         {
