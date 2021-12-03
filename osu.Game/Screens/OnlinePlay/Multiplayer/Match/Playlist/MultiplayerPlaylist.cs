@@ -86,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             if (firstPopulation)
             {
                 foreach (var item in Room.Playlist)
-                    PlaylistItemAdded(item);
+                    addItemToLists(item);
 
                 firstPopulation = false;
             }
@@ -95,7 +95,25 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         protected override void PlaylistItemAdded(MultiplayerPlaylistItem item)
         {
             base.PlaylistItemAdded(item);
+            addItemToLists(item);
+        }
 
+        protected override void PlaylistItemRemoved(long item)
+        {
+            base.PlaylistItemRemoved(item);
+            removeItemFromLists(item);
+        }
+
+        protected override void PlaylistItemChanged(MultiplayerPlaylistItem item)
+        {
+            base.PlaylistItemChanged(item);
+
+            removeItemFromLists(item.ID);
+            addItemToLists(item);
+        }
+
+        private void addItemToLists(MultiplayerPlaylistItem item)
+        {
             var apiItem = Playlist.Single(i => i.ID == item.ID);
 
             if (item.Expired)
@@ -104,20 +122,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                 queueList.Items.Add(apiItem);
         }
 
-        protected override void PlaylistItemRemoved(long item)
+        private void removeItemFromLists(long item)
         {
-            base.PlaylistItemRemoved(item);
-
             queueList.Items.RemoveAll(i => i.ID == item);
             historyList.Items.RemoveAll(i => i.ID == item);
-        }
-
-        protected override void PlaylistItemChanged(MultiplayerPlaylistItem item)
-        {
-            base.PlaylistItemChanged(item);
-
-            PlaylistItemRemoved(item.ID);
-            PlaylistItemAdded(item);
         }
     }
 }
