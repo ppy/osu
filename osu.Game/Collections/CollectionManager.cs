@@ -41,9 +41,6 @@ namespace osu.Game.Collections
         public readonly BindableList<BeatmapCollection> Collections = new BindableList<BeatmapCollection>();
 
         [Resolved]
-        private GameHost host { get; set; }
-
-        [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
         private readonly Storage storage;
