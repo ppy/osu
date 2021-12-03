@@ -24,9 +24,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestScenePlaylistsSongSelect : OnlinePlayTestScene
     {
-        [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
-
         private BeatmapManager manager;
 
         private RulesetStore rulesets;
