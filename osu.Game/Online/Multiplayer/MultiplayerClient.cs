@@ -94,7 +94,7 @@ namespace osu.Game.Online.Multiplayer
         protected IAPIProvider API { get; private set; } = null!;
 
         [Resolved]
-        protected RulesetStore Rulesets { get; private set; } = null!;
+        protected IRulesetStore Rulesets { get; private set; } = null!;
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
@@ -706,6 +706,9 @@ namespace osu.Game.Online.Multiplayer
             var apiBeatmap = await GetAPIBeatmap(item.BeatmapID).ConfigureAwait(false);
 
             var ruleset = Rulesets.GetRuleset(item.RulesetID);
+
+            Debug.Assert(ruleset != null);
+
             var rulesetInstance = ruleset.CreateInstance();
 
             var playlistItem = new PlaylistItem

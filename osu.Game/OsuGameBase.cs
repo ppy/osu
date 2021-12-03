@@ -196,6 +196,7 @@ namespace osu.Game
             runMigrations();
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
+            dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", contextFactory));
 

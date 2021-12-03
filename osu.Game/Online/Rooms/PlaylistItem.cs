@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -79,10 +80,12 @@ namespace osu.Game.Online.Rooms
 
         public void MarkInvalid() => valid.Value = false;
 
-        public void MapObjects(RulesetStore rulesets)
+        public void MapObjects(IRulesetStore rulesets)
         {
             Beatmap.Value ??= apiBeatmap;
             Ruleset.Value ??= rulesets.GetRuleset(RulesetID);
+
+            Debug.Assert(Ruleset.Value != null);
 
             Ruleset rulesetInstance = Ruleset.Value.CreateInstance();
 
