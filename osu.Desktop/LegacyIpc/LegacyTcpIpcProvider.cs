@@ -36,8 +36,8 @@ namespace osu.Desktop.LegacyIpc
             {
                 try
                 {
-                    logger.Add($"Processing legacy IPC message...");
-                    logger.Add($"\t{msg.Value}", LogLevel.Debug);
+                    logger.Add("Processing legacy IPC message...");
+                    logger.Add($"    {msg.Value}", LogLevel.Debug);
 
                     var legacyData = ((JObject)msg.Value).ToObject<LegacyIpcMessage.Data>();
                     object value = parseObject((JObject)legacyData!.MessageData, legacyData.MessageType);
@@ -64,7 +64,7 @@ namespace osu.Desktop.LegacyIpc
                     return value.ToObject<LegacyIpcDifficultyCalculationResponse>();
 
                 default:
-                    throw new ArgumentException($"Unknown type: {type}");
+                    throw new ArgumentException($"Unsupported object type {type}");
             }
         }
 
