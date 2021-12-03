@@ -23,7 +23,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Spectate;
 using osu.Game.Users;
@@ -43,9 +42,6 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
