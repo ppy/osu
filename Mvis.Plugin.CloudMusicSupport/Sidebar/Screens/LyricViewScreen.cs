@@ -1,3 +1,4 @@
+using System.Linq;
 using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Misc;
@@ -36,7 +37,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         [Resolved]
         private LyricSidebarSectionContainer sectionContainer { get; set; }
 
-        protected override LyricPiece CreateDrawableLyric(Lyric lyric)
+        protected override LyricPiece CreatePiece(Lyric lyric)
             => new LyricPiece(lyric);
 
         public override IconButton[] Entries => new[]
@@ -123,6 +124,17 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                 ScrollToCurrent();
 
             base.Update();
+        }
+
+        protected override void ScrollToCurrent()
+        {
+            float pos = AvaliablePieces.FirstOrDefault(p =>
+                p.Value.Equals(plugin.CurrentLine))?.CurrentY ?? 0;
+
+            if (pos + DrawHeight > LyricScroll.ScrollContent.Height)
+                LyricScroll.ScrollToEnd();
+            else
+                LyricScroll.ScrollTo(pos);
         }
 
         private readonly BindableFloat followCooldown = new BindableFloat();
