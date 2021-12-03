@@ -16,16 +16,16 @@ using osuTK;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
-    public class LyricViewScreen : LyricScreen
+    public class LyricViewScreen : LyricScreen<LyricPiece>
     {
         [Resolved]
         private IImplementLLin llin { get; set; }
 
         [Resolved]
-        private LyricPlugin plugin { get; set; }
+        private CustomColourProvider colourProvider { get; set; }
 
         [Resolved]
-        private CustomColourProvider colourProvider { get; set; }
+        private LyricPlugin plugin { get; set; }
 
         [Resolved]
         private GameHost host { get; set; }
@@ -36,7 +36,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         [Resolved]
         private LyricSidebarSectionContainer sectionContainer { get; set; }
 
-        protected override DrawableLyric CreateDrawableLyric(Lyric lyric)
+        protected override LyricPiece CreateDrawableLyric(Lyric lyric)
             => new LyricPiece(lyric);
 
         public override IconButton[] Entries => new[]
@@ -74,24 +74,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             },
             new IconButton
             {
-                Icon = FontAwesome.Solid.Edit,
-                Size = new Vector2(45),
-                TooltipText = CloudMusicStrings.Edit,
-                Action = pushEditScreen
-            },
-            new IconButton
-            {
                 Icon = FontAwesome.Solid.AngleDown,
                 Size = new Vector2(45),
                 TooltipText = CloudMusicStrings.ScrollToCurrent,
                 Action = ScrollToCurrent
             }
         };
-
-        private void pushEditScreen()
-        {
-            plugin.RequestControl(() => this.Push(new LyricEditScreen()));
-        }
 
         private readonly IconButton saveButton = new IconButton
         {
@@ -100,16 +88,17 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             TooltipText = CloudMusicStrings.Save
         };
 
-        [Resolved]
-        private LyricConfigManager configManager { get; set; }
+        private Bindable<bool> allowAutoScroll;
 
-        private readonly BindableBool autoScroll = new BindableBool();
+        [BackgroundDependencyLoader]
+        private void load(LyricConfigManager config)
+        {
+            allowAutoScroll = config.GetBindable<bool>(LyricSettings.AutoScrollToCurrent);
+        }
 
         protected override void LoadComplete()
         {
             saveButton.Action = plugin.WriteLyricToDisk;
-
-            configManager.BindWith(LyricSettings.AutoScrollToCurrent, autoScroll);
 
             plugin.CurrentStatus.BindValueChanged(v =>
             {
@@ -128,17 +117,19 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             base.LoadComplete();
         }
 
-        private readonly BindableFloat followCooldown = new BindableFloat();
-
         protected override void Update()
         {
-            if (followCooldown.Value == 0 && autoScroll.Value) ScrollToCurrent();
+            if (followCooldown.Value == 0 && allowAutoScroll.Value)
+                ScrollToCurrent();
+
             base.Update();
         }
 
+        private readonly BindableFloat followCooldown = new BindableFloat();
+
         protected override bool OnHover(HoverEvent e)
         {
-            followCooldown.Value = 1;
+            this.TransformBindableTo(followCooldown, 1);
             return base.OnHover(e);
         }
 
