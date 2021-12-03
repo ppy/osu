@@ -42,11 +42,15 @@ namespace osu.Game.Online.Rooms
         /// <summary>
         /// The order in which this <see cref="MultiplayerPlaylistItem"/> will be played, starting from 0 and increasing for items which will be played later.
         /// </summary>
-        /// <remarks>
-        /// Undefined value for items which are expired.
-        /// </remarks>
         [Key(8)]
         public int GameplayOrder { get; set; }
+
+        /// <summary>
+        /// The date when this <see cref="MultiplayerPlaylistItem"/> was last updated.
+        /// Not serialised to/from the client.
+        /// </summary>
+        [IgnoreMember]
+        public DateTimeOffset UpdatedAt { get; set; }
 
         public MultiplayerPlaylistItem()
         {
