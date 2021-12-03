@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -168,7 +169,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Beatmap = { Value = importedBeatmap },
             BeatmapID = importedBeatmap.OnlineID ?? -1,
-            Expired = expired
+            Expired = expired,
+            PlayedAt = DateTimeOffset.Now
         })));
 
         /// <summary>

@@ -36,6 +36,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("playlist_order")]
         public ushort? PlaylistOrder { get; set; }
 
+        [JsonProperty("played_at")]
+        public DateTimeOffset? PlayedAt { get; set; }
+
         [JsonIgnore]
         public IBindable<bool> Valid => valid;
 

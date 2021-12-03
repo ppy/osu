@@ -46,11 +46,10 @@ namespace osu.Game.Online.Rooms
         public ushort PlaylistOrder { get; set; }
 
         /// <summary>
-        /// The date when this <see cref="MultiplayerPlaylistItem"/> was last updated.
-        /// Not serialised to/from the client.
+        /// The date when this <see cref="MultiplayerPlaylistItem"/> was played.
         /// </summary>
-        [IgnoreMember]
-        public DateTimeOffset UpdatedAt { get; set; }
+        [Key(9)]
+        public DateTimeOffset? PlayedAt { get; set; }
 
         public MultiplayerPlaylistItem()
         {
@@ -66,6 +65,7 @@ namespace osu.Game.Online.Rooms
             AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray();
             Expired = item.Expired;
             PlaylistOrder = item.PlaylistOrder ?? 0;
+            PlayedAt = item.PlayedAt;
         }
     }
 }
