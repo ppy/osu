@@ -12,10 +12,10 @@ namespace osu.Game.Scoring.Legacy
     /// </summary>
     public class DatabasedLegacyScoreDecoder : LegacyScoreDecoder
     {
-        private readonly RulesetStore rulesets;
+        private readonly IRulesetStore rulesets;
         private readonly BeatmapManager beatmaps;
 
-        public DatabasedLegacyScoreDecoder(RulesetStore rulesets, BeatmapManager beatmaps)
+        public DatabasedLegacyScoreDecoder(IRulesetStore rulesets, BeatmapManager beatmaps)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
