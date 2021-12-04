@@ -187,7 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             // Todo: Should use the room's selected item to determine ruleset.
             var ruleset = rulesets.GetRuleset(0)?.CreateInstance();
 
-            int? currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank;
+            int? currentModeRank = ruleset != null ? User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank : null;
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
