@@ -26,9 +26,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         private BeatmapSetInfo testBeatmap;
         private IAPIProvider api;
 
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osu, IAPIProvider api, RulesetStore rulesets)
         {
