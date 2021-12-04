@@ -13,7 +13,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Rulesets
 {
-    public class RulesetStore : DatabaseBackedStore, IDisposable
+    public class RulesetStore : DatabaseBackedStore, IRulesetStore, IDisposable
     {
         private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
@@ -236,5 +236,13 @@ namespace osu.Game.Rulesets
         {
             AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetDependencyAssembly;
         }
+
+        #region Implementation of IRulesetStore
+
+        IRulesetInfo IRulesetStore.GetRuleset(int id) => GetRuleset(id);
+        IRulesetInfo IRulesetStore.GetRuleset(string shortName) => GetRuleset(shortName);
+        IEnumerable<IRulesetInfo> IRulesetStore.AvailableRulesets => AvailableRulesets;
+
+        #endregion
     }
 }
