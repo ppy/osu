@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -29,9 +28,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
-
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
