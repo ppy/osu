@@ -157,8 +157,11 @@ namespace osu.Game.Screens.OnlinePlay
                             Schedule(() => ownerAvatar.User = foundUser);
                         }
 
-                        var foundBeatmap = await beatmapLookupCache.GetBeatmapAsync(Item.BeatmapID).ConfigureAwait(false);
-                        Schedule(() => Item.Beatmap.Value = foundBeatmap);
+                        if (Item.Beatmap.Value == null)
+                        {
+                            var foundBeatmap = await beatmapLookupCache.GetBeatmapAsync(Item.BeatmapID).ConfigureAwait(false);
+                            Schedule(() => Item.Beatmap.Value = foundBeatmap);
+                        }
                     }
                     catch (Exception e)
                     {
