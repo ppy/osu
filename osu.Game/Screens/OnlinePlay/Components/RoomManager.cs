@@ -27,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private readonly Bindable<Room> joinedRoom = new Bindable<Room>();
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
