@@ -431,6 +431,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(Room != null);
 
             // Add the item to the list first in order to compute gameplay order.
+            item.ID = long.MaxValue;
             serverSidePlaylist.Add(item);
             await updatePlaylistOrder(Room).ConfigureAwait(false);
 
@@ -440,11 +441,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private async Task updateCurrentItem(MultiplayerRoom room, bool notify = true)
         {
-            MultiplayerPlaylistItem nextItem = serverSidePlaylist
-                                               .Where(i => !i.Expired)
-                                               .OrderBy(i => i.PlaylistOrder)
-                                               .FirstOrDefault()
-                                               ?? room.Playlist.Last();
+            // Pick the next non-expired playlist item by playlist order, or default to the most-recently-expired item.
+            MultiplayerPlaylistItem nextItem = serverSidePlaylist.Where(i => !i.Expired).OrderBy(i => i.PlaylistOrder).FirstOrDefault()
+                                               ?? serverSidePlaylist.OrderByDescending(i => i.PlayedAt).First();
 
             currentIndex = serverSidePlaylist.IndexOf(nextItem);
 
@@ -462,7 +461,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             switch (room.Settings.QueueMode)
             {
                 default:
-                    orderedActiveItems = serverSidePlaylist.Where(item => !item.Expired).OrderBy(item => item.ID == 0 ? int.MaxValue : item.ID).ToList();
+                    orderedActiveItems = serverSidePlaylist.Where(item => !item.Expired).OrderBy(item => item.ID).ToList();
                     break;
 
                 case QueueMode.AllPlayersRoundRobin:
@@ -483,7 +482,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         MultiplayerPlaylistItem candidateItem = unprocessedItems
                                                                 .OrderBy(item => perUserCounts[item.OwnerID])
-                                                                .ThenBy(item => item.ID == 0 ? int.MaxValue : item.ID)
+                                                                .ThenBy(item => item.ID)
                                                                 .First();
 
                         unprocessedItems.Remove(candidateItem);
@@ -504,8 +503,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 item.PlaylistOrder = (ushort)i;
 
-                // Items which have an ID of 0 are not in the database, so avoid propagating database/hub events for them.
-                if (item.ID <= 0)
+                // Items which have an "infinite" ID are not yet in the database, so avoid propagating database/hub events for them.
+                // See addItem() for when this occurs.
+                if (item.ID == long.MaxValue)
                     continue;
 
                 await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
