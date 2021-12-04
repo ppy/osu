@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
@@ -20,9 +19,6 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneContractedPanelMiddleContent : OsuTestScene
     {
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; }
-
         [Test]
         public void TestShowPanel()
         {

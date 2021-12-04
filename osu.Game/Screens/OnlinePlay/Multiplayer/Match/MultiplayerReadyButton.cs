@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
@@ -24,9 +23,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             set => button.Action = value;
         }
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
