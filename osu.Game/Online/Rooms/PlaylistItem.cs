@@ -34,6 +34,12 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("expired")]
         public bool Expired { get; set; }
 
+        [JsonProperty("playlist_order")]
+        public ushort? PlaylistOrder { get; set; }
+
+        [JsonProperty("played_at")]
+        public DateTimeOffset? PlayedAt { get; set; }
+
         [JsonIgnore]
         public IBindable<bool> Valid => valid;
 

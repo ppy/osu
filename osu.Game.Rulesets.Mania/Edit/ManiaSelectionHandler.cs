@@ -7,16 +7,12 @@ using osu.Framework.Allocation;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaSelectionHandler : EditorSelectionHandler
     {
-        [Resolved]
-        private IScrollingInfo scrollingInfo { get; set; }
-
         [Resolved]
         private HitObjectComposer composer { get; set; }
 

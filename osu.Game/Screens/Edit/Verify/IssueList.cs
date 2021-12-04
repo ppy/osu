@@ -24,9 +24,6 @@ namespace osu.Game.Screens.Edit.Verify
         private IssueTable table;
 
         [Resolved]
-        private EditorClock clock { get; set; }
-
-        [Resolved]
         private IBindable<WorkingBeatmap> workingBeatmap { get; set; }
 
         [Resolved]

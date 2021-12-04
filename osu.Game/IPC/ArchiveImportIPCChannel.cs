@@ -18,6 +18,7 @@ namespace osu.Game.IPC
             : base(host)
         {
             this.importer = importer;
+
             MessageReceived += msg =>
             {
                 Debug.Assert(importer != null);

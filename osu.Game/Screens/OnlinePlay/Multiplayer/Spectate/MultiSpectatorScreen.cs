@@ -37,9 +37,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private OsuColour colours { get; set; }
 
         [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
-
-        [Resolved]
         private MultiplayerClient multiplayerClient { get; set; }
 
         private readonly PlayerArea[] instances;
