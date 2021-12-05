@@ -3,13 +3,17 @@
 
 #nullable enable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -24,7 +28,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         public Drawable Dropdown
         {
-            set => dropdownContent.Child = value;
+            set => dropdownScroll.Child = value;
         }
 
         public Bindable<bool> Expanded { get; } = new BindableBool();
@@ -33,6 +37,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private readonly Container content;
         private readonly Container bodyContent;
         private readonly Container dropdownContent;
+        private readonly OsuScrollContainer dropdownScroll;
         private readonly Container borderContainer;
 
         public BeatmapCardDropdown(float height)
@@ -71,7 +76,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             keep();
                             return true;
                         },
-                        Unhovered = _ => checkForHide()
+                        Unhovered = _ => checkForHide(),
+                        Child = dropdownScroll = new DropdownScrollContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            ScrollbarVisible = false
+                        }
                     },
                     borderContainer = new Container
                     {
@@ -167,6 +177,55 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 Colour = Colour4.Black.Opacity(Expanded.Value ? 0.3f : 0f),
                 Hollow = true,
             }, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+        }
+
+        private class DropdownScrollContainer : OsuScrollContainer
+        {
+            public DropdownScrollContainer()
+            {
+                ScrollbarVisible = false;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                Height = Math.Min(Content.DrawHeight, 400);
+            }
+
+            private bool allowScroll => !Precision.AlmostEquals(DrawSize, Content.DrawSize);
+
+            protected override bool OnDragStart(DragStartEvent e)
+            {
+                if (!allowScroll)
+                    return false;
+
+                return base.OnDragStart(e);
+            }
+
+            protected override void OnDrag(DragEvent e)
+            {
+                if (!allowScroll)
+                    return;
+
+                base.OnDrag(e);
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                if (!allowScroll)
+                    return;
+
+                base.OnDragEnd(e);
+            }
+
+            protected override bool OnScroll(ScrollEvent e)
+            {
+                if (!allowScroll)
+                    return false;
+
+                return base.OnScroll(e);
+            }
         }
     }
 }
