@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -253,7 +254,13 @@ namespace osu.Game.Tests.Visual.Beatmaps
         {
             createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
 
-            AddToggleStep("toggle expanded state", expanded => this.ChildrenOfType<BeatmapCard>().Last().Expanded.Value = expanded);
+            AddToggleStep("toggle expanded state", expanded =>
+            {
+                var card = this.ChildrenOfType<BeatmapCard>().Last();
+                if (!card.Expanded.Disabled)
+                    card.Expanded.Value = expanded;
+            });
+            AddToggleStep("disable/enable expansion", disabled => this.ChildrenOfType<BeatmapCard>().ForEach(card => card.Expanded.Disabled = disabled));
         }
     }
 }

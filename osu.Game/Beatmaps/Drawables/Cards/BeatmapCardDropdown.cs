@@ -109,23 +109,34 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public void ScheduleShow()
         {
             scheduledExpandedChange?.Cancel();
-            if (Expanded.Value)
+            if (Expanded.Disabled || Expanded.Value)
                 return;
 
-            scheduledExpandedChange = Scheduler.AddDelayed(() => Expanded.Value = true, 100);
+            scheduledExpandedChange = Scheduler.AddDelayed(() =>
+            {
+                if (!Expanded.Disabled)
+                    Expanded.Value = true;
+            }, 100);
         }
 
         public void ScheduleHide()
         {
             scheduledExpandedChange?.Cancel();
-            if (!Expanded.Value)
+            if (Expanded.Disabled || !Expanded.Value)
                 return;
 
-            scheduledExpandedChange = Scheduler.AddDelayed(() => Expanded.Value = false, 500);
+            scheduledExpandedChange = Scheduler.AddDelayed(() =>
+            {
+                if (!Expanded.Disabled)
+                    Expanded.Value = false;
+            }, 500);
         }
 
         private void checkForHide()
         {
+            if (Expanded.Disabled)
+                return;
+
             if (content.IsHovered || dropdownContent.IsHovered)
                 return;
 
@@ -135,6 +146,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void keep()
         {
+            if (Expanded.Disabled)
+                return;
+
             scheduledExpandedChange?.Cancel();
             Expanded.Value = true;
         }
