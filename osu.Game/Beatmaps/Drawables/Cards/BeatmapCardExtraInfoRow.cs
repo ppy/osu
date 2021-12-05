@@ -8,14 +8,14 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardExtraInfoRow : CompositeDrawable
+    public class BeatmapCardExtraInfoRow : HoverHandlingContainer
     {
         public BeatmapCardExtraInfoRow(APIBeatmapSet beatmapSet)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = new FillFlowContainer
+            Child = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,

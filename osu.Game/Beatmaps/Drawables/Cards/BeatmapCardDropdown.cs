@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -37,13 +40,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             RelativeSizeAxes = Axes.X;
             Height = height;
 
-            InternalChild = content = new Container
+            InternalChild = content = new HoverHandlingContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 CornerRadius = BeatmapCard.CORNER_RADIUS,
                 Masking = true,
-
+                Unhovered = _ => checkForHide(),
                 Children = new Drawable[]
                 {
                     background = new Box
@@ -57,12 +60,18 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         CornerRadius = BeatmapCard.CORNER_RADIUS,
                         Masking = true,
                     },
-                    dropdownContent = new Container
+                    dropdownContent = new HoverHandlingContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Margin = new MarginPadding { Top = height },
-                        Alpha = 0
+                        Alpha = 0,
+                        Hovered = _ =>
+                        {
+                            keep();
+                            return true;
+                        },
+                        Unhovered = _ => checkForHide()
                     },
                     borderContainer = new Container
                     {
@@ -93,6 +102,41 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             base.LoadComplete();
             Expanded.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
+        }
+
+        private ScheduledDelegate? scheduledExpandedChange;
+
+        public void ScheduleShow()
+        {
+            scheduledExpandedChange?.Cancel();
+            if (Expanded.Value)
+                return;
+
+            scheduledExpandedChange = Scheduler.AddDelayed(() => Expanded.Value = true, 100);
+        }
+
+        public void ScheduleHide()
+        {
+            scheduledExpandedChange?.Cancel();
+            if (!Expanded.Value)
+                return;
+
+            scheduledExpandedChange = Scheduler.AddDelayed(() => Expanded.Value = false, 500);
+        }
+
+        private void checkForHide()
+        {
+            if (content.IsHovered || dropdownContent.IsHovered)
+                return;
+
+            scheduledExpandedChange?.Cancel();
+            Expanded.Value = false;
+        }
+
+        private void keep()
+        {
+            scheduledExpandedChange?.Cancel();
+            Expanded.Value = true;
         }
 
         private void updateState()
