@@ -31,10 +31,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards
     public class BeatmapCard : OsuClickableContainer
     {
         public const float TRANSITION_DURATION = 400;
+        public const float CORNER_RADIUS = 10;
+
+        public Bindable<bool> Expanded { get; } = new BindableBool();
 
         private const float width = 408;
         private const float height = 100;
-        private const float corner_radius = 10;
         private const float icon_area_width = 30;
 
         private readonly APIBeatmapSet beatmapSet;
@@ -73,242 +75,255 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             Width = width;
             Height = height;
-            CornerRadius = corner_radius;
-            Masking = true;
 
             FillFlowContainer leftIconArea;
             GridContainer titleContainer;
             GridContainer artistContainer;
 
-            InternalChildren = new Drawable[]
+            InternalChild = new BeatmapCardDropdown(height)
             {
-                downloadTracker,
-                rightAreaBackground = new Container
+                Body = new Container
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = icon_area_width + 2 * corner_radius,
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    // workaround for masking artifacts at the top & bottom of card,
-                    // which become especially visible on downloaded beatmaps (when the icon area has a lime background).
-                    Padding = new MarginPadding { Vertical = 1 },
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Colour4.White
-                    },
-                },
-                thumbnail = new BeatmapCardThumbnail(beatmapSet)
-                {
-                    Name = @"Left (icon) area",
-                    Size = new Vector2(height),
-                    Padding = new MarginPadding { Right = corner_radius },
-                    Child = leftIconArea = new FillFlowContainer
-                    {
-                        Margin = new MarginPadding(5),
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(1)
-                    }
-                },
-                new Container
-                {
-                    Name = @"Right (button) area",
-                    Width = 30,
-                    RelativeSizeAxes = Axes.Y,
-                    Origin = Anchor.TopRight,
-                    Anchor = Anchor.TopRight,
-                    Padding = new MarginPadding { Vertical = 17.5f },
-                    Child = rightAreaButtons = new Container<BeatmapCardIconButton>
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new BeatmapCardIconButton[]
-                        {
-                            new FavouriteButton(beatmapSet)
-                            {
-                                Current = favouriteState,
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre
-                            },
-                            new DownloadButton(beatmapSet)
-                            {
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State }
-                            },
-                            new GoToBeatmapButton(beatmapSet)
-                            {
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State }
-                            }
-                        }
-                    }
-                },
-                mainContent = new Container
-                {
-                    Name = @"Main content",
-                    X = height - corner_radius,
-                    Height = height,
-                    CornerRadius = corner_radius,
-                    Masking = true,
+                    RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        mainContentBackground = new BeatmapCardContentBackground(beatmapSet)
+                        downloadTracker,
+                        rightAreaBackground = new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding
+                            RelativeSizeAxes = Axes.Y,
+                            Width = icon_area_width + 2 * CORNER_RADIUS,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            // workaround for masking artifacts at the top & bottom of card,
+                            // which become especially visible on downloaded beatmaps (when the icon area has a lime background).
+                            Padding = new MarginPadding { Vertical = 1 },
+                            Child = new Box
                             {
-                                Horizontal = 10,
-                                Vertical = 4
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Colour4.White
                             },
-                            Direction = FillDirection.Vertical,
-                            Children = new Drawable[]
+                        },
+                        thumbnail = new BeatmapCardThumbnail(beatmapSet)
+                        {
+                            Name = @"Left (icon) area",
+                            Size = new Vector2(height),
+                            Padding = new MarginPadding { Right = CORNER_RADIUS },
+                            Child = leftIconArea = new FillFlowContainer
                             {
-                                titleContainer = new GridContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    ColumnDimensions = new[]
-                                    {
-                                        new Dimension(),
-                                        new Dimension(GridSizeMode.AutoSize)
-                                    },
-                                    RowDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize)
-                                    },
-                                    Content = new[]
-                                    {
-                                        new[]
-                                        {
-                                            new OsuSpriteText
-                                            {
-                                                Text = new RomanisableString(beatmapSet.TitleUnicode, beatmapSet.Title),
-                                                Font = OsuFont.Default.With(size: 22.5f, weight: FontWeight.SemiBold),
-                                                RelativeSizeAxes = Axes.X,
-                                                Truncate = true
-                                            },
-                                            Empty()
-                                        }
-                                    }
-                                },
-                                artistContainer = new GridContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    ColumnDimensions = new[]
-                                    {
-                                        new Dimension(),
-                                        new Dimension(GridSizeMode.AutoSize)
-                                    },
-                                    RowDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize)
-                                    },
-                                    Content = new[]
-                                    {
-                                        new[]
-                                        {
-                                            new OsuSpriteText
-                                            {
-                                                Text = createArtistText(),
-                                                Font = OsuFont.Default.With(size: 17.5f, weight: FontWeight.SemiBold),
-                                                RelativeSizeAxes = Axes.X,
-                                                Truncate = true
-                                            },
-                                            Empty()
-                                        },
-                                    }
-                                },
-                                new LinkFlowContainer(s =>
-                                {
-                                    s.Shadow = false;
-                                    s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold);
-                                }).With(d =>
-                                {
-                                    d.AutoSizeAxes = Axes.Both;
-                                    d.Margin = new MarginPadding { Top = 2 };
-                                    d.AddText("mapped by ", t => t.Colour = colourProvider.Content2);
-                                    d.AddUserLink(beatmapSet.Author);
-                                }),
+                                Margin = new MarginPadding(5),
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(1)
                             }
                         },
                         new Container
                         {
-                            Name = @"Bottom content",
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Padding = new MarginPadding
+                            Name = @"Right (button) area",
+                            Width = 30,
+                            RelativeSizeAxes = Axes.Y,
+                            Origin = Anchor.TopRight,
+                            Anchor = Anchor.TopRight,
+                            Padding = new MarginPadding { Vertical = 17.5f },
+                            Child = rightAreaButtons = new Container<BeatmapCardIconButton>
                             {
-                                Horizontal = 10,
-                                Vertical = 4
-                            },
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new BeatmapCardIconButton[]
+                                {
+                                    new FavouriteButton(beatmapSet)
+                                    {
+                                        Current = favouriteState,
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre
+                                    },
+                                    new DownloadButton(beatmapSet)
+                                    {
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.BottomCentre,
+                                        State = { BindTarget = downloadTracker.State }
+                                    },
+                                    new GoToBeatmapButton(beatmapSet)
+                                    {
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.BottomCentre,
+                                        State = { BindTarget = downloadTracker.State }
+                                    }
+                                }
+                            }
+                        },
+                        mainContent = new Container
+                        {
+                            Name = @"Main content",
+                            X = height - CORNER_RADIUS,
+                            Height = height,
+                            CornerRadius = CORNER_RADIUS,
+                            Masking = true,
                             Children = new Drawable[]
                             {
-                                idleBottomContent = new FillFlowContainer
+                                mainContentBackground = new BeatmapCardContentBackground(beatmapSet)
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = 10,
+                                        Vertical = 4
+                                    },
                                     Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0, 3),
-                                    AlwaysPresent = true,
                                     Children = new Drawable[]
                                     {
-                                        statisticsContainer = new FillFlowContainer<BeatmapCardStatistic>
+                                        titleContainer = new GridContainer
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Direction = FillDirection.Horizontal,
-                                            Spacing = new Vector2(10, 0),
-                                            Alpha = 0,
-                                            AlwaysPresent = true,
-                                            ChildrenEnumerable = createStatistics()
-                                        },
-                                        new FillFlowContainer
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Direction = FillDirection.Horizontal,
-                                            Spacing = new Vector2(4, 0),
-                                            Children = new Drawable[]
+                                            ColumnDimensions = new[]
                                             {
-                                                new BeatmapSetOnlineStatusPill
+                                                new Dimension(),
+                                                new Dimension(GridSizeMode.AutoSize)
+                                            },
+                                            RowDimensions = new[]
+                                            {
+                                                new Dimension(GridSizeMode.AutoSize)
+                                            },
+                                            Content = new[]
+                                            {
+                                                new[]
                                                 {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Status = beatmapSet.Status,
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft
-                                                },
-                                                new DifficultySpectrumDisplay(beatmapSet)
-                                                {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                    DotSize = new Vector2(6, 12)
+                                                    new OsuSpriteText
+                                                    {
+                                                        Text = new RomanisableString(beatmapSet.TitleUnicode, beatmapSet.Title),
+                                                        Font = OsuFont.Default.With(size: 22.5f, weight: FontWeight.SemiBold),
+                                                        RelativeSizeAxes = Axes.X,
+                                                        Truncate = true
+                                                    },
+                                                    Empty()
                                                 }
                                             }
-                                        }
+                                        },
+                                        artistContainer = new GridContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            ColumnDimensions = new[]
+                                            {
+                                                new Dimension(),
+                                                new Dimension(GridSizeMode.AutoSize)
+                                            },
+                                            RowDimensions = new[]
+                                            {
+                                                new Dimension(GridSizeMode.AutoSize)
+                                            },
+                                            Content = new[]
+                                            {
+                                                new[]
+                                                {
+                                                    new OsuSpriteText
+                                                    {
+                                                        Text = createArtistText(),
+                                                        Font = OsuFont.Default.With(size: 17.5f, weight: FontWeight.SemiBold),
+                                                        RelativeSizeAxes = Axes.X,
+                                                        Truncate = true
+                                                    },
+                                                    Empty()
+                                                },
+                                            }
+                                        },
+                                        new LinkFlowContainer(s =>
+                                        {
+                                            s.Shadow = false;
+                                            s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold);
+                                        }).With(d =>
+                                        {
+                                            d.AutoSizeAxes = Axes.Both;
+                                            d.Margin = new MarginPadding { Top = 2 };
+                                            d.AddText("mapped by ", t => t.Colour = colourProvider.Content2);
+                                            d.AddUserLink(beatmapSet.Author);
+                                        }),
                                     }
                                 },
-                                downloadProgressBar = new BeatmapCardDownloadProgressBar
+                                new Container
                                 {
+                                    Name = @"Bottom content",
                                     RelativeSizeAxes = Axes.X,
-                                    Height = 6,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    State = { BindTarget = downloadTracker.State },
-                                    Progress = { BindTarget = downloadTracker.Progress }
+                                    AutoSizeAxes = Axes.Y,
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = 10,
+                                        Vertical = 4
+                                    },
+                                    Children = new Drawable[]
+                                    {
+                                        idleBottomContent = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, 3),
+                                            AlwaysPresent = true,
+                                            Children = new Drawable[]
+                                            {
+                                                statisticsContainer = new FillFlowContainer<BeatmapCardStatistic>
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(10, 0),
+                                                    Alpha = 0,
+                                                    AlwaysPresent = true,
+                                                    ChildrenEnumerable = createStatistics()
+                                                },
+                                                new FillFlowContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(4, 0),
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new BeatmapSetOnlineStatusPill
+                                                        {
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Status = beatmapSet.Status,
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft
+                                                        },
+                                                        new DifficultySpectrumDisplay(beatmapSet)
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            DotSize = new Vector2(6, 12)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        downloadProgressBar = new BeatmapCardDownloadProgressBar
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = 6,
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            State = { BindTarget = downloadTracker.State },
+                                            Progress = { BindTarget = downloadTracker.Progress }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                }
+                },
+                Dropdown = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Horizontal = 10, Vertical = 13 },
+                    Child = new BeatmapCardDifficultyList(beatmapSet)
+                },
+                Expanded = { BindTarget = Expanded }
             };
 
             if (beatmapSet.HasVideo)
@@ -388,7 +403,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             float targetWidth = width - height;
             if (IsHovered)
-                targetWidth = targetWidth - icon_area_width + corner_radius;
+                targetWidth = targetWidth - icon_area_width + CORNER_RADIUS;
 
             thumbnail.Dimmed.Value = IsHovered;
 

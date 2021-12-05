@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -227,7 +228,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                     new BasicScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new FillFlowContainer
+                        Child = new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -248,6 +249,11 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         [Test]
-        public void TestNormal() => createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
+        public void TestNormal()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
+
+            AddToggleStep("toggle expanded state", expanded => this.ChildrenOfType<BeatmapCard>().Last().Expanded.Value = expanded);
+        }
     }
 }
