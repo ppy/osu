@@ -359,7 +359,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             base.LoadComplete();
 
-            downloadTracker.State.BindValueChanged(_ => updateState(), true);
+            downloadTracker.State.BindValueChanged(_ => updateState());
+            Expanded.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
         }
 
@@ -401,19 +402,21 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void updateState()
         {
+            bool showDetails = IsHovered || Expanded.Value;
+
             float targetWidth = width - height;
-            if (IsHovered)
+            if (showDetails)
                 targetWidth = targetWidth - icon_area_width + CORNER_RADIUS;
 
-            thumbnail.Dimmed.Value = IsHovered;
+            thumbnail.Dimmed.Value = showDetails;
 
             mainContent.ResizeWidthTo(targetWidth, TRANSITION_DURATION, Easing.OutQuint);
-            mainContentBackground.Dimmed.Value = IsHovered;
+            mainContentBackground.Dimmed.Value = showDetails;
 
-            statisticsContainer.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
+            statisticsContainer.FadeTo(showDetails ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
 
             rightAreaBackground.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, TRANSITION_DURATION, Easing.OutQuint);
-            rightAreaButtons.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
+            rightAreaButtons.FadeTo(showDetails ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
 
             foreach (var button in rightAreaButtons)
             {
