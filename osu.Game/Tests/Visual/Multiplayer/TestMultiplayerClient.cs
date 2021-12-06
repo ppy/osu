@@ -464,31 +464,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     break;
 
                 case QueueMode.AllPlayersRoundRobin:
-                    orderedActiveItems = new List<MultiplayerPlaylistItem>();
+                    var itemsByPriority = new List<(MultiplayerPlaylistItem item, int priority)>();
 
-                    // Todo: This could probably be more efficient, likely at the cost of increased complexity.
-                    // Number of "expired" or "used" items per player.
-                    Dictionary<int, int> perUserCounts = serverSidePlaylist
-                                                         .GroupBy(item => item.OwnerID)
-                                                         .ToDictionary(group => group.Key, group => group.Count(item => item.Expired));
-
-                    // We'll run a simulation over all items which are not expired ("unprocessed"). Expired items will not have their ordering updated.
-                    List<MultiplayerPlaylistItem> unprocessedItems = serverSidePlaylist.Where(item => !item.Expired).ToList();
-
-                    // In every iteration of the simulation, pick the first available item from the user with the lowest number of items in the queue to add to the result set.
-                    // If multiple users have the same number of items in the queue, then the item with the lowest ID is chosen.
-                    while (unprocessedItems.Count > 0)
+                    // Assign a priority for items from each user, starting from 0 and increasing in order which the user added the items.
+                    foreach (var group in room.Playlist.Where(item => !item.Expired).OrderBy(item => item.ID).GroupBy(item => item.OwnerID))
                     {
-                        MultiplayerPlaylistItem candidateItem = unprocessedItems
-                                                                .OrderBy(item => perUserCounts[item.OwnerID])
-                                                                .ThenBy(item => item.ID)
-                                                                .First();
-
-                        unprocessedItems.Remove(candidateItem);
-                        orderedActiveItems.Add(candidateItem);
-
-                        perUserCounts[candidateItem.OwnerID]++;
+                        int priority = 0;
+                        itemsByPriority.AddRange(group.Select(item => (item, priority++)));
                     }
+
+                    orderedActiveItems = itemsByPriority
+                                         // Order by each user's priority.
+                                         .OrderBy(i => i.priority)
+                                         // Many users will have the same priority of items, so attempt to break the tie by maintaining previous ordering.
+                                         // Suppose there are two users: User1 and User2. User1 adds two items, and then User2 adds a third. If the previous order is not maintained,
+                                         // then after playing the first item by User1, their second item will become priority=0 and jump to the front of the queue (because it was added first).
+                                         .ThenBy(i => i.item.PlaylistOrder)
+                                         // If there are still ties (normally shouldn't happen), break ties by making items added earlier go first.
+                                         // This could happen if e.g. the item orders get reset.
+                                         .ThenBy(i => i.item.ID)
+                                         .Select(i => i.item)
+                                         .ToList();
 
                     break;
             }
