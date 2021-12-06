@@ -129,7 +129,7 @@ namespace osu.Game.Online.Chat
         /// Checks if <paramref name="message"/> contains <paramref name="username"/>.
         /// This will match against the case where underscores are used instead of spaces (which is how osu-stable handles usernames with spaces).
         /// </summary>
-        private static bool checkContainsUsername(string message, string username) => message.Contains(username, StringComparison.OrdinalIgnoreCase) || message.Contains(username.Replace(' ', '_'), StringComparison.OrdinalIgnoreCase);
+        public static bool checkContainsUsername(string message, string username) => message.Contains(username, StringComparison.OrdinalIgnoreCase) || message.Contains(username.Replace(' ', '_'), StringComparison.OrdinalIgnoreCase);
 
         public class PrivateMessageNotification : OpenChannelNotification
         {
