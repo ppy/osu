@@ -164,6 +164,74 @@ namespace osu.Game.Tests.Skins.IO
             assertCorrectMetadata(import2, "name 1 [my custom skin 2]", "author 1", osu);
         });
 
+        [Test]
+        public Task TestExportThenImportDefaultSkin() => runSkinTest(osu =>
+        {
+            var skinManager = osu.Dependencies.Get<SkinManager>();
+
+            skinManager.EnsureMutableSkin();
+
+            MemoryStream exportStream = new MemoryStream();
+
+            Guid originalSkinId = skinManager.CurrentSkinInfo.Value.ID;
+
+            skinManager.CurrentSkinInfo.Value.PerformRead(s =>
+            {
+                Assert.IsFalse(s.Protected);
+                Assert.AreEqual(typeof(DefaultSkin), s.CreateInstance(skinManager).GetType());
+
+                new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportModelTo(s, exportStream);
+
+                Assert.Greater(exportStream.Length, 0);
+            });
+
+            var imported = skinManager.Import(new ImportTask(exportStream, "exported.osk"));
+
+            imported.Result.PerformRead(s =>
+            {
+                Assert.IsFalse(s.Protected);
+                Assert.AreNotEqual(originalSkinId, s.ID);
+                Assert.AreEqual(typeof(DefaultSkin), s.CreateInstance(skinManager).GetType());
+            });
+
+            return Task.CompletedTask;
+        });
+
+        [Test]
+        public Task TestExportThenImportClassicSkin() => runSkinTest(osu =>
+        {
+            var skinManager = osu.Dependencies.Get<SkinManager>();
+
+            skinManager.CurrentSkinInfo.Value = skinManager.DefaultLegacySkin.SkinInfo;
+
+            skinManager.EnsureMutableSkin();
+
+            MemoryStream exportStream = new MemoryStream();
+
+            Guid originalSkinId = skinManager.CurrentSkinInfo.Value.ID;
+
+            skinManager.CurrentSkinInfo.Value.PerformRead(s =>
+            {
+                Assert.IsFalse(s.Protected);
+                Assert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
+
+                new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportModelTo(s, exportStream);
+
+                Assert.Greater(exportStream.Length, 0);
+            });
+
+            var imported = skinManager.Import(new ImportTask(exportStream, "exported.osk"));
+
+            imported.Result.PerformRead(s =>
+            {
+                Assert.IsFalse(s.Protected);
+                Assert.AreNotEqual(originalSkinId, s.ID);
+                Assert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
+            });
+
+            return Task.CompletedTask;
+        });
+
         #endregion
 
         private void assertCorrectMetadata(ILive<SkinInfo> import1, string name, string creator, OsuGameBase osu)
