@@ -50,6 +50,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private MultiplayerPlaylistItem? currentItem => Room?.Playlist[currentIndex];
         private int currentIndex;
 
+        private long lastPlaylistItemId;
+
         public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
         {
             this.roomManager = roomManager;
@@ -145,7 +147,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                             ((IMultiplayerClient)this).ResultsReady();
 
-                            finishCurrentItem().Wait();
+                            FinishCurrentItem().Wait();
                         }
 
                         break;
@@ -169,6 +171,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             serverSidePlaylist.Clear();
             serverSidePlaylist.AddRange(apiRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)));
+            lastPlaylistItemId = serverSidePlaylist.Max(item => item.ID);
 
             var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
@@ -189,6 +192,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Host = localUser
             };
 
+            await updatePlaylistOrder(room).ConfigureAwait(false);
             await updateCurrentItem(room, false).ConfigureAwait(false);
 
             RoomSetupAction?.Invoke(room);
@@ -308,12 +312,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (Room.Settings.QueueMode == QueueMode.HostOnly && Room.Host?.UserID != LocalUser?.UserID)
                 throw new InvalidOperationException("Local user is not the room host.");
 
+            item.OwnerID = userId;
+
             switch (Room.Settings.QueueMode)
             {
                 case QueueMode.HostOnly:
                     // In host-only mode, the current item is re-used.
                     item.ID = currentItem.ID;
-                    item.OwnerID = currentItem.OwnerID;
+                    item.PlaylistOrder = currentItem.PlaylistOrder;
 
                     serverSidePlaylist[currentIndex] = item;
                     await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
@@ -323,12 +329,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     break;
 
                 default:
-                    item.ID = serverSidePlaylist.Last().ID + 1;
-                    item.OwnerID = userId;
+                    await addItem(item).ConfigureAwait(false);
 
-                    serverSidePlaylist.Add(item);
-                    await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
-
+                    // The current item can change as a result of an item being added. For example, if all items earlier in the queue were expired.
                     await updateCurrentItem(Room).ConfigureAwait(false);
                     break;
             }
@@ -385,11 +388,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (newMode == QueueMode.HostOnly && serverSidePlaylist.All(item => item.Expired))
                 await duplicateCurrentItem().ConfigureAwait(false);
 
-            // When changing modes, items could have been added (above) or the queueing order could have changed.
+            await updatePlaylistOrder(Room).ConfigureAwait(false);
             await updateCurrentItem(Room).ConfigureAwait(false);
         }
 
-        private async Task finishCurrentItem()
+        public async Task FinishCurrentItem()
         {
             Debug.Assert(Room != null);
             Debug.Assert(APIRoom != null);
@@ -397,10 +400,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // Expire the current playlist item.
             currentItem.Expired = true;
+            currentItem.PlayedAt = DateTimeOffset.Now;
+
             await ((IMultiplayerClient)this).PlaylistItemChanged(currentItem).ConfigureAwait(false);
+            await updatePlaylistOrder(Room).ConfigureAwait(false);
 
             // In host-only mode, a duplicate playlist item will be used for the next round.
-            if (Room.Settings.QueueMode == QueueMode.HostOnly)
+            if (Room.Settings.QueueMode == QueueMode.HostOnly && serverSidePlaylist.All(item => item.Expired))
                 await duplicateCurrentItem().ConfigureAwait(false);
 
             await updateCurrentItem(Room).ConfigureAwait(false);
@@ -408,47 +414,96 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private async Task duplicateCurrentItem()
         {
-            Debug.Assert(Room != null);
-            Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
-            var newItem = new MultiplayerPlaylistItem
+            await addItem(new MultiplayerPlaylistItem
             {
-                ID = serverSidePlaylist.Last().ID + 1,
                 BeatmapID = currentItem.BeatmapID,
                 BeatmapChecksum = currentItem.BeatmapChecksum,
                 RulesetID = currentItem.RulesetID,
                 RequiredMods = currentItem.RequiredMods,
                 AllowedMods = currentItem.AllowedMods
-            };
+            }).ConfigureAwait(false);
+        }
 
-            serverSidePlaylist.Add(newItem);
-            await ((IMultiplayerClient)this).PlaylistItemAdded(newItem).ConfigureAwait(false);
+        private async Task addItem(MultiplayerPlaylistItem item)
+        {
+            Debug.Assert(Room != null);
+
+            item.ID = ++lastPlaylistItemId;
+
+            serverSidePlaylist.Add(item);
+            await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
+
+            await updatePlaylistOrder(Room).ConfigureAwait(false);
         }
 
         private async Task updateCurrentItem(MultiplayerRoom room, bool notify = true)
         {
-            MultiplayerPlaylistItem newItem;
+            // Pick the next non-expired playlist item by playlist order, or default to the most-recently-expired item.
+            MultiplayerPlaylistItem nextItem = serverSidePlaylist.Where(i => !i.Expired).OrderBy(i => i.PlaylistOrder).FirstOrDefault()
+                                               ?? serverSidePlaylist.OrderByDescending(i => i.PlayedAt).First();
+
+            currentIndex = serverSidePlaylist.IndexOf(nextItem);
+
+            long lastItem = room.Settings.PlaylistItemId;
+            room.Settings.PlaylistItemId = nextItem.ID;
+
+            if (notify && nextItem.ID != lastItem)
+                await ((IMultiplayerClient)this).SettingsChanged(room.Settings).ConfigureAwait(false);
+        }
+
+        private async Task updatePlaylistOrder(MultiplayerRoom room)
+        {
+            List<MultiplayerPlaylistItem> orderedActiveItems;
 
             switch (room.Settings.QueueMode)
             {
                 default:
-                    // Pick the single non-expired playlist item.
-                    newItem = serverSidePlaylist.FirstOrDefault(i => !i.Expired) ?? serverSidePlaylist.Last();
+                    orderedActiveItems = serverSidePlaylist.Where(item => !item.Expired).OrderBy(item => item.ID).ToList();
                     break;
 
                 case QueueMode.AllPlayersRoundRobin:
-                    // Group playlist items by (user_id -> count_expired), and select the first available playlist item from a user that has available beatmaps where count_expired is the lowest.
-                    throw new NotImplementedException();
+                    orderedActiveItems = new List<MultiplayerPlaylistItem>();
+
+                    // Todo: This could probably be more efficient, likely at the cost of increased complexity.
+                    // Number of "expired" or "used" items per player.
+                    Dictionary<int, int> perUserCounts = serverSidePlaylist
+                                                         .GroupBy(item => item.OwnerID)
+                                                         .ToDictionary(group => group.Key, group => group.Count(item => item.Expired));
+
+                    // We'll run a simulation over all items which are not expired ("unprocessed"). Expired items will not have their ordering updated.
+                    List<MultiplayerPlaylistItem> unprocessedItems = serverSidePlaylist.Where(item => !item.Expired).ToList();
+
+                    // In every iteration of the simulation, pick the first available item from the user with the lowest number of items in the queue to add to the result set.
+                    // If multiple users have the same number of items in the queue, then the item with the lowest ID is chosen.
+                    while (unprocessedItems.Count > 0)
+                    {
+                        MultiplayerPlaylistItem candidateItem = unprocessedItems
+                                                                .OrderBy(item => perUserCounts[item.OwnerID])
+                                                                .ThenBy(item => item.ID)
+                                                                .First();
+
+                        unprocessedItems.Remove(candidateItem);
+                        orderedActiveItems.Add(candidateItem);
+
+                        perUserCounts[candidateItem.OwnerID]++;
+                    }
+
+                    break;
             }
 
-            currentIndex = serverSidePlaylist.IndexOf(newItem);
+            for (int i = 0; i < orderedActiveItems.Count; i++)
+            {
+                var item = orderedActiveItems[i];
 
-            long lastItem = room.Settings.PlaylistItemId;
-            room.Settings.PlaylistItemId = newItem.ID;
+                if (item.PlaylistOrder == i)
+                    continue;
 
-            if (notify && newItem.ID != lastItem)
-                await ((IMultiplayerClient)this).SettingsChanged(room.Settings).ConfigureAwait(false);
+                item.PlaylistOrder = (ushort)i;
+
+                await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
+            }
         }
     }
 }

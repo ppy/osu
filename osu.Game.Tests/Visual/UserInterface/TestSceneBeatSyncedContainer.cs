@@ -135,6 +135,35 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("bpm is default", () => lastBpm != null && Precision.AlmostEquals(lastBpm.Value, 60));
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestEarlyActivationEffectPoint(bool earlyActivating)
+        {
+            double earlyActivationMilliseconds = earlyActivating ? 100 : 0;
+            ControlPoint actualEffectPoint = null;
+
+            AddStep($"set early activation to {earlyActivationMilliseconds}", () => beatContainer.EarlyActivationMilliseconds = earlyActivationMilliseconds);
+
+            AddStep("seek before kiai effect point", () =>
+            {
+                ControlPoint expectedEffectPoint = Beatmap.Value.Beatmap.ControlPointInfo.EffectPoints.First(ep => ep.KiaiMode);
+                actualEffectPoint = null;
+                beatContainer.AllowMistimedEventFiring = false;
+
+                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                {
+                    if (Precision.AlmostEquals(gameplayClockContainer.CurrentTime + earlyActivationMilliseconds, expectedEffectPoint.Time, BeatSyncedContainer.MISTIMED_ALLOWANCE))
+                        actualEffectPoint = effectControlPoint;
+                };
+
+                gameplayClockContainer.Seek(expectedEffectPoint.Time - earlyActivationMilliseconds);
+            });
+
+            AddUntilStep("wait for effect point", () => actualEffectPoint != null);
+
+            AddAssert("effect has kiai", () => actualEffectPoint != null && ((EffectControlPoint)actualEffectPoint).KiaiMode);
+        }
+
         private class TestBeatSyncedContainer : BeatSyncedContainer
         {
             private const int flash_layer_height = 150;
@@ -143,6 +172,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 get => base.AllowMistimedEventFiring;
                 set => base.AllowMistimedEventFiring = value;
+            }
+
+            public new double EarlyActivationMilliseconds
+            {
+                get => base.EarlyActivationMilliseconds;
+                set => base.EarlyActivationMilliseconds = value;
             }
 
             private readonly InfoString timingPointCount;
