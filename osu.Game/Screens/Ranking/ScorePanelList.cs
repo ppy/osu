@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Ranking
             }
 
             // Find the panel corresponding to the new score.
-            var expandedTrackingComponent = flow.SingleOrDefault(t => t.Panel.Score == score.NewValue);
+            var expandedTrackingComponent = flow.SingleOrDefault(t => t.Panel.Score.Equals(score.NewValue));
             expandedPanel = expandedTrackingComponent?.Panel;
 
             if (expandedPanel == null)

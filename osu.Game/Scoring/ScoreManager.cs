@@ -63,7 +63,7 @@ namespace osu.Game.Scoring
                 // Compute difficulties asynchronously first to prevent blocking via the GetTotalScore() call below.
                 foreach (var s in scores)
                 {
-                    await difficultyCache.GetDifficultyAsync(s.BeatmapInfo, s.Ruleset, s.Mods, cancellationToken).ConfigureAwait(false);
+                    await difficultyCache.GetDifficultyAsync(s.Beatmap, s.Ruleset, s.Mods, cancellationToken).ConfigureAwait(false);
                     cancellationToken.ThrowIfCancellationRequested();
                 }
             }
@@ -125,7 +125,7 @@ namespace osu.Game.Scoring
         /// <returns>The total score.</returns>
         public async Task<long> GetTotalScoreAsync([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
-            if (score.BeatmapInfo == null)
+            if (score.Beatmap == null)
                 return score.TotalScore;
 
             int beatmapMaxCombo;
@@ -146,11 +146,11 @@ namespace osu.Game.Scoring
 
                 // This score is guaranteed to be an osu!stable score.
                 // The combo must be determined through either the beatmap's max combo value or the difficulty calculator, as lazer's scoring has changed and the score statistics cannot be used.
-                if (score.BeatmapInfo.MaxCombo != null)
-                    beatmapMaxCombo = score.BeatmapInfo.MaxCombo.Value;
+                if (score.Beatmap.MaxCombo != null)
+                    beatmapMaxCombo = score.Beatmap.MaxCombo.Value;
                 else
                 {
-                    if (score.BeatmapInfo.ID == 0 || difficulties == null)
+                    if (score.Beatmap.ID == 0 || difficulties == null)
                     {
                         // We don't have enough information (max combo) to compute the score, so use the provided score.
                         return score.TotalScore;

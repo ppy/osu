@@ -105,7 +105,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineID = OnlineID,
                 Date = Date,
                 PP = PP,
-                RulesetID = RulesetID,
                 Hash = HasReplay ? "online" : string.Empty, // todo: temporary?
                 Rank = Rank,
                 Ruleset = ruleset,
