@@ -138,11 +138,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Height = 40,
-                                        Action = () =>
-                                        {
-                                            if (this.IsCurrentScreen())
-                                                this.Push(new MultiplayerMatchSongSelect(Room));
-                                        },
+                                        Action = SelectBeatmap,
                                         Alpha = 0
                                     },
                                 },
@@ -223,6 +219,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 }
             }
         };
+
+        internal void SelectBeatmap()
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            this.Push(new MultiplayerMatchSongSelect(Room));
+        }
 
         protected override Drawable CreateFooter() => new MultiplayerMatchFooter
         {
