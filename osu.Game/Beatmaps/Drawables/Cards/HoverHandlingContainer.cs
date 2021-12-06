@@ -14,14 +14,16 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public Func<HoverEvent, bool>? Hovered { get; set; }
         public Action<HoverLostEvent>? Unhovered { get; set; }
 
-        protected override bool OnHover(HoverEvent e) => Hovered?.Invoke(e) ?? base.OnHover(e);
+        protected override bool OnHover(HoverEvent e)
+        {
+            bool handledByBase = base.OnHover(e);
+            return Hovered?.Invoke(e) ?? handledByBase;
+        }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (Unhovered != null)
-                Unhovered?.Invoke(e);
-            else
-                base.OnHoverLost(e);
+            base.OnHoverLost(e);
+            Unhovered?.Invoke(e);
         }
     }
 }
