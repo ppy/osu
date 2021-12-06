@@ -23,6 +23,8 @@ namespace osu.Game.Scoring
     {
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public ScoreRank Rank { get; set; }
 
         public long TotalScore { get; set; }

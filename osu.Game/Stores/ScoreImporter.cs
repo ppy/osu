@@ -12,7 +12,6 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
-using osu.Game.Models;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using Realms;
