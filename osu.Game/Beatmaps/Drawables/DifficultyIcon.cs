@@ -86,7 +86,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
