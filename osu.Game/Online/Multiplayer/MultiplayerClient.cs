@@ -458,7 +458,8 @@ namespace osu.Game.Online.Multiplayer
                 {
                     GetAPIBeatmap(playlistItem.BeatmapID).ContinueWith(b =>
                     {
-                        bool success = b.IsCompletedSuccessfully;
+                        // Should be called outside of the `Scheduler` logic (and specifically accessing `Exception`) to suppress an exception from firing outwards.
+                        bool success = b.Exception == null;
 
                         Scheduler.Add(() =>
                         {
