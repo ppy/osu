@@ -40,8 +40,12 @@ namespace osu.Game.Online.Rooms
         public bool Expired { get; set; }
 
         /// <summary>
-        /// The order in which this <see cref="MultiplayerPlaylistItem"/> will be played, starting from 0 and increasing for items which will be played later.
+        /// The order in which this <see cref="MultiplayerPlaylistItem"/> will be played relative to others.
+        /// Playlist items should be played in increasing order (lower values are played first).
         /// </summary>
+        /// <remarks>
+        /// This is only valid for items which are not <see cref="Expired"/>. The value for expired items is undefined and should not be used.
+        /// </remarks>
         [Key(8)]
         public ushort PlaylistOrder { get; set; }
 
