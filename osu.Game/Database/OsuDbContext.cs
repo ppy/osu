@@ -26,7 +26,7 @@ namespace osu.Game.Database
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<EFRulesetInfo> RulesetInfo { get; set; }
         public DbSet<EFSkinInfo> SkinInfo { get; set; }
-        public DbSet<ScoreInfo> ScoreInfo { get; set; }
+        public DbSet<EFScoreInfo> ScoreInfo { get; set; }
 
         // migrated to realm
         public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
