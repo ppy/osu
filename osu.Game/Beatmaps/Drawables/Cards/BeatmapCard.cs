@@ -285,7 +285,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                         content.ScheduleShow();
                                                         return false;
                                                     },
-                                                    Unhovered = _ => content.ScheduleHide()
+                                                    Unhovered = _ =>
+                                                    {
+                                                        // This hide should only trigger if the expanded content has not shown yet.
+                                                        // ie. if the user has not shown intent to want to see it (quickly moved over the info row area).
+                                                        if (!Expanded.Value)
+                                                            content.ScheduleHide();
+                                                    }
                                                 }
                                             }
                                         },
@@ -360,6 +366,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+            content.ScheduleHide();
+
             updateState();
             base.OnHoverLost(e);
         }
@@ -397,6 +405,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 targetWidth = targetWidth - icon_area_width + CORNER_RADIUS;
 
             thumbnail.Dimmed.Value = showDetails;
+
+            // Scale value is intentionally chosen to fit in the spacing of listing displays, as to not overlap horizontally with adjacent cards.
+            // This avoids depth issues where a hovered (scaled) card to the right of another card would be beneath the card to the left.
+            content.ScaleTo(Expanded.Value ? 1.03f : 1, 500, Easing.OutQuint);
 
             mainContent.ResizeWidthTo(targetWidth, TRANSITION_DURATION, Easing.OutQuint);
             mainContentBackground.Dimmed.Value = showDetails;
