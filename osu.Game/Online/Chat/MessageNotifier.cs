@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -126,10 +127,14 @@ namespace osu.Game.Online.Chat
         }
 
         /// <summary>
-        /// Checks if <paramref name="message"/> contains <paramref name="username"/>.
+        /// Checks if <paramref name="message"/> mentions <paramref name="username"/>.
         /// This will match against the case where underscores are used instead of spaces (which is how osu-stable handles usernames with spaces).
         /// </summary>
-        public static bool checkContainsUsername(string message, string username) => message.Contains(username, StringComparison.OrdinalIgnoreCase) || message.Contains(username.Replace(' ', '_'), StringComparison.OrdinalIgnoreCase);
+        public static bool checkContainsUsername(string message, string username) {
+            string fullName = Regex.Escape(username);
+            string underscoreName = Regex.Escape(username.Replace(' ', '_'));
+            return new Regex($"\\b({fullName}|{underscoreName})\\b", RegexOptions.IgnoreCase).Matches(message).Count > 0;
+        }
 
         public class PrivateMessageNotification : OpenChannelNotification
         {
