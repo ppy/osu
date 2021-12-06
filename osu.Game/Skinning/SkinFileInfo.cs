@@ -13,6 +13,8 @@ namespace osu.Game.Skinning
 
         public int SkinInfoID { get; set; }
 
+        public EFSkinInfo SkinInfo { get; set; }
+
         public int FileInfoID { get; set; }
 
         public FileInfo FileInfo { get; set; }
