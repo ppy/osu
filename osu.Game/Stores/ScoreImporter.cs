@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
+using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using Realms;
 
@@ -24,7 +25,7 @@ namespace osu.Game.Stores
     /// Handles the storage and retrieval of Scores/WorkingScores.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class ScoreImporter : RealmArchiveModelImporter<RealmScore>
+    public class ScoreImporter : RealmArchiveModelImporter<ScoreInfo>
     {
         private readonly RealmRulesetStore rulesets;
         private readonly BeatmapManager beatmaps;
@@ -40,7 +41,7 @@ namespace osu.Game.Stores
             this.beatmaps = beatmaps;
         }
 
-        protected override RealmScore? CreateModel(ArchiveReader archive)
+        protected override ScoreInfo? CreateModel(ArchiveReader archive)
         {
             using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase))))
             {
@@ -48,7 +49,7 @@ namespace osu.Game.Stores
                 {
                     // TODO: make work.
                     // return new DatabasedLegacyScoreDecoder(rulesets, beatmaps).Parse(stream).ScoreInfo;
-                    return new RealmScore();
+                    return new ScoreInfo();
                 }
                 catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
@@ -58,7 +59,7 @@ namespace osu.Game.Stores
             }
         }
 
-        protected override Task Populate(RealmScore model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
+        protected override Task Populate(ScoreInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
             => Task.CompletedTask;
     }
 }
