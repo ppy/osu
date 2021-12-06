@@ -452,7 +452,7 @@ namespace osu.Game.Online.Multiplayer
             Scheduler.Add(() =>
             {
                 // ensure the new selected item is populated immediately.
-                var playlistItem = APIRoom.Playlist.SingleOrDefault(p => p.ID == newSettings.PlaylistItemId);
+                var playlistItem = APIRoom.Playlist.Single(p => p.ID == newSettings.PlaylistItemId);
 
                 if (playlistItem != null)
                 {
