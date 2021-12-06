@@ -30,9 +30,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public readonly Room Room;
 
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
-
         protected Container ButtonsContainer { get; private set; }
 
         private readonly Bindable<MatchType> roomType = new Bindable<MatchType>();

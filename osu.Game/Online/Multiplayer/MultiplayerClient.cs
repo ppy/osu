@@ -32,11 +32,35 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public event Action? RoomUpdated;
 
+        /// <summary>
+        /// Invoked when a new user joins the room.
+        /// </summary>
         public event Action<MultiplayerRoomUser>? UserJoined;
 
+        /// <summary>
+        /// Invoked when a user leaves the room of their own accord.
+        /// </summary>
         public event Action<MultiplayerRoomUser>? UserLeft;
 
+        /// <summary>
+        /// Invoked when a user was kicked from the room forcefully.
+        /// </summary>
         public event Action<MultiplayerRoomUser>? UserKicked;
+
+        /// <summary>
+        /// Invoked when a new item is added to the playlist.
+        /// </summary>
+        public event Action<MultiplayerPlaylistItem>? ItemAdded;
+
+        /// <summary>
+        /// Invoked when a playlist item is removed from the playlist. The provided <c>long</c> is the playlist's item ID.
+        /// </summary>
+        public event Action<long>? ItemRemoved;
+
+        /// <summary>
+        /// Invoked when a playlist item's details change.
+        /// </summary>
+        public event Action<MultiplayerPlaylistItem>? ItemChanged;
 
         /// <summary>
         /// Invoked when the multiplayer server requests the current beatmap to be loaded into play.
@@ -94,7 +118,7 @@ namespace osu.Game.Online.Multiplayer
         protected IAPIProvider API { get; private set; } = null!;
 
         [Resolved]
-        protected RulesetStore Rulesets { get; private set; } = null!;
+        protected IRulesetStore Rulesets { get; private set; } = null!;
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
@@ -617,6 +641,7 @@ namespace osu.Game.Online.Multiplayer
                 Room.Playlist.Add(item);
                 APIRoom.Playlist.Add(playlistItem);
 
+                ItemAdded?.Invoke(item);
                 RoomUpdated?.Invoke();
             });
         }
@@ -636,6 +661,7 @@ namespace osu.Game.Online.Multiplayer
                 Room.Playlist.Remove(Room.Playlist.Single(existing => existing.ID == playlistItemId));
                 APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItemId);
 
+                ItemRemoved?.Invoke(playlistItemId);
                 RoomUpdated?.Invoke();
             });
 
@@ -666,6 +692,7 @@ namespace osu.Game.Online.Multiplayer
                 if (CurrentMatchPlayingItem.Value?.ID == playlistItem.ID)
                     CurrentMatchPlayingItem.Value = playlistItem;
 
+                ItemChanged?.Invoke(item);
                 RoomUpdated?.Invoke();
             });
         }
@@ -706,6 +733,9 @@ namespace osu.Game.Online.Multiplayer
             var apiBeatmap = await GetAPIBeatmap(item.BeatmapID).ConfigureAwait(false);
 
             var ruleset = Rulesets.GetRuleset(item.RulesetID);
+
+            Debug.Assert(ruleset != null);
+
             var rulesetInstance = ruleset.CreateInstance();
 
             var playlistItem = new PlaylistItem
@@ -714,7 +744,9 @@ namespace osu.Game.Online.Multiplayer
                 OwnerID = item.OwnerID,
                 Beatmap = { Value = apiBeatmap },
                 Ruleset = { Value = ruleset },
-                Expired = item.Expired
+                Expired = item.Expired,
+                PlaylistOrder = item.PlaylistOrder,
+                PlayedAt = item.PlayedAt
             };
 
             playlistItem.RequiredMods.AddRange(item.RequiredMods.Select(m => m.ToMod(rulesetInstance)));

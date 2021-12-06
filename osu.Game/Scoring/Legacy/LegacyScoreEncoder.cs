@@ -46,7 +46,7 @@ namespace osu.Game.Scoring.Legacy
                 sw.Write(LATEST_VERSION);
                 sw.Write(score.ScoreInfo.BeatmapInfo.MD5Hash);
                 sw.Write(score.ScoreInfo.UserString);
-                sw.Write($"lazer-{score.ScoreInfo.UserString}-{score.ScoreInfo.Date}".ComputeMD5Hash());
+                sw.Write(FormattableString.Invariant($"lazer-{score.ScoreInfo.UserString}-{score.ScoreInfo.Date}").ComputeMD5Hash());
                 sw.Write((ushort)(score.ScoreInfo.GetCount300() ?? 0));
                 sw.Write((ushort)(score.ScoreInfo.GetCount100() ?? 0));
                 sw.Write((ushort)(score.ScoreInfo.GetCount50() ?? 0));
@@ -110,7 +110,9 @@ namespace osu.Game.Scoring.Legacy
                     }
                 }
 
-                replayData.AppendFormat(@"{0}|{1}|{2}|{3},", -12345, 0, 0, 0);
+                // Warning: this is purposefully hardcoded as a string rather than interpolating, as in some cultures the minus sign is not encoded as the standard ASCII U+00C2 codepoint,
+                // which then would break decoding.
+                replayData.Append(@"-12345|0|0|0");
                 return replayData.ToString();
             }
         }

@@ -86,7 +86,7 @@ namespace osu.Game.Tournament.IO
                 DeleteRecursive(source);
             }
 
-            moveFileIfExists("bracket.json", destination);
+            moveFileIfExists(TournamentGameBase.BRACKET_FILENAME, destination);
             moveFileIfExists("drawings.txt", destination);
             moveFileIfExists("drawings_results.txt", destination);
             moveFileIfExists("drawings.ini", destination);
