@@ -26,6 +26,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
@@ -56,8 +57,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [CanBeNull]
         private IDisposable readyClickOperation;
 
-        private DrawableRoomPlaylist playlist;
-
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
         {
@@ -73,9 +72,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
-
-            playlist.Items.BindTo(Room.Playlist);
-            playlist.SelectedItem.BindTo(SelectedItem);
 
             client.LoadRequested += onLoadRequested;
             client.RoomUpdated += onRoomUpdated;
@@ -153,10 +149,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 null,
                                 new Drawable[]
                                 {
-                                    playlist = new DrawableRoomPlaylist(false, false, true, true)
+                                    new MultiplayerPlaylist
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                    },
+                                        RelativeSizeAxes = Axes.Both
+                                    }
                                 },
                                 new[]
                                 {

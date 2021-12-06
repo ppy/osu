@@ -62,9 +62,6 @@ namespace osu.Game.Screens.Edit
 
             private readonly Box hoveredBackground;
 
-            [Resolved]
-            private EditorClock clock { get; set; }
-
             public RowBackground(object item)
             {
                 Item = item;

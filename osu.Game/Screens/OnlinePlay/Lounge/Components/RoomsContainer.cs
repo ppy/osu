@@ -33,9 +33,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [Resolved]
         private IRoomManager roomManager { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private LoungeSubScreen loungeSubScreen { get; set; }
-
         // handle deselection
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
