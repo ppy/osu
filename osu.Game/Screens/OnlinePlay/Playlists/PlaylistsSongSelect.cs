@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.Select;
@@ -13,9 +11,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class PlaylistsSongSelect : OnlinePlaySongSelect
     {
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
-
         public PlaylistsSongSelect(Room room)
             : base(room)
         {

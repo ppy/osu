@@ -96,7 +96,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 Directory.CreateDirectory(flagsPath);
 
                 // Define testing files corresponding to the specific file migrations that are needed
-                string bracketFile = Path.Combine(osuRoot, "bracket.json");
+                string bracketFile = Path.Combine(osuRoot, TournamentGameBase.BRACKET_FILENAME);
 
                 string drawingsConfig = Path.Combine(osuRoot, "drawings.ini");
                 string drawingsFile = Path.Combine(osuRoot, "drawings.txt");
@@ -133,7 +133,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(migratedPath));
 
-                    Assert.True(storage.Exists("bracket.json"));
+                    Assert.True(storage.Exists(TournamentGameBase.BRACKET_FILENAME));
                     Assert.True(storage.Exists("drawings.txt"));
                     Assert.True(storage.Exists("drawings_results.txt"));
 

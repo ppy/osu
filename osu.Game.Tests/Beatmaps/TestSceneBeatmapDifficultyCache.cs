@@ -25,9 +25,6 @@ namespace osu.Game.Tests.Beatmaps
 
         private BeatmapSetInfo importedSet;
 
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
-
         private TestBeatmapDifficultyCache difficultyCache;
 
         private IBindable<StarDifficulty?> starDifficultyBindable;
