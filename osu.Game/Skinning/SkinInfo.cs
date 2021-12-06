@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Database;
@@ -16,6 +17,7 @@ namespace osu.Game.Skinning
 {
     [ExcludeFromDynamicCompile]
     [MapTo("Skin")]
+    [JsonObject(MemberSerialization.OptIn)]
     public class SkinInfo : RealmObject, IHasRealmFiles, IEquatable<SkinInfo>, IHasGuidPrimaryKey, ISoftDelete, IHasNamedFiles
     {
         internal static readonly Guid DEFAULT_SKIN = new Guid("2991CFD8-2140-469A-BCB9-2EC23FBCE4AD");
@@ -23,17 +25,21 @@ namespace osu.Game.Skinning
         internal static readonly Guid RANDOM_SKIN = new Guid("D39DFEFB-477C-4372-B1EA-2BCEA5FB8908");
 
         [PrimaryKey]
+        [JsonProperty]
         public Guid ID { get; set; } = Guid.NewGuid();
 
+        [JsonProperty]
         public string Name { get; set; } = string.Empty;
 
+        [JsonProperty]
         public string Creator { get; set; } = string.Empty;
+
+        [JsonProperty]
+        public string InstantiationInfo { get; set; } = string.Empty;
 
         public string Hash { get; set; } = string.Empty;
 
         public bool Protected { get; set; }
-
-        public string InstantiationInfo { get; set; } = string.Empty;
 
         public virtual Skin CreateInstance(IStorageResourceProvider resources)
         {

@@ -24,6 +24,8 @@ namespace osu.Game.Skinning
 {
     public class SkinModelManager : RealmArchiveModelManager<SkinInfo>
     {
+        private const string skin_info_file = "skininfo.json";
+
         private readonly IStorageResourceProvider skinResources;
 
         public SkinModelManager(Storage storage, RealmContextFactory contextFactory, GameHost host, IStorageResourceProvider skinResources)
@@ -49,8 +51,36 @@ namespace osu.Game.Skinning
 
         protected override Task Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrEmpty(model.InstantiationInfo))
-                model.InstantiationInfo = createInstance(model).GetType().GetInvariantInstantiationInfo();
+            var skinInfoFile = model.Files.SingleOrDefault(f => f.Filename == skin_info_file);
+
+            if (skinInfoFile != null)
+            {
+                try
+                {
+                    using (var existingStream = Files.Storage.GetStream(skinInfoFile.File.GetStoragePath()))
+                    using (var reader = new StreamReader(existingStream))
+                    {
+                        var deserialisedSkinInfo = JsonConvert.DeserializeObject<SkinInfo>(reader.ReadToEnd());
+
+                        if (deserialisedSkinInfo != null)
+                        {
+                            // for now we only care about the instantiation info.
+                            // eventually we probably want to transfer everything across.
+                            model.InstantiationInfo = deserialisedSkinInfo.InstantiationInfo;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    LogForModel(model, $"Error during {skin_info_file} parsing, falling back to default", e);
+
+                    // Not sure if we should still run the import in the case of failure here, but let's do so for now.
+                    model.InstantiationInfo = string.Empty;
+                }
+            }
+
+            // Always rewrite instantiation info (even after parsing in from the skin json) for sanity.
+            model.InstantiationInfo = createInstance(model).GetType().GetInvariantInstantiationInfo();
 
             checkSkinIniMetadata(model, realm);
 
@@ -128,7 +158,7 @@ namespace osu.Game.Skinning
                             sw.WriteLine(line);
                     }
 
-                    ReplaceFile(item, existingFile, stream, realm);
+                    ReplaceFile(existingFile, stream, realm);
 
                     // can be removed 20220502.
                     if (!ensureIniWasUpdated(item))
@@ -203,6 +233,15 @@ namespace osu.Game.Skinning
         {
             skin.SkinInfo.PerformWrite(s =>
             {
+                // Serialise out the SkinInfo itself.
+                string skinInfoJson = JsonConvert.SerializeObject(s, new JsonSerializerSettings { Formatting = Formatting.Indented });
+
+                using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(skinInfoJson)))
+                {
+                    AddFile(s, streamContent, skin_info_file, s.Realm);
+                }
+
+                // Then serialise each of the drawable component groups into respective files.
                 foreach (var drawableInfo in skin.DrawableComponentInfo)
                 {
                     string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
@@ -214,7 +253,7 @@ namespace osu.Game.Skinning
                         var oldFile = s.Files.FirstOrDefault(f => f.Filename == filename);
 
                         if (oldFile != null)
-                            ReplaceFile(s, oldFile, streamContent, s.Realm);
+                            ReplaceFile(oldFile, streamContent, s.Realm);
                         else
                             AddFile(s, streamContent, filename, s.Realm);
                     }
