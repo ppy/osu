@@ -19,14 +19,14 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardDropdown : CompositeDrawable
+    public class BeatmapCardContent : CompositeDrawable
     {
-        public Drawable Body
+        public Drawable MainContent
         {
             set => bodyContent.Child = value;
         }
 
-        public Drawable Dropdown
+        public Drawable ExpandedContent
         {
             set => dropdownScroll.Child = value;
         }
@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private readonly OsuScrollContainer dropdownScroll;
         private readonly Container borderContainer;
 
-        public BeatmapCardDropdown(float height)
+        public BeatmapCardContent(float height)
         {
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -77,7 +77,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             return true;
                         },
                         Unhovered = _ => checkForHide(),
-                        Child = dropdownScroll = new DropdownScrollContainer
+                        Child = dropdownScroll = new ExpandedContentScrollContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             ScrollbarVisible = false
@@ -179,9 +179,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
 
-        private class DropdownScrollContainer : OsuScrollContainer
+        private class ExpandedContentScrollContainer : OsuScrollContainer
         {
-            public DropdownScrollContainer()
+            public ExpandedContentScrollContainer()
             {
                 ScrollbarVisible = false;
             }
