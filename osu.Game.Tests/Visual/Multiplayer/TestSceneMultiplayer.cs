@@ -420,7 +420,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ((MultiplayerMatchSubScreen)currentSubScreen).SelectBeatmap();
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.IsLoaded == true);
+            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
 
             AddAssert("Beatmap matches current item", () => Beatmap.Value.BeatmapInfo.OnlineID == client.Room?.Playlist.First().BeatmapID);
 
