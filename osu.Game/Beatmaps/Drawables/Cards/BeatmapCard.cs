@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private readonly BeatmapDownloadTracker downloadTracker;
 
-        private BeatmapCardDropdown dropdown = null!;
+        private BeatmapCardContent content = null!;
 
         private BeatmapCardThumbnail thumbnail = null!;
 
@@ -82,9 +82,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             GridContainer titleContainer;
             GridContainer artistContainer;
 
-            InternalChild = dropdown = new BeatmapCardDropdown(height)
+            InternalChild = content = new BeatmapCardContent(height)
             {
-                Body = new Container
+                MainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -282,10 +282,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                 {
                                                     Hovered = _ =>
                                                     {
-                                                        dropdown.ScheduleShow();
+                                                        content.ScheduleShow();
                                                         return false;
                                                     },
-                                                    Unhovered = _ => dropdown.ScheduleHide()
+                                                    Unhovered = _ => content.ScheduleHide()
                                                 }
                                             }
                                         },
@@ -304,7 +304,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         }
                     }
                 },
-                Dropdown = new Container
+                ExpandedContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
