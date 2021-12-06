@@ -80,6 +80,8 @@ namespace osu.Game.Overlays.Profile
                                 }
                             }
                         },
+                        // reverse ID flow is required for correct Z-ordering of the content (last item should be front-most).
+                        // particularly important in BeatmapsSection, as it uses beatmap cards, which have expandable overhanging content.
                         content = new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             Direction = FillDirection.Vertical,

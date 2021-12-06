@@ -49,11 +49,14 @@ namespace osu.Game.Overlays.Profile.Sections
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
+                // reverse ID flow is required for correct Z-ordering of the items (last item should be front-most).
+                // particularly important in PaginatedBeatmapContainer, as it uses beatmap cards, which have expandable overhanging content.
                 ItemsContainer = new ReverseChildIDFillFlowContainer<Drawable>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(0, 2),
+                    // ensure the container and its contents are in front of the "more" button.
                     Depth = float.MinValue
                 },
                 moreButton = new ShowMoreButton
