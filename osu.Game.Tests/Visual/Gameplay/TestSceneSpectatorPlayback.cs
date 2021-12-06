@@ -246,10 +246,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void cleanUpState()
         {
-                // Ensure previous recorder is disposed else it may affect the global playing state of `SpectatorClient`.
-                recorder?.RemoveAndDisposeImmediately();
-                recorder = null;
-                spectatorClient.OnNewFrames -= onNewFrames;
+            // Ensure previous recorder is disposed else it may affect the global playing state of `SpectatorClient`.
+            recorder?.RemoveAndDisposeImmediately();
+            recorder = null;
+            spectatorClient.OnNewFrames -= onNewFrames;
         }
 
         public class TestFramedReplayInputHandler : FramedReplayInputHandler<TestReplayFrame>
