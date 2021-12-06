@@ -502,11 +502,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 item.PlaylistOrder = (ushort)i;
 
-                // Items which have an "infinite" ID are not yet in the database, so avoid propagating database/hub events for them.
-                // See addItem() for when this occurs.
-                if (item.ID == long.MaxValue)
-                    continue;
-
                 await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
             }
         }
