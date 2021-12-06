@@ -136,30 +136,32 @@ namespace osu.Game.Online.Spectator
 
         public void BeginPlaying(GameplayState state, Score score)
         {
-            Debug.Assert(ThreadSafety.IsUpdateThread);
+            // This schedule is only here to match the one below in `EndPlaying`.
+            Schedule(() =>
+            {
+                if (IsPlaying)
+                    throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
 
-            if (IsPlaying)
-                throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
+                IsPlaying = true;
 
-            IsPlaying = true;
+                // transfer state at point of beginning play
+                currentState.BeatmapID = score.ScoreInfo.BeatmapInfo.OnlineID;
+                currentState.RulesetID = score.ScoreInfo.RulesetID;
+                currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
 
-            // transfer state at point of beginning play
-            currentState.BeatmapID = score.ScoreInfo.BeatmapInfo.OnlineID;
-            currentState.RulesetID = score.ScoreInfo.RulesetID;
-            currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
+                currentBeatmap = state.Beatmap;
+                currentScore = score;
 
-            currentBeatmap = state.Beatmap;
-            currentScore = score;
-
-            BeginPlayingInternal(currentState);
+                BeginPlayingInternal(currentState);
+            });
         }
 
         public void SendFrames(FrameDataBundle data) => lastSend = SendFramesInternal(data);
 
         public void EndPlaying()
         {
-            // This method is most commonly called via Dispose(), which is asynchronous.
-            // Todo: This should not be a thing, but requires framework changes.
+            // This method is most commonly called via Dispose(), which is can be asynchronous (via the AsyncDisposalQueue).
+            // We probably need to find a better way to handle this...
             Schedule(() =>
             {
                 if (!IsPlaying)
