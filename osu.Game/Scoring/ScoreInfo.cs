@@ -51,6 +51,22 @@ namespace osu.Game.Scoring
 
         public RealmRuleset Ruleset { get; set; } = null!;
 
+        [Ignored]
+        public Dictionary<HitResult, int> Statistics
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(StatisticsJson))
+                    return new Dictionary<HitResult, int>();
+
+                return JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(StatisticsJson) ?? new Dictionary<HitResult, int>();
+            }
+            set => JsonConvert.SerializeObject(StatisticsJson);
+        }
+
+        [MapTo("Statistics")]
+        public string StatisticsJson { get; set; } = null!;
+
         public ScoreRank Rank
         {
             get => (ScoreRank)RankInt;
