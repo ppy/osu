@@ -430,13 +430,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Debug.Assert(Room != null);
 
-            // Add the item to the list first in order to compute gameplay order.
-            item.ID = long.MaxValue;
-            serverSidePlaylist.Add(item);
-            await updatePlaylistOrder(Room).ConfigureAwait(false);
-
             item.ID = ++lastPlaylistItemId;
+
+            serverSidePlaylist.Add(item);
             await ((IMultiplayerClient)this).PlaylistItemAdded(item).ConfigureAwait(false);
+
+            await updatePlaylistOrder(Room).ConfigureAwait(false);
         }
 
         private async Task updateCurrentItem(MultiplayerRoom room, bool notify = true)
