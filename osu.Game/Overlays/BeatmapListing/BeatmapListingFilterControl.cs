@@ -15,7 +15,6 @@ using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
@@ -60,9 +59,6 @@ namespace osu.Game.Overlays.BeatmapListing
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
 
         public BeatmapListingFilterControl()
         {
@@ -119,7 +115,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            sortControlBackground.Colour = colourProvider.Background5;
+            sortControlBackground.Colour = colourProvider.Background4;
         }
 
         public void Search(string query)

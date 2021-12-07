@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -146,7 +147,8 @@ namespace osu.Game.Online.API.Requests.Responses
             return scoreInfo;
         }
 
-        public IRulesetInfo Ruleset => new RulesetInfo { ID = RulesetID };
+        public IRulesetInfo Ruleset => new RulesetInfo { OnlineID = RulesetID };
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => throw new NotImplementedException();
 
         IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
     }

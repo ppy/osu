@@ -78,6 +78,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("playlist item is not expired", () => Client.APIRoom?.Playlist[1].Expired == false);
         }
 
+        [Test]
+        public void TestCorrectItemSelectedAfterNewItemAdded()
+        {
+            addItem(() => OtherBeatmap);
+            AddAssert("selected beatmap is initial beatmap", () => Beatmap.Value.BeatmapInfo.OnlineID == InitialBeatmap.OnlineID);
+        }
+
         private void addItem(Func<BeatmapInfo> beatmap)
         {
             AddStep("click edit button", () =>
@@ -86,7 +93,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for song select", () => CurrentSubScreen is Screens.Select.SongSelect select && select.IsLoaded);
+            AddUntilStep("wait for song select", () => CurrentSubScreen is Screens.Select.SongSelect select && select.BeatmapSetsLoaded);
             AddStep("select other beatmap", () => ((Screens.Select.SongSelect)CurrentSubScreen).FinaliseSelection(beatmap()));
             AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
         }

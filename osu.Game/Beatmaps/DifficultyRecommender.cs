@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         [Resolved]
         private Bindable<RulesetInfo> ruleset { get; set; }
@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         private int? requestedUserId;
 
-        private readonly Dictionary<RulesetInfo, double> recommendedDifficultyMapping = new Dictionary<RulesetInfo, double>();
+        private readonly Dictionary<IRulesetInfo, double> recommendedDifficultyMapping = new Dictionary<IRulesetInfo, double>();
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
@@ -83,7 +83,7 @@ namespace osu.Game.Beatmaps
             requestedUserId = api.LocalUser.Value.Id;
 
             // only query API for built-in rulesets
-            rulesets.AvailableRulesets.Where(ruleset => ruleset.ID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID).ForEach(rulesetInfo =>
+            rulesets.AvailableRulesets.Where(ruleset => ruleset.OnlineID >= 0 && ruleset.OnlineID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID).ForEach(rulesetInfo =>
             {
                 var req = new GetUserRequest(api.LocalUser.Value.Id, rulesetInfo);
 
@@ -101,7 +101,7 @@ namespace osu.Game.Beatmaps
         /// Rulesets ordered descending by their respective recommended difficulties.
         /// The currently selected ruleset will always be first.
         /// </returns>
-        private IEnumerable<RulesetInfo> orderedRulesets
+        private IEnumerable<IRulesetInfo> orderedRulesets
         {
             get
             {

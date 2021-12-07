@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
@@ -15,6 +17,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// </summary>
     public class TestMultiplayerRoomManager : MultiplayerRoomManager
     {
+        public bool RoomJoined { get; private set; }
+
         private readonly TestRoomRequestsHandler requestsHandler;
 
         public TestMultiplayerRoomManager(TestRoomRequestsHandler requestsHandler)
@@ -24,10 +28,35 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public IReadOnlyList<Room> ServerSideRooms => requestsHandler.ServerSideRooms;
 
+        public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
+        {
+            base.CreateRoom(room, r =>
+            {
+                onSuccess?.Invoke(r);
+                RoomJoined = true;
+            }, onError);
+        }
+
+        public override void JoinRoom(Room room, string password = null, Action<Room> onSuccess = null, Action<string> onError = null)
+        {
+            base.JoinRoom(room, password, r =>
+            {
+                onSuccess?.Invoke(r);
+                RoomJoined = true;
+            }, onError);
+        }
+
+        public override void PartRoom()
+        {
+            base.PartRoom();
+            RoomJoined = false;
+        }
+
         /// <summary>
         /// Adds a room to a local "server-side" list that's returned when a <see cref="GetRoomsRequest"/> is fired.
         /// </summary>
         /// <param name="room">The room.</param>
-        public void AddServerSideRoom(Room room) => requestsHandler.AddServerSideRoom(room);
+        /// <param name="host">The host.</param>
+        public void AddServerSideRoom(Room room, APIUser host) => requestsHandler.AddServerSideRoom(room, host);
     }
 }

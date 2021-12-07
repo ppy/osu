@@ -16,7 +16,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
     {
         private BeatmapInfo getExampleBeatmap() => new BeatmapInfo
         {
-            Ruleset = new RulesetInfo { ID = 5 },
+            Ruleset = new RulesetInfo { OnlineID = 5 },
             StarRating = 4.0d,
             BaseDifficulty = new BeatmapDifficulty
             {
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Length = 2500,
             BPM = 160,
             BeatDivisor = 12,
-            Status = BeatmapSetOnlineStatus.Loved
+            Status = BeatmapOnlineStatus.Loved
         };
 
         [Test]
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { ID = 6 }
+                Ruleset = new RulesetInfo { OnlineID = 6 }
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { ID = 6 },
+                Ruleset = new RulesetInfo { OnlineID = 6 },
                 AllowConvertedBeatmaps = true
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { ID = 6 },
+                Ruleset = new RulesetInfo { OnlineID = 6 },
                 AllowConvertedBeatmaps = true,
                 ApproachRate = new FilterCriteria.OptionalRange<float>
                 {
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { ID = 6 },
+                Ruleset = new RulesetInfo { OnlineID = 6 },
                 AllowConvertedBeatmaps = true,
                 BPM = new FilterCriteria.OptionalRange<double>
                 {
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { ID = 6 },
+                Ruleset = new RulesetInfo { OnlineID = 6 },
                 AllowConvertedBeatmaps = true,
                 SearchText = terms
             };

@@ -2,14 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
@@ -21,15 +17,13 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
+using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestScenePlaylistsSongSelect : OnlinePlayTestScene
     {
-        [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
-
         private BeatmapManager manager;
 
         private RulesetStore rulesets;
@@ -42,43 +36,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
 
-            var beatmaps = new List<BeatmapInfo>();
+            var beatmapSet = TestResources.CreateTestBeatmapSetInfo();
 
-            for (int i = 0; i < 6; i++)
-            {
-                int beatmapId = 10 * 10 + i;
-
-                int length = RNG.Next(30000, 200000);
-                double bpm = RNG.NextSingle(80, 200);
-
-                beatmaps.Add(new BeatmapInfo
-                {
-                    Ruleset = new OsuRuleset().RulesetInfo,
-                    OnlineID = beatmapId,
-                    DifficultyName = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
-                    Length = length,
-                    BPM = bpm,
-                    BaseDifficulty = new BeatmapDifficulty
-                    {
-                        OverallDifficulty = 3.5f,
-                    },
-                });
-            }
-
-            manager.Import(new BeatmapSetInfo
-            {
-                OnlineID = 10,
-                Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
-                Metadata = new BeatmapMetadata
-                {
-                    // Create random metadata, then we can check if sorting works based on these
-                    Artist = "Some Artist " + RNG.Next(0, 9),
-                    Title = $"Some Song (set id 10), max bpm {beatmaps.Max(b => b.BPM):0.#})",
-                    AuthorString = "Some Guy " + RNG.Next(0, 9),
-                },
-                Beatmaps = beatmaps,
-                DateAdded = DateTimeOffset.UtcNow,
-            }).Wait();
+            manager.Import(beatmapSet).Wait();
         }
 
         public override void SetUpSteps()
@@ -94,7 +54,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("create song select", () => LoadScreen(songSelect = new TestPlaylistsSongSelect(SelectedRoom.Value)));
-            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen());
+            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
         }
 
         [Test]

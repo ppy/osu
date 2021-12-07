@@ -6,7 +6,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Skinning
 {
-    public class SkinStore : MutableDatabaseBackedStoreWithFileIncludes<SkinInfo, SkinFileInfo>
+    public class SkinStore : MutableDatabaseBackedStoreWithFileIncludes<EFSkinInfo, SkinFileInfo>
     {
         public SkinStore(DatabaseContextFactory contextFactory, Storage storage = null)
             : base(contextFactory, storage)

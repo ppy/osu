@@ -132,9 +132,6 @@ namespace osu.Game.Screens.Edit.Timing
                 controlPoints.BindTo(group.ControlPoints);
             }
 
-            [Resolved]
-            private OsuColour colours { get; set; }
-
             [BackgroundDependencyLoader]
             private void load()
             {

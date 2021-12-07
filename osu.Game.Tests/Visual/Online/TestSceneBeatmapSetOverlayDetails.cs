@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 },
                 Ratings = Enumerable.Range(0, 11).Select(_ => RNG.Next(10)).ToArray(),
-                Status = BeatmapSetOnlineStatus.Ranked
+                Status = BeatmapOnlineStatus.Ranked
             };
         }
 
