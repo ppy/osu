@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -176,18 +175,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             sampleJoin?.Play();
             lounge?.Join(Room, null);
             return true;
-        }
-
-        protected override IEnumerable<Drawable> CreateBottomDetails()
-        {
-            if (Room.Type.Value == MatchType.Playlists)
-                return base.CreateBottomDetails();
-
-            return new Drawable[]
-            {
-                new MatchTypePill(),
-                new QueueModePill(),
-            }.Concat(base.CreateBottomDetails());
         }
 
         public class PasswordEntryPopover : OsuPopover
