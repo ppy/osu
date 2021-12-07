@@ -228,7 +228,10 @@ namespace osu.Game.Screens.Play
             onlineBeatmapRequest.Success += beatmapSet => Schedule(() =>
             {
                 this.beatmapSet = beatmapSet;
-                beatmapPanelContainer.Child = new BeatmapCard(this.beatmapSet);
+                beatmapPanelContainer.Child = new BeatmapCard(this.beatmapSet)
+                {
+                    Expanded = { Disabled = true }
+                };
                 checkForAutomaticDownload();
             });
 

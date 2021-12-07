@@ -151,7 +151,8 @@ namespace osu.Game.Overlays
                 }
 
                 // spawn new children with the contained so we only clear old content at the last moment.
-                var content = new FillFlowContainer<BeatmapCard>
+                // reverse ID flow is required for correct Z-ordering of the cards' expandable content (last card should be front-most).
+                var content = new ReverseChildIDFillFlowContainer<BeatmapCard>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
