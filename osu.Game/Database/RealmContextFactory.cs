@@ -14,6 +14,8 @@ using osu.Framework.Statistics;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Skinning;
+using osu.Game.Stores;
 using Realms;
 
 #nullable enable
@@ -41,13 +43,17 @@ namespace osu.Game.Database
         /// 8    2021-10-29    Rebind scroll adjust keys to not have control modifier.
         /// 9    2021-11-04    Converted BeatmapMetadata.Author from string to RealmUser.
         /// 10   2021-11-22    Use ShortName instead of RulesetID for ruleset settings.
+        /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
+        /// 12   2021-11-24    Add Status to RealmBeatmapSet.
         /// </summary>
-        private const int schema_version = 10;
+        private const int schema_version = 12;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
         /// </summary>
         private readonly SemaphoreSlim contextCreationLock = new SemaphoreSlim(1);
+
+        private readonly ThreadLocal<bool> currentThreadCanCreateContexts = new ThreadLocal<bool>();
 
         private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>(@"Realm", @"Dirty Refreshes");
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
@@ -94,6 +100,7 @@ namespace osu.Game.Database
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
 
+            // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
             cleanupPendingDeletions();
         }
 
@@ -112,8 +119,17 @@ namespace osu.Game.Database
                     realm.Remove(s);
                 }
 
+                var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
+
+                foreach (var s in pendingDeleteSkins)
+                    realm.Remove(s);
+
                 transaction.Commit();
             }
+
+            // clean up files after dropping any pending deletions.
+            // in the future we may want to only do this when the game is idle, rather than on every startup.
+            new RealmFileStore(this, storage).Cleanup();
         }
 
         /// <summary>
@@ -139,9 +155,22 @@ namespace osu.Game.Database
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
+            bool tookSemaphoreLock = false;
+
             try
             {
-                contextCreationLock.Wait();
+                if (!currentThreadCanCreateContexts.Value)
+                {
+                    contextCreationLock.Wait();
+                    currentThreadCanCreateContexts.Value = true;
+                    tookSemaphoreLock = true;
+                }
+                else
+                {
+                    // the semaphore is used to handle blocking of all context creation during certain periods.
+                    // once the semaphore has been taken by this code section, it is safe to create further contexts on the same thread.
+                    // this can happen if a realm subscription is active and triggers a callback which has user code that calls `CreateContext`.
+                }
 
                 contexts_created.Value++;
 
@@ -149,7 +178,11 @@ namespace osu.Game.Database
             }
             finally
             {
-                contextCreationLock.Release();
+                if (tookSemaphoreLock)
+                {
+                    contextCreationLock.Release();
+                    currentThreadCanCreateContexts.Value = false;
+                }
             }
         }
 
@@ -248,6 +281,9 @@ namespace osu.Game.Database
                 case 10:
                     string rulesetSettingClassName = getMappedOrOriginalName(typeof(RealmRulesetSetting));
 
+                    if (!migration.OldRealm.Schema.TryFindObjectSchema(rulesetSettingClassName, out _))
+                        return;
+
                     var oldSettings = migration.OldRealm.DynamicApi.All(rulesetSettingClassName);
                     var newSettings = migration.NewRealm.All<RealmRulesetSetting>().ToList();
 
@@ -255,6 +291,34 @@ namespace osu.Game.Database
                     {
                         dynamic? oldItem = oldSettings.ElementAt(i);
                         var newItem = newSettings.ElementAt(i);
+
+                        long rulesetId = oldItem.RulesetID;
+                        string? rulesetName = getRulesetShortNameFromLegacyID(rulesetId);
+
+                        if (string.IsNullOrEmpty(rulesetName))
+                            migration.NewRealm.Remove(newItem);
+                        else
+                            newItem.RulesetName = rulesetName;
+                    }
+
+                    break;
+
+                case 11:
+                    string keyBindingClassName = getMappedOrOriginalName(typeof(RealmKeyBinding));
+
+                    if (!migration.OldRealm.Schema.TryFindObjectSchema(keyBindingClassName, out _))
+                        return;
+
+                    var oldKeyBindings = migration.OldRealm.DynamicApi.All(keyBindingClassName);
+                    var newKeyBindings = migration.NewRealm.All<RealmKeyBinding>().ToList();
+
+                    for (int i = 0; i < newKeyBindings.Count; i++)
+                    {
+                        dynamic? oldItem = oldKeyBindings.ElementAt(i);
+                        var newItem = newKeyBindings.ElementAt(i);
+
+                        if (oldItem.RulesetID == null)
+                            continue;
 
                         long rulesetId = oldItem.RulesetID;
                         string? rulesetName = getRulesetShortNameFromLegacyID(rulesetId);

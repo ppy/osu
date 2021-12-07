@@ -584,7 +584,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     {
                         OnlineID = 1,
                         Metadata = metadata,
-                        Beatmaps = new List<BeatmapInfo>
+                        Beatmaps =
                         {
                             new BeatmapInfo
                             {
@@ -596,7 +596,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             {
                                 OnlineID = 2,
                                 Metadata = metadata,
-                                Status = BeatmapSetOnlineStatus.Loved,
+                                Status = BeatmapOnlineStatus.Loved,
                                 BaseDifficulty = difficulty
                             }
                         }
@@ -1050,7 +1050,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private static void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
         {
-            Assert.AreEqual(expected, osu.Dependencies.Get<FileStore>().QueryFiles(f => f.ReferenceCount == 1).Count());
+            Assert.AreEqual(expected, osu.Dependencies.Get<DatabaseContextFactory>().Get().FileInfo.Count(f => f.ReferenceCount == 1));
         }
 
         private static void ensureLoaded(OsuGameBase osu, int timeout = 60000)

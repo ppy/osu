@@ -26,11 +26,20 @@ namespace osu.Game.Models
 
         public DateTimeOffset DateAdded { get; set; }
 
-        public IBeatmapMetadataInfo? Metadata => Beatmaps.FirstOrDefault()?.Metadata;
+        public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new RealmBeatmapMetadata();
 
         public IList<RealmBeatmap> Beatmaps { get; } = null!;
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
+
+        public BeatmapOnlineStatus Status
+        {
+            get => (BeatmapOnlineStatus)StatusInt;
+            set => StatusInt = (int)value;
+        }
+
+        [MapTo(nameof(Status))]
+        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
 
         public bool DeletePending { get; set; }
 
@@ -62,12 +71,11 @@ namespace osu.Game.Models
             return ID == other.ID;
         }
 
-        public override string ToString() => Metadata?.GetDisplayString() ?? base.ToString();
+        public override string ToString() => Metadata.GetDisplayString();
 
         public bool Equals(IBeatmapSetInfo? other) => other is RealmBeatmapSet b && Equals(b);
 
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
-
-        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
     }
 }

@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps.Drawables
             // matching web: https://github.com/ppy/osu-web/blob/d06d8c5e735eb1f48799b1654b528e9a7afb0a35/resources/assets/lib/beatmapset-panel.tsx#L127
             bool collapsed = beatmapSet.Beatmaps.Count() > 12;
 
-            foreach (var rulesetGrouping in beatmapSet.Beatmaps.GroupBy(beatmap => beatmap.Ruleset.OnlineID))
+            foreach (var rulesetGrouping in beatmapSet.Beatmaps.GroupBy(beatmap => beatmap.Ruleset.OnlineID).OrderBy(group => group.Key))
             {
                 flow.Add(new RulesetDifficultyGroup(rulesetGrouping.Key, rulesetGrouping, collapsed));
             }
@@ -117,7 +117,7 @@ namespace osu.Game.Beatmaps.Drawables
                 Spacing = new Vector2(1, 0);
                 Direction = FillDirection.Horizontal;
 
-                var icon = rulesets.GetRuleset(rulesetId)?.CreateInstance()?.CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
+                var icon = rulesets.GetRuleset(rulesetId)?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
                 Add(icon.With(i =>
                 {
                     i.Size = new Vector2(14);

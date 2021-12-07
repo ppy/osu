@@ -21,9 +21,6 @@ namespace osu.Game.Tournament.Screens.Setup
 {
     public class StablePathSelectScreen : TournamentScreen
     {
-        [Resolved]
-        private GameHost host { get; set; }
-
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
 

@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets
         private readonly RealmContextFactory realmFactory;
         private readonly RulesetStore rulesets;
 
-        private readonly Dictionary<int, IRulesetConfigManager> configCache = new Dictionary<int, IRulesetConfigManager>();
+        private readonly Dictionary<string, IRulesetConfigManager> configCache = new Dictionary<string, IRulesetConfigManager>();
 
         public RulesetConfigCache(RealmContextFactory realmFactory, RulesetStore rulesets)
         {
@@ -36,10 +36,10 @@ namespace osu.Game.Rulesets
             // let's keep things simple for now and just retrieve all the required configs at startup..
             foreach (var ruleset in rulesets.AvailableRulesets)
             {
-                if (ruleset.ID == null)
+                if (string.IsNullOrEmpty(ruleset.ShortName))
                     continue;
 
-                configCache[ruleset.ID.Value] = ruleset.CreateInstance().CreateConfig(settingsStore);
+                configCache[ruleset.ShortName] = ruleset.CreateInstance().CreateConfig(settingsStore);
             }
         }
 
@@ -51,10 +51,7 @@ namespace osu.Game.Rulesets
         /// <exception cref="InvalidOperationException">If <paramref name="ruleset"/> doesn't have a valid <see cref="RulesetInfo.ID"/>.</exception>
         public IRulesetConfigManager GetConfigFor(Ruleset ruleset)
         {
-            if (ruleset.RulesetInfo.ID == null)
-                return null;
-
-            if (!configCache.TryGetValue(ruleset.RulesetInfo.ID.Value, out var config))
+            if (!configCache.TryGetValue(ruleset.RulesetInfo.ShortName, out var config))
                 // any ruleset request which wasn't initialised on startup should not be stored to realm.
                 // this should only be used by tests.
                 return ruleset.CreateConfig(null);

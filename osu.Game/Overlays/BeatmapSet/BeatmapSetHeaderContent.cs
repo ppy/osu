@@ -17,7 +17,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osuTK;
 
@@ -286,7 +285,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new BeatmapPanelDownloadButton(BeatmapSet.Value)
+                    downloadButtonsContainer.Child = new BeatmapDownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y,

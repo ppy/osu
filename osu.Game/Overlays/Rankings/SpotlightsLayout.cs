@@ -1,21 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Bindables;
-using osu.Game.Rulesets;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
-using osuTK;
-using osu.Framework.Allocation;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.Rankings.Tables;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Rankings.Tables;
+using osu.Game.Rulesets;
+using osuTK;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -28,9 +28,6 @@ namespace osu.Game.Overlays.Rankings
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
 
         private CancellationTokenSource cancellationToken;
         private GetSpotlightRankingsRequest getRankingsRequest;
@@ -143,7 +140,7 @@ namespace osu.Game.Overlays.Rankings
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(10),
-                    Children = response.BeatmapSets.Select(b => new GridBeatmapPanel(b)
+                    Children = response.BeatmapSets.Select(b => new BeatmapCard(b)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,

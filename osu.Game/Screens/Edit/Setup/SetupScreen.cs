@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Setup
                 new DesignSection(),
             };
 
-            var rulesetSpecificSection = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateEditorSetupSection();
+            var rulesetSpecificSection = beatmap.BeatmapInfo.Ruleset?.CreateInstance().CreateEditorSetupSection();
             if (rulesetSpecificSection != null)
                 sectionsEnumerable.Add(rulesetSpecificSection);
 

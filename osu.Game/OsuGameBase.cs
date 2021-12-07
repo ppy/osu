@@ -96,7 +96,11 @@ namespace osu.Game
 
         protected BeatmapManager BeatmapManager { get; private set; }
 
+        protected BeatmapModelDownloader BeatmapDownloader { get; private set; }
+
         protected ScoreManager ScoreManager { get; private set; }
+
+        protected ScoreModelDownloader ScoreDownloader { get; private set; }
 
         protected SkinManager SkinManager { get; private set; }
 
@@ -138,6 +142,7 @@ namespace osu.Game
         private BeatmapDifficultyCache difficultyCache;
 
         private UserLookupCache userCache;
+        private BeatmapLookupCache beatmapCache;
 
         private FileStore fileStore;
 
@@ -191,8 +196,11 @@ namespace osu.Game
             runMigrations();
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
+            dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", contextFactory));
+
+            new EFToRealmMigrator(contextFactory, realmFactory, LocalConfig).Run();
 
             dependencies.CacheAs(Storage);
 
@@ -207,16 +215,8 @@ namespace osu.Game
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Resources, Audio));
+            dependencies.Cache(SkinManager = new SkinManager(Storage, realmFactory, Host, Resources, Audio, Scheduler));
             dependencies.CacheAs<ISkinSource>(SkinManager);
-
-            // needs to be done here rather than inside SkinManager to ensure thread safety of CurrentSkinInfo.
-            SkinManager.ItemRemoved += item => Schedule(() =>
-            {
-                // check the removed skin is not the current user choice. if it is, switch back to default.
-                if (item.ID == SkinManager.CurrentSkinInfo.Value.ID)
-                    SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
-            });
 
             EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
@@ -232,8 +232,11 @@ namespace osu.Game
             dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
+
+            dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
+            dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
 
             // the following realm components are not actively used yet, but initialised and kept up to date for initial testing.
             realmRulesetStore = new RealmRulesetStore(realmFactory, Storage);
@@ -258,11 +261,12 @@ namespace osu.Game
             dependencies.Cache(userCache = new UserLookupCache());
             AddInternal(userCache);
 
+            dependencies.Cache(beatmapCache = new BeatmapLookupCache());
+            AddInternal(beatmapCache);
+
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
-
-            migrateDataToRealm();
 
             dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(realmFactory, RulesetStore));
 
@@ -372,6 +376,13 @@ namespace osu.Game
             FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            realmFactory.Refresh();
+        }
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -436,39 +447,6 @@ namespace osu.Game
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
-
-        private void migrateDataToRealm()
-        {
-            using (var db = contextFactory.GetForWrite())
-            using (var realm = realmFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
-            {
-                // migrate ruleset settings. can be removed 20220315.
-                var existingSettings = db.Context.DatabasedSetting;
-
-                // only migrate data if the realm database is empty.
-                if (!realm.All<RealmRulesetSetting>().Any())
-                {
-                    foreach (var dkb in existingSettings)
-                    {
-                        if (dkb.RulesetID == null) continue;
-
-                        realm.Add(new RealmRulesetSetting
-                        {
-                            Key = dkb.Key,
-                            Value = dkb.StringValue,
-                            // important: this RulesetStore must be the EF one.
-                            RulesetName = RulesetStore.GetRuleset(dkb.RulesetID.Value).ShortName,
-                            Variant = dkb.Variant ?? 0,
-                        });
-                    }
-                }
-
-                db.Context.RemoveRange(existingSettings);
-
-                transaction.Commit();
-            }
-        }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
