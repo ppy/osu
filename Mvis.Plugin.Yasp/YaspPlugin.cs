@@ -38,7 +38,7 @@ namespace Mvis.Plugin.Yasp
         public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
             => new YaspSidebarSection(this);
 
-        public override int Version => 8;
+        public override int Version => 9;
 
         public YaspPlugin()
         {
@@ -97,13 +97,11 @@ namespace Mvis.Plugin.Yasp
                         {
                             Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                             Text = currentWorkingBeatmap.Metadata.TitleUnicode
-                                   ?? currentWorkingBeatmap.Metadata.Title
                         },
                         new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(size: 25),
                             Text = currentWorkingBeatmap.Metadata.ArtistUnicode
-                                   ?? currentWorkingBeatmap.Metadata.Artist
                         },
                         new OsuSpriteText
                         {

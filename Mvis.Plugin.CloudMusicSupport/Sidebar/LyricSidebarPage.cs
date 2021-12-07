@@ -1,16 +1,12 @@
-using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Screens;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 using osu.Game.Screens.LLin;
 using osu.Game.Screens.LLin.Plugins;
 using osu.Game.Screens.LLin.Plugins.Types;
@@ -33,15 +29,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         [Resolved]
         private IImplementLLin mvisScreen { get; set; }
 
-        [Resolved]
-        private Storage storage { get; set; }
-
-        [Resolved]
-        private DialogOverlay dialog { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private GameHost host { get; set; }
-
         private LyricPlugin plugin => (LyricPlugin)Plugin;
 
         public int BeatmapSetId;
@@ -50,14 +37,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
         private Toolbox toolbox;
 
-        private Bindable<bool> useDrawablePool;
-
         [BackgroundDependencyLoader]
         private void load(CustomColourProvider provider)
         {
-            var config = (LyricConfigManager)Config;
-            useDrawablePool = config.GetBindable<bool>(LyricSettings.UseDrawablePool);
-
             Children = new Drawable[]
             {
                 new FillFlowContainer
@@ -108,7 +90,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         private void onScreenChanged(IScreen lastscreen, IScreen newscreen)
         {
             if (newscreen is SidebarScreen screen)
-                toolbox.AddButtonRange(screen.Entries, (screen is LyricViewScreen || screen is LyricViewScreenWithDrawablePool));
+                toolbox.AddButtonRange(screen.Entries, (screen is LyricViewScreen));
         }
 
         protected override void LoadComplete()
@@ -116,25 +98,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             mvisScreen.OnBeatmapChanged(refreshBeatmap, this);
             refreshBeatmap(mvisScreen.Beatmap.Value);
 
-            useDrawablePool.BindValueChanged(onUseDrawablePoolChanged, true);
+            screenStack.Push(new LyricViewScreen());
             base.LoadComplete();
-        }
-
-        private void onUseDrawablePoolChanged(ValueChangedEvent<bool> v)
-        {
-            if (screenStack.CurrentScreen != null)
-            {
-                screenStack.Exit();
-
-                if (screenStack.CurrentScreen is LyricViewScreen
-                    || screenStack.CurrentScreen is LyricViewScreenWithDrawablePool)
-                    screenStack.Exit();
-            }
-
-            if (v.NewValue)
-                screenStack.Push(new LyricViewScreenWithDrawablePool());
-            else
-                screenStack.Push(new LyricViewScreen());
         }
 
         private void refreshBeatmap(WorkingBeatmap working)

@@ -31,9 +31,9 @@ namespace M.Resources.Localisation.LLin.Plugins
 
         public static LocalisableString LyricFadeOutDuration => new TranslatableString(getKey(@"lyric_fade_out_duration"), @"歌词淡出时间");
 
-        public static LocalisableString LyricAutoScrollMain => new TranslatableString(getKey(@"lyric_auto_scroll_main"), @"歌词自动滚动");
+        public static LocalisableString LyricAutoScrollMain => new TranslatableString(getKey(@"lyric_auto_scroll_main"), @"自动滚动歌词");
 
-        public static LocalisableString LyricAutoScrollSub => new TranslatableString(getKey(@"lyric_auto_scroll_sub"), @"与DrawablePool不兼容");
+        public static LocalisableString LyricAutoScrollSub => new TranslatableString(getKey(@"lyric_auto_scroll_sub"), @"使歌词界面自动滚动歌词");
 
         public static LocalisableString AudioControlRequest => new TranslatableString(getKey(@"audio_control_request"), @"编辑歌词需要禁用切歌功能");
 

@@ -28,7 +28,7 @@ namespace Mvis.Plugin.BottomBar
         private readonly SongProgressBar progressBar;
         private readonly Container contentContainer;
 
-        public override int Version => 8;
+        public override int Version => 9;
 
         public override TargetLayer Target => TargetLayer.FunctionBar;
 

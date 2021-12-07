@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        public string CompletionText { get; set; } = "Task has completed!";
+        public LocalisableString CompletionText { get; set; } = "Task has completed!";
 
         private float progress;
 

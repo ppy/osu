@@ -74,6 +74,7 @@ namespace osu.Game.Screens.LLin.Plugins
 
         public string Description = "插件描述";
         public string Author = "插件作者";
+        public string Website = "???";
 
         public abstract int Version { get; }
 

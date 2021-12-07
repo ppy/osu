@@ -42,7 +42,7 @@ namespace osu.Game.Screens.LLin.Plugins
         internal Action<LLinPlugin> OnPluginAdd;
         internal Action<LLinPlugin> OnPluginUnLoad;
 
-        public int PluginVersion => 8;
+        public int PluginVersion => 9;
         public int MinimumPluginVersion => 8;
         private const bool experimental = false;
 
@@ -106,6 +106,8 @@ namespace osu.Game.Screens.LLin.Plugins
 
             resolver.UpdatePluginDictionary(GetAllPlugins(false));
 
+#pragma warning disable 162
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (!DebugUtils.IsDebugBuild && experimental)
             {
                 Logger.Log($"看上去该版本 ({PluginVersion}) 尚处于实现性阶段。 "
@@ -113,6 +115,7 @@ namespace osu.Game.Screens.LLin.Plugins
                     LoggingTarget.Runtime,
                     LogLevel.Important);
             }
+#pragma warning restore 162
         }
 
         public IPluginConfigManager GetConfigManager(LLinPlugin pl) =>
@@ -194,7 +197,7 @@ namespace osu.Game.Screens.LLin.Plugins
 
                     using (var writer = new StreamWriter(File.OpenWrite(blockedPluginFilePath)))
                     {
-                        var serializedString = JsonConvert.SerializeObject(blockedProviders);
+                        string serializedString = JsonConvert.SerializeObject(blockedProviders);
                         writer.Write(serializedString);
                     }
                 }

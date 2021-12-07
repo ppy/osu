@@ -65,9 +65,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         private ScoreManager scoreManager { get; set; }
 
         [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
-
-        [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]

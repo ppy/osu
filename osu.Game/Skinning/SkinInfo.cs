@@ -1,30 +1,45 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Models;
+using Realms;
+
+#nullable enable
 
 namespace osu.Game.Skinning
 {
-    public class SkinInfo : IHasFiles<SkinFileInfo>, IEquatable<SkinInfo>, IHasPrimaryKey, ISoftDelete, IHasNamedFiles
+    [ExcludeFromDynamicCompile]
+    [MapTo("Skin")]
+    [JsonObject(MemberSerialization.OptIn)]
+    public class SkinInfo : RealmObject, IHasRealmFiles, IEquatable<SkinInfo>, IHasGuidPrimaryKey, ISoftDelete, IHasNamedFiles
     {
-        internal const int DEFAULT_SKIN = 0;
-        internal const int CLASSIC_SKIN = -1;
-        internal const int RANDOM_SKIN = -2;
+        internal static readonly Guid DEFAULT_SKIN = new Guid("2991CFD8-2140-469A-BCB9-2EC23FBCE4AD");
+        internal static readonly Guid CLASSIC_SKIN = new Guid("81F02CD3-EEC6-4865-AC23-FAE26A386187");
+        internal static readonly Guid RANDOM_SKIN = new Guid("D39DFEFB-477C-4372-B1EA-2BCEA5FB8908");
 
-        public int ID { get; set; }
+        [PrimaryKey]
+        [JsonProperty]
+        public Guid ID { get; set; } = Guid.NewGuid();
 
+        [JsonProperty]
         public string Name { get; set; } = string.Empty;
 
+        [JsonProperty]
         public string Creator { get; set; } = string.Empty;
 
-        public string Hash { get; set; }
+        [JsonProperty]
+        public string InstantiationInfo { get; set; } = string.Empty;
 
-        public string InstantiationInfo { get; set; }
+        public string Hash { get; set; } = string.Empty;
+
+        public bool Protected { get; set; }
 
         public virtual Skin CreateInstance(IStorageResourceProvider resources)
         {
@@ -36,23 +51,21 @@ namespace osu.Game.Skinning
             return (Skin)Activator.CreateInstance(type, this, resources);
         }
 
-        public List<SkinFileInfo> Files { get; } = new List<SkinFileInfo>();
+        public IList<RealmNamedFileUsage> Files { get; } = null!;
 
         public bool DeletePending { get; set; }
 
-        public static SkinInfo Default { get; } = new SkinInfo
+        public bool Equals(SkinInfo? other)
         {
-            ID = DEFAULT_SKIN,
-            Name = "osu! (triangles)",
-            Creator = "team osu!",
-            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
-        };
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
-        public bool Equals(SkinInfo other) => other != null && ID == other.ID;
+            return ID == other.ID;
+        }
 
         public override string ToString()
         {
-            string author = Creator == null ? string.Empty : $"({Creator})";
+            string author = string.IsNullOrEmpty(Creator) ? string.Empty : $"({Creator})";
             return $"{Name} {author}".Trim();
         }
 

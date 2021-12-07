@@ -25,9 +25,6 @@ namespace osu.Game.Tournament.Screens.Editors
 
         protected override BindableList<SeedingResult> Storage => team.SeedingResults;
 
-        [Resolved(canBeNull: true)]
-        private TournamentSceneManager sceneManager { get; set; }
-
         public SeedingEditorScreen(TournamentTeam team, TournamentScreen parentScreen)
             : base(parentScreen)
         {
@@ -37,9 +34,6 @@ namespace osu.Game.Tournament.Screens.Editors
         public class SeedingResultRow : CompositeDrawable, IModelBacked<SeedingResult>
         {
             public SeedingResult Model { get; }
-
-            [Resolved]
-            private LadderInfo ladderInfo { get; set; }
 
             public SeedingResultRow(TournamentTeam team, SeedingResult round)
             {

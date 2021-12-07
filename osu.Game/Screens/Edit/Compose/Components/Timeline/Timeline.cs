@@ -280,9 +280,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
-
-        [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
         /// <summary>

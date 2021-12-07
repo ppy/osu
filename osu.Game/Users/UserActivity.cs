@@ -29,9 +29,9 @@ namespace osu.Game.Users
         {
             public IBeatmapInfo BeatmapInfo { get; }
 
-            public RulesetInfo Ruleset { get; }
+            public IRulesetInfo Ruleset { get; }
 
-            protected InGame(IBeatmapInfo beatmapInfo, RulesetInfo ruleset)
+            protected InGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
             {
                 BeatmapInfo = beatmapInfo;
                 Ruleset = ruleset;
@@ -52,7 +52,7 @@ namespace osu.Game.Users
 
         public class InMultiplayerGame : InGame
         {
-            public InMultiplayerGame(IBeatmapInfo beatmapInfo, RulesetInfo ruleset)
+            public InMultiplayerGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
                 : base(beatmapInfo, ruleset)
             {
             }
@@ -62,7 +62,7 @@ namespace osu.Game.Users
 
         public class InPlaylistGame : InGame
         {
-            public InPlaylistGame(IBeatmapInfo beatmapInfo, RulesetInfo ruleset)
+            public InPlaylistGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
                 : base(beatmapInfo, ruleset)
             {
             }
@@ -70,7 +70,7 @@ namespace osu.Game.Users
 
         public class InSoloGame : InGame
         {
-            public InSoloGame(IBeatmapInfo beatmapInfo, RulesetInfo ruleset)
+            public InSoloGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
                 : base(beatmapInfo, ruleset)
             {
             }

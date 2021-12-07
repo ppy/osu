@@ -72,9 +72,6 @@ namespace osu.Game.Online.Leaderboards
         private SongSelect songSelect { get; set; }
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
-
-        [Resolved]
         private Storage storage { get; set; }
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true, bool isSongSelect = false)

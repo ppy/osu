@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Components
         private readonly string modAcronym;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         public TournamentModIcon(string modAcronym)
         {

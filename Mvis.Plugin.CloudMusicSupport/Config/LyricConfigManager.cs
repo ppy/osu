@@ -23,7 +23,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
             SetDefault(LyricSettings.LyricFadeOutDuration, 200f, 0, 1000);
             SetDefault(LyricSettings.SaveLrcWhenFetchFinish, true);
             SetDefault(LyricSettings.NoExtraShadow, true);
-            SetDefault(LyricSettings.UseDrawablePool, false);
             SetDefault(LyricSettings.AutoScrollToCurrent, false);
             SetDefault(LyricSettings.LyricDirection, Anchor.BottomCentre);
             SetDefault(LyricSettings.LyricPositionX, 0f, -1f, 1f);
@@ -43,7 +42,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
         LyricFadeOutDuration,
         SaveLrcWhenFetchFinish,
         NoExtraShadow,
-        UseDrawablePool,
         AutoScrollToCurrent,
         LyricDirection,
         LyricPositionX,
