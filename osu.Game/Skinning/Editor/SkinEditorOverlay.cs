@@ -3,13 +3,11 @@
 
 using System.Diagnostics;
 using JetBrains.Annotations;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 
@@ -27,9 +25,6 @@ namespace osu.Game.Skinning.Editor
         private SkinEditor skinEditor;
 
         public const float VISIBLE_TARGET_SCALE = 0.8f;
-
-        [Resolved]
-        private OsuColour colours { get; set; }
 
         public SkinEditorOverlay(ScalingContainer target)
         {

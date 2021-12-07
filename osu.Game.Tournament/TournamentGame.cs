@@ -71,7 +71,7 @@ namespace osu.Game.Tournament
                         loadingSpinner.Expire();
 
                         Logger.Error(t.Exception, "Couldn't load bracket with error");
-                        Add(new WarningBox("Your bracket.json file could not be parsed. Please check runtime.log for more details."));
+                        Add(new WarningBox($"Your {BRACKET_FILENAME} file could not be parsed. Please check runtime.log for more details."));
                     });
 
                     return;

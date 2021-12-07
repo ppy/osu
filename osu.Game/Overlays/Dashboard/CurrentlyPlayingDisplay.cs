@@ -44,9 +44,6 @@ namespace osu.Game.Overlays.Dashboard
         }
 
         [Resolved]
-        private IAPIProvider api { get; set; }
-
-        [Resolved]
         private UserLookupCache users { get; set; }
 
         protected override void LoadComplete()

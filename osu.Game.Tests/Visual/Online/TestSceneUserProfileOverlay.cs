@@ -4,8 +4,6 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
@@ -19,9 +17,6 @@ namespace osu.Game.Tests.Visual.Online
         protected override bool UseOnlineAPI => true;
 
         private readonly TestUserProfileOverlay profile;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
 
         public static readonly APIUser TEST_USER = new APIUser
         {

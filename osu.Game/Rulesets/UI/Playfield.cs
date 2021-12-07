@@ -19,7 +19,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 using osuTK;
 using System.Diagnostics;
-using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -87,9 +86,6 @@ namespace osu.Game.Rulesets.UI
 
         [Resolved(CanBeNull = true)]
         private IReadOnlyList<Mod> mods { get; set; }
-
-        [Resolved]
-        private ISampleStore sampleStore { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
