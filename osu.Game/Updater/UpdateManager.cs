@@ -100,7 +100,7 @@ namespace osu.Game.Updater
             public UpdateCompleteNotification(string version)
             {
                 this.version = version;
-                Text = $"恭喜!mfosu已更新到 {version}!\n点此查看发行注记。";
+                Text = $"恭喜!mfosu已更新到 {version}!";
             }
 
             [BackgroundDependencyLoader]
