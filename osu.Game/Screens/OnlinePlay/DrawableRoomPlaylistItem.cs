@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -50,6 +51,7 @@ namespace osu.Game.Screens.OnlinePlay
         private LinkFlowContainer authorText;
         private ExplicitContentBeatmapPill explicitContentPill;
         private ModDisplay modDisplay;
+        private FillFlowContainer buttonsFlow;
         private UpdateableAvatar ownerAvatar;
 
         private readonly IBindable<bool> valid = new Bindable<bool>();
@@ -66,9 +68,18 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
 
+        [Resolved]
+        private BeatmapLookupCache beatmapLookupCache { get; set; }
+
+        private PanelBackground panelBackground;
+
+        private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
+
         private readonly bool allowEdit;
         private readonly bool allowSelection;
         private readonly bool showItemOwner;
+
+        private FillFlowContainer mainFillFlow;
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => allowEdit || !allowSelection || SelectedItem.Value == Model;
 
@@ -130,10 +141,33 @@ namespace osu.Game.Screens.OnlinePlay
             valid.BindValueChanged(_ => Scheduler.AddOnce(refresh));
             requiredMods.CollectionChanged += (_, __) => Scheduler.AddOnce(refresh);
 
+            onScreenLoader.DelayedLoadStarted += _ =>
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        if (showItemOwner)
+                        {
+                            var foundUser = await userLookupCache.GetUserAsync(Item.OwnerID).ConfigureAwait(false);
+                            Schedule(() => ownerAvatar.User = foundUser);
+                        }
+
+                        if (Item.Beatmap.Value == null)
+                        {
+                            var foundBeatmap = await beatmapLookupCache.GetBeatmapAsync(Item.BeatmapID).ConfigureAwait(false);
+                            Schedule(() => Item.Beatmap.Value = foundBeatmap);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Error while populating playlist item {e}");
+                    }
+                });
+            };
+
             refresh();
         }
-
-        private PanelBackground panelBackground;
 
         private void refresh()
         {
@@ -143,22 +177,22 @@ namespace osu.Game.Screens.OnlinePlay
                 maskingContainer.BorderColour = colours.Red;
             }
 
-            if (showItemOwner)
-            {
-                ownerAvatar.Show();
-                userLookupCache.GetUserAsync(Item.OwnerID)
-                               .ContinueWith(u => Schedule(() => ownerAvatar.User = u.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
-            }
-
-            difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(ICON_HEIGHT) };
+            if (Item.Beatmap.Value != null)
+                difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(ICON_HEIGHT) };
+            else
+                difficultyIconContainer.Clear();
 
             panelBackground.Beatmap.Value = Item.Beatmap.Value;
 
             beatmapText.Clear();
-            beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineID.ToString(), null, text =>
+
+            if (Item.Beatmap.Value != null)
             {
-                text.Truncate = true;
-            });
+                beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineID.ToString(), null, text =>
+                {
+                    text.Truncate = true;
+                });
+            }
 
             authorText.Clear();
 
@@ -168,10 +202,16 @@ namespace osu.Game.Screens.OnlinePlay
                 authorText.AddUserLink(Item.Beatmap.Value.Metadata.Author);
             }
 
-            bool hasExplicitContent = (Item.Beatmap.Value.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
+            bool hasExplicitContent = (Item.Beatmap.Value?.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
             explicitContentPill.Alpha = hasExplicitContent ? 1 : 0;
 
             modDisplay.Current.Value = requiredMods.ToArray();
+
+            buttonsFlow.Clear();
+            buttonsFlow.ChildrenEnumerable = CreateButtons();
+
+            difficultyIconContainer.FadeInFromZero(500, Easing.OutQuint);
+            mainFillFlow.FadeInFromZero(500, Easing.OutQuint);
         }
 
         protected override Drawable CreateContent()
@@ -192,6 +232,7 @@ namespace osu.Game.Screens.OnlinePlay
                         Alpha = 0,
                         AlwaysPresent = true
                     },
+                    onScreenLoader,
                     panelBackground = new PanelBackground
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -217,7 +258,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     AutoSizeAxes = Axes.Both,
                                     Margin = new MarginPadding { Left = 8, Right = 8 },
                                 },
-                                new FillFlowContainer
+                                mainFillFlow = new FillFlowContainer
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -273,7 +314,7 @@ namespace osu.Game.Screens.OnlinePlay
                                         }
                                     }
                                 },
-                                new FillFlowContainer
+                                buttonsFlow = new FillFlowContainer
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
@@ -305,9 +346,9 @@ namespace osu.Game.Screens.OnlinePlay
         }
 
         protected virtual IEnumerable<Drawable> CreateButtons() =>
-            new Drawable[]
+            new[]
             {
-                new PlaylistDownloadButton(Item),
+                Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),
                 new PlaylistRemoveButton
                 {
                     Size = new Vector2(30, 30),
