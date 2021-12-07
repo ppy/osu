@@ -42,7 +42,7 @@ namespace osu.Game.Online.API
             if (WebRequest != null)
             {
                 Response = ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
-                Logger.Log($"{GetType()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes");
+                Logger.Log($"{GetType()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes", LoggingTarget.Network);
             }
         }
 
