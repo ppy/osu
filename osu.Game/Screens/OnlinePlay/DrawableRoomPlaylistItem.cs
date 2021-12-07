@@ -25,7 +25,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
@@ -71,9 +70,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; }
-
-        [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
 
         private PanelBackground panelBackground;
 
