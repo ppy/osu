@@ -62,5 +62,17 @@ namespace osu.Game.Tests.Online.Chat
         {
             Assert.IsFalse(MessageNotifier.checkContainsUsername("Test ha\u0460\u0460o message", "\u0460\u0460"));
         }
+
+        [Test]
+        public void TestContainsUsernameSpecialCharactersPositive()
+        {
+            Assert.IsTrue(MessageNotifier.checkContainsUsername("Test [#^-^#] message", "[#^-^#]"));
+        }
+
+        [Test]
+        public void TestContainsUsernameSpecialCharactersNegative()
+        {
+            Assert.IsFalse(MessageNotifier.checkContainsUsername("Test pad[#^-^#]oru message", "[#^-^#]"));
+        }
     }
 }
