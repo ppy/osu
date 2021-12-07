@@ -195,12 +195,7 @@ namespace osu.Game.Overlays.Mf.Sections
                                         {
                                             new OsuSpriteText
                                             {
-                                                Text = "目前osu!lazer与osu!stable存储文件的方式并不一样，因此在lazer下不存在'Songs'、'Skins'，lazer将几乎所有文件以sha256编码存在'files'中。",
-                                                RelativeSizeAxes = Axes.X
-                                            },
-                                            new OsuSpriteText
-                                            {
-                                                Text = "不过根据wiki，ppy或许会在本年上线一个游戏内管理功能，所以一起期待吧*摊手*",
+                                                Text = "目前osu!lazer与osu!stable存储文件的方式并不一样，因此在lazer下不存在诸如'Songs'、'Skins'这类文件夹, 只有一个'files'用于存储所有文件。",
                                                 RelativeSizeAxes = Axes.X
                                             },
                                             new Box
@@ -210,7 +205,7 @@ namespace osu.Game.Overlays.Mf.Sections
                                             },
                                             new OsuSpriteText
                                             {
-                                                Text = "详情请见: https://github.com/ppy/osu/wiki/User-file-storage",
+                                                Text = "详情请见 https://github.com/ppy/osu/wiki/User-file-storage",
                                                 RelativeSizeAxes = Axes.X
                                             }
                                         }
