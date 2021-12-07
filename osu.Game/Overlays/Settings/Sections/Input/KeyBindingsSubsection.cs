@@ -32,12 +32,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         [BackgroundDependencyLoader]
         private void load(RealmContextFactory realmFactory)
         {
-            int? rulesetId = Ruleset?.ID;
+            string rulesetName = Ruleset?.ShortName;
 
             List<RealmKeyBinding> bindings;
 
             using (var realm = realmFactory.CreateContext())
-                bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
+                bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetName == rulesetName && b.Variant == variant).Detach();
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {

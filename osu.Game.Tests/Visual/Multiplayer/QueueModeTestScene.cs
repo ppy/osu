@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -92,7 +93,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for join", () => Client.Room != null);
+            AddUntilStep("wait for join", () => RoomManager.RoomJoined);
         }
 
         [Test]
@@ -104,23 +105,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected void RunGameplay()
         {
             AddUntilStep("wait for idle", () => Client.LocalUser?.State == MultiplayerUserState.Idle);
-
-            AddStep("click ready button", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            clickReadyButton();
 
             AddUntilStep("wait for ready", () => Client.LocalUser?.State == MultiplayerUserState.Ready);
-
-            AddStep("click ready button", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            clickReadyButton();
 
             AddUntilStep("wait for player", () => multiplayerScreenStack.CurrentScreen is Player player && player.IsLoaded);
             AddStep("exit player", () => multiplayerScreenStack.MultiplayerScreen.MakeCurrent());
+        }
+
+        private void clickReadyButton()
+        {
+            AddUntilStep("wait for ready button to be enabled", () => this.ChildrenOfType<MultiplayerReadyButton>().Single().ChildrenOfType<Button>().Single().Enabled.Value);
+
+            AddStep("click ready button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
         }
     }
 }

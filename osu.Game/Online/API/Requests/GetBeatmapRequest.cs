@@ -26,9 +26,12 @@ namespace osu.Game.Online.API.Requests
         {
             var request = base.CreateWebRequest();
 
-            request.AddParameter(@"id", beatmapInfo.OnlineID.ToString());
-            request.AddParameter(@"checksum", beatmapInfo.MD5Hash);
-            request.AddParameter(@"filename", filename);
+            if (beatmapInfo.OnlineID > 0)
+                request.AddParameter(@"id", beatmapInfo.OnlineID.ToString());
+            if (!string.IsNullOrEmpty(beatmapInfo.MD5Hash))
+                request.AddParameter(@"checksum", beatmapInfo.MD5Hash);
+            if (!string.IsNullOrEmpty(filename))
+                request.AddParameter(@"filename", filename);
 
             return request;
         }

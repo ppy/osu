@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -220,23 +221,29 @@ namespace osu.Game.Tests.Visual
         {
             var beatmap = CreateBeatmap(ruleset ?? Ruleset.Value).BeatmapInfo;
 
+            Debug.Assert(beatmap.BeatmapSet != null);
+
             return new APIBeatmapSet
             {
                 OnlineID = ((IBeatmapSetInfo)beatmap.BeatmapSet).OnlineID,
-                Status = BeatmapSetOnlineStatus.Ranked,
+                Status = BeatmapOnlineStatus.Ranked,
                 Covers = new BeatmapSetOnlineCovers
                 {
                     Cover = "https://assets.ppy.sh/beatmaps/163112/covers/cover.jpg",
                     Card = "https://assets.ppy.sh/beatmaps/163112/covers/card.jpg",
                     List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg"
                 },
-                Title = beatmap.BeatmapSet.Metadata.Title,
-                TitleUnicode = beatmap.BeatmapSet.Metadata.TitleUnicode,
-                Artist = beatmap.BeatmapSet.Metadata.Artist,
-                ArtistUnicode = beatmap.BeatmapSet.Metadata.ArtistUnicode,
-                Author = beatmap.BeatmapSet.Metadata.Author,
-                Source = beatmap.BeatmapSet.Metadata.Source,
-                Tags = beatmap.BeatmapSet.Metadata.Tags,
+                Title = beatmap.Metadata.Title,
+                TitleUnicode = beatmap.Metadata.TitleUnicode,
+                Artist = beatmap.Metadata.Artist,
+                ArtistUnicode = beatmap.Metadata.ArtistUnicode,
+                Author = new APIUser
+                {
+                    Username = beatmap.Metadata.Author.Username,
+                    Id = beatmap.Metadata.Author.OnlineID
+                },
+                Source = beatmap.Metadata.Source,
+                Tags = beatmap.Metadata.Tags,
                 Beatmaps = new[]
                 {
                     new APIBeatmap
