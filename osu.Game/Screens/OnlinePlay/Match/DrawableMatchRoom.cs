@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -66,6 +68,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
         }
 
         protected override Drawable CreateBackground() => background = new BackgroundSprite();
+
+        protected override IEnumerable<Drawable> CreateBottomDetails() => new Drawable[]
+        {
+            new MatchTypePill(),
+            new QueueModePill(),
+        }.Concat(base.CreateBottomDetails());
 
         private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
         {
