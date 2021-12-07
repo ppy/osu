@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Database;
 using osu.Game.Rulesets;
-using Realms;
 
 namespace osu.Game.Input.Bindings
 {
@@ -56,7 +55,7 @@ namespace osu.Game.Input.Bindings
                                            .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
 
             realmSubscription = realmKeyBindings
-                .SubscribeForNotifications((sender, changes, error) =>
+                .QueryAsyncWithNotifications((sender, changes, error) =>
                 {
                     // first subscription ignored as we are handling this in LoadComplete.
                     if (changes == null)

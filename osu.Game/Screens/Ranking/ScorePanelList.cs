@@ -13,7 +13,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Scoring;
 using osuTK;
@@ -69,9 +68,6 @@ namespace osu.Game.Screens.Ranking
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
-
-        [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
 
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
         private readonly Flow flow;
