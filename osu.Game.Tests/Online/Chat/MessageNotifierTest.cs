@@ -7,7 +7,7 @@ using osu.Game.Online.Chat;
 namespace osu.Game.Tests.Online.Chat
 {
     [TestFixture]
-    public class TestCheckUsername
+    public class MessageNotifierTest
     {
         [Test]
         public void TestContainsUsernameMidlinePositive()
