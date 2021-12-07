@@ -275,20 +275,36 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected virtual Drawable CreateBackground() => new OnlinePlayBackgroundSprite();
 
-        protected virtual IEnumerable<Drawable> CreateBottomDetails() => new Drawable[]
+        protected virtual IEnumerable<Drawable> CreateBottomDetails()
         {
-            new PlaylistCountPill
+            var pills = new List<Drawable>();
+
+            if (Room.Type.Value != MatchType.Playlists)
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-            },
-            new StarRatingRangeDisplay
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Scale = new Vector2(0.8f)
+                pills.AddRange(new OnlinePlayComposite[]
+                {
+                    new MatchTypePill(),
+                    new QueueModePill(),
+                });
             }
-        };
+
+            pills.AddRange(new Drawable[]
+            {
+                new PlaylistCountPill
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                new StarRatingRangeDisplay
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Scale = new Vector2(0.8f)
+                }
+            });
+
+            return pills;
+        }
 
         private class RoomNameText : OsuSpriteText
         {
