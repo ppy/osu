@@ -87,16 +87,16 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 // Recreate the old setup that uses "tournament" as the base path.
                 string oldPath = Path.Combine(osuRoot, "tournament");
 
-                string videosPath = Path.Combine(oldPath, "videos");
-                string modsPath = Path.Combine(oldPath, "mods");
-                string flagsPath = Path.Combine(oldPath, "flags");
+                string videosPath = Path.Combine(oldPath, "Videos");
+                string modsPath = Path.Combine(oldPath, "Mods");
+                string flagsPath = Path.Combine(oldPath, "Flags");
 
                 Directory.CreateDirectory(videosPath);
                 Directory.CreateDirectory(modsPath);
                 Directory.CreateDirectory(flagsPath);
 
                 // Define testing files corresponding to the specific file migrations that are needed
-                string bracketFile = Path.Combine(osuRoot, "bracket.json");
+                string bracketFile = Path.Combine(osuRoot, TournamentGameBase.BRACKET_FILENAME);
 
                 string drawingsConfig = Path.Combine(osuRoot, "drawings.ini");
                 string drawingsFile = Path.Combine(osuRoot, "drawings.txt");
@@ -123,9 +123,9 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                     string migratedPath = Path.Combine(host.Storage.GetFullPath("."), "tournaments", "default");
 
-                    videosPath = Path.Combine(migratedPath, "videos");
-                    modsPath = Path.Combine(migratedPath, "mods");
-                    flagsPath = Path.Combine(migratedPath, "flags");
+                    videosPath = Path.Combine(migratedPath, "Videos");
+                    modsPath = Path.Combine(migratedPath, "Mods");
+                    flagsPath = Path.Combine(migratedPath, "Flags");
 
                     videoFile = Path.Combine(videosPath, "video.mp4");
                     modFile = Path.Combine(modsPath, "mod.png");
@@ -133,7 +133,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(migratedPath));
 
-                    Assert.True(storage.Exists("bracket.json"));
+                    Assert.True(storage.Exists(TournamentGameBase.BRACKET_FILENAME));
                     Assert.True(storage.Exists("drawings.txt"));
                     Assert.True(storage.Exists("drawings_results.txt"));
 

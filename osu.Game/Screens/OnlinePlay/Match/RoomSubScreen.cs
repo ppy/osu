@@ -302,6 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
+            updateWorkingBeatmap();
             beginHandlingTrack();
             Scheduler.AddOnce(UpdateMods);
         }
@@ -318,6 +319,16 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected void StartPlay()
         {
+            // User may be at song select or otherwise when the host starts gameplay.
+            // Ensure that they first return to this screen, else global bindables (beatmap etc.) may be in a bad state.
+            if (!this.IsCurrentScreen())
+            {
+                this.MakeCurrent();
+
+                Schedule(StartPlay);
+                return;
+            }
+
             sampleStart?.Play();
 
             // fallback is to allow this class to operate when there is no parent OnlineScreen (testing purposes).

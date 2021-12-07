@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, null, ContextFactory, Scheduler));
+            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
 
             return dependencies;
         }
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestBeatmapStates()
         {
-            foreach (BeatmapSetOnlineStatus status in Enum.GetValues(typeof(BeatmapSetOnlineStatus)))
+            foreach (BeatmapOnlineStatus status in Enum.GetValues(typeof(BeatmapOnlineStatus)))
                 AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
         }
 
@@ -384,7 +384,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private void showBeatmapWithStatus(BeatmapSetOnlineStatus status)
+        private void showBeatmapWithStatus(BeatmapOnlineStatus status)
         {
             leaderboard.BeatmapInfo = new BeatmapInfo
             {

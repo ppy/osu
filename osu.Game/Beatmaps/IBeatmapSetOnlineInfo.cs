@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The status of this beatmap set.
         /// </summary>
-        BeatmapSetOnlineStatus Status { get; }
+        BeatmapOnlineStatus Status { get; }
 
         /// <summary>
         /// Whether or not this beatmap set has explicit content.
@@ -105,7 +105,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Contains the current hype status of the beatmap set.
-        /// Non-null only for <see cref="BeatmapSetOnlineStatus.WIP"/>, <see cref="BeatmapSetOnlineStatus.Pending"/>, and <see cref="BeatmapSetOnlineStatus.Qualified"/> sets.
+        /// Non-null only for <see cref="BeatmapOnlineStatus.WIP"/>, <see cref="BeatmapOnlineStatus.Pending"/>, and <see cref="BeatmapOnlineStatus.Qualified"/> sets.
         /// </summary>
         /// <remarks>
         /// See: https://github.com/ppy/osu-web/blob/93930cd02cfbd49724929912597c727c9fbadcd1/app/Models/Beatmapset.php#L155

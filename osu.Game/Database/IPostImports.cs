@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Database
 {
-    public interface IPostImports<out TModel>
+    public interface IPostImports<TModel>
         where TModel : class
     {
         /// <summary>

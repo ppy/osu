@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -21,9 +23,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osuTK;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
-using osuTK.Graphics;
 using DownloadButton = osu.Game.Beatmaps.Drawables.Cards.Buttons.DownloadButton;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
@@ -42,27 +42,23 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private readonly BeatmapDownloadTracker downloadTracker;
 
-        private UpdateableOnlineBeatmapSetCover leftCover;
-        private FillFlowContainer leftIconArea;
+        private BeatmapCardThumbnail thumbnail = null!;
 
-        private Container rightAreaBackground;
-        private Container<BeatmapCardIconButton> rightAreaButtons;
+        private Container rightAreaBackground = null!;
+        private Container<BeatmapCardIconButton> rightAreaButtons = null!;
 
-        private Container mainContent;
-        private BeatmapCardContentBackground mainContentBackground;
+        private Container mainContent = null!;
+        private BeatmapCardContentBackground mainContentBackground = null!;
+        private FillFlowContainer<BeatmapCardStatistic> statisticsContainer = null!;
 
-        private GridContainer titleContainer;
-        private GridContainer artistContainer;
-        private FillFlowContainer<BeatmapCardStatistic> statisticsContainer;
-
-        private FillFlowContainer idleBottomContent;
-        private BeatmapCardDownloadProgressBar downloadProgressBar;
+        private FillFlowContainer idleBottomContent = null!;
+        private BeatmapCardDownloadProgressBar downloadProgressBar = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public BeatmapCard(APIBeatmapSet beatmapSet)
             : base(HoverSampleSet.Submit)
@@ -72,13 +68,17 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             downloadTracker = new BeatmapDownloadTracker(beatmapSet);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load(BeatmapSetOverlay? beatmapSetOverlay)
         {
             Width = width;
             Height = height;
             CornerRadius = corner_radius;
             Masking = true;
+
+            FillFlowContainer leftIconArea;
+            GridContainer titleContainer;
+            GridContainer artistContainer;
 
             InternalChildren = new Drawable[]
             {
@@ -98,24 +98,17 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         Colour = Colour4.White
                     },
                 },
-                new Container
+                thumbnail = new BeatmapCardThumbnail(beatmapSet)
                 {
                     Name = @"Left (icon) area",
                     Size = new Vector2(height),
-                    Children = new Drawable[]
+                    Padding = new MarginPadding { Right = corner_radius },
+                    Child = leftIconArea = new FillFlowContainer
                     {
-                        leftCover = new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            OnlineInfo = beatmapSet
-                        },
-                        leftIconArea = new FillFlowContainer
-                        {
-                            Margin = new MarginPadding(5),
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(1)
-                        }
+                        Margin = new MarginPadding(5),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(1)
                     }
                 },
                 new Container
@@ -319,10 +312,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             };
 
             if (beatmapSet.HasVideo)
-                leftIconArea.Add(new IconPill(FontAwesome.Solid.Film));
+                leftIconArea.Add(new IconPill(FontAwesome.Solid.Film) { IconSize = new Vector2(20) });
 
             if (beatmapSet.HasStoryboard)
-                leftIconArea.Add(new IconPill(FontAwesome.Solid.Image));
+                leftIconArea.Add(new IconPill(FontAwesome.Solid.Image) { IconSize = new Vector2(20) });
 
             if (beatmapSet.HasExplicitContent)
             {
@@ -343,6 +336,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Margin = new MarginPadding { Left = 5 }
                 };
             }
+
+            Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmapSet.OnlineID);
         }
 
         protected override void LoadComplete()
@@ -395,10 +390,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             if (IsHovered)
                 targetWidth = targetWidth - icon_area_width + corner_radius;
 
+            thumbnail.Dimmed.Value = IsHovered;
+
             mainContent.ResizeWidthTo(targetWidth, TRANSITION_DURATION, Easing.OutQuint);
             mainContentBackground.Dimmed.Value = IsHovered;
 
-            leftCover.FadeColour(IsHovered ? OsuColour.Gray(0.2f) : Color4.White, TRANSITION_DURATION, Easing.OutQuint);
             statisticsContainer.FadeTo(IsHovered ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
 
             rightAreaBackground.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, TRANSITION_DURATION, Easing.OutQuint);
