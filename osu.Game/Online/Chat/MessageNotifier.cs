@@ -134,7 +134,7 @@ namespace osu.Game.Online.Chat
         {
             string fullName = Regex.Escape(username);
             string underscoreName = Regex.Escape(username.Replace(' ', '_'));
-            return new Regex($"(^|^\\W|\\W|\\w\\W)({fullName}|{underscoreName})($|$\\W|\\W|\\w\\W)", RegexOptions.IgnoreCase).IsMatch(message);
+            return Regex.IsMatch(message, $@"(^|\W)({fullName}|{underscoreName})($|\W)", RegexOptions.IgnoreCase);
         }
 
         public class PrivateMessageNotification : OpenChannelNotification
