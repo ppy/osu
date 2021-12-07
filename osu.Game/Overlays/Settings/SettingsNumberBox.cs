@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Settings
 
         private class OutlinedNumberBox : OutlinedTextBox
         {
-            protected override bool CanAddCharacter(char character) => char.IsNumber(character);
+            protected override bool CanAddCharacter(char character) => character >= '0' && character <= '9';
 
             public new void NotifyInputError() => base.NotifyInputError();
         }
