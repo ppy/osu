@@ -74,5 +74,17 @@ namespace osu.Game.Tests.Online.Chat
         {
             Assert.IsFalse(MessageNotifier.checkContainsUsername("Test pad[#^-^#]oru message", "[#^-^#]"));
         }
+
+        [Test]
+        public void TestContainsUsernameAtSign()
+        {
+            Assert.IsTrue(MessageNotifier.checkContainsUsername("@username hi", "username"));
+        }
+
+        [Test]
+        public void TestContainsUsernameColon()
+        {
+            Assert.IsTrue(MessageNotifier.checkContainsUsername("username: hi", "username"));
+        }
     }
 }
