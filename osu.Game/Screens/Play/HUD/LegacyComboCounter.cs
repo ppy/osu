@@ -40,9 +40,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private bool isRolling;
 
-        [Resolved]
-        private ISkinSource skin { get; set; }
-
         private readonly Container counterContainer;
 
         /// <summary>

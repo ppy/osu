@@ -3,13 +3,11 @@
 
 using System;
 using System.Threading;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Online.Leaderboards
@@ -24,9 +22,6 @@ namespace osu.Game.Online.Leaderboards
         private readonly Func<TScoreInfo, LeaderboardScore> createScoreDelegate;
 
         protected override bool StartHidden => true;
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
 
         public UserTopScoreContainer(Func<TScoreInfo, LeaderboardScore> createScoreDelegate)
         {

@@ -23,9 +23,9 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         private readonly List<Room> serverSideRooms = new List<Room>();
 
-        private int currentRoomId;
-        private int currentPlaylistItemId;
-        private int currentScoreId;
+        private int currentRoomId = 1;
+        private int currentPlaylistItemId = 1;
+        private int currentScoreId = 1;
 
         /// <summary>
         /// Handles an API request, while also updating the local state to match

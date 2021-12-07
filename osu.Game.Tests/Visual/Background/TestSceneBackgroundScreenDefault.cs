@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -122,7 +123,7 @@ namespace osu.Game.Tests.Visual.Background
         private void setCustomSkin()
         {
             // feign a skin switch. this doesn't do anything except force CurrentSkin to become a LegacySkin.
-            AddStep("set custom skin", () => skins.CurrentSkinInfo.Value = new SkinInfo { ID = 5 });
+            AddStep("set custom skin", () => skins.CurrentSkinInfo.Value = new SkinInfo().ToLive());
         }
 
         private void setDefaultSkin() => AddStep("set default skin", () => skins.CurrentSkinInfo.SetDefault());

@@ -13,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -46,9 +45,6 @@ namespace osu.Game.Tests.Visual.Online
 
         [CanBeNull]
         private Func<Channel, List<Message>> onGetMessages;
-
-        [Resolved]
-        private GameHost host { get; set; }
 
         public TestSceneChatOverlay()
         {

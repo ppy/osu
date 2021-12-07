@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Database
 
                 using (var updateThreadContext = realmFactory.CreateContext())
                 {
-                    updateThreadContext.All<RealmBeatmap>().SubscribeForNotifications(gotChange);
+                    updateThreadContext.All<RealmBeatmap>().QueryAsyncWithNotifications(gotChange);
                     ILive<RealmBeatmap>? liveBeatmap = null;
 
                     Task.Factory.StartNew(() =>

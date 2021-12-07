@@ -23,10 +23,19 @@ namespace osu.Game.Skinning
 {
     public class DefaultSkin : Skin
     {
+        public static SkinInfo CreateInfo() => new SkinInfo
+        {
+            ID = osu.Game.Skinning.SkinInfo.DEFAULT_SKIN,
+            Name = "osu! (triangles)",
+            Creator = "team osu!",
+            Protected = true,
+            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
+        };
+
         private readonly IStorageResourceProvider resources;
 
         public DefaultSkin(IStorageResourceProvider resources)
-            : this(SkinInfo.Default, resources)
+            : this(CreateInfo(), resources)
         {
         }
 
