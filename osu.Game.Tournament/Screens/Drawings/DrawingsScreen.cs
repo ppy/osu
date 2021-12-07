@@ -65,7 +65,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                         Origin = Anchor.Centre,
                         Height = 0.3f,
                     },
-                    new WarningBox("No drawings.txt file found. Please create one and restart the client."),
+                    new WarningBox("未找到drawings.txt。请先创建一个并重启比赛端。"),
                     links = new LinkFlowContainer
                     {
                         Anchor = Anchor.Centre,
@@ -75,7 +75,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                     }
                 };
 
-                links.AddLink("Click for details on the file format", "https://osu.ppy.sh/wiki/en/Tournament_Drawings", t => t.Colour = Color4.White);
+                links.AddLink("点击此处查看文件格式", "https://osu.ppy.sh/wiki/en/Tournament_Drawings", t => t.Colour = Color4.White);
                 return;
             }
 

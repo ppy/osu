@@ -12,6 +12,7 @@ using osuTK;
 namespace osu.Game.Overlays.Mf.Sections
 {
     //todo: 优化这里的实现方式...
+    //2021.12.7: 干脆重做算了
     public class MfMenuFaqSection : MfMenuSection
     {
         public override string Title => "常见问题";
