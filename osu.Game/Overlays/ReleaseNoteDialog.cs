@@ -53,7 +53,7 @@ namespace osu.Game.Overlays
                     Height = 0.1f,
                     Child = new OsuSpriteText
                     {
-                        Text = "发行注记",
+                        Text = "有关后续更新的打算",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Font = OsuFont.GetFont(size: 26)
