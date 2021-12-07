@@ -24,22 +24,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public readonly double StrainTime;
 
         /// <summary>
-        /// Normalised distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
+        /// Normalised distance from the "lazy" end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
+        /// <para>
+        /// The "lazy" end position is the position at which the cursor ends up if the previous hitobject is followed with as minimal movement as possible (i.e. on the edge of slider follow circles).
+        /// </para>
         /// </summary>
-        public double JumpDistance { get; private set; }
+        public double LazyJumpDistance { get; private set; }
 
         /// <summary>
-        /// Normalised minimum distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
+        /// Normalised shortest distance to consider for a jump between the previous <see cref="OsuDifficultyHitObject"/> and this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         /// <remarks>
-        /// This is bounded by <see cref="JumpDistance"/>, but may be smaller if a more natural path is able to be taken through a preceding slider.
+        /// This is bounded from above by <see cref="LazyJumpDistance"/>, and is smaller than the former if a more natural path is able to be taken through the previous <see cref="OsuDifficultyHitObject"/>.
         /// </remarks>
-        public double MovementDistance { get; private set; }
+        /// <example>
+        /// Suppose a linear slider - circle pattern.
+        /// <br />
+        /// Following the slider lazily (see: <see cref="LazyJumpDistance"/>) will result in underestimating the true end position of the slider as being closer towards the start position.
+        /// As a result, <see cref="LazyJumpDistance"/> overestimates the jump distance because the player is able to take a more natural path by following through the slider to its end,
+        /// such that the jump is felt as only starting from the slider's true end position.
+        /// <br />
+        /// Now consider a slider - circle pattern where the circle is stacked along the path inside the slider.
+        /// In this case, the lazy end position correctly estimates the true end position of the slider and provides the more natural movement path.
+        /// </example>
+        public double MinimumJumpDistance { get; private set; }
 
         /// <summary>
-        /// The time taken to travel through <see cref="MovementDistance"/>, with a minimum value of 25ms.
+        /// The time taken to travel through <see cref="MinimumJumpDistance"/>, with a minimum value of 25ms.
         /// </summary>
-        public double MovementTime { get; private set; }
+        public double MinimumJumpTime { get; private set; }
 
         /// <summary>
         /// Normalised distance between the start and end position of this <see cref="OsuDifficultyHitObject"/>.
@@ -96,14 +109,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
-            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-            MovementTime = StrainTime;
-            MovementDistance = JumpDistance;
+            LazyJumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            MinimumJumpTime = StrainTime;
+            MinimumJumpDistance = LazyJumpDistance;
 
             if (lastObject is Slider lastSlider)
             {
                 double lastTravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
-                MovementTime = Math.Max(StrainTime - lastTravelTime, min_delta_time);
+                MinimumJumpTime = Math.Max(StrainTime - lastTravelTime, min_delta_time);
 
                 //
                 // We'll try to better approximate the real movements a player will take in patterns following on from sliders. Consider the following slider-to-object patterns:
@@ -127,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 //
 
                 float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
-                MovementDistance = Math.Max(0, Math.Min(JumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
+                MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
