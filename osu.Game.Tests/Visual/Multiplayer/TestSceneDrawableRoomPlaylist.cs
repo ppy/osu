@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestNonEditableNonSelectable()
         {
-            createPlaylist(false, false);
+            createPlaylist();
 
             moveToItem(0);
             assertHandleVisibility(0, false);
@@ -61,7 +62,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestEditable()
         {
-            createPlaylist(true, false);
+            createPlaylist(p => p.AllowReordering = p.AllowDeletion = true);
 
             moveToItem(0);
             assertHandleVisibility(0, true);
@@ -74,7 +75,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestMarkInvalid()
         {
-            createPlaylist(true, true);
+            createPlaylist(p => p.AllowReordering = p.AllowDeletion = p.AllowSelection = true);
 
             AddStep("mark item 0 as invalid", () => playlist.Items[0].MarkInvalid());
 
@@ -87,7 +88,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestSelectable()
         {
-            createPlaylist(false, true);
+            createPlaylist(p => p.AllowSelection = true);
 
             moveToItem(0);
             assertHandleVisibility(0, false);
@@ -101,7 +102,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestEditableSelectable()
         {
-            createPlaylist(true, true);
+            createPlaylist(p => p.AllowReordering = p.AllowDeletion = p.AllowSelection = true);
 
             moveToItem(0);
             assertHandleVisibility(0, true);
@@ -115,7 +116,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestSelectionNotLostAfterRearrangement()
         {
-            createPlaylist(true, true);
+            createPlaylist(p => p.AllowReordering = p.AllowDeletion = p.AllowSelection = true);
 
             moveToItem(0);
             AddStep("click", () => InputManager.Click(MouseButton.Left));
@@ -180,7 +181,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create playlist", () =>
             {
-                Child = playlist = new TestPlaylist(false, false)
+                Child = playlist = new TestPlaylist
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -223,7 +224,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [TestCase(true)]
         public void TestWithOwner(bool withOwner)
         {
-            createPlaylist(false, false, withOwner);
+            createPlaylist(p => p.ShowItemOwners = withOwner);
 
             AddAssert("owner visible", () => playlist.ChildrenOfType<UpdateableAvatar>().All(a => a.IsPresent == withOwner));
         }
@@ -245,11 +246,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible",
                 () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
 
-        private void createPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
+        private void createPlaylist(Action<TestPlaylist> setupPlaylist)
         {
             AddStep("create playlist", () =>
             {
-                Child = playlist = new TestPlaylist(allowEdit, allowSelection, showItemOwner)
+                Child = playlist = new TestPlaylist
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -295,7 +296,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create playlist", () =>
             {
-                Child = playlist = new TestPlaylist(false, false)
+                Child = playlist = new TestPlaylist
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -328,27 +329,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private class TestPlaylist : DrawableRoomPlaylist
         {
             public new IReadOnlyDictionary<PlaylistItem, RearrangeableListItem<PlaylistItem>> ItemMap => base.ItemMap;
-
-            private readonly bool allowEdit;
-            private readonly bool allowSelection;
-            private readonly bool showItemOwner;
-
-            public TestPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
-            {
-                this.allowEdit = allowEdit;
-                this.allowSelection = allowSelection;
-                this.showItemOwner = showItemOwner;
-            }
-
-            protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => base.CreateOsuDrawable(item).With(d =>
-            {
-                var drawablePlaylistItem = (DrawableRoomPlaylistItem)d;
-
-                drawablePlaylistItem.AllowReordering = allowEdit;
-                drawablePlaylistItem.AllowDeletion = allowEdit;
-                drawablePlaylistItem.AllowSelection = allowSelection;
-                drawablePlaylistItem.ShowItemOwner = showItemOwner;
-            });
         }
     }
 }
