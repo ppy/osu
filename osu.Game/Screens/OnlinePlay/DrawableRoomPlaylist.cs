@@ -21,6 +21,11 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         public Action<PlaylistItem> DeletionRequested;
 
+        /// <summary>
+        /// Invoked to request showing the results for an item.
+        /// </summary>
+        public Action<PlaylistItem> ShowResultsRequested;
+
         private bool allowReordering;
 
         public bool AllowReordering
@@ -63,6 +68,20 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
+        private bool allowShowingResults;
+
+        public bool AllowShowingResults
+        {
+            get => allowShowingResults;
+            set
+            {
+                allowShowingResults = value;
+
+                foreach (var item in ListContainer.OfType<DrawableRoomPlaylistItem>())
+                    item.AllowShowingResults = value;
+            }
+        }
+
         private bool showItemOwners;
 
         public bool ShowItemOwners
@@ -94,7 +113,9 @@ namespace osu.Game.Screens.OnlinePlay
             AllowReordering = AllowReordering,
             AllowDeletion = AllowDeletion,
             AllowSelection = AllowSelection,
+            AllowShowingResults = AllowShowingResults,
             ShowItemOwner = ShowItemOwners,
+            ShowResultsRequested = i => ShowResultsRequested?.Invoke(i)
         };
     }
 }

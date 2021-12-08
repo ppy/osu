@@ -88,12 +88,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                 new Drawable[] { new OverlinedPlaylistHeader(), },
                                 new Drawable[]
                                 {
-                                    new DrawableRoomPlaylistWithResults
+                                    new DrawableRoomPlaylist
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Items = { BindTarget = Room.Playlist },
                                         SelectedItem = { BindTarget = SelectedItem },
-                                        RequestShowResults = item =>
+                                        AllowSelection = true,
+                                        AllowShowingResults = true,
+                                        ShowResultsRequested = item =>
                                         {
                                             Debug.Assert(RoomId.Value != null);
                                             ParentScreen?.Push(new PlaylistsResultsScreen(null, RoomId.Value.Value, item, false));

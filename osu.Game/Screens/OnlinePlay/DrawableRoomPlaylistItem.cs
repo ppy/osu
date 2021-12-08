@@ -41,6 +41,7 @@ namespace osu.Game.Screens.OnlinePlay
         public const float ICON_HEIGHT = 34;
 
         public Action<PlaylistItem> RequestDeletion;
+        public Action<PlaylistItem> ShowResultsRequested;
 
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
@@ -53,6 +54,7 @@ namespace osu.Game.Screens.OnlinePlay
         private FillFlowContainer buttonsFlow;
         private UpdateableAvatar ownerAvatar;
         private Drawable removeButton;
+        private Drawable showResultsButton;
 
         private readonly IBindable<bool> valid = new Bindable<bool>();
 
@@ -177,6 +179,20 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
+        private bool allowShowingResults;
+
+        public bool AllowShowingResults
+        {
+            get => allowShowingResults;
+            set
+            {
+                allowShowingResults = value;
+
+                if (showResultsButton != null)
+                    showResultsButton.Alpha = value ? 1 : 0;
+            }
+        }
+
         private bool showItemOwner;
 
         public bool ShowItemOwner
@@ -230,7 +246,7 @@ namespace osu.Game.Screens.OnlinePlay
             modDisplay.Current.Value = requiredMods.ToArray();
 
             buttonsFlow.Clear();
-            buttonsFlow.ChildrenEnumerable = CreateButtons();
+            buttonsFlow.ChildrenEnumerable = createButtons();
 
             difficultyIconContainer.FadeInFromZero(500, Easing.OutQuint);
             mainFillFlow.FadeInFromZero(500, Easing.OutQuint);
@@ -344,7 +360,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     Margin = new MarginPadding { Horizontal = 8 },
                                     AutoSizeAxes = Axes.Both,
                                     Spacing = new Vector2(5),
-                                    ChildrenEnumerable = CreateButtons().Select(button => button.With(b =>
+                                    ChildrenEnumerable = createButtons().Select(button => button.With(b =>
                                     {
                                         b.Anchor = Anchor.Centre;
                                         b.Origin = Anchor.Centre;
@@ -367,9 +383,14 @@ namespace osu.Game.Screens.OnlinePlay
             };
         }
 
-        protected virtual IEnumerable<Drawable> CreateButtons() =>
+        private IEnumerable<Drawable> createButtons() =>
             new[]
             {
+                showResultsButton = new ShowResultsButton
+                {
+                    Action = () => ShowResultsRequested?.Invoke(Item),
+                    Alpha = AllowShowingResults ? 1 : 0,
+                },
                 Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),
                 removeButton = new PlaylistRemoveButton
                 {
@@ -451,6 +472,23 @@ namespace osu.Game.Screens.OnlinePlay
                             .FadeTo(1, 500);
                         break;
                 }
+            }
+        }
+
+        private class ShowResultsButton : IconButton
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Icon = FontAwesome.Solid.ChartPie;
+                TooltipText = "View results";
+
+                Add(new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                    Colour = colours.Gray4,
+                });
             }
         }
 
