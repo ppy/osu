@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay
         /// <summary>
         /// Invoked when this item requests its results to be shown.
         /// </summary>
-        public Action<PlaylistItem> ShowResultsRequested;
+        public Action<PlaylistItem> RequestResults;
 
         /// <summary>
         /// The currently-selected item, used to show a border around this item.
@@ -410,7 +410,7 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 showResultsButton = new ShowResultsButton
                 {
-                    Action = () => ShowResultsRequested?.Invoke(Item),
+                    Action = () => RequestResults?.Invoke(Item),
                     Alpha = AllowShowingResults ? 1 : 0,
                 },
                 Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),

@@ -95,7 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                         SelectedItem = { BindTarget = SelectedItem },
                                         AllowSelection = true,
                                         AllowShowingResults = true,
-                                        ShowResultsRequested = item =>
+                                        RequestResults = item =>
                                         {
                                             Debug.Assert(RoomId.Value != null);
                                             ParentScreen?.Push(new PlaylistsResultsScreen(null, RoomId.Value.Value, item, false));
