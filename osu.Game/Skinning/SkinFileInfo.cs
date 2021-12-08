@@ -7,7 +7,7 @@ using osu.Game.IO;
 
 namespace osu.Game.Skinning
 {
-    public class SkinFileInfo : INamedFileInfo, IHasPrimaryKey
+    public class SkinFileInfo : INamedFileInfo, IHasPrimaryKey, INamedFileUsage
     {
         public int ID { get; set; }
 
@@ -15,11 +15,15 @@ namespace osu.Game.Skinning
 
         public int SkinInfoID { get; set; }
 
+        public EFSkinInfo SkinInfo { get; set; }
+
         public int FileInfoID { get; set; }
 
         public FileInfo FileInfo { get; set; }
 
         [Required]
         public string Filename { get; set; }
+
+        IFileInfo INamedFileUsage.File => FileInfo;
     }
 }

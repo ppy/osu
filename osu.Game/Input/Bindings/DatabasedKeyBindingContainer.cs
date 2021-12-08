@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Database;
 using osu.Game.Rulesets;
-using Realms;
 
 namespace osu.Game.Input.Bindings
 {
@@ -50,23 +49,20 @@ namespace osu.Game.Input.Bindings
 
         protected override void LoadComplete()
         {
-            if (ruleset == null || ruleset.ID.HasValue)
-            {
-                int? rulesetId = ruleset?.ID;
+            string rulesetName = ruleset?.ShortName;
 
-                realmKeyBindings = realmFactory.Context.All<RealmKeyBinding>()
-                                               .Where(b => b.RulesetID == rulesetId && b.Variant == variant);
+            realmKeyBindings = realmFactory.Context.All<RealmKeyBinding>()
+                                           .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
 
-                realmSubscription = realmKeyBindings
-                    .SubscribeForNotifications((sender, changes, error) =>
-                    {
-                        // first subscription ignored as we are handling this in LoadComplete.
-                        if (changes == null)
-                            return;
+            realmSubscription = realmKeyBindings
+                .QueryAsyncWithNotifications((sender, changes, error) =>
+                {
+                    // first subscription ignored as we are handling this in LoadComplete.
+                    if (changes == null)
+                        return;
 
-                        ReloadMappings();
-                    });
-            }
+                    ReloadMappings();
+                });
 
             base.LoadComplete();
         }

@@ -18,11 +18,13 @@ namespace osu.Game.Screens.OnlinePlay
 
         private readonly bool allowEdit;
         private readonly bool allowSelection;
+        private readonly bool showItemOwner;
 
-        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection)
+        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
         {
             this.allowEdit = allowEdit;
             this.allowSelection = allowSelection;
+            this.showItemOwner = showItemOwner;
         }
 
         protected override void LoadComplete()
@@ -35,7 +37,7 @@ namespace osu.Game.Screens.OnlinePlay
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Remove:
-                        if (args.OldItems.Contains(SelectedItem))
+                        if (allowSelection && args.OldItems.Contains(SelectedItem))
                             SelectedItem.Value = null;
                         break;
                 }
@@ -49,12 +51,10 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
-            LayoutDuration = 200,
-            LayoutEasing = Easing.OutQuint,
             Spacing = new Vector2(0, 2)
         };
 
-        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection)
+        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection, showItemOwner)
         {
             SelectedItem = { BindTarget = SelectedItem },
             RequestDeletion = requestDeletion
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void requestDeletion(PlaylistItem item)
         {
-            if (SelectedItem.Value == item)
+            if (allowSelection && SelectedItem.Value == item)
             {
                 if (Items.Count == 1)
                     SelectedItem.Value = null;

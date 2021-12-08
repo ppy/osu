@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
@@ -25,9 +23,9 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         private readonly List<Room> serverSideRooms = new List<Room>();
 
-        private int currentRoomId;
-        private int currentPlaylistItemId;
-        private int currentScoreId;
+        private int currentRoomId = 1;
+        private int currentPlaylistItemId = 1;
+        private int currentScoreId = 1;
 
         /// <summary>
         /// Handles an API request, while also updating the local state to match
@@ -50,7 +48,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     apiRoom.HasPassword.Value = !string.IsNullOrEmpty(createRoomRequest.Room.Password.Value);
                     apiRoom.Password.Value = createRoomRequest.Room.Password.Value;
 
-                    AddServerSideRoom(apiRoom);
+                    AddServerSideRoom(apiRoom, localUser);
 
                     var responseRoom = new APICreatedRoom();
                     responseRoom.CopyFrom(createResponseRoom(apiRoom, false));
@@ -89,15 +87,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     getRoomRequest.TriggerSuccess(createResponseRoom(ServerSideRooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId), true));
                     return true;
 
-                case GetBeatmapSetRequest getBeatmapSetRequest:
-                    var onlineReq = new GetBeatmapSetRequest(getBeatmapSetRequest.ID, getBeatmapSetRequest.Type);
-                    onlineReq.Success += res => getBeatmapSetRequest.TriggerSuccess(res);
-                    onlineReq.Failure += e => getBeatmapSetRequest.TriggerFailure(e);
-
-                    // Get the online API from the game's dependencies.
-                    game.Dependencies.Get<IAPIProvider>().Queue(onlineReq);
-                    return true;
-
                 case CreateRoomScoreRequest createRoomScoreRequest:
                     createRoomScoreRequest.TriggerSuccess(new APIScoreToken { ID = 1 });
                     return true;
@@ -125,11 +114,17 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// Adds a room to a local "server-side" list that's returned when a <see cref="GetRoomsRequest"/> is fired.
         /// </summary>
         /// <param name="room">The room.</param>
-        public void AddServerSideRoom(Room room)
+        /// <param name="host">The room host.</param>
+        public void AddServerSideRoom(Room room, APIUser host)
         {
             room.RoomID.Value ??= currentRoomId++;
+            room.Host.Value = host;
+
             for (int i = 0; i < room.Playlist.Count; i++)
+            {
                 room.Playlist[i].ID = currentPlaylistItemId++;
+                room.Playlist[i].OwnerID = room.Host.Value.OnlineID;
+            }
 
             serverSideRooms.Add(room);
         }

@@ -6,6 +6,8 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Database;
 using Realms;
 
+#nullable enable
+
 namespace osu.Game.Input.Bindings
 {
     [MapTo(nameof(KeyBinding))]
@@ -14,7 +16,7 @@ namespace osu.Game.Input.Bindings
         [PrimaryKey]
         public Guid ID { get; set; } = Guid.NewGuid();
 
-        public int? RulesetID { get; set; }
+        public string? RulesetName { get; set; }
 
         public int? Variant { get; set; }
 
@@ -34,6 +36,6 @@ namespace osu.Game.Input.Bindings
         public int ActionInt { get; set; }
 
         [MapTo(nameof(KeyCombination))]
-        public string KeyCombinationString { get; set; }
+        public string KeyCombinationString { get; set; } = string.Empty;
     }
 }

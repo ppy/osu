@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -24,8 +23,6 @@ namespace osu.Game.Scoring
         public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
-
-        protected override string ImportFromStablePath => Path.Combine("Data", "r");
 
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
@@ -70,19 +67,5 @@ namespace osu.Game.Scoring
         protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
             => base.CheckLocalAvailability(model, items)
                || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
-
-        public override void ExportModelTo(ScoreInfo model, Stream outputStream)
-        {
-            var file = model.Files.SingleOrDefault();
-            if (file == null)
-                return;
-
-            using (var inputStream = Files.Storage.GetStream(file.FileInfo.StoragePath))
-                inputStream.CopyTo(outputStream);
-        }
-
-        protected override IEnumerable<string> GetStableImportPaths(Storage storage)
-            => storage.GetFiles(ImportFromStablePath).Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false))
-                      .Select(path => storage.GetFullPath(path));
     }
 }

@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
-using osu.Game.IO;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
@@ -22,22 +20,17 @@ namespace osu.Game.Tests.Editing.Checks
         [SetUp]
         public void Setup()
         {
+            var file = CheckTestHelpers.CreateMockFile("jpg");
+
             check = new CheckBackgroundPresence();
             beatmap = new Beatmap<HitObject>
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    Metadata = new BeatmapMetadata { BackgroundFile = "abc123.jpg" },
+                    Metadata = new BeatmapMetadata { BackgroundFile = file.Filename },
                     BeatmapSet = new BeatmapSetInfo
                     {
-                        Files = new List<BeatmapSetFileInfo>(new[]
-                        {
-                            new BeatmapSetFileInfo
-                            {
-                                Filename = "abc123.jpg",
-                                FileInfo = new FileInfo { Hash = "abcdef" }
-                            }
-                        })
+                        Files = { file }
                     }
                 }
             };
