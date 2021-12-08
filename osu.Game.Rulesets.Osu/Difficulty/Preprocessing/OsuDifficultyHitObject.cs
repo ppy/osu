@@ -121,20 +121,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 //
                 // We'll try to better approximate the real movements a player will take in patterns following on from sliders. Consider the following slider-to-object patterns:
                 //
-                // 1.  <======o==>
+                // 1.  <======x==>
                 //            | /
-                //            o
+                //            x
                 //
-                // 2.  <======o==>---o
+                // 2.  <======x==>---x
                 //            |______|
                 //
-                // Where "<==>" represents a slider, and "o" represents where the cursor needs to be for either hitobject (for a slider, this is the lazy cursor position).
+                // Where "<==>" represents a slider, and "x" represents where the cursor needs to be for either hitobject (for a slider, this is the lazy cursor position).
                 //
-                // The pattern (o--o) has distance JumpDistance.
-                // The pattern (>--o) is a new distance we'll call "tailJumpDistance".
+                // The pattern (x--x) has distance JumpDistance.
+                // The pattern (>--x) is a new distance we'll call "tailJumpDistance".
                 //
-                // Case (1) is an anti-flow pattern, where players will cut the slider short in order to move to the next object. The most natural jump pattern is (o--o).
-                // Case (2) is a flow pattern, where players will follow the slider through to its visual extent. The most natural jump pattern is (>--o).
+                // Case (1) is an anti-flow pattern, where players will cut the slider short in order to move to the next object. The most natural jump pattern is (x--x).
+                // Case (2) is a flow pattern, where players will follow the slider through to its visual extent. The most natural jump pattern is (>--x).
                 //
                 // A lenience is applied by assuming that the player jumps the minimum of these two distances in all cases.
                 //
