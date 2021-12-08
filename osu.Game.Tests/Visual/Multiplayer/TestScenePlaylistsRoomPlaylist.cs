@@ -180,8 +180,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             public new IReadOnlyDictionary<PlaylistItem, RearrangeableListItem<PlaylistItem>> ItemMap => base.ItemMap;
 
             public TestPlaylist()
-                : base(true, true, true)
             {
+                AllowSelection = true;
             }
         }
     }

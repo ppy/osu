@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,6 +21,61 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         public Action<PlaylistItem> DeletionRequested;
 
+        private bool allowReordering;
+
+        public bool AllowReordering
+        {
+            get => allowReordering;
+            set
+            {
+                allowReordering = value;
+
+                foreach (var item in ListContainer.OfType<DrawableRoomPlaylistItem>())
+                    item.AllowReordering = value;
+            }
+        }
+
+        private bool allowDeletion;
+
+        public bool AllowDeletion
+        {
+            get => allowDeletion;
+            set
+            {
+                allowDeletion = value;
+
+                foreach (var item in ListContainer.OfType<DrawableRoomPlaylistItem>())
+                    item.AllowDeletion = value;
+            }
+        }
+
+        private bool allowSelection;
+
+        public bool AllowSelection
+        {
+            get => allowSelection;
+            set
+            {
+                allowSelection = value;
+
+                foreach (var item in ListContainer.OfType<DrawableRoomPlaylistItem>())
+                    item.AllowSelection = value;
+            }
+        }
+
+        private bool showItemOwners;
+
+        public bool ShowItemOwners
+        {
+            get => showItemOwners;
+            set
+            {
+                showItemOwners = value;
+
+                foreach (var item in ListContainer.OfType<DrawableRoomPlaylistItem>())
+                    item.ShowItemOwner = value;
+            }
+        }
 
         protected override ScrollContainer<Drawable> CreateScrollContainer() => base.CreateScrollContainer().With(d =>
         {
@@ -35,6 +91,10 @@ namespace osu.Game.Screens.OnlinePlay
         {
             SelectedItem = { BindTarget = SelectedItem },
             RequestDeletion = i => DeletionRequested?.Invoke(i),
+            AllowReordering = AllowReordering,
+            AllowDeletion = AllowDeletion,
+            AllowSelection = AllowSelection,
+            ShowItemOwner = ShowItemOwners,
         };
     }
 }
