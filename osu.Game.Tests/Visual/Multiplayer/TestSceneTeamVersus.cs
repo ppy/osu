@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("change to team vs", () => client.ChangeSettings(matchType: MatchType.TeamVersus));
 
-            AddAssert("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
+            AddUntilStep("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
 
             AddUntilStep("team displays are displaying teams", () => multiplayerScreenStack.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam != null));
         }
