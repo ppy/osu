@@ -131,16 +131,18 @@ namespace osu.Game.Screens.OnlinePlay
             Spacing = new Vector2(0, 2)
         };
 
-        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item)
+        protected sealed override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => CreateDrawablePlaylistItem(item).With(d =>
         {
-            SelectedItem = { BindTarget = SelectedItem },
-            RequestDeletion = i => DeletionRequested?.Invoke(i),
-            AllowReordering = AllowReordering,
-            AllowDeletion = AllowDeletion,
-            AllowSelection = AllowSelection,
-            AllowShowingResults = AllowShowingResults,
-            ShowItemOwner = ShowItemOwners,
-            ShowResultsRequested = i => ShowResultsRequested?.Invoke(i)
-        };
+            d.SelectedItem.BindTarget = SelectedItem;
+            d.RequestDeletion = i => DeletionRequested?.Invoke(i);
+            d.AllowReordering = AllowReordering;
+            d.AllowDeletion = AllowDeletion;
+            d.AllowSelection = AllowSelection;
+            d.AllowShowingResults = AllowShowingResults;
+            d.ShowItemOwner = ShowItemOwners;
+            d.ShowResultsRequested = i => ShowResultsRequested?.Invoke(i);
+        });
+
+        protected virtual DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new DrawableRoomPlaylistItem(item);
     }
 }
